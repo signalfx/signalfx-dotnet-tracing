@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -20,6 +21,11 @@ namespace Datadog.Trace.Configuration
         /// The default port value for <see cref="AgentUri"/>.
         /// </summary>
         public const int DefaultAgentPort = 8126;
+
+        /// <summary>
+        /// The default API for <see cref="ApiType"/>.
+        /// </summary>
+        public const string DefaultApiType = "dd";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TracerSettings"/> class with default values.
@@ -72,6 +78,8 @@ namespace Datadog.Trace.Configuration
                            $"http://{agentHost}:{agentPort}";
 
             AgentUri = new Uri(agentUri);
+
+            ApiType = source?.GetString(ConfigurationKeys.ApiType) ?? DefaultApiType;
 
             AnalyticsEnabled = source?.GetBool(ConfigurationKeys.GlobalAnalyticsEnabled) ??
                                // default value
@@ -140,6 +148,12 @@ namespace Datadog.Trace.Configuration
         /// <seealso cref="ConfigurationKeys.AgentHost"/>
         /// <seealso cref="ConfigurationKeys.AgentPort"/>
         public Uri AgentUri { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating API type
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.ApiType"/>
+        public string ApiType { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether default Analytics are enabled.

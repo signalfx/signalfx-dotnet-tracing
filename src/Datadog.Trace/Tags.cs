@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 
 namespace Datadog.Trace
@@ -48,6 +49,21 @@ namespace Datadog.Trace
         /// The status code of an HTTP response
         /// </summary>
         public const string HttpStatusCode = "http.status_code";
+
+        /// <summary>
+        /// The span.Resource for span encoding without applicable field.
+        /// </summary>
+        public const string ResourceName = "resource.name";
+
+        /// <summary>
+        /// The span.Type for span encoding without applicable field.
+        /// </summary>
+        public const string SpanType = "span.type";
+
+        /// <summary>
+        /// Whether a span denotes an error.
+        /// </summary>
+        public const string Error = "error";
 
         /// <summary>
         /// The error message of an exception

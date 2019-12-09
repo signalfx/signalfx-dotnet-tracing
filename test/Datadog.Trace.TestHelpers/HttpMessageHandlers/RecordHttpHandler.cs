@@ -1,10 +1,14 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MsgPack;
+using Newtonsoft.Json.Linq;
 
 namespace Datadog.Trace.TestHelpers.HttpMessageHandlers
 {
@@ -33,6 +37,19 @@ namespace Datadog.Trace.TestHelpers.HttpMessageHandlers
             .Where(x => x.Item1.RequestUri.ToString().Contains("/v0.4/traces"))
             .Select(x => Unpacking.UnpackObject(x.Item2).Value.AsList())
             .ToList();
+
+        public List<JToken> ZipkinTraces => Requests
+            .Where(x => x.Item1.RequestUri.ToString().Contains("/v1/trace"))
+            .Select(x =>
+                {
+                    string item;
+                    using (StreamReader reader = new StreamReader(new MemoryStream(x.Item2), Encoding.UTF8))
+                    {
+                        item = reader.ReadToEnd();
+                    }
+                    JToken parsed = JToken.Parse(item);
+                    return parsed;
+                }).ToList();
 
         public List<MessagePackObjectDictionary> Services => Requests
             .Where(x => x.Item1.RequestUri.ToString().Contains("/v0.4/services"))

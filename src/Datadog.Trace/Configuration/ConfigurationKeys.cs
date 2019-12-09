@@ -1,3 +1,4 @@
+// Modified by SignalFx
 namespace Datadog.Trace.Configuration
 {
     /// <summary>
@@ -70,6 +71,13 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="TracerSettings.AgentUri"/>
         public const string AgentUri = "DD_TRACE_AGENT_URL";
+
+        /// <summary>
+        /// Configuration key for the formatting API the Tracer uses to encode traces.
+        /// Default value is "dd".
+        /// </summary>
+        /// <seealso cref="TracerSettings.ApiType"/>
+        public const string ApiType = "SIGNALFX_API_TYPE";
 
         /// <summary>
         /// Configuration key for enabling or disabling default Analytics.
