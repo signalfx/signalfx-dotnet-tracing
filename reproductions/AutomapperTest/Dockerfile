@@ -1,3 +1,4 @@
+# Modified by SignalFx
 FROM mcr.microsoft.com/dotnet/core/runtime:2.1-stretch-slim AS base
 ARG TRACER_VERSION=1.10.0
 RUN mkdir -p /opt/datadog
@@ -5,7 +6,7 @@ RUN mkdir -p /var/log/datadog
 RUN curl -L https://github.com/DataDog/dd-trace-dotnet/releases/download/v$TRACER_VERSION/datadog-dotnet-apm-$TRACER_VERSION.tar.gz | tar xzf - -C /opt/datadog
 
 ENV CORECLR_ENABLE_PROFILING=1
-ENV CORECLR_PROFILER={846F5F1C-F9AE-4B07-969E-05C26BC060D8}
+ENV CORECLR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}
 ENV CORECLR_PROFILER_PATH=/opt/datadog/Datadog.Trace.ClrProfiler.Native.so
 ENV DD_DOTNET_TRACER_HOME=/opt/datadog
 ENV DD_INTEGRATIONS=/opt/datadog/integrations.json

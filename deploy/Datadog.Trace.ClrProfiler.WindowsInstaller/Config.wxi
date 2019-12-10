@@ -1,3 +1,4 @@
+<!-- Modified by SignalFx -->
 <?xml version="1.0" encoding="utf-8"?>
 
 <Include>
@@ -8,7 +9,7 @@
   <?define ManagedDllPath = "$(sys.CURRENTDIR)..\..\src\bin\managed-publish" ?>
   <?define NativeDllPath = "$(sys.CURRENTDIR)..\..\src\Datadog.Trace.ClrProfiler.Native\bin\$(var.Configuration)\$(var.Platform)" ?>
   <?define NativeDll32Path = "$(sys.CURRENTDIR)..\..\src\Datadog.Trace.ClrProfiler.Native\bin\$(var.Configuration)\x86" ?>
-  <?define ProfilerCLSID = "{846F5F1C-F9AE-4B07-969E-05C26BC060D8}" ?>
+  <?define ProfilerCLSID = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}" ?>
 
   <?if $(var.Platform) = x64 ?>
   <?define ProductName = "Datadog $(var.BaseProductName) 64-bit" ?>

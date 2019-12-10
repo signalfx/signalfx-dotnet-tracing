@@ -12,7 +12,7 @@ namespace Datadog.Trace.TestHelpers
 {
     public class EnvironmentHelper
     {
-        public const string ProfilerClsId = "{846F5F1C-F9AE-4B07-969E-05C26BC060D8}";
+        public const string ProfilerClsId = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}";
         public const string DotNetFramework = ".NETFramework";
         public const string CoreFramework = ".NETCoreApp";
 

@@ -1,4 +1,5 @@
 @echo off
+rem Modified by SignalFx
 rem This batch script sets up the development environment
 rem by enabling the Profiler API and starting Visual Studio.
 rem Any process started by VS will inherit the environment variables,
@@ -39,12 +40,12 @@ echo Enabling profiler for "%profiler_configuration%/%profiler_platform%".
 
 rem Enable .NET Framework Profiling API
 SET COR_ENABLE_PROFILING=1
-SET COR_PROFILER={846F5F1C-F9AE-4B07-969E-05C26BC060D8}
+SET COR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}
 SET COR_PROFILER_PATH=%~dp0\src\Datadog.Trace.ClrProfiler.Native\bin\%profiler_configuration%\%profiler_platform%\Datadog.Trace.ClrProfiler.Native.dll
 
 rem Enable .NET Core Profiling API
 SET CORECLR_ENABLE_PROFILING=1
-SET CORECLR_PROFILER={846F5F1C-F9AE-4B07-969E-05C26BC060D8}
+SET CORECLR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}
 SET CORECLR_PROFILER_PATH=%~dp0\src\Datadog.Trace.ClrProfiler.Native\bin\%profiler_configuration%\%profiler_platform%\Datadog.Trace.ClrProfiler.Native.dll
 
 rem Don't attach the profiler to these processes
