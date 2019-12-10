@@ -19,7 +19,7 @@ namespace Datadog.Trace
     /// </summary>
     public class Tracer : IDatadogTracer
     {
-        private const string UnknownServiceName = "UnknownService";
+        private const string UnknownServiceName = "unnamed-dotnet-service";
 
         private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.For<Tracer>();
 

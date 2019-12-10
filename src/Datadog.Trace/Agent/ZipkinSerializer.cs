@@ -84,7 +84,8 @@ namespace Datadog.Trace.Agent
 
             public Dictionary<string, string> LocalEndpoint
             {
-                get => new Dictionary<string, string>() { { "serviceName", _span.ServiceName } };
+                // Don't allow overriding service name per span
+                get => new Dictionary<string, string>() { { "serviceName", Tracer.Instance.DefaultServiceName } };
             }
 
             public IDictionary<string, string> Tags

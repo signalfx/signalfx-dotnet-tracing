@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Datadog.Trace;
 using Datadog.Trace.ExtensionMethods;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -84,7 +85,7 @@ namespace Datadog.Trace.TestHelpers
 
             Assert.Equal(expected.OperationName, actual.OperationName());
             Assert.Equal(expected.ResourceName, actual.ResourceName());
-            Assert.Equal(expected.ServiceName, actual.ServiceName());
+            Assert.Equal(Tracer.Instance.DefaultServiceName, actual.ServiceName());
             Assert.Equal(expected.Type, actual.Type());
             Assert.Equal(expected.StartTime.ToUnixTimeMicroseconds(), actual.StartTime());
             Assert.Equal(expected.Duration.ToMicroseconds(), actual.Duration());
