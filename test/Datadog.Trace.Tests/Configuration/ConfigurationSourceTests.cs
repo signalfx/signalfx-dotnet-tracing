@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -52,25 +53,25 @@ namespace Datadog.Trace.Tests.Configuration
         // JsonConfigurationSource needs to be tested with JSON data, which cannot be used with the other IConfigurationSource implementations.
         public static IEnumerable<object[]> GetJsonTestData()
         {
-            yield return new object[] { @"{ ""DD_TRACE_GLOBAL_TAGS"": { ""name1"":""value1"", ""name2"": ""value2""} }", CreateFunc(s => s.GlobalTags.Count), 2 };
+            yield return new object[] { @"{ ""SIGNALFX_TRACE_GLOBAL_TAGS"": { ""name1"":""value1"", ""name2"": ""value2""} }", CreateFunc(s => s.GlobalTags.Count), 2 };
         }
 
         public static IEnumerable<object[]> GetBadJsonTestData1()
         {
             // Extra opening brace
-            yield return new object[] { @"{ ""DD_TRACE_GLOBAL_TAGS"": { { ""name1"":""value1"", ""name2"": ""value2""} }" };
+            yield return new object[] { @"{ ""SIGNALFX_TRACE_GLOBAL_TAGS"": { { ""name1"":""value1"", ""name2"": ""value2""} }" };
         }
 
         public static IEnumerable<object[]> GetBadJsonTestData2()
         {
             // Missing closing brace
-            yield return new object[] { @"{ ""DD_TRACE_GLOBAL_TAGS"": { ""name1"":""value1"", ""name2"": ""value2"" }" };
+            yield return new object[] { @"{ ""SIGNALFX_TRACE_GLOBAL_TAGS"": { ""name1"":""value1"", ""name2"": ""value2"" }" };
         }
 
         public static IEnumerable<object[]> GetBadJsonTestData3()
         {
             // Json doesn't represent dictionary of string to string
-            yield return new object[] { @"{ ""DD_TRACE_GLOBAL_TAGS"": { ""name1"": { ""name2"": [ ""vers"" ] } } }", CreateFunc(s => s.GlobalTags.Count), 0 };
+            yield return new object[] { @"{ ""SIGNALFX_TRACE_GLOBAL_TAGS"": { ""name1"": { ""name2"": [ ""vers"" ] } } }", CreateFunc(s => s.GlobalTags.Count), 0 };
         }
 
         public static Func<TracerSettings, object> CreateFunc(Func<TracerSettings, object> settingGetter)

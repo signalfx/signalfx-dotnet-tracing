@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -270,18 +271,18 @@ namespace Datadog.Trace.Tests
         [InlineData(null, null, "http://localhost:8126")]
         public void SetHostAndPortEnvironmentVariables(string host, string port, string expectedUri)
         {
-            string originalHost = Environment.GetEnvironmentVariable("DD_AGENT_HOST");
-            string originalPort = Environment.GetEnvironmentVariable("DD_TRACE_AGENT_PORT");
+            string originalHost = Environment.GetEnvironmentVariable("SIGNALFX_AGENT_HOST");
+            string originalPort = Environment.GetEnvironmentVariable("SIGNALFX_TRACE_AGENT_PORT");
 
-            Environment.SetEnvironmentVariable("DD_AGENT_HOST", host);
-            Environment.SetEnvironmentVariable("DD_TRACE_AGENT_PORT", port);
+            Environment.SetEnvironmentVariable("SIGNALFX_AGENT_HOST", host);
+            Environment.SetEnvironmentVariable("SIGNALFX_TRACE_AGENT_PORT", port);
 
             var settings = new TracerSettings(new EnvironmentConfigurationSource());
             Assert.Equal(new Uri(expectedUri), settings.AgentUri);
 
             // reset the environment variables to their original values (if any) when done
-            Environment.SetEnvironmentVariable("DD_AGENT_HOST", originalHost);
-            Environment.SetEnvironmentVariable("DD_TRACE_AGENT_PORT", originalPort);
+            Environment.SetEnvironmentVariable("SIGNALFX_AGENT_HOST", originalHost);
+            Environment.SetEnvironmentVariable("SIGNALFX_TRACE_AGENT_PORT", originalPort);
         }
 
         [Theory]
@@ -289,7 +290,7 @@ namespace Datadog.Trace.Tests
         [InlineData("test")]
         public void SetEnvEnvironmentVariable(string env)
         {
-            var name = "DD_ENV";
+            var name = "SIGNALFX_ENV";
             string originalEnv = Environment.GetEnvironmentVariable(name);
 
             // Tracer reads settings when created,
@@ -318,7 +319,7 @@ namespace Datadog.Trace.Tests
         [InlineData("envService", "tracerService", "spanService", "spanService")]
         public void SetServiceName(string envServiceName, string tracerServiceName, string spanServiceName, string expectedServiceName)
         {
-            var name = "DD_SERVICE_NAME";
+            var name = "SIGNALFX_SERVICE_NAME";
             string originalEnv = Environment.GetEnvironmentVariable(name);
             Environment.SetEnvironmentVariable(name, envServiceName);
 

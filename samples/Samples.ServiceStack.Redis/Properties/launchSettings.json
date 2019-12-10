@@ -12,8 +12,8 @@
         "CORECLR_PROFILER": "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}",
         "CORECLR_PROFILER_PATH": "$(ProjectDir)$(OutputPath)profiler-lib\\Datadog.Trace.ClrProfiler.Native.dll",
 
-        "DD_DOTNET_TRACER_HOME": "$(ProjectDir)$(OutputPath)profiler-lib",
-        "DD_INTEGRATIONS": "$(ProjectDir)$(OutputPath)profiler-lib\\integrations.json"
+        "SIGNALFX_DOTNET_TRACER_HOME": "$(ProjectDir)$(OutputPath)profiler-lib",
+        "SIGNALFX_INTEGRATIONS": "$(ProjectDir)$(OutputPath)profiler-lib\\integrations.json"
       },
       "nativeDebugging": true
     }

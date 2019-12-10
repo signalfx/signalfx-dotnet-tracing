@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -36,14 +37,14 @@ namespace Datadog.Trace.Logging
                     MinimumLogEventLevel = LogEventLevel.Verbose;
                 }
 
-                var maxLogSizeVar = Environment.GetEnvironmentVariable("DD_MAX_LOGFILE_SIZE");
+                var maxLogSizeVar = Environment.GetEnvironmentVariable("SIGNALFX_MAX_LOGFILE_SIZE");
                 if (long.TryParse(maxLogSizeVar, out var maxLogSize))
                 {
                     // No verbose or debug logs
                     MaxLogFileSize = maxLogSize;
                 }
 
-                var nativeLogFile = Environment.GetEnvironmentVariable("DD_TRACE_LOG_PATH");
+                var nativeLogFile = Environment.GetEnvironmentVariable("SIGNALFX_TRACE_LOG_PATH");
                 string logDirectory = null;
 
                 if (!string.IsNullOrEmpty(nativeLogFile))

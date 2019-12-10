@@ -62,7 +62,7 @@ namespace Datadog.Trace.Configuration
 
             var agentHost = source?.GetString(ConfigurationKeys.AgentHost) ??
                             // backwards compatibility for names used in the past
-                            source?.GetString("DD_TRACE_AGENT_HOSTNAME") ??
+                            source?.GetString("SIGNALFX_TRACE_AGENT_HOSTNAME") ??
                             source?.GetString("DATADOG_TRACE_AGENT_HOSTNAME") ??
                             // default value
                             DefaultAgentHost;

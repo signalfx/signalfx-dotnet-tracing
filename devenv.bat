@@ -49,11 +49,11 @@ SET CORECLR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}
 SET CORECLR_PROFILER_PATH=%~dp0\src\Datadog.Trace.ClrProfiler.Native\bin\%profiler_configuration%\%profiler_platform%\Datadog.Trace.ClrProfiler.Native.dll
 
 rem Don't attach the profiler to these processes
-SET DD_PROFILER_EXCLUDE_PROCESSES=devenv.exe;Microsoft.ServiceHub.Controller.exe;ServiceHub.Host.CLR.exe;sqlservr.exe;VBCSCompiler.exe;iisexpresstray.exe;msvsmon.exe
+SET SIGNALFX_PROFILER_EXCLUDE_PROCESSES=devenv.exe;Microsoft.ServiceHub.Controller.exe;ServiceHub.Host.CLR.exe;sqlservr.exe;VBCSCompiler.exe;iisexpresstray.exe;msvsmon.exe
 
 rem Set dotnet tracer home path
-SET DD_DOTNET_TRACER_HOME=%~dp0
-SET DD_INTEGRATIONS=%DD_DOTNET_TRACER_HOME%\integrations.json
+SET SIGNALFX_DOTNET_TRACER_HOME=%~dp0
+SET SIGNALFX_INTEGRATIONS=%SIGNALFX_DOTNET_TRACER_HOME%\integrations.json
 
 if "%start_visual_studio%" == "true" (
     echo Starting Visual Studio...

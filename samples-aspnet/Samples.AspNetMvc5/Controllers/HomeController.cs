@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace Samples.AspNetMvc5.Controllers
     {
         public ActionResult Index()
         {
-            var prefixes = new[] { "COR_", "CORECLR_", "DD_", "DATADOG_" };
+            var prefixes = new[] { "COR_", "CORECLR_", "SIGNALFX_", "DATADOG_" };
 
             var envVars = from envVar in Environment.GetEnvironmentVariables().Cast<DictionaryEntry>()
                           from prefix in prefixes

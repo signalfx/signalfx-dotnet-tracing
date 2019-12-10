@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,7 +32,7 @@ namespace Samples.GraphQL
             var logger = host.Services.GetRequiredService<ILogger<Program>>();
             logger.LogInformation($"Instrumentation.ProfilerAttached = {Instrumentation.ProfilerAttached}");
 
-            var prefixes = new[] { "COR_", "CORECLR_", "DD_", "DATADOG_" };
+            var prefixes = new[] { "COR_", "CORECLR_", "SIGNALFX_", "DATADOG_" };
             var envVars = from envVar in Environment.GetEnvironmentVariables().Cast<DictionaryEntry>()
                           from prefix in prefixes
                           let key = (envVar.Key as string)?.ToUpperInvariant()

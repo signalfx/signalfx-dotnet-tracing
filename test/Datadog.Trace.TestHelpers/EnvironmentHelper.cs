@@ -157,10 +157,10 @@ namespace Datadog.Trace.TestHelpers
                 "COR_PROFILER_PATH",
 
                 // Datadog
-                "DD_PROFILER_PROCESSES",
-                "DD_DOTNET_TRACER_HOME",
-                "DD_INTEGRATIONS",
-                "DD_DISABLED_INTEGRATIONS",
+                "SIGNALFX_PROFILER_PROCESSES",
+                "SIGNALFX_DOTNET_TRACER_HOME",
+                "SIGNALFX_INTEGRATIONS",
+                "SIGNALFX_DISABLED_INTEGRATIONS",
                 "DATADOG_PROFILER_PROCESSES",
                 "DATADOG_INTEGRATIONS",
 
@@ -191,7 +191,7 @@ namespace Datadog.Trace.TestHelpers
 
                 profilerPath = GetProfilerPath();
                 environmentVariables["CORECLR_PROFILER_PATH"] = profilerPath;
-                environmentVariables["DD_DOTNET_TRACER_HOME"] = Path.GetDirectoryName(profilerPath);
+                environmentVariables["SIGNALFX_DOTNET_TRACER_HOME"] = Path.GetDirectoryName(profilerPath);
             }
             else
             {
@@ -200,22 +200,22 @@ namespace Datadog.Trace.TestHelpers
 
                 profilerPath = GetProfilerPath();
                 environmentVariables["COR_PROFILER_PATH"] = profilerPath;
-                environmentVariables["DD_DOTNET_TRACER_HOME"] = Path.GetDirectoryName(profilerPath);
+                environmentVariables["SIGNALFX_DOTNET_TRACER_HOME"] = Path.GetDirectoryName(profilerPath);
 
                 processName = Path.GetFileName(processPath);
             }
 
             if (DebugModeEnabled)
             {
-                environmentVariables["DD_TRACE_DEBUG"] = "1";
+                environmentVariables["SIGNALFX_TRACE_DEBUG"] = "1";
             }
 
-            environmentVariables["DD_PROFILER_PROCESSES"] = processName;
+            environmentVariables["SIGNALFX_PROFILER_PROCESSES"] = processName;
 
             string integrations = string.Join(";", GetIntegrationsFilePaths());
-            environmentVariables["DD_INTEGRATIONS"] = integrations;
-            environmentVariables["DD_TRACE_AGENT_HOSTNAME"] = "localhost";
-            environmentVariables["DD_TRACE_AGENT_PORT"] = agentPort.ToString();
+            environmentVariables["SIGNALFX_INTEGRATIONS"] = integrations;
+            environmentVariables["SIGNALFX_TRACE_AGENT_HOSTNAME"] = "localhost";
+            environmentVariables["SIGNALFX_TRACE_AGENT_PORT"] = agentPort.ToString();
 
             environmentVariables["SIGNALFX_API_TYPE"] = "dd";
 
@@ -233,7 +233,7 @@ namespace Datadog.Trace.TestHelpers
 
             if (_disabledIntegrations != null)
             {
-                environmentVariables["DD_DISABLED_INTEGRATIONS"] = _disabledIntegrations;
+                environmentVariables["SIGNALFX_DISABLED_INTEGRATIONS"] = _disabledIntegrations;
             }
         }
 
