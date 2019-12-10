@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,7 +19,7 @@ namespace Datadog.Trace
     /// </summary>
     public class Tracer : IDatadogTracer
     {
-        private const string UnknownServiceName = "UnknownService";
+        private const string UnknownServiceName = "unnamed-dotnet-service";
 
         private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.For<Tracer>();
 
@@ -78,8 +79,16 @@ namespace Datadog.Trace
                 Statsd = statsd ?? CreateDogStatsdClient(Settings, DefaultServiceName);
             }
 
-            // fall back to default implementations of each dependency if not provided
-            IApi apiClient = new Api(Settings.AgentUri, delegatingHandler: null, Statsd);
+            IApi apiClient;
+            if (Settings.ApiType.ToLower().Equals("zipkin"))
+            {
+                apiClient = new ZipkinApi(Settings.AgentUri, delegatingHandler: null, Statsd);
+            }
+            else
+            {
+                apiClient = new Api(Settings.AgentUri, delegatingHandler: null, Statsd);
+            }
+
             _agentWriter = agentWriter ?? new AgentWriter(apiClient, Statsd);
             _scopeManager = scopeManager ?? new AsyncLocalScopeManager();
             Sampler = sampler ?? new RuleBasedSampler(new RateLimiter(Settings.MaxTracesSubmittedPerSecond));
