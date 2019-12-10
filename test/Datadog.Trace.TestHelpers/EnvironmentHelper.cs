@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Specialized;
 using System.IO;
@@ -294,7 +295,7 @@ namespace Datadog.Trace.TestHelpers
                                        ? "dll"
                                        : "so";
 
-                string fileName = $"Datadog.Trace.ClrProfiler.Native.{extension}";
+                string fileName = $"SignalFx.Tracing.ClrProfiler.Native.{extension}";
 
                 var directory = GetSampleApplicationOutputDirectory();
 

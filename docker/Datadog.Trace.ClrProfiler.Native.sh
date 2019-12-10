@@ -1,4 +1,5 @@
 #!/bin/bash
+# Modified by SignalFx
 set -euxo pipefail
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
@@ -12,7 +13,7 @@ mkdir -p obj/Debug/x64
 (cd obj/Debug/x64 && cmake ../../.. && make)
 
 mkdir -p bin/Debug/x64
-cp -f obj/Debug/x64/Datadog.Trace.ClrProfiler.Native.so bin/Debug/x64/Datadog.Trace.ClrProfiler.Native.so
+cp -f obj/Debug/x64/Datadog.Trace.ClrProfiler.Native.so bin/Debug/x64/SignalFx.Tracing.ClrProfiler.Native.so
 
 mkdir -p bin/Debug/x64/netstandard2.0
 cp -f $PUBLISH_OUTPUT/*.dll bin/Debug/x64/netstandard2.0/

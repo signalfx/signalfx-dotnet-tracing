@@ -1,4 +1,5 @@
 #!/bin/bash
+# Modified by SignalFx
 set -euxo pipefail
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
@@ -13,14 +14,14 @@ for pkgtype in deb rpm tar ; do
         -f \
         -s dir \
         -t $pkgtype \
-        -n datadog-dotnet-apm \
+        -n signalfx-dotnet-tracing \
         -v $VERSION \
-        $(if [ $pkgtype != 'tar' ] ; then echo --prefix /opt/datadog ; fi) \
+        $(if [ $pkgtype != 'tar' ] ; then echo --prefix /opt/signalfx-dotnet-tracing ; fi) \
         --chdir $DIR/../src/Datadog.Trace.ClrProfiler.Native/bin/Debug/x64 \
         netstandard2.0/ \
-        Datadog.Trace.ClrProfiler.Native.so \
+        SignalFx.Tracing.ClrProfiler.Native.so \
         integrations.json
 done
 
-gzip -f datadog-dotnet-apm.tar
-mv datadog-dotnet-apm.tar.gz datadog-dotnet-apm-$VERSION.tar.gz
+gzip -f signalfx-dotnet-tracing.tar
+mv signalfx-dotnet-tracing.tar.gz signalfx-dotnet-tracing-$VERSION.tar.gz
