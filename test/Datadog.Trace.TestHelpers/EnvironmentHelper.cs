@@ -162,6 +162,9 @@ namespace Datadog.Trace.TestHelpers
                 "DD_DISABLED_INTEGRATIONS",
                 "DATADOG_PROFILER_PROCESSES",
                 "DATADOG_INTEGRATIONS",
+
+                // SignalFx
+                "SIGNALFX_API_TYPE",
             };
 
             foreach (string variable in environmentVariables)
@@ -212,6 +215,8 @@ namespace Datadog.Trace.TestHelpers
             environmentVariables["DD_INTEGRATIONS"] = integrations;
             environmentVariables["DD_TRACE_AGENT_HOSTNAME"] = "localhost";
             environmentVariables["DD_TRACE_AGENT_PORT"] = agentPort.ToString();
+
+            environmentVariables["SIGNALFX_API_TYPE"] = "dd";
 
             // for ASP.NET Core sample apps, set the server's port
             environmentVariables["ASPNETCORE_URLS"] = $"http://localhost:{aspNetCorePort}/";

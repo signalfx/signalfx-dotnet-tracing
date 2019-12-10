@@ -79,14 +79,17 @@ namespace Datadog.Trace
                 Statsd = statsd ?? CreateDogStatsdClient(Settings, DefaultServiceName);
             }
 
-            IApi apiClient;
-            if (Settings.ApiType.ToLower().Equals("zipkin"))
+            IApi apiClient = null;
+            if (agentWriter == null)
             {
-                apiClient = new ZipkinApi(Settings.AgentUri, delegatingHandler: null, Statsd);
-            }
-            else
-            {
-                apiClient = new Api(Settings.AgentUri, delegatingHandler: null, Statsd);
+                if (Settings.ApiType.ToLower().Equals("zipkin"))
+                {
+                    apiClient = new ZipkinApi(Settings.AgentUri, delegatingHandler: null, Statsd);
+                }
+                else
+                {
+                    apiClient = new Api(Settings.AgentUri, delegatingHandler: null, Statsd);
+                }
             }
 
             _agentWriter = agentWriter ?? new AgentWriter(apiClient, Statsd);

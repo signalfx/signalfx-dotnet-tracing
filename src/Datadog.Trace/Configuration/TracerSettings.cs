@@ -25,7 +25,7 @@ namespace Datadog.Trace.Configuration
         /// <summary>
         /// The default API for <see cref="ApiType"/>.
         /// </summary>
-        public const string DefaultApiType = "dd";
+        public const string DefaultApiType = "zipkin";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TracerSettings"/> class with default values.
