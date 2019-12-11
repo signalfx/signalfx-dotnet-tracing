@@ -25,6 +25,7 @@ namespace Datadog.Trace.Agent
             _client = delegatingHandler == null
                           ? new HttpClient()
                           : new HttpClient(delegatingHandler);
+            _client.DefaultRequestHeaders.Add(HttpHeaderNames.TracingEnabled, "false");
         }
 
         public async Task SendTracesAsync(IList<List<Span>> traces)

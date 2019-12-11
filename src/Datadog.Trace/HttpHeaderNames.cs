@@ -1,3 +1,4 @@
+// Modified by SignalFx
 namespace Datadog.Trace
 {
     /// <summary>
@@ -24,6 +25,6 @@ namespace Datadog.Trace
         /// If header is set to "false", tracing is disabled for that http request.
         /// Tracing is enabled by default.
         /// </summary>
-        public const string TracingEnabled = "x-datadog-tracing-enabled";
+        public const string TracingEnabled = "x-sfx-tracing-enabled";
     }
 }
