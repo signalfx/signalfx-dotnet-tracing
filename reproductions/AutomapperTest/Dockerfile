@@ -10,7 +10,7 @@ ENV CORECLR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}
 ENV CORECLR_PROFILER_PATH=/opt/signalfx-dotnet-tracing/SignalFx.Tracing.ClrProfiler.Native.so
 ENV SIGNALFX_DOTNET_TRACER_HOME=/opt/signalfx-dotnet-tracing
 ENV SIGNALFX_INTEGRATIONS=/opt/signalfx-dotnet-tracing/integrations.json
-ENV SIGNALFX_TRACE_ENABLED=true
+ENV SIGNALFX_TRACING_ENABLED=true
 
 FROM mcr.microsoft.com/dotnet/core/sdk:2.1-stretch AS build
 WORKDIR "/src"

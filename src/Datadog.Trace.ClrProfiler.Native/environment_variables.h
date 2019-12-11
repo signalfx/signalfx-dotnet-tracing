@@ -9,7 +9,7 @@ namespace environment {
 
 // Sets whether the profiler is enabled. Default is true.
 // Setting this to false disabled the profiler entirely.
-const WSTRING tracing_enabled = "SIGNALFX_TRACE_ENABLED"_W;
+const WSTRING tracing_enabled = "SIGNALFX_TRACING_ENABLED"_W;
 
 // Sets whether debug mode is enabled. Default is false.
 const WSTRING debug_enabled = "SIGNALFX_TRACE_DEBUG"_W;
