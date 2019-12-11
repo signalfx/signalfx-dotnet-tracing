@@ -38,7 +38,7 @@ const WSTRING exclude_process_names = "SIGNALFX_PROFILER_EXCLUDE_PROCESSES"_W;
 // Sets the Agent's host. Default is localhost.
 const WSTRING agent_host = "SIGNALFX_AGENT_HOST"_W;
 
-// Sets the Agent's port. Default is 8126.
+// Sets the Agent's port. Default is 9080.
 const WSTRING agent_port = "SIGNALFX_TRACE_AGENT_PORT"_W;
 
 // Sets the "env" tag for every span.

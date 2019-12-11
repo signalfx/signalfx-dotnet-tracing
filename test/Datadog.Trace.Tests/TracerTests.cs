@@ -267,8 +267,8 @@ namespace Datadog.Trace.Tests
 
         [Theory]
         [InlineData("ddagent", "5000", "http://ddagent:5000")]
-        [InlineData("", "", "http://localhost:8126")]
-        [InlineData(null, null, "http://localhost:8126")]
+        [InlineData("", "", "http://localhost:9080")]
+        [InlineData(null, null, "http://localhost:9080")]
         public void SetHostAndPortEnvironmentVariables(string host, string port, string expectedUri)
         {
             string originalHost = Environment.GetEnvironmentVariable("SIGNALFX_AGENT_HOST");

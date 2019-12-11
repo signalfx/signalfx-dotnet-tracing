@@ -59,7 +59,7 @@ namespace Datadog.Trace.Configuration
 
         /// <summary>
         /// Configuration key for the Agent port where the Tracer can send traces.
-        /// Default value is 8126.
+        /// Default value is 9080.
         /// </summary>
         /// <seealso cref="TracerSettings.AgentUri"/>
         public const string AgentPort = "SIGNALFX_TRACE_AGENT_PORT";
@@ -67,10 +67,24 @@ namespace Datadog.Trace.Configuration
         /// <summary>
         /// Configuration key for the Agent URL where the Tracer can send traces.
         /// Overrides values in <see cref="AgentHost"/> and <see cref="AgentPort"/> if present.
-        /// Default value is "http://localhost:8126".
+        /// Default value is "http://localhost:9080".
         /// </summary>
         /// <seealso cref="TracerSettings.AgentUri"/>
         public const string AgentUri = "SIGNALFX_TRACE_AGENT_URL";
+
+        /// <summary>
+        /// Configuration key for the Zipkin Api Collector path.
+        /// Default value is "/v1/trace".
+        /// </summary>
+        /// <seealso cref="TracerSettings.EndpointUrl"/>
+        public const string AgentPath = "SIGNALFX_TRACE_AGENT_PATH";
+
+        /// <summary>
+        /// Configuration key for the Zipkin API collector endpoint.
+        /// Default value is "http://localhost:9080/v1/trace".
+        /// </summary>
+        /// <seealso cref="TracerSettings.EndpointUrl"/>
+        public const string EndpointUrl = "SIGNALFX_ENDPOINT_URL";
 
         /// <summary>
         /// Configuration key for the formatting API the Tracer uses to encode traces.

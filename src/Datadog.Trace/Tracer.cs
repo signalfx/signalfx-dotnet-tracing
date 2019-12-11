@@ -84,7 +84,7 @@ namespace Datadog.Trace
             {
                 if (Settings.ApiType.ToLower().Equals("zipkin"))
                 {
-                    apiClient = new ZipkinApi(Settings.AgentUri, delegatingHandler: null, Statsd);
+                    apiClient = new ZipkinApi(Settings.EndpointUrl, delegatingHandler: null, Statsd);
                 }
                 else
                 {
@@ -172,7 +172,7 @@ namespace Datadog.Trace
         /// <summary>
         /// Create a new Tracer with the given parameters
         /// </summary>
-        /// <param name="agentEndpoint">The agent endpoint where the traces will be sent (default is http://localhost:8126).</param>
+        /// <param name="agentEndpoint">The agent endpoint where the traces will be sent (default is http://localhost:9080).</param>
         /// <param name="defaultServiceName">Default name of the service (default is the name of the executing assembly).</param>
         /// <param name="isDebugEnabled">Turns on all debug logging (this may have an impact on application performance).</param>
         /// <returns>The newly created tracer</returns>
