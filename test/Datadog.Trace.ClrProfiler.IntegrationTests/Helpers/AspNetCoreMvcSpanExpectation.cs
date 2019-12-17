@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using Datadog.Trace.TestHelpers;
 
 namespace Datadog.Trace.ClrProfiler.IntegrationTests
@@ -9,7 +10,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         {
         }
 
-        public override bool Matches(MockTracerAgent.Span span)
+        public override bool Matches(IMockSpan span)
         {
             var spanUri = GetTag(span, Tags.HttpUrl);
             if (spanUri == null || !spanUri.Contains(OriginalUri))

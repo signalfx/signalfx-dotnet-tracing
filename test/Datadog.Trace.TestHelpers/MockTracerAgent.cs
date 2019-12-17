@@ -1,9 +1,11 @@
+// Modified by SignalFx
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -56,7 +58,7 @@ namespace Datadog.Trace.TestHelpers
 
         public event EventHandler<EventArgs<HttpListenerContext>> RequestReceived;
 
-        public event EventHandler<EventArgs<IList<IList<Span>>>> RequestDeserialized;
+        public event EventHandler<EventArgs<IList<IList<IMockSpan>>>> RequestDeserialized;
 
         /// <summary>
         /// Gets or sets a value indicating whether to skip serialization of traces.
@@ -73,9 +75,9 @@ namespace Datadog.Trace.TestHelpers
         /// <summary>
         /// Gets the filters used to filter out spans we don't want to look at for a test.
         /// </summary>
-        public List<Func<Span, bool>> SpanFilters { get; private set; } = new List<Func<Span, bool>>();
+        public List<Func<IMockSpan, bool>> SpanFilters { get; private set; } = new List<Func<IMockSpan, bool>>();
 
-        public IImmutableList<Span> Spans { get; private set; } = ImmutableList<Span>.Empty;
+        public IImmutableList<IMockSpan> Spans { get; private set; } = ImmutableList<IMockSpan>.Empty;
 
         public IImmutableList<NameValueCollection> RequestHeaders { get; private set; } = ImmutableList<NameValueCollection>.Empty;
 
@@ -88,7 +90,7 @@ namespace Datadog.Trace.TestHelpers
         /// <param name="minDateTime">Minimum time to check for spans from</param>
         /// <param name="returnAllOperations">When true, returns every span regardless of operation name</param>
         /// <returns>The list of spans.</returns>
-        public IImmutableList<Span> WaitForSpans(
+        public IImmutableList<IMockSpan> WaitForSpans(
             int count,
             int timeoutInMilliseconds = 20000,
             string operationName = null,
@@ -98,7 +100,7 @@ namespace Datadog.Trace.TestHelpers
             var deadline = DateTime.Now.AddMilliseconds(timeoutInMilliseconds);
             var minimumOffset = (minDateTime ?? DateTimeOffset.MinValue).ToUnixTimeNanoseconds();
 
-            IImmutableList<Span> relevantSpans = ImmutableList<Span>.Empty;
+            IImmutableList<IMockSpan> relevantSpans = ImmutableList<IMockSpan>.Empty;
 
             while (DateTime.Now < deadline)
             {
@@ -154,9 +156,9 @@ namespace Datadog.Trace.TestHelpers
             RequestReceived?.Invoke(this, new EventArgs<HttpListenerContext>(context));
         }
 
-        protected virtual void OnRequestDeserialized(IList<IList<Span>> traces)
+        protected virtual void OnRequestDeserialized(IList<IList<IMockSpan>> traces)
         {
-            RequestDeserialized?.Invoke(this, new EventArgs<IList<IList<Span>>>(traces));
+            RequestDeserialized?.Invoke(this, new EventArgs<IList<IList<IMockSpan>>>(traces));
         }
 
         private void AssertHeader(
@@ -188,8 +190,9 @@ namespace Datadog.Trace.TestHelpers
 
                     if (ShouldDeserializeTraces)
                     {
-                        var spans = MessagePackSerializer.Deserialize<IList<IList<Span>>>(ctx.Request.InputStream);
-                        OnRequestDeserialized(spans);
+                        var dspans = MessagePackSerializer.Deserialize<List<List<Span>>>(ctx.Request.InputStream);
+                        List<IList<IMockSpan>> spans = dspans.ConvertAll(x => (IList<IMockSpan>)x.ConvertAll(y => (IMockSpan)y));
+                        OnRequestDeserialized((IList<IList<IMockSpan>>)spans);
 
                         lock (this)
                         {
@@ -215,7 +218,7 @@ namespace Datadog.Trace.TestHelpers
 
         [MessagePackObject]
         [DebuggerDisplay("TraceId={TraceId}, SpanId={SpanId}, Service={Service}, Name={Name}, Resource={Resource}")]
-        public struct Span
+        public struct Span : IMockSpan
         {
             [Key("trace_id")]
             public ulong TraceId { get; set; }

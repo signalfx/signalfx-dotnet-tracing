@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -127,7 +128,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
             string httpMethod,
             string httpStatus,
             string resourceUrl,
-            Func<MockTracerAgent.Span, List<string>> additionalCheck = null)
+            Func<IMockSpan, List<string>> additionalCheck = null)
         {
             var expectation = new AspNetCoreMvcSpanExpectation(EnvironmentHelper.FullSampleName, TopLevelOperationName)
             {
@@ -191,7 +192,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
             return true;
         }
 
-        private bool IsNotServerLifeCheck(MockTracerAgent.Span span)
+        private bool IsNotServerLifeCheck(IMockSpan span)
         {
             var url = SpanExpectation.GetTag(span, Tags.HttpUrl);
             if (url == null)

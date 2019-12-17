@@ -96,9 +96,9 @@ namespace Datadog.Trace.Tests
             statsd.VerifyNoOtherCalls();
         }
 
-        private static IImmutableList<MockTracerAgent.Span> SendSpan(bool tracerMetricsEnabled, Mock<IStatsd> statsd)
+        private static IImmutableList<IMockSpan> SendSpan(bool tracerMetricsEnabled, Mock<IStatsd> statsd)
         {
-            IImmutableList<MockTracerAgent.Span> spans;
+            IImmutableList<IMockSpan> spans;
             var agentPort = TcpPortProvider.GetOpenPort();
 
             using (var agent = new MockTracerAgent(agentPort))
