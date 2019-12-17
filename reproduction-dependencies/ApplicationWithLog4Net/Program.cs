@@ -1,4 +1,4 @@
-
+// Modified by SignalFx
 using System;
 using System.IO;
 using Datadog.Trace.ClrProfiler.Integrations;
@@ -21,8 +21,8 @@ namespace ApplicationWithLog4Net
 
         public override string ToString()
         {
-            // Set DD_LOGS_INJECTION to enable the automatic trace injection
-            Environment.SetEnvironmentVariable("DD_LOGS_INJECTION", "true");
+            // Set SIGNALFX_LOGS_INJECTION to enable the automatic trace injection
+            Environment.SetEnvironmentVariable("SIGNALFX_LOGS_INJECTION", "true");
 
             // Let's call AspNetStartup.Register now
             // This will create a Tracer and, if buggy, store items in the CallContext

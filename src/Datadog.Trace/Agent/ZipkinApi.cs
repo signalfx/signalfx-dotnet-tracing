@@ -14,19 +14,18 @@ namespace Datadog.Trace.Agent
 {
     internal class ZipkinApi : IApi
     {
-        private const string TracesPath = "/v1/trace";
-
         private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.For<ZipkinApi>();
 
         private readonly Uri _tracesEndpoint;
         private readonly HttpClient _client;
 
-        public ZipkinApi(Uri baseEndpoint, DelegatingHandler delegatingHandler, IStatsd statsd)
+        public ZipkinApi(Uri endpoint, DelegatingHandler delegatingHandler, IStatsd statsd)
         {
-            _tracesEndpoint = new Uri(baseEndpoint, TracesPath);
+            _tracesEndpoint = endpoint;
             _client = delegatingHandler == null
                           ? new HttpClient()
                           : new HttpClient(delegatingHandler);
+            _client.DefaultRequestHeaders.Add(HttpHeaderNames.TracingEnabled, "false");
         }
 
         public async Task SendTracesAsync(IList<List<Span>> traces)

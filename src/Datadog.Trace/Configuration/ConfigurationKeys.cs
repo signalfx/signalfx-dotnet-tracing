@@ -11,13 +11,13 @@ namespace Datadog.Trace.Configuration
         /// Can only be set with an environment variable
         /// or in the <c>app.config</c>/<c>web.config</c> file.
         /// </summary>
-        public const string ConfigurationFileName = "DD_DOTNET_TRACER_CONFIG_FILE";
+        public const string ConfigurationFileName = "SIGNALFX_DOTNET_TRACER_CONFIG_FILE";
 
         /// <summary>
         /// Configuration key for the application's environment. Sets the "env" tag on every <see cref="Span"/>.
         /// </summary>
         /// <seealso cref="TracerSettings.Environment"/>
-        public const string Environment = "DD_ENV";
+        public const string Environment = "SIGNALFX_ENV";
 
         /// <summary>
         /// Configuration key for the application's default service name.
@@ -25,21 +25,21 @@ namespace Datadog.Trace.Configuration
         /// and used to determine service name of some child spans.
         /// </summary>
         /// <seealso cref="TracerSettings.ServiceName"/>
-        public const string ServiceName = "DD_SERVICE_NAME";
+        public const string ServiceName = "SIGNALFX_SERVICE_NAME";
 
         /// <summary>
         /// Configuration key for enabling or disabling the Tracer.
         /// Default is value is true (enabled).
         /// </summary>
         /// <seealso cref="TracerSettings.TraceEnabled"/>
-        public const string TraceEnabled = "DD_TRACE_ENABLED";
+        public const string TraceEnabled = "SIGNALFX_TRACING_ENABLED";
 
         /// <summary>
         /// Configuration key for enabling or disabling the Tracer's debug mode.
         /// Default is value is false (disabled).
         /// </summary>
         /// <seealso cref="TracerSettings.DebugEnabled"/>
-        public const string DebugEnabled = "DD_TRACE_DEBUG";
+        public const string DebugEnabled = "SIGNALFX_TRACE_DEBUG";
 
         /// <summary>
         /// Configuration key for a list of integrations to disable. All other integrations remain enabled.
@@ -47,7 +47,7 @@ namespace Datadog.Trace.Configuration
         /// Supports multiple values separated with semi-colons.
         /// </summary>
         /// <seealso cref="TracerSettings.DisabledIntegrationNames"/>
-        public const string DisabledIntegrations = "DD_DISABLED_INTEGRATIONS";
+        public const string DisabledIntegrations = "SIGNALFX_DISABLED_INTEGRATIONS";
 
         /// <summary>
         /// Configuration key for the Agent host where the Tracer can send traces.
@@ -55,22 +55,36 @@ namespace Datadog.Trace.Configuration
         /// Default value is "localhost".
         /// </summary>
         /// <seealso cref="TracerSettings.AgentUri"/>
-        public const string AgentHost = "DD_AGENT_HOST";
+        public const string AgentHost = "SIGNALFX_AGENT_HOST";
 
         /// <summary>
         /// Configuration key for the Agent port where the Tracer can send traces.
-        /// Default value is 8126.
+        /// Default value is 9080.
         /// </summary>
         /// <seealso cref="TracerSettings.AgentUri"/>
-        public const string AgentPort = "DD_TRACE_AGENT_PORT";
+        public const string AgentPort = "SIGNALFX_TRACE_AGENT_PORT";
 
         /// <summary>
         /// Configuration key for the Agent URL where the Tracer can send traces.
         /// Overrides values in <see cref="AgentHost"/> and <see cref="AgentPort"/> if present.
-        /// Default value is "http://localhost:8126".
+        /// Default value is "http://localhost:9080".
         /// </summary>
         /// <seealso cref="TracerSettings.AgentUri"/>
-        public const string AgentUri = "DD_TRACE_AGENT_URL";
+        public const string AgentUri = "SIGNALFX_TRACE_AGENT_URL";
+
+        /// <summary>
+        /// Configuration key for the Zipkin Api Collector path.
+        /// Default value is "/v1/trace".
+        /// </summary>
+        /// <seealso cref="TracerSettings.EndpointUrl"/>
+        public const string AgentPath = "SIGNALFX_TRACE_AGENT_PATH";
+
+        /// <summary>
+        /// Configuration key for the Zipkin API collector endpoint.
+        /// Default value is "http://localhost:9080/v1/trace".
+        /// </summary>
+        /// <seealso cref="TracerSettings.EndpointUrl"/>
+        public const string EndpointUrl = "SIGNALFX_ENDPOINT_URL";
 
         /// <summary>
         /// Configuration key for the formatting API the Tracer uses to encode traces.
@@ -83,26 +97,26 @@ namespace Datadog.Trace.Configuration
         /// Configuration key for enabling or disabling default Analytics.
         /// </summary>
         /// <seealso cref="TracerSettings.AnalyticsEnabled"/>
-        public const string GlobalAnalyticsEnabled = "DD_TRACE_ANALYTICS_ENABLED";
+        public const string GlobalAnalyticsEnabled = "SIGNALFX_TRACE_ANALYTICS_ENABLED";
 
         /// <summary>
         /// Configuration key for a list of tags to be applied globally to spans.
         /// </summary>
-        public const string GlobalTags = "DD_TRACE_GLOBAL_TAGS";
+        public const string GlobalTags = "SIGNALFX_TRACE_GLOBAL_TAGS";
 
         /// <summary>
         /// Configuration key for enabling or disabling the automatic injection
         /// of correlation identifiers into the logging context.
         /// </summary>
         /// <seealso cref="TracerSettings.LogsInjectionEnabled"/>
-        public const string LogsInjectionEnabled = "DD_LOGS_INJECTION";
+        public const string LogsInjectionEnabled = "SIGNALFX_LOGS_INJECTION";
 
         /// <summary>
         /// Configuration key for setting the number of traces allowed
         /// to be submitted per second.
         /// </summary>
         /// <seealso cref="TracerSettings.MaxTracesSubmittedPerSecond"/>
-        public const string MaxTracesSubmittedPerSecond = "DD_MAX_TRACES_PER_SECOND";
+        public const string MaxTracesSubmittedPerSecond = "SIGNALFX_MAX_TRACES_PER_SECOND";
 
         /// <summary>
         /// Configuration key for setting custom sampling rules based on regular expressions.
@@ -132,19 +146,19 @@ namespace Datadog.Trace.Configuration
         /// If no rules are specified, or none match, default internal sampling logic will be used.
         /// </summary>
         /// <seealso cref="TracerSettings.CustomSamplingRules"/>
-        public const string CustomSamplingRules = "DD_CUSTOM_SAMPLING_RULES";
+        public const string CustomSamplingRules = "SIGNALFX_CUSTOM_SAMPLING_RULES";
 
         /// <summary>
         /// Configuration key for the DogStatsd port where the Tracer can send metrics.
         /// Default value is 8125/
         /// </summary>
-        public const string DogStatsdPort = "DD_DOGSTATSD_PORT";
+        public const string DogStatsdPort = "SIGNALFX_DOGSTATSD_PORT";
 
         /// <summary>
         /// Configuration key for enabling or disabling internal metrics sent to DogStatsD.
         /// Default value is <c>false</c> (disabled).
         /// </summary>
-        public const string TracerMetricsEnabled = "DD_TRACE_METRICS_ENABLED";
+        public const string TracerMetricsEnabled = "SIGNALFX_TRACE_METRICS_ENABLED";
 
         /// <summary>
         /// String format patterns used to match integration-specific configuration keys.
@@ -154,17 +168,17 @@ namespace Datadog.Trace.Configuration
             /// <summary>
             /// Configuration key pattern for enabling or disabling an integration.
             /// </summary>
-            public const string Enabled = "DD_{0}_ENABLED";
+            public const string Enabled = "SIGNALFX_{0}_ENABLED";
 
             /// <summary>
             /// Configuration key pattern for enabling or disabling Analytics in an integration.
             /// </summary>
-            public const string AnalyticsEnabled = "DD_{0}_ANALYTICS_ENABLED";
+            public const string AnalyticsEnabled = "SIGNALFX_{0}_ANALYTICS_ENABLED";
 
             /// <summary>
             /// Configuration key pattern for setting Analytics sampling rate in an integration.
             /// </summary>
-            public const string AnalyticsSampleRate = "DD_{0}_ANALYTICS_SAMPLE_RATE";
+            public const string AnalyticsSampleRate = "SIGNALFX_{0}_ANALYTICS_SAMPLE_RATE";
         }
 
         /// <summary>
@@ -175,12 +189,12 @@ namespace Datadog.Trace.Configuration
             /// <summary>
             /// Configuration key for forcing the automatic instrumentation to only use the mdToken method lookup mechanism.
             /// </summary>
-            public const string ForceMdTokenLookup = "DD_TRACE_DEBUG_LOOKUP_MDTOKEN";
+            public const string ForceMdTokenLookup = "SIGNALFX_TRACE_DEBUG_LOOKUP_MDTOKEN";
 
             /// <summary>
             /// Configuration key for forcing the automatic instrumentation to only use the fallback method lookup mechanism.
             /// </summary>
-            public const string ForceFallbackLookup = "DD_TRACE_DEBUG_LOOKUP_FALLBACK";
+            public const string ForceFallbackLookup = "SIGNALFX_TRACE_DEBUG_LOOKUP_FALLBACK";
         }
     }
 }

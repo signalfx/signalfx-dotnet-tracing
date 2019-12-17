@@ -20,9 +20,8 @@ namespace Datadog.Trace.IntegrationTests
         public SendTracesToZipkinCollector()
         {
             var settings = new TracerSettings();
-            var endpoint = new Uri($"http://localhost:{collectorPort}");
             _httpRecorder = new RecordHttpHandler();
-            var api = new ZipkinApi(endpoint, _httpRecorder, statsd: null);
+            var api = new ZipkinApi(settings.EndpointUrl, _httpRecorder, statsd: null);
             var agentWriter = new AgentWriter(api, statsd: null);
             _tracer = new Tracer(settings, agentWriter, sampler: null, scopeManager: null, statsd: null);
         }

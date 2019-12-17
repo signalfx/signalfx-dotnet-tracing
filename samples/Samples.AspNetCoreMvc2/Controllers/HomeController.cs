@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace Samples.AspNetCoreMvc2.Controllers
         public IActionResult Index()
         {
             ViewBag.StackTrace = StackTraceHelper.GetUsefulStack();
-            var prefixes = new[] { "COR_", "CORECLR_", "DD_", "DATADOG_" };
+            var prefixes = new[] { "COR_", "CORECLR_", "SIGNALFX_", "DATADOG_" };
 
             var envVars = from envVar in Environment.GetEnvironmentVariables().Cast<DictionaryEntry>()
                           from prefix in prefixes

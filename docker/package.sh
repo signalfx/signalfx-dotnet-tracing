@@ -1,11 +1,14 @@
 #!/bin/bash
+# Modified by SignalFx
 set -euxo pipefail
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 VERSION=1.10.0
 
 mkdir -p $DIR/../deploy/linux
-cp $DIR/../integrations.json $DIR/../src/Datadog.Trace.ClrProfiler.Native/bin/Debug/x64/
+for target in integrations.json defaults.env LICENSE NOTICE ; do
+    cp $DIR/../$target $DIR/../src/Datadog.Trace.ClrProfiler.Native/bin/Debug/x64/
+done
 
 cd $DIR/../deploy/linux
 for pkgtype in deb rpm tar ; do
@@ -13,14 +16,22 @@ for pkgtype in deb rpm tar ; do
         -f \
         -s dir \
         -t $pkgtype \
-        -n datadog-dotnet-apm \
+        -n signalfx-dotnet-tracing \
+        -m signalfx-oss@splunk.com \
+        --license "Apache License, Version 2.0" \
+        --provides signalfx-dotnet-tracing \
+        --vendor SignalFx \
+        --url "https://docs.signalfx.com/en/latest/apm/apm-instrument/apm-dotnet.html" \
         -v $VERSION \
-        $(if [ $pkgtype != 'tar' ] ; then echo --prefix /opt/datadog ; fi) \
+        --prefix /opt/signalfx-dotnet-tracing \
         --chdir $DIR/../src/Datadog.Trace.ClrProfiler.Native/bin/Debug/x64 \
         netstandard2.0/ \
-        Datadog.Trace.ClrProfiler.Native.so \
-        integrations.json
+        SignalFx.Tracing.ClrProfiler.Native.so \
+        integrations.json \
+        defaults.env \
+        LICENSE \
+        NOTICE
 done
 
-gzip -f datadog-dotnet-apm.tar
-mv datadog-dotnet-apm.tar.gz datadog-dotnet-apm-$VERSION.tar.gz
+gzip -f signalfx-dotnet-tracing.tar
+mv signalfx-dotnet-tracing.tar.gz signalfx-dotnet-tracing-$VERSION.tar.gz

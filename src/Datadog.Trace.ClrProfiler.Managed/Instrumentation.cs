@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 
 namespace Datadog.Trace.ClrProfiler
@@ -10,7 +11,7 @@ namespace Datadog.Trace.ClrProfiler
         /// <summary>
         /// Gets the CLSID for the Datadog .NET profiler
         /// </summary>
-        public static readonly string ProfilerClsid = "{846F5F1C-F9AE-4B07-969E-05C26BC060D8}";
+        public static readonly string ProfilerClsid = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}";
 
         /// <summary>
         /// Gets a value indicating whether Datadog's profiler is attached to the current process.

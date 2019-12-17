@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Immutable;
 using System.Threading;
@@ -105,7 +106,8 @@ namespace Datadog.Trace.Tests
                 var settings = new TracerSettings
                                {
                                    AgentUri = new Uri($"http://localhost:{agentPort}"),
-                                   TracerMetricsEnabled = tracerMetricsEnabled
+                                   TracerMetricsEnabled = tracerMetricsEnabled,
+                                   ApiType = "dd"
                                };
 
                 var tracer = new Tracer(settings, agentWriter: null, sampler: null, scopeManager: null, statsd.Object);

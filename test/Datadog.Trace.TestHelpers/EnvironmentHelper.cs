@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Specialized;
 using System.IO;
@@ -11,7 +12,7 @@ namespace Datadog.Trace.TestHelpers
 {
     public class EnvironmentHelper
     {
-        public const string ProfilerClsId = "{846F5F1C-F9AE-4B07-969E-05C26BC060D8}";
+        public const string ProfilerClsId = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}";
         public const string DotNetFramework = ".NETFramework";
         public const string CoreFramework = ".NETCoreApp";
 
@@ -156,12 +157,15 @@ namespace Datadog.Trace.TestHelpers
                 "COR_PROFILER_PATH",
 
                 // Datadog
-                "DD_PROFILER_PROCESSES",
-                "DD_DOTNET_TRACER_HOME",
-                "DD_INTEGRATIONS",
-                "DD_DISABLED_INTEGRATIONS",
+                "SIGNALFX_PROFILER_PROCESSES",
+                "SIGNALFX_DOTNET_TRACER_HOME",
+                "SIGNALFX_INTEGRATIONS",
+                "SIGNALFX_DISABLED_INTEGRATIONS",
                 "DATADOG_PROFILER_PROCESSES",
                 "DATADOG_INTEGRATIONS",
+
+                // SignalFx
+                "SIGNALFX_API_TYPE",
             };
 
             foreach (string variable in environmentVariables)
@@ -187,7 +191,7 @@ namespace Datadog.Trace.TestHelpers
 
                 profilerPath = GetProfilerPath();
                 environmentVariables["CORECLR_PROFILER_PATH"] = profilerPath;
-                environmentVariables["DD_DOTNET_TRACER_HOME"] = Path.GetDirectoryName(profilerPath);
+                environmentVariables["SIGNALFX_DOTNET_TRACER_HOME"] = Path.GetDirectoryName(profilerPath);
             }
             else
             {
@@ -196,22 +200,24 @@ namespace Datadog.Trace.TestHelpers
 
                 profilerPath = GetProfilerPath();
                 environmentVariables["COR_PROFILER_PATH"] = profilerPath;
-                environmentVariables["DD_DOTNET_TRACER_HOME"] = Path.GetDirectoryName(profilerPath);
+                environmentVariables["SIGNALFX_DOTNET_TRACER_HOME"] = Path.GetDirectoryName(profilerPath);
 
                 processName = Path.GetFileName(processPath);
             }
 
             if (DebugModeEnabled)
             {
-                environmentVariables["DD_TRACE_DEBUG"] = "1";
+                environmentVariables["SIGNALFX_TRACE_DEBUG"] = "1";
             }
 
-            environmentVariables["DD_PROFILER_PROCESSES"] = processName;
+            environmentVariables["SIGNALFX_PROFILER_PROCESSES"] = processName;
 
             string integrations = string.Join(";", GetIntegrationsFilePaths());
-            environmentVariables["DD_INTEGRATIONS"] = integrations;
-            environmentVariables["DD_TRACE_AGENT_HOSTNAME"] = "localhost";
-            environmentVariables["DD_TRACE_AGENT_PORT"] = agentPort.ToString();
+            environmentVariables["SIGNALFX_INTEGRATIONS"] = integrations;
+            environmentVariables["SIGNALFX_TRACE_AGENT_HOSTNAME"] = "localhost";
+            environmentVariables["SIGNALFX_TRACE_AGENT_PORT"] = agentPort.ToString();
+
+            environmentVariables["SIGNALFX_API_TYPE"] = "dd";
 
             // for ASP.NET Core sample apps, set the server's port
             environmentVariables["ASPNETCORE_URLS"] = $"http://localhost:{aspNetCorePort}/";
@@ -227,7 +233,7 @@ namespace Datadog.Trace.TestHelpers
 
             if (_disabledIntegrations != null)
             {
-                environmentVariables["DD_DISABLED_INTEGRATIONS"] = _disabledIntegrations;
+                environmentVariables["SIGNALFX_DISABLED_INTEGRATIONS"] = _disabledIntegrations;
             }
         }
 
@@ -289,7 +295,7 @@ namespace Datadog.Trace.TestHelpers
                                        ? "dll"
                                        : "so";
 
-                string fileName = $"Datadog.Trace.ClrProfiler.Native.{extension}";
+                string fileName = $"SignalFx.Tracing.ClrProfiler.Native.{extension}";
 
                 var directory = GetSampleApplicationOutputDirectory();
 

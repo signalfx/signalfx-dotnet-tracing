@@ -13,19 +13,14 @@ namespace Datadog.Trace.Configuration
     public class TracerSettings
     {
         /// <summary>
-        /// The default host value for <see cref="AgentUri"/>.
+        /// The default agent/collector url value <see cref="EndpointUrl"/>.
         /// </summary>
-        public const string DefaultAgentHost = "localhost";
-
-        /// <summary>
-        /// The default port value for <see cref="AgentUri"/>.
-        /// </summary>
-        public const int DefaultAgentPort = 8126;
+        public const string DefaultEndpointUrl = "http://localhost:9080/v1/trace";
 
         /// <summary>
         /// The default API for <see cref="ApiType"/>.
         /// </summary>
-        public const string DefaultApiType = "dd";
+        public const string DefaultApiType = "zipkin";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TracerSettings"/> class with default values.
@@ -60,24 +55,32 @@ namespace Datadog.Trace.Configuration
 
             DisabledIntegrationNames = new HashSet<string>(disabledIntegrationNames, StringComparer.OrdinalIgnoreCase);
 
+            var endpointUrl = source?.GetString(ConfigurationKeys.EndpointUrl) ?? DefaultEndpointUrl;
+            EndpointUrl = new Uri(endpointUrl);
+
             var agentHost = source?.GetString(ConfigurationKeys.AgentHost) ??
                             // backwards compatibility for names used in the past
-                            source?.GetString("DD_TRACE_AGENT_HOSTNAME") ??
+                            source?.GetString("SIGNALFX_TRACE_AGENT_HOSTNAME") ??
                             source?.GetString("DATADOG_TRACE_AGENT_HOSTNAME") ??
                             // default value
-                            DefaultAgentHost;
+                            EndpointUrl.Host;
 
             var agentPort = source?.GetInt32(ConfigurationKeys.AgentPort) ??
                             // backwards compatibility for names used in the past
                             source?.GetInt32("DATADOG_TRACE_AGENT_PORT") ??
                             // default value
-                            DefaultAgentPort;
+                            EndpointUrl.Port;
 
             var agentUri = source?.GetString(ConfigurationKeys.AgentUri) ??
                            // default value
-                           $"http://{agentHost}:{agentPort}";
+                           $"{EndpointUrl.Scheme}://{agentHost}:{agentPort}";
 
             AgentUri = new Uri(agentUri);
+
+            var agentPath = source?.GetString(ConfigurationKeys.AgentPath) ?? EndpointUrl.PathAndQuery;
+
+            // We still want tests and users to be able to configure Uri elements, so reform Endpoint Url
+            EndpointUrl = new Uri(AgentUri, agentPath);
 
             ApiType = source?.GetString(ConfigurationKeys.ApiType) ?? DefaultApiType;
 
@@ -142,12 +145,23 @@ namespace Datadog.Trace.Configuration
 
         /// <summary>
         /// Gets or sets the Uri where the Tracer can connect to the Agent.
-        /// Default is <c>"http://localhost:8126"</c>.
+        /// Default is <c>"http://localhost:9080"</c>.
         /// </summary>
         /// <seealso cref="ConfigurationKeys.AgentUri"/>
         /// <seealso cref="ConfigurationKeys.AgentHost"/>
         /// <seealso cref="ConfigurationKeys.AgentPort"/>
         public Uri AgentUri { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Uri where the Tracer's Zipkin ApiType can report trace data.
+        /// Default is <c>"http://localhost:9080/v1/trace"</c>.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.EndpointUrl"/>
+        /// <seealso cref="ConfigurationKeys.AgentUri"/>
+        /// <seealso cref="ConfigurationKeys.AgentHost"/>
+        /// <seealso cref="ConfigurationKeys.AgentPort"/>
+        /// <seealso cref="ConfigurationKeys.AgentPath"/>
+        public Uri EndpointUrl { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating API type
