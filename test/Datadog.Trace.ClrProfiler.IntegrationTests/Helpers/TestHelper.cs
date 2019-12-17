@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -58,7 +59,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             return EnvironmentHelper.GetSampleApplicationPath(packageVersion);
         }
 
-        public Process StartSample(int traceAgentPort, string arguments, string packageVersion, int aspNetCorePort)
+        public Process StartSample(int traceAgentPort, string arguments, string packageVersion, int aspNetCorePort, Dictionary<string, string> envVars = null)
         {
             // get path to sample app that the profiler will attach to
             string sampleAppPath = GetSampleApplicationPath(packageVersion);
@@ -75,7 +76,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 integrationPaths,
                 arguments,
                 traceAgentPort: traceAgentPort,
-                aspNetCorePort: aspNetCorePort);
+                aspNetCorePort: aspNetCorePort,
+                envVars: envVars);
         }
 
         public ProcessResult RunSampleAndWaitForExit(int traceAgentPort, string arguments = null, string packageVersion = "")
