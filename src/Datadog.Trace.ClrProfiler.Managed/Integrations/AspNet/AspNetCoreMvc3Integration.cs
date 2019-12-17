@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -96,16 +97,17 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     }
                 }
 
-                var scope = tracer.StartActive(OperationName, propagatedContext);
+                var scope = tracer.StartActive($"{controllerName}.{actionName}", propagatedContext);
                 context.Scope = scope;
                 var span = scope.Span;
 
                 span.DecorateWebServerSpan(
-                    resourceName: resourceName,
+                    resourceName: null,
                     method: httpMethod,
                     host: host,
                     httpUrl: url);
 
+                span.SetTag(Tags.InstrumentationName, IntegrationName);
                 span.SetTag(Tags.AspNetController, controllerName);
                 span.SetTag(Tags.AspNetAction, actionName);
 
