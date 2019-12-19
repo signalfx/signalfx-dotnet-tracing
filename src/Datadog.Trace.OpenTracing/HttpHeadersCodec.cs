@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Globalization;
 using Datadog.Trace.Headers;
@@ -19,7 +20,7 @@ namespace Datadog.Trace.OpenTracing
             }
 
             IHeadersCollection headers = new TextMapHeadersCollection(map);
-            var propagationContext = SpanContextPropagator.Instance.Extract(headers);
+            var propagationContext = B3SpanContextPropagator.Instance.Extract(headers);
             return new OpenTracingSpanContext(propagationContext);
         }
 
@@ -37,7 +38,7 @@ namespace Datadog.Trace.OpenTracing
             if (context is OpenTracingSpanContext otSpanContext && otSpanContext.Context is SpanContext ddSpanContext)
             {
                 // this is a Datadog context
-                SpanContextPropagator.Instance.Inject(ddSpanContext, headers);
+                B3SpanContextPropagator.Instance.Inject(ddSpanContext, headers);
             }
             else
             {

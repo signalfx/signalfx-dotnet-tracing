@@ -1,3 +1,4 @@
+// Modified by SignalFx
 #if !NETSTANDARD2_0
 using System;
 using System.Collections.Generic;
@@ -150,7 +151,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     {
                         // extract propagated http headers
                         var headers = request.Headers.Wrap();
-                        propagatedContext = SpanContextPropagator.Instance.Extract(headers);
+                        propagatedContext = B3SpanContextPropagator.Instance.Extract(headers);
                     }
                     catch (Exception ex)
                     {

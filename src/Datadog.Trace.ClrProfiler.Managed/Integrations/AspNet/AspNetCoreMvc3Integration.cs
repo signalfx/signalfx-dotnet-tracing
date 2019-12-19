@@ -88,7 +88,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                                 }
                             }
 
-                            propagatedContext = SpanContextPropagator.Instance.Extract(headersCollection);
+                            propagatedContext = B3SpanContextPropagator.Instance.Extract(headersCollection);
                         }
                     }
                     catch (Exception ex)

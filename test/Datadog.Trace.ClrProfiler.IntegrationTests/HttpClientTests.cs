@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -35,8 +36,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 var spans = agent.WaitForSpans(1);
                 Assert.True(spans.Count > 0, "expected at least one span");
 
-                var traceId = GetHeader(processResult.StandardOutput, HttpHeaderNames.TraceId);
-                var parentSpanId = GetHeader(processResult.StandardOutput, HttpHeaderNames.ParentId);
+                var traceId = GetHeader(processResult.StandardOutput, HttpHeaderNames.B3TraceId);
+                var parentSpanId = GetHeader(processResult.StandardOutput, HttpHeaderNames.B3SpanId);
 
                 var firstSpan = spans.First();
                 Assert.Equal("http.request", firstSpan.Name);
@@ -45,8 +46,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 Assert.Equal(nameof(HttpMessageHandler), firstSpan.Tags[Tags.InstrumentationName]);
 
                 var lastSpan = spans.Last();
-                Assert.Equal(lastSpan.TraceId.ToString(CultureInfo.InvariantCulture), traceId);
-                Assert.Equal(lastSpan.SpanId.ToString(CultureInfo.InvariantCulture), parentSpanId);
+                Assert.Equal(lastSpan.TraceId.ToString("x16", CultureInfo.InvariantCulture), traceId);
+                Assert.Equal(lastSpan.SpanId.ToString("x16", CultureInfo.InvariantCulture), parentSpanId);
             }
         }
 
@@ -66,8 +67,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 var spans = agent.WaitForSpans(1, 500);
                 Assert.Equal(0, spans.Count);
 
-                var traceId = GetHeader(processResult.StandardOutput, HttpHeaderNames.TraceId);
-                var parentSpanId = GetHeader(processResult.StandardOutput, HttpHeaderNames.ParentId);
+                var traceId = GetHeader(processResult.StandardOutput, HttpHeaderNames.B3TraceId);
+                var parentSpanId = GetHeader(processResult.StandardOutput, HttpHeaderNames.B3SpanId);
                 var tracingEnabled = GetHeader(processResult.StandardOutput, HttpHeaderNames.TracingEnabled);
 
                 Assert.Null(traceId);
@@ -92,8 +93,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 var spans = agent.WaitForSpans(1);
                 Assert.True(spans.Count > 0, "expected at least one span");
 
-                var traceId = GetHeader(processResult.StandardOutput, HttpHeaderNames.TraceId);
-                var parentSpanId = GetHeader(processResult.StandardOutput, HttpHeaderNames.ParentId);
+                var traceId = GetHeader(processResult.StandardOutput, HttpHeaderNames.B3TraceId);
+                var parentSpanId = GetHeader(processResult.StandardOutput, HttpHeaderNames.B3SpanId);
 
                 // inspect the top-level span, underlying spans can be HttpMessageHandler in .NET Core
                 var firstSpan = spans.First();
@@ -103,8 +104,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 Assert.Equal(nameof(WebRequest), firstSpan.Tags[Tags.InstrumentationName]);
 
                 var lastSpan = spans.Last();
-                Assert.Equal(lastSpan.TraceId.ToString(CultureInfo.InvariantCulture), traceId);
-                Assert.Equal(lastSpan.SpanId.ToString(CultureInfo.InvariantCulture), parentSpanId);
+                Assert.Equal(lastSpan.TraceId.ToString("x16", CultureInfo.InvariantCulture), traceId);
+                Assert.Equal(lastSpan.SpanId.ToString("x16", CultureInfo.InvariantCulture), parentSpanId);
             }
         }
 
@@ -124,8 +125,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 var spans = agent.WaitForSpans(1, 500);
                 Assert.Equal(0, spans.Count);
 
-                var traceId = GetHeader(processResult.StandardOutput, HttpHeaderNames.TraceId);
-                var parentSpanId = GetHeader(processResult.StandardOutput, HttpHeaderNames.ParentId);
+                var traceId = GetHeader(processResult.StandardOutput, HttpHeaderNames.B3TraceId);
+                var parentSpanId = GetHeader(processResult.StandardOutput, HttpHeaderNames.B3SpanId);
                 var tracingEnabled = GetHeader(processResult.StandardOutput, HttpHeaderNames.TracingEnabled);
 
                 Assert.Null(traceId);

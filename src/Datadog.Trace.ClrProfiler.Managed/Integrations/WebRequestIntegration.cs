@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Net;
 using System.Threading.Tasks;
@@ -86,7 +87,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     if (scope != null)
                     {
                         // add distributed tracing headers to the HTTP request
-                        SpanContextPropagator.Instance.Inject(scope.Span.Context, request.Headers.Wrap());
+                        B3SpanContextPropagator.Instance.Inject(scope.Span.Context, request.Headers.Wrap());
                     }
 
                     WebResponse response = callGetResponse(webRequest);
@@ -165,7 +166,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     if (scope != null)
                     {
                         // add distributed tracing headers to the HTTP request
-                        SpanContextPropagator.Instance.Inject(scope.Span.Context, webRequest.Headers.Wrap());
+                        B3SpanContextPropagator.Instance.Inject(scope.Span.Context, webRequest.Headers.Wrap());
                     }
 
                     WebResponse response = await originalMethod(webRequest).ConfigureAwait(false);

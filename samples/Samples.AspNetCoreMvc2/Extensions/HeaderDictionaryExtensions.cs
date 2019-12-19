@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Globalization;
 using System.Linq;
@@ -19,9 +20,9 @@ namespace Samples.AspNetCoreMvc2.Extensions
             ulong parentId = 0;
             SamplingPriority? samplingPriority = null;
 
-            if (headers.TryGetValue(HttpHeaderNames.TraceId, out var traceIdHeaders))
+            if (headers.TryGetValue(HttpHeaderNames.B3TraceId, out var traceIdHeaders))
             {
-                ulong.TryParse(traceIdHeaders.FirstOrDefault(), NumberStyles.Integer, CultureInfo.InvariantCulture, out traceId);
+                ulong.TryParse(traceIdHeaders.FirstOrDefault(), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out traceId);
             }
 
             if (traceId == 0)
@@ -30,15 +31,23 @@ namespace Samples.AspNetCoreMvc2.Extensions
                 return null;
             }
 
-            if (headers.TryGetValue(HttpHeaderNames.ParentId, out var parentIdHeaders))
+            if (headers.TryGetValue(HttpHeaderNames.B3SpanId, out var parentIdHeaders))
             {
-                ulong.TryParse(parentIdHeaders.FirstOrDefault(), NumberStyles.Integer, CultureInfo.InvariantCulture, out parentId);
+                ulong.TryParse(parentIdHeaders.FirstOrDefault(), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out parentId);
             }
 
-            if (headers.TryGetValue(HttpHeaderNames.SamplingPriority, out var samplingPriorityHeaders) &&
-                int.TryParse(samplingPriorityHeaders.FirstOrDefault(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var samplingPriorityValue))
+            if (headers.TryGetValue(HttpHeaderNames.B3Sampled, out var sampledHeaders) &&
+                int.TryParse(sampledHeaders.FirstOrDefault(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var sampledValue))
             {
-                samplingPriority = (SamplingPriority?)samplingPriorityValue;
+                // There is no 1:1 mapping between B3 sampled/debug flags and SamplingPriority.
+                // Will map to AutoReject or AutoKeep.
+                samplingPriority = (SamplingPriority?)sampledValue;
+            }
+            else if (headers.TryGetValue(HttpHeaderNames.B3Flags, out var debuggedHeaders) &&
+                int.TryParse(debuggedHeaders.FirstOrDefault(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var debugValue))
+            {
+                // Add 1 to coerce to UserKeep.
+                samplingPriority = (SamplingPriority?)debugValue++;
             }
 
             return new SpanContext(traceId, parentId, samplingPriority);

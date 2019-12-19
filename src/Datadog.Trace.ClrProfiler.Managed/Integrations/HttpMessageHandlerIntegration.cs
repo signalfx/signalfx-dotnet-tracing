@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Linq;
 using System.Net.Http;
@@ -188,7 +189,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                         scope.Span.SetTag("http-client-handler-type", reportedType.FullName);
 
                         // add distributed tracing headers to the HTTP request
-                        SpanContextPropagator.Instance.Inject(scope.Span.Context, request.Headers.Wrap());
+                        B3SpanContextPropagator.Instance.Inject(scope.Span.Context, request.Headers.Wrap());
                     }
 
                     HttpResponseMessage response = await sendAsync(handler, request, cancellationToken).ConfigureAwait(false);
