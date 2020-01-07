@@ -1,6 +1,8 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -57,7 +59,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             return EnvironmentHelper.GetSampleApplicationPath(packageVersion);
         }
 
-        public Process StartSample(int traceAgentPort, string arguments, string packageVersion, int aspNetCorePort)
+        public Process StartSample(int traceAgentPort, string arguments, string packageVersion, int aspNetCorePort, Dictionary<string, string> envVars = null)
         {
             // get path to sample app that the profiler will attach to
             string sampleAppPath = GetSampleApplicationPath(packageVersion);
@@ -74,7 +76,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 integrationPaths,
                 arguments,
                 traceAgentPort: traceAgentPort,
-                aspNetCorePort: aspNetCorePort);
+                aspNetCorePort: aspNetCorePort,
+                envVars: envVars);
         }
 
         public ProcessResult RunSampleAndWaitForExit(int traceAgentPort, string arguments = null, string packageVersion = "")
@@ -176,7 +179,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             return process;
         }
 
-        protected void ValidateSpans<T>(IEnumerable<MockTracerAgent.Span> spans, Func<MockTracerAgent.Span, T> mapper, IEnumerable<T> expected)
+        protected void ValidateSpans<T>(IEnumerable<IMockSpan> spans, Func<IMockSpan, T> mapper, IEnumerable<T> expected)
         {
             var spanLookup = new Dictionary<T, int>();
             foreach (var span in spans)
@@ -229,7 +232,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             string expectedOperationName,
             string expectedResourceName)
         {
-            IImmutableList<MockTracerAgent.Span> spans;
+            IImmutableList<IMockSpan> spans;
 
             using (var httpClient = new HttpClient())
             {
@@ -249,7 +252,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 Assert.True(spans.Count == 1, "expected one span");
             }
 
-            MockTracerAgent.Span span = spans[0];
+            IMockSpan span = spans[0];
             Assert.Equal(expectedSpanType, span.Type);
             Assert.Equal(expectedOperationName, span.Name);
             Assert.Equal(expectedResourceName, span.Resource);

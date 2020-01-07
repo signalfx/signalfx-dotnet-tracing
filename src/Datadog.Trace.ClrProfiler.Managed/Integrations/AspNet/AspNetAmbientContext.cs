@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -71,7 +72,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                                 }
                             }
 
-                            propagatedContext = SpanContextPropagator.Instance.Extract(headersCollection);
+                            propagatedContext = B3SpanContextPropagator.Instance.Extract(headersCollection);
                         }
                     }
                     catch (Exception ex)

@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
     {
         public static void AssertExpectationsMet<T>(
             List<T> expectations,
-            List<MockTracerAgent.Span> spans)
+            List<IMockSpan> spans)
             where T : SpanExpectation
         {
             Assert.True(spans.Count >= expectations.Count, $"Expected at least {expectations.Count} spans, received {spans.Count}");

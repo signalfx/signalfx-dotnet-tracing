@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -83,7 +84,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                                 }
                             }
 
-                            propagatedContext = SpanContextPropagator.Instance.Extract(headersCollection);
+                            propagatedContext = B3SpanContextPropagator.Instance.Extract(headersCollection);
                         }
                     }
                     catch (Exception ex)
@@ -92,15 +93,16 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     }
                 }
 
-                _scope = tracer.StartActive(OperationName, propagatedContext);
+                _scope = tracer.StartActive($"{controllerName}.{actionName}", propagatedContext);
                 var span = _scope.Span;
 
                 span.DecorateWebServerSpan(
-                    resourceName: resourceName,
+                    resourceName: null,
                     method: httpMethod,
                     host: host,
                     httpUrl: url);
 
+                span.SetTag(Tags.InstrumentationName, IntegrationName);
                 span.SetTag(Tags.AspNetController, controllerName);
                 span.SetTag(Tags.AspNetAction, actionName);
 

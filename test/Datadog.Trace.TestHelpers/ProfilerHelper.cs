@@ -1,5 +1,8 @@
+// Modified by SignalFx
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 
 namespace Datadog.Trace.TestHelpers
@@ -12,7 +15,8 @@ namespace Datadog.Trace.TestHelpers
             string arguments = null,
             bool redirectStandardInput = false,
             int traceAgentPort = 9696,
-            int aspNetCorePort = 5000)
+            int aspNetCorePort = 5000,
+            Dictionary<string, string> envVars = null)
         {
             if (environmentHelper == null)
             {
@@ -50,6 +54,14 @@ namespace Datadog.Trace.TestHelpers
             startInfo.RedirectStandardOutput = true;
             startInfo.RedirectStandardError = true;
             startInfo.RedirectStandardInput = redirectStandardInput;
+
+            if (envVars != null)
+            {
+                foreach (KeyValuePair<string, string> entry in envVars)
+                {
+                    startInfo.EnvironmentVariables[entry.Key] = entry.Value;
+                }
+            }
 
             return Process.Start(startInfo);
         }

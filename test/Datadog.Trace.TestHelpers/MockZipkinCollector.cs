@@ -61,7 +61,7 @@ namespace Datadog.Trace.TestHelpers
 
         public event EventHandler<EventArgs<HttpListenerContext>> RequestReceived;
 
-        public event EventHandler<EventArgs<IList<Span>>> RequestDeserialized;
+        public event EventHandler<EventArgs<IList<IMockSpan>>> RequestDeserialized;
 
         /// <summary>
         /// Gets or sets a value indicating whether to skip serialization of traces.
@@ -78,9 +78,9 @@ namespace Datadog.Trace.TestHelpers
         /// <summary>
         /// Gets the filters used to filter out spans we don't want to look at for a test.
         /// </summary>
-        public List<Func<Span, bool>> SpanFilters { get; private set; } = new List<Func<Span, bool>>();
+        public List<Func<IMockSpan, bool>> SpanFilters { get; private set; } = new List<Func<IMockSpan, bool>>();
 
-        public IImmutableList<Span> Spans { get; private set; } = ImmutableList<Span>.Empty;
+        public IImmutableList<IMockSpan> Spans { get; private set; } = ImmutableList<IMockSpan>.Empty;
 
         public IImmutableList<NameValueCollection> RequestHeaders { get; private set; } = ImmutableList<NameValueCollection>.Empty;
 
@@ -93,7 +93,7 @@ namespace Datadog.Trace.TestHelpers
         /// <param name="minDateTime">Minimum time to check for spans from</param>
         /// <param name="returnAllOperations">When true, returns every span regardless of operation name</param>
         /// <returns>The list of spans.</returns>
-        public IImmutableList<Span> WaitForSpans(
+        public IImmutableList<IMockSpan> WaitForSpans(
             int count,
             int timeoutInMilliseconds = 20000,
             string operationName = null,
@@ -101,9 +101,9 @@ namespace Datadog.Trace.TestHelpers
             bool returnAllOperations = false)
         {
             var deadline = DateTime.Now.AddMilliseconds(timeoutInMilliseconds);
-            var minimumOffset = (minDateTime ?? DateTimeOffset.MinValue).ToUnixTimeNanoseconds();
+            var minimumOffset = (minDateTime ?? DateTimeOffset.MinValue).ToUnixTimeMicroseconds();
 
-            IImmutableList<Span> relevantSpans = ImmutableList<Span>.Empty;
+            IImmutableList<IMockSpan> relevantSpans = ImmutableList<IMockSpan>.Empty;
 
             while (DateTime.Now < deadline)
             {
@@ -142,9 +142,9 @@ namespace Datadog.Trace.TestHelpers
             RequestReceived?.Invoke(this, new EventArgs<HttpListenerContext>(context));
         }
 
-        protected virtual void OnRequestDeserialized(IList<Span> trace)
+        protected virtual void OnRequestDeserialized(IList<IMockSpan> trace)
         {
-            RequestDeserialized?.Invoke(this, new EventArgs<IList<Span>>(trace));
+            RequestDeserialized?.Invoke(this, new EventArgs<IList<IMockSpan>>(trace));
         }
 
         private void AssertHeader(
@@ -178,7 +178,8 @@ namespace Datadog.Trace.TestHelpers
                     {
                         using (var reader = new StreamReader(ctx.Request.InputStream))
                         {
-                            var spans = JsonConvert.DeserializeObject<IList<Span>>(reader.ReadToEnd());
+                            var zspans = JsonConvert.DeserializeObject<List<Span>>(reader.ReadToEnd());
+                            IList<IMockSpan> spans = (IList<IMockSpan>)zspans.ConvertAll(x => (IMockSpan)x);
                             OnRequestDeserialized(spans);
 
                             lock (this)
@@ -205,7 +206,7 @@ namespace Datadog.Trace.TestHelpers
         }
 
         [DebuggerDisplay("TraceId={TraceId}, SpanId={SpanId}, Service={Service}, Name={Name}, Resource={Resource}")]
-        public class Span
+        public class Span : IMockSpan
         {
             [JsonExtensionData]
             private IDictionary<string, JToken> _zipkinData;
@@ -229,11 +230,17 @@ namespace Datadog.Trace.TestHelpers
 
             public string Resource { get; set; }
 
-            public string Service { get; set; }
+            public string Service
+            {
+                get => _zipkinData["localEndpoint"]["serviceName"].ToString();
+            }
 
             public string Type { get; set; }
 
-            public long Start { get; set; }
+            public long Start
+            {
+                get => Convert.ToInt64(_zipkinData["timestamp"].ToString());
+            }
 
             public long Duration { get; set; }
 
@@ -251,12 +258,8 @@ namespace Datadog.Trace.TestHelpers
             [OnDeserialized]
             private void OnDeserialized(StreamingContext context)
             {
-                Resource = string.Empty;
-                if (_zipkinData.ContainsKey("Tags"))
-                {
-                    var tags = _zipkinData["Tags"].ToObject<Dictionary<string, string>>();
-                    Resource = (string)DictionaryExtensions.GetValueOrDefault(tags, "resource.name");
-                }
+                Resource = (string)DictionaryExtensions.GetValueOrDefault(Tags, "resource.name");
+                Type = (string)DictionaryExtensions.GetValueOrDefault(Tags, "span.type");
             }
         }
     }

@@ -1,5 +1,7 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -16,11 +18,12 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
         protected AspNetCoreMvcTestBase(string sampleAppName, ITestOutputHelper output)
             : base(sampleAppName, output)
         {
-            CreateTopLevelExpectation(url: "/", httpMethod: "GET", httpStatus: "200", resourceUrl: "/");
-            CreateTopLevelExpectation(url: "/delay/0", httpMethod: "GET", httpStatus: "200", resourceUrl: "delay/{seconds}");
-            CreateTopLevelExpectation(url: "/api/delay/0", httpMethod: "GET", httpStatus: "200", resourceUrl: "api/delay/{seconds}");
-            CreateTopLevelExpectation(url: "/status-code/203", httpMethod: "GET", httpStatus: "203", resourceUrl: "status-code/{statusCode}");
+            CreateTopLevelExpectation(operationName: "home.index", url: "/", httpMethod: "GET", httpStatus: "200", resourceUrl: "/");
+            CreateTopLevelExpectation(operationName: "home.delay", url: "/delay/0", httpMethod: "GET", httpStatus: "200", resourceUrl: "delay/{seconds}");
+            CreateTopLevelExpectation(operationName: "api.delay", url: "/api/delay/0", httpMethod: "GET", httpStatus: "200", resourceUrl: "api/delay/{seconds}");
+            CreateTopLevelExpectation(operationName: "home.statuscodetest", url: "/status-code/203", httpMethod: "GET", httpStatus: "203", resourceUrl: "status-code/{statusCode}");
             CreateTopLevelExpectation(
+                operationName: "home.throwexception",
                 url: "/bad-request",
                 httpMethod: "GET",
                 httpStatus: null, // TODO: Enable status code tests
@@ -43,9 +46,13 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
         {
             var agentPort = TcpPortProvider.GetOpenPort();
             var aspNetCorePort = TcpPortProvider.GetOpenPort();
+            var envVars = new Dictionary<string, string>()
+            {
+                { "SIGNALFX_API_TYPE", "zipkin" }
+            };
 
-            using (var agent = new MockTracerAgent(agentPort))
-            using (var process = StartSample(agent.Port, arguments: null, packageVersion: packageVersion, aspNetCorePort: aspNetCorePort))
+            using (var agent = new MockZipkinCollector(agentPort))
+            using (var process = StartSample(agent.Port, arguments: null, packageVersion: packageVersion, aspNetCorePort: aspNetCorePort, envVars: envVars))
             {
                 agent.SpanFilters.Add(IsNotServerLifeCheck);
 
@@ -108,7 +115,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
                 var spans =
                     agent.WaitForSpans(
                               Expectations.Count,
-                              operationName: TopLevelOperationName,
                               minDateTime: testStart)
                          .OrderBy(s => s.Start)
                          .ToList();
@@ -123,17 +129,18 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
         }
 
         protected void CreateTopLevelExpectation(
+            string operationName,
             string url,
             string httpMethod,
             string httpStatus,
             string resourceUrl,
-            Func<MockTracerAgent.Span, List<string>> additionalCheck = null)
+            Func<IMockSpan, List<string>> additionalCheck = null)
         {
-            var expectation = new AspNetCoreMvcSpanExpectation(EnvironmentHelper.FullSampleName, TopLevelOperationName)
+            var expectation = new AspNetCoreMvcSpanExpectation(EnvironmentHelper.FullSampleName, operationName)
             {
                 OriginalUri = url,
                 HttpMethod = httpMethod,
-                ResourceName = $"{httpMethod.ToUpper()} {resourceUrl}",
+                ResourceName = operationName,
                 StatusCode = httpStatus,
             };
 
@@ -191,7 +198,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
             return true;
         }
 
-        private bool IsNotServerLifeCheck(MockTracerAgent.Span span)
+        private bool IsNotServerLifeCheck(IMockSpan span)
         {
             var url = SpanExpectation.GetTag(span, Tags.HttpUrl);
             if (url == null)
