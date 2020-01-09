@@ -11,7 +11,7 @@ namespace Datadog.Trace.Logging
 {
     internal static class DatadogLogging
     {
-        private const string NixDefaultDirectory = "/var/log/datadog/";
+        private const string NixDefaultDirectory = "/var/log/signalfx/";
         private static readonly string WindowsDefaultDirectory =
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"Datadog .NET Tracer", "logs");
 

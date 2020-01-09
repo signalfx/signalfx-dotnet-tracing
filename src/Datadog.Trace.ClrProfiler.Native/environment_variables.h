@@ -58,7 +58,7 @@ const WSTRING disabled_integrations = "SIGNALFX_DISABLED_INTEGRATIONS"_W;
 // Sets the path for the profiler's log file.
 // If not set, default is
 // "%ProgramData%"\Datadog .NET Tracer\logs\dotnet-profiler.log" on Windows or
-// "/var/log/datadog/dotnet-profiler.log" on Linux.
+// "/var/log/signalfx/dotnet-profiler.log" on Linux.
 const WSTRING log_path = "SIGNALFX_TRACE_LOG_PATH"_W;
 
 // Sets whether to disable all optimizations.
