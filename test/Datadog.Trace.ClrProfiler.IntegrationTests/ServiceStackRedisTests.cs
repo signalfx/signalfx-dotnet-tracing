@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Linq;
 using Datadog.Trace.ExtensionMethods;
@@ -41,8 +42,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     Assert.Equal("redis.command", span.Name);
                     Assert.Equal("Samples.ServiceStack.Redis-redis", span.Service);
                     Assert.Equal(SpanTypes.Redis, span.Type);
-                    Assert.Equal(host, span.Tags.GetValueOrDefault("out.host"));
-                    Assert.Equal(port, span.Tags.GetValueOrDefault("out.port"));
+                    Assert.Equal(host, span.Tags.GetValueOrDefault("peer.hostname"));
+                    Assert.Equal(port, span.Tags.GetValueOrDefault("peer.port"));
                 }
 
                 var expected = new TupleList<string, string>

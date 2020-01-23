@@ -44,6 +44,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             Output.WriteLine($"Profiler DLL: {EnvironmentHelper.GetProfilerPath()}");
         }
 
+        public Dictionary<string, string> ZipkinEnvVars
+        {
+            get => new Dictionary<string, string>() { { "SIGNALFX_API_TYPE", "zipkin" } };
+        }
+
         protected EnvironmentHelper EnvironmentHelper { get; set; }
 
         protected string TestPrefix => $"{EnvironmentHelper.GetBuildConfiguration()}.{EnvironmentHelper.GetTargetFramework()}";
@@ -80,9 +85,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 envVars: envVars);
         }
 
-        public ProcessResult RunSampleAndWaitForExit(int traceAgentPort, string arguments = null, string packageVersion = "")
+        public ProcessResult RunSampleAndWaitForExit(int traceAgentPort, string arguments = null, string packageVersion = "", Dictionary<string, string> envVars = null)
         {
-            Process process = StartSample(traceAgentPort, arguments, packageVersion, aspNetCorePort: 5000);
+            Process process = StartSample(traceAgentPort, arguments, packageVersion, aspNetCorePort: 5000, envVars);
 
             string standardOutput = process.StandardOutput.ReadToEnd();
             string standardError = process.StandardError.ReadToEnd();

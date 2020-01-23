@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Data;
 using System.Data.Common;
@@ -88,10 +89,11 @@ namespace Datadog.Trace.ClrProfiler
 
                 Span parent = tracer.ActiveScope?.Span;
 
+                string statement = command.CommandText.Length > 1024 ? command.CommandText.Substring(0, 1024) : command.CommandText;
+
                 if (parent != null &&
-                    parent.Type == SpanTypes.Sql &&
                     parent.GetTag(Tags.DbType) == dbType &&
-                    parent.ResourceName == command.CommandText)
+                    parent.GetTag(Tags.DbStatement) == statement)
                 {
                     // we are already instrumenting this,
                     // don't instrument nested methods that belong to the same stacktrace
@@ -106,7 +108,7 @@ namespace Datadog.Trace.ClrProfiler
                 var span = scope.Span;
                 span.SetTag(Tags.DbType, dbType);
                 span.SetTag(Tags.InstrumentationName, integrationName);
-                span.AddTagsFromDbCommand(command);
+                span.AddTagsFromDbCommand(command, statement);
 
                 // set analytics sample rate if enabled
                 var analyticsSampleRate = tracer.Settings.GetIntegrationAnalyticsSampleRate(integrationName, enabledWithGlobalSetting: false);
