@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -259,8 +260,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     Assert.Equal("redis.command", span.Name);
                     Assert.Equal("Samples.StackExchange.Redis-redis", span.Service);
                     Assert.Equal(SpanTypes.Redis, span.Type);
-                    Assert.Equal(host, span.Tags.GetValueOrDefault<string>("out.host"));
-                    Assert.Equal(port, span.Tags.GetValueOrDefault<string>("out.port"));
+                    Assert.Equal(host, span.Tags.GetValueOrDefault<string>("peer.hostname"));
+                    Assert.Equal(port, span.Tags.GetValueOrDefault<string>("peer.port"));
                 }
 
                 var spanLookup = new Dictionary<Tuple<string, string>, int>();

@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Data;
 using System.Data.Common;
@@ -29,10 +30,15 @@ namespace Datadog.Trace.ExtensionMethods
         /// </summary>
         /// <param name="span">The span to add the tags to.</param>
         /// <param name="command">The db command to get tags values from.</param>
-        public static void AddTagsFromDbCommand(this Span span, IDbCommand command)
+        /// <param name="statement">The db statement to use over command.CommandText.</param>
+        public static void AddTagsFromDbCommand(this Span span, IDbCommand command, string statement = "")
         {
-            span.ResourceName = command.CommandText;
-            span.Type = SpanTypes.Sql;
+            if (string.IsNullOrEmpty(statement))
+            {
+                statement = command.CommandText.Length > 1024 ? command.CommandText.Substring(0, 1024) : command.CommandText;
+            }
+
+            span.SetTag(Tags.DbStatement, statement);
 
             // parse the connection string
             var builder = new DbConnectionStringBuilder { ConnectionString = command.Connection.ConnectionString };

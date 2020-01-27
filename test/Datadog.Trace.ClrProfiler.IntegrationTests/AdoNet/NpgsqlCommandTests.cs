@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using Datadog.Trace.TestHelpers;
 using Xunit;
 using Xunit.Abstractions;
@@ -20,12 +21,12 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             int expectedSpanCount = EnvironmentHelper.IsCoreClr() ? 21 : 22;
             const string dbType = "postgres";
             const string expectedOperationName = dbType + ".query";
-            const string expectedServiceName = "Samples.Npgsql-" + dbType;
+            const string expectedServiceName = "Samples.Npgsql";
 
             int agentPort = TcpPortProvider.GetOpenPort();
 
-            using (var agent = new MockTracerAgent(agentPort))
-            using (ProcessResult processResult = RunSampleAndWaitForExit(agent.Port))
+            using (var agent = new MockZipkinCollector(agentPort))
+            using (ProcessResult processResult = RunSampleAndWaitForExit(agent.Port, envVars: ZipkinEnvVars))
             {
                 Assert.True(processResult.ExitCode >= 0, $"Process exited with code {processResult.ExitCode}");
 
@@ -36,8 +37,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
                 {
                     Assert.Equal(expectedOperationName, span.Name);
                     Assert.Equal(expectedServiceName, span.Service);
-                    Assert.Equal(SpanTypes.Sql, span.Type);
+                    Assert.Null(span.Type);
                     Assert.Equal(dbType, span.Tags[Tags.DbType]);
+                    Assert.NotNull(span.Tags[Tags.DbStatement]);
                 }
             }
         }

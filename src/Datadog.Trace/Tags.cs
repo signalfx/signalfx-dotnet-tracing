@@ -93,7 +93,12 @@ namespace Datadog.Trace
         /// <summary>
         /// The name of the database.
         /// </summary>
-        public const string DbName = "db.name";
+        public const string DbName = "db.instance";
+
+        /// <summary>
+        /// The command/query text
+        /// </summary>
+        public const string DbStatement = "db.statement";
 
         /// <summary>
         /// The query text
@@ -123,12 +128,12 @@ namespace Datadog.Trace
         /// <summary>
         /// The hostname of a outgoing server connection.
         /// </summary>
-        public const string OutHost = "out.host";
+        public const string OutHost = "peer.hostname";
 
         /// <summary>
         /// The port of a outgoing server connection.
         /// </summary>
-        public const string OutPort = "out.port";
+        public const string OutPort = "peer.port";
 
         /// <summary>
         /// The raw command sent to Redis.
