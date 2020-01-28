@@ -92,9 +92,17 @@ namespace Datadog.Trace.Agent
             {
                 get
                 {
-                    // Store Resource and Type as tags so as not to lose
-                    _span.Tags[Trace.Tags.ResourceName] = _span.ResourceName;
-                    _span.Tags[Trace.Tags.SpanType] = _span.Type;
+                    // Store Resource and Type when unique as tags so as not to lose
+                    if (!string.Equals(_span.OperationName, _span.ResourceName))
+                    {
+                        _span.Tags[Trace.Tags.ResourceName] = _span.ResourceName;
+                    }
+
+                    if (_span.Type != null)
+                    {
+                        _span.Tags[Trace.Tags.SpanType] = _span.Type;
+                    }
+
                     if (_span.Error)
                     {
                         _span.Tags[Trace.Tags.Error] = "true";

@@ -258,7 +258,9 @@ namespace Datadog.Trace.TestHelpers
             [OnDeserialized]
             private void OnDeserialized(StreamingContext context)
             {
-                Resource = (string)DictionaryExtensions.GetValueOrDefault(Tags, "resource.name");
+                var resourceNameTag = (string)DictionaryExtensions.GetValueOrDefault(Tags, "resource.name");
+                // If resource.name tag not set, it matches the operation name
+                Resource = string.IsNullOrEmpty(resourceNameTag) ? Name : resourceNameTag;
                 Type = (string)DictionaryExtensions.GetValueOrDefault(Tags, "span.type");
             }
         }
