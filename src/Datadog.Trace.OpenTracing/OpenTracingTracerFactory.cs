@@ -1,6 +1,7 @@
 using System;
 using System.Net.Http;
 using OpenTracing;
+using OpenTracing.Util;
 
 namespace Datadog.Trace.OpenTracing
 {
@@ -9,6 +10,8 @@ namespace Datadog.Trace.OpenTracing
     /// </summary>
     public static class OpenTracingTracerFactory
     {
+        private static object _lock = new object();
+
         /// <summary>
         /// Create a new Datadog compatible ITracer implementation with the given parameters
         /// </summary>
@@ -29,6 +32,28 @@ namespace Datadog.Trace.OpenTracing
         public static ITracer WrapTracer(Tracer tracer)
         {
             return new OpenTracingTracer(tracer);
+        }
+
+        /// <summary>
+        /// Registers a Tracer as the global tracer, if unregistered.
+        /// </summary>
+        /// <param name="tracer">Existing Datadog Tracer instance.</param>
+        /// <returns>True if the Tracer was successfully registered by this call, otherwise false.</returns>
+        public static bool RegisterGlobalTracer(Tracer tracer)
+        {
+           if (!GlobalTracer.IsRegistered())
+            {
+                lock (_lock)
+                {
+                    if (!GlobalTracer.IsRegistered())
+                    {
+                        GlobalTracer.Register(WrapTracer(tracer));
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         internal static OpenTracingTracer CreateTracer(Uri agentEndpoint, string defaultServiceName, DelegatingHandler delegatingHandler, bool isDebugEnabled)

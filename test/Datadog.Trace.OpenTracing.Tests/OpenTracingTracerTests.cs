@@ -9,6 +9,7 @@ using Datadog.Trace.TestHelpers;
 using Moq;
 using OpenTracing;
 using OpenTracing.Propagation;
+using OpenTracing.Util;
 using Xunit;
 
 namespace Datadog.Trace.OpenTracing.Tests
@@ -16,6 +17,7 @@ namespace Datadog.Trace.OpenTracing.Tests
     public class OpenTracingTracerTests
     {
         private readonly OpenTracingTracer _tracer;
+        private readonly Tracer _datadogTracer;
 
         public OpenTracingTracerTests()
         {
@@ -23,9 +25,9 @@ namespace Datadog.Trace.OpenTracing.Tests
             var writerMock = new Mock<IAgentWriter>();
             var samplerMock = new Mock<ISampler>();
 
-            var datadogTracer = new Tracer(settings, writerMock.Object, samplerMock.Object, scopeManager: null, statsd: null);
+            _datadogTracer = new Tracer(settings, writerMock.Object, samplerMock.Object, scopeManager: null, statsd: null);
 
-            _tracer = new OpenTracingTracer(datadogTracer);
+            _tracer = new OpenTracingTracer(_datadogTracer);
         }
 
         [Fact]
@@ -318,6 +320,19 @@ namespace Datadog.Trace.OpenTracing.Tests
             var ddSpan = otSpan.Span;
 
             Assert.Equal("MyAwesomeService", ddSpan.ServiceName);
+        }
+
+        [Fact]
+        public void RegisteredAsGlobalTracer_ByDefault()
+        {
+            var globalTracerRep = GlobalTracer.Instance.ToString();
+            Assert.Contains("Datadog.Trace.OpenTracing.OpenTracingTracer", globalTracerRep);
+        }
+
+        [Fact]
+        public void RegisteredAsGlobalTracer_OnlyOnce()
+        {
+            Assert.False(OpenTracingTracerFactory.RegisterGlobalTracer(_datadogTracer));
         }
     }
 }

@@ -1,3 +1,4 @@
+/** Modified by SignalFx */
 #include "cor_profiler.h"
 
 #include <corprof.h>
@@ -283,6 +284,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::ModuleLoadFinished(ModuleID module_id,
       "netstandard"_W,
       "Datadog.Trace"_W,
       "Datadog.Trace.ClrProfiler.Managed"_W,
+      "Datadog.Trace.OpenTracing"_W,
       "MsgPack"_W,
       "MsgPack.Serialization.EmittingSerializers.GeneratedSerealizers0"_W,
       "MsgPack.Serialization.EmittingSerializers.GeneratedSerealizers1"_W,

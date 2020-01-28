@@ -10,6 +10,12 @@ for target in integrations.json defaults.env LICENSE NOTICE ; do
     cp $DIR/../$target $DIR/../src/Datadog.Trace.ClrProfiler.Native/bin/Debug/x64/
 done
 
+# leave OT dependency to user app
+OPENTRACING_DLL=$DIR/../src/Datadog.Trace.ClrProfiler.Native/bin/Debug/x64/netstandard2.0/OpenTracing.dll
+if [ -f $OPENTRACING_DLL ]; then
+    mv $OPENTRACING_DLL /tmp/OpenTracing.dll
+fi
+
 cd $DIR/../deploy/linux
 for pkgtype in deb rpm tar ; do
     fpm \
@@ -32,6 +38,10 @@ for pkgtype in deb rpm tar ; do
         LICENSE \
         NOTICE
 done
+
+if [ -f /tmp/OpenTracing.dll ]; then
+    mv /tmp/OpenTracing.dll $OPENTRACING_DLL
+fi
 
 gzip -f signalfx-dotnet-tracing.tar
 mv signalfx-dotnet-tracing.tar.gz signalfx-dotnet-tracing-$VERSION.tar.gz
