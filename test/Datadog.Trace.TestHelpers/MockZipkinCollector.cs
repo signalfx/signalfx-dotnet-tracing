@@ -253,6 +253,23 @@ namespace Datadog.Trace.TestHelpers
 
             public Dictionary<string, string> Tags { get; set; }
 
+            public Dictionary<DateTimeOffset, Dictionary<string, string>> Logs
+            {
+                get
+                {
+                    var annotations = _zipkinData["annotations"].ToObject<List<Dictionary<string, object>>>();
+                    var logs = new Dictionary<DateTimeOffset, Dictionary<string, string>>();
+                    foreach (var item in annotations)
+                    {
+                        DateTimeOffset timestamp = ((long)item["timestamp"]).ToDateTimeOffset();
+                        Dictionary<string, string> fields = JsonConvert.DeserializeObject<Dictionary<string, string>>(item["value"].ToString());
+                        logs[timestamp] = fields;
+                    }
+
+                    return logs;
+                }
+            }
+
             public Dictionary<string, double> Metrics { get; set; }
 
             [OnDeserialized]

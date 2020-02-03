@@ -1,5 +1,7 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Datadog.Trace.Interfaces;
 
 namespace Datadog.Trace.TestHelpers
@@ -12,12 +14,21 @@ namespace Datadog.Trace.TestHelpers
 
         public bool Error { get; private set; }
 
+        public Dictionary<DateTimeOffset, Dictionary<string, string>> Logs { get; } = new Dictionary<DateTimeOffset, Dictionary<string, string>>();
+
         private Dictionary<string, string> Tags { get; } = new Dictionary<string, string>();
 
         ISpan ISpan.SetTag(string key, string value)
         {
             SetTagInternal(key, value);
 
+            return this;
+        }
+
+        ISpan ISpan.Log(DateTimeOffset timestamp, IEnumerable<KeyValuePair<string, object>> fields)
+        {
+            Dictionary<string, string> loggedFields = fields.ToDictionary(x => x.Key, x => x.Value.ToString());
+            Logs[timestamp] = loggedFields;
             return this;
         }
 

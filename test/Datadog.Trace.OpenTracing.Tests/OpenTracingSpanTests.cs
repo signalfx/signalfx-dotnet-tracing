@@ -1,4 +1,7 @@
+// Modifed by SignalFx
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Datadog.Trace.Agent;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Sampling;
@@ -37,6 +40,36 @@ namespace Datadog.Trace.OpenTracing.Tests
             Assert.Equal("42", otSpan.GetTag("IntKey"));
             Assert.Equal("1.618", otSpan.GetTag("DoubleKey"));
             Assert.Equal("True", otSpan.GetTag("BoolKey"));
+        }
+
+        [Fact]
+        public void Log_Logs_LogsAreProperlySet()
+        {
+            ISpan span = GetScope("Op1").Span;
+
+            span.Log("Some Event");
+            var doubleDict = new Dictionary<string, object>() { { "event name", 123.45 } };
+            span.Log(doubleDict);
+
+            var ex = new Exception("Some Exception");
+            var exDict = new Dictionary<string, object>() { { "another event name", ex } };
+            span.Log(exDict);
+
+            var now = DateTime.UtcNow;
+            var then = DateTime.UtcNow;
+            span.Log(now, "Another Event");
+            span.Log(then, exDict);
+
+            var otSpan = (OpenTracingSpan)span;
+            var logs = otSpan.Span.Logs;
+
+            var sortedLogs = logs.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
+            Assert.Equal("Some Event", sortedLogs.ElementAt(0).Value["event"]);
+            Assert.Equal("123.45", sortedLogs.ElementAt(1).Value["event name"]);
+            Assert.Equal(ex.ToString(), sortedLogs.ElementAt(2).Value["another event name"]);
+            Assert.Equal("Another Event", sortedLogs[now]["event"]);
+            Assert.Equal(ex.ToString(), sortedLogs[then]["another event name"]);
+            Assert.True(logs.Count == 5);
         }
 
         [Fact]

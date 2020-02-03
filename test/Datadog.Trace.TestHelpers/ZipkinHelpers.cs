@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace;
 using Datadog.Trace.ExtensionMethods;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
@@ -74,6 +75,21 @@ namespace Datadog.Trace.TestHelpers
             return obj.FirstDictionary()["tags"].ToObject<Dictionary<string, string>>();
         }
 
+        public static Dictionary<DateTimeOffset, Dictionary<string, string>> Logs(this JToken obj)
+        {
+            var annotations = obj.FirstDictionary()["annotations"].ToObject<List<Dictionary<string, object>>>();
+            var logs = new Dictionary<DateTimeOffset, Dictionary<string, string>>();
+            foreach (var item in annotations)
+            {
+                // Zipkin timestamps are in µS
+                var timestamp = ((long)item["timestamp"]).ToDateTimeOffset();
+                var fields = JsonConvert.DeserializeObject<Dictionary<string, string>>(item["value"].ToString());
+                logs[timestamp] = fields;
+            }
+
+            return logs;
+        }
+
         public static void AssertSpanEqual(Span expected, JToken actual)
         {
             Assert.Equal(expected.Context.TraceId, actual.TraceId());
@@ -97,6 +113,16 @@ namespace Datadog.Trace.TestHelpers
             if (expected.Tags != null)
             {
                 Assert.Equal(expected.Tags, actual.Tags());
+            }
+
+            if (expected.Logs != null)
+            {
+                var actualLogs = actual.Logs();
+                foreach (var item in expected.Logs)
+                {
+                    var truncatedTimestamp = item.Key.ToUnixTimeMicroseconds().ToDateTimeOffset();
+                    Assert.Equal(item.Value, actualLogs[truncatedTimestamp]);
+                }
             }
         }
 

@@ -112,9 +112,32 @@ namespace Datadog.Trace.Agent
                 }
             }
 
+            public List<Dictionary<string, object>> Annotations
+            {
+                get
+                {
+                    List<Dictionary<string, object>> annotations = new List<Dictionary<string, object>>();
+
+                    foreach (var e in _span.Logs)
+                    {
+                        var ts = e.Key.ToUnixTimeMicroseconds();
+                        var fields = JsonConvert.SerializeObject(e.Value);
+                        var item = new Dictionary<string, object>() { { "timestamp", ts }, { "value", fields } };
+                        annotations.Add(item);
+                    }
+
+                    return annotations;
+                }
+            }
+
             public bool ShouldSerializeTags()
             {
                 return _span.Tags != null;
+            }
+
+            public bool ShouldSerializeAnnotations()
+            {
+                return _span.Logs != null;
             }
 
             public bool ShouldSerializeParentId()
