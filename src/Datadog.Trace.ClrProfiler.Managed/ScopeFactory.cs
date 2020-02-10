@@ -40,15 +40,20 @@ namespace Datadog.Trace.ClrProfiler
                 scope = tracer.StartActive(OperationName);
                 var span = scope.Span;
 
-                span.Type = SpanTypes.Http;
                 span.ServiceName = $"{tracer.DefaultServiceName}-{ServiceName}";
 
-                span.ResourceName = string.Join(
-                    " ",
-                    httpMethod,
-                    UriHelpers.CleanUri(requestUri, removeScheme: true, tryRemoveIds: true));
-
                 span.SetTag(Tags.SpanKind, SpanKinds.Client);
+                // Only the span responsible for propagated context should have client span.kind
+                if (span.Context.Parent != null)
+                {
+                    var parent = ((SpanContext)span.Context.Parent).Span;
+                    var spanKind = parent.GetTag(Tags.SpanKind);
+                    if (SpanKinds.Client.Equals(spanKind))
+                    {
+                        parent.SetTag(Tags.SpanKind, null);
+                    }
+                }
+
                 span.SetTag(Tags.HttpMethod, httpMethod?.ToUpperInvariant());
                 span.SetTag(Tags.HttpUrl, UriHelpers.CleanUri(requestUri, removeScheme: false, tryRemoveIds: false));
                 span.SetTag(Tags.InstrumentationName, integrationName);
