@@ -27,6 +27,7 @@ namespace Datadog.Trace
         internal Span(SpanContext context, DateTimeOffset? start)
         {
             Context = context;
+            Context.Span = this;
             ServiceName = context.ServiceName;
             StartTime = start ?? Context.TraceContext.UtcNow;
 
