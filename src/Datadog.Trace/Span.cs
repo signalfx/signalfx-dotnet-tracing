@@ -1,6 +1,9 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Interfaces;
@@ -17,7 +20,7 @@ namespace Datadog.Trace
     /// </summary>
     public class Span : IDisposable, ISpan
     {
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.For<Span>();
+        private static readonly Vendors.Serilog.ILogger Logger = DatadogLogging.For<Span>();
 
         private readonly object _lock = new object();
 
@@ -27,7 +30,7 @@ namespace Datadog.Trace
             ServiceName = context.ServiceName;
             StartTime = start ?? Context.TraceContext.UtcNow;
 
-            Log.Debug(
+            Logger.Debug(
                 "Span started: [s_id: {0}, p_id: {1}, t_id: {2}]",
                 SpanId,
                 Context.ParentId,
@@ -85,6 +88,8 @@ namespace Datadog.Trace
 
         internal ConcurrentDictionary<string, double> Metrics { get; } = new ConcurrentDictionary<string, double>();
 
+        internal ConcurrentDictionary<DateTimeOffset, Dictionary<string, string>> Logs { get; } = new ConcurrentDictionary<DateTimeOffset, Dictionary<string, string>>();
+
         internal bool IsFinished { get; private set; }
 
         internal bool IsRootSpan => Context?.TraceContext?.RootSpan == this;
@@ -114,7 +119,17 @@ namespace Datadog.Trace
             {
                 foreach (var kv in Tags)
                 {
-                    sb.Append($"\t{kv.Key}:{kv.Value}");
+                    sb.Append($"\t{kv.Key}:{kv.Value}\n");
+                }
+            }
+
+            sb.AppendLine("Logs:");
+            foreach (var e in Logs)
+            {
+                sb.Append($"\t{e.Key}:\n");
+                foreach (var kv in e.Value)
+                {
+                    sb.Append($"\t\t{kv.Key}:{kv.Value}\n");
                 }
             }
 
@@ -124,7 +139,7 @@ namespace Datadog.Trace
             {
                 foreach (var kv in Metrics)
                 {
-                    sb.Append($"\t{kv.Key}:{kv.Value}");
+                    sb.Append($"\t{kv.Key}:{kv.Value}\n");
                 }
             }
 
@@ -141,7 +156,7 @@ namespace Datadog.Trace
         {
             if (IsFinished)
             {
-                Log.Debug("SetTag should not be called after the span was closed");
+                Logger.Debug("SetTag should not be called after the span was closed");
                 return this;
             }
 
@@ -213,7 +228,7 @@ namespace Datadog.Trace
                     }
                     else
                     {
-                        Log.Warning("Value {0} has incorrect format for tag {1}", value, Trace.Tags.Analytics);
+                        Logger.Warning("Value {0} has incorrect format for tag {1}", value, Trace.Tags.Analytics);
                     }
 
                     break;
@@ -227,6 +242,61 @@ namespace Datadog.Trace
         }
 
         /// <summary>
+        /// Add the specified log fields to this span.
+        /// </summary>
+        /// <param name="fields">The logged fields.</param>
+        /// <returns>This span to allow method chaining.</returns>
+        public Span Log(IEnumerable<KeyValuePair<string, object>> fields)
+        {
+            return Log(Context.TraceContext.UtcNow, fields);
+        }
+
+        /// <summary>
+        /// Add the specified log field objects to this span.
+        /// </summary>
+        /// <param name="timestamp">The event timestamp.</param>
+        /// <param name="fields">The logged fields.</param>
+        /// <returns>This span to allow method chaining.</returns>
+        public Span Log(DateTimeOffset timestamp, IEnumerable<KeyValuePair<string, object>> fields)
+        {
+            if (IsFinished)
+            {
+                Logger.Debug("Log should not be called after the span was closed");
+                return this;
+            }
+
+            if (fields == null)
+            {
+                return this;
+            }
+
+            var loggedFields = fields.ToDictionary(x => x.Key, x => x.Value.ToString());
+            Logs[timestamp] = loggedFields;
+            return this;
+        }
+
+        /// <summary>
+        /// Add the specified event to this span.
+        /// </summary>
+        /// <param name="eventName">The key to log as an event field name.</param>
+        /// <param name="value">The value to log as an event field value.</param>
+        /// <returns>This span to allow method chaining.</returns>
+        public Span Log(string eventName, object value)
+        {
+            return Log(new Dictionary<string, object>() { { eventName, value } });
+        }
+
+        /// <summary>
+        /// Add the specified event to this span.
+        /// </summary>
+        /// <param name="value">The event to log as an "event" field.</param>
+        /// <returns>This span to allow method chaining.</returns>
+        public Span Log(object value)
+        {
+            return Log(global::Datadog.Trace.Logs.Event, value);
+        }
+
+        /// <summary>
         /// Add a the specified tag to this span.
         /// </summary>
         /// <param name="key">The tag's key.</param>
@@ -234,6 +304,15 @@ namespace Datadog.Trace
         /// <returns>This span to allow method chaining.</returns>
         ISpan ISpan.SetTag(string key, string value)
             => SetTag(key, value);
+
+        /// <summary>
+        /// Add the specified log fields to this span.
+        /// </summary>
+        /// <param name="timestamp">The event's timestamp.</param>
+        /// <param name="fields">The logged fields.</param>
+        /// <returns>This span to allow method chaining.</returns>
+        ISpan ISpan.Log(DateTimeOffset timestamp, IEnumerable<KeyValuePair<string, object>> fields)
+            => Log(timestamp, fields);
 
         /// <summary>
         /// Record the end time of the span and flushes it to the backend.
@@ -271,9 +350,9 @@ namespace Datadog.Trace
             if (shouldCloseSpan)
             {
                 Context.TraceContext.CloseSpan(this);
-                if (Log.IsEnabled(LogEventLevel.Debug))
+                if (Logger.IsEnabled(LogEventLevel.Debug))
                 {
-                    Log.Debug(
+                    Logger.Debug(
                         "Span closed: [s_id: {0}, p_id: {1}, t_id: {2}] for (Service: {3}, Resource: {4}, Operation: {5}, Tags: [{6}])",
                         SpanId,
                         Context.ParentId,

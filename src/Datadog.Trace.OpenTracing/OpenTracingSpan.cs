@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -30,13 +31,31 @@ namespace Datadog.Trace.OpenTracing
 
         public string GetBaggageItem(string key) => null;
 
-        public ISpan Log(DateTimeOffset timestamp, IEnumerable<KeyValuePair<string, object>> fields) => this;
+        public ISpan Log(DateTimeOffset timestamp, IEnumerable<KeyValuePair<string, object>> fields)
+        {
+            Span.Log(timestamp, fields);
+            return this;
+        }
 
-        public ISpan Log(string eventName) => this;
+        public ISpan Log(string eventName)
+        {
+            var fields = new Dictionary<string, object>() { { Logs.Event, eventName } };
+            Span.Log(fields);
+            return this;
+        }
 
-        public ISpan Log(DateTimeOffset timestamp, string eventName) => this;
+        public ISpan Log(DateTimeOffset timestamp, string eventName)
+        {
+            var fields = new Dictionary<string, object>() { { Logs.Event, eventName } };
+            Span.Log(timestamp, fields);
+            return this;
+        }
 
-        public ISpan Log(IEnumerable<KeyValuePair<string, object>> fields) => this;
+        public ISpan Log(IEnumerable<KeyValuePair<string, object>> fields)
+        {
+            Span.Log(fields);
+            return this;
+        }
 
         public ISpan SetBaggageItem(string key, string value) => this;
 

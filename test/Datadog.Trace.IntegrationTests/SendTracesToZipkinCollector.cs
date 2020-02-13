@@ -73,6 +73,8 @@ namespace Datadog.Trace.IntegrationTests
                 var scope = _tracer.StartActive("Aᛗᚪᚾᚾᚪ", serviceName: "На берегу пустынных волн");
                 scope.Span.ResourceName = "η γλώσσα μου έδωσαν ελληνική";
                 scope.Span.SetTag("யாமறிந்த", "ნუთუ კვლა");
+                scope.Span.Log("யாமறிந்த", "ნუთუ კვლა");
+                scope.Span.Log("யாமறிந்த", "ნუთუ კვლა");
                 scope.Dispose();
 
                 await _httpRecorder.WaitForCompletion(1);

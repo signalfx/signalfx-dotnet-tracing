@@ -34,5 +34,15 @@ namespace Datadog.Trace.ExtensionMethods
         {
             return ToNanoseconds(ts) / 1000;
         }
+
+        /// <summary>
+        /// Reconverts a long timestamp from ToUnixTimeMicroseconds.
+        /// </summary>
+        /// <param name="ts">The unix time in microseconds.</param>
+        /// <returns>The corresponding DateTimeOffset.</returns>
+        public static DateTimeOffset ToDateTimeOffset(this long ts)
+        {
+            return DateTimeOffset.FromUnixTimeMilliseconds(ts / 1000);
+        }
     }
 }

@@ -38,6 +38,7 @@ namespace Datadog.Trace
         {
             // create the default global Tracer
             Instance = new Tracer();
+            RegisterGlobalTracer(Instance);
         }
 
         /// <summary>
@@ -355,6 +356,22 @@ namespace Datadog.Trace
 
             var statsdUdp = new StatsdUDP(settings.AgentUri.DnsSafeHost, settings.DogStatsdPort, StatsdConfig.DefaultStatsdMaxUDPPacketSize);
             return new Statsd(statsdUdp, new RandomGenerator(), new StopWatchFactory(), prefix: string.Empty, constantTags);
+        }
+
+        private static void RegisterGlobalTracer(Tracer instance)
+        {
+            try
+            {
+                Assembly asm = Assembly.Load(new AssemblyName("Datadog.Trace.OpenTracing, Version=1.10.0.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb"));
+                Type openTracingTracerFactory = asm.GetType("Datadog.Trace.OpenTracing.OpenTracingTracerFactory");
+                var methodInfo = openTracingTracerFactory.GetMethod("RegisterGlobalTracer");
+                object[] args = new object[] { instance };
+                methodInfo.Invoke(null, args);
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "Unable to load OpenTracing helper library.");
+            }
         }
 
         private void InitializeLibLogScopeEventSubscriber(IScopeManager scopeManager)
