@@ -11,6 +11,7 @@ This library provides an OpenTracing-compatible tracer and automatically configu
 | ADO.NET | Supported .NET Core versions | |
 | ASP.NET Core MVC | 2.0+ | `Microsoft.AspNet.Mvc.Core` NuGet and built-in packages |
 | HttpClient | Supported .NET Core versions | by way of `System.Net.Http.HttpClientHandler` and `HttpMessageHandler` instrumentations |
+| MongoDB | `MongoDB.Driver.Core` Nuget 2.1.0+ | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS=false` (`true` by default). |
 | WebClient | Supported .NET Core versions | by way of `System.Net.WebRequest` instrumentation |
 
 ## Installation

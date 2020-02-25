@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Reflection;
 
@@ -26,12 +27,27 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
             try
             {
                 Assembly.Load(new AssemblyName("Datadog.Trace.ClrProfiler.Managed, Version=1.10.0.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb"));
-                return true;
             }
             catch
             {
                 return false;
             }
+
+            try
+            {
+                // In order to support custom instrumentation we must initialize the tracer singleton on loading.
+                // This will register the OT global tracer.
+                Assembly asm = Assembly.Load(new AssemblyName("Datadog.Trace, Version=1.10.0.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb"));
+                Type tracer = asm.GetType("Datadog.Trace.Tracer");
+                tracer.GetProperty("Instance").GetValue(null);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("signalfx-dotnet-tracing: Unable to load Tracer singleton: " + ex);
+                return false;
+            }
+
+            return true;
         }
     }
 }

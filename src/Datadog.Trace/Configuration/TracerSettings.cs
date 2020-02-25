@@ -109,6 +109,8 @@ namespace Datadog.Trace.Configuration
             TracerMetricsEnabled = source?.GetBool(ConfigurationKeys.TracerMetricsEnabled) ??
                                    // default value
                                    false;
+
+            TagMongoCommands = source?.GetBool(ConfigurationKeys.TagMongoCommands) ?? true;
         }
 
         /// <summary>
@@ -221,6 +223,14 @@ namespace Datadog.Trace.Configuration
         /// are enabled and send to DogStatsd.
         /// </summary>
         public bool TracerMetricsEnabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether MongoDb integration
+        /// should tag the command BsonDocument as db.statement.
+        /// Default is <c>true</c>.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.TagMongoCommands"/>
+        public bool TagMongoCommands { get; set; }
 
         /// <summary>
         /// Create a <see cref="TracerSettings"/> populated from the default sources

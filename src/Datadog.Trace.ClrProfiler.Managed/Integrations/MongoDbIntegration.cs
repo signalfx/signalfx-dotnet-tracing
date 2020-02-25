@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Net;
 using System.Threading;
@@ -420,15 +421,22 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 Log.Warning(ex, "Unable to access EndPoint properties.");
             }
 
+            Tracer tracer = Tracer.Instance;
+            string statement = null;
             string operationName = null;
             string collectionName = null;
             string query = null;
-            string resourceName = null;
 
             try
             {
                 if (wireProtocol.TryGetFieldValue("_command", out object command) && command != null)
                 {
+                    if (tracer.Settings.TagMongoCommands)
+                    {
+                        string document = command.ToString();
+                        statement = document.Length > 1024 ? document.Substring(0, 1024) : document;
+                    }
+
                     // the name of the first element in the command BsonDocument will be the operation type (insert, delete, find, etc)
                     // and its value is the collection name
                     if (command.TryCallMethod("GetElement", 0, out object firstElement) && firstElement != null)
@@ -452,8 +460,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                             }
                         }
                     }
-
-                    resourceName = $"{operationName ?? "operation"} {databaseName ?? "database"} {query ?? "query"}";
                 }
             }
             catch (Exception ex)
@@ -461,18 +467,30 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 Log.Warning(ex, "Unable to access IWireProtocol.Command properties.");
             }
 
-            Tracer tracer = Tracer.Instance;
             string serviceName = string.Join("-", tracer.DefaultServiceName, ServiceName);
+            operationName = operationName ?? OperationName;
+
+            Span parent = tracer.ActiveScope?.Span;
+
+            if (parent != null &&
+                parent.GetTag(Tags.DbType) == SpanTypes.MongoDb &&
+                parent.OperationName == operationName &&
+                parent.GetTag(Tags.DbStatement) == statement)
+            {
+                // we are already instrumenting this command execution,
+                return null;
+            }
 
             Scope scope = null;
-
             try
             {
-                scope = tracer.StartActive(OperationName, serviceName: serviceName);
+                scope = tracer.StartActive(operationName, serviceName: serviceName);
                 var span = scope.Span;
-                span.Type = SpanTypes.MongoDb;
-                span.ResourceName = resourceName;
+                span.SetTag(Tags.DbType, SpanTypes.MongoDb);
+                span.SetTag(Tags.InstrumentationName, IntegrationName);
+                span.SetTag(Tags.SpanKind, SpanKinds.Client);
                 span.SetTag(Tags.DbName, databaseName);
+                span.SetTag(Tags.DbStatement, statement);
                 span.SetTag(Tags.MongoDbQuery, query);
                 span.SetTag(Tags.MongoDbCollection, collectionName);
                 span.SetTag(Tags.OutHost, host);
