@@ -28,8 +28,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             Output.WriteLine($"Assigning port {agentPort} for the agentPort.");
             Output.WriteLine($"Assigning port {httpPort} for the httpPort.");
 
-            using (var agent = new MockTracerAgent(agentPort))
-            using (ProcessResult processResult = RunSampleAndWaitForExit(agent.Port, arguments: $"HttpClient Port={httpPort}"))
+            using (var agent = new MockZipkinCollector(agentPort))
+            using (ProcessResult processResult = RunSampleAndWaitForExit(agent.Port, arguments: $"HttpClient Port={httpPort}", envVars: ZipkinEnvVars))
             {
                 Assert.True(processResult.ExitCode >= 0, $"Process exited with code {processResult.ExitCode}");
 
@@ -41,8 +41,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 var firstSpan = spans.First();
                 Assert.Equal("http.request", firstSpan.Name);
-                Assert.Equal("Samples.HttpMessageHandler-http-client", firstSpan.Service);
-                Assert.Equal(SpanTypes.Http, firstSpan.Type);
+                Assert.Equal("Samples.HttpMessageHandler", firstSpan.Service);
+                Assert.Null(firstSpan.Type);
                 Assert.Equal(nameof(HttpMessageHandler), firstSpan.Tags[Tags.InstrumentationName]);
 
                 var lastSpan = spans.Last();
@@ -59,8 +59,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             int agentPort = TcpPortProvider.GetOpenPort();
             int httpPort = TcpPortProvider.GetOpenPort();
 
-            using (var agent = new MockTracerAgent(agentPort))
-            using (ProcessResult processResult = RunSampleAndWaitForExit(agent.Port, arguments: $"HttpClient TracingDisabled Port={httpPort}"))
+            using (var agent = new MockZipkinCollector(agentPort))
+            using (ProcessResult processResult = RunSampleAndWaitForExit(agent.Port, arguments: $"HttpClient TracingDisabled Port={httpPort}", envVars: ZipkinEnvVars))
             {
                 Assert.True(processResult.ExitCode >= 0, $"Process exited with code {processResult.ExitCode}");
 
@@ -85,8 +85,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             int agentPort = TcpPortProvider.GetOpenPort();
             int httpPort = TcpPortProvider.GetOpenPort();
 
-            using (var agent = new MockTracerAgent(agentPort))
-            using (ProcessResult processResult = RunSampleAndWaitForExit(agent.Port, arguments: $"WebClient Port={httpPort}"))
+            using (var agent = new MockZipkinCollector(agentPort))
+            using (ProcessResult processResult = RunSampleAndWaitForExit(agent.Port, arguments: $"WebClient Port={httpPort}", envVars: ZipkinEnvVars))
             {
                 Assert.True(processResult.ExitCode >= 0, $"Process exited with code {processResult.ExitCode}");
 
@@ -99,8 +99,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 // inspect the top-level span, underlying spans can be HttpMessageHandler in .NET Core
                 var firstSpan = spans.First();
                 Assert.Equal("http.request", firstSpan.Name);
-                Assert.Equal("Samples.HttpMessageHandler-http-client", firstSpan.Service);
-                Assert.Equal(SpanTypes.Http, firstSpan.Type);
+                Assert.Equal("Samples.HttpMessageHandler", firstSpan.Service);
+                Assert.Null(firstSpan.Type);
                 Assert.Equal(nameof(WebRequest), firstSpan.Tags[Tags.InstrumentationName]);
 
                 var lastSpan = spans.Last();
@@ -117,8 +117,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             int agentPort = TcpPortProvider.GetOpenPort();
             int httpPort = TcpPortProvider.GetOpenPort();
 
-            using (var agent = new MockTracerAgent(agentPort))
-            using (ProcessResult processResult = RunSampleAndWaitForExit(agent.Port, arguments: $"WebClient TracingDisabled Port={httpPort}"))
+            using (var agent = new MockZipkinCollector(agentPort))
+            using (ProcessResult processResult = RunSampleAndWaitForExit(agent.Port, arguments: $"WebClient TracingDisabled Port={httpPort}", envVars: ZipkinEnvVars))
             {
                 Assert.True(processResult.ExitCode >= 0, $"Process exited with code {processResult.ExitCode}");
 

@@ -1,5 +1,7 @@
+// Modified by SignalFx
 using System;
 using System.Threading;
+using Datadog.Trace.Abstractions;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Logging;
 
@@ -89,5 +91,10 @@ namespace Datadog.Trace
         /// Returns null for local contexts.
         /// </summary>
         internal SamplingPriority? SamplingPriority { get; }
+
+        /// <summary>
+        /// Gets or sets the span associated with this context.
+        /// </summary>
+        internal ISpan Span { get; set; }
     }
 }

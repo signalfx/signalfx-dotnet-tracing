@@ -11,7 +11,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
     {
         /// <summary>
         /// Initializes static members of the <see cref="Startup"/> class.
-        /// This method also attempts to load the Datadog.Trace.ClrProfiler.Managed. NET assembly.
+        /// This method also attempts to load the Datadog.Trace.ClrProfiler.Managed .NET assembly.
         /// </summary>
         static Startup()
         {
@@ -22,32 +22,24 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
 
         internal static string ManagedProfilerDirectory { get; }
 
-        private static bool TryLoadManagedAssembly()
+        private static void TryLoadManagedAssembly()
         {
             try
             {
-                Assembly.Load(new AssemblyName("Datadog.Trace.ClrProfiler.Managed, Version=1.10.0.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb"));
+                var assembly = Assembly.Load("Datadog.Trace.ClrProfiler.Managed, Version=1.13.0.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb");
+
+                if (assembly != null)
+                {
+                    // call method Datadog.Trace.ClrProfiler.Instrumentation.Initialize()
+                    var type = assembly.GetType("Datadog.Trace.ClrProfiler.Instrumentation", throwOnError: false);
+                    var method = type?.GetRuntimeMethod("Initialize", parameters: new Type[0]);
+                    method?.Invoke(obj: null, parameters: null);
+                }
             }
             catch
             {
-                return false;
+                // ignore
             }
-
-            try
-            {
-                // In order to support custom instrumentation we must initialize the tracer singleton on loading.
-                // This will register the OT global tracer.
-                Assembly asm = Assembly.Load(new AssemblyName("Datadog.Trace, Version=1.10.0.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb"));
-                Type tracer = asm.GetType("Datadog.Trace.Tracer");
-                tracer.GetProperty("Instance").GetValue(null);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("signalfx-dotnet-tracing: Unable to load Tracer singleton: " + ex);
-                return false;
-            }
-
-            return true;
         }
     }
 }

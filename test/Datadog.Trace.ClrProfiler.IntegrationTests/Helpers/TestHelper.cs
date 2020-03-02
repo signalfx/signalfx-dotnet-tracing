@@ -11,6 +11,7 @@ using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
+using Datadog.Core.Tools;
 using Datadog.Trace.TestHelpers;
 using Xunit;
 using Xunit.Abstractions;
@@ -19,13 +20,13 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 {
     public abstract class TestHelper
     {
-        protected TestHelper(string sampleAppName, string samplePathOverrides, ITestOutputHelper output, string disabledIntegrations = null)
-            : this(new EnvironmentHelper(sampleAppName, typeof(TestHelper), output, samplePathOverrides, disabledIntegrations), output)
+        protected TestHelper(string sampleAppName, string samplePathOverrides, ITestOutputHelper output)
+            : this(new EnvironmentHelper(sampleAppName, typeof(TestHelper), output, samplePathOverrides), output)
         {
         }
 
-        protected TestHelper(string sampleAppName, ITestOutputHelper output, string disabledIntegrations = null)
-            : this(new EnvironmentHelper(sampleAppName, typeof(TestHelper), output, disabledIntegrations), output)
+        protected TestHelper(string sampleAppName, ITestOutputHelper output)
+            : this(new EnvironmentHelper(sampleAppName, typeof(TestHelper), output), output)
         {
         }
 
@@ -36,8 +37,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             Output = output;
 
             PathToSample = EnvironmentHelper.GetSampleApplicationOutputDirectory();
-            Output.WriteLine($"Platform: {EnvironmentHelper.GetPlatform()}");
-            Output.WriteLine($"Configuration: {EnvironmentHelper.GetBuildConfiguration()}");
+            Output.WriteLine($"Platform: {EnvironmentTools.GetPlatform()}");
+            Output.WriteLine($"Configuration: {EnvironmentTools.GetBuildConfiguration()}");
             Output.WriteLine($"TargetFramework: {EnvironmentHelper.GetTargetFramework()}");
             Output.WriteLine($".NET Core: {EnvironmentHelper.IsCoreClr()}");
             Output.WriteLine($"Application: {GetSampleApplicationPath()}");
@@ -51,7 +52,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
         protected EnvironmentHelper EnvironmentHelper { get; set; }
 
-        protected string TestPrefix => $"{EnvironmentHelper.GetBuildConfiguration()}.{EnvironmentHelper.GetTargetFramework()}";
+        protected string TestPrefix => $"{EnvironmentTools.GetBuildConfiguration()}.{EnvironmentHelper.GetTargetFramework()}";
 
         protected string SampleAppName { get; }
 
@@ -226,6 +227,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         protected void EnableDebugMode()
         {
             EnvironmentHelper.DebugModeEnabled = true;
+        }
+
+        protected void SetEnvironmentVariable(string key, string value)
+        {
+            EnvironmentHelper.CustomEnvironmentVariables.Add(key, value);
         }
 
         protected async Task AssertHttpSpan(

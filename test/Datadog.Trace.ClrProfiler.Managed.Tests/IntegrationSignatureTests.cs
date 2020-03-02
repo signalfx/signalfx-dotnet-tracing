@@ -1,24 +1,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Datadog.Trace.ClrProfiler.Integrations;
+#if !NETCOREAPP
+using Datadog.Trace.ClrProfiler.Integrations.AspNet;
+#endif
 using Xunit;
 
 namespace Datadog.Trace.ClrProfiler.Managed.Tests
 {
     public class IntegrationSignatureTests
     {
+        // This is a list of instrumented methods that are static, i.e., the target method is static.
         private static readonly List<MethodInfo> StaticInstrumentations = new List<MethodInfo>()
         {
-             typeof(AspNetCoreMvc2Integration).GetMethod(nameof(AspNetCoreMvc2Integration.BeforeAction)),
-             typeof(AspNetCoreMvc2Integration).GetMethod(nameof(AspNetCoreMvc2Integration.AfterAction)),
-             typeof(AspNetCoreMvc2Integration).GetMethod(nameof(AspNetCoreMvc2Integration.Rethrow)),
-
-             typeof(AspNetCoreMvc3Integration).GetMethod(nameof(AspNetCoreMvc3Integration.BeforeAction)),
-             typeof(AspNetCoreMvc3Integration).GetMethod(nameof(AspNetCoreMvc3Integration.AfterAction)),
-             typeof(AspNetCoreMvc3Integration).GetMethod(nameof(AspNetCoreMvc3Integration.Rethrow_ExceptionContextSealed)),
-             typeof(AspNetCoreMvc3Integration).GetMethod(nameof(AspNetCoreMvc3Integration.Rethrow_ResourceExecutedContextSealed)),
-             typeof(AspNetCoreMvc3Integration).GetMethod(nameof(AspNetCoreMvc3Integration.Rethrow_ResultExecutedContextSealed)),
+#if !NETCOREAPP
+             typeof(AspNetIntegration).GetMethod(nameof(AspNetIntegration.InvokePreStartInitMethods)),
+#endif
         };
 
         public static IEnumerable<object[]> GetWrapperMethodWithInterceptionAttributes()

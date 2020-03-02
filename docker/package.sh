@@ -3,7 +3,7 @@
 set -euxo pipefail
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-VERSION=1.10.0
+VERSION=1.13.0
 
 mkdir -p $DIR/../deploy/linux
 for target in integrations.json defaults.env LICENSE NOTICE ; do
@@ -17,7 +17,7 @@ if [ -f $OPENTRACING_DLL ]; then
 fi
 
 cd $DIR/../deploy/linux
-for pkgtype in deb rpm tar ; do
+for pkgtype in $PKGTYPES ; do
     fpm \
         -f \
         -s dir \
@@ -44,4 +44,9 @@ if [ -f /tmp/OpenTracing.dll ]; then
 fi
 
 gzip -f signalfx-dotnet-tracing.tar
-mv signalfx-dotnet-tracing.tar.gz signalfx-dotnet-tracing-$VERSION.tar.gz
+
+if [ -z "${MUSL-}" ]; then
+  mv signalfx-dotnet-tracing.tar.gz signalfx-dotnet-tracing-$VERSION.tar.gz
+else
+  mv signalfx-dotnet-tracing.tar.gz signalfx-dotnet-tracing-$VERSION-musl.tar.gz
+fi

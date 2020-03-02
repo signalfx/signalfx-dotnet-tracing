@@ -124,33 +124,38 @@ namespace Datadog.Trace.Configuration
         /// The rule is matched in order of specification. The first match in a list is used.
         ///
         /// Per entry:
-        ///   The item 'rate' is required in decimal format.
-        ///   The item 'service' is optional in regular expression format, to match on service name.
-        ///   The item 'operation' is optional in regular expression format, to match on operation name.
+        ///   The item "sample_rate" is required in decimal format.
+        ///   The item "service" is optional in regular expression format, to match on service name.
+        ///   The item "name" is optional in regular expression format, to match on operation name.
         ///
         /// To give a rate of 50% to any traces in a service starting with the text "cart":
-        ///   'rate=0.5, service=cart.*'
+        ///   '[{"sample_rate":0.5, "service":"cart.*"}]'
         ///
         /// To give a rate of 20% to any traces which have an operation name of "http.request":
-        ///   'rate=0.2, operation=http.request'
+        ///   '[{"sample_rate":0.2, "name":"http.request"}]'
         ///
         /// To give a rate of 100% to any traces within a service named "background" and with an operation name of "sql.query":
-        ///   'rate=1.0, service=background, operation=sql.query
+        ///   '[{"sample_rate":1.0, "service":"background", "name":"sql.query"}]
         ///
         /// To give a rate of 10% to all traces
-        ///   'rate=0.1'
+        ///   '[{"sample_rate":0.1}]'
         ///
         /// To configure multiple rules, separate by semi-colon and order from most specific to least specific:
-        ///   'rate=0.5, service=cart.*; rate=0.2, operation=http.request; rate=1.0, service=background, operation=sql.query; rate=0.1'
+        ///   '[{"sample_rate":0.5, "service":"cart.*"}, {"sample_rate":0.2, "name":"http.request"}, {"sample_rate":1.0, "service":"background", "name":"sql.query"}, {"sample_rate":0.1}]'
         ///
         /// If no rules are specified, or none match, default internal sampling logic will be used.
         /// </summary>
         /// <seealso cref="TracerSettings.CustomSamplingRules"/>
-        public const string CustomSamplingRules = "SIGNALFX_CUSTOM_SAMPLING_RULES";
+        public const string CustomSamplingRules = "SIGNALFX_TRACE_SAMPLING_RULES";
+
+        /// <summary>
+        /// Configuration key for setting the global rate for the sampler.
+        /// </summary>
+        public const string GlobalSamplingRate = "SIGNALFX_TRACE_SAMPLE_RATE";
 
         /// <summary>
         /// Configuration key for the DogStatsd port where the Tracer can send metrics.
-        /// Default value is 8125/
+        /// Default value is 8125.
         /// </summary>
         public const string DogStatsdPort = "SIGNALFX_DOGSTATSD_PORT";
 
@@ -166,6 +171,46 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="TracerSettings.TagMongoCommands"/>
         public const string TagMongoCommands = "SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS";
+
+        /// <summary>
+        /// Configuration key for setting the approximate maximum size,
+        /// in bytes, for Tracer log files.
+        /// Default value is 10 MB.
+        /// </summary>
+        public const string MaxLogFileSize = "SIGNALFX_MAX_LOGFILE_SIZE";
+
+        /// <summary>
+        /// Configuration key for setting the path to the profiler log file.
+        /// Default value is "%ProgramData%"\Datadog .NET Tracer\logs\dotnet-profiler.log" on Windows
+        /// or "/var/log/datadog/dotnet-profiler.log" on Linux.
+        /// </summary>
+        public const string ProfilerLogPath = "SIGNALFX_TRACE_LOG_PATH";
+
+        /// <summary>
+        /// Configuration key for when a standalone instance of the Trace Agent needs to be started.
+        /// </summary>
+        public const string TraceAgentPath = "SIGNALFX_TRACE_AGENT_PATH";
+
+        /// <summary>
+        /// Configuration key for arguments to pass to the Trace Agent process.
+        /// </summary>
+        public const string TraceAgentArgs = "SIGNALFX_TRACE_AGENT_ARGS";
+
+        /// <summary>
+        /// Configuration key for when a standalone instance of DogStatsD needs to be started.
+        /// </summary>
+        public const string DogStatsDPath = "SIGNALFX_DOGSTATSD_PATH";
+
+        /// <summary>
+        /// Configuration key for arguments to pass to the DogStatsD process.
+        /// </summary>
+        public const string DogStatsDArgs = "SIGNALFX_DOGSTATSD_ARGS";
+
+        /// <summary>
+        /// Configuration key for enabling or disabling the use of <see cref="System.Diagnostics.DiagnosticSource"/>.
+        /// Default value is <c>true</c> (enabled).
+        /// </summary>
+        public const string DiagnosticSourceEnabled = "SIGNALFX_DIAGNOSTIC_SOURCE_ENABLED";
 
         /// <summary>
         /// String format patterns used to match integration-specific configuration keys.

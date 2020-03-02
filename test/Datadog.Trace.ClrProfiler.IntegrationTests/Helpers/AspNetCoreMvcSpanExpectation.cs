@@ -5,8 +5,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 {
     public class AspNetCoreMvcSpanExpectation : WebServerSpanExpectation
     {
-        public AspNetCoreMvcSpanExpectation(string serviceName, string operationName)
-            : base(serviceName, operationName)
+        public AspNetCoreMvcSpanExpectation(string serviceName, string operationName, string resourceName, string statusCode, string httpMethod)
+            : base(serviceName, operationName, resourceName, SpanTypes.Web, statusCode, httpMethod)
         {
         }
 

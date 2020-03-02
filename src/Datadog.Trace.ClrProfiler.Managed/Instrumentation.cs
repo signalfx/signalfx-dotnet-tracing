@@ -1,5 +1,7 @@
 // Modified by SignalFx
 using System;
+using Datadog.Trace.Logging;
+using Datadog.Trace.Vendors.Serilog.Events;
 
 namespace Datadog.Trace.ClrProfiler
 {
@@ -12,6 +14,8 @@ namespace Datadog.Trace.ClrProfiler
         /// Gets the CLSID for the Datadog .NET profiler
         /// </summary>
         public static readonly string ProfilerClsid = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}";
+
+        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(Instrumentation));
 
         /// <summary>
         /// Gets a value indicating whether Datadog's profiler is attached to the current process.
@@ -31,6 +35,26 @@ namespace Datadog.Trace.ClrProfiler
                 {
                     return false;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Initializes global instrumentation values.
+        /// </summary>
+        public static void Initialize()
+        {
+            try
+            {
+                var tracer = Tracer.Instance;
+
+                if (tracer.Settings.DiagnosticSourceEnabled)
+                {
+                    tracer.StartDiagnosticObservers();
+                }
+            }
+            catch
+            {
+                // ignore
             }
         }
     }

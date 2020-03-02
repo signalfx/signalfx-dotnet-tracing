@@ -6,9 +6,9 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Datadog.Trace.ClrProfiler.Emit;
-using Datadog.Trace.ClrProfiler.ExtensionMethods;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Logging;
+using Datadog.Trace.Util;
 
 namespace Datadog.Trace.ClrProfiler.Integrations
 {
@@ -19,7 +19,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
     {
         private const string IntegrationName = "AspNetWebApi2";
         private const string OperationName = "aspnet-webapi.request";
-        private const string Major5Minor2 = "5.2";
+        private const string Major5Minor1 = "5.1";
         private const string Major5 = "5";
 
         private const string SystemWebHttpAssemblyName = "System.Web.Http";
@@ -42,7 +42,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             TargetAssembly = SystemWebHttpAssemblyName,
             TargetType = HttpControllerTypeName,
             TargetSignatureTypes = new[] { ClrNames.HttpResponseMessageTask, HttpControllerContextTypeName, ClrNames.CancellationToken },
-            TargetMinimumVersion = Major5Minor2,
+            TargetMinimumVersion = Major5Minor1,
             TargetMaximumVersion = Major5)]
         public static object ExecuteAsync(
             object apiController,
@@ -123,6 +123,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 }
                 catch (Exception ex)
                 {
+                    if (scope != null)
+                    {
+                        // some fields aren't set till after execution, so populate anything missing
+                        UpdateSpan(controllerContext, scope.Span);
+                    }
+
                     scope?.Span.SetException(ex);
                     throw;
                 }

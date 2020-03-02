@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Datadog.Trace.Interfaces;
+using Datadog.Trace.Abstractions;
 
 namespace Datadog.Trace.TestHelpers
 {
@@ -12,7 +12,7 @@ namespace Datadog.Trace.TestHelpers
 
         public string Type { get; set; }
 
-        public bool Error { get; private set; }
+        public bool Error { get; set; }
 
         public Dictionary<DateTimeOffset, Dictionary<string, string>> Logs { get; } = new Dictionary<DateTimeOffset, Dictionary<string, string>>();
 

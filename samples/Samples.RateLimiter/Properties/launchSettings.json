@@ -1,0 +1,23 @@
+{
+  // Modified by SignalFx
+  "profiles": {
+    "Samples.TracingWithoutLimits": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "COR_ENABLE_PROFILING": "1",
+        "COR_PROFILER": "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}",
+        "COR_PROFILER_PATH": "$(ProjectDir)$(OutputPath)profiler-lib\\Datadog.Trace.ClrProfiler.Native.dll",
+
+        "CORECLR_ENABLE_PROFILING": "1",
+        "CORECLR_PROFILER": "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}",
+        "CORECLR_PROFILER_PATH": "$(ProjectDir)$(OutputPath)profiler-lib\\Datadog.Trace.ClrProfiler.Native.dll",
+
+        "SIGNALFX_DOTNET_TRACER_HOME": "$(ProjectDir)$(OutputPath)profiler-lib",
+        "SIGNALFX_INTEGRATIONS": "$(ProjectDir)$(OutputPath)profiler-lib\\integrations.json",
+
+        "SIGNALFX_MAX_TRACES_PER_SECOND": "50"
+      },
+      "nativeDebugging": true
+    }
+  }
+}

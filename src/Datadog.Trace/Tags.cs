@@ -200,6 +200,6 @@ namespace Datadog.Trace
         /// <summary>
         /// Language tag, applied to root spans that are .NET runtime (e.g., ASP.NET)
         /// </summary>
-        public const string Language = "language";
+        public const string Language = "signalfx.tracing.library";
     }
 }
