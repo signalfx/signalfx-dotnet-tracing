@@ -39,6 +39,7 @@ namespace Datadog.Trace.ExtensionMethods
             }
 
             span.SetTag(Tags.DbStatement, statement);
+            span.SetTag(Tags.SpanKind, SpanKinds.Client);
 
             // parse the connection string
             var builder = new DbConnectionStringBuilder { ConnectionString = command.Connection.ConnectionString };
