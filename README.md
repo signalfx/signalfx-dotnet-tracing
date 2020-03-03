@@ -25,10 +25,6 @@ $ dpkg -i signalfx-dotnet-tracing.deb
 # Using rpm:
 $ rpm -ivh signalfx-dotnet-tracing.rpm
 
-# Using apk:
-# Install libc6-compat dependency and follow release bundle instructions (below).
-$ apk add libc6-compat
-
 # Directly from the release bundle:
 $ tar -xf signalfx-dotnet-tracing.tar.gz -C /
 ```
