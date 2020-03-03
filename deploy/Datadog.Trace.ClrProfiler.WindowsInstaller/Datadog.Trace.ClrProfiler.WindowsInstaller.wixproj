@@ -1,3 +1,4 @@
+<!-- Modified by SignalFx -->
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" InitialTargets="EnsureWixToolsetInstalled" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
@@ -14,11 +15,11 @@
     <IntermediateOutputPath>obj\$(Configuration)\$(Platform)\</IntermediateOutputPath>
     <SuppressPdbOutput>True</SuppressPdbOutput>
     <DefineSolutionProperties>false</DefineSolutionProperties>
-    <OutputName>datadog-dotnet-apm-1.13.0-$(Platform)</OutputName>
+    <OutputName>datadog-dotnet-apm-0.0.1-$(Platform)</OutputName>
   </PropertyGroup>
 
   <PropertyGroup>
-    <DefineConstants>InstallerVersion=1.13.0</DefineConstants>
+    <DefineConstants>InstallerVersion=0.0.1</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">

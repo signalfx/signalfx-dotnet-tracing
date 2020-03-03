@@ -1,8 +1,9 @@
+<!-- Modified by SignalFx -->
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <!-- NuGet -->
-    <Version>1.13.0</Version>
+    <Version>0.0.1</Version>
     <Title>Datadog APM - OpenTracing</Title>
     <Description>Provides OpenTracing support for Datadog APM</Description>
     <Authors>lucas.pimentel.datadog;colinhigginsdatadog;zachmontoyadd</Authors>
