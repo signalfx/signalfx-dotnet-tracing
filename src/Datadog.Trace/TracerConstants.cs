@@ -1,8 +1,9 @@
+// Modified by SignalFx
 namespace Datadog.Trace
 {
     internal static class TracerConstants
     {
-        public const string Language = "dotnet";
+        public const string Language = "dotnet-tracing";
 
         /// <summary>
         /// 2^63-1

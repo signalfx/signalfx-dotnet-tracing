@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Datadog.Trace.Agent;
 using Datadog.Trace.Configuration;
+using Datadog.Trace.DiagnosticListeners;
 using Datadog.Trace.DogStatsd;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Sampling;
@@ -21,8 +22,6 @@ namespace Datadog.Trace
     {
         private const string UnknownServiceName = "unnamed-dotnet-service";
 
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.For<Tracer>();
-
         /// <summary>
         /// The number of Tracer instances that have been created and not yet destroyed.
         /// This is used in the heartbeat metrics to estimate the number of
@@ -36,6 +35,7 @@ namespace Datadog.Trace
 
         static Tracer()
         {
+            TracingProcessManager.StartProcesses();
             // create the default global Tracer
             Instance = new Tracer();
             RegisterGlobalTracer(Instance);
@@ -99,14 +99,32 @@ namespace Datadog.Trace
 
             if (!string.IsNullOrWhiteSpace(Settings.CustomSamplingRules))
             {
-                foreach (var rule in RegexSamplingRule.BuildFromConfigurationString(Settings.CustomSamplingRules))
+                // User has opted in, ensure rate limiter is used
+                RuleBasedSampler.OptInTracingWithoutLimits();
+
+                foreach (var rule in CustomSamplingRule.BuildFromConfigurationString(Settings.CustomSamplingRules))
                 {
                     Sampler.RegisterRule(rule);
                 }
             }
 
+            if (Settings.GlobalSamplingRate != null)
+            {
+                var globalRate = (float)Settings.GlobalSamplingRate;
+
+                if (globalRate < 0f || globalRate > 1f)
+                {
+                    DatadogLogging.RegisterStartupLog(log => log.Warning("{0} configuration of {1} is out of range", ConfigurationKeys.GlobalSamplingRate, Settings.GlobalSamplingRate));
+                }
+                else
+                {
+                    Sampler.RegisterRule(new GlobalSamplingRule(globalRate));
+                }
+            }
+
             // Register callbacks to make sure we flush the traces before exiting
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+            AppDomain.CurrentDomain.DomainUnload += CurrentDomain_DomainUnload;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             Console.CancelKeyPress += Console_CancelKeyPress;
 
@@ -141,12 +159,6 @@ namespace Datadog.Trace
         public Scope ActiveScope => _scopeManager.Active;
 
         /// <summary>
-        /// Gets a value indicating whether debugging mode is enabled.
-        /// </summary>
-        /// <value><c>true</c> is debugging is enabled, otherwise <c>false</c>.</value>
-        bool IDatadogTracer.IsDebugEnabled => Settings.DebugEnabled;
-
-        /// <summary>
         /// Gets the default service name for traces where a service name is not specified.
         /// </summary>
         public string DefaultServiceName { get; }
@@ -165,6 +177,8 @@ namespace Datadog.Trace
         /// Gets the <see cref="ISampler"/> instance used by this <see cref="IDatadogTracer"/> instance.
         /// </summary>
         ISampler IDatadogTracer.Sampler => Sampler;
+
+        internal IDiagnosticManager DiagnosticManager { get; set; }
 
         internal ISampler Sampler { get; }
 
@@ -198,18 +212,29 @@ namespace Datadog.Trace
         }
 
         /// <summary>
-        /// Make a span active and return a scope that can be disposed to close the span
+        /// Make a span the active span and return its new scope.
         /// </summary>
-        /// <param name="span">The span to activate</param>
-        /// <param name="finishOnClose">If set to false, closing the returned scope will not close the enclosed span </param>
-        /// <returns>A Scope object wrapping this span</returns>
+        /// <param name="span">The span to activate.</param>
+        /// <returns>A Scope object wrapping this span.</returns>
+        Scope IDatadogTracer.ActivateSpan(Span span)
+        {
+            return ActivateSpan(span);
+        }
+
+        /// <summary>
+        /// Make a span the active span and return its new scope.
+        /// </summary>
+        /// <param name="span">The span to activate.</param>
+        /// <param name="finishOnClose">Determines whether closing the returned scope will also finish the span.</param>
+        /// <returns>A Scope object wrapping this span.</returns>
         public Scope ActivateSpan(Span span, bool finishOnClose = true)
         {
             return _scopeManager.Activate(span, finishOnClose);
         }
 
         /// <summary>
-        /// This is a shortcut for <see cref="StartSpan"/> and <see cref="ActivateSpan"/>, it creates a new span with the given parameters and makes it active.
+        /// This is a shortcut for <see cref="StartSpan(string, ISpanContext, string, DateTimeOffset?, bool)"/>
+        /// and <see cref="ActivateSpan(Span, bool)"/>, it creates a new span with the given parameters and makes it active.
         /// </summary>
         /// <param name="operationName">The span's operation name</param>
         /// <param name="parent">The span's parent</param>
@@ -222,6 +247,27 @@ namespace Datadog.Trace
         {
             var span = StartSpan(operationName, parent, serviceName, startTime, ignoreActiveScope);
             return _scopeManager.Activate(span, finishOnClose);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Span"/> with the specified parameters.
+        /// </summary>
+        /// <param name="operationName">The span's operation name</param>
+        /// <returns>The newly created span</returns>
+        Span IDatadogTracer.StartSpan(string operationName)
+        {
+            return StartSpan(operationName);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Span"/> with the specified parameters.
+        /// </summary>
+        /// <param name="operationName">The span's operation name</param>
+        /// <param name="parent">The span's parent</param>
+        /// <returns>The newly created span</returns>
+        Span IDatadogTracer.StartSpan(string operationName, ISpanContext parent)
+        {
+            return StartSpan(operationName, parent);
         }
 
         /// <summary>
@@ -312,6 +358,53 @@ namespace Datadog.Trace
             await _agentWriter.FlushAndCloseAsync();
         }
 
+        internal void StartDiagnosticObservers()
+        {
+            // instead of adding a hard dependency on DiagnosticSource,
+            // check if it is available before trying to use it
+            var type = Type.GetType("System.Diagnostics.DiagnosticSource, System.Diagnostics.DiagnosticSource", throwOnError: false);
+
+            if (type == null)
+            {
+                DatadogLogging.RegisterStartupLog(log => log.Warning("DiagnosticSource type could not be loaded. Disabling diagnostic observers."));
+            }
+            else
+            {
+                // don't call this method unless the necessary types are available
+                StartDiagnosticObserversInternal();
+            }
+        }
+
+        internal void StartDiagnosticObserversInternal()
+        {
+            DiagnosticManager?.Stop();
+
+            var observers = new List<DiagnosticObserver>();
+
+#if NETSTANDARD
+            if (Settings.IsIntegrationEnabled(AspNetCoreDiagnosticObserver.IntegrationName))
+            {
+                DatadogLogging.RegisterStartupLog(log => log.Debug("Adding AspNetCoreDiagnosticObserver"));
+
+                var aspNetCoreDiagnosticOptions = new AspNetCoreDiagnosticOptions();
+                observers.Add(new AspNetCoreDiagnosticObserver(this, aspNetCoreDiagnosticOptions));
+            }
+#endif
+
+            if (observers.Count == 0)
+            {
+                DatadogLogging.RegisterStartupLog(log => log.Debug("DiagnosticManager not started, zero observers added."));
+            }
+            else
+            {
+                DatadogLogging.RegisterStartupLog(log => log.Debug("Starting DiagnosticManager with {0} observers.", observers.Count));
+
+                var diagnosticManager = new DiagnosticManager(observers);
+                diagnosticManager.Start();
+                DiagnosticManager = diagnosticManager;
+            }
+        }
+
         /// <summary>
         /// Gets an "application name" for the executing application by looking at
         /// the hosted app name (.NET Framework on IIS only), assembly name, and process name.
@@ -336,7 +429,7 @@ namespace Datadog.Trace
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Error creating default service name.");
+                DatadogLogging.RegisterStartupLog(log => log.Error(ex, "Error creating default service name."));
                 return null;
             }
         }
@@ -362,7 +455,7 @@ namespace Datadog.Trace
         {
             try
             {
-                Assembly asm = Assembly.Load(new AssemblyName("Datadog.Trace.OpenTracing, Version=1.10.0.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb"));
+                Assembly asm = Assembly.Load(new AssemblyName("Datadog.Trace.OpenTracing, Version=0.0.1.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb"));
                 Type openTracingTracerFactory = asm.GetType("Datadog.Trace.OpenTracing.OpenTracingTracerFactory");
                 var methodInfo = openTracingTracerFactory.GetMethod("RegisterGlobalTracer");
                 object[] args = new object[] { instance };
@@ -370,7 +463,7 @@ namespace Datadog.Trace
             }
             catch (Exception ex)
             {
-                Log.Warning(ex, "Unable to load OpenTracing helper library.");
+                DatadogLogging.RegisterStartupLog(log => log.Warning(ex, "Unable to load OpenTracing helper library."));
             }
         }
 
@@ -381,17 +474,36 @@ namespace Datadog.Trace
 
         private void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
-            _agentWriter.FlushAndCloseAsync().Wait();
+            RunShutdownTasks();
         }
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            _agentWriter.FlushAndCloseAsync().Wait();
+            RunShutdownTasks();
         }
 
         private void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
         {
-            _agentWriter.FlushAndCloseAsync().Wait();
+            RunShutdownTasks();
+        }
+
+        private void CurrentDomain_DomainUnload(object sender, EventArgs e)
+        {
+            RunShutdownTasks();
+        }
+
+        private void RunShutdownTasks()
+        {
+            try
+            {
+                _agentWriter.FlushAndCloseAsync().Wait();
+            }
+            catch (Exception ex)
+            {
+                DatadogLogging.RegisterStartupLog(log => log.Error(ex, "Error flushing traces on shutdown."));
+            }
+
+            TracingProcessManager.StopProcesses();
         }
 
         private void HeartbeatCallback(object state)

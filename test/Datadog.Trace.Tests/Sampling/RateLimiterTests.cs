@@ -2,7 +2,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
-using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Sampling;
 using Xunit;
 
@@ -17,8 +16,11 @@ namespace Datadog.Trace.Tests.Sampling
         [Fact]
         public void One_Is_Allowed()
         {
+            var traceContext = new TraceContext(Tracer.Instance);
+            var spanContext = new SpanContext(null, traceContext, "Weeeee");
+            var span = new Span(spanContext, null);
             var rateLimiter = new RateLimiter(maxTracesPerInterval: null);
-            var allowed = rateLimiter.Allowed(1);
+            var allowed = rateLimiter.Allowed(span);
             Assert.True(allowed);
         }
 
@@ -74,9 +76,10 @@ namespace Datadog.Trace.Tests.Sampling
             var totalMilliseconds = result.TimeElapsed.TotalMilliseconds;
 
             var expectedLimit = totalMilliseconds * actualIntervalLimit / 1_000;
-            var acceptableDifference = (actualIntervalLimit * 0.80);
-            var upperLimit = expectedLimit + acceptableDifference;
-            var lowerLimit = expectedLimit - acceptableDifference;
+
+            var acceptableVariance = (actualIntervalLimit * 1.0);
+            var upperLimit = expectedLimit + acceptableVariance;
+            var lowerLimit = expectedLimit - acceptableVariance;
 
             Assert.True(
                 result.TotalAllowed >= lowerLimit && result.TotalAllowed <= upperLimit,
@@ -88,9 +91,13 @@ namespace Datadog.Trace.Tests.Sampling
             var totalExpectedAllowed = 2 * actualIntervalLimit;
             var expectedRate = totalExpectedAllowed / (float)totalExpectedSent;
 
-            var maxPercentVariance = 0.35f;
-            var lowestRate = expectedRate - maxPercentVariance;
-            var highestRate = expectedRate + maxPercentVariance;
+            var lowestRate = expectedRate - 0.40f;
+            if (lowestRate < 0)
+            {
+                lowestRate = expectedRate / 2;
+            }
+
+            var highestRate = expectedRate + 0.40f;
 
             Assert.True(
                 result.ReportedRate >= lowestRate && result.ReportedRate <= highestRate,
@@ -99,11 +106,15 @@ namespace Datadog.Trace.Tests.Sampling
 
         private static int AskTheRateLimiterABunchOfTimes(RateLimiter rateLimiter, int howManyTimes)
         {
+            var traceContext = new TraceContext(Tracer.Instance);
+            var spanContext = new SpanContext(null, traceContext, "Weeeee");
+            var span = new Span(spanContext, null);
+
             var remaining = howManyTimes;
             var allowedCount = 0;
             while (remaining-- > 0)
             {
-                var allowed = rateLimiter.Allowed(1);
+                var allowed = rateLimiter.Allowed(span);
                 if (allowed)
                 {
                     allowedCount++;
@@ -135,6 +146,8 @@ namespace Datadog.Trace.Tests.Sampling
             var end = DateTime.Now;
             var endLock = new object();
 
+            var traceContext = new TraceContext(Tracer.Instance);
+
             for (var i = 0; i < test.NumberOfBursts; i++)
             {
                 var remaining = test.NumberPerBurst;
@@ -148,14 +161,17 @@ namespace Datadog.Trace.Tests.Sampling
                                        while (remaining > 0)
                                        {
                                            Interlocked.Decrement(ref remaining);
-                                           var id = Random.Value.NextUInt63();
-                                           if (limiter.Allowed(id))
+
+                                           var spanContext = new SpanContext(null, traceContext, "Weeeee");
+                                           var span = new Span(spanContext, null);
+
+                                           if (limiter.Allowed(span))
                                            {
-                                               result.Allowed.Add(id);
+                                               result.Allowed.Add(span.SpanId);
                                            }
                                            else
                                            {
-                                               result.Denied.Add(id);
+                                               result.Denied.Add(span.SpanId);
                                            }
                                        }
 

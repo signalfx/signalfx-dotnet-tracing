@@ -49,20 +49,24 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 Assert.Equal("Samples.MongoDB", firstSpan.Service);
                 Assert.Null(firstSpan.Type);
 
-                var manualNames = new List<string>() { "sync-calls", "async-calls" };
-                var mongoNames = new List<string>() { "aggregate", "buildInfo", "delete", "find", "getLastError", "insert", "isMaster" };
-                var expectedNames = manualNames.Concat(mongoNames);
+                var manualNames = new HashSet<string>() { "sync-calls", "async-calls" };
+                var mongoNames = new HashSet<string>() { "aggregate", "buildInfo", "delete", "find", "getLastError", "insert", "isMaster", "mongodb.query" };
+                var expectedNames = new HashSet<string>();
+                expectedNames.UnionWith(manualNames);
+                expectedNames.UnionWith(mongoNames);
 
+                var foundNames = new HashSet<string>();
                 for (int i = 1; i < spans.Count; i++)
                 {
                     var span = spans[i];
                     var name = span.Name;
-                    Assert.Contains(name, expectedNames);
+                    foundNames.Add(name);
+
                     if (mongoNames.Contains(name))
                     {
                         Assert.Equal("MongoDb", span.Tags["component"]);
                         span.Tags.TryGetValue(Tags.DbStatement, out string statement);
-                        if (tagCommands.Equals("true"))
+                        if (tagCommands.Equals("true") && !name.Equals("mongodb.query"))
                         {
                             Assert.NotNull(statement);
                         }
@@ -71,9 +75,14 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                             Assert.Null(statement);
                         }
 
-                        Assert.NotNull(span.Tags[Tags.DbName]);
+                        if (!name.Equals("mongodb.query"))
+                        {
+                            Assert.NotNull(span.Tags[Tags.DbName]);
+                        }
                     }
                 }
+
+                Assert.True(expectedNames.SetEquals(foundNames));
             }
         }
     }

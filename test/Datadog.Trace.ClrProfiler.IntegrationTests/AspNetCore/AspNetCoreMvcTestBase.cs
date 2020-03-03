@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading;
 using Datadog.Trace.TestHelpers;
 using Xunit.Abstractions;
@@ -13,7 +14,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
 {
     public abstract class AspNetCoreMvcTestBase : TestHelper
     {
-        protected static readonly string TopLevelOperationName = "aspnet-coremvc.request";
+        protected static readonly string TopLevelOperationName = "aspnet_core.request";
 
         protected AspNetCoreMvcTestBase(string sampleAppName, ITestOutputHelper output)
             : base(sampleAppName, output)
@@ -21,24 +22,40 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
             CreateTopLevelExpectation(operationName: "home.index", url: "/", httpMethod: "GET", httpStatus: "200", resourceUrl: "/");
             CreateTopLevelExpectation(operationName: "home.delay", url: "/delay/0", httpMethod: "GET", httpStatus: "200", resourceUrl: "delay/{seconds}");
             CreateTopLevelExpectation(operationName: "api.delay", url: "/api/delay/0", httpMethod: "GET", httpStatus: "200", resourceUrl: "api/delay/{seconds}");
+            CreateTopLevelExpectation(operationName: "aspnet_core.request", url: "/not-found", httpMethod: "GET", httpStatus: "404", resourceUrl: "/not-found");
             CreateTopLevelExpectation(operationName: "home.statuscodetest", url: "/status-code/203", httpMethod: "GET", httpStatus: "203", resourceUrl: "status-code/{statusCode}");
             CreateTopLevelExpectation(
                 operationName: "home.throwexception",
                 url: "/bad-request",
                 httpMethod: "GET",
-                httpStatus: null, // TODO: Enable status code tests
+                httpStatus: "500",
                 resourceUrl: "bad-request",
                 additionalCheck: span =>
                 {
                     var failures = new List<string>();
-                    if (SpanExpectation.GetTag(span, Tags.ErrorMsg) != "This was a bad request.")
+
+                    if (span.Error == 0)
+                    {
+                        failures.Add($"Expected Error flag set within {span.Resource}");
+                    }
+
+                    if (SpanExpectation.GetTag(span, Tags.ErrorType) != "System.Exception")
                     {
                         failures.Add($"Expected specific exception within {span.Resource}");
+                    }
+
+                    var errorMessage = SpanExpectation.GetTag(span, Tags.ErrorMsg);
+
+                    if (errorMessage != "This was a bad request.")
+                    {
+                        failures.Add($"Expected specific error message within {span.Resource}. Found \"{errorMessage}\"");
                     }
 
                     return failures;
                 });
         }
+
+        protected HttpClient HttpClient { get; } = new HttpClient();
 
         protected List<AspNetCoreMvcSpanExpectation> Expectations { get; set; } = new List<AspNetCoreMvcSpanExpectation>();
 
@@ -46,13 +63,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
         {
             var agentPort = TcpPortProvider.GetOpenPort();
             var aspNetCorePort = TcpPortProvider.GetOpenPort();
-            var envVars = new Dictionary<string, string>()
-            {
-                { "SIGNALFX_API_TYPE", "zipkin" }
-            };
 
             using (var agent = new MockZipkinCollector(agentPort))
-            using (var process = StartSample(agent.Port, arguments: null, packageVersion: packageVersion, aspNetCorePort: aspNetCorePort, envVars: envVars))
+            using (var process = StartSample(agent.Port, arguments: null, packageVersion: packageVersion, aspNetCorePort: aspNetCorePort, envVars: ZipkinEnvVars))
             {
                 agent.SpanFilters.Add(IsNotServerLifeCheck);
 
@@ -92,7 +105,14 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
                 // wait for server to be ready to receive requests
                 while (intervals-- > 0)
                 {
-                    serverReady = SubmitRequest(aspNetCorePort, "/alive-check");
+                    try
+                    {
+                        serverReady = SubmitRequest(aspNetCorePort, "/alive-check") == HttpStatusCode.OK;
+                    }
+                    catch
+                    {
+                        // ignore
+                    }
 
                     if (serverReady)
                     {
@@ -136,12 +156,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
             string resourceUrl,
             Func<IMockSpan, List<string>> additionalCheck = null)
         {
-            var expectation = new AspNetCoreMvcSpanExpectation(EnvironmentHelper.FullSampleName, operationName)
+            var expectation = new AspNetCoreMvcSpanExpectation(EnvironmentHelper.FullSampleName, operationName, operationName, httpStatus, httpMethod)
             {
                 OriginalUri = url,
-                HttpMethod = httpMethod,
-                ResourceName = operationName,
-                StatusCode = httpStatus,
             };
 
             expectation.RegisterDelegateExpectation(additionalCheck);
@@ -157,45 +174,12 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
             }
         }
 
-        protected bool SubmitRequest(int aspNetCorePort, string path)
+        protected HttpStatusCode SubmitRequest(int aspNetCorePort, string path)
         {
-            try
-            {
-                var request = WebRequest.Create($"http://localhost:{aspNetCorePort}{path}");
-                using (var response = (HttpWebResponse)request.GetResponse())
-                using (var stream = response.GetResponseStream())
-                using (var reader = new StreamReader(stream))
-                {
-                    string responseText;
-                    try
-                    {
-                        responseText = reader.ReadToEnd();
-                    }
-                    catch (Exception ex)
-                    {
-                        responseText = "ENCOUNTERED AN ERROR WHEN READING RESPONSE.";
-                        Output.WriteLine(ex.ToString());
-                    }
-
-                    Output.WriteLine($"[http] {response.StatusCode} {responseText}");
-                }
-            }
-            catch (WebException wex)
-            {
-                Output.WriteLine($"[http] exception: {wex}");
-                if (wex.Response is HttpWebResponse response)
-                {
-                    using (var stream = response.GetResponseStream())
-                    using (var reader = new StreamReader(stream))
-                    {
-                        Output.WriteLine($"[http] {response.StatusCode} {reader.ReadToEnd()}");
-                    }
-                }
-
-                return false;
-            }
-
-            return true;
+            HttpResponseMessage response = HttpClient.GetAsync($"http://localhost:{aspNetCorePort}{path}").Result;
+            string responseText = response.Content.ReadAsStringAsync().Result;
+            Output.WriteLine($"[http] {response.StatusCode} {responseText}");
+            return response.StatusCode;
         }
 
         private bool IsNotServerLifeCheck(IMockSpan span)

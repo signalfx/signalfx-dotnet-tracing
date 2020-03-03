@@ -91,10 +91,40 @@ CorProfiler::Initialize(IUnknown* cor_profiler_info_unknown) {
                      environment::env,
                      environment::service_name,
                      environment::disabled_integrations,
-                     environment::clr_disable_optimizations};
+                     environment::clr_disable_optimizations,
+                     environment::azure_app_services,
+                     environment::azure_app_services_app_pool_id,
+                     environment::azure_app_services_cli_telemetry_profile_value};
 
   for (auto&& env_var : env_vars) {
     Info("  ", env_var, "=", GetEnvironmentValue(env_var));
+  }
+
+  const WSTRING azure_app_services_value =
+      GetEnvironmentValue(environment::azure_app_services);
+
+  if (azure_app_services_value == "1"_W) {
+    Info("Profiler is operating within Azure App Services context.");
+    in_azure_app_services = true;
+
+    const auto app_pool_id_value =
+        GetEnvironmentValue(environment::azure_app_services_app_pool_id);
+
+    if (app_pool_id_value.size() > 1 && app_pool_id_value.at(0) == '~') {
+      Info("Profiler disabled: ", environment::azure_app_services_app_pool_id,
+           " ", app_pool_id_value,
+           " is recognized as an Azure App Services infrastructure process.");
+      return E_FAIL;
+    }
+
+    const auto cli_telemetry_profile_value = GetEnvironmentValue(
+        environment::azure_app_services_cli_telemetry_profile_value);
+
+    if (cli_telemetry_profile_value == "AzureKudu"_W) {
+      Info("Profiler disabled: ", app_pool_id_value,
+           " is recognized as Kudu, an Azure App Services reserved process.");
+      return E_FAIL;
+    }
   }
 
   // get path to integration definition JSON files
@@ -215,7 +245,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::AssemblyLoadFinished(AssemblyID assembly_
   if (ws.str() == ToWSTRING(PROFILER_VERSION)) {
     Info("AssemblyLoadFinished: Datadog.Trace.ClrProfiler.Managed v", ws.str(), " matched profiler version v", PROFILER_VERSION);
     managed_profiler_loaded_app_domains.insert(assembly_info.app_domain_id);
-      
+
     if (runtime_information_.is_desktop() && corlib_module_loaded &&
           assembly_info.app_domain_id == corlib_app_domain_id) {
       Info("AssemblyLoadFinished: Datadog.Trace.ClrProfiler.Managed was loaded domain-neutral");
@@ -353,13 +383,18 @@ HRESULT STDMETHODCALLTYPE CorProfiler::ModuleLoadFinished(ModuleID module_id,
   const auto assembly_emit =
       metadata_interfaces.As<IMetaDataAssemblyEmit>(IID_IMetaDataAssemblyEmit);
 
-  filtered_integrations =
-      FilterIntegrationsByTarget(filtered_integrations, assembly_import);
-  if (filtered_integrations.empty()) {
-    // we don't need to instrument anything in this module, skip it
-    Debug("ModuleLoadFinished skipping module (filtered by target): ",
-          module_id, " ", module_info.assembly.name);
-    return S_OK;
+  // don't skip Microsoft.AspNetCore.Hosting so we can run the startup hook and
+  // subscribe to DiagnosticSource events
+  if (module_info.assembly.name != "Microsoft.AspNetCore.Hosting"_W) {
+    filtered_integrations =
+        FilterIntegrationsByTarget(filtered_integrations, assembly_import);
+
+    if (filtered_integrations.empty()) {
+      // we don't need to instrument anything in this module, skip it
+      Debug("ModuleLoadFinished skipping module (filtered by target): ",
+            module_id, " ", module_info.assembly.name);
+      return S_OK;
+    }
   }
 
   mdModule module;
@@ -480,13 +515,19 @@ HRESULT STDMETHODCALLTYPE CorProfiler::JITCompilationStarted(
           caller.name, "()");
   }
 
-  if (!ProfilerAssemblyIsLoadedIntoAppDomain(module_metadata->app_domain_id) &&
-      first_jit_compilation_app_domains.find(module_metadata->app_domain_id) ==
+  if (first_jit_compilation_app_domains.find(module_metadata->app_domain_id) ==
       first_jit_compilation_app_domains.end()) {
     first_jit_compilation_app_domains.insert(module_metadata->app_domain_id);
     hr = RunILStartupHook(module_metadata->metadata_emit, module_id,
                           function_token);
     RETURN_OK_IF_FAILED(hr);
+  }
+
+  // we don't actually need to instrument anything in
+  // Microsoft.AspNetCore.Hosting, it was included only to ensure the startup
+  // hook is called
+  if (module_metadata->assemblyName == "Microsoft.AspNetCore.Hosting"_W) {
+    return S_OK;
   }
 
   // Do not perform any modification if the owning module has been
@@ -778,6 +819,26 @@ HRESULT STDMETHODCALLTYPE CorProfiler::JITCompilationStarted(
       rewriter_wrapper.LoadInt32(method_def_md_token);
       rewriter_wrapper.LoadInt64(reinterpret_cast<INT64>(module_version_id_ptr));
 
+      // after the call is made, unbox any valuetypes
+      mdToken typeToken;
+      if (method_replacement.wrapper_method.method_signature.ReturnTypeIsObject()
+          && ReturnTypeIsValueTypeOrGeneric(module_metadata->metadata_import,
+                              module_metadata->metadata_emit,
+                              module_metadata->assembly_emit,
+                              target.id,
+                              target.signature,
+                              &typeToken)) {
+        if (debug_logging_enabled) {
+          Debug(
+              "JITCompilationStarted inserting 'unbox.any ", typeToken,
+              "' instruction after calling target function."
+              " function_id=", function_id,
+              " token=", function_token,
+              " target_name=", target.type.name, ".", target.name,"()");
+        }
+        rewriter_wrapper.UnboxAnyAfter(typeToken);
+      }
+
       modified = true;
 
       Info("*** JITCompilationStarted() replaced calls from ", caller.type.name,
@@ -856,17 +917,13 @@ HRESULT CorProfiler::GenerateVoidILStartupMethod(const ModuleID module_id,
   const auto assembly_emit =
       metadata_interfaces.As<IMetaDataAssemblyEmit>(IID_IMetaDataAssemblyEmit);
 
-  // TODO fix this for .NET Core
-  // Define an AssemblyRef to mscorlib, needed to create TypeRefs later
   mdModuleRef mscorlib_ref;
-  ASSEMBLYMETADATA metadata{};
-  metadata.usMajorVersion = 4;
-  metadata.usMinorVersion = 0;
-  metadata.usBuildNumber = 0;
-  metadata.usRevisionNumber = 0;
-  BYTE public_key[] = {0xB7, 0x7A, 0x5C, 0x56, 0x19, 0x34, 0xE0, 0x89};
-  assembly_emit->DefineAssemblyRef(public_key, sizeof(public_key), "mscorlib"_W.c_str(),
-                                   &metadata, NULL, 0, 0, &mscorlib_ref);
+  hr = CreateAssemblyRefToMscorlib(assembly_emit, &mscorlib_ref);
+
+  if (FAILED(hr)) {
+    Warn("GenerateVoidILStartupMethod: failed to define AssemblyRef to mscorlib");
+    return hr;
+  }
 
   // Define a TypeRef for System.Object
   mdTypeRef object_type_ref;

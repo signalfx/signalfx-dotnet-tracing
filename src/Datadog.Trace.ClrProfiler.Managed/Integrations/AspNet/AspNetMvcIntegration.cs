@@ -6,9 +6,9 @@ using System.Linq;
 using System.Web;
 using System.Web.Routing;
 using Datadog.Trace.ClrProfiler.Emit;
-using Datadog.Trace.ClrProfiler.ExtensionMethods;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Logging;
+using Datadog.Trace.Util;
 
 namespace Datadog.Trace.ClrProfiler.Integrations
 {
@@ -20,8 +20,8 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         private const string IntegrationName = "AspNetMvc";
         private const string OperationName = "aspnet-mvc.request";
         private const string HttpContextKey = "__Datadog.Trace.ClrProfiler.Integrations.AspNetMvcIntegration";
-        private const string Major5Minor1 = "5.1";
-        private const string Major5 = "5";
+        private const string MinimumVersion = "4";
+        private const string MaximumVersion = "5";
         private const string AssemblyName = "System.Web.Mvc";
 
         private const string AsyncActionInvokerTypeName = "System.Web.Mvc.Async.IAsyncActionInvoker";
@@ -171,8 +171,8 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             TargetAssembly = AssemblyName,
             TargetType = AsyncActionInvokerTypeName,
             TargetSignatureTypes = new[] { ClrNames.IAsyncResult, ControllerContextTypeName, ClrNames.String, ClrNames.AsyncCallback, ClrNames.Object },
-            TargetMinimumVersion = Major5Minor1,
-            TargetMaximumVersion = Major5)]
+            TargetMinimumVersion = MinimumVersion,
+            TargetMaximumVersion = MaximumVersion)]
         public static object BeginInvokeAction(
             object asyncControllerActionInvoker,
             object controllerContext,
@@ -260,8 +260,8 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             TargetAssembly = AssemblyName,
             TargetType = AsyncActionInvokerTypeName,
             TargetSignatureTypes = new[] { ClrNames.Bool, ClrNames.IAsyncResult },
-            TargetMinimumVersion = Major5Minor1,
-            TargetMaximumVersion = Major5)]
+            TargetMinimumVersion = MinimumVersion,
+            TargetMaximumVersion = MaximumVersion)]
         public static bool EndInvokeAction(
             object asyncControllerActionInvoker,
             object asyncResult,

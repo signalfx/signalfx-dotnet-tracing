@@ -279,6 +279,8 @@ namespace Datadog.Trace.TestHelpers
                 // If resource.name tag not set, it matches the operation name
                 Resource = string.IsNullOrEmpty(resourceNameTag) ? Name : resourceNameTag;
                 Type = (string)DictionaryExtensions.GetValueOrDefault(Tags, "span.type");
+                var error = DictionaryExtensions.GetValueOrDefault(Tags, "error") ?? "false";
+                Error = (byte)(error.ToLowerInvariant().Equals("true") ? 1 : 0);
             }
         }
     }

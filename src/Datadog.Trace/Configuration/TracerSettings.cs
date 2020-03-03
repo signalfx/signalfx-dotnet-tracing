@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Datadog.Trace.Sampling;
 
 namespace Datadog.Trace.Configuration
 {
@@ -92,9 +93,19 @@ namespace Datadog.Trace.Configuration
                                    // default value
                                    false;
 
-            MaxTracesSubmittedPerSecond = source?.GetInt32(ConfigurationKeys.MaxTracesSubmittedPerSecond) ??
-                                          // default value
-                                          100;
+            var maxTracesPerSecond = source?.GetInt32(ConfigurationKeys.MaxTracesSubmittedPerSecond);
+
+            if (maxTracesPerSecond != null)
+            {
+                // Ensure our flag for the rate limiter is enabled
+                RuleBasedSampler.OptInTracingWithoutLimits();
+            }
+            else
+            {
+                maxTracesPerSecond = 100; // default
+            }
+
+            MaxTracesSubmittedPerSecond = maxTracesPerSecond.Value;
 
             Integrations = new IntegrationSettingsCollection(source);
 
@@ -109,6 +120,14 @@ namespace Datadog.Trace.Configuration
             TracerMetricsEnabled = source?.GetBool(ConfigurationKeys.TracerMetricsEnabled) ??
                                    // default value
                                    false;
+
+            CustomSamplingRules = source?.GetString(ConfigurationKeys.CustomSamplingRules);
+
+            GlobalSamplingRate = source?.GetDouble(ConfigurationKeys.GlobalSamplingRate);
+
+            DiagnosticSourceEnabled = source?.GetBool(ConfigurationKeys.DiagnosticSourceEnabled) ??
+                                      // default value
+                                      true;
 
             TagMongoCommands = source?.GetBool(ConfigurationKeys.TagMongoCommands) ?? true;
         }
@@ -202,6 +221,12 @@ namespace Datadog.Trace.Configuration
         public string CustomSamplingRules { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating a global rate for sampling.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.GlobalSamplingRate"/>
+        public double? GlobalSamplingRate { get; set; }
+
+        /// <summary>
         /// Gets a collection of <see cref="Integrations"/> keyed by integration name.
         /// </summary>
         public IntegrationSettingsCollection Integrations { get; }
@@ -220,7 +245,7 @@ namespace Datadog.Trace.Configuration
 
         /// <summary>
         /// Gets or sets a value indicating whether internal metrics
-        /// are enabled and send to DogStatsd.
+        /// are enabled and sent to DogStatsd.
         /// </summary>
         public bool TracerMetricsEnabled { get; set; }
 
@@ -231,6 +256,12 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="ConfigurationKeys.TagMongoCommands"/>
         public bool TagMongoCommands { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the use
+        /// of <see cref="System.Diagnostics.DiagnosticSource"/> is enabled.
+        /// </summary>
+        public bool DiagnosticSourceEnabled { get; set; }
 
         /// <summary>
         /// Create a <see cref="TracerSettings"/> populated from the default sources
@@ -287,9 +318,8 @@ namespace Datadog.Trace.Configuration
 
         internal bool IsIntegrationEnabled(string name)
         {
-            return TraceEnabled &&
-                   Integrations[name].Enabled != false &&
-                   !DisabledIntegrationNames.Contains(name);
+            bool disabled = Integrations[name].Enabled == false || DisabledIntegrationNames.Contains(name);
+            return TraceEnabled && !disabled;
         }
 
         internal double? GetIntegrationAnalyticsSampleRate(string name, bool enabledWithGlobalSetting)
