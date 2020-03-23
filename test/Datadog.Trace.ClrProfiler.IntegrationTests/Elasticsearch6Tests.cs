@@ -1,3 +1,6 @@
+// Modified by SignalFx
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.TestHelpers;
@@ -13,15 +16,29 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         {
         }
 
+        public static IEnumerable<object[]> TestParameters()
+        {
+            foreach (var versions in PackageVersions.ElasticSearch6)
+            {
+                foreach (var version in versions)
+                {
+                    yield return new object[] { version, "true" };
+                    yield return new object[] { version, "false" };
+                }
+            }
+        }
+
         [Theory]
-        [MemberData(nameof(PackageVersions.ElasticSearch6), MemberType = typeof(PackageVersions))]
+        [MemberData(nameof(TestParameters))]
         [Trait("Category", "EndToEnd")]
-        public void SubmitsTraces(string packageVersion)
+        public void SubmitsTraces(string packageVersion, string tagQueries)
         {
             int agentPort = TcpPortProvider.GetOpenPort();
+            var envVars = ZipkinEnvVars;
+            envVars["SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES"] = tagQueries;
 
-            using (var agent = new MockTracerAgent(agentPort))
-            using (var processResult = RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion))
+            using (var agent = new MockZipkinCollector(agentPort))
+            using (var processResult = RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion, envVars: envVars))
             {
                 Assert.True(processResult.ExitCode >= 0, $"Process exited with code {processResult.ExitCode}");
 
@@ -127,18 +144,53 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 }
 
                 var spans = agent.WaitForSpans(expected.Count)
-                                 .Where(s => s.Type == "elasticsearch")
+                                 .Where(s => s.Tags.GetValueOrDefault(Tags.InstrumentationName) == "elasticsearch-net")
                                  .OrderBy(s => s.Start)
                                  .ToList();
 
+                var statementNames = new List<string>
+                {
+                    "Bulk",
+                    "BulkAlias",
+                    "ClusterAllocationExplain",
+                    "ClusterPutSettings",
+                    "ClusterReroute",
+                    "Create",
+                    "CreateIndex",
+                    "DeleteByQuery",
+                    "FlushJob",
+                    "GetAnomalyRecords",
+                    "GetBuckets",
+                    "GetCategories",
+                    "GetInfluencers",
+                    "GetModelSnapshots",
+                    "PutAlias",
+                    "PutIndexTemplate",
+                    "PutJob",
+                    "PutRole",
+                    "PutRoleMapping",
+                    "Search",
+                    "UpdateIndexSettings",
+                    "ValidateJob",
+                };
+
                 foreach (var span in spans)
                 {
-                    Assert.Equal("elasticsearch.query", span.Name);
-                    Assert.Equal("Samples.Elasticsearch-elasticsearch", span.Service);
-                    Assert.Equal("elasticsearch", span.Type);
+                    Assert.Equal("Samples.Elasticsearch", span.Service);
+                    Assert.Equal("elasticsearch", span.Tags["db.type"]);
+
+                    span.Tags.TryGetValue(Tags.DbStatement, out string statement);
+                    if (tagQueries.Equals("true") && statementNames.Contains(span.Name))
+                    {
+                        Assert.NotNull(statement);
+                    }
+                    else
+                    {
+                        Assert.Null(statement);
+                    }
                 }
 
-                ValidateSpans(spans, (span) => span.Resource, expected);
+                ValidateSpans(spans, (span) => span.Name, expected);
             }
         }
     }

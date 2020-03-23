@@ -1,5 +1,9 @@
+// Modified by SignalFx
 using System;
+using System.IO;
+using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using Datadog.Trace.ClrProfiler.Emit;
 using Datadog.Trace.Logging;
 
@@ -47,13 +51,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
             try
             {
-                scope = tracer.StartActive(OperationName, serviceName: serviceName);
+                var operationName = requestName ?? OperationName;
+                scope = tracer.StartActive(operationName, serviceName: serviceName);
                 var span = scope.Span;
-                span.ResourceName = requestName ?? pathAndQuery ?? string.Empty;
-                span.Type = SpanType;
                 span.SetTag(Tags.InstrumentationName, ComponentValue);
+                span.SetTag(Tags.DbType, SpanType);
                 span.SetTag(Tags.SpanKind, SpanKinds.Client);
-                span.SetTag(ElasticsearchActionKey, requestName);
                 span.SetTag(ElasticsearchMethodKey, method);
                 span.SetTag(ElasticsearchUrlKey, url);
 
@@ -67,6 +70,101 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             }
 
             return scope;
+        }
+
+        public static bool AttemptWrittenBytes(Span span, object requestData, out object postData, out object writtenBytes)
+        {
+            postData = null;
+            writtenBytes = null;
+            if (span == null)
+            {
+                return false;
+            }
+
+            if (!Tracer.Instance.Settings.TagElasticsearchQueries)
+            {
+                return false;
+            }
+
+            string operationName = span.OperationName;
+            if (operationName.Contains("ChangePassword") ||
+                span.OperationName.Contains("PutUser") ||
+                span.OperationName.Contains("UserAccessToken"))
+            {
+                return false;
+            }
+
+            postData = requestData.GetProperty("PostData")
+                                  .GetValueOrDefault();
+            if (postData == null)
+            {
+                return false;
+            }
+
+            writtenBytes = postData.GetProperty("WrittenBytes").GetValueOrDefault();
+            return true;
+        }
+
+        public static MethodInfo GetWriteMethodInfo(string methodName, object requestData, object postData, out object connectionSettings)
+        {
+            connectionSettings = requestData.GetProperty("ConnectionSettings").GetValueOrDefault();
+            var postDataType = postData.GetType();
+            return postDataType.GetMethod(methodName);
+        }
+
+        public static void SetDbStatement(Span span, object writtenBytes)
+        {
+            string data = System.Text.Encoding.UTF8.GetString((byte[])writtenBytes);
+            string statement = data.Length > 1024 ? data.Substring(0, 1024) : data;
+            span.SetTag(Tags.DbStatement, statement);
+        }
+
+        public static void SetDbStatementFromRequestData(this Span span, object requestData)
+        {
+            object postData;
+            object writtenBytes;
+            if (!AttemptWrittenBytes(span, requestData, out postData, out writtenBytes))
+            {
+                return;
+            }
+
+            if (writtenBytes == null)
+            {
+                object connectionSettings;
+                var methodInfo = GetWriteMethodInfo("Write", requestData, postData, out connectionSettings);
+                using (var stream = new MemoryStream())
+                {
+                    object[] args = new object[] { stream, connectionSettings };
+                    methodInfo.Invoke(postData, args);
+                    writtenBytes = stream.ToArray();
+                }
+            }
+
+            SetDbStatement(span, writtenBytes);
+        }
+
+        public static async Task SetDbStatementFromRequestDataAsync(this Span span, object requestData)
+        {
+            object postData;
+            object writtenBytes;
+            if (!AttemptWrittenBytes(span, requestData, out postData, out writtenBytes))
+            {
+                return;
+            }
+
+            if (writtenBytes == null)
+            {
+                object connectionSettings;
+                var methodInfo = GetWriteMethodInfo("WriteAsync", requestData, postData, out connectionSettings);
+                using (var stream = new MemoryStream())
+                {
+                    object[] args = new object[] { stream, connectionSettings, null };
+                    await (Task)(methodInfo.Invoke(postData, args));
+                    writtenBytes = stream.ToArray();
+                }
+            }
+
+            SetDbStatement(span, writtenBytes);
         }
     }
 }
