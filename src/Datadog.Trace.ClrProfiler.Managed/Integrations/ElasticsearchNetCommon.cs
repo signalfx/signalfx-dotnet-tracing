@@ -112,10 +112,24 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             return postDataType.GetMethod(methodName);
         }
 
+        public static string SanitizePostData(string data)
+        {
+            return data;
+        }
+
         public static void SetDbStatement(Span span, object writtenBytes)
         {
-            string data = System.Text.Encoding.UTF8.GetString((byte[])writtenBytes);
-            string statement = data.Length > 1024 ? data.Substring(0, 1024) : data;
+            string data = null;
+            if (writtenBytes.Length > 1024)
+            {
+                data = System.Text.Encoding.UTF8.GetString((byte[])writtenBytes, 0, 1024);
+            }
+            else
+            {
+                data = System.Text.Encoding.UTF8.GetString((byte[])writtenBytes);
+            }
+
+            string statement = SanitizePostData(data);
             span.SetTag(Tags.DbStatement, statement);
         }
 
