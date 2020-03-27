@@ -17,6 +17,36 @@ namespace Datadog.Trace.Agent
         // Don't serialize with BOM
         private readonly Encoding utf8 = new UTF8Encoding(false);
 
+        public static IDictionary<string, string> BuildTags(Span span)
+        {
+            var tags = new Dictionary<string, string>();
+            foreach (var entry in span.Tags)
+            {
+                if (!entry.Key.Equals(Trace.Tags.SpanKind))
+                {
+                    tags[entry.Key] = entry.Value;
+                }
+            }
+
+            // Store Resource and Type when unique as tags so as not to lose
+            if (!string.Equals(span.OperationName, span.ResourceName))
+            {
+                tags[Trace.Tags.ResourceName] = span.ResourceName;
+            }
+
+            if (span.Type != null)
+            {
+                tags[Trace.Tags.SpanType] = span.Type;
+            }
+
+            if (span.Error)
+            {
+                tags[Trace.Tags.Error] = "true";
+            }
+
+            return tags;
+        }
+
         public void Serialize(Stream stream, IList<List<Span>> traces)
         {
             var zipkinTraces = new List<ZipkinSpan>();
@@ -42,9 +72,15 @@ namespace Datadog.Trace.Agent
         {
             private readonly Span _span;
 
+            private readonly IDictionary<string, string> _tags;
+
             public ZipkinSpan(Span span)
             {
                 _span = span;
+                if (span.Tags != null)
+                {
+                    _tags = BuildTags(span);
+                }
             }
 
             public string Id
@@ -79,7 +115,7 @@ namespace Datadog.Trace.Agent
 
             public string Kind
             {
-                get => _span.Tags[Trace.Tags.SpanKind];
+                get => _span.Tags[Trace.Tags.SpanKind].ToUpper();
             }
 
             public Dictionary<string, string> LocalEndpoint
@@ -90,26 +126,7 @@ namespace Datadog.Trace.Agent
 
             public IDictionary<string, string> Tags
             {
-                get
-                {
-                    // Store Resource and Type when unique as tags so as not to lose
-                    if (!string.Equals(_span.OperationName, _span.ResourceName))
-                    {
-                        _span.Tags[Trace.Tags.ResourceName] = _span.ResourceName;
-                    }
-
-                    if (_span.Type != null)
-                    {
-                        _span.Tags[Trace.Tags.SpanType] = _span.Type;
-                    }
-
-                    if (_span.Error)
-                    {
-                        _span.Tags[Trace.Tags.Error] = "true";
-                    }
-
-                    return _span.Tags;
-                }
+                get => _tags;
             }
 
             public List<Dictionary<string, object>> Annotations
@@ -132,7 +149,7 @@ namespace Datadog.Trace.Agent
 
             public bool ShouldSerializeTags()
             {
-                return _span.Tags != null;
+                return _tags != null;
             }
 
             public bool ShouldSerializeAnnotations()

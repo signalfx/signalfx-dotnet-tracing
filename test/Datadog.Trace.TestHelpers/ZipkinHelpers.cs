@@ -112,7 +112,11 @@ namespace Datadog.Trace.TestHelpers
 
             if (expected.Tags != null)
             {
-                Assert.Equal(expected.Tags, actual.Tags());
+                var actualTags = new Dictionary<string, string>(actual.Tags());
+                actualTags.Remove("span.type");
+                actualTags.Remove("resource.name");
+                actualTags.Remove("error");
+                Assert.Equal(expected.Tags, actualTags);
             }
 
             if (expected.Logs != null)
