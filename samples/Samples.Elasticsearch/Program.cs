@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -180,6 +181,24 @@ namespace Samples.Elasticsearch
                 () => elastic.IndicesStats("test_index_1"),
                 () => elastic.DeleteIndex("test_index_1"),
                 () => elastic.GetAlias(new GetAliasRequest()),
+                () => elastic.ReindexOnServer(new ReindexOnServerRequest
+                {
+                    Source = new ReindexSource
+                    {
+                        Remote = new RemoteSource
+                        {
+                            Host = new Uri("http://" + Host()),
+                            Username = "test_user_1",
+                            Password = "supersecret"
+                        },
+                        Index = "some_index",
+                        Size = 10
+                    },
+                    Destination = new ReindexDestination
+                    {
+                        Index = "some_index_clone",
+                    }
+                })
             };
         }
 
@@ -232,6 +251,24 @@ namespace Samples.Elasticsearch
                 () => elastic.IndicesStatsAsync("test_index_1"),
                 () => elastic.DeleteIndexAsync("test_index_1"),
                 () => elastic.GetAliasAsync(new GetAliasRequest()),
+                () => elastic.ReindexOnServerAsync(new ReindexOnServerRequest
+                {
+                    Source = new ReindexSource
+                    {
+                        Remote = new RemoteSource
+                        {
+                            Host = new Uri("http://" + Host()),
+                            Username = "test_user_1",
+                            Password = "supersecret"
+                        },
+                        Index = "some_index",
+                        Size = 10
+                    },
+                    Destination = new ReindexDestination
+                    {
+                        Index = "some_index_clone",
+                    }
+                })
             };
         }
 

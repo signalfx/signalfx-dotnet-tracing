@@ -1,7 +1,9 @@
 // Modified by SignalFx
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Datadog.Trace.ClrProfiler.Emit;
@@ -18,7 +20,9 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         public const string ElasticsearchActionKey = "elasticsearch.action";
         public const string ElasticsearchMethodKey = "elasticsearch.method";
         public const string ElasticsearchUrlKey = "elasticsearch.url";
+        public const string Replacement = "?";
 
+        public static readonly List<Regex> SanitizePatterns = new List<Regex>() { new Regex("\"username\":\\s*\"([^\"]*)\""), new Regex("\"password\":\\s*\"([^\"]*)\"") };
         public static readonly Type CancellationTokenType = typeof(CancellationToken);
         public static readonly Type RequestPipelineType = Type.GetType("Elasticsearch.Net.IRequestPipeline, Elasticsearch.Net");
         public static readonly Type RequestDataType = Type.GetType("Elasticsearch.Net.RequestData, Elasticsearch.Net");
@@ -86,14 +90,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 return false;
             }
 
-            string operationName = span.OperationName;
-            if (operationName.Contains("ChangePassword") ||
-                span.OperationName.Contains("PutUser") ||
-                span.OperationName.Contains("UserAccessToken"))
-            {
-                return false;
-            }
-
             postData = requestData.GetProperty("PostData")
                                   .GetValueOrDefault();
             if (postData == null)
@@ -114,22 +110,34 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
         public static string SanitizePostData(string data)
         {
+            foreach (var pattern in SanitizePatterns)
+            {
+                data = pattern.Replace(data, (m) =>
+                {
+                    var group = m.Groups[1];
+                    var start = m.Value.Substring(0, group.Index - m.Index);
+                    var finish = m.Value.Substring(group.Index - m.Index + group.Length);
+                    return string.Format("{0}{1}{2}", start, Replacement, finish);
+                });
+            }
+
             return data;
         }
 
         public static void SetDbStatement(Span span, object writtenBytes)
         {
-            string data = null;
-            if (writtenBytes.Length > 1024)
+            string postData = null;
+            byte[] bytes = writtenBytes == null ? new byte[0] : (byte[])writtenBytes;
+            if (bytes.Length > 1024)
             {
-                data = System.Text.Encoding.UTF8.GetString((byte[])writtenBytes, 0, 1024);
+                postData = System.Text.Encoding.UTF8.GetString(bytes, 0, 1024);
             }
             else
             {
-                data = System.Text.Encoding.UTF8.GetString((byte[])writtenBytes);
+                postData = System.Text.Encoding.UTF8.GetString(bytes);
             }
 
-            string statement = SanitizePostData(data);
+            string statement = SanitizePostData(postData);
             span.SetTag(Tags.DbStatement, statement);
         }
 

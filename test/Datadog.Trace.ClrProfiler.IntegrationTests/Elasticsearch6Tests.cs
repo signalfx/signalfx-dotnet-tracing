@@ -75,6 +75,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                         "IndicesStats",
                         "DeleteIndex",
                         "GetAlias",
+                        "ReindexOnServer",
 
                         "CatAliases",
                         "CatAllocation",
@@ -152,6 +153,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 {
                     "Bulk",
                     "BulkAlias",
+                    "ChangePassword",
                     "ClusterAllocationExplain",
                     "ClusterPutSettings",
                     "ClusterReroute",
@@ -168,7 +170,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     "PutIndexTemplate",
                     "PutJob",
                     "PutRole",
+                    "PutUser",
                     "PutRoleMapping",
+                    "ReindexOnServer",
                     "Search",
                     "UpdateIndexSettings",
                     "ValidateJob",
@@ -183,6 +187,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     if (tagQueries.Equals("true") && statementNames.Contains(span.Name))
                     {
                         Assert.NotNull(statement);
+                        Assert.DoesNotContain(statement, "test_user");
+                        Assert.DoesNotContain(statement, "supersecret");
                     }
                     else
                     {
