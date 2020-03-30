@@ -113,10 +113,20 @@ namespace Datadog.Trace.TestHelpers
             if (expected.Tags != null)
             {
                 var actualTags = new Dictionary<string, string>(actual.Tags());
+                var expectedTags = new Dictionary<string, string>(expected.Tags);
                 actualTags.Remove("span.type");
                 actualTags.Remove("resource.name");
                 actualTags.Remove("error");
-                Assert.Equal(expected.Tags, actualTags);
+
+                var expectedSpanKind = DictionaryExtensions.GetValueOrDefault(expectedTags, Datadog.Trace.Tags.SpanKind);
+                if (expectedSpanKind != null)
+                {
+                    var actualSpanKind = actual.FirstDictionary()["kind"];
+                    Assert.Equal(expectedSpanKind.ToUpper(), actualSpanKind);
+                    expectedTags.Remove(Datadog.Trace.Tags.SpanKind);
+                }
+
+                Assert.Equal(expectedTags, actualTags);
             }
 
             if (expected.Logs != null)
