@@ -76,7 +76,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             return scope;
         }
 
-        public static bool AttemptWrittenBytes(Span span, object requestData, out object postData, out object writtenBytes)
+        public static bool AttemptWrittenBytes(Span span, object requestData, out object postData, out byte[] writtenBytes)
         {
             postData = null;
             writtenBytes = null;
@@ -97,7 +97,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 return false;
             }
 
-            writtenBytes = postData.GetProperty("WrittenBytes").GetValueOrDefault();
+            writtenBytes = (byte[])postData.GetProperty("WrittenBytes").GetValueOrDefault();
             return true;
         }
 
@@ -124,17 +124,21 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             return data;
         }
 
-        public static void SetDbStatement(Span span, object writtenBytes)
+        public static void SetDbStatement(Span span, byte[] writtenBytes)
         {
             string postData = null;
-            byte[] bytes = writtenBytes == null ? new byte[0] : (byte[])writtenBytes;
-            if (bytes.Length > 1024)
+            if (writtenBytes == null)
             {
-                postData = System.Text.Encoding.UTF8.GetString(bytes, 0, 1024);
+                return;
+            }
+
+            if (writtenBytes.Length > 1024)
+            {
+                postData = System.Text.Encoding.UTF8.GetString(writtenBytes, 0, 1024);
             }
             else
             {
-                postData = System.Text.Encoding.UTF8.GetString(bytes);
+                postData = System.Text.Encoding.UTF8.GetString(writtenBytes);
             }
 
             string statement = SanitizePostData(postData);
@@ -144,7 +148,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         public static void SetDbStatementFromRequestData(this Span span, object requestData)
         {
             object postData;
-            object writtenBytes;
+            byte[] writtenBytes;
             if (!AttemptWrittenBytes(span, requestData, out postData, out writtenBytes))
             {
                 return;
@@ -168,7 +172,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         public static async Task SetDbStatementFromRequestDataAsync(this Span span, object requestData)
         {
             object postData;
-            object writtenBytes;
+            byte[] writtenBytes;
             if (!AttemptWrittenBytes(span, requestData, out postData, out writtenBytes))
             {
                 return;
