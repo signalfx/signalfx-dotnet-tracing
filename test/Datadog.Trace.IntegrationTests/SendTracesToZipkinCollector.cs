@@ -32,6 +32,7 @@ namespace Datadog.Trace.IntegrationTests
             using (var agent = new MockZipkinCollector(collectorPort))
             {
                 var scope = _tracer.StartActive("Operation");
+                scope.Span.SetTag(Tags.SpanKind, SpanKinds.Client);
                 scope.Dispose();
 
                 await _httpRecorder.WaitForCompletion(1);
