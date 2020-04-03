@@ -166,11 +166,18 @@ namespace Datadog.Trace.Configuration
         public const string TracerMetricsEnabled = "SIGNALFX_TRACE_METRICS_ENABLED";
 
         /// <summary>
-        /// Configuration key for enabling or disabling the automatic injection
-        /// of correlation identifiers into the logging context.
+        /// Configuration key for enabling or disabling the tagging of
+        /// a Mongo command BsonDocument as db.statement.
         /// </summary>
         /// <seealso cref="TracerSettings.TagMongoCommands"/>
         public const string TagMongoCommands = "SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS";
+
+        /// <summary>
+        /// Configuration key for enabling or disabling tagging Elasticsearch
+        /// PostData as db.statement.
+        /// </summary>
+        /// <seealso cref="TracerSettings.TagElasticsearchQueries"/>
+        public const string TagElasticsearchQueries = "SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES";
 
         /// <summary>
         /// Configuration key for setting the approximate maximum size,

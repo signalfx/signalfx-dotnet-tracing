@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -82,7 +83,9 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             {
                 try
                 {
-                    return callElasticSearch(pipeline, requestData);
+                    var returned = callElasticSearch(pipeline, requestData);
+                    scope?.Span.SetDbStatementFromRequestData(requestData);
+                    return returned;
                 }
                 catch (Exception ex) when (scope?.Span.SetExceptionForFilter(ex) ?? false)
                 {
@@ -175,7 +178,13 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             {
                 try
                 {
-                    return await callElasticSearchAsync(pipeline, requestData, cancellationToken).ConfigureAwait(false);
+                    var returned = await callElasticSearchAsync(pipeline, requestData, cancellationToken).ConfigureAwait(false);
+                    if (scope != null)
+                    {
+                        await scope.Span.SetDbStatementFromRequestDataAsync(requestData);
+                    }
+
+                    return returned;
                 }
                 catch (Exception ex) when (scope?.Span.SetExceptionForFilter(ex) ?? false)
                 {

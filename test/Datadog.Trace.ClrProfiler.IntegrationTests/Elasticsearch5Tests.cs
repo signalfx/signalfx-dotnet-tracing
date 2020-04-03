@@ -1,3 +1,5 @@
+// Modified by SignalFx
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.TestHelpers;
@@ -15,15 +17,29 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         {
         }
 
+        public static IEnumerable<object[]> TestParameters()
+        {
+            foreach (var versions in PackageVersions.ElasticSearch5)
+            {
+                foreach (var version in versions)
+                {
+                    yield return new object[] { version, "true" };
+                    yield return new object[] { version, "false" };
+                }
+            }
+        }
+
         [Theory]
-        [MemberData(nameof(PackageVersions.ElasticSearch5), MemberType = typeof(PackageVersions))]
+        [MemberData(nameof(TestParameters))]
         [Trait("Category", "EndToEnd")]
-        public void SubmitsTraces(string packageVersion)
+        public void SubmitsTraces(string packageVersion, string tagQueries)
         {
             int agentPort = TcpPortProvider.GetOpenPort();
+            var envVars = ZipkinEnvVars;
+            envVars["SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES"] = tagQueries;
 
-            using (var agent = new MockTracerAgent(agentPort))
-            using (var processResult = RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion))
+            using (var agent = new MockZipkinCollector(agentPort))
+            using (var processResult = RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion, envVars: envVars))
             {
                 Assert.True(processResult.ExitCode >= 0, $"Process exited with code {processResult.ExitCode}");
 
@@ -60,6 +76,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                         "IndicesStats",
                         "DeleteIndex",
                         "GetAlias",
+                        "ReindexOnServer",
 
                         "CatAliases",
                         "CatAllocation",
@@ -122,18 +139,51 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 }
 
                 var spans = agent.WaitForSpans(expected.Count)
-                                 .Where(s => s.Type == "elasticsearch")
+                                 .Where(s => s.Tags.GetValueOrDefault(Tags.InstrumentationName) == "elasticsearch-net")
                                  .OrderBy(s => s.Start)
                                  .ToList();
 
+                var statementNames = new List<string>
+                {
+                    "Bulk",
+                    "BulkAlias",
+                    "ChangePassword",
+                    "ClusterAllocationExplain",
+                    "ClusterPutSettings",
+                    "ClusterReroute",
+                    "Create",
+                    "CreateIndex",
+                    "DeleteByQuery",
+                    "PutAlias",
+                    "PutIndexTemplate",
+                    "PutRole",
+                    "PutRole",
+                    "PutUser",
+                    "ReindexOnServer",
+                    "Search",
+                    "UpdateIndexSettings"
+                };
+
                 foreach (var span in spans)
                 {
-                    Assert.Equal("elasticsearch.query", span.Name);
-                    Assert.Equal("Samples.Elasticsearch.V5-elasticsearch", span.Service);
-                    Assert.Equal("elasticsearch", span.Type);
+                    Assert.Equal("Samples.Elasticsearch.V5", span.Service);
+                    Assert.Equal("elasticsearch", span.Tags["db.type"]);
+
+                    span.Tags.TryGetValue(Tags.DbStatement, out string statement);
+                    if (tagQueries.Equals("true") && statementNames.Contains(span.Name))
+                    {
+                        Assert.NotNull(statement);
+                        Assert.NotEqual(string.Empty, statement);
+                        Assert.DoesNotContain(statement, "test_user");
+                        Assert.DoesNotContain(statement, "supersecret");
+                    }
+                    else
+                    {
+                        Assert.Null(statement);
+                    }
                 }
 
-                ValidateSpans(spans, (span) => span.Resource, expected);
+                ValidateSpans(spans, (span) => span.Name, expected);
             }
         }
     }
