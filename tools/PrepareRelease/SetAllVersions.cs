@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.IO;
 using System.Text;
@@ -74,6 +75,10 @@ namespace PrepareRelease
                 NugetVersionReplace);
 
             SynchronizeVersion(
+                "src/Datadog.Trace/Tracer.cs",
+                PartialAssemblyNameReplace);
+
+            SynchronizeVersion(
                 "src/Datadog.Trace.AspNet/Datadog.Trace.AspNet.csproj",
                 NugetVersionReplace);
 
@@ -96,6 +101,11 @@ namespace PrepareRelease
         private static string FullAssemblyNameReplace(string text)
         {
             return Regex.Replace(text, AssemblyString(VersionPattern()), AssemblyString(VersionString()), RegexOptions.Singleline);
+        }
+
+        private static string PartialAssemblyNameReplace(string text)
+        {
+            return Regex.Replace(text, PartialAssemblyString(VersionPattern()), PartialAssemblyString(VersionString()), RegexOptions.Singleline);
         }
 
         private static string MajorAssemblyVersionReplace(string text, string split)
@@ -193,7 +203,13 @@ namespace PrepareRelease
 
         private static string AssemblyString(string versionText)
         {
-            return $"Datadog.Trace.ClrProfiler.Managed, Version={versionText}.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb";
+            var partial = PartialAssemblyString(versionText);
+            return $"Datadog.Trace.ClrProfiler.Managed, {partial}";
+        }
+
+        private static string PartialAssemblyString(string versionText)
+        {
+            return $"Version={versionText}.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb";
         }
     }
 }
