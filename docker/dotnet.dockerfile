@@ -17,3 +17,6 @@ RUN apt-get update && \
 
 ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /bin/wait-for-it
 RUN chmod +x /bin/wait-for-it
+
+RUN echo "alias ll='ls -laph'" >> ~/.bashrc
+RUN echo "alias rr='reset; pkill -9 dotnet'" >> ~/.bashrc
