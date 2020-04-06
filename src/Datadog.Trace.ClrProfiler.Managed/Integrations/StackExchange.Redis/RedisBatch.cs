@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -162,7 +163,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.StackExchange.Redis
             var hostAndPort = StackExchangeRedisHelper.GetHostAndPort(config);
             var cmd = StackExchangeRedisHelper.GetRawCommand(batch, message);
 
-            return RedisHelper.CreateScope(Tracer.Instance, IntegrationName, hostAndPort.Item1, hostAndPort.Item2, cmd);
+            return RedisHelper.CreateScope(Tracer.Instance, IntegrationName, RedisAssembly, hostAndPort.Item1, hostAndPort.Item2, cmd);
         }
     }
 }

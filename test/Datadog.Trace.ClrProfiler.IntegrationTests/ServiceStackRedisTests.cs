@@ -22,14 +22,14 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         {
             int agentPort = TcpPortProvider.GetOpenPort();
 
-            using (var agent = new MockTracerAgent(agentPort))
-            using (var processResult = RunSampleAndWaitForExit(agent.Port, arguments: $"{TestPrefix}", packageVersion: packageVersion))
+            using (var agent = new MockZipkinCollector(agentPort))
+            using (var processResult = RunSampleAndWaitForExit(agent.Port, arguments: $"{TestPrefix}", packageVersion: packageVersion, envVars: ZipkinEnvVars))
             {
                 Assert.True(processResult.ExitCode >= 0, $"Process exited with code {processResult.ExitCode}");
 
                 // note: ignore the INFO command because it's timing is unpredictable (on Linux?)
                 var spans = agent.WaitForSpans(11)
-                                 .Where(s => s.Type == "redis" && s.Resource != "INFO")
+                                 .Where(s => s.Tags.GetValueOrDefault("db.type") == "redis" && s.Name != "INFO")
                                  .OrderBy(s => s.Start)
                                  .ToList();
 
@@ -39,9 +39,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 foreach (var span in spans)
                 {
-                    Assert.Equal("redis.command", span.Name);
-                    Assert.Equal("Samples.ServiceStack.Redis-redis", span.Service);
-                    Assert.Equal(SpanTypes.Redis, span.Type);
+                    Assert.Equal("Samples.ServiceStack.Redis", span.Service);
+                    Assert.Equal(SpanTypes.Redis, span.Tags.GetValueOrDefault<string>(Tags.DbType));
+                    Assert.Equal("ServiceStack.Redis", span.Tags.GetValueOrDefault<string>("component"));
                     Assert.Equal(host, span.Tags.GetValueOrDefault("peer.hostname"));
                     Assert.Equal(port, span.Tags.GetValueOrDefault("peer.port"));
                 }
@@ -66,10 +66,10 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     var e2 = expected[i].Item2;
 
                     var a1 = i < spans.Count
-                                 ? spans[i].Resource
+                                 ? spans[i].Name
                                  : string.Empty;
                     var a2 = i < spans.Count
-                                 ? spans[i].Tags.GetValueOrDefault("redis.raw_command")
+                                 ? spans[i].Tags.GetValueOrDefault("db.statement")
                                  : string.Empty;
 
                     Assert.True(e1 == a1, $@"invalid resource name for span #{i}, expected ""{e1}"", actual ""{a1}""");
