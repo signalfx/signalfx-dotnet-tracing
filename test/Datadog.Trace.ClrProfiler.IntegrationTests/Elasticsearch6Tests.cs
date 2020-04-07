@@ -166,6 +166,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     "GetCategories",
                     "GetInfluencers",
                     "GetModelSnapshots",
+                    "GetOverallBuckets",
                     "PutAlias",
                     "PutIndexTemplate",
                     "PutJob",
@@ -174,6 +175,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     "PutRoleMapping",
                     "ReindexOnServer",
                     "Search",
+                    "SplitIndex",
                     "UpdateIndexSettings",
                     "ValidateJob",
                 };
