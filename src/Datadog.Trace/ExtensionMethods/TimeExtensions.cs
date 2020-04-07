@@ -22,7 +22,9 @@ namespace Datadog.Trace.ExtensionMethods
         /// <returns>The number of nanoseconds that have elapsed since 1970-01-01T00:00:00.000Z.</returns>
         public static long ToUnixTimeMicroseconds(this DateTimeOffset dateTimeOffset)
         {
-            return ToUnixTimeNanoseconds(dateTimeOffset) / 1000;
+            const long microsecondsPerMillisecond = 1000;
+            const long ticksPerMicrosecond = TimeSpan.TicksPerMillisecond / microsecondsPerMillisecond;
+            return (dateTimeOffset.Ticks - TimeConstants.UnixEpochInTicks) / ticksPerMicrosecond;
         }
 
         public static long ToNanoseconds(this TimeSpan ts)
@@ -33,16 +35,6 @@ namespace Datadog.Trace.ExtensionMethods
         public static long ToMicroseconds(this TimeSpan ts)
         {
             return ToNanoseconds(ts) / 1000;
-        }
-
-        /// <summary>
-        /// Reconverts a long timestamp from ToUnixTimeMicroseconds.
-        /// </summary>
-        /// <param name="ts">The unix time in microseconds.</param>
-        /// <returns>The corresponding DateTimeOffset.</returns>
-        public static DateTimeOffset ToDateTimeOffset(this long ts)
-        {
-            return DateTimeOffset.FromUnixTimeMilliseconds(ts / 1000);
         }
     }
 }
