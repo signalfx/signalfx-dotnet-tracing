@@ -261,7 +261,7 @@ namespace Datadog.Trace.TestHelpers
                     var logs = new Dictionary<DateTimeOffset, Dictionary<string, string>>();
                     foreach (var item in annotations)
                     {
-                        DateTimeOffset timestamp = ((long)item["timestamp"]).ToDateTimeOffset();
+                        DateTimeOffset timestamp = TimeHelpers.UnixMicrosecondsToDateTimeOffset((long)item["timestamp"]);
                         Dictionary<string, string> fields = JsonConvert.DeserializeObject<Dictionary<string, string>>(item["value"].ToString());
                         logs[timestamp] = fields;
                     }

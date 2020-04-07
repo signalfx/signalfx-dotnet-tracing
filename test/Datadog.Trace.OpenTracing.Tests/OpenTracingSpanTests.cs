@@ -55,8 +55,8 @@ namespace Datadog.Trace.OpenTracing.Tests
             var exDict = new Dictionary<string, object>() { { "another event name", ex } };
             span.Log(exDict);
 
-            var now = DateTime.UtcNow;
-            var then = DateTime.UtcNow;
+            var now = DateTime.UtcNow.AddMilliseconds(1); // Add 1 msec to ensure different time than calls above.
+            var then = now.AddMilliseconds(2); // TODO: currently if Log receives same timestamp previous are overwritten.
             span.Log(now, "Another Event");
             span.Log(then, exDict);
 

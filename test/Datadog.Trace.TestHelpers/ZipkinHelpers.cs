@@ -82,7 +82,7 @@ namespace Datadog.Trace.TestHelpers
             foreach (var item in annotations)
             {
                 // Zipkin timestamps are in µS
-                var timestamp = ((long)item["timestamp"]).ToDateTimeOffset();
+                var timestamp = TimeHelpers.UnixMicrosecondsToDateTimeOffset((long)item["timestamp"]);
                 var fields = JsonConvert.DeserializeObject<Dictionary<string, string>>(item["value"].ToString());
                 logs[timestamp] = fields;
             }
@@ -134,7 +134,7 @@ namespace Datadog.Trace.TestHelpers
                 var actualLogs = actual.Logs();
                 foreach (var item in expected.Logs)
                 {
-                    var truncatedTimestamp = item.Key.ToUnixTimeMicroseconds().ToDateTimeOffset();
+                    var truncatedTimestamp = TimeHelpers.UnixMicrosecondsToDateTimeOffset(item.Key.ToUnixTimeMicroseconds());
                     Assert.Equal(item.Value, actualLogs[truncatedTimestamp]);
                 }
             }
