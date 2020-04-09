@@ -16,15 +16,29 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         {
         }
 
+        public static IEnumerable<object[]> TestParameters()
+        {
+            foreach (var versions in PackageVersions.StackExchangeRedis)
+            {
+                foreach (var version in versions)
+                {
+                    yield return new object[] { version, "true" };
+                    yield return new object[] { version, "false" };
+                }
+            }
+        }
+
         [Theory]
-        [MemberData(nameof(PackageVersions.StackExchangeRedis), MemberType = typeof(PackageVersions))]
+        [MemberData(nameof(TestParameters))]
         [Trait("Category", "EndToEnd")]
-        public void SubmitsTraces(string packageVersion)
+        public void SubmitsTraces(string packageVersion, string tagCommands)
         {
             int agentPort = TcpPortProvider.GetOpenPort();
+            var envVars = ZipkinEnvVars;
+            envVars["SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS"] = tagCommands;
 
             using (var agent = new MockZipkinCollector(agentPort))
-            using (var processResult = RunSampleAndWaitForExit(agent.Port, arguments: $"{TestPrefix}", packageVersion: packageVersion, envVars: ZipkinEnvVars))
+            using (var processResult = RunSampleAndWaitForExit(agent.Port, arguments: $"{TestPrefix}", packageVersion: packageVersion, envVars: envVars))
             {
                 Assert.True(processResult.ExitCode >= 0, $"Process exited with code {processResult.ExitCode}");
 
@@ -249,6 +263,18 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 });
 
                 FilterExpectedResultsByApiVersion(expected, packageVersion);
+
+                // No db.statement tags should exists, so overwrite with null
+                if (!tagCommands.Equals("true"))
+                {
+                    var replacement = new TupleList<string, string>();
+                    foreach (var item in expected)
+                    {
+                        replacement.Add(new Tuple<string, string>(item.Item1, null));
+                    }
+
+                    expected = replacement;
+                }
 
                 var spans = agent.WaitForSpans(expected.Count).Where(s => s.Tags.GetValueOrDefault<string>("db.type") == "redis").OrderBy(s => s.Start).ToList();
                 var host = Environment.GetEnvironmentVariable("STACKEXCHANGE_REDIS_HOST") ?? "localhost:6389";

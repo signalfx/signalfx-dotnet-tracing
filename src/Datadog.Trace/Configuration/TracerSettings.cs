@@ -132,6 +132,8 @@ namespace Datadog.Trace.Configuration
             TagMongoCommands = source?.GetBool(ConfigurationKeys.TagMongoCommands) ?? true;
 
             TagElasticsearchQueries = source?.GetBool(ConfigurationKeys.TagElasticsearchQueries) ?? true;
+
+            TagRedisCommands = source?.GetBool(ConfigurationKeys.TagRedisCommands) ?? true;
         }
 
         /// <summary>
@@ -266,6 +268,14 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="ConfigurationKeys.TagElasticsearchQueries"/>
         public bool TagElasticsearchQueries { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether Redis integrations
+        /// should tag commands as db.statement.
+        /// Default is <c>true</c>.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.TagRedisCommands"/>
+        public bool TagRedisCommands { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the use
