@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.TestHelpers;
 using Xunit;
 using Xunit.Abstractions;
@@ -145,7 +146,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 }
 
                 var spans = agent.WaitForSpans(expected.Count)
-                                 .Where(s => s.Tags.GetValueOrDefault(Tags.InstrumentationName) == "elasticsearch-net")
+                                 .Where(s => DictionaryExtensions.GetValueOrDefault(s.Tags, Tags.InstrumentationName) == "elasticsearch-net")
                                  .OrderBy(s => s.Start)
                                  .ToList();
 
