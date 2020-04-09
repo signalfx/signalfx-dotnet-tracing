@@ -139,7 +139,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 }
 
                 var spans = agent.WaitForSpans(expected.Count)
-                                 .Where(s => s.Tags.TryGetValue(Tags.InstrumentationName, out string tagValue) ? tagValue == "elasticsearch-net" : false)
+                                 .Where(s => s.Tags.GetValueOrDefault(Tags.InstrumentationName) == "elasticsearch-net")
                                  .OrderBy(s => s.Start)
                                  .ToList();
 
