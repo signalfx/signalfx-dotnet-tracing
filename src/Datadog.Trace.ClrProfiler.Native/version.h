@@ -1,4 +1,4 @@
 // Modified by SignalFx
 #pragma once
 
-constexpr auto PROFILER_VERSION = "0.0.2";
+constexpr auto PROFILER_VERSION = "0.0.3";
