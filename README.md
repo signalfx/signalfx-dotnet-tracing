@@ -13,6 +13,8 @@ This library provides an OpenTracing-compatible tracer and automatically configu
 | Elasticsearch.Net | `Elasticsearch.Net` Nuget 5.3 - 6.x | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES=false` (`true` by default, which may introduce overhead for direct streaming users). |
 | HttpClient | Supported .NET Core versions | by way of `System.Net.Http.HttpClientHandler` and `HttpMessageHandler` instrumentations |
 | MongoDB | `MongoDB.Driver.Core` Nuget 2.1.0+ | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS=false` (`true` by default). |
+| ServiceStack.Redis | `ServiceStack.Redis` Nuget 4.0+ | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS=false` (`true` by default). |
+| StackExchange.Redis | `StackExchange.Redis` Nuget 1.0+ | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS=false` (`true` by default). |
 | WebClient | Supported .NET Core versions | by way of `System.Net.WebRequest` instrumentation |
 
 ## Installation

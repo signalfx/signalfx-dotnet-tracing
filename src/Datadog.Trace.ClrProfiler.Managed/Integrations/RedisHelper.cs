@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using Datadog.Trace.Logging;
 
@@ -10,7 +11,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
         private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(RedisHelper));
 
-        internal static Scope CreateScope(Tracer tracer, string integrationName, string host, string port, string rawCommand)
+        internal static Scope CreateScope(Tracer tracer, string integrationName, string componentName, string host, string port, string rawCommand)
         {
             if (!Tracer.Instance.Settings.IsIntegrationEnabled(integrationName))
             {
@@ -23,7 +24,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
             try
             {
-                scope = tracer.StartActive(OperationName, serviceName: serviceName);
                 int separatorIndex = rawCommand.IndexOf(' ');
                 string command;
 
@@ -36,10 +36,16 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     command = rawCommand;
                 }
 
+                scope = tracer.StartActive(command ?? OperationName, serviceName: serviceName);
+
                 var span = scope.Span;
-                span.Type = SpanTypes.Redis;
-                span.ResourceName = command;
-                span.SetTag(Tags.RedisRawCommand, rawCommand);
+                span.SetTag(Tags.InstrumentationName, componentName);
+                span.SetTag(Tags.DbType, SpanTypes.Redis);
+                if (Tracer.Instance.Settings.TagRedisCommands)
+                {
+                    span.SetTag(Tags.DbStatement, rawCommand.Substring(0, Math.Min(rawCommand.Length, 1024)));
+                }
+
                 span.SetTag(Tags.OutHost, host);
                 span.SetTag(Tags.OutPort, port);
 

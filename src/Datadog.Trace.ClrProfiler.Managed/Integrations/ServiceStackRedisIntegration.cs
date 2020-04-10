@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
     public static class ServiceStackRedisIntegration
     {
         private const string IntegrationName = "ServiceStackRedis";
+        private const string RedisAssembly = "ServiceStack.Redis";
         private const string Major4 = "4";
         private const string Major5 = "5";
         private const string RedisNativeClient = "ServiceStack.Redis.RedisNativeClient";
@@ -32,8 +34,8 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         /// <param name="moduleVersionPtr">A pointer to the module version GUID.</param>
         /// <returns>The original result</returns>
         [InterceptMethod(
-            CallerAssembly = "ServiceStack.Redis",
-            TargetAssembly = "ServiceStack.Redis",
+            CallerAssembly = RedisAssembly,
+            TargetAssembly = RedisAssembly,
             TargetType = RedisNativeClient,
             TargetSignatureTypes = new[] { "T", "System.Byte[][]", "System.Func`1<T>", "System.Action`1<System.Func`1<T>>", ClrNames.Bool },
             TargetMinimumVersion = Major4,
@@ -83,6 +85,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             using (var scope = RedisHelper.CreateScope(
                 Tracer.Instance,
                 IntegrationName,
+                RedisAssembly,
                 GetHost(redisNativeClient),
                 GetPort(redisNativeClient),
                 GetRawCommand(cmdWithBinaryArgs)))
