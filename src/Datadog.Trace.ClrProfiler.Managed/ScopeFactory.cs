@@ -60,11 +60,11 @@ namespace Datadog.Trace.ClrProfiler
                 // Only the span responsible for propagated context should have client span.kind
                 if (span.Context.Parent != null)
                 {
-                    var parent = ((SpanContext)span.Context.Parent).Span;
-                    var spanKind = parent.GetTag(Tags.SpanKind);
+                    var spanParent = ((SpanContext)span.Context.Parent).Span;
+                    var spanKind = spanParent.GetTag(Tags.SpanKind);
                     if (SpanKinds.Client.Equals(spanKind))
                     {
-                        parent.SetTag(Tags.SpanKind, null);
+                        spanParent.SetTag(Tags.SpanKind, null);
                     }
                 }
 

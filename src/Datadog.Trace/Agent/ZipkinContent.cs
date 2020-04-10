@@ -26,7 +26,7 @@ namespace Datadog.Trace.Agent
         {
             return Task.Factory.StartNew(() =>
                 {
-                    IList<List<Span>> traces = (IList<List<Span>>)Value;
+                    var traces = (IList<List<Span>>)Value;
                     serializer.Serialize(stream, traces);
                 });
         }

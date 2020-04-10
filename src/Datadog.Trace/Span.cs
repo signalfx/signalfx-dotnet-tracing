@@ -140,7 +140,7 @@ namespace Datadog.Trace
                     sb.Append($"\t\t{kv.Key}:{kv.Value}\n");
                 }
             }
-            
+
             sb.AppendLine("Metrics:");
 
             if (Metrics?.Count > 0)

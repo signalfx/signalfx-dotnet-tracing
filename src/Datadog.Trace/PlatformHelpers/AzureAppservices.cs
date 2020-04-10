@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Collections;
 using Datadog.Trace.ExtensionMethods;
@@ -10,7 +11,7 @@ namespace Datadog.Trace.PlatformHelpers
         /// <summary>
         /// Configuration key which is used as a flag to tell us whether we are running in the context of Azure App Services.
         /// </summary>
-        internal static readonly string AzureAppServicesContextKey = "DD_AZURE_APP_SERVICES";
+        internal static readonly string AzureAppServicesContextKey = "SIGNALFX_AZURE_APP_SERVICES";
 
         /// <summary>
         /// Example: 8c56d827-5f07-45ce-8f2b-6c5001db5c6f+apm-dotnet-EastUSwebspace
