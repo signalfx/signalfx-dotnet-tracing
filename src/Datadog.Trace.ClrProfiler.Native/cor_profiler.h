@@ -25,6 +25,7 @@ class CorProfiler : public CorProfilerBase {
   // Startup helper variables
   bool first_jit_compilation_completed = false;
 
+  bool instrument_domain_neutral_assemblies = false;
   bool corlib_module_loaded = false;
   AppDomainID corlib_app_domain_id;
   bool managed_profiler_loaded_domain_neutral = false;
@@ -39,9 +40,29 @@ class CorProfiler : public CorProfilerBase {
   std::unordered_map<ModuleID, ModuleMetadata*> module_id_to_info_map_;
 
   //
+  // Helper methods
+  //
+  bool GetWrapperMethodRef(ModuleMetadata* module_metadata,
+                           ModuleID module_id,
+                           const MethodReplacement& method_replacement,
+                           mdMemberRef& wrapper_method_ref);
+  HRESULT ProcessReplacementCalls(ModuleMetadata* module_metadata,
+                                         const FunctionID function_id,
+                                         const ModuleID module_id,
+                                         const mdToken function_token,
+                                         const FunctionInfo& caller,
+                                         const std::vector<MethodReplacement> method_replacements);
+  HRESULT ProcessInsertionCalls(ModuleMetadata* module_metadata,
+                                         const FunctionID function_id,
+                                         const ModuleID module_id,
+                                         const mdToken function_token,
+                                         const FunctionInfo& caller,
+                                         const std::vector<MethodReplacement> method_replacements);
+  bool ProfilerAssemblyIsLoadedIntoAppDomain(AppDomainID app_domain_id);
+
+  //
   // Startup methods
   //
-  bool ProfilerAssemblyIsLoadedIntoAppDomain(AppDomainID app_domain_id);
   HRESULT RunILStartupHook(const ComPtr<IMetaDataEmit2>&,
                              const ModuleID module_id,
                              const mdToken function_token);

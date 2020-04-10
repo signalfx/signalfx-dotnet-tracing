@@ -34,6 +34,7 @@ for pkgtype in $PKGTYPES ; do
         netstandard2.0/ \
         SignalFx.Tracing.ClrProfiler.Native.so \
         integrations.json \
+        createLogPath.sh \
         defaults.env \
         LICENSE \
         NOTICE

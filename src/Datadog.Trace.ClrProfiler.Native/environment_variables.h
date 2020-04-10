@@ -58,7 +58,7 @@ const WSTRING disabled_integrations = "SIGNALFX_DISABLED_INTEGRATIONS"_W;
 // Sets the path for the profiler's log file.
 // If not set, default is
 // "%ProgramData%"\Datadog .NET Tracer\logs\dotnet-profiler.log" on Windows or
-// "/var/log/signalfx/dotnet-profiler.log" on Linux.
+// "/var/log/signalfx/dotnet/dotnet-profiler.log" on Linux.
 const WSTRING log_path = "SIGNALFX_TRACE_LOG_PATH"_W;
 
 // Sets whether to disable all optimizations.
@@ -67,6 +67,17 @@ const WSTRING log_path = "SIGNALFX_TRACE_LOG_PATH"_W;
 // https://github.com/dotnet/coreclr/issues/24676
 // https://github.com/dotnet/coreclr/issues/12468
 const WSTRING clr_disable_optimizations = "SIGNALFX_CLR_DISABLE_OPTIMIZATIONS"_W;
+
+// Sets whether to intercept method calls when the caller method is inside a
+// domain-neutral assembly. This is dangerous because the integration assembly
+// Datadog.Trace.ClrProfiler.Managed.dll must also be loaded domain-neutral,
+// otherwise a sharing violation (HRESULT 0x80131401) may occur. This setting should only be
+// enabled when there is only one AppDomain or, when hosting applications in IIS,
+// the user can guarantee that all Application Pools on the system have at most
+// one application.
+// Default is false.
+// https://github.com/DataDog/dd-trace-dotnet/pull/671
+const WSTRING domain_neutral_instrumentation = "SIGNALFX_TRACE_DOMAIN_NEUTRAL_INSTRUMENTATION"_W;
 
 // Indicates whether the profiler is running in the context
 // of Azure App Services

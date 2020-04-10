@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Datadog.Trace.Logging;
+using Datadog.Trace.PlatformHelpers;
 
 namespace Datadog.Trace
 {
@@ -9,11 +10,10 @@ namespace Datadog.Trace
     {
         private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.For<TraceContext>();
 
-        private readonly object _lock = new object();
         private readonly DateTimeOffset _utcStart = DateTimeOffset.UtcNow;
         private readonly Stopwatch _stopwatch = Stopwatch.StartNew();
+        private readonly List<Span> _spans = new List<Span>();
 
-        private List<Span> _spans = new List<Span>();
         private int _openSpans;
         private SamplingPriority? _samplingPriority;
         private bool _samplingPriorityLocked;
@@ -48,12 +48,13 @@ namespace Datadog.Trace
 
         public void AddSpan(Span span)
         {
-            lock (_lock)
+            lock (_spans)
             {
                 if (RootSpan == null)
                 {
                     // first span added is the root span
                     RootSpan = span;
+                    DecorateRootSpan(span);
 
                     if (_samplingPriority == null)
                     {
@@ -96,16 +97,16 @@ namespace Datadog.Trace
                 }
             }
 
-            List<Span> spansToWrite = null;
+            Span[] spansToWrite = null;
 
-            lock (_lock)
+            lock (_spans)
             {
                 _openSpans--;
 
                 if (_openSpans == 0)
                 {
-                    spansToWrite = _spans;
-                    _spans = new List<Span>();
+                    spansToWrite = _spans.ToArray();
+                    _spans.Clear();
                 }
             }
 
@@ -124,6 +125,17 @@ namespace Datadog.Trace
             else
             {
                 _samplingPriorityLocked = true;
+            }
+        }
+
+        private void DecorateRootSpan(Span span)
+        {
+            if (AzureAppServices.Metadata?.IsRelevant ?? false)
+            {
+                span.SetTag(Tags.AzureAppServicesSiteName, AzureAppServices.Metadata.SiteName);
+                span.SetTag(Tags.AzureAppServicesResourceGroup, AzureAppServices.Metadata.ResourceGroup);
+                span.SetTag(Tags.AzureAppServicesSubscriptionId, AzureAppServices.Metadata.SubscriptionId);
+                span.SetTag(Tags.AzureAppServicesResourceId, AzureAppServices.Metadata.ResourceId);
             }
         }
     }
