@@ -198,8 +198,13 @@ namespace Datadog.Trace
         public const string Analytics = "_dd1.sr.eausr";
 
         /// <summary>
-        /// Language tag, applied to root spans that are .NET runtime (e.g., ASP.NET)
+        /// Language tag, applied to all spans with other globals.
         /// </summary>
         public const string Language = "signalfx.tracing.library";
+
+        /// <summary>
+        /// Version tag, applied to all spans with other globals.
+        /// </summary>
+        public const string Version = "signalfx.tracing.version";
     }
 }
