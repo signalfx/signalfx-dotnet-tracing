@@ -41,7 +41,6 @@ namespace Datadog.Trace.Tests.Configuration
         public static IEnumerable<object[]> GetDefaultTestData()
         {
             yield return new object[] { CreateFunc(s => s.TraceEnabled), true };
-            yield return new object[] { CreateFunc(s => s.DebugEnabled), false };
             yield return new object[] { CreateFunc(s => s.AgentUri), new Uri("http://localhost:9080/") };
             yield return new object[] { CreateFunc(s => s.Environment), null };
             yield return new object[] { CreateFunc(s => s.ServiceName), null };
