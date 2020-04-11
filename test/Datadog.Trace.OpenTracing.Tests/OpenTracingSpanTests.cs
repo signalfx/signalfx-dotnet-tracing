@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Datadog.Trace.Agent;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Sampling;
@@ -63,7 +64,7 @@ namespace Datadog.Trace.OpenTracing.Tests
             var otSpan = (OpenTracingSpan)span;
             var logs = otSpan.Span.Logs;
 
-            var sortedLogs = logs.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
+            var sortedLogs = new SortedDictionary<DateTimeOffset, Dictionary<string, string>>(logs);
             Assert.Equal("Some Event", sortedLogs.ElementAt(0).Value["event"]);
             Assert.Equal("123.45", sortedLogs.ElementAt(1).Value["event name"]);
             Assert.Equal(ex.ToString(), sortedLogs.ElementAt(2).Value["another event name"]);
