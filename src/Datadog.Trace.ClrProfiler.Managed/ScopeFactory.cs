@@ -41,9 +41,9 @@ namespace Datadog.Trace.ClrProfiler
                 Span parent = tracer.ActiveScope?.Span;
 
                 if (parent != null &&
-                    parent.Type == SpanTypes.Http &&
-                    parent.GetTag(Tags.HttpMethod).Equals(httpMethod, StringComparison.OrdinalIgnoreCase) &&
-                    parent.GetTag(Tags.HttpUrl).Equals(UriHelpers.CleanUri(requestUri, removeScheme: false, tryRemoveIds: false), StringComparison.OrdinalIgnoreCase))
+                    StringComparer.OrdinalIgnoreCase.Equals(parent.GetTag(Tags.SpanKind), SpanKinds.Client) &&
+                    StringComparer.OrdinalIgnoreCase.Equals(parent.GetTag(Tags.HttpMethod), httpMethod) &&
+                    StringComparer.OrdinalIgnoreCase.Equals(parent.GetTag(Tags.HttpUrl), UriHelpers.CleanUri(requestUri, removeScheme: false, tryRemoveIds: false)))
                 {
                     // we are already instrumenting this,
                     // don't instrument nested methods that belong to the same stacktrace
@@ -60,11 +60,11 @@ namespace Datadog.Trace.ClrProfiler
                 // Only the span responsible for propagated context should have client span.kind
                 if (span.Context.Parent != null)
                 {
-                    var spanParent = ((SpanContext)span.Context.Parent).Span;
-                    var spanKind = spanParent.GetTag(Tags.SpanKind);
+                    var parentSpan = ((SpanContext)span.Context.Parent).Span;
+                    var spanKind = parentSpan.GetTag(Tags.SpanKind);
                     if (SpanKinds.Client.Equals(spanKind))
                     {
-                        spanParent.SetTag(Tags.SpanKind, null);
+                        parentSpan.SetTag(Tags.SpanKind, null);
                     }
                 }
 
