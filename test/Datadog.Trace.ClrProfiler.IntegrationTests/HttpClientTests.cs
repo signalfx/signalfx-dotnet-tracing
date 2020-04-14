@@ -66,8 +66,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             int agentPort = TcpPortProvider.GetOpenPort();
             int httpPort = TcpPortProvider.GetOpenPort();
 
-            using (var agent = new MockTracerAgent(agentPort))
-            using (ProcessResult processResult = RunSampleAndWaitForExit(agent.Port, arguments: $"HttpClient TracingDisabled Port={httpPort}"))
+            using (var agent = new MockZipkinCollector(agentPort))
+            using (ProcessResult processResult = RunSampleAndWaitForExit(agent.Port, arguments: $"HttpClient TracingDisabled Port={httpPort}", envVars: ZipkinEnvVars))
             {
                 Assert.True(processResult.ExitCode >= 0, $"Process exited with code {processResult.ExitCode}");
 
