@@ -59,6 +59,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     Assert.Equal("ServiceStack.Redis", span.Tags.GetValueOrDefault<string>("component"));
                     Assert.Equal(host, span.Tags.GetValueOrDefault<string>("peer.hostname"));
                     Assert.Equal(port, span.Tags.GetValueOrDefault<string>("peer.port"));
+                    Assert.Equal(SpanKinds.Client, span.Tags.GetValueOrDefault<string>("span.kind"));
                 }
 
                 var expected = new TupleList<string, string>

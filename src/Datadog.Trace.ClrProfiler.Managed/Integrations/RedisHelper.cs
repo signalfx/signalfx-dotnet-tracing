@@ -41,6 +41,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 var span = scope.Span;
                 span.SetTag(Tags.InstrumentationName, componentName);
                 span.SetTag(Tags.DbType, SpanTypes.Redis);
+                span.SetTag(Tags.SpanKind, SpanKinds.Client);
                 if (Tracer.Instance.Settings.TagRedisCommands)
                 {
                     span.SetTag(Tags.DbStatement, rawCommand.Substring(0, Math.Min(rawCommand.Length, 1024)));

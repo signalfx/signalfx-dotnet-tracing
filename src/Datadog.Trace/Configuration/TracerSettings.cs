@@ -108,6 +108,9 @@ namespace Datadog.Trace.Configuration
                          // default value (empty)
                          new ConcurrentDictionary<string, string>();
 
+            GlobalTags.Add(Tags.Language, TracerConstants.Language);
+            GlobalTags.Add(Tags.Version, TracerConstants.AssemblyVersion);
+
             DogStatsdPort = source?.GetInt32(ConfigurationKeys.DogStatsdPort) ??
                             // default value
                             8125;

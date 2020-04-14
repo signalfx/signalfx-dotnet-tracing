@@ -285,6 +285,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 {
                     Assert.Equal("Samples.StackExchange.Redis", span.Service);
                     Assert.Equal("StackExchange.Redis", span.Tags.GetValueOrDefault<string>("component"));
+                    Assert.Equal(SpanKinds.Client, span.Tags.GetValueOrDefault<string>("span.kind"));
                     Assert.Equal(host, span.Tags.GetValueOrDefault<string>("peer.hostname"));
                     Assert.Equal(port, span.Tags.GetValueOrDefault<string>("peer.port"));
                 }
