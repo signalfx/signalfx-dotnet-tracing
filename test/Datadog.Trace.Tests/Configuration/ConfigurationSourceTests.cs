@@ -19,7 +19,7 @@ namespace Datadog.Trace.Tests.Configuration
             yield return new object[] { CreateFunc(s => s.ServiceName), null };
             yield return new object[] { CreateFunc(s => s.DisabledIntegrationNames.Count), 0 };
             yield return new object[] { CreateFunc(s => s.LogsInjectionEnabled), false };
-            yield return new object[] { CreateFunc(s => s.GlobalTags.Count), 0 };
+            yield return new object[] { CreateFunc(s => s.GlobalTags.Count), 2 };
             yield return new object[] { CreateFunc(s => s.AnalyticsEnabled), false };
             yield return new object[] { CreateFunc(s => s.CustomSamplingRules), null };
             yield return new object[] { CreateFunc(s => s.MaxTracesSubmittedPerSecond), 100 };
@@ -44,7 +44,7 @@ namespace Datadog.Trace.Tests.Configuration
 
             yield return new object[] { ConfigurationKeys.DisabledIntegrations, "integration1;integration2", CreateFunc(s => s.DisabledIntegrationNames.Count), 2 };
 
-            yield return new object[] { ConfigurationKeys.GlobalTags, "k1:v1, k2:v2", CreateFunc(s => s.GlobalTags.Count), 2 };
+            yield return new object[] { ConfigurationKeys.GlobalTags, "k1:v1, k2:v2", CreateFunc(s => s.GlobalTags.Count), 4 };
 
             yield return new object[] { ConfigurationKeys.GlobalAnalyticsEnabled, "true", CreateFunc(s => s.AnalyticsEnabled), true };
             yield return new object[] { ConfigurationKeys.GlobalAnalyticsEnabled, "false", CreateFunc(s => s.AnalyticsEnabled), false };
@@ -53,7 +53,7 @@ namespace Datadog.Trace.Tests.Configuration
         // JsonConfigurationSource needs to be tested with JSON data, which cannot be used with the other IConfigurationSource implementations.
         public static IEnumerable<object[]> GetJsonTestData()
         {
-            yield return new object[] { @"{ ""SIGNALFX_TRACE_GLOBAL_TAGS"": { ""name1"":""value1"", ""name2"": ""value2""} }", CreateFunc(s => s.GlobalTags.Count), 2 };
+            yield return new object[] { @"{ ""SIGNALFX_TRACE_GLOBAL_TAGS"": { ""name1"":""value1"", ""name2"": ""value2""} }", CreateFunc(s => s.GlobalTags.Count), 4 };
         }
 
         public static IEnumerable<object[]> GetBadJsonTestData1()
@@ -71,7 +71,7 @@ namespace Datadog.Trace.Tests.Configuration
         public static IEnumerable<object[]> GetBadJsonTestData3()
         {
             // Json doesn't represent dictionary of string to string
-            yield return new object[] { @"{ ""SIGNALFX_TRACE_GLOBAL_TAGS"": { ""name1"": { ""name2"": [ ""vers"" ] } } }", CreateFunc(s => s.GlobalTags.Count), 0 };
+            yield return new object[] { @"{ ""SIGNALFX_TRACE_GLOBAL_TAGS"": { ""name1"": { ""name2"": [ ""vers"" ] } } }", CreateFunc(s => s.GlobalTags.Count), 2 };
         }
 
         public static Func<TracerSettings, object> CreateFunc(Func<TracerSettings, object> settingGetter)

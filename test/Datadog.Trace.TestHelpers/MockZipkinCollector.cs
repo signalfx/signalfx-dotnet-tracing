@@ -281,6 +281,11 @@ namespace Datadog.Trace.TestHelpers
                 Type = (string)DictionaryExtensions.GetValueOrDefault(Tags, "span.type");
                 var error = DictionaryExtensions.GetValueOrDefault(Tags, "error") ?? "false";
                 Error = (byte)(error.ToLowerInvariant().Equals("true") ? 1 : 0);
+                var spanKind = (string)DictionaryExtensions.GetValueOrDefault(_zipkinData, "kind");
+                if (spanKind != null)
+                {
+                    Tags["span.kind"] = spanKind.ToLowerInvariant();
+                }
             }
         }
     }
