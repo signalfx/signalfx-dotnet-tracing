@@ -1,10 +1,11 @@
+<!-- Modified by SignalFx -->
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <RootNamespace>Datadog.Trace.ClrProfiler</RootNamespace>
 
     <!-- NuGet -->
-    <Version>1.16.0</Version>
+    <Version>0.0.3</Version>
     <IsPackable>false</IsPackable>
 
     <!-- Allow the GenerateAssemblyInfo task in the .NET SDK to generate all
