@@ -11,6 +11,7 @@ using System.Net;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Datadog.Trace.ExtensionMethods;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -22,6 +23,7 @@ namespace Datadog.Trace.TestHelpers
     {
         private readonly HttpListener _listener;
         private readonly Thread _listenerThread;
+        private readonly CancellationTokenSource _listenerCts = CancellationTokenSource();
 
         public MockZipkinCollector(int port = 9080, int retries = 5)
         {
@@ -134,7 +136,12 @@ namespace Datadog.Trace.TestHelpers
 
         public void Dispose()
         {
-            _listener?.Stop();
+            lock (_listener)
+            {
+                _listenerCts.Cancel();
+                _listener.Stop();
+                _listenerCts.Dispose();
+            }
         }
 
         protected virtual void OnRequestReceived(HttpListenerContext context)
@@ -167,11 +174,14 @@ namespace Datadog.Trace.TestHelpers
 
         private void HandleHttpRequests()
         {
-            while (_listener.IsListening)
+            while (true)
             {
                 try
                 {
-                    var ctx = _listener.GetContext();
+                    var getCtxTask = Task.Run(() => _listener.GetContext());
+                    getCtxTask.Wait(_listenerCts.Token);
+
+                    var ctx = getCtxTask.Result;
                     OnRequestReceived(ctx);
 
                     if (ShouldDeserializeTraces)
@@ -182,13 +192,8 @@ namespace Datadog.Trace.TestHelpers
                             IList<IMockSpan> spans = (IList<IMockSpan>)zspans.ConvertAll(x => (IMockSpan)x);
                             OnRequestDeserialized(spans);
 
-                            lock (this)
-                            {
-                                // we only need to lock when replacing the span collection,
-                                // not when reading it because it is immutable
-                                Spans = Spans.AddRange(spans);
-                                RequestHeaders = RequestHeaders.Add(new NameValueCollection(ctx.Request.Headers));
-                            }
+                            Spans = Spans.AddRange(spans);
+                            RequestHeaders = RequestHeaders.Add(new NameValueCollection(ctx.Request.Headers));
                         }
                     }
 
@@ -197,10 +202,17 @@ namespace Datadog.Trace.TestHelpers
                     ctx.Response.OutputStream.Write(buffer, 0, buffer.Length);
                     ctx.Response.Close();
                 }
-                catch (HttpListenerException)
+                catch (Exception ex) when (ex is OperationCanceledException || ex is AggregateException)
                 {
-                    // listener was stopped,
-                    // ignore to let the loop end and the method return
+                    lock (_listener)
+                    {
+                        if (!_listener.IsListening)
+                        {
+                            return;
+                        }
+                    }
+
+                    throw;
                 }
             }
         }
