@@ -23,7 +23,7 @@ namespace Datadog.Trace.TestHelpers
     {
         private readonly HttpListener _listener;
         private readonly Thread _listenerThread;
-        private readonly CancellationTokenSource _listenerCts = CancellationTokenSource();
+        private readonly CancellationTokenSource _listenerCts = new CancellationTokenSource();
 
         public MockZipkinCollector(int port = 9080, int retries = 5)
         {
