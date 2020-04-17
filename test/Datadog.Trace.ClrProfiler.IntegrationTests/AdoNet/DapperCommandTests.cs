@@ -1,3 +1,4 @@
+// Modified by SignalFx
 #if !NET452
 using Datadog.Trace.TestHelpers;
 using Xunit;
@@ -35,7 +36,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
                 {
                     Assert.Equal(expectedOperationName, span.Name);
                     Assert.Equal(expectedServiceName, span.Service);
-                    Assert.Equal(SpanTypes.Sql, span.Type);
                     Assert.Equal(dbType, span.Tags[Tags.DbType]);
                 }
             }
