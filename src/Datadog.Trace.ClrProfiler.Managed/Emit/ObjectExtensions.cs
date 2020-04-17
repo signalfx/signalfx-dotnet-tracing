@@ -12,7 +12,6 @@ namespace Datadog.Trace.ClrProfiler.Emit
     internal static class ObjectExtensions
     {
         private static readonly ConcurrentDictionary<string, object> Cache = new ConcurrentDictionary<string, object>();
-        private static readonly ConcurrentDictionary<string, PropertyFetcher> PropertyFetcherCache = new ConcurrentDictionary<string, PropertyFetcher>();
 
         /// <summary>
         /// Tries to call an instance method with the specified name, a single parameter, and a return value.
@@ -113,13 +112,14 @@ namespace Datadog.Trace.ClrProfiler.Emit
             {
                 var type = source.GetType();
 
-                PropertyFetcher fetcher = PropertyFetcherCache.GetOrAdd(
+                // TODO: this was updated on upstream 0ee897ac88caaec7872807009515c489d13af2bb but it breaks MongoDbIntegration.
+                object cachedItem = Cache.GetOrAdd(
                     GetKey<TResult>(propertyName, type),
-                    key => new PropertyFetcher(propertyName));
+                    key => CreatePropertyDelegate<TResult>(type, propertyName));
 
-                if (fetcher != null)
+                if (cachedItem is Func<object, TResult> func)
                 {
-                    value = (TResult)fetcher.Fetch(source);
+                    value = func(source);
                     return true;
                 }
             }
