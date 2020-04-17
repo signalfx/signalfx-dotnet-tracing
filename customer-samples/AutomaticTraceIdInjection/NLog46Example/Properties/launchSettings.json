@@ -1,9 +1,10 @@
 {
+  // Modified by SignalFx
   "profiles": {
     "NLog46Example": {
       "commandName": "Project",
       "environmentVariables": {
-        "DD_LOGS_INJECTION": "true"
+        "SIGNALFX_LOGS_INJECTION": "true"
       },
       "nativeDebugging": true
     }
