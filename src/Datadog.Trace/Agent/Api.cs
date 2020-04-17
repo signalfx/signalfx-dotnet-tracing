@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Datadog.Trace.Containers;
 using Datadog.Trace.DogStatsd;
 using Datadog.Trace.Logging;
+using Datadog.Trace.PlatformHelpers;
 using Datadog.Trace.Vendors.StatsdClient;
 using MsgPack.Serialization;
 using Newtonsoft.Json;
@@ -19,9 +19,9 @@ namespace Datadog.Trace.Agent
         private static readonly SerializationContext SerializationContext = new SerializationContext();
         private static readonly SpanMessagePackSerializer Serializer = new SpanMessagePackSerializer(SerializationContext);
 
-        private readonly Uri _tracesEndpoint;
         private readonly HttpClient _client;
         private readonly IStatsd _statsd;
+        private readonly Uri _tracesEndpoint;
 
         static Api()
         {
@@ -36,13 +36,13 @@ namespace Datadog.Trace.Agent
 
         public Api(Uri baseEndpoint, DelegatingHandler delegatingHandler, IStatsd statsd)
         {
+            Log.Debug("Creating new Api");
+
             _tracesEndpoint = new Uri(baseEndpoint, TracesPath);
             _statsd = statsd;
-
             _client = delegatingHandler == null
                           ? new HttpClient()
                           : new HttpClient(delegatingHandler);
-
             _client.DefaultRequestHeaders.Add(AgentHttpHeaderNames.Language, ".NET");
 
             // report runtime details
@@ -65,7 +65,7 @@ namespace Datadog.Trace.Agent
             _client.DefaultRequestHeaders.Add(AgentHttpHeaderNames.TracerVersion, TracerConstants.AssemblyVersion);
 
             // report container id (only Linux containers supported for now)
-            var containerId = ContainerInfo.GetContainerId();
+            var containerId = ContainerMetadata.GetContainerId();
 
             if (containerId != null)
             {
@@ -76,7 +76,7 @@ namespace Datadog.Trace.Agent
             _client.DefaultRequestHeaders.Add(HttpHeaderNames.TracingEnabled, "false");
         }
 
-        public async Task SendTracesAsync(IList<List<Span>> traces)
+        public async Task SendTracesAsync(Span[][] traces)
         {
             // retry up to 5 times with exponential back-off
             var retryLimit = 5;
@@ -92,7 +92,7 @@ namespace Datadog.Trace.Agent
                     var traceIds = GetUniqueTraceIds(traces);
 
                     // re-create content on every retry because some versions of HttpClient always dispose of it, so we can't reuse.
-                    using (var content = new MsgPackContent<IList<List<Span>>>(traces, SerializationContext))
+                    using (var content = new MsgPackContent<Span[][]>(traces, SerializationContext))
                     {
                         content.Headers.Add(AgentHttpHeaderNames.TraceCount, traceIds.Count.ToString());
 
@@ -142,6 +142,7 @@ namespace Datadog.Trace.Agent
                     await Task.Delay(sleepDuration).ConfigureAwait(false);
                     retryCount++;
                     sleepDuration *= 2;
+                    TracingProcessManager.TraceAgentMetadata.ForcePortFileRead();
                     continue;
                 }
 
@@ -166,7 +167,7 @@ namespace Datadog.Trace.Agent
             }
         }
 
-        private static HashSet<ulong> GetUniqueTraceIds(IList<List<Span>> traces)
+        private static HashSet<ulong> GetUniqueTraceIds(Span[][] traces)
         {
             var uniqueTraceIds = new HashSet<ulong>();
 

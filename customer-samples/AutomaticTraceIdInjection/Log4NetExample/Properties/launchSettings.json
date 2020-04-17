@@ -1,0 +1,12 @@
+{
+  // Modified by SignalFx
+  "profiles": {
+    "Log4NetExample": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "SIGNALFX_LOGS_INJECTION": "true"
+      },
+      "nativeDebugging": true
+    }
+  }
+}

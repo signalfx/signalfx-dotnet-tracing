@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Reflection;
+using Datadog.Trace.Util;
 using Sigil;
 
 namespace Datadog.Trace.ClrProfiler.Emit
@@ -111,6 +112,7 @@ namespace Datadog.Trace.ClrProfiler.Emit
             {
                 var type = source.GetType();
 
+                // TODO: this was updated on upstream 0ee897ac88caaec7872807009515c489d13af2bb but it breaks MongoDbIntegration.
                 object cachedItem = Cache.GetOrAdd(
                     GetKey<TResult>(propertyName, type),
                     key => CreatePropertyDelegate<TResult>(type, propertyName));
@@ -183,7 +185,7 @@ namespace Datadog.Trace.ClrProfiler.Emit
 
         private static string GetKey<TResult>(string name, Type type)
         {
-            return $"{typeof(TResult).FullName}.{type.FullName}.{name}";
+            return $"{typeof(TResult).AssemblyQualifiedName}:{type.AssemblyQualifiedName}:{name}";
         }
 
         private static Func<object, TResult> CreatePropertyDelegate<TResult>(Type containerType, string propertyName)

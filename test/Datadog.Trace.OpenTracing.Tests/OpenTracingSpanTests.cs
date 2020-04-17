@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Datadog.Trace.Agent;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Sampling;
@@ -48,12 +49,16 @@ namespace Datadog.Trace.OpenTracing.Tests
             ISpan span = GetScope("Op1").Span;
 
             span.Log("Some Event");
+            Thread.Sleep(TimeSpan.FromMilliseconds(15));
+
             var doubleDict = new Dictionary<string, object>() { { "event name", 123.45 } };
             span.Log(doubleDict);
+            Thread.Sleep(TimeSpan.FromMilliseconds(15));
 
             var ex = new Exception("Some Exception");
             var exDict = new Dictionary<string, object>() { { "another event name", ex } };
             span.Log(exDict);
+            Thread.Sleep(TimeSpan.FromMilliseconds(15));
 
             var now = DateTime.UtcNow.AddMilliseconds(1); // Add 1 msec to ensure different time than calls above.
             var then = now.AddMilliseconds(2); // TODO: currently if Log receives same timestamp previous are overwritten.
@@ -63,7 +68,7 @@ namespace Datadog.Trace.OpenTracing.Tests
             var otSpan = (OpenTracingSpan)span;
             var logs = otSpan.Span.Logs;
 
-            var sortedLogs = logs.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
+            var sortedLogs = new SortedDictionary<DateTimeOffset, Dictionary<string, string>>(logs);
             Assert.Equal("Some Event", sortedLogs.ElementAt(0).Value["event"]);
             Assert.Equal("123.45", sortedLogs.ElementAt(1).Value["event name"]);
             Assert.Equal(ex.ToString(), sortedLogs.ElementAt(2).Value["another event name"]);

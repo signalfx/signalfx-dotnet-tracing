@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Datadog.Trace.DogStatsd;
@@ -14,11 +13,12 @@ namespace Datadog.Trace.Agent
 
         private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.For<AgentWriter>();
 
-        private readonly AgentWriterBuffer<List<Span>> _tracesBuffer = new AgentWriterBuffer<List<Span>>(TraceBufferSize);
-        private readonly IApi _api;
+        private readonly AgentWriterBuffer<Span[]> _tracesBuffer = new AgentWriterBuffer<Span[]>(TraceBufferSize);
         private readonly IStatsd _statsd;
         private readonly Task _flushTask;
         private readonly TaskCompletionSource<bool> _processExit = new TaskCompletionSource<bool>();
+
+        private IApi _api;
 
         public AgentWriter(IApi api, IStatsd statsd)
         {
@@ -27,7 +27,12 @@ namespace Datadog.Trace.Agent
             _flushTask = Task.Run(FlushTracesTaskLoopAsync);
         }
 
-        public void WriteTrace(List<Span> trace)
+        public void OverrideApi(IApi api)
+        {
+            _api = api;
+        }
+
+        public void WriteTrace(Span[] trace)
         {
             var success = _tracesBuffer.Push(trace);
 
@@ -39,12 +44,12 @@ namespace Datadog.Trace.Agent
             if (_statsd != null)
             {
                 _statsd.AppendIncrementCount(TracerMetricNames.Queue.EnqueuedTraces);
-                _statsd.AppendIncrementCount(TracerMetricNames.Queue.EnqueuedSpans, trace.Count);
+                _statsd.AppendIncrementCount(TracerMetricNames.Queue.EnqueuedSpans, trace.Length);
 
                 if (!success)
                 {
                     _statsd.AppendIncrementCount(TracerMetricNames.Queue.DroppedTraces);
-                    _statsd.AppendIncrementCount(TracerMetricNames.Queue.DroppedSpans, trace.Count);
+                    _statsd.AppendIncrementCount(TracerMetricNames.Queue.DroppedSpans, trace.Length);
                 }
 
                 _statsd.Send();
@@ -73,15 +78,15 @@ namespace Datadog.Trace.Agent
 
             if (_statsd != null)
             {
-                var spanCount = traces.Sum(t => t.Count);
+                var spanCount = traces.Sum(t => t.Length);
 
-                _statsd.AppendIncrementCount(TracerMetricNames.Queue.DequeuedTraces, traces.Count);
+                _statsd.AppendIncrementCount(TracerMetricNames.Queue.DequeuedTraces, traces.Length);
                 _statsd.AppendIncrementCount(TracerMetricNames.Queue.DequeuedSpans, spanCount);
                 _statsd.AppendSetGauge(TracerMetricNames.Queue.MaxTraces, TraceBufferSize);
                 _statsd.Send();
             }
 
-            if (traces.Any())
+            if (traces.Length > 0)
             {
                 await _api.SendTracesAsync(traces).ConfigureAwait(false);
             }

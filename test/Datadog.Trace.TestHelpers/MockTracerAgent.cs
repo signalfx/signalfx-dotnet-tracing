@@ -46,7 +46,7 @@ namespace Datadog.Trace.TestHelpers
                 catch (HttpListenerException) when (retries > 0)
                 {
                     // only catch the exception if there are retries left
-                    port++;
+                    port = TcpPortProvider.GetOpenPort();
                     retries--;
                 }
 

@@ -203,6 +203,26 @@ namespace Datadog.Trace
         public const string Language = "signalfx.tracing.library";
 
         /// <summary>
+        /// The resource id of the site instance in azure app services where the traced application is running.
+        /// </summary>
+        public const string AzureAppServicesResourceId = "aas.resource.id";
+
+        /// <summary>
+        /// The resource group of the site instance in azure app services where the traced application is running.
+        /// </summary>
+        public const string AzureAppServicesResourceGroup = "aas.resource.group";
+
+        /// <summary>
+        /// The site name of the site instance in azure app services where the traced application is running.
+        /// </summary>
+        public const string AzureAppServicesSiteName = "aas.site.name";
+
+        /// <summary>
+        /// The subscription id of the site instance in azure app services where the traced application is running.
+        /// </summary>
+        public const string AzureAppServicesSubscriptionId = "aas.subscription.id";
+
+        /// <summary>
         /// Version tag, applied to all spans with other globals.
         /// </summary>
         public const string Version = "signalfx.tracing.version";

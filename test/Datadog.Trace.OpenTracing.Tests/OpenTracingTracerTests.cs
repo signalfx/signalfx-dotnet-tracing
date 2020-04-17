@@ -152,7 +152,29 @@ namespace Datadog.Trace.OpenTracing.Tests
         }
 
         [Fact]
-        public void Extract_HeadersProperlySet_SpanContext()
+        public void Inject_TextMapFormat_CorrectHeaders()
+        {
+            var span = (OpenTracingSpan)_tracer.BuildSpan("Span").Start();
+            var headers = new MockTextMap();
+
+            _tracer.Inject(span.Context, BuiltinFormats.TextMap, headers);
+
+            Assert.Equal(span.DDSpan.Context.TraceId.ToString("x16"), headers.Get(HttpHeaderNames.B3TraceId));
+            Assert.Equal(span.DDSpan.Context.SpanId.ToString("x16"), headers.Get(HttpHeaderNames.B3SpanId));
+        }
+
+        [Fact]
+        public void Inject_UnknownFormat_Throws()
+        {
+            var span = (OpenTracingSpan)_tracer.BuildSpan("Span").Start();
+            var headers = new MockTextMap();
+            var mockFormat = new Mock<IFormat<ITextMap>>();
+
+            Assert.Throws<NotSupportedException>(() => _tracer.Inject(span.Context, mockFormat.Object, headers));
+        }
+
+        [Fact]
+        public void Extract_HttpHeadersFormat_HeadersProperlySet_SpanContext()
         {
             const ulong parentId = 10;
             const ulong traceId = 42;
@@ -164,6 +186,34 @@ namespace Datadog.Trace.OpenTracing.Tests
 
             Assert.Equal(parentId, otSpanContext.Context.SpanId);
             Assert.Equal(traceId, otSpanContext.Context.TraceId);
+        }
+
+        [Fact]
+        public void Extract_TextMapFormat_HeadersProperlySet_SpanContext()
+        {
+            const ulong parentId = 10;
+            const ulong traceId = 42;
+            var headers = new MockTextMap();
+            headers.Set(HttpHeaderNames.B3SpanId, parentId.ToString("x16"));
+            headers.Set(HttpHeaderNames.B3TraceId, traceId.ToString("x16"));
+
+            var otSpanContext = (OpenTracingSpanContext)_tracer.Extract(BuiltinFormats.TextMap, headers);
+
+            Assert.Equal(parentId, otSpanContext.Context.SpanId);
+            Assert.Equal(traceId, otSpanContext.Context.TraceId);
+        }
+
+        [Fact]
+        public void Extract_UnknownFormat_Throws()
+        {
+            const ulong parentId = 10;
+            const ulong traceId = 42;
+            var headers = new MockTextMap();
+            headers.Set(HttpHeaderNames.ParentId, parentId.ToString());
+            headers.Set(HttpHeaderNames.TraceId, traceId.ToString());
+            var mockFormat = new Mock<IFormat<ITextMap>>();
+
+            Assert.Throws<NotSupportedException>(() => _tracer.Extract(mockFormat.Object, headers));
         }
 
         [Fact]

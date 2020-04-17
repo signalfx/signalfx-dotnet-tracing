@@ -1,5 +1,5 @@
-<!-- Modified by SignalFx -->
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Modified by SignalFx -->
 
 <Include>
   <?define BaseProductName = ".NET Tracer" ?>

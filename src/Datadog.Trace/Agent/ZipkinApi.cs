@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Datadog.Trace.Containers;
 using Datadog.Trace.DogStatsd;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Vendors.StatsdClient;
@@ -28,12 +27,19 @@ namespace Datadog.Trace.Agent
             _client.DefaultRequestHeaders.Add(HttpHeaderNames.TracingEnabled, "false");
         }
 
-        public async Task SendTracesAsync(IList<List<Span>> traces)
+        public async Task SendTracesAsync(Span[][] traces)
         {
             // retry up to 5 times with exponential back-off
             var retryLimit = 5;
             var retryCount = 1;
             var sleepDuration = 100; // in milliseconds
+
+            // TODO: Optimize this, right now just a simple conversion.
+            var traceList = new List<List<Span>>(traces.Length);
+            foreach (var spanArray in traces)
+            {
+                traceList.Add(new List<Span>(spanArray));
+            }
 
             while (true)
             {
@@ -42,7 +48,7 @@ namespace Datadog.Trace.Agent
                 try
                 {
                     // re-create content on every retry because some versions of HttpClient always dispose of it, so we can't reuse.
-                    using (var content = new ZipkinContent<IList<List<Span>>>(traces))
+                    using (var content = new ZipkinContent<IList<List<Span>>>(traceList))
                     {
                         responseMessage = await _client.PostAsync(_tracesEndpoint, content).ConfigureAwait(false);
                         responseMessage.EnsureSuccessStatusCode();

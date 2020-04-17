@@ -18,6 +18,9 @@ namespace Samples.HttpMessageHandler
 
         private static string Url;
 
+#if NETFRAMEWORK
+        [LoaderOptimization(LoaderOptimization.MultiDomainHost)]
+#endif
         public static void Main(string[] args)
         {
             bool tracingDisabled = args.Any(arg => arg.Equals("TracingDisabled", StringComparison.OrdinalIgnoreCase));
@@ -102,6 +105,30 @@ namespace Samples.HttpMessageHandler
                     }
                 }
             }
+
+#if NETCOREAPP
+            using (var client = new HttpClient(new SocketsHttpHandler()))
+            {
+                if (tracingDisabled)
+                {
+                    client.DefaultRequestHeaders.Add(HttpHeaderNames.TracingEnabled, "false");
+                }
+
+                using (var responseMessage = await client.PostAsync(Url, clientRequestContent))
+                {
+                    // read response content and headers
+                    var responseContent = await responseMessage.Content.ReadAsStringAsync();
+                    Console.WriteLine($"[HttpClient] response content: {responseContent}");
+
+                    foreach (var header in responseMessage.Headers)
+                    {
+                        var name = header.Key;
+                        var values = string.Join(",", header.Value);
+                        Console.WriteLine($"[HttpClient] response header: {name}={values}");
+                    }
+                }
+            }
+#endif
         }
 
         private static void SendWebClientRequest(bool tracingDisabled)

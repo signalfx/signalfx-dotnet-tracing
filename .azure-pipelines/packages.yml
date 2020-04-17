@@ -1,12 +1,12 @@
 trigger:
   branches:
     include:
+      - master
       - refs/tags/*
 pr: none
 
 variables:
   buildConfiguration: release
-  packageFeed: /ffc32c57-3e0e-4e8f-8633-a7ad01df2e45
   dotnetCoreSdkVersion: 3.1.x
   publishOutput: $(Build.SourcesDirectory)/src/bin/managed-publish
 
@@ -29,22 +29,19 @@ jobs:
 
   steps:
 
-  - task: gittools.gitversion.gitversion-task.GitVersion@4
-    displayName: GitVersion
-    inputs:
-      preferBundledVersion: false
-
   - task: UseDotNet@2
     displayName: install dotnet core sdk
     inputs:
       packageType: sdk
       version: $(dotnetCoreSdkVersion)
 
+  - task: NuGetToolInstaller@1
+    displayName: install nuget
+
   - task: NuGetCommand@2
     displayName: nuget restore native
     inputs:
       restoreSolution: Datadog.Trace.Native.sln
-      vstsFeed: $(packageFeed)
       verbosityRestore: Normal
 
   - task: DotNetCoreCLI@2
@@ -52,7 +49,6 @@ jobs:
     inputs:
       command: restore
       projects: src/**/*.csproj
-      vstsFeed: $(packageFeed)
 
   - task: DotNetCoreCLI@2
     displayName: dotnet build
@@ -66,7 +62,7 @@ jobs:
     condition: and(succeeded(), eq(variables['nugetPack'], 'true'))
     inputs:
       command: pack
-      packagesToPack: src/Datadog.Trace/Datadog.Trace.csproj;src/Datadog.Trace.AspNet/Datadog.Trace.AspNet.csproj;src/Datadog.Trace.ClrProfiler.Managed/Datadog.Trace.ClrProfiler.Managed.csproj;src/Datadog.Trace.OpenTracing/Datadog.Trace.OpenTracing.csproj
+      packagesToPack: src/Datadog.Trace/Datadog.Trace.csproj;src/Datadog.Trace.OpenTracing/Datadog.Trace.OpenTracing.csproj
       packDirectory: nuget-output
       configuration: $(buildConfiguration)
 
@@ -127,7 +123,6 @@ jobs:
     inputs:
       command: restore
       projects: src/**/*.csproj
-      vstsFeed: $(packageFeed)
 
   - task: DotNetCoreCLI@2
     displayName: dotnet build
@@ -180,7 +175,6 @@ jobs:
     inputs:
       command: restore
       projects: src/**/*.csproj
-      vstsFeed: $(packageFeed)
 
   - task: DotNetCoreCLI@2
     displayName: dotnet build
@@ -216,3 +210,63 @@ jobs:
     inputs:
       artifactName: linux-alpine-packages
       targetPath: deploy/linux
+
+- job: s3_upload
+  condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/')))
+
+  dependsOn:
+    - nuget_and_windows_msi_and_home
+    - linux_packages
+
+  pool:
+    vmImage: ubuntu-16.04
+
+  steps:
+  - task: GitVersion@5
+    displayName: GitVersion
+    inputs:
+      preferBundledVersion: false
+
+  - download: current
+    artifact: windows-msi-x64
+    patterns: '**/*x64.msi'
+
+  - download: current
+    artifact: linux-packages
+    patterns: '**/*amd64.deb'
+
+  - script: |
+      mkdir s3_upload
+      mv $(Pipeline.Workspace)/windows-msi-x64/*.msi s3_upload/
+      mv $(Pipeline.Workspace)/linux-packages/*.deb s3_upload/
+    displayName: Move deb package and MSI to s3_upload folder
+
+  - script: |
+      MSI_NAME=$(ls s3_upload/*.msi)
+      PACKAGE_NAME=${MSI_NAME::-4}
+      mv s3_upload/*.deb $PACKAGE_NAME.deb
+    displayName: Rename deb package name to match MSI name
+
+  - script: |
+      INDEX_FILE=$(pwd)/s3_upload/index.txt
+      echo $(GitVersion.BranchName) >> $INDEX_FILE
+      echo $(GitVersion.Sha) >> $INDEX_FILE
+      pushd s3_upload && name=$(ls *.deb) && echo "${name::-7}*" >> $INDEX_FILE && popd
+      git show -s --format='%ae' $(GitVersion.Sha) >> $INDEX_FILE
+    displayName: Write index.txt
+
+  - script: sudo apt-get install -y awscli
+    displayName: Install AWS CLI
+
+  - script: aws configure set aws_access_key_id $SECRET
+    displayName: Authenticate aws_access_key_id
+    env:
+      SECRET: $(AWS_ACCESS_KEY_ID)
+
+  - script: aws configure set aws_secret_access_key $SECRET
+    displayName: Authenticate aws_secret_access_key
+    env:
+      SECRET: $(AWS_SECRET_ACCESS_KEY)
+
+  - script: aws s3 cp s3_upload s3://datadog-reliability-env/dotnet/ --recursive
+    displayName: Upload deb, MSI, index.txt to s3

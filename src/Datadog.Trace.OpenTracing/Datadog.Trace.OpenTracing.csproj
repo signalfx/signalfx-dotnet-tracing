@@ -6,7 +6,6 @@
     <Version>0.0.3</Version>
     <Title>Datadog APM - OpenTracing</Title>
     <Description>Provides OpenTracing support for Datadog APM</Description>
-    <Authors>lucas.pimentel.datadog;colinhigginsdatadog;zachmontoyadd</Authors>
     <PackageTags>$(PackageTags);OpenTracing</PackageTags>
   </PropertyGroup>
 
