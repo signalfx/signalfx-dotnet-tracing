@@ -50,11 +50,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 }
 
                 var firstSpan = spans.First();
-                var traceId = GetHeader(processResult.StandardOutput, HttpHeaderNames.TraceId);
-                var parentSpanId = GetHeader(processResult.StandardOutput, HttpHeaderNames.ParentId);
+                var traceId = GetHeader(processResult.StandardOutput, HttpHeaderNames.B3TraceId);
+                var parentSpanId = GetHeader(processResult.StandardOutput, HttpHeaderNames.B3SpanId);
 
-                Assert.Equal(firstSpan.TraceId.ToString(CultureInfo.InvariantCulture), traceId);
-                Assert.Equal(firstSpan.SpanId.ToString(CultureInfo.InvariantCulture), parentSpanId);
+                Assert.Equal(firstSpan.TraceId.ToString("x16", CultureInfo.InvariantCulture), traceId);
+                Assert.Equal(firstSpan.SpanId.ToString("x16", CultureInfo.InvariantCulture), parentSpanId);
             }
         }
 
