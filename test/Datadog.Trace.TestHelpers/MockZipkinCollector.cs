@@ -140,7 +140,6 @@ namespace Datadog.Trace.TestHelpers
             {
                 _listenerCts.Cancel();
                 _listener.Stop();
-                _listenerCts.Dispose();
             }
         }
 
