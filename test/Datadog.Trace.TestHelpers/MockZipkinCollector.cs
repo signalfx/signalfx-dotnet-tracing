@@ -201,7 +201,7 @@ namespace Datadog.Trace.TestHelpers
                     ctx.Response.OutputStream.Write(buffer, 0, buffer.Length);
                     ctx.Response.Close();
                 }
-                catch (Exception ex) when (ex is OperationCanceledException || ex is AggregateException)
+                catch (Exception ex) when (ex is HttpListenerException || ex is OperationCanceledException || ex is AggregateException)
                 {
                     lock (_listener)
                     {
