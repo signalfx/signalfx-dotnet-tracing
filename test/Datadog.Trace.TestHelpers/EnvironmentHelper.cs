@@ -264,7 +264,10 @@ namespace Datadog.Trace.TestHelpers
                                        ? "dll"
                                        : "so";
 
-                string fileName = $"SignalFx.Tracing.ClrProfiler.Native.{extension}";
+                // TODO: Temporary workaround until rename of windows images is complete.
+                string fileName = EnvironmentTools.IsWindows()
+                                      ? "Datadog.Trace.ClrProfiler.Native.dll"
+                                      : $"SignalFx.Tracing.ClrProfiler.Native.{extension}";
 
                 var directory = GetSampleApplicationOutputDirectory();
 
