@@ -20,12 +20,12 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             var expectedSpanCount = EnvironmentHelper.IsCoreClr() ? 4 : 7;
             const string dbType = "postgres";
             const string expectedOperationName = dbType + ".query";
-            const string expectedServiceName = "Samples.Dapper-" + dbType;
+            const string expectedServiceName = "Samples.Dapper";
 
             int agentPort = TcpPortProvider.GetOpenPort();
 
-            using (var agent = new MockTracerAgent(agentPort))
-            using (ProcessResult processResult = RunSampleAndWaitForExit(agent.Port))
+            using (var agent = new MockZipkinCollector(agentPort))
+            using (ProcessResult processResult = RunSampleAndWaitForExit(agent.Port, envVars: ZipkinEnvVars))
             {
                 Assert.True(processResult.ExitCode >= 0, $"Process exited with code {processResult.ExitCode}");
 
@@ -37,6 +37,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
                     Assert.Equal(expectedOperationName, span.Name);
                     Assert.Equal(expectedServiceName, span.Service);
                     Assert.Equal(dbType, span.Tags[Tags.DbType]);
+                    Assert.Null(span.Type);
+                    Assert.NotNull(span.Tags[Tags.DbStatement]);
                 }
             }
         }
