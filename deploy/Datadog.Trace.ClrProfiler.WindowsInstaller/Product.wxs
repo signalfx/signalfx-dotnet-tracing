@@ -147,7 +147,7 @@
     <ComponentGroup Id="Files.Native" Directory="INSTALLFOLDER">
       <Component Win64="$(var.Win64)">
         <File Id="Datadog.Trace.ClrProfiler.Native"
-              Source="$(var.NativeDllPath)\Datadog.Trace.ClrProfiler.Native.dll"
+              Source="$(var.NativeDllPath)\SignalFx.Tracing.ClrProfiler.Native.dll"
               Checksum="yes">
           <Class Id="$(var.ProfilerCLSID)" Context="InprocServer32" ThreadingModel="both" Description="$(var.ProductNamePlatformAgnostic)"/>
         </File>
@@ -159,7 +159,7 @@
     <ComponentGroup Id="Files.Native.32" Directory="INSTALLFOLDER.32">
       <Component Win64="no" Id="Datadog.Trace.ClrProfiler.Native.32">
         <File Id="Datadog.Trace.ClrProfiler.Native.32"
-              Source="$(var.NativeDll32Path)\Datadog.Trace.ClrProfiler.Native.dll"
+              Source="$(var.NativeDll32Path)\SignalFx.Tracing.ClrProfiler.Native.dll"
               Checksum="yes">
           <Class Id="$(var.ProfilerCLSID)" Context="InprocServer32" ThreadingModel="both" Description="$(var.ProductNamePlatformAgnostic)"/>
         </File>

@@ -1,3 +1,4 @@
+# Modified by SignalFx
 cmake_minimum_required (VERSION 3.8)
 cmake_policy(SET CMP0015 NEW)
 
@@ -32,7 +33,7 @@ SET_SOURCE_FILES_PROPERTIES(
   GENERATED true
 )
 
-add_library("Datadog.Trace.ClrProfiler.Native.static" STATIC
+add_library("SignalFx.Tracing.ClrProfiler.Native.static" STATIC
     class_factory.cpp
     clr_helpers.cpp
     cor_profiler_base.cpp
@@ -49,8 +50,8 @@ add_library("Datadog.Trace.ClrProfiler.Native.static" STATIC
     util.cpp
     ${GENERATED_OBJ_FILES}
 )
-set_target_properties("Datadog.Trace.ClrProfiler.Native.static" PROPERTIES PREFIX "")
-target_include_directories("Datadog.Trace.ClrProfiler.Native.static"
+set_target_properties("SignalFx.Tracing.ClrProfiler.Native.static" PROPERTIES PREFIX "")
+target_include_directories("SignalFx.Tracing.ClrProfiler.Native.static"
     PUBLIC ../../lib/coreclr/src/pal/inc/rt
     PUBLIC ../../lib/coreclr/src/pal/prebuilt/inc
     PUBLIC ../../lib/coreclr/src/pal/inc
@@ -58,7 +59,7 @@ target_include_directories("Datadog.Trace.ClrProfiler.Native.static"
     PUBLIC $<BUILD_INTERFACE:/opt/re2>
     PUBLIC $<BUILD_INTERFACE:/opt/json/include>
 )
-target_link_libraries("Datadog.Trace.ClrProfiler.Native.static"
+target_link_libraries("SignalFx.Tracing.ClrProfiler.Native.static"
     /opt/re2/obj/libre2.a
     -static-libgcc
     -static-libstdc++
@@ -69,4 +70,4 @@ add_library("Datadog.Trace.ClrProfiler.Native" SHARED
     interop.cpp
 )
 set_target_properties("Datadog.Trace.ClrProfiler.Native" PROPERTIES PREFIX "")
-target_link_libraries("Datadog.Trace.ClrProfiler.Native" "Datadog.Trace.ClrProfiler.Native.static")
+target_link_libraries("Datadog.Trace.ClrProfiler.Native" "SignalFx.Tracing.ClrProfiler.Native.static")

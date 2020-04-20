@@ -1,3 +1,4 @@
+<!-- Modified by SignalFx -->
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <BuildInParallel Condition="'$(BuildInParallel)' == ''">true</BuildInParallel>
@@ -161,13 +162,13 @@
         Retries="3"
         RetryDelayMilliseconds="300"/>
       <Copy 
-        SourceFiles="$(MSBuildThisFileDirectory)src\Datadog.Trace.ClrProfiler.Native\bin\Release\x64\Datadog.Trace.ClrProfiler.Native.dll" 
+        SourceFiles="$(MSBuildThisFileDirectory)src\Datadog.Trace.ClrProfiler.Native\bin\Release\x64\SignalFx.Tracing.ClrProfiler.Native.dll" 
         DestinationFolder="$(WindowsHomeOutput)\x64" 
 		SkipUnchangedFiles="true"
         Retries="3"
         RetryDelayMilliseconds="300"/>
       <Copy 
-        SourceFiles="$(MSBuildThisFileDirectory)src\Datadog.Trace.ClrProfiler.Native\bin\Release\x86\Datadog.Trace.ClrProfiler.Native.dll" 
+        SourceFiles="$(MSBuildThisFileDirectory)src\Datadog.Trace.ClrProfiler.Native\bin\Release\x86\SignalFx.Tracing.ClrProfiler.Native.dll" 
         DestinationFolder="$(WindowsHomeOutput)\x86" 
 		SkipUnchangedFiles="true"
         Retries="3"
