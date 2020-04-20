@@ -1,0 +1,30 @@
+version: 2.1
+
+orbs:
+  win: circleci/windows@2.2.0
+
+jobs:
+  build:
+    executor: 
+      name: win/default
+      shell: cmd.exe
+
+    steps:
+      - checkout
+      - run: dotnet --list-sdks
+      - run: choco install wixtoolset
+      - run: nuget restore Datadog.Trace.sln
+      - run: msbuild Datadog.Trace.proj /t:BuildCsharp /p:Configuration=Release
+      - run: dotnet pack src\Datadog.Trace\Datadog.Trace.csproj
+      - run: dotnet pack src\Datadog.Trace.OpenTracing\Datadog.Trace.OpenTracing.csproj
+      - run: msbuild Datadog.Trace.proj /t:BuildCpp /p:Configuration=Release;Platform=x64
+      - run: msbuild Datadog.Trace.proj /t:BuildCpp /p:Configuration=Release;Platform=x86
+      - run: msbuild Datadog.Trace.proj /t:msi /p:Configuration=Release;Platform=x64
+      - run: msbuild Datadog.Trace.proj /t:msi /p:Configuration=Release;Platform=x86
+      - run: msbuild Datadog.Trace.proj /t:CreateHomeDirectory /p:Configuration=Release;Platform=x64
+      - store_artifacts:
+          path: C:\Users\circleci\project\deploy\Datadog.Trace.ClrProfiler.WindowsInstaller\bin\Release\x64\en-us\
+      - store_artifacts:
+          path: C:\Users\circleci\project\deploy\Datadog.Trace.ClrProfiler.WindowsInstaller\bin\Release\x86\en-us\
+      - store_artifacts:
+          path: C:\Users\circleci\project\src\bin\windows-tracer-home.zip
