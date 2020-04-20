@@ -34,13 +34,6 @@ namespace Datadog.Trace.Agent
             var retryCount = 1;
             var sleepDuration = 100; // in milliseconds
 
-            // TODO: Optimize this, right now just a simple conversion.
-            var traceList = new List<List<Span>>(traces.Length);
-            foreach (var spanArray in traces)
-            {
-                traceList.Add(new List<Span>(spanArray));
-            }
-
             while (true)
             {
                 HttpResponseMessage responseMessage;
@@ -48,7 +41,7 @@ namespace Datadog.Trace.Agent
                 try
                 {
                     // re-create content on every retry because some versions of HttpClient always dispose of it, so we can't reuse.
-                    using (var content = new ZipkinContent<IList<List<Span>>>(traceList))
+                    using (var content = new ZipkinContent(traces))
                     {
                         responseMessage = await _client.PostAsync(_tracesEndpoint, content).ConfigureAwait(false);
                         responseMessage.EnsureSuccessStatusCode();

@@ -47,7 +47,7 @@ namespace Datadog.Trace.Agent
             return tags;
         }
 
-        public void Serialize(Stream stream, IList<List<Span>> traces)
+        public void Serialize(Stream stream, Span[][] traces)
         {
             var zipkinTraces = new List<ZipkinSpan>();
 
