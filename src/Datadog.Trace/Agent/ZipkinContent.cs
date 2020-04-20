@@ -12,21 +12,20 @@ namespace Datadog.Trace.Agent
 {
     internal class ZipkinContent : HttpContent
     {
-        private readonly ZipkinSerializer serializer = new ZipkinSerializer();
+        private readonly ZipkinSerializer _serializer = new ZipkinSerializer();
+        private readonly Span[][] _spans;
 
-        public ZipkinContent(Span[][] value)
+        public ZipkinContent(Span[][] spans)
         {
-            Value = value;
+            _spans = spans;
             Headers.ContentType = new MediaTypeHeaderValue("application/json");
         }
-
-        public Span[][] Value { get; }
 
         protected override Task SerializeToStreamAsync(Stream stream, TransportContext context)
         {
             return Task.Factory.StartNew(() =>
                 {
-                    serializer.Serialize(stream, Value);
+                    _serializer.Serialize(stream, _spans);
                 });
         }
 
