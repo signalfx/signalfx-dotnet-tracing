@@ -10,24 +10,22 @@ using System.Threading.Tasks;
 
 namespace Datadog.Trace.Agent
 {
-    internal class ZipkinContent<T> : HttpContent
+    internal class ZipkinContent : HttpContent
     {
-        private readonly ZipkinSerializer serializer = new ZipkinSerializer();
+        private readonly ZipkinSerializer _serializer = new ZipkinSerializer();
+        private readonly Span[][] _spans;
 
-        public ZipkinContent(T value)
+        public ZipkinContent(Span[][] spans)
         {
-            Value = value;
+            _spans = spans;
             Headers.ContentType = new MediaTypeHeaderValue("application/json");
         }
-
-        public T Value { get; }
 
         protected override Task SerializeToStreamAsync(Stream stream, TransportContext context)
         {
             return Task.Factory.StartNew(() =>
                 {
-                    var traces = (IList<List<Span>>)Value;
-                    serializer.Serialize(stream, traces);
+                    _serializer.Serialize(stream, _spans);
                 });
         }
 
