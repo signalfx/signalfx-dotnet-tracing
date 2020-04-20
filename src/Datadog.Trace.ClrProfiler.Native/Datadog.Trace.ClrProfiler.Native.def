@@ -1,3 +1,4 @@
+; Modified by SignalFx
 LIBRARY "SignalFx.Tracing.ClrProfiler.Native.dll"
 
 EXPORTS
