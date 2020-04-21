@@ -6,7 +6,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 VERSION=0.0.3
 
 mkdir -p $DIR/../deploy/linux
-for target in integrations.json defaults.env LICENSE NOTICE ; do
+for target in integrations.json defaults.env LICENSE NOTICE createLogPath.sh ; do
     cp $DIR/../$target $DIR/../src/Datadog.Trace.ClrProfiler.Native/bin/Debug/x64/
 done
 
