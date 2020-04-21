@@ -257,7 +257,11 @@ namespace Datadog.Trace.TestHelpers
 
             public ulong? ParentId
             {
-                get => Convert.ToUInt64(_zipkinData["parentId"].ToString(), 16);
+                get
+                {
+                    ((IDictionary)_zipkinData).TryGetValue<string>("parentId", out string parentId);
+                    return parentId == null ? null : (ulong?)Convert.ToUInt64(parentId.ToString(), 16);
+                }
             }
 
             public byte Error { get; set; }
@@ -282,6 +286,42 @@ namespace Datadog.Trace.TestHelpers
             }
 
             public Dictionary<string, double> Metrics { get; set; }
+
+            public override string ToString()
+            {
+                var sb = new StringBuilder();
+                sb.AppendLine($"TraceId: {TraceId}");
+                sb.AppendLine($"ParentId: {ParentId}");
+                sb.AppendLine($"SpanId: {SpanId}");
+                sb.AppendLine($"Service: {Service}");
+                sb.AppendLine($"Name: {Name}");
+                sb.AppendLine($"Resource: {Resource}");
+                sb.AppendLine($"Type: {Type}");
+                sb.AppendLine($"Start: {Start}");
+                sb.AppendLine($"Duration: {Duration}");
+                sb.AppendLine($"Error: {Error}");
+                sb.AppendLine("Tags:");
+
+                if (Tags?.Count > 0)
+                {
+                    foreach (var kv in Tags)
+                    {
+                        sb.Append($"\t{kv.Key}:{kv.Value}\n");
+                    }
+                }
+
+                sb.AppendLine("Logs:");
+                foreach (var e in Logs)
+                {
+                    sb.Append($"\t{e.Key}:\n");
+                    foreach (var kv in e.Value)
+                    {
+                        sb.Append($"\t\t{kv.Key}:{kv.Value}\n");
+                    }
+                }
+
+                return sb.ToString();
+            }
 
             [OnDeserialized]
             private void OnDeserialized(StreamingContext context)
