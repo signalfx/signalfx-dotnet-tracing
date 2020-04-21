@@ -15,9 +15,14 @@
               Source="$(var.ManagedDllPath)\netstandard2.0\Datadog.Trace.ClrProfiler.Managed.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
-      <Component Win64="$(var.Win64)">
+      <Component Win64="$(var.Win64)" > 
         <File Id="netstandard20_Datadog.Trace.dll"
               Source="$(var.ManagedDllPath)\netstandard2.0\Datadog.Trace.dll"
+              KeyPath="yes" Checksum="yes"/>
+      </Component>
+      <Component Win64="$(var.Win64)" > 
+        <File Id="netstandard20_Datadog.Trace.OpenTracing.dll"
+              Source="$(var.ManagedDllPath)\netstandard2.0\Datadog.Trace.OpenTracing.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
@@ -33,6 +38,11 @@
       <Component Win64="$(var.Win64)">
         <File Id="netstandard20_Newtonsoft.Json.dll"
               Source="$(var.ManagedDllPath)\netstandard2.0\Newtonsoft.Json.dll"
+              KeyPath="yes" Checksum="yes"/>
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="netstandard20_OpenTracing.dll"
+              Source="$(var.ManagedDllPath)\netstandard2.0\OpenTracing.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">

@@ -26,6 +26,11 @@
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
+        <File Id="net461_Datadog.Trace.OpenTracing.dll"
+              Source="$(var.ManagedDllPath)\net461\Datadog.Trace.OpenTracing.dll"
+              KeyPath="yes" Checksum="yes"/>
+      </Component>
+      <Component Win64="$(var.Win64)">
         <File Id="net461_MsgPack.dll"
               Source="$(var.ManagedDllPath)\net461\MsgPack.dll"
               KeyPath="yes" Checksum="yes"/>
@@ -33,6 +38,11 @@
       <Component Win64="$(var.Win64)">
         <File Id="net461_Newtonsoft.Json.dll"
               Source="$(var.ManagedDllPath)\net461\Newtonsoft.Json.dll"
+              KeyPath="yes" Checksum="yes"/>
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="net461_OpenTracing.dll"
+              Source="$(var.ManagedDllPath)\net461\OpenTracing.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
