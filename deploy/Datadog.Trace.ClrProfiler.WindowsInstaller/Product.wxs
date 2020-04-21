@@ -15,10 +15,10 @@
              InstallScope="perMachine"
              Description="$(var.ProductName)" />
 
-    <Icon Id="datadog.ico" SourceFile="datadog-icon.ico"/>
+    <Icon Id="datadog.ico" SourceFile="sfx-icon.ico"/>
     <Property Id="ARPPRODUCTICON">datadog.ico</Property>
-    <Property Id="ARPURLINFOABOUT">https://datadoghq.com/</Property>
-    <Property Id="ARPHELPLINK">https://datadoghq.com/support/</Property>
+    <Property Id="ARPURLINFOABOUT">https://signalfx.com/</Property>
+    <Property Id="ARPHELPLINK">https://docs.signalfx.com/</Property>
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER"/>
 
     <Property Id="INSTALLFOLDER">
@@ -33,7 +33,7 @@
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed."/>
     <MediaTemplate EmbedCab="yes"/>
 
-    <Feature Id="ProductFeature" Title="Datadog.Trace.ClrProfiler" Level="1">
+    <Feature Id="ProductFeature" Title="SignalFx .NET Tracing" Level="1">
       <ComponentGroupRef Id="Files"/>
       <ComponentGroupRef Id="Files.Native"/>
       <ComponentGroupRef Id="Files.Managed.Net45.GAC"/>
@@ -82,9 +82,9 @@
       <Directory Id="$(var.PlatformProgramFilesFolder)">
         <!-- "C:\Program Files" or "C:\Program Files (x86)"-->
         <Directory Id="ProgramFilesFolder.Datadog" Name="$(var.Company)">
-          <!-- ".\Datadog" -->
+          <!-- ".\SignalFx" -->
           <Directory Id="INSTALLFOLDER" Name="$(var.BaseProductName)">
-            <!-- ".\.NET Tracer" -->
+            <!-- ".\.NET Tracing" -->
               <Directory Id="net45" Name="net45">
                 <!-- ".\net45" -->
               </Directory>
@@ -109,9 +109,9 @@
       <Directory Id="ProgramFilesFolder">
         <!-- "C:\Program Files (x86)" -->
         <Directory Id="ProgramFilesFolder.Datadog.32" Name="$(var.Company)">
-          <!-- ".\Datadog" -->
+          <!-- ".\SignalFx" -->
           <Directory Id="INSTALLFOLDER.32" Name="$(var.BaseProductName)">
-            <!-- ".\.NET Tracer" -->
+            <!-- ".\.NET Tracing" -->
           </Directory>
         </Directory>
       </Directory>
@@ -119,8 +119,8 @@
 
       <Directory Id="CommonAppDataFolder">
         <!-- "C:\ProgramData" -->
-        <Directory Id="CommonAppDataFolder.DatadogDotNetTracer" Name="Datadog .NET Tracer">
-          <!-- ".\Datadog .NET Tracer" -->
+        <Directory Id="CommonAppDataFolder.DatadogDotNetTracer" Name="SignalFx .NET Tracing">
+          <!-- ".\SignalFx .NET Tracing" -->
           <Directory Id="CommonAppDataFolder.DatadogDotNetTracer.logs" Name="logs">
             <!-- ".\logs" -->
           </Directory>
