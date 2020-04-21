@@ -1,5 +1,6 @@
 // Modified by SignalFx
 using System;
+using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Logging;
 
 namespace Datadog.Trace.ClrProfiler.Integrations
@@ -44,7 +45,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 span.SetTag(Tags.SpanKind, SpanKinds.Client);
                 if (Tracer.Instance.Settings.TagRedisCommands)
                 {
-                    span.SetTag(Tags.DbStatement, rawCommand.Substring(0, Math.Min(rawCommand.Length, 1024)));
+                    span.SetTag(Tags.DbStatement, rawCommand.Truncate());
                 }
 
                 span.SetTag(Tags.OutHost, host);

@@ -132,6 +132,8 @@ namespace Datadog.Trace.Configuration
             TagElasticsearchQueries = source?.GetBool(ConfigurationKeys.TagElasticsearchQueries) ?? true;
 
             TagRedisCommands = source?.GetBool(ConfigurationKeys.TagRedisCommands) ?? true;
+
+            SanitizeSqlStatements = source?.GetBool(ConfigurationKeys.SanitizeSqlStatements) ?? true;
         }
 
         /// <summary>
@@ -275,6 +277,12 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="ConfigurationKeys.TagRedisCommands"/>
         public bool TagRedisCommands { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to sanitize SQL db.statement
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.SanitizeSqlStatements"/>
+        public bool SanitizeSqlStatements { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the use

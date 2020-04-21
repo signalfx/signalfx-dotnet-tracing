@@ -195,6 +195,12 @@ namespace Datadog.Trace.Configuration
         public const string TagRedisCommands = "SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS";
 
         /// <summary>
+        /// Configuration key for disabling sanitizing SQL db.statement
+        /// </summary>
+        /// <seealso cref="TracerSettings.SanitizeSqlStatements"/>
+        public const string SanitizeSqlStatements = "SIGNALFX_SANITIZE_SQL_STATEMENTS";
+
+        /// <summary>
         /// Configuration key for setting the approximate maximum size,
         /// in bytes, for Tracer log files.
         /// Default value is 10 MB.
