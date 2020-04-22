@@ -142,6 +142,10 @@
       <Component Win64="$(var.Win64)">
         <File Id="integrations.json" Source="..\..\integrations.json" />
       </Component>
+
+      <Component Win64="$(var.Win64)">
+        <File Id="NOTICE" Source="..\..\NOTICE" />
+      </Component>
     </ComponentGroup>
 
     <ComponentGroup Id="Files.Native" Directory="INSTALLFOLDER">
