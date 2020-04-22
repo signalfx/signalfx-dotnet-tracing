@@ -203,8 +203,8 @@ namespace Datadog.Trace.Configuration
 
         /// <summary>
         /// Configuration key for setting the path to the profiler log file.
-        /// Default value is "%ProgramData%"\Datadog .NET Tracer\logs\dotnet-profiler.log" on Windows
-        /// or "/var/log/datadog/dotnet/dotnet-profiler.log" on Linux.
+        /// Default value is "%ProgramData%"\SignalFx .NET Tracing\logs\dotnet-profiler.log" on Windows
+        /// or "/var/log/signalfx/dotnet/dotnet-profiler.log" on Linux.
         /// </summary>
         public const string ProfilerLogPath = "SIGNALFX_TRACE_LOG_PATH";
 
