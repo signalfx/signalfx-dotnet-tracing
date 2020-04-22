@@ -47,10 +47,13 @@
   <ItemGroup>
     <Content Include="banner.bmp" />
     <Content Include="build.ps1" />
+    <Content Include="core-env.cmd" />
+    <Content Include="fx-env.cmd" />
     <Content Include="sfx-icon.ico" />
     <Content Include="dialog.bmp" />
     <Content Include="Config.wxi" />
     <Content Include="license.rtf" />
+    <Content Include="NOTICE" />
   </ItemGroup>
   <ItemGroup>
     <WixExtension Include="WixUtilExtension">

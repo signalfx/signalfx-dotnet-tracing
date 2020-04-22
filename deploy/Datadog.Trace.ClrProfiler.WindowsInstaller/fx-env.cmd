@@ -1,0 +1,3 @@
+@rem Enable instrumentation for .NET Framework
+set COR_ENABLE_PROFILING=1
+set COR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}

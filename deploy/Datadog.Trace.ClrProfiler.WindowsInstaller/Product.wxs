@@ -146,6 +146,14 @@
       <Component Win64="$(var.Win64)">
         <File Id="NOTICE" Source="..\..\NOTICE" />
       </Component>
+
+      <Component Win64="$(var.Win64)">
+        <File Id="fx-env.cmd" Source="..\..\fx-env.cmd" />
+      </Component>
+
+      <Component Win64="$(var.Win64)">
+        <File Id="core-env.cmd" Source="..\..\core-env.cmd" />
+      </Component>
     </ComponentGroup>
 
     <ComponentGroup Id="Files.Native" Directory="INSTALLFOLDER">
