@@ -1,5 +1,7 @@
 // Modified by SignalFx
 using System;
+using System.Collections;
+using System.Linq;
 using Datadog.Trace.ExtensionMethods;
 using Xunit;
 
@@ -69,7 +71,7 @@ namespace Datadog.Trace.Tests.ExtensionMethods
             Assert.Equal(expected, actual);
         }
 
-        [Theory]
+        [Fact]
         public void TruncateExtension()
         {
             var a = string.Concat(Enumerable.Repeat("0", 10000));

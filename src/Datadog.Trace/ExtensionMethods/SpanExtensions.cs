@@ -45,7 +45,11 @@ namespace Datadog.Trace.ExtensionMethods
                 }
             }
 
-            span.SetTag(Tags.DbStatement, statement);
+            if (!string.IsNullOrEmpty(statement))
+            {
+                span.SetTag(Tags.DbStatement, statement);
+            }
+
             span.SetTag(Tags.SpanKind, SpanKinds.Client);
 
             // parse the connection string
