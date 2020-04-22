@@ -1,9 +1,24 @@
 using System;
+using System.Text.RegularExpressions;
 
 namespace Datadog.Trace.ExtensionMethods
 {
     internal static class StringExtensions
     {
+        private static string hex = "(0x[0-9a-fA-F]+)";
+
+        private static string numericLiteral = @"((?<![\p{L}\p{C}_0-9])[+.-]*[0-9]+[0-9xEe.+-]*)";
+
+        private static string singleQuoted = "('((?:''|[^'])*)')";
+
+        private static string doubleQuoted = "(\"((?:\"\"|[^\"])*)\")";
+
+        private static string replacement = "?";
+
+        private static string sqlNormalizeString = string.Join("|", new string[] { hex, numericLiteral, singleQuoted, doubleQuoted });
+
+        private static Regex sqlNormalizePattern = new Regex(sqlNormalizeString, RegexOptions.Compiled);
+
         /// <summary>
         /// Removes the trailing occurrence of a substring from the current string.
         /// </summary>
@@ -45,6 +60,30 @@ namespace Datadog.Trace.ExtensionMethods
                 default:
                     return null;
             }
+        }
+
+        /// <summary>
+        /// Truncates a <see cref="string"/> to 1024 characters, if necessary.
+        /// </summary>
+        /// <param name="value">The string to convert.</param>
+        /// <returns>The truncated string</returns>
+        public static string Truncate(this string value)
+        {
+            if (value == null) { throw new ArgumentNullException(nameof(value)); }
+
+            return value.Length > 1024 ? value.Substring(0, 1024) : value;
+        }
+
+        /// <summary>
+        /// Sanitize all values from sql statements.
+        /// </summary>
+        /// <param name="value">The string to sanitize.</param>
+        /// <returns>The santized string</returns>
+        public static string SanitizeSqlStatement(this string value)
+        {
+            if (value == null) { throw new ArgumentNullException(nameof(value)); }
+
+            return sqlNormalizePattern.Replace(value, replacement);
         }
     }
 }

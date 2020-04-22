@@ -108,7 +108,11 @@ namespace Datadog.Trace.ClrProfiler
 
                 Span parent = tracer.ActiveScope?.Span;
 
-                string statement = command.CommandText.Length > 1024 ? command.CommandText.Substring(0, 1024) : command.CommandText;
+                string statement = command.CommandText.Truncate();
+                if (tracer.Settings.SanitizeSqlStatements)
+                {
+                    statement = statement.SanitizeSqlStatement();
+                }
 
                 if (parent != null &&
                     parent.GetTag(Tags.DbType) == dbType &&
