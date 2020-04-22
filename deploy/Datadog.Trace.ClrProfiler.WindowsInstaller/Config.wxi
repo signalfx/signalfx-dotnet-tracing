@@ -2,21 +2,21 @@
 <!-- Modified by SignalFx -->
 
 <Include>
-  <?define BaseProductName = ".NET Tracer" ?>
-  <?define ArpManufacturer = "Datadog, Inc." ?>
-  <?define Company = "Datadog" ?>
-  <?define ProductNamePlatformAgnostic = "Datadog $(var.BaseProductName)" ?>
+  <?define BaseProductName = ".NET Tracing" ?>
+  <?define ArpManufacturer = "SignalFx" ?>
+  <?define Company = "SignalFx" ?>
+  <?define ProductNamePlatformAgnostic = "SignalFx $(var.BaseProductName)" ?>
   <?define ManagedDllPath = "$(sys.CURRENTDIR)..\..\src\bin\managed-publish" ?>
   <?define NativeDllPath = "$(sys.CURRENTDIR)..\..\src\Datadog.Trace.ClrProfiler.Native\bin\$(var.Configuration)\$(var.Platform)" ?>
   <?define NativeDll32Path = "$(sys.CURRENTDIR)..\..\src\Datadog.Trace.ClrProfiler.Native\bin\$(var.Configuration)\x86" ?>
   <?define ProfilerCLSID = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}" ?>
 
   <?if $(var.Platform) = x64 ?>
-  <?define ProductName = "Datadog $(var.BaseProductName) 64-bit" ?>
+  <?define ProductName = "SignalFx $(var.BaseProductName) 64-bit" ?>
   <?define Win64 = "yes" ?>
   <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
   <?else ?>
-  <?define ProductName = "Datadog $(var.BaseProductName) 32-bit" ?>
+  <?define ProductName = "SignalFx $(var.BaseProductName) 32-bit" ?>
   <?define Win64 = "no" ?>
   <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
   <?endif ?>

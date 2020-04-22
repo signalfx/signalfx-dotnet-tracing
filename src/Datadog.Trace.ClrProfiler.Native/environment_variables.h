@@ -16,11 +16,11 @@ const WSTRING debug_enabled = "SIGNALFX_TRACE_DEBUG"_W;
 
 // Sets the paths to integration definition JSON files.
 // Supports multiple values separated with semi-colons, for example:
-// "C:\Program Files\Datadog .NET Tracer\integrations.json;D:\temp\test_integrations.json"
+// "C:\Program Files\SignalFx .NET Tracing\integrations.json;D:\temp\test_integrations.json"
 const WSTRING integrations_path = "SIGNALFX_INTEGRATIONS"_W;
 
 // Sets the path to the profiler's home directory, for example:
-// "C:\Program Files\Datadog .NET Tracer\" or "/opt/datadog/"
+// "C:\Program Files\SignalFx .NET Tracing" or "/opt/signalfx/"
 const WSTRING profiler_home_path = "SIGNALFX_DOTNET_TRACER_HOME"_W;
 
 // Sets the filename of executables the profiler can attach to.
@@ -57,7 +57,7 @@ const WSTRING disabled_integrations = "SIGNALFX_DISABLED_INTEGRATIONS"_W;
 
 // Sets the path for the profiler's log file.
 // If not set, default is
-// "%ProgramData%"\Datadog .NET Tracer\logs\dotnet-profiler.log" on Windows or
+// "%ProgramData%"\SignalFx .NET Tracing\logs\dotnet-profiler.log" on Windows or
 // "/var/log/signalfx/dotnet/dotnet-profiler.log" on Linux.
 const WSTRING log_path = "SIGNALFX_TRACE_LOG_PATH"_W;
 

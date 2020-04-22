@@ -130,7 +130,7 @@ namespace Datadog.Trace.Logging
             {
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    var windowsDefaultDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"Datadog .NET Tracer", "logs");
+                    var windowsDefaultDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"SignalFx .NET Tracing", "logs");
                     if (Directory.Exists(windowsDefaultDirectory))
                     {
                         logDirectory = windowsDefaultDirectory;

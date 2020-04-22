@@ -1,4 +1,5 @@
-LIBRARY "Datadog.Trace.ClrProfiler.Native.dll"
+; Modified by SignalFx
+LIBRARY "SignalFx.Tracing.ClrProfiler.Native.dll"
 
 EXPORTS
     DllCanUnloadNow PRIVATE
