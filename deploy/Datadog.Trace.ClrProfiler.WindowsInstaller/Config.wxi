@@ -3,7 +3,7 @@
 
 <Include>
   <?define BaseProductName = ".NET Tracing" ?>
-  <?define ArpManufacturer = "SignalFx, Inc." ?>
+  <?define ArpManufacturer = "SignalFx" ?>
   <?define Company = "SignalFx" ?>
   <?define ProductNamePlatformAgnostic = "SignalFx $(var.BaseProductName)" ?>
   <?define ManagedDllPath = "$(sys.CURRENTDIR)..\..\src\bin\managed-publish" ?>
