@@ -148,11 +148,11 @@
       </Component>
 
       <Component Win64="$(var.Win64)">
-        <File Id="fx_env.cmd" Source="..\..\fx-env.cmd" />
+        <File Id="fx_env.cmd" Source="fx-env.cmd" />
       </Component>
 
       <Component Win64="$(var.Win64)">
-        <File Id="core_env.cmd" Source="..\..\core-env.cmd" />
+        <File Id="core_env.cmd" Source="core-env.cmd" />
       </Component>
     </ComponentGroup>
 
