@@ -39,7 +39,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
                         failures.Add($"Expected Error flag set within {span.Resource}");
                     }
 
-                    if (SpanExpectation.GetTag(span, Tags.ErrorType) != "System.Exception")
+                    if (SpanExpectation.GetTag(span, Tags.ErrorKind) != "System.Exception")
                     {
                         failures.Add($"Expected specific exception within {span.Resource}");
                     }

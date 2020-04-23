@@ -43,7 +43,7 @@ namespace Datadog.Trace.TestHelpers
 
             SetTagInternal(Trace.Tags.ErrorMsg, exception.Message);
             SetTagInternal(Trace.Tags.ErrorStack, exception.StackTrace);
-            SetTagInternal(Trace.Tags.ErrorType, exception.GetType().ToString());
+            SetTagInternal(Trace.Tags.ErrorKind, exception.GetType().ToString());
         }
 
         private void SetTagInternal(string key, string value)
