@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -330,7 +331,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 span.Error = true;
 
                 span.SetTag(Trace.Tags.ErrorMsg, $"{errorCount} error(s)");
-                span.SetTag(Trace.Tags.ErrorType, errorType);
+                span.SetTag(Trace.Tags.ErrorKind, errorType);
                 span.SetTag(Trace.Tags.ErrorStack, ConstructErrorMessage(executionErrors));
             }
         }

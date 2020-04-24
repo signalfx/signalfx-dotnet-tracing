@@ -68,17 +68,17 @@ namespace Datadog.Trace
         /// <summary>
         /// The error message of an exception
         /// </summary>
-        public const string ErrorMsg = "error.msg";
+        public const string ErrorMsg = "sfx.error.message";
 
         /// <summary>
-        /// The type of an exception
+        /// The kind of exception
         /// </summary>
-        public const string ErrorType = "error.type";
+        public const string ErrorKind = "sfx.error.kind";
 
         /// <summary>
         /// The stack trace of an exception
         /// </summary>
-        public const string ErrorStack = "error.stack";
+        public const string ErrorStack = "sfx.error.stack";
 
         /// <summary>
         /// The type of database (e.g. mssql, mysql)
