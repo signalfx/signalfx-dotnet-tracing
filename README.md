@@ -30,6 +30,7 @@ for version 2.1.0 and 2.1.2.
 | StackExchange.Redis | `StackExchange.Redis` Nuget 1.0+ | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS=false` (`true` by default). |
 | WebClient | Supported .NET Core versions | by way of `System.Net.WebRequest` instrumentation |
 
+<<<<<<< HEAD
 ## Configure the SignalFx Tracing Library for .NET Core on Linux
 
 After downloading the library, install the CLR Profiler and its components
@@ -96,6 +97,65 @@ automatically become child spans of any existing spans in the same context:
     using OpenTracing.Util;
 
     namespace MyProject
+=======
+## Installation
+
+After downloading the [latest release](https://github.com/signalfx/signalfx-dotnet-tracing/releases/latest), you can easily install the CLR Profiler and its components via your system's package manager:
+
+```bash
+# Using dpkg:
+$ dpkg -i signalfx-dotnet-tracing.deb
+
+# Using rpm:
+$ rpm -ivh signalfx-dotnet-tracing.rpm
+
+# Directly from the release bundle:
+$ tar -xf signalfx-dotnet-tracing.tar.gz -C /
+
+# Directly from the release bundle for musl-using systems (Alpine Linux):
+$ tar -xf signalfx-dotnet-tracing-musl.tar.gz -C /
+```
+
+## Usage
+
+The SignalFx-Tracing Library for .NET Core implements the [Profiling API](https://docs.microsoft.com/en-us/dotnet/framework/unmanaged-api/profiling/) and should only require basic configuration of your application environment.
+
+```bash
+# After installing, configure the required environment variables:
+$ source /opt/signalfx-dotnet-tracing/defaults.env
+
+# Optionally create the default logging directory:
+$ mkdir /var/log/signalfx
+
+# Configure you desired service name:
+$ export SIGNALFX_SERVICE_NAME='MyCoreService'
+
+# Configure reporting to your Smart Agent or Gateway instance:
+# (http://localhost:9080/v1/trace by default)
+$ export SIGNALFX_ENDPOINT_URL='http://<MyAgentOrGateway>:9080/v1/trace'
+
+# Then run your application as usual:
+$ dotnet run
+```
+
+## Custom Instrumentation
+
+In cases where you desire more customized performance-monitoring capabilities, you can build upon the provided tracing functionality by modifying and adding to automatically generated traces.
+The SignalFx Tracing library for .NET Core provides and registers an [OpenTracing-compatible](https://github.com/opentracing/opentracing-csharp) global tracer you can use to this end:
+
+```xml
+<!-- Add the OpenTracing dependency to your project -->
+<PackageReference Include="OpenTracing" Version="0.12.1" />
+```
+
+```csharp
+using OpenTracing;
+using OpenTracing.Util;
+
+namespace MyProject
+{
+    public class MyClass
+>>>>>>> 82943c7c48bd769b1196093d7db9748dc759e8da
     {
         public class MyClass
         {
