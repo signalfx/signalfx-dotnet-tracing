@@ -31,6 +31,9 @@ $ rpm -ivh signalfx-dotnet-tracing.rpm
 
 # Directly from the release bundle:
 $ tar -xf signalfx-dotnet-tracing.tar.gz -C /
+
+# Directly from the release bundle for musl-using systems (Alpine Linux):
+$ tar -xf signalfx-dotnet-tracing-musl.tar.gz -C /
 ```
 
 ## Usage
