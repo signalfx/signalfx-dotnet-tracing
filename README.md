@@ -3,11 +3,10 @@
 The SignalFx Tracing Library for .NET Core on Linux provides an
 OpenTracing-compatible tracer and automatically configured instrumentations
 for popular .NET Core libraries and frameworks.  It supports .NET Core 2.0+ on
-Linux OS distributions.
+Linux distributions.
 
-The library enables tracing with constant sampling (i.e., 100% chance of
-tracing) and reports each span to SignalFx. Where applicable, context
-propagation uses [B3 headers](https://github.com/openzipkin/b3-propagation).
+Where applicable, context propagation uses
+[B3 headers](https://github.com/openzipkin/b3-propagation).
 
 The SignalFx-Tracing Library for .NET Core on Linux implements the
 [Profiling API](https://docs.microsoft.com/en-us/dotnet/framework/unmanaged-api/profiling/)
