@@ -59,13 +59,13 @@ $ tar -xf signalfx-dotnet-tracing-musl.tar.gz -C /
     ```bash
     $ export SIGNALFX_SERVICE_NAME='MyCoreService'
     ```
-5. Set the endpoint URL of a Smart Agent, OpenTelemetry Collector, or ingest
+5. Set the endpoint URL of a Smart Agent or ingest
 endpoint:
     ```bash
     $ export SIGNALFX_ENDPOINT_URL='http://<yourEndpoint>:9080/v1/trace'
 6. Optionally, create the default logging directory:
     ```bash
-    $ mkdir /var/log/signalfx
+    $ mkdir -p /var/log/signalfx/dotnet
     ```
 7. Run your application:
     ```bash
@@ -82,10 +82,10 @@ global tracer you can use.
 OpenTracing versions 0.12.0+ are supported and the provided tracer offers a
 complete implementation of the OpenTracing API.
 
-The tracing insights the auto-instrumentation provides can act as the basis of
-any introspective elements you add. By using both instrumentation approaches,
-you'll be able to present a more detailed representation of the logic and
-functionality of your application, clients, and framework.
+The auto-instrumentation provides a base you can build on by adding your own
+custom instrumentation. By using both instrumentation approaches, you'll be
+able to present a more detailed representation of the logic and functionality
+of your application, clients, and framework.
 
 1. Add the OpenTracing dependency to your project:
     ```xml
