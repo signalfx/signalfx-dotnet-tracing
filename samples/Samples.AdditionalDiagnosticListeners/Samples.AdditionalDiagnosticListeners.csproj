@@ -2,7 +2,7 @@
   <!-- Modified by SignalFx -->
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">netcoreapp3.0;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0;netcoreapp3.1</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>

@@ -24,7 +24,6 @@ namespace Samples.AdditionalDiagnosticListeners
             services.AddGraphQL(sp => SchemaBuilder.New()
                 .SetOptions(new SchemaOptions(){ StrictValidation = false })
                 .AddServices(sp)
-
                 .AddAuthorizeDirectiveType()
                 .Create());
         }

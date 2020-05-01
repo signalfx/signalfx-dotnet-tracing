@@ -43,7 +43,7 @@ namespace Datadog.Trace.DiagnosticListeners
             }
             else
             {
-                Log.Debug($"{diagnosticListener.Name} not subscribing to {this}.");
+                Log.Debug($"{diagnosticListener.Name} not subscribing to {this.GetType().Name}.");
             }
 
             return null;
