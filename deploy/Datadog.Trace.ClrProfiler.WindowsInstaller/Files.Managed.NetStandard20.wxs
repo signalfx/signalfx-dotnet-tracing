@@ -6,8 +6,8 @@
   <Fragment>
     <ComponentGroup Id="Files.Managed.NetStandard20" Directory="netstandard2.0">
       <Component Win64="$(var.Win64)">
-        <File Id="netstandard20_Datadog.Trace.ClrProfiler.Managed.Core.dll"
-              Source="$(var.ManagedDllPath)\netstandard2.0\Datadog.Trace.ClrProfiler.Managed.Core.dll"
+        <File Id="netstandard20_SignalFx.Tracing.ClrProfiler.Managed.Core.dll"
+              Source="$(var.ManagedDllPath)\netstandard2.0\SignalFx.Tracing.ClrProfiler.Managed.Core.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">

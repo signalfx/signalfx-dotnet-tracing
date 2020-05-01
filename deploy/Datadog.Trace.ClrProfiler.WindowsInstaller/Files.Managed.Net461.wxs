@@ -11,8 +11,8 @@
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="net461_Datadog.Trace.ClrProfiler.Managed.Core.dll"
-              Source="$(var.ManagedDllPath)\net461\Datadog.Trace.ClrProfiler.Managed.Core.dll"
+        <File Id="net461_SignalFx.Tracing.ClrProfiler.Managed.Core.dll"
+              Source="$(var.ManagedDllPath)\net461\SignalFx.Tracing.ClrProfiler.Managed.Core.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
