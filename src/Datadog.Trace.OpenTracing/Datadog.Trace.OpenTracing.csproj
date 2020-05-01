@@ -4,9 +4,10 @@
   <PropertyGroup>
     <!-- NuGet -->
     <Version>0.0.3</Version>
-    <Title>Datadog APM - OpenTracing</Title>
-    <Description>Provides OpenTracing support for Datadog APM</Description>
+    <Title>SignalFx Tracing OpenTracing</Title>
+    <Description>Provides OpenTracing support for SignalFx Tracing</Description>
     <PackageTags>$(PackageTags);OpenTracing</PackageTags>
+    <AssemblyName>SignalFx.Tracing.OpenTracing</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
