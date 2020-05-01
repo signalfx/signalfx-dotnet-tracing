@@ -201,6 +201,12 @@ namespace Datadog.Trace.Configuration
         public const string SanitizeSqlStatements = "SIGNALFX_SANITIZE_SQL_STATEMENTS";
 
         /// <summary>
+        /// Comma-separated list of DiagnosticListeners to subscribe to ASP.NET instrumentation DiagnosticObserver
+        /// </summary>
+        /// <seealso cref="TracerSettings.AdditionalDiagnosticListeners"/>
+        public const string AdditionalDiagnosticListeners = "SIGNALFX_INSTRUMENTATION_ASPNETCORE_ADDITIONAL_DIAGNOSTIC_LISTENERS";
+
+        /// <summary>
         /// Configuration key for setting the approximate maximum size,
         /// in bytes, for Tracer log files.
         /// Default value is 10 MB.
