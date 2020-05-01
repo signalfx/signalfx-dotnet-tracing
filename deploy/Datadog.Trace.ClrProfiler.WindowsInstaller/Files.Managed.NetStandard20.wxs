@@ -16,8 +16,8 @@
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)" > 
-        <File Id="netstandard20_Datadog.Trace.dll"
-              Source="$(var.ManagedDllPath)\netstandard2.0\Datadog.Trace.dll"
+        <File Id="netstandard20_SignalFx.Tracing.dll"
+              Source="$(var.ManagedDllPath)\netstandard2.0\SignalFx.Tracing.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)" > 

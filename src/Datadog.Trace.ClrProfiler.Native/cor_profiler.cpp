@@ -329,7 +329,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::ModuleLoadFinished(ModuleID module_id,
   WSTRING skip_assemblies[]{
       "mscorlib"_W,
       "netstandard"_W,
-      "Datadog.Trace"_W,
+      "SignalFx.Tracing"_W,
       "SignalFx.Tracing.ClrProfiler.Managed"_W,
       "SignalFx.Tracing.OpenTracing"_W,
       "MsgPack"_W,
