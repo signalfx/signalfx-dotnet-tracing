@@ -20,7 +20,7 @@ for version 2.1.0 and 2.1.2.
 | Library | Versions Supported | Notes |
 | ---     | ---                | ---   |
 | ADO.NET | Supported .NET Core versions | Disable sanitization of `db.statement` with `SIGNALFX_SANITIZE_SQL_STATEMENTS=false` (`true` by default) |
-| ASP.NET Core MVC | 2.0+ | `Microsoft.AspNet.Mvc.Core` NuGet and built-in packages.  Include additional applicable Diagnostic Listeners with `SIGNALFX_INSTRUMENTATION_ASPNETCORE_ADDITIONAL_DIAGNOSTIC_LISTENERS='Listener.One,Listener.Two'` |
+| ASP.NET Core MVC | 2.0+ | `Microsoft.AspNet.Mvc.Core` NuGet and built-in packages.  Include additional applicable Diagnostic Listeners with `SIGNALFX_INSTRUMENTATION_ASPNETCORE_DIAGNOSTIC_LISTENERS='Listener.One,Listener.Two'` |
 | Elasticsearch.Net | `Elasticsearch.Net` Nuget 5.3 - 6.x | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES=false` (`true` by default, which may introduce overhead for direct streaming users). |
 | HttpClient | Supported .NET Core versions | by way of `System.Net.Http.HttpClientHandler` and `HttpMessageHandler` instrumentations |
 | MongoDB | `MongoDB.Driver.Core` Nuget 2.1.0+ | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS=false` (`true` by default). |

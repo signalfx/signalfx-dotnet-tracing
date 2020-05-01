@@ -136,7 +136,8 @@ namespace Datadog.Trace.Configuration
             SanitizeSqlStatements = source?.GetBool(ConfigurationKeys.SanitizeSqlStatements) ?? true;
 
             AdditionalDiagnosticListeners = source?.GetString(ConfigurationKeys.AdditionalDiagnosticListeners)
-                                                 ?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToArray() ??
+                                                 ?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                                                 .Select(s => s.Trim()).ToArray() ??
                                             new string[0];
         }
 
@@ -289,8 +290,8 @@ namespace Datadog.Trace.Configuration
         public bool SanitizeSqlStatements { get; set; }
 
         /// <summary>
-        /// Gets or sets a comma-separated list of DiagnosticListeners
-        /// to subscribe to ASP.NET instrumentation DiagnosticObserver.
+        /// Gets or sets the list of <see cref="System.Diagnostics.DiagnosticListener"/> to subscribe to the
+        /// ASP.NET Core instrumentation's observer.
         /// </summary>
         /// <seealso cref="ConfigurationKeys.AdditionalDiagnosticListeners"/>
         public string[] AdditionalDiagnosticListeners { get; set; }

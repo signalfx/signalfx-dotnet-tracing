@@ -34,7 +34,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
             var agentPort = TcpPortProvider.GetOpenPort();
             var aspNetCorePort = TcpPortProvider.GetOpenPort();
             var envVars = ZipkinEnvVars;
-            envVars["SIGNALFX_INSTRUMENTATION_ASPNETCORE_ADDITIONAL_DIAGNOSTIC_LISTENERS"] = "Unused,HotChocolate.Execution,Another.Unused";
+            envVars["SIGNALFX_INSTRUMENTATION_ASPNETCORE_DIAGNOSTIC_LISTENERS"] = "Unused,HotChocolate.Execution,Another.Unused";
 
             using (var agent = new MockZipkinCollector(agentPort))
             using (var process = StartSample(agent.Port, arguments: null, packageVersion: string.Empty, aspNetCorePort: aspNetCorePort, envVars: envVars))

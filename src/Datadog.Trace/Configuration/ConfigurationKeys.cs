@@ -205,7 +205,7 @@ namespace Datadog.Trace.Configuration
         /// ASP.NET Core instrumentation's observer.
         /// </summary>
         /// <seealso cref="TracerSettings.AdditionalDiagnosticListeners"/>
-        public const string AdditionalDiagnosticListeners = "SIGNALFX_INSTRUMENTATION_ASPNETCORE_ADDITIONAL_DIAGNOSTIC_LISTENERS";
+        public const string AdditionalDiagnosticListeners = "SIGNALFX_INSTRUMENTATION_ASPNETCORE_DIAGNOSTIC_LISTENERS";
 
         /// <summary>
         /// Configuration key for setting the approximate maximum size,
