@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+<!-- Modified by SignalFx -->
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
   <?include $(sys.CURRENTDIR)\Config.wxi?>
@@ -11,8 +11,8 @@
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="netstandard20_Datadog.Trace.ClrProfiler.Managed.dll"
-              Source="$(var.ManagedDllPath)\netstandard2.0\Datadog.Trace.ClrProfiler.Managed.dll"
+        <File Id="netstandard20_SignalFx.Tracing.ClrProfiler.Managed.dll"
+              Source="$(var.ManagedDllPath)\netstandard2.0\SignalFx.Tracing.ClrProfiler.Managed.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)" > 

@@ -1,5 +1,6 @@
+// Modified by SignalFx
 //---------------------------------------------------------------------------------------
-// Exports that managed code from Datadog.Trace.ClrProfiler.Managed.dll will
+// Exports that managed code from SignalFx.Tracing.ClrProfiler.Managed.dll will
 // P/Invoke into
 //
 // NOTE: Must keep these signatures in sync with the DllImports in

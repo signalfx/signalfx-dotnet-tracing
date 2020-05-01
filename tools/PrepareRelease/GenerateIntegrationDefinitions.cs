@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,7 +20,7 @@ namespace PrepareRelease
             var assemblies = new List<Assembly>();
             assemblies.Add(typeof(Instrumentation).Assembly);
 
-            // find all methods in Datadog.Trace.ClrProfiler.Managed.dll with [InterceptMethod]
+            // find all methods in SignalFx.Tracing.ClrProfiler.Managed.dll with [InterceptMethod]
             // and create objects that will generate correct JSON schema
             var integrations = from assembly in assemblies
                                from wrapperType in assembly.GetTypes()
