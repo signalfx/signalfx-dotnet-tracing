@@ -62,11 +62,11 @@ manager:
 5. Set the endpoint URL of a Smart Agent or OpenTelemetry endpoint:
     ```bash
     $ export SIGNALFX_ENDPOINT_URL='http://<yourEndpoint>:9080/v1/trace'
-1. Optionally, create the default logging directory:
+6. Optionally, create the default logging directory:
     ```bash
     $ mkdir /var/log/signalfx
     ```
-2. Run your application:
+7. Run your application:
     ```bash
     $ dotnet run
     ```
