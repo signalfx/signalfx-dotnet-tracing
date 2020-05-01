@@ -59,9 +59,9 @@ manager:
     ```bash
     $ export SIGNALFX_SERVICE_NAME='MyCoreService'
     ```
-5. Set the endpoint URL of a Smart Agent or OpenTelemetry endpoint:
+5. Set the endpoint of a Smart Agent or OpenTelemetry Collector:
     ```bash
-    $ export SIGNALFX_ENDPOINT_URL='http://<yourEndpoint>:9080/v1/trace'
+    $ export SIGNALFX_ENDPOINT_URL='<YourSmartAgentOrCollector>'
 6. Optionally, create the default logging directory:
     ```bash
     $ mkdir /var/log/signalfx
