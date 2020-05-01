@@ -49,7 +49,7 @@ manager:
     $ tar -xf signalfx-dotnet-tracing.tar.gz -C /
 
     # Install directly from the release bundle for musl-using systems (Alpine Linux):
-$ tar -xf signalfx-dotnet-tracing-musl.tar.gz -C /
+    $ tar -xf signalfx-dotnet-tracing-musl.tar.gz -C /
     ```
 3. Configure the required environment variables:
     ```bash
@@ -59,15 +59,14 @@ $ tar -xf signalfx-dotnet-tracing-musl.tar.gz -C /
     ```bash
     $ export SIGNALFX_SERVICE_NAME='MyCoreService'
     ```
-5. Set the endpoint URL of a Smart Agent or ingest
-endpoint:
+5. Set the endpoint URL of a Smart Agent or OpenTelemetry endpoint:
     ```bash
     $ export SIGNALFX_ENDPOINT_URL='http://<yourEndpoint>:9080/v1/trace'
-6. Optionally, create the default logging directory:
+1. Optionally, create the default logging directory:
     ```bash
-    $ mkdir -p /var/log/signalfx/dotnet
+    $ mkdir /var/log/signalfx
     ```
-7. Run your application:
+2. Run your application:
     ```bash
     $ dotnet run
     ```
