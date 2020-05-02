@@ -41,8 +41,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
 
             var path = Path.Combine(ManagedProfilerDirectory, $"{assemblyName.Name}.dll");
 
-            // TODO: For now keeping both prefixes until all assemblies are renamed.
-            if ((assemblyName.Name.StartsWith("Datadog.Trace", StringComparison.OrdinalIgnoreCase) || assemblyName.Name.StartsWith("SignalFx.Tracing", StringComparison.OrdinalIgnoreCase))
+            if (assemblyName.Name.StartsWith("SignalFx.Tracing", StringComparison.OrdinalIgnoreCase)
                 && assemblyName.FullName.IndexOf("PublicKeyToken=def86d061d0d2eeb", StringComparison.OrdinalIgnoreCase) >= 0
                 && File.Exists(path))
             {
