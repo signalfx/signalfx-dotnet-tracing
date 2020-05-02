@@ -6,8 +6,8 @@
   <Fragment>
     <ComponentGroup Id="Files.Managed.Net461" Directory="net461">
       <Component Win64="$(var.Win64)">
-        <File Id="net461_Datadog.Trace.AspNet.dll"
-              Source="$(var.ManagedDllPath)\net461\Datadog.Trace.AspNet.dll"
+        <File Id="net461_SignalFx.Tracing.AspNet.dll"
+              Source="$(var.ManagedDllPath)\net461\SignalFx.Tracing.AspNet.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
