@@ -214,7 +214,7 @@ namespace PrepareRelease
         private static string AssemblyString(string versionText)
         {
             var partial = PartialAssemblyString(versionText);
-            return $"Datadog.Trace.ClrProfiler.Managed, {partial}";
+            return $"SignalFx.Tracing.ClrProfiler.Managed, {partial}";
         }
 
         private static string PartialAssemblyString(string versionText)

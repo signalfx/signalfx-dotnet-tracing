@@ -3,6 +3,7 @@
 
   <PropertyGroup>
     <RootNamespace>Datadog.Trace.ClrProfiler</RootNamespace>
+    <AssemblyName>SignalFx.Tracing.ClrProfiler.Managed.Core</AssemblyName>
 
     <!-- NuGet -->
     <Version>0.0.3</Version>

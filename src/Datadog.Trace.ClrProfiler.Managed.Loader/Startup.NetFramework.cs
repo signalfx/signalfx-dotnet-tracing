@@ -8,7 +8,7 @@ using System.Reflection;
 namespace Datadog.Trace.ClrProfiler.Managed.Loader
 {
     /// <summary>
-    /// A class that attempts to load the Datadog.Trace.ClrProfiler.Managed .NET assembly.
+    /// A class that attempts to load the SignalFx.Tracing.ClrProfiler.Managed .NET assembly.
     /// </summary>
     public partial class Startup
     {

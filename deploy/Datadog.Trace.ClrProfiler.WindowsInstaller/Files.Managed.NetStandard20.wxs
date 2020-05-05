@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+<!-- Modified by SignalFx -->
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
   <?include $(sys.CURRENTDIR)\Config.wxi?>
   <Fragment>
     <ComponentGroup Id="Files.Managed.NetStandard20" Directory="netstandard2.0">
       <Component Win64="$(var.Win64)">
-        <File Id="netstandard20_Datadog.Trace.ClrProfiler.Managed.Core.dll"
-              Source="$(var.ManagedDllPath)\netstandard2.0\Datadog.Trace.ClrProfiler.Managed.Core.dll"
+        <File Id="netstandard20_SignalFx.Tracing.ClrProfiler.Managed.Core.dll"
+              Source="$(var.ManagedDllPath)\netstandard2.0\SignalFx.Tracing.ClrProfiler.Managed.Core.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="netstandard20_Datadog.Trace.ClrProfiler.Managed.dll"
-              Source="$(var.ManagedDllPath)\netstandard2.0\Datadog.Trace.ClrProfiler.Managed.dll"
+        <File Id="netstandard20_SignalFx.Tracing.ClrProfiler.Managed.dll"
+              Source="$(var.ManagedDllPath)\netstandard2.0\SignalFx.Tracing.ClrProfiler.Managed.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)" > 
-        <File Id="netstandard20_Datadog.Trace.dll"
-              Source="$(var.ManagedDllPath)\netstandard2.0\Datadog.Trace.dll"
+        <File Id="netstandard20_SignalFx.Tracing.dll"
+              Source="$(var.ManagedDllPath)\netstandard2.0\SignalFx.Tracing.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)" > 
-        <File Id="netstandard20_Datadog.Trace.OpenTracing.dll"
-              Source="$(var.ManagedDllPath)\netstandard2.0\Datadog.Trace.OpenTracing.dll"
+        <File Id="netstandard20_SignalFx.Tracing.OpenTracing.dll"
+              Source="$(var.ManagedDllPath)\netstandard2.0\SignalFx.Tracing.OpenTracing.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">

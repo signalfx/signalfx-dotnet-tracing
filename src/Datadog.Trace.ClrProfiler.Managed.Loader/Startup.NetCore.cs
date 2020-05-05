@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Datadog.Trace.ClrProfiler.Managed.Loader
 {
     /// <summary>
-    /// A class that attempts to load the Datadog.Trace.ClrProfiler.Managed .NET assembly.
+    /// A class that attempts to load the SignalFx.Tracing.ClrProfiler.Managed .NET assembly.
     /// </summary>
     public partial class Startup
     {
@@ -41,7 +41,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
 
             var path = Path.Combine(ManagedProfilerDirectory, $"{assemblyName.Name}.dll");
 
-            if (assemblyName.Name.StartsWith("Datadog.Trace", StringComparison.OrdinalIgnoreCase)
+            if (assemblyName.Name.StartsWith("SignalFx.Tracing", StringComparison.OrdinalIgnoreCase)
                 && assemblyName.FullName.IndexOf("PublicKeyToken=def86d061d0d2eeb", StringComparison.OrdinalIgnoreCase) >= 0
                 && File.Exists(path))
             {

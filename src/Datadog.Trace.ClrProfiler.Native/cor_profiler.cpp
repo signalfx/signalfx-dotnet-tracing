@@ -251,25 +251,25 @@ HRESULT STDMETHODCALLTYPE CorProfiler::AssemblyLoadFinished(AssemblyID assembly_
     Debug("AssemblyLoadFinished: AssemblyName=", assembly_info.name, " AssemblyVersion=", ws.str(), ".", assembly_metadata.version.revision);
   }
 
-  if (assembly_info.name == "Datadog.Trace.ClrProfiler.Managed"_W) {
+  if (assembly_info.name == "SignalFx.Tracing.ClrProfiler.Managed"_W) {
     // Check that Major.Minor.Build match the profiler version
     if (ws.str() == ToWSTRING(PROFILER_VERSION)) {
-      Info("AssemblyLoadFinished: Datadog.Trace.ClrProfiler.Managed v", ws.str(), " matched profiler version v", PROFILER_VERSION);
+      Info("AssemblyLoadFinished: SignalFx.Tracing.ClrProfiler.Managed v", ws.str(), " matched profiler version v", PROFILER_VERSION);
       managed_profiler_loaded_app_domains.insert(assembly_info.app_domain_id);
 
       if (runtime_information_.is_desktop() && corlib_module_loaded) {
         // Set the managed_profiler_loaded_domain_neutral flag whenever the managed profiler is loaded shared
         if (assembly_info.app_domain_id == corlib_app_domain_id) {
-          Info("AssemblyLoadFinished: Datadog.Trace.ClrProfiler.Managed was loaded domain-neutral");
+          Info("AssemblyLoadFinished: SignalFx.Tracing.ClrProfiler.Managed was loaded domain-neutral");
           managed_profiler_loaded_domain_neutral = true;
         }
         else {
-          Info("AssemblyLoadFinished: Datadog.Trace.ClrProfiler.Managed was not loaded domain-neutral");
+          Info("AssemblyLoadFinished: SignalFx.Tracing.ClrProfiler.Managed was not loaded domain-neutral");
         }
       }
     }
     else {
-      Warn("AssemblyLoadFinished: Datadog.Trace.ClrProfiler.Managed v", ws.str(), " did not match profiler version v", PROFILER_VERSION);
+      Warn("AssemblyLoadFinished: SignalFx.Tracing.ClrProfiler.Managed v", ws.str(), " did not match profiler version v", PROFILER_VERSION);
     }
   }
 
@@ -329,9 +329,9 @@ HRESULT STDMETHODCALLTYPE CorProfiler::ModuleLoadFinished(ModuleID module_id,
   WSTRING skip_assemblies[]{
       "mscorlib"_W,
       "netstandard"_W,
-      "Datadog.Trace"_W,
-      "Datadog.Trace.ClrProfiler.Managed"_W,
-      "Datadog.Trace.OpenTracing"_W,
+      "SignalFx.Tracing"_W,
+      "SignalFx.Tracing.ClrProfiler.Managed"_W,
+      "SignalFx.Tracing.OpenTracing"_W,
       "MsgPack"_W,
       "MsgPack.Serialization.EmittingSerializers.GeneratedSerealizers0"_W,
       "MsgPack.Serialization.EmittingSerializers.GeneratedSerealizers1"_W,
@@ -534,7 +534,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::JITCompilationStarted(
 
   // The first time a method is JIT compiled in an AppDomain, insert our startup
   // hook which, at a minimum, must add an AssemblyResolve event so we can find
-  // Datadog.Trace.ClrProfiler.Managed.dll and its dependencies on-disk since it
+  // SignalFx.Tracing.ClrProfiler.Managed.dll and its dependencies on-disk since it
   // is no longer provided in a NuGet package
   if (first_jit_compilation_app_domains.find(module_metadata->app_domain_id) ==
       first_jit_compilation_app_domains.end()) {
@@ -786,10 +786,10 @@ HRESULT CorProfiler::ProcessReplacementCalls(
       }
 
       // At this point we know we've hit a match. Error out if
-      //   1) The target assembly is Datadog.Trace.ClrProfiler.Managed
+      //   1) The target assembly is SignalFx.Tracing.ClrProfiler.Managed
       //   2) The managed profiler has not been loaded yet
       if (!ProfilerAssemblyIsLoadedIntoAppDomain(module_metadata->app_domain_id) &&
-          method_replacement.wrapper_method.assembly.name == "Datadog.Trace.ClrProfiler.Managed"_W) {
+          method_replacement.wrapper_method.assembly.name == "SignalFx.Tracing.ClrProfiler.Managed"_W) {
         Warn(
             "JITCompilationStarted skipping method: Method replacement "
             "found but the managed profiler has not yet been loaded "
@@ -803,11 +803,11 @@ HRESULT CorProfiler::ProcessReplacementCalls(
       // At this point we know we've hit a match. Error out if
       //   1) The calling assembly is domain-neutral
       //   2) The profiler is not configured to instrument domain-neutral assemblies
-      //   3) The target assembly is Datadog.Trace.ClrProfiler.Managed
+      //   3) The target assembly is SignalFx.Tracing.ClrProfiler.Managed
       if (runtime_information_.is_desktop() && corlib_module_loaded &&
           module_metadata->app_domain_id == corlib_app_domain_id &&
           !instrument_domain_neutral_assemblies &&
-          method_replacement.wrapper_method.assembly.name == "Datadog.Trace.ClrProfiler.Managed"_W) {
+          method_replacement.wrapper_method.assembly.name == "SignalFx.Tracing.ClrProfiler.Managed"_W) {
         Warn(
             "JITCompilationStarted skipping method: Method replacement",
             " found but the calling assembly ", module_metadata->assemblyName,

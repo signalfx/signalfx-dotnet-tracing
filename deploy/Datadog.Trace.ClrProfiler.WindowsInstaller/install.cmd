@@ -4,7 +4,7 @@ setlocal
 
 echo Executing install.cmd at %date% %time%
 
-set DATADOG_APPCMD_CMDLINE=%systemroot%\system32\inetsrv\appcmd.exe set config /section:system.webServer/modules /+[name='SignalFxTracingModule',type='Datadog.Trace.AspNet.TracingHttpModule,Datadog.Trace.AspNet,Version=1.0.0.0,Culture=neutral,PublicKeyToken=def86d061d0d2eeb']
+set DATADOG_APPCMD_CMDLINE=%systemroot%\system32\inetsrv\appcmd.exe set config /section:system.webServer/modules /+[name='SignalFxTracingModule',type='Datadog.Trace.AspNet.TracingHttpModule,SignalFx.Tracing.AspNet,Version=1.0.0.0,Culture=neutral,PublicKeyToken=def86d061d0d2eeb']
 
 IF EXIST %systemroot%\system32\inetsrv\appcmd.exe (
     echo Attempting to install the SignalFx ASP.NET HttpModule with %systemroot%\system32\inetsrv\appcmd.exe
