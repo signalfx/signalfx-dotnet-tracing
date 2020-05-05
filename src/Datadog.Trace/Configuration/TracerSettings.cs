@@ -134,6 +134,11 @@ namespace Datadog.Trace.Configuration
             TagRedisCommands = source?.GetBool(ConfigurationKeys.TagRedisCommands) ?? true;
 
             SanitizeSqlStatements = source?.GetBool(ConfigurationKeys.SanitizeSqlStatements) ?? true;
+
+            AdditionalDiagnosticListeners = source?.GetString(ConfigurationKeys.AdditionalDiagnosticListeners)
+                                                 ?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                                                 .Select(s => s.Trim()).ToArray() ??
+                                            new string[0];
         }
 
         /// <summary>
@@ -283,6 +288,13 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="ConfigurationKeys.SanitizeSqlStatements"/>
         public bool SanitizeSqlStatements { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of <see cref="System.Diagnostics.DiagnosticListener"/> to subscribe to the
+        /// ASP.NET Core instrumentation's observer.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.AdditionalDiagnosticListeners"/>
+        public string[] AdditionalDiagnosticListeners { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the use

@@ -1,6 +1,8 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Datadog.Trace.Logging;
 
 namespace Datadog.Trace.DiagnosticListeners
@@ -12,9 +14,15 @@ namespace Datadog.Trace.DiagnosticListeners
         protected DiagnosticObserver(IDatadogTracer tracer)
         {
             Tracer = tracer ?? throw new ArgumentNullException(nameof(tracer));
+
+            ListenerNames = new List<string>();
+            ListenerNames.Add(ListenerName);
+            ListenerNames.AddRange(tracer.Settings.AdditionalDiagnosticListeners);
         }
 
         protected IDatadogTracer Tracer { get; }
+
+        protected List<string> ListenerNames { get; }
 
         /// <summary>
         /// Gets the name of the <see cref="DiagnosticListener"/> that should be instrumented.
@@ -29,9 +37,13 @@ namespace Datadog.Trace.DiagnosticListeners
 
         public virtual IDisposable SubscribeIfMatch(DiagnosticListener diagnosticListener)
         {
-            if (diagnosticListener.Name == ListenerName)
+            if (ListenerNames.Any(diagnosticListener.Name.Contains))
             {
                 return diagnosticListener.Subscribe(this, IsEventEnabled);
+            }
+            else
+            {
+                Log.Debug($"{diagnosticListener.Name} not subscribing to {this.GetType().Name}.");
             }
 
             return null;

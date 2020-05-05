@@ -189,16 +189,23 @@ namespace Datadog.Trace.Configuration
 
         /// <summary>
         /// Configuration key for enabling or disabling tagging Redis
-        /// commands as db.statement
+        /// commands as db.statement.
         /// </summary>
         /// <seealso cref="TracerSettings.TagRedisCommands"/>
         public const string TagRedisCommands = "SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS";
 
         /// <summary>
-        /// Configuration key for disabling sanitizing SQL db.statement
+        /// Configuration key for disabling sanitizing SQL db.statement.
         /// </summary>
         /// <seealso cref="TracerSettings.SanitizeSqlStatements"/>
         public const string SanitizeSqlStatements = "SIGNALFX_SANITIZE_SQL_STATEMENTS";
+
+        /// <summary>
+        /// Comma-separated list of <see cref="System.Diagnostics.DiagnosticListener"/> to subscribe to the
+        /// ASP.NET Core instrumentation's observer.
+        /// </summary>
+        /// <seealso cref="TracerSettings.AdditionalDiagnosticListeners"/>
+        public const string AdditionalDiagnosticListeners = "SIGNALFX_INSTRUMENTATION_ASPNETCORE_DIAGNOSTIC_LISTENERS";
 
         /// <summary>
         /// Configuration key for setting the approximate maximum size,
