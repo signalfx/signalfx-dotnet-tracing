@@ -48,5 +48,12 @@
     "NugetPackageSearchName": "ServiceStack.Redis",
     "MinVersion": "4.0.48",
     "MaxVersionExclusive": "6.0.0"
+  },
+  {
+    "IntegrationName": "OpenTracing",
+    "SampleProjectName": "Samples.OpenTracing",
+    "NugetPackageSearchName": "OpenTracing",
+    "MinVersion": "0.11.0",
+    "MaxVersionExclusive": "1.0.0"
   }
 ]

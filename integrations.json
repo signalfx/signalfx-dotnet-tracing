@@ -1221,6 +1221,33 @@
     ]
   },
   {
+    "name": "OpenTracing",
+    "method_replacements": [
+      {
+        "caller": {},
+        "target": {
+          "assembly": "OpenTracing",
+          "type": "",
+          "method": "NoopWithoutMatchingMethod",
+          "signature_types": [],
+          "minimum_major": 0,
+          "minimum_minor": 0,
+          "minimum_patch": 0,
+          "maximum_major": 0,
+          "maximum_minor": 65535,
+          "maximum_patch": 65535
+        },
+        "wrapper": {
+          "assembly": "SignalFx.Tracing.ClrProfiler.Managed, Version=0.1.0.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb",
+          "type": "Datadog.Trace.ClrProfiler.Integrations.OpenTracingIntegration",
+          "method": "NoopWithoutMatchingMethod",
+          "signature": "00 03 1C 08 08 0A",
+          "action": "ReplaceTargetMethod"
+        }
+      }
+    ]
+  },
+  {
     "name": "ServiceStackRedis",
     "method_replacements": [
       {
