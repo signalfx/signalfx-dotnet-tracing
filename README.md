@@ -75,11 +75,11 @@ manager:
 
 ### Windows
 
-1. Install the CLR Profiler using the installers (MSI files) from
-[latest release](https://github.com/signalfx/signalfx-dotnet-tracing/releases/latest),
-choose the installer (x64 or x86) according to the architecture of the application
-to be instrumented.
-2. Configure the required environment variables:
+1. Install the CLR Profiler using an installer file (`.msi` file) from the
+[latest release](https://github.com/signalfx/signalfx-dotnet-tracing/releases/latest).
+Choose the installer (x64 or x86) according to the architecture of the application
+you're instrumenting.
+2. Configure the required environment variables to enable the CLR Profiler:
     - For .NET Framework applications:
     ```batch
     set COR_ENABLE_PROFILING=1
@@ -90,16 +90,18 @@ to be instrumented.
    set CORECLR_ENABLE_PROFILING=1
    set CORECLR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}
    ```
-3. Set the service name:
+3. Set the "service name" that better describes your application:
    ```batch
    set SIGNALFX_SERVICE_NAME=MyServiceName
    ```
-4. Set the endpoint of a Smart Agent or OpenTelemetry Collector:
+4. Set the endpoint of a Smart Agent or OpenTelemetry Collector that will forward
+the trace data:
    ```batch
    set SIGNALFX_ENDPOINT_URL='http://<YourSmartAgentOrCollector>:9080/v1/trace'
    ```
-5. Re-start your application ensuring that all environment variables are properly
-configured.
+5. Restart your application ensuring that all environment variables above are properly
+configured. If you need to check the environment variables for a process use a tool
+like [Process Explorer](https://docs.microsoft.com/en-us/sysinternals/downloads/process-explorer).
 
 ## Configure custom instrumentation
 
