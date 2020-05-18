@@ -1,14 +1,14 @@
-# SignalFx Tracing Library for .NET Core on Linux
+# SignalFx Tracing Library for .NET
 
-The SignalFx Tracing Library for .NET Core on Linux provides an
+The SignalFx Tracing Library for .NET provides an
 OpenTracing-compatible tracer and automatically configured instrumentations
-for popular .NET Core libraries and frameworks.  It supports .NET Core 2.0+ on
-Linux distributions.
+for popular .NET libraries and frameworks.  It supports .NET Core 2.0+ on
+Linux and Windows and .NET Framework 4.5+ on Windows.
 
 Where applicable, context propagation uses
 [B3 headers](https://github.com/openzipkin/b3-propagation).
 
-The SignalFx-Tracing Library for .NET Core on Linux implements the
+The SignalFx-Tracing Library for .NET implements the
 [Profiling API](https://docs.microsoft.com/en-us/dotnet/framework/unmanaged-api/profiling/)
 and should only require basic configuration of your application environment.
 
@@ -29,7 +29,9 @@ for version 2.1.0 and 2.1.2.
 | StackExchange.Redis | `StackExchange.Redis` Nuget 1.0+ | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS=false` (`true` by default). |
 | WebClient | Supported .NET Core versions | by way of `System.Net.WebRequest` instrumentation |
 
-## Configure the SignalFx Tracing Library for .NET Core on Linux
+## Configure the SignalFx Tracing Library for .NET
+
+### Linux
 
 After downloading the library, install the CLR Profiler and its components
 via your system's package manager.
@@ -71,10 +73,40 @@ manager:
     $ dotnet run
     ```
 
+### Windows
+
+1. Install the CLR Profiler using an installer file (`.msi` file) from the
+[latest release](https://github.com/signalfx/signalfx-dotnet-tracing/releases/latest).
+Choose the installer (x64 or x86) according to the architecture of the application
+you're instrumenting.
+2. Configure the required environment variables to enable the CLR Profiler:
+    - For .NET Framework applications:
+    ```batch
+    set COR_ENABLE_PROFILING=1
+    set COR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874} 
+    ```
+   - For .NET Core applications:
+   ```batch
+   set CORECLR_ENABLE_PROFILING=1
+   set CORECLR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}
+   ```
+3. Set the "service name" that better describes your application:
+   ```batch
+   set SIGNALFX_SERVICE_NAME=MyServiceName
+   ```
+4. Set the endpoint of a Smart Agent or OpenTelemetry Collector that will forward
+the trace data:
+   ```batch
+   set SIGNALFX_ENDPOINT_URL='http://<YourSmartAgentOrCollector>:9080/v1/trace'
+   ```
+5. Restart your application ensuring that all environment variables above are properly
+configured. If you need to check the environment variables for a process use a tool
+like [Process Explorer](https://docs.microsoft.com/en-us/sysinternals/downloads/process-explorer).
+
 ## Configure custom instrumentation
 
 You can build upon the provided tracing functionality by modifying and adding
-to automatically generated traces. The SignalFx Tracing library for .NET Core
+to automatically generated traces. The SignalFx Tracing library for .NET
 provides and registers an [OpenTracing-compatible](https://github.com/opentracing/opentracing-csharp)
 global tracer you can use.
 
@@ -122,7 +154,7 @@ automatically become child spans of any existing spans in the same context:
     ```
 
 ## About
-The SignalFx-Tracing Library for .NET Core on Linux is a fork of the .NET
+The SignalFx-Tracing Library for .NET is a fork of the .NET
 Tracer for Datadog APM that has been modified to provide Zipkin v2 JSON
 formatting, a complete OpenTracing API implementation, B3 propagation, and
 properly annotated trace data for handling by
