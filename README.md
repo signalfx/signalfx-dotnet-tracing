@@ -78,7 +78,7 @@ to automatically generated traces. The SignalFx Tracing library for .NET Core
 provides and registers an [OpenTracing-compatible](https://github.com/opentracing/opentracing-csharp)
 global tracer you can use.
 
-OpenTracing versions 0.12.0+ are supported and the provided tracer offers a
+OpenTracing versions 0.11.0+ are supported and the provided tracer offers a
 complete implementation of the OpenTracing API.
 
 The auto-instrumentation provides a base you can build on by adding your own

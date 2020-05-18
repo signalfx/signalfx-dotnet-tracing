@@ -288,5 +288,18 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 #endif
             };
 
+        public static IEnumerable<object[]> OpenTracing =>
+
+            new List<object[]>
+            {
+#if DEFAULT_SAMPLES
+                new object[] { string.Empty },
+#else
+                new object[] { "0.11.0" },
+                new object[] { "0.12.0" },
+                new object[] { "0.12.1" },
+#endif
+            };
+
     }
 }
