@@ -100,13 +100,15 @@ namespace Datadog.Trace.TestHelpers
             int timeoutInMilliseconds = 20000,
             string operationName = null,
             DateTimeOffset? minDateTime = null,
-            bool returnAllOperations = false)
+            bool returnAllOperations = false,
+            string[] operationNameContainsAny = null)
         {
             var deadline = DateTime.Now.AddMilliseconds(timeoutInMilliseconds);
             var minimumOffset = (minDateTime ?? DateTimeOffset.MinValue).ToUnixTimeMicroseconds();
 
             IImmutableList<IMockSpan> relevantSpans = ImmutableList<IMockSpan>.Empty;
 
+            operationNameContainsAny ??= new string[0];
             while (DateTime.Now < deadline)
             {
                 relevantSpans =
@@ -115,7 +117,7 @@ namespace Datadog.Trace.TestHelpers
                        .Where(s => s.Start > minimumOffset)
                        .ToImmutableList();
 
-                if (relevantSpans.Count(s => operationName == null || s.Name == operationName) >= count)
+                if (relevantSpans.Count(s => operationNameContainsAny.Any(contains => s.Name.Contains(contains)) || operationName == null || s.Name == operationName) >= count)
                 {
                     break;
                 }
@@ -127,7 +129,7 @@ namespace Datadog.Trace.TestHelpers
             {
                 relevantSpans =
                     relevantSpans
-                       .Where(s => operationName == null || s.Name == operationName)
+                       .Where(s => operationNameContainsAny.Any(contains => s.Name.Contains(contains)) || operationName == null || s.Name == operationName)
                        .ToImmutableList();
             }
 

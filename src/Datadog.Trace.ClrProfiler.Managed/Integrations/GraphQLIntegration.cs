@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Datadog.Trace.ClrProfiler.Emit;
 using Datadog.Trace.ClrProfiler.Helpers;
+using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Logging;
 
 namespace Datadog.Trace.ClrProfiler.Integrations
@@ -237,9 +238,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
         private static void DecorateSpan(Span span)
         {
-            span.Type = SpanTypes.GraphQL;
-            span.SetTag(Tags.SpanKind, SpanKinds.Server);
-            span.SetTag(Tags.Language, TracerConstants.Language);
+            span.SetTag(Tags.InstrumentationName, SpanTypes.GraphQL);
         }
 
         private static Scope CreateScopeFromValidate(object document)
@@ -262,7 +261,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 scope = tracer.StartActive(ValidateOperationName, serviceName: serviceName);
                 var span = scope.Span;
                 DecorateSpan(span);
-                span.SetTag(Tags.GraphQLSource, source);
+                span.SetTag(Tags.GraphQLSource, source.Truncate());
 
                 // set analytics sample rate if enabled
                 var analyticsSampleRate = tracer.Settings.GetIntegrationAnalyticsSampleRate(IntegrationName, enabledWithGlobalSetting: false);
@@ -301,12 +300,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
             try
             {
-                scope = tracer.StartActive(ExecuteOperationName, serviceName: serviceName);
+                var operation = $"{operationType}{(!string.IsNullOrEmpty(operationName) ? $" {operationName}" : string.Empty)}";
+                scope = tracer.StartActive(operation, serviceName: serviceName);
                 var span = scope.Span;
                 DecorateSpan(span);
-                span.ResourceName = $"{operationType} {operationName ?? "operation"}";
 
-                span.SetTag(Tags.GraphQLSource, source);
+                span.SetTag(Tags.GraphQLSource, source.Truncate());
                 span.SetTag(Tags.GraphQLOperationName, operationName);
                 span.SetTag(Tags.GraphQLOperationType, operationType);
 

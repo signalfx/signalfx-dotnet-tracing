@@ -185,11 +185,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 yield return "Resource must be set.";
             }
 
-            if (string.IsNullOrWhiteSpace(span.Type))
-            {
-                yield return "Type must be set.";
-            }
-
             if (string.IsNullOrWhiteSpace(span.Name))
             {
                 yield return "Name must be set.";

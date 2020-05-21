@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,8 +17,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
     public class GraphQLTests : TestHelper
     {
         private static readonly string _graphQLValidateOperationName = "graphql.validate";
-        private static readonly string _graphQLExecuteOperationName = "graphql.execute";
-
         private static readonly List<RequestInfo> _requests;
         private static readonly List<WebServerSpanExpectation> _expectations;
         private static int _expectedGraphQLValidateSpanCount;
@@ -31,7 +30,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             _expectedGraphQLExecuteSpanCount = 0;
 
             // SUCCESS: query using GET
-            CreateGraphQLRequestsAndExpectations(url: "/graphql?query=" + WebUtility.UrlEncode("query{hero{name appearsIn}}"), httpMethod: "GET", resourceName: "Query operation", graphQLRequestBody: null, graphQLOperationType: "Query", graphQLOperationName: null, graphQLSource: "query{hero{name appearsIn} }");
+            CreateGraphQLRequestsAndExpectations(url: "/graphql?query=" + WebUtility.UrlEncode("query{hero{name appearsIn}}"), httpMethod: "GET", resourceName: "Query", graphQLRequestBody: null, graphQLOperationType: "Query", graphQLOperationName: null, graphQLSource: "query{hero{name appearsIn} }");
 
             // SUCCESS: query using POST (default)
             CreateGraphQLRequestsAndExpectations(url: "/graphql", httpMethod: "POST", resourceName: "Query HeroQuery", graphQLRequestBody: @"{""query"":""query HeroQuery{hero {name appearsIn}}"",""operationName"": ""HeroQuery""}", graphQLOperationType: "Query", graphQLOperationName: "HeroQuery", graphQLSource: "query HeroQuery{hero{name appearsIn}}");
@@ -66,8 +65,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             int agentPort = TcpPortProvider.GetOpenPort();
             int aspNetCorePort = TcpPortProvider.GetOpenPort();
 
-            using (var agent = new MockTracerAgent(agentPort))
-            using (Process process = StartSample(agent.Port, arguments: null, packageVersion: string.Empty, aspNetCorePort: aspNetCorePort))
+            using (var agent = new MockZipkinCollector(agentPort))
+            using (Process process = StartSample(agent.Port, arguments: null, packageVersion: string.Empty, aspNetCorePort: aspNetCorePort, envVars: ZipkinEnvVars))
             {
                 var wh = new EventWaitHandle(false, EventResetMode.AutoReset);
 
@@ -102,7 +101,13 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                                  .GroupBy(s => s.SpanId)
                                  .Select(grp => grp.First())
                                  .OrderBy(s => s.Start);
-                var graphQLExecuteSpans = agent.WaitForSpans(_expectedGraphQLExecuteSpanCount, operationName: _graphQLExecuteOperationName, returnAllOperations: false)
+
+                var expectedContains = new string[]
+                {
+                    "Query", "Mutation", "Subscription"
+                };
+
+                var graphQLExecuteSpans = agent.WaitForSpans(_expectedGraphQLExecuteSpanCount, operationName: string.Empty, operationNameContainsAny: expectedContains, returnAllOperations: false)
                                  .GroupBy(s => s.SpanId)
                                  .Select(grp => grp.First())
                                  .OrderBy(s => s.Start);
@@ -136,7 +141,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             });
 
             // Expect a 'validate' span
-            _expectations.Add(new GraphQLSpanExpectation("Samples.GraphQL-graphql", _graphQLValidateOperationName, _graphQLValidateOperationName)
+            _expectations.Add(new GraphQLSpanExpectation("Samples.GraphQL", _graphQLValidateOperationName, _graphQLValidateOperationName)
             {
                 OriginalUri = url,
                 GraphQLRequestBody = graphQLRequestBody,
@@ -150,7 +155,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             if (failsValidation) { return; }
 
             // Expect an 'execute' span
-            _expectations.Add(new GraphQLSpanExpectation("Samples.GraphQL-graphql", _graphQLExecuteOperationName, resourceName)
+            _expectations.Add(new GraphQLSpanExpectation("Samples.GraphQL", resourceName, null)
             {
                 OriginalUri = url,
                 GraphQLRequestBody = graphQLRequestBody,
