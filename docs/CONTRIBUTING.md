@@ -1,6 +1,17 @@
-As an open source project we welcome contributions of many forms. Please reach out before starting
-work on any major code changes. This will ensure we avoid duplicating work, or that
-your code can't be merged due to a rapidly changing code base. If you would like support
-for a library that is not listed, [contact support][1] to share a request.
+### Preparing release
 
-[1]: https://docs.datadoghq.com/help
+1. Update the desired version in `Datadog.Core.Tools.TracerVersion`.
+2. In build container (`docker-compose run build bash`):
+    * `cd /project/tools/PrepareRelease`
+    * `dotnet run --project . versions`
+    * `dotnet run --project . integrations`
+3. Update out of container as needed to avoid undesired changes:
+    * `git checkout -- src/Datadog.Trace.ClrProfiler.Managed.Core/AssemblyInfo.cs src/Datadog.Trace.AspNet/AssemblyInfo.cs`
+4. Once version PR is appropriately squashed and merged use artifacts for GH release and any built locally as necessary for release:
+    * `docker-compose run build`
+    * `docker-compose run Profiler`
+    * `docker-compose run package`
+    * `docker-compose run Profiler.Alpine`
+    * `docker-compose run package.alpine`
+
+*Modified by SignalFx*

@@ -3,7 +3,7 @@
 set -euxo pipefail
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-VERSION=0.1.0
+VERSION=0.1.1
 
 mkdir -p $DIR/../deploy/linux
 for target in integrations.json defaults.env LICENSE NOTICE createLogPath.sh ; do
