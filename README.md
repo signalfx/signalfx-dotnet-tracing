@@ -14,20 +14,21 @@ and should only require basic configuration of your application environment.
 
 ## Supported libraries and frameworks
 
-All instrumentations are in beta. There are [known .NET Core runtime issues](https://github.com/dotnet/coreclr/issues/18448)
+.NET Core is supported while .NET Framework is in beta. There are
+[known .NET Core runtime issues](https://github.com/dotnet/coreclr/issues/18448)
 for version 2.1.0 and 2.1.2.
 
 | Library | Versions Supported | Notes |
 | ---     | ---                | ---   |
-| ADO.NET | Supported .NET Core versions | Disable sanitization of `db.statement` with `SIGNALFX_SANITIZE_SQL_STATEMENTS=false` (`true` by default) |
+| ADO.NET | Supported .NET versions | Disable sanitization of `db.statement` with `SIGNALFX_SANITIZE_SQL_STATEMENTS=false` (`true` by default) |
 | ASP.NET Core MVC | 2.0+ | `Microsoft.AspNet.Mvc.Core` NuGet and built-in packages.  Include additional applicable Diagnostic Listeners with `SIGNALFX_INSTRUMENTATION_ASPNETCORE_DIAGNOSTIC_LISTENERS='Listener.One,Listener.Two'` |
-| Elasticsearch.Net | `Elasticsearch.Net` Nuget 5.3 - 6.x | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES=false` (`true` by default, which may introduce overhead for direct streaming users). |
-| HttpClient | Supported .NET Core versions | by way of `System.Net.Http.HttpClientHandler` and `HttpMessageHandler` instrumentations |
-| MongoDB | `MongoDB.Driver.Core` Nuget 2.1.0+ | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS=false` (`true` by default). |
-| Npgsql | `Npqsql` Nuget 4.0+ | Provided via enhanced ADO.NET instrumentation |
-| ServiceStack.Redis | `ServiceStack.Redis` Nuget 4.0+ | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS=false` (`true` by default). |
-| StackExchange.Redis | `StackExchange.Redis` Nuget 1.0+ | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS=false` (`true` by default). |
-| WebClient | Supported .NET Core versions | by way of `System.Net.WebRequest` instrumentation |
+| Elasticsearch.Net | `Elasticsearch.Net` NuGet 5.3 - 6.x | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES=false` (`true` by default, which may introduce overhead for direct streaming users). |
+| HttpClient | Supported .NET versions | by way of `System.Net.Http.HttpClientHandler` and `HttpMessageHandler` instrumentations |
+| MongoDB | `MongoDB.Driver.Core` NuGet 2.1.0+ | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS=false` (`true` by default). |
+| Npgsql | `Npqsql` NuGet 4.0+ | Provided via enhanced ADO.NET instrumentation |
+| ServiceStack.Redis | `ServiceStack.Redis` NuGet 4.0+ | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS=false` (`true` by default). |
+| StackExchange.Redis | `StackExchange.Redis` NuGet 1.0+ | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS=false` (`true` by default). |
+| WebClient | Supported .NET versions | by way of `System.Net.WebRequest` instrumentation |
 
 ## Configure the SignalFx Tracing Library for .NET
 
