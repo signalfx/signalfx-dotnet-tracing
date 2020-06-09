@@ -51,7 +51,13 @@ namespace Datadog.Trace.ClrProfiler
                     return null;
                 }
 
-                scope = tracer.StartActive(OperationName);
+                var spanName = httpMethod ?? OperationName;
+                if (tracer.Settings.AppendUrlPathToName)
+                {
+                    spanName += ":" + requestUri.AbsolutePath;
+                }
+
+                scope = tracer.StartActive(spanName);
                 var span = scope.Span;
 
                 span.ServiceName = $"{tracer.DefaultServiceName}-{ServiceName}";

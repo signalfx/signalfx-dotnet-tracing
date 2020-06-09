@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -23,6 +24,8 @@ namespace Samples.HttpMessageHandler
 #endif
         public static void Main(string[] args)
         {
+            DumpEnvVars();
+
             bool tracingDisabled = args.Any(arg => arg.Equals("TracingDisabled", StringComparison.OrdinalIgnoreCase));
             Console.WriteLine($"TracingDisabled {tracingDisabled}");
 
@@ -195,6 +198,21 @@ namespace Samples.HttpMessageHandler
                     // ignore to let the loop end and the method return
                 }
             }
+        }
+
+        private static void DumpEnvVars()
+        {
+            IDictionary envVars = System.Environment.GetEnvironmentVariables();
+            foreach(var key in envVars.Keys)
+            {
+                var keyStr = key.ToString();
+                if (keyStr.Contains("SIGNALFX") || keyStr.Contains("CORCLR") || keyStr.Contains("DOTNET"))
+                {
+                    Console.WriteLine(key  + ":" + envVars[key]);
+                }
+            }
+
+            Console.WriteLine();
         }
     }
 }

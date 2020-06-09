@@ -472,7 +472,7 @@ namespace Datadog.Trace
         {
             try
             {
-                Assembly asm = Assembly.Load(new AssemblyName("SignalFx.Tracing.OpenTracing, Version=0.0.3.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb"));
+                Assembly asm = Assembly.Load(new AssemblyName("SignalFx.Tracing.OpenTracing, Version=0.1.1.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb"));
                 Type openTracingTracerFactory = asm.GetType("Datadog.Trace.OpenTracing.OpenTracingTracerFactory");
                 var methodInfo = openTracingTracerFactory.GetMethod("RegisterGlobalTracer");
                 object[] args = new object[] { instance };

@@ -24,7 +24,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         public void HttpClient()
         {
             int expectedSpanCount = EnvironmentHelper.IsCoreClr() ? 2 : 1;
-            const string expectedOperationName = "http.request";
+            const string expectedOperationName = "POST";
             const string expectedServiceName = "Samples.HttpMessageHandler";
 
             int agentPort = TcpPortProvider.GetOpenPort();
@@ -105,7 +105,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 // inspect the top-level span, underlying spans can be HttpMessageHandler in .NET Core
                 var firstSpan = spans.First();
-                Assert.Equal("http.request", firstSpan.Name);
+                Assert.Equal("GET", firstSpan.Name);
                 Assert.Equal("Samples.HttpMessageHandler", firstSpan.Service);
                 Assert.Null(firstSpan.Type);
                 Assert.Equal(nameof(WebRequest), firstSpan.Tags[Tags.InstrumentationName]);
