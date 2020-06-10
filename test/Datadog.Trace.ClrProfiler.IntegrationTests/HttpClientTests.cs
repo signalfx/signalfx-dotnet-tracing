@@ -18,14 +18,18 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetEnvironmentVariable("SIGNALFX_TRACE_DOMAIN_NEUTRAL_INSTRUMENTATION", "true");
         }
 
-        [Fact]
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
-        public void HttpClient()
+        public void HttpClient(bool appendPathToName)
         {
             int expectedSpanCount = EnvironmentHelper.IsCoreClr() ? 2 : 1;
-            const string expectedOperationName = "POST";
             const string expectedServiceName = "Samples.HttpMessageHandler";
+            var expectedOperationName = appendPathToName
+                ? "POST:/Samples.HttpMessageHandler/"
+                : "POST";
 
             int agentPort = TcpPortProvider.GetOpenPort();
             int httpPort = TcpPortProvider.GetOpenPort();
@@ -33,8 +37,14 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             Output.WriteLine($"Assigning port {agentPort} for the agentPort.");
             Output.WriteLine($"Assigning port {httpPort} for the httpPort.");
 
+            var envVars = ZipkinEnvVars;
+            if (appendPathToName)
+            {
+                envVars["SIGNALFX_APPEND_URL_PATH_TO_NAME"] = "true";
+            }
+
             using (var agent = new MockZipkinCollector(agentPort))
-            using (ProcessResult processResult = RunSampleAndWaitForExit(agent.Port, arguments: $"HttpClient Port={httpPort}", envVars: ZipkinEnvVars))
+            using (ProcessResult processResult = RunSampleAndWaitForExit(agent.Port, arguments: $"HttpClient Port={httpPort}", envVars: envVars))
             {
                 Assert.True(processResult.ExitCode >= 0, $"Process exited with code {processResult.ExitCode}");
 
