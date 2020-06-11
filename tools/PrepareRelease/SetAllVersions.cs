@@ -36,6 +36,10 @@ namespace PrepareRelease
                 NugetVersionReplace);
 
             SynchronizeVersion(
+                "src/Datadog.Trace/Tracer.cs",
+                PartialAssemblyNameReplace);
+
+            SynchronizeVersion(
                 "src/Datadog.Trace.AspNet/Datadog.Trace.AspNet.csproj",
                 NugetVersionReplace);
 

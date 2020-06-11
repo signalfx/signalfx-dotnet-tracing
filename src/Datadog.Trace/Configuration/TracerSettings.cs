@@ -139,6 +139,10 @@ namespace Datadog.Trace.Configuration
                                                  ?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                                                  .Select(s => s.Trim()).ToArray() ??
                                             new string[0];
+
+            AppendUrlPathToName = source?.GetBool(ConfigurationKeys.AppendUrlPathToName) ??
+                           // default value
+                           false;
         }
 
         /// <summary>
@@ -301,6 +305,13 @@ namespace Datadog.Trace.Configuration
         /// of <see cref="System.Diagnostics.DiagnosticSource"/> is enabled.
         /// </summary>
         public bool DiagnosticSourceEnabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the absolute URL path should be
+        /// appended to the span name.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.AppendUrlPathToName"/>
+        public bool AppendUrlPathToName { get; set; }
 
         /// <summary>
         /// Create a <see cref="TracerSettings"/> populated from the default sources

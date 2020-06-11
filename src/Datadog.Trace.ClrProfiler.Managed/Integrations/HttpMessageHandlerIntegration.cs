@@ -172,7 +172,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
-            if (!(handler is HttpClientHandler || reportedType.FullName.Equals("System.Net.Http.SocketsHttpHandler", StringComparison.OrdinalIgnoreCase)) ||
+            if (!(handler is HttpClientHandler || "System.Net.Http.SocketsHttpHandler".Equals(reportedType.FullName, StringComparison.OrdinalIgnoreCase)) ||
                 !IsTracingEnabled(request))
             {
                 // skip instrumentation
@@ -195,8 +195,15 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
                     HttpResponseMessage response = await sendAsync(handler, request, cancellationToken).ConfigureAwait(false);
 
-                    // this tag can only be set after the response is returned
-                    scope?.Span.SetTag(Tags.HttpStatusCode, ((int)response.StatusCode).ToString());
+                    if (scope != null)
+                    {
+                        // this tag can only be set after the response is returned
+                        scope.Span.SetTag(Tags.HttpStatusCode, ((int)response.StatusCode).ToString());
+                        if (!response.IsSuccessStatusCode && !string.IsNullOrWhiteSpace(response.ReasonPhrase))
+                        {
+                            scope.Span.SetTag(Tags.HttpStatusText, response.ReasonPhrase.Truncate());
+                        }
+                    }
 
                     return response;
                 }

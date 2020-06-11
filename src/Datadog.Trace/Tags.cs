@@ -46,9 +46,14 @@ namespace Datadog.Trace
         public const string HttpRequestHeadersHost = "http.request.headers.host";
 
         /// <summary>
-        /// The status code of an HTTP response
+        /// The status code of an HTTP response.
         /// </summary>
         public const string HttpStatusCode = "http.status_code";
+
+        /// <summary>
+        /// The HTTP response reason phrase, eg: "OK".
+        /// </summary>
+        public const string HttpStatusText = "http.status_text";
 
         /// <summary>
         /// The span.Resource for span encoding without applicable field.

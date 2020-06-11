@@ -248,6 +248,13 @@ namespace Datadog.Trace.Configuration
         public const string DiagnosticSourceEnabled = "SIGNALFX_DIAGNOSTIC_SOURCE_ENABLED";
 
         /// <summary>
+        /// Configuration key for enabling or disabling appending the absolute URI path to the span name.
+        /// Default is value is false (disabled).
+        /// </summary>
+        /// <seealso cref="TracerSettings.AppendUrlPathToName"/>
+        public const string AppendUrlPathToName = "SIGNALFX_APPEND_URL_PATH_TO_NAME";
+
+        /// <summary>
         /// String format patterns used to match integration-specific configuration keys.
         /// </summary>
         public static class Integrations
