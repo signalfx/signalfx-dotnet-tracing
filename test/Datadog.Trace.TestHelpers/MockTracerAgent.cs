@@ -10,6 +10,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Datadog.Trace.ExtensionMethods;
 using MessagePack;
 
@@ -19,6 +20,7 @@ namespace Datadog.Trace.TestHelpers
     {
         private readonly HttpListener _listener;
         private readonly Thread _listenerThread;
+        private readonly CancellationTokenSource _listenerCts = new CancellationTokenSource();
 
         public MockTracerAgent(int port = 8126, int retries = 5)
         {
@@ -148,7 +150,11 @@ namespace Datadog.Trace.TestHelpers
 
         public void Dispose()
         {
-            _listener?.Stop();
+            lock (_listener)
+            {
+                _listenerCts.Cancel();
+                _listener.Stop();
+            }
         }
 
         protected virtual void OnRequestReceived(HttpListenerContext context)
@@ -181,12 +187,15 @@ namespace Datadog.Trace.TestHelpers
 
         private void HandleHttpRequests()
         {
-            while (_listener.IsListening)
+            while (true)
             {
                 try
                 {
-                    var ctx = _listener.GetContext();
-                    OnRequestReceived(ctx);
+                    var getCtxTask = Task.Run(() => _listener.GetContext());
+                    getCtxTask.Wait(_listenerCts.Token);
+
+                    var ctx = getCtxTask.Result;
+                   OnRequestReceived(ctx);
 
                     if (ShouldDeserializeTraces)
                     {
@@ -208,10 +217,17 @@ namespace Datadog.Trace.TestHelpers
                     ctx.Response.OutputStream.Write(buffer, 0, buffer.Length);
                     ctx.Response.Close();
                 }
-                catch (HttpListenerException)
+                catch (Exception ex) when (ex is HttpListenerException || ex is OperationCanceledException || ex is AggregateException)
                 {
-                    // listener was stopped,
-                    // ignore to let the loop end and the method return
+                    lock (_listener)
+                    {
+                        if (!_listener.IsListening)
+                        {
+                            return;
+                        }
+                    }
+
+                    throw;
                 }
             }
         }
