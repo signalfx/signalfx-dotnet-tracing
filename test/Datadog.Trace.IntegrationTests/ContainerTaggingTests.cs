@@ -24,9 +24,8 @@ namespace Datadog.Trace.IntegrationTests
         {
             string expectedContainedId = ContainerMetadata.GetContainerId();
             string actualContainerId = null;
-            var agentPort = TcpPortProvider.GetOpenPort();
 
-            using (var agent = new MockTracerAgent(agentPort))
+            using (var agent = new MockTracerAgent(TcpPortProvider.GetOpenPort()))
             {
                 agent.RequestReceived += (sender, args) =>
                 {
@@ -35,7 +34,7 @@ namespace Datadog.Trace.IntegrationTests
 
                 var settings = new TracerSettings
                                {
-                                   AgentUri = new Uri($"http://localhost:{agentPort}"),
+                                   AgentUri = new Uri($"http://localhost:{agent.Port}"),
                                    ApiType = "dd"
                                };
                 var tracer = new Tracer(settings);
