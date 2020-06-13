@@ -49,7 +49,7 @@ namespace Datadog.Trace.TestHelpers
                 {
                     // only catch the exception if there are retries left
                     listener.Prefixes.Clear();
-                    port++;
+                    port = TcpPortProvider.GetOpenPort();
                     retries--;
                 }
 

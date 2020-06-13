@@ -59,34 +59,33 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.SmokeTests
 
             ProcessStartInfo startInfo;
 
-            int agentPort = TcpPortProvider.GetOpenPort();
-            int aspNetCorePort = TcpPortProvider.GetOpenPort(); // unused for now
-            Output.WriteLine($"Assigning port {agentPort} for the agentPort.");
-            Output.WriteLine($"Assigning port {aspNetCorePort} for the aspNetCorePort.");
-
-            if (EnvironmentHelper.IsCoreClr())
-            {
-                // .NET Core
-                startInfo = new ProcessStartInfo(executable, $"{applicationPath}");
-            }
-            else
-            {
-                // .NET Framework
-                startInfo = new ProcessStartInfo(executable);
-            }
-
-            EnvironmentHelper.SetEnvironmentVariables(agentPort, aspNetCorePort, executable, startInfo.EnvironmentVariables);
-
-            startInfo.UseShellExecute = false;
-            startInfo.CreateNoWindow = true;
-            startInfo.RedirectStandardOutput = true;
-            startInfo.RedirectStandardError = true;
-            startInfo.RedirectStandardInput = false;
-
             ProcessResult result;
 
-            using (var agent = new MockZipkinCollector(agentPort))
+            using (var agent = new MockZipkinCollector(TcpPortProvider.GetOpenPort()))
             {
+                int aspNetCorePort = TcpPortProvider.GetOpenPort(); // unused for now
+                Output.WriteLine($"Assigning port {agent.Port} for the agentPort.");
+                Output.WriteLine($"Assigning port {aspNetCorePort} for the aspNetCorePort.");
+
+                if (EnvironmentHelper.IsCoreClr())
+                {
+                    // .NET Core
+                    startInfo = new ProcessStartInfo(executable, $"{applicationPath}");
+                }
+                else
+                {
+                    // .NET Framework
+                    startInfo = new ProcessStartInfo(executable);
+                }
+
+                EnvironmentHelper.SetEnvironmentVariables(agent.Port, aspNetCorePort, executable, startInfo.EnvironmentVariables);
+
+                startInfo.UseShellExecute = false;
+                startInfo.CreateNoWindow = true;
+                startInfo.RedirectStandardOutput = true;
+                startInfo.RedirectStandardError = true;
+                startInfo.RedirectStandardInput = false;
+
                 agent.ShouldDeserializeTraces = shouldDeserializeTraces;
                 using (var process = Process.Start(startInfo))
                 {
