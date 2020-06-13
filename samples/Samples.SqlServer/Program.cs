@@ -65,6 +65,10 @@ namespace Samples.SqlServer
 
                     await testQueries.RunAsync();
                 }
+
+                // TODO: On smoke tests on Windows the process exits before sending any data
+                // temporarily adding a wait to workaround the issue. 
+                await Task.Delay(TimeSpan.FromSeconds(2));
             }
         }
 
