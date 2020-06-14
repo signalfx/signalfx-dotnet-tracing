@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,8 @@ namespace SecurityGrant.FileNotFoundException
             PermissionSet ps = new PermissionSet(PermissionState.Unrestricted);
             System.AppDomain appDomain1 = CreateAndRunAppDomain(index++, ps);
             System.AppDomain appDomain2 = CreateAndRunAppDomain(index++, ps);
+
+            Thread.Sleep(TimeSpan.FromSeconds(3));
         }
 
         private static System.AppDomain CreateAndRunAppDomain(int index, PermissionSet grantSet)

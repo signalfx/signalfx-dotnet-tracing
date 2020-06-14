@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Data;
 using System.Data.Entity.Core;
@@ -5,6 +6,7 @@ using System.Data.Entity.Core.EntityClient;
 using System.Data.Entity.Core.Objects;
 using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
+using System.Threading;
 
 namespace EntityFramework6x.MdTokenLookupFailure
 {
@@ -109,6 +111,7 @@ namespace EntityFramework6x.MdTokenLookupFailure
                 return (int)ExitCode.UnknownError;
             }
 
+            Thread.Sleep(TimeSpan.FromSeconds(3));
             return (int)ExitCode.Success;
         }
     }
