@@ -31,21 +31,20 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 ? "POST:/Samples.HttpMessageHandler/"
                 : "POST";
 
-            int agentPort = TcpPortProvider.GetOpenPort();
-            int httpPort = TcpPortProvider.GetOpenPort();
-
-            Output.WriteLine($"Assigning port {agentPort} for the agentPort.");
-            Output.WriteLine($"Assigning port {httpPort} for the httpPort.");
-
             var envVars = ZipkinEnvVars;
             if (appendPathToName)
             {
                 envVars["SIGNALFX_APPEND_URL_PATH_TO_NAME"] = "true";
             }
 
-            using (var agent = new MockZipkinCollector(agentPort))
+            int httpPort = TcpPortProvider.GetOpenPort();
+
+            using (var agent = new MockZipkinCollector(TcpPortProvider.GetOpenPort()))
             using (ProcessResult processResult = RunSampleAndWaitForExit(agent.Port, arguments: $"HttpClient Port={httpPort}", envVars: envVars))
             {
+                Output.WriteLine($"Assigning port {agent.Port} for the agentPort.");
+                Output.WriteLine($"Assigning port {httpPort} for the httpPort.");
+
                 Assert.True(processResult.ExitCode >= 0, $"Process exited with code {processResult.ExitCode}");
 
                 var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
