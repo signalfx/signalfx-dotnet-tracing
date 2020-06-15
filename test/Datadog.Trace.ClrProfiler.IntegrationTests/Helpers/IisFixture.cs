@@ -8,7 +8,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
     {
         private Process _iisExpress;
 
-        public MockTracerAgent Agent { get; private set; }
+        public MockZipkinCollector Agent { get; private set; }
 
         public int HttpPort { get; private set; }
 
@@ -19,7 +19,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 if (_iisExpress == null)
                 {
                     var initialAgentPort = TcpPortProvider.GetOpenPort();
-                    Agent = new MockTracerAgent(initialAgentPort);
+                    Agent = new MockZipkinCollector(initialAgentPort);
 
                     HttpPort = TcpPortProvider.GetOpenPort();
 

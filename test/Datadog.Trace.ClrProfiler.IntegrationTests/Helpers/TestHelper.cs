@@ -236,7 +236,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
         protected async Task AssertHttpSpan(
             string path,
-            MockTracerAgent agent,
+            MockZipkinCollector agent,
             int httpPort,
             HttpStatusCode expectedHttpStatusCode,
             string expectedSpanType,
