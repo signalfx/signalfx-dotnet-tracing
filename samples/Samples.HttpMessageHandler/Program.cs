@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -23,6 +24,8 @@ namespace Samples.HttpMessageHandler
 #endif
         public static void Main(string[] args)
         {
+            DumpEnvVars();
+
             bool tracingDisabled = args.Any(arg => arg.Equals("TracingDisabled", StringComparison.OrdinalIgnoreCase));
             Console.WriteLine($"TracingDisabled {tracingDisabled}");
 
@@ -69,6 +72,8 @@ namespace Samples.HttpMessageHandler
                 Console.WriteLine("Stopping HTTP listener.");
                 listener.Stop();
             }
+
+            //Thread.Sleep(TimeSpan.FromSeconds(4));
 
             // Force process to end, otherwise the background listener thread lives forever in .NET Core.
             // Apparently listener.GetContext() doesn't throw an exception if listener.Stop() is called,
@@ -195,6 +200,22 @@ namespace Samples.HttpMessageHandler
                     // ignore to let the loop end and the method return
                 }
             }
+        }
+
+        private static void DumpEnvVars()
+        {
+            IDictionary envVars = System.Environment.GetEnvironmentVariables();
+            Console.WriteLine("Sample Process key env vars:");
+            foreach (var key in envVars.Keys)
+            {
+                var keyStr = key.ToString();
+                if (keyStr.Contains("SIGNALFX") || keyStr.Contains("COR") || keyStr.Contains("CLR") || keyStr.Contains("DOTNET"))
+                {
+                    Console.WriteLine("\t" + key + "=" + envVars[key]);
+                }
+            }
+
+            Console.WriteLine();
         }
     }
 }
