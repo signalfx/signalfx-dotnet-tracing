@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Linq;
 using System.Reflection;
@@ -14,7 +15,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.Helpers
 
             if (targetFrameworkMonikers.Split(';').All(s => !s.Equals(compiledTargetFrameworkString, StringComparison.OrdinalIgnoreCase)))
             {
-                Skip = $"xUnit target framework does not match {targetFrameworkMonikers}";
+                Skip = $"xUnit target framework '{compiledTargetFrameworkString}' does not match '{targetFrameworkMonikers}'";
             }
         }
     }
