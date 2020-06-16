@@ -2,6 +2,7 @@
 #if !NETSTANDARD2_0
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -117,6 +118,18 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     {
                         // some fields aren't set till after execution, so populate anything missing
                         UpdateSpan(controllerContext, scope.Span);
+                        if (responseMessage.StatusCode == HttpStatusCode.OK)
+                        {
+                            scope.Span.SetTag(Tags.HttpStatusCode, "200");
+                        }
+                        else
+                        {
+                            scope.Span.SetTag(Tags.HttpStatusCode, ((int)responseMessage.StatusCode).ToString());
+                            if (!string.IsNullOrWhiteSpace(responseMessage.ReasonPhrase))
+                            {
+                                scope.Span.SetTag(Tags.HttpStatusText, responseMessage.ReasonPhrase);
+                            }
+                        }
                     }
 
                     return responseMessage;
@@ -129,7 +142,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                         UpdateSpan(controllerContext, scope.Span);
                     }
 
-                    scope?.Span.SetException(ex);
+                    if (scope != null)
+                    {
+                        scope.Span.SetException(ex);
+                        scope.Span.SetTag(Tags.HttpStatusCode, "500");
+                    }
+
                     throw;
                 }
             }
@@ -236,6 +254,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     method: method,
                     host: host,
                     httpUrl: rawUrl);
+                span.OperationName = span.ResourceName;
                 span.SetTag(Tags.AspNetAction, action);
                 span.SetTag(Tags.AspNetController, controller);
                 span.SetTag(Tags.AspNetRoute, route);

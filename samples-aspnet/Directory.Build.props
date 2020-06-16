@@ -1,6 +1,8 @@
 <Project>
+  <!-- Modified by SignalFx -->
   <!--
-  This file intentionally left blank...
-  to stop msbuild from looking up the folder hierarchy
+  Typically do not include anything to not break nuget restore DataDog.Trace.sln
+  In case of manual build use the Test.Common.props so it can launch the apps from tests.
   -->
+  <Import Project="..\Test.Common.props" Condition="'$(LoadManagedProfilerFromProfilerDirectory)' == 'true'" />
 </Project>
