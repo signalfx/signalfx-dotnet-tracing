@@ -32,7 +32,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 _iisFixture.HttpPort,
                 HttpStatusCode.OK,
                 "web",
-                "aspnet-mvc.request",
+                expectedOperationName: expectedResourceName,
                 expectedResourceName);
         }
     }

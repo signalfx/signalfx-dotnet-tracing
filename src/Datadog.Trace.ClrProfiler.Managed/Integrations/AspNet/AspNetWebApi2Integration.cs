@@ -2,6 +2,7 @@
 #if !NETSTANDARD2_0
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -124,7 +125,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                         }
                         else
                         {
-                            scope.Span.SetTag(Tags.HttpStatusCode, ((int)responseMessage.StatusCode).ToString());
+                            scope.Span.SetTag(Tags.HttpStatusCode, ((int)responseMessage.StatusCode).ToString(CultureInfo.InvariantCulture));
                             if (!string.IsNullOrWhiteSpace(responseMessage.ReasonPhrase))
                             {
                                 scope.Span.SetTag(Tags.HttpStatusText, responseMessage.ReasonPhrase);
@@ -254,7 +255,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     method: method,
                     host: host,
                     httpUrl: rawUrl);
-                span.OperationName = span.ResourceName;
                 span.SetTag(Tags.AspNetAction, action);
                 span.SetTag(Tags.AspNetController, controller);
                 span.SetTag(Tags.AspNetRoute, route);

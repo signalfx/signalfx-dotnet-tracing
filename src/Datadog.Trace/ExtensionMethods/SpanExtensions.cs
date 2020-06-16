@@ -74,6 +74,11 @@ namespace Datadog.Trace.ExtensionMethods
         {
             span.Type = SpanTypes.Web;
             span.ResourceName = resourceName?.Trim();
+            if (!string.IsNullOrEmpty(span.ResourceName))
+            {
+                span.OperationName = span.ResourceName;
+            }
+
             span.SetTag(Tags.SpanKind, SpanKinds.Server);
             span.SetTag(Tags.HttpMethod, method);
             span.SetTag(Tags.HttpRequestHeadersHost, host);

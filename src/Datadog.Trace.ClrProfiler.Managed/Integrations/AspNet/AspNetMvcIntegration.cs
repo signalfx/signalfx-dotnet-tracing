@@ -2,6 +2,7 @@
 #if !NETSTANDARD2_0
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.Routing;
@@ -315,7 +316,28 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             try
             {
                 // call the original method, inspecting (but not catching) any unhandled exceptions
-                return instrumentedMethod(asyncControllerActionInvoker, asyncResult);
+                var res = instrumentedMethod(asyncControllerActionInvoker, asyncResult);
+
+                if (scope == null)
+                {
+                    return res;
+                }
+
+                var response = httpContext?.Response;
+                if (response?.StatusCode == 200)
+                {
+                    scope.Span.SetTag(Tags.HttpStatusCode, "200");
+                }
+                else if (response?.StatusCode != null)
+                {
+                    scope.Span.SetTag(Tags.HttpStatusCode, response.StatusCode.ToString(CultureInfo.InvariantCulture));
+                    if (!string.IsNullOrWhiteSpace(response?.StatusDescription))
+                    {
+                        scope.Span.SetTag(Tags.HttpStatusText, response.StatusDescription);
+                    }
+                }
+
+                return res;
             }
             catch (Exception ex)
             {
