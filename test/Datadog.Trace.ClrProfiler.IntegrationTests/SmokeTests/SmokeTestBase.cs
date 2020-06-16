@@ -84,7 +84,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.SmokeTests
 
             ProcessResult result;
 
-            using (var agent = new MockTracerAgent(agentPort))
+            using (var agent = new MockZipkinCollector(agentPort))
             {
                 agent.ShouldDeserializeTraces = shouldDeserializeTraces;
                 using (var process = Process.Start(startInfo))
@@ -93,6 +93,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.SmokeTests
                     {
                         throw new NullException("We need a reference to the process for this test.");
                     }
+
+                    string standardOutput = process.StandardOutput.ReadToEnd();
+                    string standardError = process.StandardError.ReadToEnd();
 
                     var ranToCompletion = process.WaitForExit(MaxTestRunMilliseconds);
 
@@ -108,8 +111,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.SmokeTests
                         throw new TimeoutException("The smoke test is running for too long or was lost.");
                     }
 
-                    string standardOutput = process.StandardOutput.ReadToEnd();
-                    string standardError = process.StandardError.ReadToEnd();
                     int exitCode = process.ExitCode;
 
                     if (!string.IsNullOrWhiteSpace(standardOutput))
