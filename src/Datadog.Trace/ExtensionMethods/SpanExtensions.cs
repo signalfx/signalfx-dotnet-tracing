@@ -74,7 +74,7 @@ namespace Datadog.Trace.ExtensionMethods
         {
             span.Type = SpanTypes.Web;
             span.ResourceName = resourceName?.Trim();
-            if (!string.IsNullOrEmpty(span.ResourceName))
+            if (Tracer.Instance.Settings.UseWebServerResourceAsOperationName && !string.IsNullOrEmpty(span.ResourceName))
             {
                 span.OperationName = span.ResourceName;
             }

@@ -143,6 +143,10 @@ namespace Datadog.Trace.Configuration
             AppendUrlPathToName = source?.GetBool(ConfigurationKeys.AppendUrlPathToName) ??
                            // default value
                            false;
+
+            UseWebServerResourceAsOperationName = source?.GetBool(ConfigurationKeys.UseWebServerResourceAsOperationName) ??
+                // default value
+                true;
         }
 
         /// <summary>
@@ -312,6 +316,14 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="ConfigurationKeys.AppendUrlPathToName"/>
         public bool AppendUrlPathToName { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the resource name is going to be used as the span name.
+        /// This applies to "AspNetMvc" and "AspNetWebApi" instrumentations.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.UseWebServerResourceAsOperationName"/>
+        /// <seealso cref="ExtensionMethods.SpanExtensions.DecorateWebServerSpan(Span, string, string, string, string)"/>
+        public bool UseWebServerResourceAsOperationName { get; set; }
 
         /// <summary>
         /// Create a <see cref="TracerSettings"/> populated from the default sources
