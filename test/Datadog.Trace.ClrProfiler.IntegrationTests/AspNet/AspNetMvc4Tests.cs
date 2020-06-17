@@ -1,3 +1,4 @@
+// Modified by SignalFx
 #if NET461
 
 using System.Net;
