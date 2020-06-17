@@ -267,7 +267,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             Assert.Equal(expectedSpanType, span.Type);
             Assert.Equal(expectedOperationName, span.Name);
             Assert.Equal(expectedResourceName, span.Resource);
-            Assert.Equal(((int)expectedHttpStatusCode).ToString(), span.Tags[Tags.HttpStatusCode]);
         }
 
         internal class TupleList<T1, T2> : List<Tuple<T1, T2>>
