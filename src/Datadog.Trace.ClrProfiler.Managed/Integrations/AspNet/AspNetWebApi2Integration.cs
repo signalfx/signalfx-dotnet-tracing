@@ -143,11 +143,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                         UpdateSpan(controllerContext, scope.Span);
                     }
 
-                    if (scope != null)
-                    {
-                        scope.Span.SetException(ex);
-                        scope.Span.SetTag(Tags.HttpStatusCode, "500");
-                    }
+                    scope?.Span.SetException(ex);
 
                     throw;
                 }
