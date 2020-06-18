@@ -2,6 +2,8 @@
 #if !NETSTANDARD2_0
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -117,6 +119,18 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     {
                         // some fields aren't set till after execution, so populate anything missing
                         UpdateSpan(controllerContext, scope.Span);
+                        if (responseMessage.StatusCode == HttpStatusCode.OK)
+                        {
+                            scope.Span.SetTag(Tags.HttpStatusCode, "200");
+                        }
+                        else
+                        {
+                            scope.Span.SetTag(Tags.HttpStatusCode, ((int)responseMessage.StatusCode).ToString(CultureInfo.InvariantCulture));
+                            if (!string.IsNullOrWhiteSpace(responseMessage.ReasonPhrase))
+                            {
+                                scope.Span.SetTag(Tags.HttpStatusText, responseMessage.ReasonPhrase);
+                            }
+                        }
                     }
 
                     return responseMessage;
@@ -130,6 +144,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     }
 
                     scope?.Span.SetException(ex);
+
                     throw;
                 }
             }

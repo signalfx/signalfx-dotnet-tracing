@@ -186,7 +186,7 @@ namespace Datadog.Trace.TestHelpers
             environmentVariables["SIGNALFX_TRACE_AGENT_HOSTNAME"] = "localhost";
             environmentVariables["SIGNALFX_TRACE_AGENT_PORT"] = agentPort.ToString();
 
-            environmentVariables["SIGNALFX_API_TYPE"] = "dd";
+            environmentVariables["SIGNALFX_API_TYPE"] = "zipkin";
 
             // for ASP.NET Core sample apps, set the server's port
             environmentVariables["ASPNETCORE_URLS"] = $"http://localhost:{aspNetCorePort}/";

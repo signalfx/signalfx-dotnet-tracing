@@ -255,6 +255,14 @@ namespace Datadog.Trace.Configuration
         public const string AppendUrlPathToName = "SIGNALFX_APPEND_URL_PATH_TO_NAME";
 
         /// <summary>
+        /// Configuration key to control whether the resource name is going to be used as the span name.
+        /// This applies to "AspNetMvc" and "AspNetWebApi" instrumentations.
+        /// Default is value is true.
+        /// </summary>
+        /// <seealso cref="TracerSettings.UseWebServerResourceAsOperationName"/>
+        public const string UseWebServerResourceAsOperationName = "SIGNALFX_USE_WEBSERVER_RESOURCE_AS_OPERATION_NAME";
+
+        /// <summary>
         /// String format patterns used to match integration-specific configuration keys.
         /// </summary>
         public static class Integrations

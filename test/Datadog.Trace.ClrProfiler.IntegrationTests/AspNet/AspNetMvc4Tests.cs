@@ -1,3 +1,4 @@
+// Modified by SignalFx
 #if NET461
 
 using System.Net;
@@ -32,7 +33,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 _iisFixture.HttpPort,
                 HttpStatusCode.OK,
                 "web",
-                "aspnet-mvc.request",
+                expectedOperationName: expectedResourceName,
                 expectedResourceName);
         }
     }
