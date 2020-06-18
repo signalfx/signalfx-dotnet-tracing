@@ -5,4 +5,4 @@ Changes proposed in this pull request:
 
 
 
-@DataDog/apm-dotnet
+@signalfx/instrumentation
