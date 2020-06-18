@@ -319,7 +319,7 @@ namespace Datadog.Trace.Configuration
 
         /// <summary>
         /// Gets or sets a value indicating whether the resource name is going to be used as the span name.
-        /// This applies to "AspNetMvc" and "AspNetWebApi" instrumentations.
+        /// This applies only to "AspNetMvc" and "AspNetWebApi" instrumentations.
         /// </summary>
         /// <seealso cref="ConfigurationKeys.UseWebServerResourceAsOperationName"/>
         /// <seealso cref="ExtensionMethods.SpanExtensions.DecorateWebServerSpan(Span, string, string, string, string)"/>
