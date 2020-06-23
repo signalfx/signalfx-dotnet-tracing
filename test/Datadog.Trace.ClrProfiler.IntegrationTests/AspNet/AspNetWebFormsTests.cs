@@ -1,3 +1,4 @@
+// Modified by SignalFx
 #if NET461 || NET452
 
 using System;
@@ -37,7 +38,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 _iisFixture.HttpPort,
                 HttpStatusCode.OK,
                 SpanTypes.Web,
-                "aspnet.request",
+                expectedOperationName: expectedResourceName,
                 expectedResourceName);
         }
 
@@ -65,16 +66,23 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             Assert.True(allSpans.Count > 0, "Expected there to be spans.");
 
             var elasticSpans = allSpans
-                             .Where(s => s.Type == "elasticsearch")
+                             .Where(s => s.Tags.ContainsKey("db.type") && s.Tags["db.type"] == "elasticsearch")
                              .ToList();
 
             Assert.True(elasticSpans.Count > 0, "Expected elasticsearch spans.");
 
+            var expectedOperations = new string[]
+            {
+                "ClusterHealth",
+                "ClusterState",
+            };
+            var expectedOperationIdx = 0;
+
             foreach (var span in elasticSpans)
             {
-                Assert.Equal("elasticsearch.query", span.Name);
-                Assert.Equal("Development Web Site-elasticsearch", span.Service);
-                Assert.Equal("elasticsearch", span.Type);
+                Assert.Equal(expectedOperations[expectedOperationIdx++], span.Name);
+                Assert.Equal("Development Web Site", span.Service);
+                Assert.Equal("elasticsearch", span.Tags["db.type"]);
             }
         }
     }
