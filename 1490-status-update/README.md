@@ -14,7 +14,7 @@ and should only require basic configuration of your application environment.
 
 ## Supported libraries and frameworks
 
-.NET Core is supported while .NET Framework is in beta. There are
+.NET Core for Linux and Windows is supported and .NET Framework for Windows is in beta. There are
 [known .NET Core runtime issues](https://github.com/dotnet/coreclr/issues/18448)
 for version 2.1.0 and 2.1.2.
 
