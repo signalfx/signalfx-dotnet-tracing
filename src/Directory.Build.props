@@ -1,4 +1,5 @@
 <Project>
+  <!-- Modified by SignalFx -->
   <Import Project="..\Directory.Build.props" />
 
   <PropertyGroup>
@@ -7,23 +8,23 @@
 
     <!-- NuGet packages -->
     <IsPackable>true</IsPackable>
-    <PackageIconUrl>https://github.com/DataDog/dd-trace-dotnet/raw/master/datadog-logo-64x64.png</PackageIconUrl>
+    <PackageIconUrl>https://github.com/signalfx/signalfx-dotnet-tracing/raw/master/signalfx-logo-64x64.png</PackageIconUrl>
     <PackageIcon>packageIcon.png</PackageIcon>
-    <PackageProjectUrl>https://docs.datadoghq.com/tracing/setup/dotnet/</PackageProjectUrl>
+    <PackageProjectUrl>https://docs.signalfx.com/en/latest/apm/apm-instrument/apm-dotnet.html</PackageProjectUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>See release notes at https://github.com/DataDog/dd-trace-dotnet/releases</PackageReleaseNotes>
-    <PackageTags>Datadog;APM;tracing;profiling;instrumentation</PackageTags>
+    <PackageReleaseNotes>See release notes at https://github.com/signalfx/signalfx-dotnet-tracing/releases</PackageReleaseNotes>
+    <PackageTags>SignalFx;APM;tracing;profiling;instrumentation</PackageTags>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/DataDog/dd-trace-dotnet.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/signalfx/signalfx-dotnet-tracing.git</RepositoryUrl>
     <Copyright>Datadog, Inc. 2017-2020</Copyright>
-    <Company>Datadog</Company>
-    <Authors>lucas.pimentel.datadog;colinhigginsdatadog;zachmontoyadd;bobuva</Authors>
+    <Company>SignalFx</Company>
+    <Authors>pjanotti;rmfitzpatrick</Authors>
   </PropertyGroup>
 
   <ItemGroup>
     <!-- NuGet -->
-    <None Include="$(MSBuildThisFileDirectory)\..\datadog-logo-256x256.png" Pack="true" Visible="false" PackagePath="packageIcon.png" />
+    <None Include="$(MSBuildThisFileDirectory)\..\signalfx-logo-256x256.png" Pack="true" Visible="false" PackagePath="packageIcon.png" />
 
     <!-- StyleCop -->
     <Compile Include="..\GlobalSuppressions.cs" Link="GlobalSuppressions.src.cs" />
