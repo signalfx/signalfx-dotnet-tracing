@@ -21,7 +21,7 @@ namespace Datadog.Trace.IntegrationTests
         {
             var settings = new TracerSettings();
             _httpRecorder = new RecordHttpHandler();
-            var api = new ZipkinApi(settings.EndpointUrl, _httpRecorder, statsd: null);
+            var api = new ZipkinApi(settings, _httpRecorder, statsd: null);
             var agentWriter = new AgentWriter(api, statsd: null);
             _tracer = new Tracer(settings, agentWriter, sampler: null, scopeManager: null, statsd: null);
         }
