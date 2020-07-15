@@ -263,6 +263,13 @@ namespace Datadog.Trace.Configuration
         public const string UseWebServerResourceAsOperationName = "SIGNALFX_USE_WEBSERVER_RESOURCE_AS_OPERATION_NAME";
 
         /// <summary>
+        /// Configuration key to set the SignalFx access token. This is to be used when sending data
+        /// directly to ingestion URL, ie.: no agent or collector is being used.
+        /// </summary>
+        /// <seealso cref="TracerSettings.SignalFxAccessToken"/>
+        public const string SignalFxAccessToken = "SIGNALFX_ACCESS_TOKEN";
+
+        /// <summary>
         /// String format patterns used to match integration-specific configuration keys.
         /// </summary>
         public static class Integrations

@@ -15,10 +15,14 @@ namespace Datadog.Trace.Agent
         private readonly ZipkinSerializer _serializer = new ZipkinSerializer();
         private readonly Span[][] _spans;
 
-        public ZipkinContent(Span[][] spans)
+        public ZipkinContent(Span[][] spans, string signalFxAccessToken)
         {
             _spans = spans;
             Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            if (!string.IsNullOrWhiteSpace(signalFxAccessToken))
+            {
+                Headers.Add("X-Sf-Token", signalFxAccessToken);
+            }
         }
 
         protected override Task SerializeToStreamAsync(Stream stream, TransportContext context)

@@ -113,7 +113,7 @@ namespace Datadog.Trace
             {
                 if (Settings.ApiType.ToLower().Equals("zipkin"))
                 {
-                    apiClient = new ZipkinApi(Settings.EndpointUrl, delegatingHandler: null, Statsd);
+                    apiClient = new ZipkinApi(Settings, delegatingHandler: null, Statsd);
                 }
                 else
                 {
