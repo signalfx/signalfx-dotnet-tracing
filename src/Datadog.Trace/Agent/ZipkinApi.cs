@@ -3,13 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Datadog.Trace.Configuration;
 using Datadog.Trace.DogStatsd;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Vendors.StatsdClient;
 using MsgPack.Serialization;
 using Newtonsoft.Json;
-using SignalFx.Tracing.Configuration;
-
 
 namespace Datadog.Trace.Agent
 {
