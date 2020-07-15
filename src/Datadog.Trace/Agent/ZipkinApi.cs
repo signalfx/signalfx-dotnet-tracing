@@ -8,6 +8,8 @@ using Datadog.Trace.Logging;
 using Datadog.Trace.Vendors.StatsdClient;
 using MsgPack.Serialization;
 using Newtonsoft.Json;
+using SignalFx.Tracing.Configuration;
+
 
 namespace Datadog.Trace.Agent
 {
@@ -15,12 +17,13 @@ namespace Datadog.Trace.Agent
     {
         private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.For<ZipkinApi>();
 
-        private readonly Uri _tracesEndpoint;
         private readonly HttpClient _client;
+        private readonly TracerSettings _settings;
 
-        public ZipkinApi(Uri endpoint, DelegatingHandler delegatingHandler, IStatsd statsd)
+        public ZipkinApi(TracerSettings settings, DelegatingHandler delegatingHandler, IStatsd statsd)
         {
-            _tracesEndpoint = endpoint;
+            _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+
             _client = delegatingHandler == null
                           ? new HttpClient()
                           : new HttpClient(delegatingHandler);
@@ -41,9 +44,9 @@ namespace Datadog.Trace.Agent
                 try
                 {
                     // re-create content on every retry because some versions of HttpClient always dispose of it, so we can't reuse.
-                    using (var content = new ZipkinContent(traces))
+                    using (var content = new ZipkinContent(traces, _settings.SignalFxAccessToken))
                     {
-                        responseMessage = await _client.PostAsync(_tracesEndpoint, content).ConfigureAwait(false);
+                        responseMessage = await _client.PostAsync(_settings.EndpointUrl, content).ConfigureAwait(false);
                         responseMessage.EnsureSuccessStatusCode();
                         return;
                     }
@@ -53,14 +56,14 @@ namespace Datadog.Trace.Agent
 #if DEBUG
                     if (ex.InnerException is InvalidOperationException ioe)
                     {
-                        Log.Error("An error occurred while sending traces to {Endpoint}\n{Exception}", ex, _tracesEndpoint, ex.ToString());
+                        Log.Error("An error occurred while sending traces to {Endpoint}\n{Exception}", ex, _settings.EndpointUrl, ex.ToString());
                         return;
                     }
 #endif
                     if (retryCount >= retryLimit)
                     {
                         // stop retrying
-                        Log.Error("An error occurred while sending traces to {Endpoint}", ex, _tracesEndpoint);
+                        Log.Error("An error occurred while sending traces to {Endpoint}", ex, _settings.EndpointUrl);
                         return;
                     }
 

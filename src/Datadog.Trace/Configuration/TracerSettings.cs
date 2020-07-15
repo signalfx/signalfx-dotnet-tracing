@@ -41,6 +41,8 @@ namespace Datadog.Trace.Configuration
 
             ServiceName = source?.GetString(ConfigurationKeys.ServiceName);
 
+            SignalFxAccessToken = source?.GetString(ConfigurationKeys.SignalFxAccessToken);
+
             TraceEnabled = source?.GetBool(ConfigurationKeys.TraceEnabled) ??
                            // default value
                            true;
@@ -324,6 +326,13 @@ namespace Datadog.Trace.Configuration
         /// <seealso cref="ConfigurationKeys.UseWebServerResourceAsOperationName"/>
         /// <seealso cref="ExtensionMethods.SpanExtensions.DecorateWebServerSpan(Span, string, string, string, string)"/>
         public bool UseWebServerResourceAsOperationName { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value with the SignalFx access token. This is to be used when sending data
+        /// directly to ingestion URL, ie.: no agent or collector is being used.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.SignalFxAccessToken"/>
+        public string SignalFxAccessToken { get; set; }
 
         /// <summary>
         /// Create a <see cref="TracerSettings"/> populated from the default sources
