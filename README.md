@@ -68,12 +68,59 @@ manager:
     $ export SIGNALFX_ENDPOINT_URL='http://<YourSmartAgentOrCollector>:9080/v1/trace'
 6. Optionally, create the default logging directory:
     ```bash
-    $ mkdir /var/log/signalfx
+    $ source /opt/signalfx-dotnet-tracing/createLogPath.sh
     ```
 7. Run your application:
     ```bash
     $ dotnet run
     ```
+
+### Azure Function Custom Linux Docker Image
+
+The CLR Profiler can be added to Docker images using any of the provided packages,
+below an example of adding it to an Azure Function image:
+
+```dockerfile
+# These first lines are from the example but in principle could be
+# build outside of docker, but they make the example clear showing
+# what should be copied to the Azure VM machine.
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS installer-env
+
+COPY . /src/dotnet-function-app
+RUN cd /src/dotnet-function-app && \
+    mkdir -p /home/site/wwwroot && \
+    dotnet publish *.csproj --output /home/site/wwwroot
+
+FROM mcr.microsoft.com/azure-functions/dotnet:3.0
+ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
+    AzureFunctionsJobHost__Logging__Console__IsEnabled=true
+
+# Custom lines Adding the SignalFx Auto-Instrumentation to the image:
+
+# First install the package. This example downloads the latest version
+# alternatively download a specific version or use a local copy.
+ADD https://github.com/signalfx/signalfx-dotnet-tracing/releases/latest/download/signalfx-dotnet-tracing.deb  /signalfx-package/signalfx-dotnet-tracing.deb
+RUN dpkg -i /signalfx-package/signalfx-dotnet-tracing.deb
+RUN rm -rf /signalfx-package
+
+# Prepare the log directory (useful for local tests).
+RUN mkdir -p /var/log/signalfx/dotnet && \
+    chmod a+rwx /var/log/signalfx/dotnet
+
+# Set the required environment variables. In the case of Azure Functions more
+# can be set either here or on the application settings. 
+ENV CORECLR_ENABLE_PROFILING=1 \
+    CORECLR_PROFILER='{B4C89B0F-9908-4F73-9F59-0D77C5A06874}' \
+    CORECLR_PROFILER_PATH=/opt/signalfx-dotnet-tracing/SignalFx.Tracing.ClrProfiler.Native.so \
+    SIGNALFX_INTEGRATIONS=/opt/signalfx-dotnet-tracing/integrations.json \
+    SIGNALFX_DOTNET_TRACER_HOME=/opt/signalfx-dotnet-tracing
+# End of SignalFx customization.
+
+COPY --from=installer-env ["/home/site/wwwroot", "/home/site/wwwroot"]
+```
+
+For more information on how to configure a custom Linux Azure Function image refer to
+the [Azure documentation](https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-function-linux-custom-image?tabs=bash%2Cportal&pivots=programming-language-csharp).
 
 ### Windows
 
