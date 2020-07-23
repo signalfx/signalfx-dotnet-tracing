@@ -8,7 +8,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
     internal static class RedisHelper
     {
         private const string OperationName = "redis.command";
-        private const string ServiceName = "redis";
 
         private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(RedisHelper));
 
@@ -20,7 +19,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 return null;
             }
 
-            string serviceName = string.Join("-", tracer.DefaultServiceName, ServiceName);
             Scope scope = null;
 
             try
@@ -37,7 +35,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     command = rawCommand;
                 }
 
-                scope = tracer.StartActive(command ?? OperationName, serviceName: serviceName);
+                scope = tracer.StartActive(command ?? OperationName, serviceName: tracer.DefaultServiceName);
 
                 var span = scope.Span;
                 span.SetTag(Tags.InstrumentationName, componentName);

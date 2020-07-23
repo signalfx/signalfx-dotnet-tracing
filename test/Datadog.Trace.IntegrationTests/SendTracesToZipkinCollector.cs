@@ -57,9 +57,9 @@ namespace Datadog.Trace.IntegrationTests
 
                 using (var agent = new MockZipkinCollector(collectorPort))
                 {
-                    const string ServiceName = "MyService";
+                    const string serviceName = "MyService";
 
-                    var scope = _tracer.StartActive("Operation", serviceName: ServiceName);
+                    var scope = _tracer.StartActive("Operation", serviceName: serviceName);
                     scope.Span.ResourceName = "This is a resource";
                     scope.Dispose();
 
@@ -71,7 +71,7 @@ namespace Datadog.Trace.IntegrationTests
                     var trace = _httpRecorder.ZipkinTraces.Single();
 
                     var expectedServiceName = serviceNamePerSpanEnabled
-                                                  ? ServiceName
+                                                  ? serviceName
                                                   : _tracer.DefaultServiceName;
 
                     ZipkinHelpers.AssertSpanEqual(scope.Span, trace, expectedServiceName);

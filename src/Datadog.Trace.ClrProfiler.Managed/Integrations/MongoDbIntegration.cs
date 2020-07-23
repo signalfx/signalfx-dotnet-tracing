@@ -16,7 +16,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
     {
         private const string IntegrationName = "MongoDb";
         private const string OperationName = "mongodb.query";
-        private const string ServiceName = "mongodb";
 
         private const string Major2 = "2";
         private const string Major2Minor1 = "2.1";
@@ -467,7 +466,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 Log.Warning(ex, "Unable to access IWireProtocol.Command properties.");
             }
 
-            string serviceName = string.Join("-", tracer.DefaultServiceName, ServiceName);
             operationName = operationName ?? OperationName;
 
             Span parent = tracer.ActiveScope?.Span;
@@ -484,7 +482,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             Scope scope = null;
             try
             {
-                scope = tracer.StartActive(operationName, serviceName: serviceName);
+                scope = tracer.StartActive(operationName, serviceName: tracer.DefaultServiceName);
                 var span = scope.Span;
                 span.SetTag(Tags.DbType, SpanTypes.MongoDb);
                 span.SetTag(Tags.InstrumentationName, IntegrationName);

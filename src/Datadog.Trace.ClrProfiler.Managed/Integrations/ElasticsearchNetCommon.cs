@@ -14,7 +14,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
     internal static class ElasticsearchNetCommon
     {
         public const string OperationName = "elasticsearch.query";
-        public const string ServiceName = "elasticsearch";
         public const string SpanType = "elasticsearch";
         public const string ComponentValue = "elasticsearch-net";
         public const string ElasticsearchActionKey = "elasticsearch.action";
@@ -49,14 +48,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             string method = requestData.GetProperty("Method").GetValueOrDefault()?.ToString();
             var url = requestData.GetProperty("Uri").GetValueOrDefault()?.ToString();
 
-            var serviceName = string.Join("-", tracer.DefaultServiceName, ServiceName);
-
             Scope scope = null;
 
             try
             {
                 var operationName = requestName ?? OperationName;
-                scope = tracer.StartActive(operationName, serviceName: serviceName);
+                scope = tracer.StartActive(operationName, serviceName: tracer.DefaultServiceName);
                 var span = scope.Span;
                 span.SetTag(Tags.InstrumentationName, ComponentValue);
                 span.SetTag(Tags.DbType, SpanType);
