@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Datadog.Trace.Configuration;
 
 namespace Datadog.Trace.Agent
 {
@@ -14,14 +15,16 @@ namespace Datadog.Trace.Agent
     {
         private readonly ZipkinSerializer _serializer = new ZipkinSerializer();
         private readonly Span[][] _spans;
+        private readonly TracerSettings _settings;
 
-        public ZipkinContent(Span[][] spans, string signalFxAccessToken)
+        public ZipkinContent(Span[][] spans, TracerSettings settings)
         {
             _spans = spans;
+            _settings = settings;
             Headers.ContentType = new MediaTypeHeaderValue("application/json");
-            if (!string.IsNullOrWhiteSpace(signalFxAccessToken))
+            if (!string.IsNullOrWhiteSpace(_settings.SignalFxAccessToken))
             {
-                Headers.Add("X-Sf-Token", signalFxAccessToken);
+                Headers.Add("X-Sf-Token", _settings.SignalFxAccessToken);
             }
         }
 
@@ -29,7 +32,7 @@ namespace Datadog.Trace.Agent
         {
             return Task.Factory.StartNew(() =>
                 {
-                    _serializer.Serialize(stream, _spans);
+                    _serializer.Serialize(stream, _spans, _settings);
                 });
         }
 

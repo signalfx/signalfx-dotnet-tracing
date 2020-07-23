@@ -28,6 +28,14 @@ namespace Datadog.Trace.Configuration
         public const string ServiceName = "SIGNALFX_SERVICE_NAME";
 
         /// <summary>
+        /// Configuration key for the application's to allow spans to specify
+        /// different service names then the default one using the "service.name"
+        /// OpenTracing semantic convention.
+        /// </summary>
+        /// <seealso cref="TracerSettings.ServiceName"/>
+        public const string ServiceNamePerSpan = "SIGNALFX_SERVICE_NAME_PER_SPAN";
+
+        /// <summary>
         /// Configuration key for enabling or disabling the Tracer.
         /// Default is value is true (enabled).
         /// </summary>

@@ -41,10 +41,12 @@ namespace Datadog.Trace.Configuration
 
             ServiceName = source?.GetString(ConfigurationKeys.ServiceName);
 
+            ServiceNamePerSpanEnabled = source?.GetBool(ConfigurationKeys.ServiceNamePerSpan) ??
+                                        false;
+
             SignalFxAccessToken = source?.GetString(ConfigurationKeys.SignalFxAccessToken);
 
             TraceEnabled = source?.GetBool(ConfigurationKeys.TraceEnabled) ??
-                           // default value
                            true;
 
             var disabledIntegrationNames = source?.GetString(ConfigurationKeys.DisabledIntegrations)
@@ -162,6 +164,13 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="ConfigurationKeys.ServiceName"/>
         public string ServiceName { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether setting the service name per span is enabled.
+        /// The default is <c>false</c>.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.ServiceNamePerSpan"/>
+        public bool ServiceNamePerSpanEnabled { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether tracing is enabled.
