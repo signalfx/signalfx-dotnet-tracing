@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Datadog.Trace;
+using Datadog.Trace.Configuration;
 using Datadog.Trace.ExtensionMethods;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -47,7 +48,7 @@ namespace Datadog.Trace.Agent
             return tags;
         }
 
-        public void Serialize(Stream stream, Span[][] traces)
+        public void Serialize(Stream stream, Span[][] traces, TracerSettings settings)
         {
             var zipkinTraces = new List<ZipkinSpan>();
 
@@ -55,7 +56,7 @@ namespace Datadog.Trace.Agent
             {
                 foreach (var span in trace)
                 {
-                    var zspan = new ZipkinSpan(span);
+                    var zspan = new ZipkinSpan(span, settings);
                     zipkinTraces.Add(zspan);
                 }
             }
@@ -71,12 +72,13 @@ namespace Datadog.Trace.Agent
         internal class ZipkinSpan
         {
             private readonly Span _span;
-
+            private readonly TracerSettings _settings;
             private readonly IDictionary<string, string> _tags;
 
-            public ZipkinSpan(Span span)
+            public ZipkinSpan(Span span, TracerSettings settings)
             {
                 _span = span;
+                _settings = settings;
                 if (span.Tags != null)
                 {
                     _tags = BuildTags(span);
@@ -120,8 +122,14 @@ namespace Datadog.Trace.Agent
 
             public Dictionary<string, string> LocalEndpoint
             {
-                // Don't allow overriding service name per span
-                get => new Dictionary<string, string>() { { "serviceName", Tracer.Instance.DefaultServiceName } };
+                get
+                {
+                    var actualServiceName = _settings.ServiceNamePerSpanEnabled && !string.IsNullOrWhiteSpace(_span.ServiceName)
+                        ? _span.ServiceName
+                        : Tracer.Instance.DefaultServiceName;
+
+                    return new Dictionary<string, string>() { { "serviceName", actualServiceName } };
+                }
             }
 
             public IDictionary<string, string> Tags

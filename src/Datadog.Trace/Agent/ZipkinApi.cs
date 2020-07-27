@@ -43,7 +43,7 @@ namespace Datadog.Trace.Agent
                 try
                 {
                     // re-create content on every retry because some versions of HttpClient always dispose of it, so we can't reuse.
-                    using (var content = new ZipkinContent(traces, _settings.SignalFxAccessToken))
+                    using (var content = new ZipkinContent(traces, _settings))
                     {
                         responseMessage = await _client.PostAsync(_settings.EndpointUrl, content).ConfigureAwait(false);
                         responseMessage.EnsureSuccessStatusCode();

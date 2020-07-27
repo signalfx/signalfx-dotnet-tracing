@@ -202,6 +202,17 @@ automatically become child spans of any existing spans in the same context:
     }
     ```
 
+When using manual instrumentation it is possible to set different service names under the same process.
+This is disabled by default but can be enabled by configuring the environment variable
+`SIGNALFX_SERVICE_NAME_PER_SPAN_ENABLED` to `true` and following the [OpenTracing semantic
+conventions](https://github.com/opentracing/specification/blob/master/semantic_conventions.md#semantic-conventions)
+by setting the tag `service.name` to the desired service name.
+
+For more examples and information on how to do manual instrumentation see:
+
+- https://github.com/signalfx/tracing-examples/tree/master/dotnet-manual-instrumentation
+- https://github.com/signalfx/tracing-examples/tree/master/signalfx-tracing/signalfx-dotnet-tracing
+
 ## About
 The SignalFx-Tracing Library for .NET is a fork of the .NET
 Tracer for Datadog APM that has been modified to provide Zipkin v2 JSON

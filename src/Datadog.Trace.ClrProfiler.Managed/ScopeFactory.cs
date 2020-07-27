@@ -14,7 +14,6 @@ namespace Datadog.Trace.ClrProfiler
     internal static class ScopeFactory
     {
         public const string OperationName = "http.request";
-        public const string ServiceName = "http-client";
 
         private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(ScopeFactory));
 
@@ -60,7 +59,7 @@ namespace Datadog.Trace.ClrProfiler
                 scope = tracer.StartActive(spanName);
                 var span = scope.Span;
 
-                span.ServiceName = $"{tracer.DefaultServiceName}-{ServiceName}";
+                span.ServiceName = tracer.DefaultServiceName;
 
                 span.SetTag(Tags.SpanKind, SpanKinds.Client);
                 // Only the span responsible for propagated context should have client span.kind
@@ -130,10 +129,9 @@ namespace Datadog.Trace.ClrProfiler
                     return null;
                 }
 
-                string serviceName = $"{tracer.DefaultServiceName}-{dbType}";
                 string operationName = $"{dbType}.query";
 
-                scope = tracer.StartActive(operationName, serviceName: serviceName);
+                scope = tracer.StartActive(operationName, serviceName: tracer.DefaultServiceName);
                 var span = scope.Span;
                 span.SetTag(Tags.DbType, dbType);
                 span.SetTag(Tags.InstrumentationName, integrationName);

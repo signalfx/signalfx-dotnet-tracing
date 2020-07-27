@@ -90,7 +90,7 @@ namespace Datadog.Trace.TestHelpers
             return logs;
         }
 
-        public static void AssertSpanEqual(Span expected, JToken actual)
+        public static void AssertSpanEqual(Span expected, JToken actual, string expectedServiceName = null)
         {
             Assert.Equal(expected.Context.TraceId, actual.TraceId());
             Assert.Equal(expected.Context.SpanId, actual.SpanId());
@@ -101,7 +101,7 @@ namespace Datadog.Trace.TestHelpers
 
             Assert.Equal(expected.OperationName, actual.OperationName());
             Assert.Equal(expected.ResourceName, actual.ResourceName());
-            Assert.Equal(Tracer.Instance.DefaultServiceName, actual.ServiceName());
+            Assert.Equal(expectedServiceName ?? Tracer.Instance.DefaultServiceName, actual.ServiceName());
             Assert.Equal(expected.Type, actual.Type());
             Assert.Equal(expected.StartTime.ToUnixTimeMicroseconds(), actual.StartTime());
             Assert.Equal(expected.Duration.ToMicroseconds(), actual.Duration());

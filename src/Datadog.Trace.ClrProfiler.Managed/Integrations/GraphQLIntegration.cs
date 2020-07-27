@@ -17,7 +17,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
     public static class GraphQLIntegration
     {
         private const string IntegrationName = "GraphQL";
-        private const string ServiceName = "graphql";
 
         private const string Major2 = "2";
         private const string Major2Minor3 = "2.3";
@@ -252,13 +251,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             Tracer tracer = Tracer.Instance;
             string source = document.GetProperty<string>("OriginalQuery")
                                     .GetValueOrDefault();
-            string serviceName = string.Join("-", tracer.DefaultServiceName, ServiceName);
 
             Scope scope = null;
 
             try
             {
-                scope = tracer.StartActive(ValidateOperationName, serviceName: serviceName);
+                scope = tracer.StartActive(ValidateOperationName, serviceName: tracer.DefaultServiceName);
                 var span = scope.Span;
                 DecorateSpan(span);
                 span.SetTag(Tags.GraphQLSource, source.Truncate());
@@ -294,14 +292,13 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                                                        .GetProperty<Enum>("OperationType")
                                                        .GetValueOrDefault()
                                                        .ToString();
-            string serviceName = string.Join("-", tracer.DefaultServiceName, ServiceName);
 
             Scope scope = null;
 
             try
             {
                 var operation = $"{operationType}{(!string.IsNullOrEmpty(operationName) ? $" {operationName}" : string.Empty)}";
-                scope = tracer.StartActive(operation, serviceName: serviceName);
+                scope = tracer.StartActive(operation, serviceName: tracer.DefaultServiceName);
                 var span = scope.Span;
                 DecorateSpan(span);
 

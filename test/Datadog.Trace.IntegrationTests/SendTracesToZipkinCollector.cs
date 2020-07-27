@@ -45,24 +45,41 @@ namespace Datadog.Trace.IntegrationTests
             }
         }
 
-        [Fact]
-        public async void CustomServiceName()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async void CustomServiceName(bool serviceNamePerSpanEnabled)
         {
-            using (var agent = new MockZipkinCollector(collectorPort))
+            var savedServiceNamePerSpanSetting = _tracer.Settings.ServiceNamePerSpanEnabled;
+            try
             {
-                const string ServiceName = "MyService";
+                _tracer.Settings.ServiceNamePerSpanEnabled = serviceNamePerSpanEnabled;
 
-                var scope = _tracer.StartActive("Operation", serviceName: ServiceName);
-                scope.Span.ResourceName = "This is a resource";
-                scope.Dispose();
+                using (var agent = new MockZipkinCollector(collectorPort))
+                {
+                    const string serviceName = "MyService";
 
-                await _httpRecorder.WaitForCompletion(1);
-                Assert.Single(_httpRecorder.Requests);
-                Assert.Single(_httpRecorder.Responses);
-                Assert.All(_httpRecorder.Responses, (x) => Assert.Equal(HttpStatusCode.OK, x.StatusCode));
+                    var scope = _tracer.StartActive("Operation", serviceName: serviceName);
+                    scope.Span.ResourceName = "This is a resource";
+                    scope.Dispose();
 
-                var trace = _httpRecorder.ZipkinTraces.Single();
-                ZipkinHelpers.AssertSpanEqual(scope.Span, trace);
+                    await _httpRecorder.WaitForCompletion(1);
+                    Assert.Single(_httpRecorder.Requests);
+                    Assert.Single(_httpRecorder.Responses);
+                    Assert.All(_httpRecorder.Responses, (x) => Assert.Equal(HttpStatusCode.OK, x.StatusCode));
+
+                    var trace = _httpRecorder.ZipkinTraces.Single();
+
+                    var expectedServiceName = serviceNamePerSpanEnabled
+                                                  ? serviceName
+                                                  : _tracer.DefaultServiceName;
+
+                    ZipkinHelpers.AssertSpanEqual(scope.Span, trace, expectedServiceName);
+                }
+            }
+            finally
+            {
+                _tracer.Settings.ServiceNamePerSpanEnabled = savedServiceNamePerSpanSetting;
             }
         }
 
