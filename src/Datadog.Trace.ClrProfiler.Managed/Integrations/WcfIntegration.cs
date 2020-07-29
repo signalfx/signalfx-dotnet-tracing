@@ -139,11 +139,16 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     }
                 }
 
-                scope = tracer.StartActive("wcf.request", propagatedContext);
+                var operationNameSuffix = requestMessage.Headers.Action ?? requestMessage.Headers.To?.LocalPath;
+                var operationName = !string.IsNullOrEmpty(operationNameSuffix)
+                    ? "wcf.request " + operationNameSuffix
+                    : "wcf.request";
+
+                scope = tracer.StartActive(operationName, propagatedContext);
                 var span = scope.Span;
 
                 span.DecorateWebServerSpan(
-                    resourceName: requestMessage.Headers.Action ?? requestMessage.Headers.To?.LocalPath,
+                    resourceName: null,
                     httpMethod,
                     host,
                     httpUrl: requestMessage.Headers.To?.AbsoluteUri);

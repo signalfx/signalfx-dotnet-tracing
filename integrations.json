@@ -1908,6 +1908,37 @@
     ]
   },
   {
+    "name": "Wcf",
+    "method_replacements": [
+      {
+        "caller": {},
+        "target": {
+          "assembly": "System.ServiceModel",
+          "type": "System.ServiceModel.Dispatcher.ChannelHandler",
+          "method": "HandleRequest",
+          "signature_types": [
+            "System.Boolean",
+            "System.ServiceModel.Channels.RequestContext",
+            "System.ServiceModel.OperationContext"
+          ],
+          "minimum_major": 4,
+          "minimum_minor": 0,
+          "minimum_patch": 0,
+          "maximum_major": 4,
+          "maximum_minor": 65535,
+          "maximum_patch": 65535
+        },
+        "wrapper": {
+          "assembly": "SignalFx.Tracing.ClrProfiler.Managed, Version=0.1.1.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb",
+          "type": "Datadog.Trace.ClrProfiler.Integrations.WcfIntegration",
+          "method": "HandleRequest",
+          "signature": "00 06 02 1C 1C 1C 08 08 0A",
+          "action": "ReplaceTargetMethod"
+        }
+      }
+    ]
+  },
+  {
     "name": "WebRequest",
     "method_replacements": [
       {
