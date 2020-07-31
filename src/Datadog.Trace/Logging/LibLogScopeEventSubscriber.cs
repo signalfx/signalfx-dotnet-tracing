@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -28,7 +29,7 @@ namespace Datadog.Trace.Logging
         private bool _safeToAddToMdc = true;
 
         // IMPORTANT: For all logging frameworks, do not set any default values for
-        //            "dd.trace_id" and "dd.span_id" when initializing the subscriber
+        //            "signalfx.trace_id" and "signalfx.span_id" when initializing the subscriber
         //            because the Tracer may be initialized at a time when it is not safe
         //            to add properties logging context of the underlying logging framework.
         //
@@ -141,10 +142,10 @@ namespace Datadog.Trace.Logging
                 // TODO: Debug logs
                 _contextDisposalStack.Push(
                     LogProvider.OpenMappedContext(
-                        CorrelationIdentifier.TraceIdKey, traceId.ToString(), destructure: false));
+                        CorrelationIdentifier.TraceIdKey, traceId.ToString("x16"), destructure: false));
                 _contextDisposalStack.Push(
                     LogProvider.OpenMappedContext(
-                        CorrelationIdentifier.SpanIdKey, spanId.ToString(), destructure: false));
+                        CorrelationIdentifier.SpanIdKey, spanId.ToString("x16"), destructure: false));
             }
             catch (Exception)
             {

@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -47,7 +48,7 @@ namespace Datadog.Trace.Tests.Logging
             int logIndex = 0;
             LoggingEvent logEvent;
 
-            // The first log should not have dd.span_id or dd.trace_id
+            // The first log should not have signalfx.span_id or signalfx.trace_id
             // Scope: N/A
             // Custom property: N/A
             logEvent = filteredLogs[logIndex++];
