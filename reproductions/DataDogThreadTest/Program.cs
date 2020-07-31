@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using Datadog.Trace.Configuration;
 using log4net;
 using System;
@@ -11,9 +12,9 @@ namespace DataDogThreadTest
 {
     class Program
     {
-        internal static readonly string TraceIdKey = "dd.trace_id";
-        internal static readonly string SpanIdKey = "dd.span_id";
-        internal static readonly string NonTraceMessage = "TraceId: 0, SpanId: 0";
+        internal static readonly string TraceIdKey = "signalfx.trace_id";
+        internal static readonly string SpanIdKey = "signalfx.span_id";
+        internal static readonly string NonTraceMessage = "TraceId: 0000000000000000, SpanId: 0000000000000000";
 
         static int Main(string[] args)
         {
@@ -55,7 +56,7 @@ namespace DataDogThreadTest
                                                 var outerTraceId = outerScope.Span.TraceId;
                                                 var outerSpanId = outerScope.Span.SpanId;
 
-                                                logger.Info($"TraceId: {outerTraceId}, SpanId: {outerSpanId}");
+                                                logger.Info($"TraceId: {outerTraceId:x16}, SpanId: {outerSpanId:x16}");
 
                                                 using (var innerScope = tracer.StartActive("nest-thread-test"))
                                                 {
@@ -72,7 +73,7 @@ namespace DataDogThreadTest
                                                         throw new Exception($"Unexpected SpanId match - outer: {outerSpanId}, inner: {innerSpanId}");
                                                     }
 
-                                                    logger.Info($"TraceId: {innerTraceId}, SpanId: {innerSpanId}");
+                                                    logger.Info($"TraceId: {innerTraceId:x16}, SpanId: {innerSpanId:x16}");
                                                 }
                                             }
                                         }
@@ -144,7 +145,7 @@ namespace DataDogThreadTest
                 var lastLog = RelevantLogs().Last();
                 var lastLogTraceId = lastLog.Properties[TraceIdKey];
                 var lastLogSpanIdId = lastLog.Properties[SpanIdKey];
-                var actual = $"TraceId: {lastLogTraceId}, SpanId: {lastLogSpanIdId}";
+                var actual = $"TraceId: {lastLogTraceId ?? 0:x16}, SpanId: {lastLogSpanIdId ?? 0:x16}";
 
                 if (!actual.Equals(NonTraceMessage))
                 {

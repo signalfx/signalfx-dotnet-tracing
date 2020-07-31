@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 
 namespace Datadog.Trace
@@ -7,8 +8,8 @@ namespace Datadog.Trace
     /// </summary>
     public static class CorrelationIdentifier
     {
-        internal static readonly string TraceIdKey = "dd.trace_id";
-        internal static readonly string SpanIdKey = "dd.span_id";
+        internal static readonly string TraceIdKey = "signalfx.trace_id";
+        internal static readonly string SpanIdKey = "signalfx.span_id";
 
         /// <summary>
         /// Gets the trace id

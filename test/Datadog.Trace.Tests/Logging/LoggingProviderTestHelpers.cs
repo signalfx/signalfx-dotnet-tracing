@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Globalization;
 using System.IO;
@@ -18,8 +19,8 @@ namespace Datadog.Trace.Tests.Logging
         internal static readonly int CustomPropertyValue = 1;
         internal static readonly string LogPrefix = "[Datadog.Trace.Tests.Logging]";
 
-        private const string Log4NetExpectedStringFormat = "\"{0}\":\"{1}\"";
-        private const string SerilogExpectedStringFormat = "{0}: \"{1}\"";
+        private const string Log4NetExpectedStringFormat = "\"{0}\":\"{1:x16}\"";
+        private const string SerilogExpectedStringFormat = "{0}: \"{1:x16}\"";
 
         internal static Tracer InitializeTracer(bool enableLogsInjection)
         {
@@ -64,9 +65,9 @@ namespace Datadog.Trace.Tests.Logging
         {
             // First, verify that the properties are attached to the LogEvent
             Assert.Contains(CorrelationIdentifier.TraceIdKey, logEvent.Properties.GetKeys());
-            Assert.Equal<ulong>(traceId, ulong.Parse(logEvent.Properties[CorrelationIdentifier.TraceIdKey].ToString()));
+            Assert.Equal<ulong>(traceId, Convert.ToUInt64(logEvent.Properties[CorrelationIdentifier.TraceIdKey].ToString(), 16));
             Assert.Contains(CorrelationIdentifier.SpanIdKey, logEvent.Properties.GetKeys());
-            Assert.Equal<ulong>(spanId, ulong.Parse(logEvent.Properties[CorrelationIdentifier.SpanIdKey].ToString()));
+            Assert.Equal<ulong>(spanId, Convert.ToUInt64(logEvent.Properties[CorrelationIdentifier.SpanIdKey].ToString(), 16));
 
             // Second, verify that the message formatting correctly encloses the
             // values in quotes, since they are string values
@@ -85,9 +86,9 @@ namespace Datadog.Trace.Tests.Logging
         {
             // First, verify that the properties are attached to the LogEvent
             Assert.True(logEvent.Properties.ContainsKey(CorrelationIdentifier.TraceIdKey));
-            Assert.Equal<ulong>(traceId, ulong.Parse(logEvent.Properties[CorrelationIdentifier.TraceIdKey].ToString().Trim(new[] { '\"' })));
+            Assert.Equal<ulong>(traceId, Convert.ToUInt64(logEvent.Properties[CorrelationIdentifier.TraceIdKey].ToString().Trim(new[] { '\"' }), 16));
             Assert.True(logEvent.Properties.ContainsKey(CorrelationIdentifier.SpanIdKey));
-            Assert.Equal<ulong>(spanId, ulong.Parse(logEvent.Properties[CorrelationIdentifier.SpanIdKey].ToString().Trim(new[] { '\"' })));
+            Assert.Equal<ulong>(spanId, Convert.ToUInt64(logEvent.Properties[CorrelationIdentifier.SpanIdKey].ToString().Trim(new[] { '\"' }), 16));
 
             // Second, verify that the message formatting correctly encloses the
             // values in quotes, since they are string values
