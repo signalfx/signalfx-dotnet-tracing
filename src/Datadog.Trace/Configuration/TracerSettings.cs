@@ -108,12 +108,7 @@ namespace Datadog.Trace.Configuration
 
             Integrations = new IntegrationSettingsCollection(source);
 
-            GlobalTags = source?.GetDictionary(ConfigurationKeys.GlobalTags) ??
-                         // default value (empty)
-                         new ConcurrentDictionary<string, string>();
-
-            GlobalTags.Add(Tags.Language, TracerConstants.Language);
-            GlobalTags.Add(Tags.Version, TracerConstants.AssemblyVersion);
+            GlobalTags = source?.GetDictionary(ConfigurationKeys.GlobalTags);
 
             DogStatsdPort = source?.GetInt32(ConfigurationKeys.DogStatsdPort) ??
                             // default value

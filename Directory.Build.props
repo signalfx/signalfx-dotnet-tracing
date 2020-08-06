@@ -1,4 +1,5 @@
 <Project>
+  <!-- Modified by SignalFx -->
   <PropertyGroup>
     <IsPackable>false</IsPackable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

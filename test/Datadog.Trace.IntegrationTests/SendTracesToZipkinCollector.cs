@@ -123,6 +123,13 @@ namespace Datadog.Trace.IntegrationTests
                 var trace = _httpRecorder.ZipkinTraces;
                 ZipkinHelpers.AssertSpanEqual(scope1.Span, trace[0][0]);
                 ZipkinHelpers.AssertSpanEqual(scope2.Span, trace[0][1]);
+
+                // Check root span for mandatory tags.
+                Assert.Contains(scope1.Span.Tags, kvp => kvp.Key == Tags.Language && kvp.Value == TracerConstants.Language);
+                Assert.Contains(scope1.Span.Tags, kvp => kvp.Key == Tags.Version && kvp.Value == TracerConstants.AssemblyVersion);
+
+                // Child spans should not have root spans tags.
+                Assert.Null(scope2.Span.Tags);
             }
         }
 
