@@ -1,5 +1,7 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Concurrent;
+using System.Net;
 using System.Web;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Logging;
@@ -124,7 +126,14 @@ namespace Datadog.Trace.AspNet
                 string resourceName = $"{httpMethod} {path.ToLowerInvariant()}";
 
                 scope = tracer.StartActive(_requestOperationName, propagatedContext);
-                scope.Span.DecorateWebServerSpan(resourceName, httpMethod, host, url);
+
+                IPAddress remoteIp = null;
+                if (Tracer.Instance.Settings.AddClientIpToServerSpans)
+                {
+                    IPAddress.TryParse(httpRequest.UserHostAddress, out remoteIp);
+                }
+
+                scope.Span.DecorateWebServerSpan(resourceName, httpMethod, host, url, remoteIp);
 
                 // set analytics sample rate if enabled
                 var analyticsSampleRate = tracer.Settings.GetIntegrationAnalyticsSampleRate(IntegrationName, enabledWithGlobalSetting: true);

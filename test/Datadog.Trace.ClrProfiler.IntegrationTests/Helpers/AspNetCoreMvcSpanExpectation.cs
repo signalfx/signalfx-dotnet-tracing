@@ -5,9 +5,10 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 {
     public class AspNetCoreMvcSpanExpectation : WebServerSpanExpectation
     {
-        public AspNetCoreMvcSpanExpectation(string serviceName, string operationName, string resourceName, string statusCode, string httpMethod)
-            : base(serviceName, operationName, resourceName, SpanTypes.Web, statusCode, httpMethod)
+        public AspNetCoreMvcSpanExpectation(string serviceName, string operationName, string resourceName, string statusCode, string httpMethod, bool addClientIpExpectation = false)
+            : base(serviceName, operationName, resourceName, SpanTypes.Web, statusCode, httpMethod, addClientIpExpectation)
         {
+            RegisterTagExpectation(Tags.SpanKind, expected: SpanKinds.Server);
         }
 
         public override bool Matches(IMockSpan span)

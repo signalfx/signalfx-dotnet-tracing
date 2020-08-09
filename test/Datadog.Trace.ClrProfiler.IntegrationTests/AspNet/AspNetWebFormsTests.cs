@@ -11,17 +11,19 @@ using Xunit.Abstractions;
 
 namespace Datadog.Trace.ClrProfiler.IntegrationTests
 {
-    public class AspNetWebFormsTests : TestHelper, IClassFixture<IisFixture>
+    public abstract class AspNetWebFormsTests : TestHelper
     {
         private readonly IisFixture _iisFixture;
+        private readonly bool _addClientIp;
 
         // NOTE: Would pass this in addition to the name/output to the new constructor if we removed the Samples.WebForms copied project in favor of the demo repo source project...
         // $"../dd-trace-demo/dotnet-coffeehouse/Datadog.Coffeehouse.WebForms",
-        public AspNetWebFormsTests(IisFixture iisFixture, ITestOutputHelper output)
+        public AspNetWebFormsTests(IisFixture iisFixture, ITestOutputHelper output, bool addClientIp)
             : base("WebForms", "samples-aspnet", output)
         {
             _iisFixture = iisFixture;
-            _iisFixture.TryStartIis(this);
+            _iisFixture.TryStartIis(this, addClientIp);
+            _addClientIp = addClientIp;
         }
 
         [Theory]
@@ -39,7 +41,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 HttpStatusCode.OK,
                 SpanTypes.Web,
                 expectedOperationName: expectedResourceName,
-                expectedResourceName);
+                expectedResourceName,
+                _addClientIp);
         }
 
         [Fact]

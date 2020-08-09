@@ -1,6 +1,7 @@
 // Modified by SignalFx
 #if NETSTANDARD
 using System;
+using System.Net;
 using Datadog.Trace.Abstractions;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Headers;
@@ -161,7 +162,13 @@ namespace Datadog.Trace.DiagnosticListeners
                 Span span = _tracer.StartSpan(HttpRequestInOperationName, propagatedContext)
                                    .SetTag(Tags.InstrumentationName, ComponentName);
 
-                span.DecorateWebServerSpan(null, httpMethod, host, url);
+                IPAddress remoteIp = null;
+                if (Trace.Tracer.Instance.Settings.AddClientIpToServerSpans)
+                {
+                    remoteIp = httpContext?.Connection?.RemoteIpAddress;
+                }
+
+                span.DecorateWebServerSpan(null, httpMethod, host, url, remoteIp);
                 span.SetTag(Tags.InstrumentationName, IntegrationName);
 
                 // set analytics sample rate if enabled

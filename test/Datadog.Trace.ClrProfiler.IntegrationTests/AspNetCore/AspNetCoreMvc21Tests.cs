@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using Datadog.Trace.ClrProfiler.IntegrationTests.Helpers;
 using Xunit;
 using Xunit.Abstractions;
@@ -11,13 +12,15 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
         {
         }
 
-        [TargetFrameworkVersionsFact("netcoreapp2.1")]
+        [TargetFrameworkVersionsTheory("netcoreapp2.1")]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
-        public void MeetsAllAspNetCoreMvcExpectations()
+        [InlineData(true)]
+        [InlineData(false)]
+        public void MeetsAllAspNetCoreMvcExpectations(bool addClientIp)
         {
             // No package versions are relevant because this is built-in
-            RunTraceTestOnSelfHosted(string.Empty);
+            RunTraceTestOnSelfHosted(string.Empty, addClientIp);
         }
     }
 }

@@ -8,16 +8,17 @@ using Xunit.Abstractions;
 
 namespace Datadog.Trace.ClrProfiler.IntegrationTests
 {
-    [Collection("IisTests")]
-    public class AspNetWebApi2Tests : TestHelper, IClassFixture<IisFixture>
+    public abstract class AspNetWebApi2Tests : TestHelper
     {
         private readonly IisFixture _iisFixture;
+        private readonly bool _addClientIp;
 
-        public AspNetWebApi2Tests(IisFixture iisFixture, ITestOutputHelper output)
+        public AspNetWebApi2Tests(IisFixture iisFixture, ITestOutputHelper output, bool addClientIp)
             : base("AspNetMvc5", "samples-aspnet", output)
         {
             _iisFixture = iisFixture;
-            _iisFixture.TryStartIis(this);
+            _iisFixture.TryStartIis(this, addClientIp);
+            _addClientIp = addClientIp;
         }
 
         [Theory]
@@ -40,7 +41,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 expectedHttpStatusCode,
                 "web",
                 expectedOperationName: expectedResourceName,
-                expectedResourceName);
+                expectedResourceName,
+                _addClientIp);
         }
     }
 }

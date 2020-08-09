@@ -1,8 +1,6 @@
 // Modified by SignalFx
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -19,53 +17,24 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
         protected AspNetCoreMvcTestBase(string sampleAppName, ITestOutputHelper output)
             : base(sampleAppName, output)
         {
-            CreateTopLevelExpectation(operationName: "home.index", url: "/", httpMethod: "GET", httpStatus: "200", resourceUrl: "/");
-            CreateTopLevelExpectation(operationName: "home.delay", url: "/delay/0", httpMethod: "GET", httpStatus: "200", resourceUrl: "delay/{seconds}");
-            CreateTopLevelExpectation(operationName: "api.delay", url: "/api/delay/0", httpMethod: "GET", httpStatus: "200", resourceUrl: "api/delay/{seconds}");
-            CreateTopLevelExpectation(operationName: "aspnet_core.request", url: "/not-found", httpMethod: "GET", httpStatus: "404", resourceUrl: "/not-found");
-            CreateTopLevelExpectation(operationName: "home.statuscodetest", url: "/status-code/203", httpMethod: "GET", httpStatus: "203", resourceUrl: "status-code/{statusCode}");
-            CreateTopLevelExpectation(
-                operationName: "home.throwexception",
-                url: "/bad-request",
-                httpMethod: "GET",
-                httpStatus: "500",
-                resourceUrl: "bad-request",
-                additionalCheck: span =>
-                {
-                    var failures = new List<string>();
-
-                    if (span.Error == 0)
-                    {
-                        failures.Add($"Expected Error flag set within {span.Resource}");
-                    }
-
-                    if (SpanExpectation.GetTag(span, Tags.ErrorKind) != "System.Exception")
-                    {
-                        failures.Add($"Expected specific exception within {span.Resource}");
-                    }
-
-                    var errorMessage = SpanExpectation.GetTag(span, Tags.ErrorMsg);
-
-                    if (errorMessage != "This was a bad request.")
-                    {
-                        failures.Add($"Expected specific error message within {span.Resource}. Found \"{errorMessage}\"");
-                    }
-
-                    return failures;
-                });
         }
 
         protected HttpClient HttpClient { get; } = new HttpClient();
 
-        protected List<AspNetCoreMvcSpanExpectation> Expectations { get; set; } = new List<AspNetCoreMvcSpanExpectation>();
-
-        public void RunTraceTestOnSelfHosted(string packageVersion)
+        public void RunTraceTestOnSelfHosted(string packageVersion, bool addClientIp)
         {
             var agentPort = TcpPortProvider.GetOpenPort();
             var aspNetCorePort = TcpPortProvider.GetOpenPort();
 
+            var expectations = CreateExpectations(addClientIp);
+            var envVars = ZipkinEnvVars;
+            if (addClientIp)
+            {
+                envVars["SIGNALFX_ADD_CLIENT_IP_TO_SERVER_SPANS"] = "1";
+            }
+
             using (var agent = new MockZipkinCollector(agentPort))
-            using (var process = StartSample(agent.Port, arguments: null, packageVersion: packageVersion, aspNetCorePort: aspNetCorePort, envVars: ZipkinEnvVars))
+            using (var process = StartSample(agent.Port, arguments: null, packageVersion: packageVersion, aspNetCorePort: aspNetCorePort, envVars))
             {
                 agent.SpanFilters.Add(IsNotServerLifeCheck);
 
@@ -129,12 +98,12 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
 
                 var testStart = DateTime.Now;
 
-                var paths = Expectations.Select(e => e.OriginalUri).ToArray();
+                var paths = expectations.Select(e => e.OriginalUri).ToArray();
                 SubmitRequests(aspNetCorePort, paths);
 
                 var spans =
                     agent.WaitForSpans(
-                              Expectations.Count,
+                              expectations.Count,
                               minDateTime: testStart)
                          .OrderBy(s => s.Start)
                          .ToList();
@@ -144,29 +113,71 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
                     process.Kill();
                 }
 
-                SpanTestHelpers.AssertExpectationsMet(Expectations, spans);
+                SpanTestHelpers.AssertExpectationsMet(expectations, spans);
             }
         }
 
-        protected void CreateTopLevelExpectation(
+        protected AspNetCoreMvcSpanExpectation CreateSingleExpectation(
             string operationName,
             string url,
             string httpMethod,
             string httpStatus,
             string resourceUrl,
+            bool addClientIpExpectation = false,
             Func<IMockSpan, List<string>> additionalCheck = null)
         {
-            var expectation = new AspNetCoreMvcSpanExpectation(EnvironmentHelper.FullSampleName, operationName, operationName, httpStatus, httpMethod)
+            var expectation = new AspNetCoreMvcSpanExpectation(EnvironmentHelper.FullSampleName, operationName, operationName, httpStatus, httpMethod, addClientIpExpectation)
             {
                 OriginalUri = url,
             };
 
             expectation.RegisterDelegateExpectation(additionalCheck);
-
-            Expectations.Add(expectation);
+            return expectation;
         }
 
-        protected void SubmitRequests(int aspNetCorePort, string[] paths)
+        protected List<AspNetCoreMvcSpanExpectation> CreateExpectations(bool addClientIpExpectation)
+        {
+            return new List<AspNetCoreMvcSpanExpectation>()
+            {
+                CreateSingleExpectation(operationName: "home.index", url: "/", httpMethod: "GET", httpStatus: "200", resourceUrl: "/", addClientIpExpectation),
+                CreateSingleExpectation(operationName: "home.delay", url: "/delay/0", httpMethod: "GET", httpStatus: "200", resourceUrl: "delay/{seconds}", addClientIpExpectation),
+                CreateSingleExpectation(operationName: "api.delay", url: "/api/delay/0", httpMethod: "GET", httpStatus: "200", resourceUrl: "api/delay/{seconds}", addClientIpExpectation),
+                CreateSingleExpectation(operationName: "aspnet_core.request", url: "/not-found", httpMethod: "GET", httpStatus: "404", resourceUrl: "/not-found", addClientIpExpectation),
+                CreateSingleExpectation(operationName: "home.statuscodetest", url: "/status-code/203", httpMethod: "GET", httpStatus: "203", resourceUrl: "status-code/{statusCode}", addClientIpExpectation),
+                CreateSingleExpectation(
+                    operationName: "home.throwexception",
+                    url: "/bad-request",
+                    httpMethod: "GET",
+                    httpStatus: "500",
+                    resourceUrl: "bad-request",
+                    addClientIpExpectation,
+                    additionalCheck: span =>
+                    {
+                        var failures = new List<string>();
+
+                        if (span.Error == 0)
+                        {
+                            failures.Add($"Expected Error flag set within {span.Resource}");
+                        }
+
+                        if (SpanExpectation.GetTag(span, Tags.ErrorKind) != "System.Exception")
+                        {
+                            failures.Add($"Expected specific exception within {span.Resource}");
+                        }
+
+                        var errorMessage = SpanExpectation.GetTag(span, Tags.ErrorMsg);
+
+                        if (errorMessage != "This was a bad request.")
+                        {
+                            failures.Add($"Expected specific error message within {span.Resource}. Found \"{errorMessage}\"");
+                        }
+
+                        return failures;
+                    }),
+        };
+    }
+
+    protected void SubmitRequests(int aspNetCorePort, string[] paths)
         {
             foreach (var path in paths)
             {

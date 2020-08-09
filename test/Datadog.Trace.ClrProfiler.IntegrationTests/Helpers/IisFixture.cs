@@ -13,7 +13,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
         public int HttpPort { get; private set; }
 
-        public void TryStartIis(TestHelper helper)
+        public void TryStartIis(TestHelper helper, bool addClientIp = false)
         {
             lock (this)
             {
@@ -24,7 +24,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                     HttpPort = TcpPortProvider.GetOpenPort();
 
-                    _iisExpress = helper.StartIISExpress(Agent.Port, HttpPort);
+                    _iisExpress = helper.StartIISExpress(Agent.Port, HttpPort, addClientIp);
                 }
             }
         }

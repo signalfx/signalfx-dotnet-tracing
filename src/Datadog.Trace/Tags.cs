@@ -136,6 +136,16 @@ namespace Datadog.Trace
         public const string OutHost = "peer.hostname";
 
         /// <summary>
+        /// The IP v4 address of the remote peer.
+        /// </summary>
+        public const string PeerIpV4 = "peer.ipv4";
+
+        /// <summary>
+        /// The IP v6 address of the remote peer.
+        /// </summary>
+        public const string PeerIpV6 = "peer.ipv6";
+
+        /// <summary>
         /// The port of a outgoing server connection.
         /// </summary>
         public const string OutPort = "peer.port";

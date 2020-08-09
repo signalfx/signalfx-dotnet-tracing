@@ -265,10 +265,19 @@ namespace Datadog.Trace.Configuration
         /// <summary>
         /// Configuration key to control whether the resource name is going to be used as the span name.
         /// This applies to "AspNetMvc" and "AspNetWebApi" instrumentations.
-        /// Default is value is true.
+        /// Default is value is <c>true</c>.
         /// </summary>
         /// <seealso cref="TracerSettings.UseWebServerResourceAsOperationName"/>
         public const string UseWebServerResourceAsOperationName = "SIGNALFX_USE_WEBSERVER_RESOURCE_AS_OPERATION_NAME";
+
+        /// <summary>
+        /// Configuration key to control whether the instrumentations creating server spans, eg.:
+        /// "AspNetMvc", "AspNetWebApi", etc, are going to try to add the client IP as tag using
+        /// the keys "peer.ipv4" or "peer.ipv6" according to the type of client IP (if available).
+        /// Default is value is <c>false</c>.
+        /// </summary>
+        /// <seealso cref="TracerSettings.AddClientIpToServerSpans"/>
+        public const string AddClientIpToServerSpans = "SIGNALFX_ADD_CLIENT_IP_TO_SERVER_SPANS";
 
         /// <summary>
         /// Configuration key to set the SignalFx access token. This is to be used when sending data
