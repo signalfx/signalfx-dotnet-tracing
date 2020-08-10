@@ -1,6 +1,7 @@
 // Modified by SignalFx
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
 using Datadog.Trace;
@@ -71,6 +72,8 @@ namespace Datadog.Trace.Agent
         [JsonObject(NamingStrategyType = typeof(CamelCaseNamingStrategy))]
         internal class ZipkinSpan
         {
+            private static IDictionary<string, string> emptyTags = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>());
+
             private readonly Span _span;
             private readonly TracerSettings _settings;
             private readonly IDictionary<string, string> _tags;
@@ -79,10 +82,7 @@ namespace Datadog.Trace.Agent
             {
                 _span = span;
                 _settings = settings;
-                if (span.Tags != null)
-                {
-                    _tags = BuildTags(span);
-                }
+                _tags = span.Tags != null ? BuildTags(span) : emptyTags;
             }
 
             public string Id

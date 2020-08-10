@@ -29,7 +29,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             RegisterTagExpectation(
                 key: Tags.Language,
                 expected: TracerConstants.Language,
-                when: s => GetTag(s, Tags.SpanKind) != SpanKinds.Client);
+                when: s => s.ParentId == 0);
         }
 
         public Func<IMockSpan, bool> Always => s => true;

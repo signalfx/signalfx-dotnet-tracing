@@ -319,6 +319,7 @@ namespace Datadog.Trace
             // try to get the trace context (from local spans) or
             // sampling priority (from propagated spans),
             // otherwise start a new trace context
+            var isRootSpan = false;
             if (parent is SpanContext parentSpanContext)
             {
                 traceContext = parentSpanContext.TraceContext ??
@@ -329,6 +330,7 @@ namespace Datadog.Trace
             }
             else
             {
+                isRootSpan = true;
                 traceContext = new TraceContext(this);
             }
 
@@ -348,8 +350,15 @@ namespace Datadog.Trace
                 span.SetTag(Tags.Env, env);
             }
 
+            // Apply root span tags
+            if (isRootSpan)
+            {
+                span.SetTag(Tags.Language, TracerConstants.Language);
+                span.SetTag(Tags.Version, TracerConstants.AssemblyVersion);
+            }
+
             // Apply any global tags
-            if (Settings.GlobalTags.Count > 0)
+            if (Settings.GlobalTags?.Count > 0)
             {
                 foreach (var entry in Settings.GlobalTags)
                 {
