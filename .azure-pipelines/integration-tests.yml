@@ -202,15 +202,6 @@ jobs:
       maximumCpuCount: true
 
   - task: MSBuild@1
-    displayName: 'Restore .NET Framework projects (not SDK-based projects)'
-    inputs:
-      solution: Datadog.Trace.proj
-      platform: '$(buildPlatform)'
-      configuration: '$(buildConfiguration)'
-      msbuildArguments: '/t:Restore'
-      maximumCpuCount: true
-
-  - task: MSBuild@1
     displayName: 'Build .NET Framework projects (not SDK-based projects)'
     inputs:
       solution: Datadog.Trace.proj
