@@ -12,6 +12,11 @@ The SignalFx-Tracing Library for .NET implements the
 [Profiling API](https://docs.microsoft.com/en-us/dotnet/framework/unmanaged-api/profiling/)
 and should only require basic configuration of your application environment.
 
+You can link individual log entries with trace IDs and span IDs associated with
+corresponding events. If your application uses a supported logger, enable trace
+injection to automatically include trace context in your application's logs.
+For more information, see [Inject traces in logs](/customer-samples/AutomaticTraceIdInjection/README.md).
+
 ## Supported libraries and frameworks
 
 .NET Core is supported while .NET Framework is in beta. There are
@@ -66,11 +71,16 @@ manager:
 5. Set the endpoint of a Smart Agent or OpenTelemetry Collector:
     ```bash
     $ export SIGNALFX_ENDPOINT_URL='http://<YourSmartAgentOrCollector>:9080/v1/trace'
-6. Optionally, create the default logging directory:
+    ```
+6. Optionally, enable trace injection in logs:
+    ```bash
+    $ export SIGNALFX_LOGS_INJECTION=true
+    ```
+7. Optionally, create the default logging directory:
     ```bash
     $ source /opt/signalfx-dotnet-tracing/createLogPath.sh
     ```
-7. Run your application:
+8. Run your application:
     ```bash
     $ dotnet run
     ```
@@ -148,7 +158,11 @@ the trace data:
    ```batch
    set SIGNALFX_ENDPOINT_URL='http://<YourSmartAgentOrCollector>:9080/v1/trace'
    ```
-5. Restart your application ensuring that all environment variables above are properly
+5. Optionally, enable trace injection in logs:
+   ```bash
+   $ export SIGNALFX_LOGS_INJECTION=true
+   ```
+6. Restart your application ensuring that all environment variables above are properly
 configured. If you need to check the environment variables for a process use a tool
 like [Process Explorer](https://docs.microsoft.com/en-us/sysinternals/downloads/process-explorer).
 
