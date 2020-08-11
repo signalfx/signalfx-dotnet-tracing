@@ -2,6 +2,8 @@
 using System;
 using System.Data;
 using System.Data.Common;
+using System.Net;
+using System.Net.Sockets;
 
 namespace Datadog.Trace.ExtensionMethods
 {
@@ -70,7 +72,8 @@ namespace Datadog.Trace.ExtensionMethods
             string resourceName,
             string method,
             string host,
-            string httpUrl)
+            string httpUrl,
+            IPAddress remoteIp = null)
         {
             span.Type = SpanTypes.Web;
             span.ResourceName = resourceName?.Trim();
@@ -83,6 +86,16 @@ namespace Datadog.Trace.ExtensionMethods
             span.SetTag(Tags.HttpMethod, method);
             span.SetTag(Tags.HttpRequestHeadersHost, host);
             span.SetTag(Tags.HttpUrl, httpUrl);
+
+            switch (remoteIp?.AddressFamily)
+            {
+                case AddressFamily.InterNetwork:
+                    span.SetTag(Tags.PeerIpV4, remoteIp.ToString());
+                    break;
+                case AddressFamily.InterNetworkV6:
+                    span.SetTag(Tags.PeerIpV6, remoteIp.ToString());
+                    break;
+            }
         }
 
         private static string GetConnectionStringValue(DbConnectionStringBuilder builder, params string[] names)

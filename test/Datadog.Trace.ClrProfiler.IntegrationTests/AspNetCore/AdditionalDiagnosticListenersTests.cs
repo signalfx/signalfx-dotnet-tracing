@@ -19,22 +19,38 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
         public AdditionalDiagnosticListenersTests(ITestOutputHelper output)
             : base("AdditionalDiagnosticListeners", output)
         {
-            CreateTopLevelExpectation(operationName: "api.someaction", url: "/api/api", httpMethod: "GET", httpStatus: "200", resourceUrl: "/api/api");
+            const string operationName = "api.someaction";
+            const string url = "/api/api";
+            const string httpMethod = "GET";
+            const string httpStatus = "200";
+            const string resourceUrl = "/api/api";
+
+            Expectations.Add(CreateTopLevelExpectation(operationName, url, httpMethod, httpStatus, resourceUrl, addClientIpExpectation: false));
+            ExpectationsWithClientIp.Add(CreateTopLevelExpectation(operationName, url, httpMethod, httpStatus, resourceUrl, addClientIpExpectation: true));
         }
 
         protected HttpClient HttpClient { get; } = new HttpClient();
 
         protected List<AspNetCoreMvcSpanExpectation> Expectations { get; set; } = new List<AspNetCoreMvcSpanExpectation>();
 
-        [TargetFrameworkVersionsFact("netcoreapp3.0;netcoreapp3.1")]
+        protected List<AspNetCoreMvcSpanExpectation> ExpectationsWithClientIp { get; set; } = new List<AspNetCoreMvcSpanExpectation>();
+
+        [TargetFrameworkVersionsTheory("netcoreapp3.0;netcoreapp3.1")]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
-        public void AdditionalDiagnosticListenerSpan()
+        [InlineData(false)]
+        [InlineData(true)]
+        public void AdditionalDiagnosticListenerSpan(bool addClientIp)
         {
             var agentPort = TcpPortProvider.GetOpenPort();
             var aspNetCorePort = TcpPortProvider.GetOpenPort();
             var envVars = ZipkinEnvVars;
             envVars["SIGNALFX_INSTRUMENTATION_ASPNETCORE_DIAGNOSTIC_LISTENERS"] = "Unused,HotChocolate.Execution,Another.Unused";
+
+            if (addClientIp)
+            {
+                envVars["SIGNALFX_ADD_CLIENT_IP_TO_SERVER_SPANS"] = "true";
+            }
 
             using (var agent = new MockZipkinCollector(agentPort))
             using (var process = StartSample(agent.Port, arguments: null, packageVersion: string.Empty, aspNetCorePort: aspNetCorePort, envVars: envVars))
@@ -118,26 +134,27 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
 
                 Console.WriteLine($"Spans: {spans}");
 
-                SpanTestHelpers.AssertExpectationsMet(Expectations, spans);
+                var expectations = addClientIp ? ExpectationsWithClientIp : Expectations;
+                SpanTestHelpers.AssertExpectationsMet(expectations, spans);
             }
         }
 
-        protected void CreateTopLevelExpectation(
+        protected AspNetCoreMvcSpanExpectation CreateTopLevelExpectation(
             string operationName,
             string url,
             string httpMethod,
             string httpStatus,
             string resourceUrl,
+            bool addClientIpExpectation,
             Func<IMockSpan, List<string>> additionalCheck = null)
         {
-            var expectation = new AspNetCoreMvcSpanExpectation(EnvironmentHelper.FullSampleName, operationName, operationName, httpStatus, httpMethod)
+            var expectation = new AspNetCoreMvcSpanExpectation(EnvironmentHelper.FullSampleName, operationName, operationName, httpStatus, httpMethod, addClientIpExpectation)
             {
                 OriginalUri = url,
             };
 
             expectation.RegisterDelegateExpectation(additionalCheck);
-
-            Expectations.Add(expectation);
+            return expectation;
         }
 
         protected void SubmitRequests(int aspNetCorePort, string[] paths)

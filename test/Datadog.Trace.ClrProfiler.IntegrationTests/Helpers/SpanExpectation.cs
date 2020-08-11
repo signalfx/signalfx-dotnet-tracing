@@ -112,6 +112,21 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             });
         }
 
+        public void TagShouldNotExist(string tagKey, Func<IMockSpan, bool> when = null)
+        {
+            when ??= Always;
+
+            Assertions.Add(span =>
+            {
+                if (when(span) && span.Tags.ContainsKey(tagKey))
+                {
+                    return $"Tag {tagKey} was found on span, but it was not expected (Value: {span.Tags[tagKey]})";
+                }
+
+                return null;
+            });
+        }
+
         public void RegisterDelegateExpectation(Func<IMockSpan, IEnumerable<string>> expectation)
         {
             if (expectation == null)

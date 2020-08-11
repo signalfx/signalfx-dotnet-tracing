@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -108,7 +107,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             return new ProcessResult(process, standardOutput, standardError, exitCode);
         }
 
-        public Process StartIISExpress(int traceAgentPort, int iisPort)
+        public Process StartIISExpress(int traceAgentPort, int iisPort, bool addClientIp)
         {
             // get full paths to integration definitions
             IEnumerable<string> integrationPaths = Directory.EnumerateFiles(".", "*integrations.json").Select(Path.GetFullPath);
@@ -125,12 +124,19 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
             Output.WriteLine($"[webserver] starting {exe} {string.Join(" ", args)}");
 
+            var envVars = new Dictionary<string, string>();
+            if (addClientIp)
+            {
+                envVars["SIGNALFX_ADD_CLIENT_IP_TO_SERVER_SPANS"] = "true";
+            }
+
             var process = ProfilerHelper.StartProcessWithProfiler(
                 EnvironmentHelper,
                 integrationPaths,
                 arguments: string.Join(" ", args),
                 redirectStandardInput: true,
-                traceAgentPort: traceAgentPort);
+                traceAgentPort: traceAgentPort,
+                envVars: envVars);
 
             var wh = new EventWaitHandle(false, EventResetMode.AutoReset);
 
@@ -241,7 +247,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             HttpStatusCode expectedHttpStatusCode,
             string expectedSpanType,
             string expectedOperationName,
-            string expectedResourceName)
+            string expectedResourceName,
+            bool expectClientIp)
         {
             IImmutableList<IMockSpan> spans;
 
@@ -267,6 +274,16 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             Assert.Equal(expectedSpanType, span.Type);
             Assert.Equal(expectedOperationName, span.Name);
             Assert.Equal(expectedResourceName, span.Resource);
+            Assert.Equal(SpanKinds.Server, span.Tags[Tags.SpanKind]);
+
+            if (expectClientIp)
+            {
+                Assert.Contains(span.Tags, kvp => kvp.Key == "peer.ipv4" || kvp.Key == "peer.ipv6");
+            }
+            else
+            {
+                Assert.DoesNotContain(span.Tags, kvp => kvp.Key == "peer.ipv4" && kvp.Key == "peer.ipv6");
+            }
         }
 
         internal class TupleList<T1, T2> : List<Tuple<T1, T2>>

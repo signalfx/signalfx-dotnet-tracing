@@ -3,6 +3,8 @@ using System;
 using System.Collections;
 using System.Data;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using Datadog.Trace.ExtensionMethods;
 using Moq;
 using Xunit;
@@ -44,6 +46,36 @@ namespace Datadog.Trace.Tests.ExtensionMethods
             Assert.Equal(statement.Length, span.Tags["db.statement"].Length);
             Assert.DoesNotContain("Field=?", span.Tags["db.statement"]);
             Assert.Contains("Field='123'", span.Tags["db.statement"]);
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("172.68.32.1")]
+        [InlineData("2001:db8::2:1")]
+        public void DecorateWebServerSpan(string remoteAddress)
+        {
+            var traceContext = new TraceContext(Tracer.Instance);
+            var spanContext = new SpanContext(null, traceContext, "WebServer");
+            var span = new Span(spanContext, null);
+
+            IPAddress.TryParse(remoteAddress, out var remoteIp);
+            span.DecorateWebServerSpan("resourceName", "METHOD", "host", "httpUrl", remoteIp);
+
+            Assert.Equal("WebServer", span.ServiceName);
+            Assert.Equal("resourceName", span.ResourceName);
+            Assert.Equal("resourceName", span.OperationName);
+            Assert.Equal("server", span.Tags["span.kind"]);
+            Assert.Equal("METHOD", span.Tags["http.method"]);
+            Assert.Equal("host", span.Tags["http.request.headers.host"]);
+            Assert.Equal("httpUrl", span.Tags["http.url"]);
+
+            if (remoteIp != null)
+            {
+                var peerTag = remoteIp.AddressFamily == AddressFamily.InterNetworkV6
+                    ? "peer.ipv6"
+                    : "peer.ipv4";
+                Assert.Equal(remoteAddress, span.Tags[peerTag]);
+            }
         }
     }
 }

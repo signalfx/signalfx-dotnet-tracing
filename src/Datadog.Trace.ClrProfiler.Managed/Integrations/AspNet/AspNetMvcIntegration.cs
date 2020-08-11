@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Routing;
 using Datadog.Trace.ClrProfiler.Emit;
@@ -134,11 +135,18 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                        .Replace("{controller}", controllerName)
                        .Replace("{action}", actionName);
 
+                IPAddress remoteIp = null;
+                if (Tracer.Instance.Settings.AddClientIpToServerSpans)
+                {
+                    IPAddress.TryParse(httpContext.Request.UserHostAddress, out remoteIp);
+                }
+
                 span.DecorateWebServerSpan(
                     resourceName: resourceName,
                     method: httpMethod,
                     host: host,
-                    httpUrl: url);
+                    httpUrl: url,
+                    remoteIp: remoteIp);
                 span.SetTag(Tags.AspNetRoute, route?.Url);
                 span.SetTag(Tags.AspNetController, controllerName);
                 span.SetTag(Tags.AspNetAction, actionName);

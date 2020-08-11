@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Net;
 using Datadog.Trace.ClrProfiler.Emit;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Headers;
@@ -88,11 +89,19 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
                 var span = _rootScope.Span;
 
+                IPAddress remoteIp = null;
+                if (Tracer.Instance.Settings.AddClientIpToServerSpans)
+                {
+                    var userHostAddress = request.GetProperty<string>("UserHostAddress").GetValueOrDefault();
+                    IPAddress.TryParse(userHostAddress, out remoteIp);
+                }
+
                 span.DecorateWebServerSpan(
                     resourceName: resourceName,
                     method: httpMethod,
                     host: host,
-                    httpUrl: absoluteUri);
+                    httpUrl: absoluteUri,
+                    remoteIp: remoteIp);
 
                 var statusCode = response.GetProperty<int>("StatusCode");
 

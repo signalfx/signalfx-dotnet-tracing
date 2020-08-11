@@ -5,8 +5,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
 using System.Net.Http;
+using System.ServiceModel.Channels;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using Datadog.Trace.ClrProfiler.Emit;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Logging;
@@ -246,11 +248,30 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                        .Replace("{controller}", controller)
                        .Replace("{action}", action);
 
+                IPAddress remoteIp = null;
+                if (req != null && Tracer.Instance.Settings.AddClientIpToServerSpans)
+                {
+                    var httpContextWrapper = req.Properties.GetValueOrDefault("MS_HttpContext") as HttpContextWrapper;
+                    if (httpContextWrapper != null)
+                    {
+                        IPAddress.TryParse(httpContextWrapper.Request.UserHostAddress, out remoteIp);
+                    }
+                    else
+                    {
+                        var remoteEndpoint = req.Properties.GetValueOrDefault(RemoteEndpointMessageProperty.Name) as RemoteEndpointMessageProperty;
+                        if (remoteEndpoint != null)
+                        {
+                            IPAddress.TryParse(remoteEndpoint.Address, out remoteIp);
+                        }
+                    }
+                }
+
                 span.DecorateWebServerSpan(
                     resourceName: resourceName,
                     method: method,
                     host: host,
-                    httpUrl: rawUrl);
+                    httpUrl: rawUrl,
+                    remoteIp: remoteIp);
                 span.SetTag(Tags.AspNetAction, action);
                 span.SetTag(Tags.AspNetController, controller);
                 span.SetTag(Tags.AspNetRoute, route);

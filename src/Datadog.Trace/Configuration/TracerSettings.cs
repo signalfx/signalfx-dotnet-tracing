@@ -139,13 +139,11 @@ namespace Datadog.Trace.Configuration
                                                  .Select(s => s.Trim()).ToArray() ??
                                             new string[0];
 
-            AppendUrlPathToName = source?.GetBool(ConfigurationKeys.AppendUrlPathToName) ??
-                           // default value
-                           false;
+            AppendUrlPathToName = source?.GetBool(ConfigurationKeys.AppendUrlPathToName) ?? false;
 
-            UseWebServerResourceAsOperationName = source?.GetBool(ConfigurationKeys.UseWebServerResourceAsOperationName) ??
-                // default value
-                true;
+            UseWebServerResourceAsOperationName = source?.GetBool(ConfigurationKeys.UseWebServerResourceAsOperationName) ?? true;
+
+            AddClientIpToServerSpans = source?.GetBool(ConfigurationKeys.AddClientIpToServerSpans) ?? false;
         }
 
         /// <summary>
@@ -328,8 +326,18 @@ namespace Datadog.Trace.Configuration
         /// This applies to "AspNetMvc" and "AspNetWebApi" instrumentations.
         /// </summary>
         /// <seealso cref="ConfigurationKeys.UseWebServerResourceAsOperationName"/>
-        /// <seealso cref="ExtensionMethods.SpanExtensions.DecorateWebServerSpan(Span, string, string, string, string)"/>
+        /// <seealso cref="ExtensionMethods.SpanExtensions.DecorateWebServerSpan(Span, string, string, string, string, System.Net.IPAddress)"/>
         public bool UseWebServerResourceAsOperationName { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the instrumentations creating server spans, eg.:
+        /// "AspNetMvc", "AspNetWebApi", etc, are going to try to add the client IP as tag using
+        /// the keys "peer.ipv4" or "peer.ipv6" according to the type of client IP (if available).
+        /// Default is value is <c>false</c>.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.AddClientIpToServerSpans"/>
+        /// <seealso cref="ExtensionMethods.SpanExtensions.DecorateWebServerSpan(Span, string, string, string, string, System.Net.IPAddress)"/>
+        public bool AddClientIpToServerSpans { get; set; }
 
         /// <summary>
         /// Gets or sets a value with the SignalFx access token. This is to be used when sending data
