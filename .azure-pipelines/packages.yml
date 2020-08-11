@@ -7,7 +7,7 @@ pr: none
 
 variables:
   buildConfiguration: release
-  dotnetCoreSdkVersion: 3.1.x
+  dotnetCoreSdkVersion: 3.1.302
   publishOutput: $(Build.SourcesDirectory)/src/bin/managed-publish
 
 jobs:
