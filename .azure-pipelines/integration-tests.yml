@@ -24,7 +24,7 @@ jobs:
         dotnetCoreSdkVersion: 3.0.x
         publishTargetFramework: netcoreapp3.0
       netcoreapp3_1:
-        dotnetCoreSdkVersion: 3.1.x
+        dotnetCoreSdkVersion: 3.1.302
         publishTargetFramework: netcoreapp3.1
 
   pool:
@@ -69,7 +69,7 @@ jobs:
         dotnetCoreSdkVersion: 3.0.x
         publishTargetFramework: netcoreapp3.0
       netcoreapp3_1:
-        dotnetCoreSdkVersion: 3.1.x
+        dotnetCoreSdkVersion: 3.1.302
         publishTargetFramework: netcoreapp3.1
 
   pool:
@@ -144,7 +144,7 @@ jobs:
     displayName: install dotnet core sdk 3.1
     inputs:
       packageType: sdk
-      version: 3.1.x
+      version: 3.1.302
 
   - task: NuGetToolInstaller@1
     displayName: install nuget

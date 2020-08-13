@@ -42,7 +42,7 @@ jobs:
     displayName: install dotnet core sdk 3.1
     inputs:
       packageType: sdk
-      version: 3.1.x
+      version: 3.1.302
 
   - task: DotNetCoreCLI@2
     displayName: dotnet restore
@@ -85,7 +85,7 @@ jobs:
     displayName: install dotnet core sdk 3.1
     inputs:
       packageType: sdk
-      version: 3.1.x
+      version: 3.1.302
 
   - task: DotNetCoreCLI@2
     displayName: dotnet build
