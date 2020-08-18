@@ -44,21 +44,15 @@ Use these environment variables to configure the tracing library:
 
 | Environment variable | Default value | Description |
 |-|-|-|
-| `SIGNALFX_DOTNET_TRACER_CONFIG_FILE` |  | The path of the tracer configuration file. |
 | `SIGNALFX_ENV` |  | The value for the `env` tag added to every span. This determines the environment in which the service is available in SignalFx µAPM.  |
 | `SIGNALFX_SERVICE_NAME` |  | The name of the service. |
 | `SIGNALFX_SERVICE_NAME_PER_SPAN_ENABLED` |  | Enable to allow manual instrumentation to have a different service name than the one you specify with `SIGNALFX_SERVICE_NAME`.  Add a tag `service.name` with the desired name to the manual instrumentation. |
 | `SIGNALFX_TRACING_ENABLED` | `true` | Enable to activate the tracer. |
 | `SIGNALFX_TRACE_DEBUG` | `false` | Enable to activate debugging mode for the tracer. |
-| `SIGNALFX_AGENT_HOST` | `localhost` | The endpoint for a SignalFx Smart Agent or OpenTelemetry Collector you send traces to. |
-| `SIGNALFX_TRACE_AGENT_PORT` | `9080` | The port for a SignalFx Smart Agent or OpenTelemetry Collector you send traces to. |
-| `SIGNALFX_ENDPOINT_URL` | `http://localhost:9080/v1/trace` | The hostname and port for a SignalFx Smart Agent or OpenTelemetry Collector. This overrides the `SIGNALFX_AGENT_HOST` and `SIGNALFX_TRACE_AGENT_PORT` values. |
+| `SIGNALFX_ENDPOINT_URL` | `http://localhost:9080/v1/trace` | The hostname and port for a SignalFx Smart Agent or OpenTelemetry Collector. |
 | `SIGNALFX_ACCESS_TOKEN` |  | The access token for your SignalFx organization. Providing a token enables you to send traces to a SignalFx ingest endpoint. |
 | `SIGNALFX_TRACE_GLOBAL_TAGS` |  | Comma-separated list of key-value pairs to specify global span tags. For example: `"key1:val1,key2:val2"` |
-| `SIGNALFX_LOGS_INJECTION` |  | Enable to inject trace IDs and span IDs in logs. This requires a compatible logger or manual configuration. |
-| `SIGNALFX_MAX_TRACES_PER_SECOND` |  | The number of traces the tracing library can submit per second. |
-| `SIGNALFX_TRACE_SAMPLING_RULES` |  | Semi-colon-separated list of custom sampling rules for a service operation based on regular expressions. The tracing library follows rules in the order of specification. The format of a custom sample rule looks like this: `[{"sample_rate":1.0, "service":"serviceName", "name":"operationName"}]`. `service` and `name` are optional. |
-| `SIGNALFX_TRACE_SAMPLE_RATE` |  | The global rate for the sampler. |
+| `SIGNALFX_LOGS_INJECTION` | `false` | Enable to inject trace IDs and span IDs in logs. This requires a compatible logger or manual configuration. |
 | `SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS` |  | Enable to tag the Mongo command `BsonDocument` as a `db.statement`. |
 | `SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES` |  | Enable to tag the Elasticsearch command `PostData` as a `db.statement`. |
 | `SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS` |  | Enable to tag Redis commands as a `db.statement`. |
@@ -68,10 +62,9 @@ Use these environment variables to configure the tracing library:
 | `SIGNALFX_TRACE_LOG_PATH` | Linux: `/var/log/signalfx/dotnet/dotnet-profiler.log`<br>Windows: `%ProgramData%"\SignalFx .NET Tracing\logs\dotnet-profiler.log` | The path of the profiler log file. |
 | `SIGNALFX_APPEND_URL_PATH_TO_NAME` | `false` | Enable to append the absolute URI path to the span name. |
 | `SIGNALFX_USE_WEBSERVER_RESOURCE_AS_OPERATION_NAME` | `true` | Enable to specify the resource name as the span name. This applies only to AspNetMvc and AspNetWebApi. |
-| `SIGNALFX_ADD_CLIENT_IP_TO_SERVER_SPANS` | `false` | Enable to add the client IP as a span tag when a library creates a server span. |
+| `SIGNALFX_ADD_CLIENT_IP_TO_SERVER_SPANS` | `false` | Enable to add the client IP as a span tag when creating a server span. |
 | `SIGNALFX_DIAGNOSTIC_SOURCE_ENABLED` | `true` | Enable to generate troubleshooting logs with the `System.Diagnostics.DiagnosticSource` class. |
-| `SIGNALFX_{0}_ENABLED` |  | Enable to enable an integration. These are the supported integrations: AspNetMvc, AspNetWebApi2, DbCommand, ElasticsearchNet5, ElasticsearchNet6, GraphQL, HttpMessageHandler, IDbCommand, MongoDb, NpgsqlCommand, OpenTracing, ServiceStackRedis, SqlCommand, StackExchangeRedis, Wcf, WebRequest |
-| `SIGNALFX_DISABLED_INTEGRATIONS` |  | The integrations you want to disable, if any, separated by a semi-colon. |
+| `SIGNALFX_DISABLED_INTEGRATIONS` |  | The integrations you want to disable, if any, separated by a semi-colon. These are the supported integrations: AspNetMvc, AspNetWebApi2, DbCommand, ElasticsearchNet5, ElasticsearchNet6, GraphQL, HttpMessageHandler, IDbCommand, MongoDb, NpgsqlCommand, OpenTracing, ServiceStackRedis, SqlCommand, StackExchangeRedis, Wcf, WebRequest |
 
 ### Linux
 
