@@ -47,7 +47,7 @@ Use these environment variables to configure the tracing library:
 | `SIGNALFX_DOTNET_TRACER_CONFIG_FILE` |  | The path of the tracer configuration file. |
 | `SIGNALFX_ENV` |  | The value for the `env` tag added to every span. This determines the environment in which the service is available in SignalFx µAPM.  |
 | `SIGNALFX_SERVICE_NAME` |  | The name of the service. |
-| `SIGNALFX_SERVICE_NAME_PER_SPAN_ENABLED` |  | Enable to allow a span tag to have a different service name than the one you specify with `SIGNALFX_SERVICE_NAME`. |
+| `SIGNALFX_SERVICE_NAME_PER_SPAN_ENABLED` |  | Enable to allow manual instrumentation to have a different service name than the one you specify with `SIGNALFX_SERVICE_NAME`.  Add a tag `service.name` with the desired name to the manual instrumentation. |
 | `SIGNALFX_TRACING_ENABLED` | `true` | Enable to activate the tracer. |
 | `SIGNALFX_TRACE_DEBUG` | `false` | Enable to activate debugging mode for the tracer. |
 | `SIGNALFX_AGENT_HOST` | `localhost` | The endpoint for a SignalFx Smart Agent or OpenTelemetry Collector you send traces to. |
