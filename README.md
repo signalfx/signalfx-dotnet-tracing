@@ -45,7 +45,7 @@ Use these environment variables to configure the tracing library:
 | Environment variable | Default value | Description |
 |-|-|-|
 | `SIGNALFX_DOTNET_TRACER_CONFIG_FILE` |  | The path of the tracer configuration file. |
-| `SIGNALFX_ENV` |  | The environment span tag. This determines the environment in which the service is available in SignalFx µAPM.   |
+| `SIGNALFX_ENV` |  | The value for the `env` tag added to every span. This determines the environment in which the service is available in SignalFx µAPM.  |
 | `SIGNALFX_SERVICE_NAME` |  | The name of the service. |
 | `SIGNALFX_SERVICE_NAME_PER_SPAN_ENABLED` |  | Enable to allow a span tag to have a different service name than the one you specify with `SIGNALFX_SERVICE_NAME`. |
 | `SIGNALFX_TRACING_ENABLED` | `true` | Enable to activate the tracer. |
