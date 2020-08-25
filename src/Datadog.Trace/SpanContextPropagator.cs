@@ -34,7 +34,7 @@ namespace Datadog.Trace
             // lock sampling priority when span propagates.
             context.TraceContext?.LockSamplingPriority();
 
-            headers.Set(HttpHeaderNames.TraceId, context.TraceId.ToString(InvariantCulture));
+            headers.Set(HttpHeaderNames.TraceId, context.TraceId.ToString("N"));
             headers.Set(HttpHeaderNames.ParentId, context.SpanId.ToString(InvariantCulture));
 
             var samplingPriority = (int?)(context.TraceContext?.SamplingPriority ?? context.SamplingPriority);
@@ -56,9 +56,9 @@ namespace Datadog.Trace
                 throw new ArgumentNullException(nameof(headers));
             }
 
-            var traceId = ParseUInt64(headers, HttpHeaderNames.TraceId);
+            var traceId = ParseGuid(headers, HttpHeaderNames.TraceId);
 
-            if (traceId == 0)
+            if (traceId == Guid.Empty)
             {
                 // a valid traceId is required to use distributed tracing
                 return null;
@@ -68,6 +68,32 @@ namespace Datadog.Trace
             var samplingPriority = ParseEnum<SamplingPriority>(headers, HttpHeaderNames.SamplingPriority);
 
             return new SpanContext(traceId, parentId, samplingPriority);
+        }
+
+        private static Guid ParseGuid(IHeadersCollection headers, string headerName)
+        {
+            var headerValues = headers.GetValues(headerName).ToList();
+
+            if (headerValues.Count > 0)
+            {
+                foreach (string headerValue in headerValues)
+                {
+                    var candidate = headerValue;
+                    if (candidate.Length == 16)
+                    {
+                        candidate = "0000000000000000" + headerValue;
+                    }
+
+                    if (Guid.TryParse(candidate, out var result))
+                    {
+                        return result;
+                    }
+                }
+
+                Log.Information("Could not parse {0} headers: {1}", headerName, string.Join(",", headerValues));
+            }
+
+            return Guid.Empty;
         }
 
         private static ulong ParseUInt64(IHeadersCollection headers, string headerName)

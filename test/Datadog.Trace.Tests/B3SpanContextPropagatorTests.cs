@@ -1,4 +1,5 @@
 // Modified by SignalFx
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -21,11 +22,11 @@ namespace Datadog.Trace.Tests
             const SamplingPriority samplingPriority = SamplingPriority.AutoKeep;
 
             IHeadersCollection headers = new HttpRequestMessage().Headers.Wrap();
-            var context = new SpanContext(traceId, spanId, samplingPriority);
+            var context = new SpanContext(Guid.Parse(traceId.ToString("x32")), spanId, samplingPriority);
 
             B3SpanContextPropagator.Instance.Inject(context, headers);
 
-            AssertExpected(headers, HttpHeaderNames.B3TraceId, "ffffffffffffffff");
+            AssertExpected(headers, HttpHeaderNames.B3TraceId, "0000000000000000ffffffffffffffff");
             AssertExpected(headers, HttpHeaderNames.B3SpanId, "fffffffffffffffe");
             AssertExpected(headers, HttpHeaderNames.B3Sampled, "1");
             AssertMissing(headers, HttpHeaderNames.B3ParentId);
@@ -47,7 +48,7 @@ namespace Datadog.Trace.Tests
             const SamplingPriority samplingPriority = SamplingPriority.UserKeep;
 
             IHeadersCollection headers = new HttpRequestMessage().Headers.Wrap();
-            var parentContext = new SpanContext(traceId, spanId, samplingPriority);
+            var parentContext = new SpanContext(Guid.Parse(traceId.ToString("x32")), spanId, samplingPriority);
             var traceContext = new TraceContext(null)
             {
                 SamplingPriority = samplingPriority
@@ -57,7 +58,7 @@ namespace Datadog.Trace.Tests
 
             B3SpanContextPropagator.Instance.Inject(context, headers);
 
-            AssertExpected(headers, HttpHeaderNames.B3TraceId, "ffffffffffffffff");
+            AssertExpected(headers, HttpHeaderNames.B3TraceId, "0000000000000000ffffffffffffffff");
             AssertExpected(headers, HttpHeaderNames.B3SpanId, context.SpanId.ToString("x16"));
             AssertExpected(headers, HttpHeaderNames.B3ParentId, "fffffffffffffffe");
             AssertExpected(headers, HttpHeaderNames.B3Flags, "1");
@@ -79,11 +80,11 @@ namespace Datadog.Trace.Tests
             const SamplingPriority samplingPriority = SamplingPriority.AutoReject;
 
             IHeadersCollection headers = WebRequest.CreateHttp("http://localhost").Headers.Wrap();
-            var context = new SpanContext(traceId, spanId, samplingPriority);
+            var context = new SpanContext(Guid.Parse(traceId.ToString("x32")), spanId, samplingPriority);
 
             B3SpanContextPropagator.Instance.Inject(context, headers);
 
-            AssertExpected(headers, HttpHeaderNames.B3TraceId, "000000007fffffff");
+            AssertExpected(headers, HttpHeaderNames.B3TraceId, "0000000000000000000000007fffffff");
             AssertExpected(headers, HttpHeaderNames.B3SpanId, "000000007ffffffe");
             AssertExpected(headers, HttpHeaderNames.B3Sampled, "0");
             AssertMissing(headers, HttpHeaderNames.B3ParentId);
@@ -122,14 +123,15 @@ namespace Datadog.Trace.Tests
             const ulong traceId = 12345678;
             const SamplingPriority samplingPriority = SamplingPriority.UserKeep;
 
+            var traceIdStr = traceId.ToString("x32", CultureInfo.InvariantCulture);
             var headers = InjectContext(
-                traceId.ToString("x16", CultureInfo.InvariantCulture),
+                traceIdStr,
                 spanId,
                 ((int)samplingPriority).ToString(CultureInfo.InvariantCulture));
             var resultContext = B3SpanContextPropagator.Instance.Extract(headers);
 
             Assert.NotNull(resultContext);
-            Assert.Equal(traceId, resultContext.TraceId);
+            Assert.Equal(Guid.Parse(traceIdStr), resultContext.TraceId);
             Assert.Equal(default(ulong), resultContext.SpanId);
             Assert.Equal(samplingPriority, resultContext.SamplingPriority);
         }
@@ -143,14 +145,15 @@ namespace Datadog.Trace.Tests
             const ulong traceId = 12345678;
             const ulong spanId = 23456789;
 
+            var traceIdStr = traceId.ToString("x32", CultureInfo.InvariantCulture);
             var headers = InjectContext(
-                traceId.ToString("x16", CultureInfo.InvariantCulture),
+                traceIdStr,
                 spanId.ToString("x16", CultureInfo.InvariantCulture),
                 samplingPriority);
             var resultContext = B3SpanContextPropagator.Instance.Extract(headers);
 
             Assert.NotNull(resultContext);
-            Assert.Equal(traceId, resultContext.TraceId);
+            Assert.Equal(traceIdStr, resultContext.TraceId.ToString("N"));
             Assert.Equal(spanId, resultContext.SpanId);
             Assert.Null(resultContext.SamplingPriority);
         }

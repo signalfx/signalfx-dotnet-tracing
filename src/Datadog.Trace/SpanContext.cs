@@ -24,7 +24,7 @@ namespace Datadog.Trace
         /// <param name="spanId">The propagated span id.</param>
         /// <param name="samplingPriority">The propagated sampling priority.</param>
         /// <param name="serviceName">The service name to propagate to child spans.</param>
-        public SpanContext(ulong? traceId, ulong spanId, SamplingPriority? samplingPriority, string serviceName = null)
+        public SpanContext(Guid traceId, ulong spanId, SamplingPriority? samplingPriority, string serviceName = null)
             : this(traceId, serviceName)
         {
             SpanId = spanId;
@@ -39,18 +39,18 @@ namespace Datadog.Trace
         /// <param name="traceContext">The trace context.</param>
         /// <param name="serviceName">The service name to propagate to child spans.</param>
         internal SpanContext(ISpanContext parent, ITraceContext traceContext, string serviceName)
-            : this(parent?.TraceId, serviceName)
+            : this(parent != null ? parent.TraceId : Guid.Empty, serviceName)
         {
             SpanId = _random.Value.NextUInt63();
             Parent = parent;
             TraceContext = traceContext;
         }
 
-        private SpanContext(ulong? traceId, string serviceName)
+        private SpanContext(Guid traceId, string serviceName)
         {
-            TraceId = traceId > 0
-                          ? traceId.Value
-                          : _random.Value.NextUInt63();
+            TraceId = traceId != Guid.Empty
+                          ? traceId
+                          : Guid.NewGuid();
 
             ServiceName = serviceName;
         }
@@ -63,7 +63,7 @@ namespace Datadog.Trace
         /// <summary>
         /// Gets the trace id
         /// </summary>
-        public ulong TraceId { get; }
+        public Guid TraceId { get; }
 
         /// <summary>
         /// Gets the span id of the parent span

@@ -99,7 +99,7 @@ namespace Datadog.Trace.Logging
 
         private void SetDefaultValues()
         {
-            SetCorrelationIdentifierContext(0, 0);
+            SetCorrelationIdentifierContext(Guid.Empty, 0);
         }
 
         private void RemoveLastCorrelationIdentifierContext()
@@ -130,7 +130,7 @@ namespace Datadog.Trace.Logging
             }
         }
 
-        private void SetCorrelationIdentifierContext(ulong traceId, ulong spanId)
+        private void SetCorrelationIdentifierContext(Guid traceId, ulong spanId)
         {
             if (!_safeToAddToMdc)
             {
@@ -142,7 +142,7 @@ namespace Datadog.Trace.Logging
                 // TODO: Debug logs
                 _contextDisposalStack.Push(
                     LogProvider.OpenMappedContext(
-                        CorrelationIdentifier.TraceIdKey, traceId.ToString("x16"), destructure: false));
+                        CorrelationIdentifier.TraceIdKey, traceId.ToString("N"), destructure: false));
                 _contextDisposalStack.Push(
                     LogProvider.OpenMappedContext(
                         CorrelationIdentifier.SpanIdKey, spanId.ToString("x16"), destructure: false));

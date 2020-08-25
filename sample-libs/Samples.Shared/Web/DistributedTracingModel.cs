@@ -1,3 +1,5 @@
+// Modified by SignalFx
+using System;
 using System.Collections.Generic;
 
 namespace Samples.Shared.Web
@@ -11,7 +13,7 @@ namespace Samples.Shared.Web
             string serviceName,
             string operationName,
             string resourceName,
-            ulong? traceId,
+            Guid traceId,
             ulong? spanId)
         {
             if (Spans == null)
@@ -39,7 +41,7 @@ namespace Samples.Shared.Web
         public string ServiceName { get; set; }
         public string OperationName { get; set; }
         public string ResourceName { get; set; }
-        public ulong? TraceId { get; set; }
+        public Guid TraceId { get; set; }
         public ulong? SpanId { get; set; }
     }
 }

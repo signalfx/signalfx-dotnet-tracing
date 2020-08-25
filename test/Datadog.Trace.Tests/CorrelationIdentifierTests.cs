@@ -1,3 +1,4 @@
+using System;
 using Datadog.Trace.Agent;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Sampling;
@@ -17,16 +18,16 @@ namespace Datadog.Trace.Tests
             var childScope = Tracer.Instance.StartActive("child");
             var childSpan = childScope.Span;
 
-            Assert.Equal<ulong>(childSpan.SpanId, CorrelationIdentifier.SpanId);
-            Assert.Equal<ulong>(childSpan.TraceId, CorrelationIdentifier.TraceId);
+            Assert.Equal(childSpan.SpanId, CorrelationIdentifier.SpanId);
+            Assert.Equal(childSpan.TraceId, CorrelationIdentifier.TraceId);
             childScope.Close();
 
-            Assert.Equal<ulong>(parentSpan.SpanId, CorrelationIdentifier.SpanId);
-            Assert.Equal<ulong>(parentSpan.TraceId, CorrelationIdentifier.TraceId);
+            Assert.Equal(parentSpan.SpanId, CorrelationIdentifier.SpanId);
+            Assert.Equal(parentSpan.TraceId, CorrelationIdentifier.TraceId);
             parentScope.Close();
 
             Assert.Equal<ulong>(0, CorrelationIdentifier.SpanId);
-            Assert.Equal<ulong>(0, CorrelationIdentifier.TraceId);
+            Assert.Equal(Guid.Empty, CorrelationIdentifier.TraceId);
         }
     }
 }

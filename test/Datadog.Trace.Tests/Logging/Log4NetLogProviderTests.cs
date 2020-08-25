@@ -1,4 +1,5 @@
 // Modified by SignalFx
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -93,7 +94,7 @@ namespace Datadog.Trace.Tests.Logging
             // Scope: Default values of TraceId=0,SpanId=0
             // Custom property: N/A
             logEvent = filteredLogs[logIndex++];
-            logEvent.Contains(traceId: 0, spanId: 0);
+            logEvent.Contains(traceId: Guid.Empty, spanId: 0);
             Assert.DoesNotContain(LoggingProviderTestHelpers.CustomPropertyName, logEvent.Properties.GetKeys());
         }
 
