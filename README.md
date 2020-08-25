@@ -19,8 +19,7 @@ For more information, see [Inject traces in logs](/customer-samples/AutomaticTra
 
 ## Supported libraries and frameworks
 
-.NET Core is supported while .NET Framework is in beta. There are
-[known .NET Core runtime issues](https://github.com/dotnet/coreclr/issues/18448)
+There are [known .NET Core runtime issues](https://github.com/dotnet/coreclr/issues/18448)
 for version 2.1.0 and 2.1.2.
 
 | Library | Versions Supported | Notes |
