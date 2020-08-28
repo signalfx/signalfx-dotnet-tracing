@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -15,9 +16,10 @@ namespace Datadog.Trace.Tests
         private static readonly ConcurrentDictionary<ulong, ulong> _generatedIds = new ConcurrentDictionary<ulong, ulong>();
 
         /// <summary>
-        /// The max value of the Ids we create should be a 63 bit unsigned number
+        /// The max value of the Ids created is limited by the "nibble" version of a Guid".
+        /// In order to not have bias in this regard the tesst code zeroes that nibble.
         /// </summary>
-        private static ulong _maxId = ulong.MaxValue / 2;
+        private static ulong _maxId = 0x0FFFFFFFFFFFFFFF;
         private static int _numberOfBuckets = 20;
         private static ulong _numberOfIdsToGenerate = 1_500_000;
 
@@ -157,7 +159,7 @@ namespace Datadog.Trace.Tests
                 {
                     var id = GenerateId();
                     _generatedIds.AddOrUpdate(
-                        key: id,
+                        key: id & _maxId,
                         addValue: 1,
                         updateValueFactory: (key, oldValue) => oldValue++);
                 });
