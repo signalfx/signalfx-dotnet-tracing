@@ -1,4 +1,3 @@
-// Modified by SignalFx
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -168,9 +167,9 @@ namespace Datadog.Trace.Agent
             }
         }
 
-        private static HashSet<Guid> GetUniqueTraceIds(Span[][] traces)
+        private static HashSet<ulong> GetUniqueTraceIds(Span[][] traces)
         {
-            var uniqueTraceIds = new HashSet<Guid>();
+            var uniqueTraceIds = new HashSet<ulong>();
 
             foreach (var trace in traces)
             {

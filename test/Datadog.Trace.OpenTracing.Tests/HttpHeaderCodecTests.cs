@@ -27,7 +27,7 @@ namespace Datadog.Trace.OpenTracing.Tests
             var spanContext = _codec.Extract(headers) as OpenTracingSpanContext;
 
             Assert.NotNull(spanContext);
-            Assert.Equal(traceId.ToString("x32"), spanContext.Context.TraceId.ToString("N"));
+            Assert.Equal(traceId, spanContext.Context.TraceId);
             Assert.Equal(parentId, spanContext.Context.SpanId);
         }
 
@@ -46,7 +46,7 @@ namespace Datadog.Trace.OpenTracing.Tests
             var spanContext = _codec.Extract(headers) as OpenTracingSpanContext;
 
             Assert.NotNull(spanContext);
-            Assert.Equal(traceId.ToString("x32"), spanContext.Context.TraceId.ToString("N"));
+            Assert.Equal(traceId, spanContext.Context.TraceId);
             Assert.Equal(parentId, spanContext.Context.SpanId);
         }
 
@@ -57,14 +57,14 @@ namespace Datadog.Trace.OpenTracing.Tests
             const ulong traceId = 7;
             const SamplingPriority samplingPriority = SamplingPriority.UserKeep;
 
-            var ddSpanContext = new SpanContext(Guid.Parse(traceId.ToString("x32")), spanId, samplingPriority);
+            var ddSpanContext = new SpanContext(traceId, spanId, samplingPriority);
             var spanContext = new OpenTracingSpanContext(ddSpanContext);
             var headers = new MockTextMap();
 
             _codec.Inject(spanContext, headers);
 
             Assert.Equal(spanId.ToString("x16"), headers.Get(HttpHeaderParentId));
-            Assert.Equal(traceId.ToString("x32"), headers.Get(HttpHeaderTraceId));
+            Assert.Equal(traceId.ToString("x16"), headers.Get(HttpHeaderTraceId));
             Assert.Equal("1", headers.Get(HttpHeaderDebugSamplingPriority));
         }
     }

@@ -19,10 +19,8 @@ namespace Datadog.Trace.Tests.Logging
         internal static readonly int CustomPropertyValue = 1;
         internal static readonly string LogPrefix = "[Datadog.Trace.Tests.Logging]";
 
-        private const string Log4NetTraceIdExpectedStringFormat = "\"{0}\":\"{1:N}\"";
-        private const string Log4NetSpanIdExpectedStringFormat = "\"{0}\":\"{1:x16}\"";
-        private const string SerilogTraceIdExpectedStringFormat = "{0}: \"{1:N}\"";
-        private const string SerilogSpanIdExpectedStringFormat = "{0}: \"{1:x16}\"";
+        private const string Log4NetExpectedStringFormat = "\"{0}\":\"{1:x16}\"";
+        private const string SerilogExpectedStringFormat = "{0}: \"{1:x16}\"";
 
         internal static Tracer InitializeTracer(bool enableLogsInjection)
         {
@@ -63,11 +61,11 @@ namespace Datadog.Trace.Tests.Logging
             logEvent.Contains(scope.Span.TraceId, scope.Span.SpanId);
         }
 
-        internal static void Contains(this log4net.Core.LoggingEvent logEvent, Guid traceId, ulong spanId)
+        internal static void Contains(this log4net.Core.LoggingEvent logEvent, ulong traceId, ulong spanId)
         {
             // First, verify that the properties are attached to the LogEvent
             Assert.Contains(CorrelationIdentifier.TraceIdKey, logEvent.Properties.GetKeys());
-            // TODO: Assert.Equal<ulong>(traceId, Convert.ToUInt64(logEvent.Properties[CorrelationIdentifier.TraceIdKey].ToString(), 16));
+            Assert.Equal<ulong>(traceId, Convert.ToUInt64(logEvent.Properties[CorrelationIdentifier.TraceIdKey].ToString(), 16));
             Assert.Contains(CorrelationIdentifier.SpanIdKey, logEvent.Properties.GetKeys());
             Assert.Equal<ulong>(spanId, Convert.ToUInt64(logEvent.Properties[CorrelationIdentifier.SpanIdKey].ToString(), 16));
 
@@ -75,8 +73,8 @@ namespace Datadog.Trace.Tests.Logging
             // values in quotes, since they are string values
             var layout = new Log4NetLogProviderTests.Log4NetJsonLayout();
             string formattedMessage = layout.Format(logEvent);
-            Assert.Contains(string.Format(Log4NetTraceIdExpectedStringFormat, CorrelationIdentifier.TraceIdKey, traceId), formattedMessage);
-            Assert.Contains(string.Format(Log4NetSpanIdExpectedStringFormat, CorrelationIdentifier.SpanIdKey, spanId), formattedMessage);
+            Assert.Contains(string.Format(Log4NetExpectedStringFormat, CorrelationIdentifier.TraceIdKey, traceId), formattedMessage);
+            Assert.Contains(string.Format(Log4NetExpectedStringFormat, CorrelationIdentifier.SpanIdKey, spanId), formattedMessage);
         }
 
         internal static void Contains(this Serilog.Events.LogEvent logEvent, Scope scope)
@@ -84,11 +82,11 @@ namespace Datadog.Trace.Tests.Logging
             logEvent.Contains(scope.Span.TraceId, scope.Span.SpanId);
         }
 
-        internal static void Contains(this Serilog.Events.LogEvent logEvent, Guid traceId, ulong spanId)
+        internal static void Contains(this Serilog.Events.LogEvent logEvent, ulong traceId, ulong spanId)
         {
             // First, verify that the properties are attached to the LogEvent
             Assert.True(logEvent.Properties.ContainsKey(CorrelationIdentifier.TraceIdKey));
-            // TODO: Assert.Equal(traceId, Convert.ToUInt64(logEvent.Properties[CorrelationIdentifier.TraceIdKey].ToString().Trim(new[] { '\"' }), 16));
+            Assert.Equal<ulong>(traceId, Convert.ToUInt64(logEvent.Properties[CorrelationIdentifier.TraceIdKey].ToString().Trim(new[] { '\"' }), 16));
             Assert.True(logEvent.Properties.ContainsKey(CorrelationIdentifier.SpanIdKey));
             Assert.Equal<ulong>(spanId, Convert.ToUInt64(logEvent.Properties[CorrelationIdentifier.SpanIdKey].ToString().Trim(new[] { '\"' }), 16));
 
@@ -104,8 +102,8 @@ namespace Datadog.Trace.Tests.Logging
             textFormatter.Format(logEvent, sw);
             var formattedMessage = sw.ToString();
 
-            Assert.Contains(string.Format(SerilogTraceIdExpectedStringFormat, CorrelationIdentifier.TraceIdKey, traceId), formattedMessage);
-            Assert.Contains(string.Format(SerilogSpanIdExpectedStringFormat, CorrelationIdentifier.SpanIdKey, spanId), formattedMessage);
+            Assert.Contains(string.Format(SerilogExpectedStringFormat, CorrelationIdentifier.TraceIdKey, traceId), formattedMessage);
+            Assert.Contains(string.Format(SerilogExpectedStringFormat, CorrelationIdentifier.SpanIdKey, spanId), formattedMessage);
         }
     }
 }

@@ -40,7 +40,7 @@ namespace Datadog.Trace.Agent
 
             packer.PackMapHeader(len);
             packer.PackString("trace_id");
-            packer.Pack(value.Context.TraceId.ToString("N"));
+            packer.Pack(value.Context.TraceId);
             packer.PackString("span_id");
             packer.Pack(value.Context.SpanId);
             packer.PackString("name");

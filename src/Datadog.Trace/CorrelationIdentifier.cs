@@ -14,11 +14,11 @@ namespace Datadog.Trace
         /// <summary>
         /// Gets the trace id
         /// </summary>
-        public static Guid TraceId
+        public static ulong TraceId
         {
             get
             {
-                return Tracer.Instance.ActiveScope?.Span != null ? Tracer.Instance.ActiveScope.Span.TraceId : Guid.Empty;
+                return Tracer.Instance.ActiveScope?.Span?.TraceId ?? 0;
             }
         }
 

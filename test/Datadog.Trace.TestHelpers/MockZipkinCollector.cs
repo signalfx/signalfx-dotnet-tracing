@@ -229,9 +229,9 @@ namespace Datadog.Trace.TestHelpers
                 _zipkinData = new Dictionary<string, JToken>();
             }
 
-            public Guid TraceId
+            public ulong TraceId
             {
-                get => Guid.Parse(_zipkinData["traceId"].ToString());
+                get => Convert.ToUInt64(_zipkinData["traceId"].ToString(), 16);
             }
 
             public ulong SpanId

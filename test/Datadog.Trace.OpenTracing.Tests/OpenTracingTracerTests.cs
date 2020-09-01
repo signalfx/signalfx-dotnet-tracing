@@ -147,7 +147,7 @@ namespace Datadog.Trace.OpenTracing.Tests
 
             _tracer.Inject(span.Context, BuiltinFormats.HttpHeaders, headers);
 
-            Assert.Equal(span.DDSpan.Context.TraceId.ToString("N"), headers.Get(HttpHeaderNames.B3TraceId));
+            Assert.Equal(span.DDSpan.Context.TraceId.ToString("x16"), headers.Get(HttpHeaderNames.B3TraceId));
             Assert.Equal(span.DDSpan.Context.SpanId.ToString("x16"), headers.Get(HttpHeaderNames.B3SpanId));
         }
 
@@ -159,7 +159,7 @@ namespace Datadog.Trace.OpenTracing.Tests
 
             _tracer.Inject(span.Context, BuiltinFormats.TextMap, headers);
 
-            Assert.Equal(span.DDSpan.Context.TraceId.ToString("N"), headers.Get(HttpHeaderNames.B3TraceId));
+            Assert.Equal(span.DDSpan.Context.TraceId.ToString("x16"), headers.Get(HttpHeaderNames.B3TraceId));
             Assert.Equal(span.DDSpan.Context.SpanId.ToString("x16"), headers.Get(HttpHeaderNames.B3SpanId));
         }
 
@@ -185,7 +185,7 @@ namespace Datadog.Trace.OpenTracing.Tests
             var otSpanContext = (OpenTracingSpanContext)_tracer.Extract(BuiltinFormats.HttpHeaders, headers);
 
             Assert.Equal(parentId, otSpanContext.Context.SpanId);
-            Assert.Equal(traceId.ToString("x32"), otSpanContext.Context.TraceId.ToString("N"));
+            Assert.Equal(traceId, otSpanContext.Context.TraceId);
         }
 
         [Fact]
@@ -200,7 +200,7 @@ namespace Datadog.Trace.OpenTracing.Tests
             var otSpanContext = (OpenTracingSpanContext)_tracer.Extract(BuiltinFormats.TextMap, headers);
 
             Assert.Equal(parentId, otSpanContext.Context.SpanId);
-            Assert.Equal(traceId.ToString("x32"), otSpanContext.Context.TraceId.ToString("N"));
+            Assert.Equal(traceId, otSpanContext.Context.TraceId);
         }
 
         [Fact]

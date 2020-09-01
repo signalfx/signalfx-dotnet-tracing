@@ -16,9 +16,9 @@ namespace Datadog.Trace.TestHelpers
     /// </summary>
     public static class ZipkinHelpers
     {
-        public static Guid TraceId(this JToken obj)
+        public static ulong TraceId(this JToken obj)
         {
-            return Guid.Parse(obj.FirstDictionary()["traceId"].ToString());
+            return Convert.ToUInt64(obj.FirstDictionary()["traceId"].ToString(), 16);
         }
 
         public static ulong SpanId(this JToken obj)

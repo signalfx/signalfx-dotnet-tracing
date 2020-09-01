@@ -120,11 +120,11 @@ namespace Datadog.Trace.Tests
             const ulong parentId = 7;
             const SamplingPriority samplingPriority = SamplingPriority.UserKeep;
 
-            var parent = new SpanContext(Guid.Parse(traceId.ToString("x32")), parentId, samplingPriority);
+            var parent = new SpanContext(traceId, parentId, samplingPriority);
             var child = _tracer.StartActive("Child", parent);
 
             Assert.True(child.Span.IsRootSpan);
-            Assert.Equal(traceId.ToString("x32"), parent.TraceId.ToString("N"));
+            Assert.Equal(traceId, parent.TraceId);
             Assert.Equal(parentId, parent.SpanId);
             Assert.Null(parent.TraceContext);
             Assert.Equal(parent, child.Span.Context.Parent);

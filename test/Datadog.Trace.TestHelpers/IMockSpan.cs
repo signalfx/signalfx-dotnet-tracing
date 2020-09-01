@@ -1,12 +1,11 @@
 // Modified by SignalFx
-using System;
 using System.Collections.Generic;
 
 namespace Datadog.Trace.TestHelpers
 {
     public interface IMockSpan
     {
-            public Guid TraceId { get; }
+            public ulong TraceId { get; }
 
             public ulong SpanId { get; }
 

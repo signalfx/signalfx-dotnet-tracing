@@ -221,7 +221,7 @@ namespace Datadog.Trace.TestHelpers
         public struct Span : IMockSpan
         {
             [Key("trace_id")]
-            public Guid TraceId { get; set; }
+            public ulong TraceId { get; set; }
 
             [Key("span_id")]
             public ulong SpanId { get; set; }

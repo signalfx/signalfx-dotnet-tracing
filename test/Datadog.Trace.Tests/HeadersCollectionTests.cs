@@ -1,5 +1,3 @@
-// Modified by SignalFx
-using System;
 using System.Globalization;
 using System.Net;
 using System.Net.Http;
@@ -25,7 +23,7 @@ namespace Datadog.Trace.Tests
             const SamplingPriority samplingPriority = SamplingPriority.UserKeep;
 
             IHeadersCollection headers = new HttpRequestMessage().Headers.Wrap();
-            var context = new SpanContext(Guid.Parse(traceId.ToString("x32")), spanId, samplingPriority);
+            var context = new SpanContext(traceId, spanId, samplingPriority);
 
             SpanContextPropagator.Instance.Inject(context, headers);
             var resultContext = SpanContextPropagator.Instance.Extract(headers);
@@ -44,7 +42,7 @@ namespace Datadog.Trace.Tests
             const SamplingPriority samplingPriority = SamplingPriority.UserKeep;
 
             IHeadersCollection headers = WebRequest.CreateHttp("http://localhost").Headers.Wrap();
-            var context = new SpanContext(Guid.Parse(traceId.ToString("x32")), spanId, samplingPriority);
+            var context = new SpanContext(traceId, spanId, samplingPriority);
 
             SpanContextPropagator.Instance.Inject(context, headers);
             var resultContext = SpanContextPropagator.Instance.Extract(headers);
@@ -81,14 +79,14 @@ namespace Datadog.Trace.Tests
             const SamplingPriority samplingPriority = SamplingPriority.UserKeep;
 
             var headers = InjectContext(
-                traceId.ToString("x16"),
+                traceId.ToString(CultureInfo.InvariantCulture),
                 spanId,
                 ((int)samplingPriority).ToString(CultureInfo.InvariantCulture));
 
             var resultContext = SpanContextPropagator.Instance.Extract(headers);
 
             Assert.NotNull(resultContext);
-            Assert.Equal(Guid.Parse(traceId.ToString("x32")), resultContext.TraceId);
+            Assert.Equal(traceId, resultContext.TraceId);
             Assert.Equal(default(ulong), resultContext.SpanId);
             Assert.Equal(samplingPriority, resultContext.SamplingPriority);
         }
@@ -103,14 +101,14 @@ namespace Datadog.Trace.Tests
             const ulong spanId = 7;
 
             var headers = InjectContext(
-                traceId.ToString("x16"),
+                traceId.ToString(CultureInfo.InvariantCulture),
                 spanId.ToString(CultureInfo.InvariantCulture),
                 samplingPriority);
 
             var resultContext = SpanContextPropagator.Instance.Extract(headers);
 
             Assert.NotNull(resultContext);
-            Assert.Equal(Guid.Parse(traceId.ToString("x32")), resultContext.TraceId);
+            Assert.Equal(traceId, resultContext.TraceId);
             Assert.Equal(spanId, resultContext.SpanId);
             Assert.Null(resultContext.SamplingPriority);
         }

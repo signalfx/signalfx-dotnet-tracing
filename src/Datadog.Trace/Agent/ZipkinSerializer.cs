@@ -92,7 +92,7 @@ namespace Datadog.Trace.Agent
 
             public string TraceId
             {
-                get => _span.Context.TraceId.ToString("N");
+                get => _span.Context.TraceId.ToString("x16");
             }
 
             public string ParentId

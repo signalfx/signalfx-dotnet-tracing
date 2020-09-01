@@ -1,6 +1,3 @@
-// Modified by SignalFx
-using System;
-
 namespace Datadog.Trace
 {
     /// <summary>
@@ -11,7 +8,7 @@ namespace Datadog.Trace
         /// <summary>
         /// Gets the trace identifier.
         /// </summary>
-        Guid TraceId { get; }
+        ulong TraceId { get; }
 
         /// <summary>
         /// Gets the span identifier.

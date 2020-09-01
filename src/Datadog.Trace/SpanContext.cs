@@ -23,7 +23,7 @@ namespace Datadog.Trace
         /// <param name="spanId">The propagated span id.</param>
         /// <param name="samplingPriority">The propagated sampling priority.</param>
         /// <param name="serviceName">The service name to propagate to child spans.</param>
-        public SpanContext(Guid traceId, ulong spanId, SamplingPriority? samplingPriority, string serviceName = null)
+        public SpanContext(ulong? traceId, ulong spanId, SamplingPriority? samplingPriority, string serviceName = null)
             : this(traceId, serviceName)
         {
             SpanId = spanId;
@@ -38,7 +38,7 @@ namespace Datadog.Trace
         /// <param name="traceContext">The trace context.</param>
         /// <param name="serviceName">The service name to propagate to child spans.</param>
         internal SpanContext(ISpanContext parent, ITraceContext traceContext, string serviceName)
-            : this(parent != null ? parent.TraceId : Guid.Empty, serviceName)
+            : this(parent?.TraceId, serviceName)
         {
             if (SpanId == 0)
             {
@@ -49,20 +49,19 @@ namespace Datadog.Trace
             TraceContext = traceContext;
         }
 
-        private SpanContext(Guid traceId, string serviceName)
+        private SpanContext(ulong? traceId, string serviceName)
         {
-            if (traceId != Guid.Empty)
+            ServiceName = serviceName;
+            if (traceId != 0)
             {
-                TraceId = traceId;
-            }
-            else
-            {
-                // This is the root span.
-                TraceId = Guid.NewGuid();
-                SpanId = BitConverter.ToUInt64(TraceId.ToByteArray(), 0);
+                TraceId = traceId.Value;
+                return;
             }
 
-            ServiceName = serviceName;
+            // This is the root span.
+            var guid = Guid.NewGuid();
+            TraceId = BitConverter.ToUInt64(guid.ToByteArray(), 0);
+            SpanId = TraceId;
         }
 
         /// <summary>
@@ -73,7 +72,7 @@ namespace Datadog.Trace
         /// <summary>
         /// Gets the trace id
         /// </summary>
-        public Guid TraceId { get; }
+        public ulong TraceId { get; }
 
         /// <summary>
         /// Gets the span id of the parent span

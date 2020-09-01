@@ -36,7 +36,7 @@ namespace Datadog.Trace
             // lock sampling priority when span propagates.
             context.TraceContext?.LockSamplingPriority();
 
-            headers.Set(HttpHeaderNames.B3TraceId, context.TraceId.ToString("N"));
+            headers.Set(HttpHeaderNames.B3TraceId, context.TraceId.ToString("x16", InvariantCulture));
             headers.Set(HttpHeaderNames.B3SpanId, context.SpanId.ToString("x16", InvariantCulture));
             if (context.ParentId != null)
             {
@@ -64,9 +64,9 @@ namespace Datadog.Trace
                 throw new ArgumentNullException(nameof(headers));
             }
 
-            var traceId = ParseGuid(headers, HttpHeaderNames.B3TraceId);
+            var traceId = ParseHexUInt64(headers, HttpHeaderNames.B3TraceId);
 
-            if (traceId == Guid.Empty)
+            if (traceId == 0)
             {
                 // a valid traceId is required to use distributed tracing
                 return null;
@@ -75,32 +75,6 @@ namespace Datadog.Trace
             var spanId = ParseHexUInt64(headers, HttpHeaderNames.B3SpanId);
             var samplingPriority = ParseB3Sampling<SamplingPriority>(headers);
             return new SpanContext(traceId, spanId, samplingPriority);
-        }
-
-        private static Guid ParseGuid(IHeadersCollection headers, string headerName)
-        {
-            var headerValues = headers.GetValues(headerName).ToList();
-
-            if (headerValues.Count > 0)
-            {
-                foreach (string headerValue in headerValues)
-                {
-                    var candidate = headerValue;
-                    if (candidate.Length == 16)
-                    {
-                        candidate = "0000000000000000" + headerValue;
-                    }
-
-                    if (Guid.TryParse(candidate, out var result))
-                    {
-                        return result;
-                    }
-                }
-
-                Log.Information("Could not parse {0} headers: {1}", headerName, string.Join(",", headerValues));
-            }
-
-            return Guid.Empty;
         }
 
         private static ulong ParseHexUInt64(IHeadersCollection headers, string headerName)
