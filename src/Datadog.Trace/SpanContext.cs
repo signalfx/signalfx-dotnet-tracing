@@ -12,6 +12,12 @@ namespace Datadog.Trace
     /// </summary>
     public class SpanContext : ISpanContext
     {
+        /// <summary>
+        /// This bit mask is also the maximum value of an ID. It is used to remove fixed bits from
+        /// the generated IDs.
+        /// </summary>
+        internal const ulong RandomIdBitMask = 0x0fffffffffffffff;
+
         private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.For<SpanContext>();
 
         /// <summary>
@@ -40,27 +46,26 @@ namespace Datadog.Trace
         internal SpanContext(ISpanContext parent, ITraceContext traceContext, string serviceName)
             : this(parent?.TraceId, serviceName)
         {
-            if (SpanId == 0)
-            {
-                SpanId = BitConverter.ToUInt64(Guid.NewGuid().ToByteArray(), 0);
-            }
-
             Parent = parent;
             TraceContext = traceContext;
+
+            if (SpanId == 0)
+            {
+                SpanId = GenerateId();
+            }
         }
 
         private SpanContext(ulong? traceId, string serviceName)
         {
             ServiceName = serviceName;
-            if (traceId != 0)
+            if (traceId > 0)
             {
                 TraceId = traceId.Value;
                 return;
             }
 
             // This is the root span.
-            var guid = Guid.NewGuid();
-            TraceId = BitConverter.ToUInt64(guid.ToByteArray(), 0);
+            TraceId = GenerateId();
             SpanId = TraceId;
         }
 
@@ -105,5 +110,10 @@ namespace Datadog.Trace
         /// Gets or sets the span associated with this context.
         /// </summary>
         internal ISpan Span { get; set; }
+
+        private static ulong GenerateId()
+        {
+            return BitConverter.ToUInt64(Guid.NewGuid().ToByteArray(), 0) & RandomIdBitMask;
+        }
     }
 }
