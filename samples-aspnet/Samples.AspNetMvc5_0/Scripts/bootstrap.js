@@ -1295,7 +1295,7 @@ if (typeof jQuery === 'undefined') {
 +function ($) {
   'use strict';
 
-  var DISALLOWED_ATTRIBUTES = ['sanitize', 'whiteList', 'sanitizeFn']
+  var DISALLOWED_ATTRIBUTES = ['sanitize', 'allowlist', 'sanitizeFn']
 
   var uriAttrs = [
     'background',
@@ -1310,7 +1310,7 @@ if (typeof jQuery === 'undefined') {
 
   var ARIA_ATTRIBUTE_PATTERN = /^aria-[\w-]*$/i
 
-  var DefaultWhitelist = {
+  var Defaultallowlist = {
     // Global attributes allowed on any supplied element below.
     '*': ['class', 'dir', 'id', 'lang', 'role', ARIA_ATTRIBUTE_PATTERN],
     a: ['target', 'href', 'title', 'rel'],
@@ -1383,7 +1383,7 @@ if (typeof jQuery === 'undefined') {
     return false
   }
 
-  function sanitizeHtml(unsafeHtml, whiteList, sanitizeFn) {
+  function sanitizeHtml(unsafeHtml, allowlist, sanitizeFn) {
     if (unsafeHtml.length === 0) {
       return unsafeHtml
     }
@@ -1400,24 +1400,24 @@ if (typeof jQuery === 'undefined') {
     var createdDocument = document.implementation.createHTMLDocument('sanitization')
     createdDocument.body.innerHTML = unsafeHtml
 
-    var whitelistKeys = $.map(whiteList, function (el, i) { return i })
+    var allowlistKeys = $.map(allowlist, function (el, i) { return i })
     var elements = $(createdDocument.body).find('*')
 
     for (var i = 0, len = elements.length; i < len; i++) {
       var el = elements[i]
       var elName = el.nodeName.toLowerCase()
 
-      if ($.inArray(elName, whitelistKeys) === -1) {
+      if ($.inArray(elName, allowlistKeys) === -1) {
         el.parentNode.removeChild(el)
 
         continue
       }
 
       var attributeList = $.map(el.attributes, function (el) { return el })
-      var whitelistedAttributes = [].concat(whiteList['*'] || [], whiteList[elName] || [])
+      var allowlistedAttributes = [].concat(allowlist['*'] || [], allowlist[elName] || [])
 
       for (var j = 0, len2 = attributeList.length; j < len2; j++) {
-        if (!allowedAttribute(attributeList[j], whitelistedAttributes)) {
+        if (!allowedAttribute(attributeList[j], allowlistedAttributes)) {
           el.removeAttribute(attributeList[j].nodeName)
         }
       }
@@ -1461,7 +1461,7 @@ if (typeof jQuery === 'undefined') {
     },
     sanitize : true,
     sanitizeFn : null,
-    whiteList : DefaultWhitelist
+    allowlist : Defaultallowlist
   }
 
   Tooltip.prototype.init = function (type, element, options) {
@@ -1520,7 +1520,7 @@ if (typeof jQuery === 'undefined') {
     }
 
     if (options.sanitize) {
-      options.template = sanitizeHtml(options.template, options.whiteList, options.sanitizeFn)
+      options.template = sanitizeHtml(options.template, options.allowlist, options.sanitizeFn)
     }
 
     return options
@@ -1738,7 +1738,7 @@ if (typeof jQuery === 'undefined') {
 
     if (this.options.html) {
       if (this.options.sanitize) {
-        title = sanitizeHtml(title, this.options.whiteList, this.options.sanitizeFn)
+        title = sanitizeHtml(title, this.options.allowlist, this.options.sanitizeFn)
       }
 
       $tip.find('.tooltip-inner').html(title)
@@ -1927,7 +1927,7 @@ if (typeof jQuery === 'undefined') {
   }
 
   Tooltip.prototype.sanitizeHtml = function (unsafeHtml) {
-    return sanitizeHtml(unsafeHtml, this.options.whiteList, this.options.sanitizeFn)
+    return sanitizeHtml(unsafeHtml, this.options.allowlist, this.options.sanitizeFn)
   }
 
   // TOOLTIP PLUGIN DEFINITION
