@@ -15,11 +15,7 @@ namespace Datadog.Trace.Tests
         private static readonly object _populationLock = new object();
         private static readonly ConcurrentDictionary<ulong, ulong> _generatedIds = new ConcurrentDictionary<ulong, ulong>();
 
-        /// <summary>
-        /// The max value of the Ids created is limited by the "nibble" version of a Guid".
-        /// In order to not have bias in this regard the tesst code zeroes that nibble.
-        /// </summary>
-        private static ulong _maxId = 0x0FFFFFFFFFFFFFFF;
+        private static ulong _maxId = ulong.MaxValue;
         private static int _numberOfBuckets = 20;
         private static ulong _numberOfIdsToGenerate = 1_500_000;
 
@@ -159,7 +155,7 @@ namespace Datadog.Trace.Tests
                 {
                     var id = GenerateId();
                     _generatedIds.AddOrUpdate(
-                        key: id & _maxId,
+                        key: id,
                         addValue: 1,
                         updateValueFactory: (key, oldValue) => oldValue++);
                 });

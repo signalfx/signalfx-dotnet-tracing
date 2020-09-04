@@ -12,12 +12,6 @@ namespace Datadog.Trace
     /// </summary>
     public class SpanContext : ISpanContext
     {
-        /// <summary>
-        /// This bit mask is also the maximum value of an ID. It is used to remove fixed bits from
-        /// the generated IDs.
-        /// </summary>
-        internal const ulong RandomIdBitMask = 0x0fffffffffffffff;
-
         private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.For<SpanContext>();
 
         /// <summary>
@@ -113,7 +107,10 @@ namespace Datadog.Trace
 
         private static ulong GenerateId()
         {
-            return BitConverter.ToUInt64(Guid.NewGuid().ToByteArray(), 0) & RandomIdBitMask;
+            var guidBytes = Guid.NewGuid().ToByteArray();
+
+            // Remove the fixed byte from the GUID in order to have all 64 bits random.
+            return (BitConverter.ToUInt64(guidBytes, 8) & 0xffffffffffffff00) | guidBytes[0];
         }
     }
 }
