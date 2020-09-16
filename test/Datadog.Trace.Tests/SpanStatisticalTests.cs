@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -14,10 +15,7 @@ namespace Datadog.Trace.Tests
         private static readonly object _populationLock = new object();
         private static readonly ConcurrentDictionary<ulong, ulong> _generatedIds = new ConcurrentDictionary<ulong, ulong>();
 
-        /// <summary>
-        /// The max value of the Ids we create should be a 63 bit unsigned number
-        /// </summary>
-        private static ulong _maxId = ulong.MaxValue / 2;
+        private static ulong _maxId = ulong.MaxValue;
         private static int _numberOfBuckets = 20;
         private static ulong _numberOfIdsToGenerate = 1_500_000;
 

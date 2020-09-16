@@ -6,9 +6,9 @@ namespace Datadog.Trace
         public const string Language = "dotnet-tracing";
 
         /// <summary>
-        /// 2^63-1
+        /// 2^64.
         /// </summary>
-        public const ulong MaxTraceId = 9_223_372_036_854_775_807;
+        public const ulong MaxTraceId = ulong.MaxValue;
 
         public static readonly string AssemblyVersion = typeof(Tracer).Assembly.GetName().Version.ToString();
     }

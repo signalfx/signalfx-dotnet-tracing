@@ -13,7 +13,6 @@ namespace Datadog.Trace
     public class SpanContext : ISpanContext
     {
         private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.For<SpanContext>();
-        private static ThreadLocal<Random> _random = new ThreadLocal<Random>(() => new Random());
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SpanContext"/> class
@@ -41,18 +40,27 @@ namespace Datadog.Trace
         internal SpanContext(ISpanContext parent, ITraceContext traceContext, string serviceName)
             : this(parent?.TraceId, serviceName)
         {
-            SpanId = _random.Value.NextUInt63();
             Parent = parent;
             TraceContext = traceContext;
+
+            if (SpanId == 0)
+            {
+                SpanId = GenerateId();
+            }
         }
 
         private SpanContext(ulong? traceId, string serviceName)
         {
-            TraceId = traceId > 0
-                          ? traceId.Value
-                          : _random.Value.NextUInt63();
-
             ServiceName = serviceName;
+            if (traceId > 0)
+            {
+                TraceId = traceId.Value;
+                return;
+            }
+
+            // This is the root span.
+            TraceId = GenerateId();
+            SpanId = TraceId;
         }
 
         /// <summary>
@@ -96,5 +104,13 @@ namespace Datadog.Trace
         /// Gets or sets the span associated with this context.
         /// </summary>
         internal ISpan Span { get; set; }
+
+        private static ulong GenerateId()
+        {
+            var guidBytes = Guid.NewGuid().ToByteArray();
+
+            // Remove the fixed byte from the GUID in order to have all 64 bits random.
+            return (BitConverter.ToUInt64(guidBytes, 8) & 0xffffffffffffff00) | guidBytes[0];
+        }
     }
 }
