@@ -33,18 +33,11 @@ namespace Datadog.Trace.ExtensionMethods
         /// <param name="span">The span to add the tags to.</param>
         /// <param name="command">The db command to get tags values from.</param>
         /// <param name="statement">The db statement to use over command.CommandText. Will not be truncated or sanitized.</param>
-        /// <param name="sanitize">Whether to sanitize tagged statements.</param>
-        public static void AddTagsFromDbCommand(this Span span, IDbCommand command, string statement = "", bool sanitize = true)
+        public static void AddTagsFromDbCommand(this Span span, IDbCommand command, string statement = "")
         {
             if (string.IsNullOrEmpty(statement))
             {
                 statement = command.CommandText ?? string.Empty;
-                statement = statement.Truncate();
-
-                if (sanitize)
-                {
-                    statement = statement.SanitizeSqlStatement();
-                }
             }
 
             if (!string.IsNullOrEmpty(statement))

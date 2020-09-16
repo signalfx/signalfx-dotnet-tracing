@@ -26,10 +26,8 @@ namespace Datadog.Trace.Tests.ExtensionMethods
             command.Setup(cmd => cmd.CommandText).Returns(statement);
             span.AddTagsFromDbCommand(command.Object);
 
-            // Known length of truncated, then sanitized statement
-            Assert.Equal(924, span.Tags["db.statement"].Length);
-            Assert.Contains("Field=?", span.Tags["db.statement"]);
-            Assert.DoesNotContain("Field='123'", span.Tags["db.statement"]);
+            Assert.Same(statement, span.Tags["db.statement"]);
+            Assert.Contains("Field='123'", span.Tags["db.statement"]);
         }
 
         [Fact]
