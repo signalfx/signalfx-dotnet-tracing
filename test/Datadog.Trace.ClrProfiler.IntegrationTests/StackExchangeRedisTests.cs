@@ -308,17 +308,20 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 foreach (var e in expected)
                 {
-                    var found = spanLookup.ContainsKey(e);
+                    // By default all "db.statement" are sanitized - no worries about truncation because
+                    // all tag values here are smaller than the maximum recorded length default.
+                    var expectedKey = new Tuple<string, string>(e.Item1, e.Item2?.SanitizeSqlStatement());
+                    var found = spanLookup.ContainsKey(expectedKey);
                     if (found)
                     {
-                        if (--spanLookup[e] <= 0)
+                        if (--spanLookup[expectedKey] <= 0)
                         {
                             spanLookup.Remove(e);
                         }
                     }
                     else
                     {
-                        missing.Add(e);
+                        missing.Add(expectedKey);
                     }
                 }
 

@@ -79,7 +79,10 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 for (int i = 0; i < expected.Count; i++)
                 {
                     var e1 = expected[i].Item1;
-                    var e2 = expected[i].Item2;
+
+                    // By default all "db.statement" are sanitized - no worries about truncation because
+                    // all tag values here are smaller than the maximum recorded length default.
+                    var e2 = expected[i].Item2.SanitizeSqlStatement();
 
                     var a1 = i < spans.Count
                                  ? spans[i].Name
