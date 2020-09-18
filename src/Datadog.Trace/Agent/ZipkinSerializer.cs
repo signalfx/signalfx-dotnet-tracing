@@ -187,14 +187,14 @@ namespace Datadog.Trace.Agent
             // some properties when they are null.
 
             public bool ShouldSerializeTags()
-            {	
-                return _tags != null;	
-            }	
+            {
+                return _tags != null;
+            }
 
-            public bool ShouldSerializeAnnotations()	
-            {	
-                return _span.Logs != null;	
-            }	
+            public bool ShouldSerializeAnnotations()
+            {
+                return _span.Logs != null;
+            }
 
             public bool ShouldSerializeParentId()
             {
