@@ -182,6 +182,29 @@ namespace Datadog.Trace.Agent
                     return annotations;
                 }
             }
+
+            // Methods below are used by Newtonsoft JSON serializer to decide if should serialize
+            // some properties when they are null.
+
+            public bool ShouldSerializeTags()
+            {	
+                return _tags != null;	
+            }	
+
+            public bool ShouldSerializeAnnotations()	
+            {	
+                return _span.Logs != null;	
+            }	
+
+            public bool ShouldSerializeParentId()
+            {
+                return _span.Context.ParentId != null;
+            }
+
+            public bool ShouldSerializeKind()
+            {
+                return _span.Tags != null && _span.Tags.ContainsKey(Trace.Tags.SpanKind);
+            }
         }
     }
 }
