@@ -43,7 +43,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 span.SetTag(Tags.SpanKind, SpanKinds.Client);
                 if (Tracer.Instance.Settings.TagRedisCommands)
                 {
-                    span.SetTag(Tags.DbStatement, rawCommand.Truncate());
+                    span.SetTag(Tags.DbStatement, rawCommand);
                 }
 
                 span.SetTag(Tags.OutHost, host);

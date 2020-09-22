@@ -63,15 +63,17 @@ namespace Datadog.Trace.ExtensionMethods
         }
 
         /// <summary>
-        /// Truncates a <see cref="string"/> to 1024 characters, if necessary.
+        /// Truncates a <see cref="string"/> to the given maximum length.
         /// </summary>
-        /// <param name="value">The string to convert.</param>
-        /// <returns>The truncated string</returns>
-        public static string Truncate(this string value)
+        /// <param name="value">The string to truncate.</param>
+        /// <param name="maxLength">The maximum length of the truncated string.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Throw if <paramref name="maxLength"/> is negative.</exception>
+        /// <returns>The truncated string or the original string if its length is less than or equal to <paramref name="maxLength"/>.</returns>
+        public static string Truncate(this string value, int maxLength)
         {
             if (value == null) { throw new ArgumentNullException(nameof(value)); }
 
-            return value.Length > 1024 ? value.Substring(0, 1024) : value;
+            return value.Length > maxLength ? value.Substring(0, maxLength) : value;
         }
 
         /// <summary>

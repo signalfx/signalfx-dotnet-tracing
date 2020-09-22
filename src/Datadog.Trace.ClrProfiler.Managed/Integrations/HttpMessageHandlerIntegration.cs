@@ -201,7 +201,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                         scope.Span.SetTag(Tags.HttpStatusCode, ((int)response.StatusCode).ToString());
                         if (!response.IsSuccessStatusCode && !string.IsNullOrWhiteSpace(response.ReasonPhrase))
                         {
-                            scope.Span.SetTag(Tags.HttpStatusText, response.ReasonPhrase.Truncate());
+                            scope.Span.SetTag(Tags.HttpStatusText, response.ReasonPhrase);
                         }
                     }
 

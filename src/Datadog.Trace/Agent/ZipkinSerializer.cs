@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Datadog.Trace;
 using Datadog.Trace.Configuration;
@@ -19,14 +20,27 @@ namespace Datadog.Trace.Agent
         // Don't serialize with BOM
         private readonly Encoding utf8 = new UTF8Encoding(false);
 
-        public static IDictionary<string, string> BuildTags(Span span)
+        public static IDictionary<string, string> BuildTags(Span span, TracerSettings settings)
         {
             var tags = new Dictionary<string, string>();
+            var recordedValueMaxLength = settings.RecordedValueMaxLength;
             foreach (var entry in span.Tags)
             {
                 if (!entry.Key.Equals(Trace.Tags.SpanKind))
                 {
-                    tags[entry.Key] = entry.Value;
+                    var truncatedValue = entry.Value.Truncate(recordedValueMaxLength);
+                    tags[entry.Key] = truncatedValue;
+                }
+            }
+
+            // Perform any DB statement sanitization only after truncating the string to avoid replacing truncated
+            // part of the statement.
+            if (settings.SanitizeSqlStatements && tags.TryGetValue(Trace.Tags.DbStatement, out var dbStatement))
+            {
+                var sanitizedDbStatement = dbStatement.SanitizeSqlStatement();
+                if (!ReferenceEquals(dbStatement, sanitizedDbStatement))
+                {
+                    tags[Trace.Tags.DbStatement] = sanitizedDbStatement;
                 }
             }
 
@@ -73,6 +87,7 @@ namespace Datadog.Trace.Agent
         internal class ZipkinSpan
         {
             private static IDictionary<string, string> emptyTags = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>());
+            private static ReadOnlyCollection<ReadOnlyDictionary<string, object>> emptyAnnotations = (new List<ReadOnlyDictionary<string, object>>()).AsReadOnly();
 
             private readonly Span _span;
             private readonly TracerSettings _settings;
@@ -82,7 +97,7 @@ namespace Datadog.Trace.Agent
             {
                 _span = span;
                 _settings = settings;
-                _tags = span.Tags != null ? BuildTags(span) : emptyTags;
+                _tags = span.Tags != null ? BuildTags(span, settings) : emptyTags;
             }
 
             public string Id
@@ -117,7 +132,7 @@ namespace Datadog.Trace.Agent
 
             public string Kind
             {
-                get => _span.Tags[Trace.Tags.SpanKind].ToUpper();
+                get => _span.GetTag(Trace.Tags.SpanKind)?.ToUpper();
             }
 
             public Dictionary<string, string> LocalEndpoint
@@ -137,14 +152,27 @@ namespace Datadog.Trace.Agent
                 get => _tags;
             }
 
-            public List<Dictionary<string, object>> Annotations
+            public IEnumerable<IDictionary<string, object>> Annotations
             {
                 get
                 {
-                    List<Dictionary<string, object>> annotations = new List<Dictionary<string, object>>();
+                    if (_span.Logs.Count == 0)
+                    {
+                        return emptyAnnotations;
+                    }
 
+                    var annotations = new List<IDictionary<string, object>>(_span.Logs.Count);
                     foreach (var e in _span.Logs)
                     {
+                        foreach (var kvp in e.Value.ToList())
+                        {
+                            var truncated = kvp.Value.Truncate(_settings.RecordedValueMaxLength);
+                            if (!ReferenceEquals(kvp.Value, truncated))
+                            {
+                                e.Value[kvp.Key] = truncated;
+                            }
+                        }
+
                         var ts = e.Key.ToUnixTimeMicroseconds();
                         var fields = JsonConvert.SerializeObject(e.Value);
                         var item = new Dictionary<string, object>() { { "timestamp", ts }, { "value", fields } };
@@ -154,6 +182,9 @@ namespace Datadog.Trace.Agent
                     return annotations;
                 }
             }
+
+            // Methods below are used by Newtonsoft JSON serializer to decide if should serialize
+            // some properties when they are null.
 
             public bool ShouldSerializeTags()
             {

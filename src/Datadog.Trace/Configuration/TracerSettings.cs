@@ -22,6 +22,8 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         public const string DefaultApiType = "zipkin";
 
+        private const int DefaultRecordedValueMaxLength = 1200;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TracerSettings"/> class with default values.
         /// </summary>
@@ -144,6 +146,12 @@ namespace Datadog.Trace.Configuration
             UseWebServerResourceAsOperationName = source?.GetBool(ConfigurationKeys.UseWebServerResourceAsOperationName) ?? true;
 
             AddClientIpToServerSpans = source?.GetBool(ConfigurationKeys.AddClientIpToServerSpans) ?? false;
+
+            RecordedValueMaxLength = source?.GetInt32(ConfigurationKeys.RecordedValueMaxLength) ?? DefaultRecordedValueMaxLength;
+            if (RecordedValueMaxLength < 0)
+            {
+                RecordedValueMaxLength = DefaultRecordedValueMaxLength;
+            }
         }
 
         /// <summary>
@@ -345,6 +353,14 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="ConfigurationKeys.SignalFxAccessToken"/>
         public string SignalFxAccessToken { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value with the maximum length a tag/log value can have.
+        /// Values are completely truncated when set to 0, and ignored when set to negative
+        /// or non-integer string. The default value is 1200.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.RecordedValueMaxLength"/>
+        public int RecordedValueMaxLength { get; set; }
 
         /// <summary>
         /// Create a <see cref="TracerSettings"/> populated from the default sources

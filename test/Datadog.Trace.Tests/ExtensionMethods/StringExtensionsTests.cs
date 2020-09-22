@@ -75,10 +75,15 @@ namespace Datadog.Trace.Tests.ExtensionMethods
         public void TruncateExtension()
         {
             var a = string.Concat(Enumerable.Repeat("0", 10000));
-            Assert.Equal(1024, a.Truncate().Length);
+            Assert.Equal(1024, a.Truncate(1024).Length);
 
-            var b = "fewer than 1024 chars";
-            Assert.Same(b, b.Truncate());
+            var b = "Preserved string";
+            Assert.Same(b, b.Truncate(b.Length));
+
+            var c = "Replaced by empty";
+            Assert.Same(string.Empty, c.Truncate(0));
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => c.Truncate(-123));
         }
     }
 }

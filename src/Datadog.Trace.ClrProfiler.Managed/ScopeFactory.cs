@@ -113,12 +113,7 @@ namespace Datadog.Trace.ClrProfiler
 
                 Span parent = tracer.ActiveScope?.Span;
 
-                string statement = command.CommandText.Truncate();
-                if (tracer.Settings.SanitizeSqlStatements)
-                {
-                    statement = statement.SanitizeSqlStatement();
-                }
-
+                string statement = command.CommandText;
                 if (parent != null &&
                     parent.GetTag(Tags.DbType) == dbType &&
                     parent.GetTag(Tags.DbStatement) == statement)
