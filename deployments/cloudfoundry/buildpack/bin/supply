@@ -1,0 +1,73 @@
+#!/usr/bin/env python3
+
+from sys import argv as ARGV
+from os import makedirs, environ as ENV
+from pathlib import Path
+from urllib.request import build_opener, HTTPRedirectHandler
+from tarfile import TarFile
+
+DOTNET_AGENT_VERSION = "0.1.2"
+DOTNET_AGENT_ARCHIVE_NAME=f"signalfx-dotnet-tracing-{DOTNET_AGENT_VERSION}.tar.gz"
+DOTNET_AGENT_URL=f"https://github.com/signalfx/signalfx-dotnet-tracing/releases/download/v{DOTNET_AGENT_VERSION}/{DOTNET_AGENT_ARCHIVE_NAME}"
+
+def log_op(msg):
+    print(f"-----> {msg}")
+
+def download_agent_tar(cache_dir):
+    agent_tar = Path(cache_dir, DOTNET_AGENT_ARCHIVE_NAME)
+    if not agent_tar.is_file():
+        log_op(f"Agent tar file {agent_tar} does not exist, downloading ...")
+        client = build_opener(HTTPRedirectHandler())
+        with client.open(DOTNET_AGENT_URL) as rs:
+            with agent_tar.open('wb') as f:
+                f.write(rs.read())
+    return agent_tar
+
+def unpack_agent_tar(agent_tar_path, deps_dir, deps_idx):
+    dep_path = Path(deps_dir, deps_idx)
+    if not dep_path.is_dir():
+        makedirs(dep_path)
+
+    log_op(f"Unpacking agent tar {agent_tar_path} to {dep_path} ...")
+    agent_tar = TarFile.gzopen(agent_tar_path)
+    agent_tar.extractall(path=dep_path)
+
+def prepare_env_vars(deps_idx):
+    log_op("Preparing environment variables ...")
+    env_vars = {}
+    for key, value in ENV.items():
+        if key.startswith("SIGNALFX_"):
+            env_vars[key] = value
+    env_vars.update({
+        "CORECLR_ENABLE_PROFILING": "1",
+        "CORECLR_PROFILER": "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}",
+        "CORECLR_PROFILER_PATH": f"/home/vcap/deps/{deps_idx}/opt/signalfx-dotnet-tracing/SignalFx.Tracing.ClrProfiler.Native.so",
+        "SIGNALFX_INTEGRATIONS": f"/home/vcap/deps/{deps_idx}/opt/signalfx-dotnet-tracing/integrations.json",
+        "SIGNALFX_DOTNET_TRACER_HOME": f"/home/vcap/deps/{deps_idx}/opt/signalfx-dotnet-tracing"
+    })
+    return env_vars
+
+def write_profile_d_script(env_vars, deps_dir, deps_idx):
+    profile_d = Path(deps_dir, deps_idx, "profile.d")
+    if not profile_d.is_dir():
+        makedirs(profile_d)
+
+    script_file = Path(profile_d, "configureSfxDotnetTracing.sh")
+    log_op(f"Writing start script {script_file} ...")
+    with script_file.open('w') as f:
+        for key, value in env_vars.items():
+            f.write(f'export {key}="{value}"\n')
+    script_file.chmod(0o755)
+
+def main(cache_dir, deps_dir, deps_idx):
+    log_op("SignalFx Tracing Library for .NET Buildpack")
+    agent_tar = download_agent_tar(cache_dir)
+    unpack_agent_tar(agent_tar, deps_dir, deps_idx)
+    env_vars = prepare_env_vars(deps_idx)
+    write_profile_d_script(env_vars, deps_dir, deps_idx)
+
+if __name__ == "__main__":
+    if len(ARGV) < 5:
+        log_op("ERROR: this script must be provided at least 4 args: BUILD_DIR, CACHE_DIR, DEPS_DIR, DEPS_IDX")
+        exit(1)
+    main(ARGV[2], ARGV[3], ARGV[4])
