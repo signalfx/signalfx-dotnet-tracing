@@ -6,7 +6,7 @@ from pathlib import Path
 from urllib.request import build_opener, HTTPRedirectHandler
 from tarfile import TarFile
 
-DOTNET_AGENT_VERSION = "0.1.2"
+DOTNET_AGENT_VERSION = ENV.get("SIGNALFX_DOTNET_TRACING_VERSION", default="0.1.2")
 DOTNET_AGENT_ARCHIVE_NAME=f"signalfx-dotnet-tracing-{DOTNET_AGENT_VERSION}.tar.gz"
 DOTNET_AGENT_URL=f"https://github.com/signalfx/signalfx-dotnet-tracing/releases/download/v{DOTNET_AGENT_VERSION}/{DOTNET_AGENT_ARCHIVE_NAME}"
 
