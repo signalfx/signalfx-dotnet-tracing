@@ -7,13 +7,13 @@ and run the SignalFx Tracing Library for .NET in CloudFoundry apps.
 
 To build and install the buildpack you need to have [cfcli](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html) installed.
 
-If you like to install the buildpack, clone this repo and change to this directory, then run:
+If you would like to install the buildpack, clone this repo, change to this directory, then run:
 
 ```sh
 $ cf create-buildpack signalfx_dotnet_tracing_buildpack . 99 --enable
 ```
 
-Now you can use it when running your apps:
+Now you can use the buildpack when running your apps:
 
 ```sh
 # app configuration
@@ -30,7 +30,7 @@ $ cf push my-app -b signalfx_dotnet_tracing_buildpack -b dotnet_core_buildpack
 You can configure the tracing library using environment variables listed in the [main README.md](../../../README.md).
 All configuration options listed there are supported by this buildpack.
 
-In case you want to use a specific version of the tracing library in your application you can set the `SIGNALFX_DOTNET_TRACING_VERSION`
+If you want to use a specific version of the tracing library in your application, you can set the `SIGNALFX_DOTNET_TRACING_VERSION`
 environment variable before application deployment, either using `cf set-env` or the `manifest.yml` file:
 
 ```sh

@@ -61,12 +61,24 @@ def write_profile_d_script(env_vars, deps_dir, deps_idx):
             f.write(f'export {key}="{value}"\n')
     script_file.chmod(0o755)
 
+# Needs to be present because of https://docs.cloudfoundry.org/buildpacks/custom.html#contract
+def write_config_yml(deps_dir, deps_idx):
+    config_yml = Path(deps_dir, deps_idx, "config.yml")
+    log_op(f"Writing {config_yml} ...")
+    with config_yml.open('w') as f:
+        f.writelines([
+            "---\n",
+            "name: signalfx-dotnet-tracing\n",
+            "config: {}"
+        ])
+
 def main(cache_dir, deps_dir, deps_idx):
     log_op("SignalFx Tracing Library for .NET Buildpack")
     agent_tar = download_agent_tar(cache_dir)
     unpack_agent_tar(agent_tar, deps_dir, deps_idx)
     env_vars = prepare_env_vars(deps_idx)
     write_profile_d_script(env_vars, deps_dir, deps_idx)
+    write_config_yml(deps_dir, deps_idx)
 
 if __name__ == "__main__":
     if len(ARGV) < 5:
