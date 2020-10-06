@@ -1,7 +1,7 @@
-# SignalFx Tracing Library for .NET Buildpack
+# SignalFx Tracing Library for .NET Buildpack (Linux)
 
 A [CloudFoundry buildpack](https://docs.run.pivotal.io/buildpacks/) to install
-and run the SignalFx Tracing Library for .NET in CloudFoundry apps.
+and run the SignalFx Tracing Library for .NET in CloudFoundry apps on the Linux stack.
 
 ## Installation
 
@@ -29,6 +29,8 @@ $ cf push my-app -b signalfx_dotnet_tracing_buildpack -b dotnet_core_buildpack
 
 You can configure the tracing library using environment variables listed in the [main README.md](../../../README.md).
 All configuration options listed there are supported by this buildpack.
+
+By default, the tracing library logs are stored in the `/home/vcap/logs/signalfx-dotnet-profiler.log` file, but you can change this behavior with `SIGNALFX_TRACE_LOG_PATH` environment variable.
 
 If you want to use a specific version of the tracing library in your application, you can set the `SIGNALFX_DOTNET_TRACING_VERSION`
 environment variable before application deployment, either using `cf set-env` or the `manifest.yml` file:

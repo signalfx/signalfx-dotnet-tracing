@@ -270,4 +270,4 @@ BenchmarkDotNet.Artifacts/
 deploy/linux/
 deploy/AzureAppServices/
 
-!deployments/cloudfoundry/buildpack/bin
+!deployments/cloudfoundry/buildpack-*/bin

@@ -1,0 +1,10 @@
+---
+language: signalfx_dotnet_tracing_buildpack
+stack: cflinuxfs3
+
+include_files:
+  - README.md
+  - bin/detect
+  - bin/supply
+  - bin/finalize
+  - manifest.yml

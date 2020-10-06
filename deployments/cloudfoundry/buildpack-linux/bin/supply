@@ -36,18 +36,17 @@ def unpack_agent_tar(agent_tar_path, deps_dir, deps_idx):
 
 def prepare_env_vars(deps_idx):
     log_op("Preparing environment variables ...")
-    env_vars = {}
-    for key, value in ENV.items():
-        if key.startswith("SIGNALFX_"):
-            env_vars[key] = value
-    env_vars.update({
+    return {
+        # .NET Core profiler
         "CORECLR_ENABLE_PROFILING": "1",
         "CORECLR_PROFILER": "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}",
         "CORECLR_PROFILER_PATH": f"/home/vcap/deps/{deps_idx}/opt/signalfx-dotnet-tracing/SignalFx.Tracing.ClrProfiler.Native.so",
+
+        # SignalFx tracing config
         "SIGNALFX_INTEGRATIONS": f"/home/vcap/deps/{deps_idx}/opt/signalfx-dotnet-tracing/integrations.json",
-        "SIGNALFX_DOTNET_TRACER_HOME": f"/home/vcap/deps/{deps_idx}/opt/signalfx-dotnet-tracing"
-    })
-    return env_vars
+        "SIGNALFX_DOTNET_TRACER_HOME": f"/home/vcap/deps/{deps_idx}/opt/signalfx-dotnet-tracing",
+        "SIGNALFX_TRACE_LOG_PATH": "/home/vcap/logs/signalfx-dotnet-profiler.log"
+    }
 
 def write_profile_d_script(env_vars, deps_dir, deps_idx):
     profile_d = Path(deps_dir, deps_idx, "profile.d")
