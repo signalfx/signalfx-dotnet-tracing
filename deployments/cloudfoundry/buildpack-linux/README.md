@@ -3,6 +3,8 @@
 A [CloudFoundry buildpack](https://docs.run.pivotal.io/buildpacks/) to install
 and run the SignalFx Tracing Library for .NET in CloudFoundry apps on the Linux stack.
 
+> :construction: This project is currently in **BETA**.
+
 ## Installation
 
 To build and install the buildpack you need to have [cfcli](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html) installed.
