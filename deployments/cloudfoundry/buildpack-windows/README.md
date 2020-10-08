@@ -19,7 +19,6 @@ $ ./build.sh
 $ cf create-buildpack signalfx_dotnet_tracing_buildpack . 99 --enable
 ```
 
-to build and install the buildpack.
 Now you can use the buildpack when running your apps (both .NET Core and .NET Framework apps are supported):
 
 ```sh

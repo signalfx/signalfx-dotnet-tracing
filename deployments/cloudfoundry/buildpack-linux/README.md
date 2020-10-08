@@ -23,7 +23,7 @@ $ cf set-env my-app SIGNALFX_SERVICE_NAME <application name>
 $ cf set-env my-app SIGNALFX_ENDPOINT_URL <Smart agent or OTel collector address>
 # ...
 
-# dotnet_core_buildpack is the main buildpack for .Net apps, it needs to be the final one
+# dotnet_core_buildpack is the main buildpack for .NET apps, it needs to be the final one
 $ cf push my-app -b signalfx_dotnet_tracing_buildpack -b dotnet_core_buildpack
 ```
 
