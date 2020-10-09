@@ -70,6 +70,7 @@ namespace PrepareRelease
                 FullAssemblyNameReplace);
 
             // Locked AssemblyVersion #.0.0.0 updates
+            #pragma warning disable CS0162
             if (TracerVersion.Major > 0)
             {
                 SynchronizeVersion(
@@ -80,6 +81,7 @@ namespace PrepareRelease
                     "src/Datadog.Trace.ClrProfiler.Managed.Core/AssemblyInfo.cs",
                     text => MajorAssemblyVersionReplace(text, "."));
             }
+            #pragma warning restore CS0162
 
             // Native profiler updates
             SynchronizeVersion(
