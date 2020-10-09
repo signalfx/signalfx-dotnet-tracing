@@ -4,13 +4,10 @@
 2. In build container (`docker-compose run build bash`):
     * `cd /project/tools/PrepareRelease`
     * `dotnet run --project . versions`
-3. Update out of container as needed to avoid undesired changes:
-    * `git checkout -- src/Datadog.Trace.ClrProfiler.Managed.Core/AssemblyInfo.cs src/Datadog.Trace.AspNet/AssemblyInfo.cs`
-4. Once version PR is appropriately squashed and merged use artifacts for GH release and any built locally as necessary for release:
-    * `docker-compose run build`
-    * `docker-compose run Profiler`
-    * `docker-compose run package`
-    * `docker-compose run Profiler.Alpine`
-    * `docker-compose run package.alpine`
+3. Submit a PR updating the version with the changes above.
+4. Approve and merge PR above.
+5. Create the label for the release and add all the CircleCI artifacts from the PR above.
+There are artifacts: under `Alpine`, `Linux`, and `Windows`.
+6. Publish the release on GH.
 
 *Modified by SignalFx*
