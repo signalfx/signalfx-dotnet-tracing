@@ -109,8 +109,14 @@ namespace PrepareRelease
                 "deployments/cloudfoundry/buildpack-linux/bin/supply",
                 text => Regex.Replace(text, $"LATEST_VERSION = \"{VersionPattern()}\"", $"LATEST_VERSION = \"{VersionString()}\""));
             SynchronizeVersion(
+                "deployments/cloudfoundry/buildpack-linux/README.md",
+                text => Regex.Replace(text, $"\\$ cf set-env SIGNALFX_DOTNET_TRACING_VERSION \"{VersionPattern()}\"", $"$ cf set-env SIGNALFX_DOTNET_TRACING_VERSION \"{VersionString()}\""));
+            SynchronizeVersion(
                 "deployments/cloudfoundry/buildpack-windows/src/supply/supply.go",
                 text => Regex.Replace(text, $"const LatestVersion = \"{VersionPattern()}\"", $"const LatestVersion = \"{VersionString()}\""));
+            SynchronizeVersion(
+                "deployments/cloudfoundry/buildpack-windows/README.md",
+                text => Regex.Replace(text, $"\\$ cf set-env SIGNALFX_DOTNET_TRACING_VERSION \"{VersionPattern()}\"", $"$ cf set-env SIGNALFX_DOTNET_TRACING_VERSION \"{VersionString()}\""));
 
             Console.WriteLine($"Completed synchronizing versions to {VersionString()}");
         }
