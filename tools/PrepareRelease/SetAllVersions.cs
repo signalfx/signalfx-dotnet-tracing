@@ -13,6 +13,11 @@ namespace PrepareRelease
         {
             Console.WriteLine($"Updating version instances to {VersionString()}");
 
+            // README.md
+            SynchronizeVersion(
+                "README.md",
+                text => Regex.Replace(text, $"ARG TRACER_VERSION={VersionPattern()}", $"ARG TRACER_VERSION={VersionString()}"));
+
             // Dockerfile updates
             SynchronizeVersion(
                 "customer-samples/ConsoleApp/Alpine3.9.dockerfile",

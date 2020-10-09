@@ -140,7 +140,8 @@ ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
 
 # First install the package. This example downloads the latest version
 # alternatively download a specific version or use a local copy.
-ADD https://github.com/signalfx/signalfx-dotnet-tracing/releases/latest/download/signalfx-dotnet-tracing.deb  /signalfx-package/signalfx-dotnet-tracing.deb
+ARG TRACER_VERSION=0.1.2
+ADD https://github.com/signalfx/signalfx-dotnet-tracing/releases/download/v${TRACER_VERSION}/signalfx-dotnet-tracing_${TRACER_VERSION}_amd64.deb
 RUN dpkg -i /signalfx-package/signalfx-dotnet-tracing.deb
 RUN rm -rf /signalfx-package
 
