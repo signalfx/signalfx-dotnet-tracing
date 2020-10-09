@@ -70,13 +70,16 @@ namespace PrepareRelease
                 FullAssemblyNameReplace);
 
             // Locked AssemblyVersion #.0.0.0 updates
-            SynchronizeVersion(
-                "src/Datadog.Trace.AspNet/AssemblyInfo.cs",
-                text => MajorAssemblyVersionReplace(text, "."));
+            if (TracerVersion.Major > 0)
+            {
+                SynchronizeVersion(
+                    "src/Datadog.Trace.AspNet/AssemblyInfo.cs",
+                    text => MajorAssemblyVersionReplace(text, "."));
 
-            SynchronizeVersion(
-                "src/Datadog.Trace.ClrProfiler.Managed.Core/AssemblyInfo.cs",
-                text => MajorAssemblyVersionReplace(text, "."));
+                SynchronizeVersion(
+                    "src/Datadog.Trace.ClrProfiler.Managed.Core/AssemblyInfo.cs",
+                    text => MajorAssemblyVersionReplace(text, "."));
+            }
 
             // Native profiler updates
             SynchronizeVersion(
