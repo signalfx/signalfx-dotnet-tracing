@@ -15,7 +15,7 @@ jobs:
       - run: docker-compose run Profiler.Alpine
       - run: docker-compose run package.alpine
       - store_artifacts:
-          path: deploy/alpine/
+          path: deploy/linux/
 
   Linux:
     machine:
