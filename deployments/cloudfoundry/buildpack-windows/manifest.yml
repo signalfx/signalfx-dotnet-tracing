@@ -1,0 +1,11 @@
+---
+language: signalfx_dotnet_tracing_buildpack
+stack: windows
+
+include_files:
+  - README.md
+  - bin/detect.bat
+  - bin/supply.exe
+  - bin/finalize.bat
+  - manifest.yml
+pre_package: build.sh

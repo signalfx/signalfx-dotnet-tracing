@@ -104,6 +104,14 @@ namespace PrepareRelease
                 "deploy/Datadog.Trace.ClrProfiler.WindowsInstaller/Datadog.Trace.ClrProfiler.WindowsInstaller.wixproj",
                 WixProjReplace);
 
+            // Buildpack updates
+            SynchronizeVersion(
+                "deployments/cloudfoundry/buildpack-linux/bin/supply",
+                text => Regex.Replace(text, $"LATEST_VERSION = \"{VersionPattern()}\"", $"LATEST_VERSION = \"{VersionString()}\""));
+            SynchronizeVersion(
+                "deployments/cloudfoundry/buildpack-windows/src/supply/supply.go",
+                text => Regex.Replace(text, $"const LatestVersion = \"{VersionPattern()}\"", $"const LatestVersion = \"{VersionString()}\""));
+
             Console.WriteLine($"Completed synchronizing versions to {VersionString()}");
         }
 
