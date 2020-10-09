@@ -4,7 +4,34 @@ orbs:
   win: circleci/windows@2.2.0
 
 jobs:
-  build:
+  Alpine:
+    machine:
+      image: ubuntu-1604:202007-01
+    environment:
+      buildConfiguration: Release
+    steps:
+      - checkout
+      - run: docker-compose run build
+      - run: docker-compose run Profiler.Alpine
+      - run: docker-compose run package.alpine
+      - store_artifacts:
+          path: deploy/linux/*
+
+  Linux:
+    machine:
+      image: ubuntu-1604:202007-01
+    environment:
+      buildConfiguration: Release
+
+    steps:
+      - checkout
+      - run: docker-compose run build
+      - run: docker-compose run Profiler
+      - run: docker-compose run package
+      - store_artifacts:
+          path: deploy/linux/*
+
+  windows:
     executor: 
       name: win/default
       shell: cmd.exe
