@@ -13,6 +13,11 @@ namespace PrepareRelease
         {
             Console.WriteLine($"Updating version instances to {VersionString()}");
 
+            // README.md
+            SynchronizeVersion(
+                "README.md",
+                text => Regex.Replace(text, $"ARG TRACER_VERSION={VersionPattern()}", $"ARG TRACER_VERSION={VersionString()}"));
+
             // Dockerfile updates
             SynchronizeVersion(
                 "customer-samples/ConsoleApp/Alpine3.9.dockerfile",
@@ -65,13 +70,18 @@ namespace PrepareRelease
                 FullAssemblyNameReplace);
 
             // Locked AssemblyVersion #.0.0.0 updates
-            SynchronizeVersion(
-                "src/Datadog.Trace.AspNet/AssemblyInfo.cs",
-                text => MajorAssemblyVersionReplace(text, "."));
+            #pragma warning disable CS0162
+            if (TracerVersion.Major > 0)
+            {
+                SynchronizeVersion(
+                    "src/Datadog.Trace.AspNet/AssemblyInfo.cs",
+                    text => MajorAssemblyVersionReplace(text, "."));
 
-            SynchronizeVersion(
-                "src/Datadog.Trace.ClrProfiler.Managed.Core/AssemblyInfo.cs",
-                text => MajorAssemblyVersionReplace(text, "."));
+                SynchronizeVersion(
+                    "src/Datadog.Trace.ClrProfiler.Managed.Core/AssemblyInfo.cs",
+                    text => MajorAssemblyVersionReplace(text, "."));
+            }
+            #pragma warning restore CS0162
 
             // Native profiler updates
             SynchronizeVersion(
@@ -109,8 +119,14 @@ namespace PrepareRelease
                 "deployments/cloudfoundry/buildpack-linux/bin/supply",
                 text => Regex.Replace(text, $"LATEST_VERSION = \"{VersionPattern()}\"", $"LATEST_VERSION = \"{VersionString()}\""));
             SynchronizeVersion(
+                "deployments/cloudfoundry/buildpack-linux/README.md",
+                text => Regex.Replace(text, $"\\$ cf set-env SIGNALFX_DOTNET_TRACING_VERSION \"{VersionPattern()}\"", $"$ cf set-env SIGNALFX_DOTNET_TRACING_VERSION \"{VersionString()}\""));
+            SynchronizeVersion(
                 "deployments/cloudfoundry/buildpack-windows/src/supply/supply.go",
                 text => Regex.Replace(text, $"const LatestVersion = \"{VersionPattern()}\"", $"const LatestVersion = \"{VersionString()}\""));
+            SynchronizeVersion(
+                "deployments/cloudfoundry/buildpack-windows/README.md",
+                text => Regex.Replace(text, $"\\$ cf set-env SIGNALFX_DOTNET_TRACING_VERSION \"{VersionPattern()}\"", $"$ cf set-env SIGNALFX_DOTNET_TRACING_VERSION \"{VersionString()}\""));
 
             Console.WriteLine($"Completed synchronizing versions to {VersionString()}");
         }

@@ -4,7 +4,34 @@ orbs:
   win: circleci/windows@2.2.0
 
 jobs:
-  build:
+  Alpine:
+    machine:
+      image: ubuntu-1604:202007-01
+    environment:
+      buildConfiguration: Release
+    steps:
+      - checkout
+      - run: docker-compose run build
+      - run: docker-compose run Profiler.Alpine
+      - run: docker-compose run package.alpine
+      - store_artifacts:
+          path: deploy/linux/
+
+  Linux:
+    machine:
+      image: ubuntu-1604:202007-01
+    environment:
+      buildConfiguration: Release
+
+    steps:
+      - checkout
+      - run: docker-compose run build
+      - run: docker-compose run Profiler
+      - run: docker-compose run package
+      - store_artifacts:
+          path: deploy/linux/
+
+  Windows:
     executor: 
       name: win/default
       shell: cmd.exe
@@ -28,3 +55,11 @@ jobs:
           path: C:\Users\circleci\project\deploy\Datadog.Trace.ClrProfiler.WindowsInstaller\bin\Release\x86\en-us\
       - store_artifacts:
           path: C:\Users\circleci\project\src\bin\windows-tracer-home.zip
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - Alpine
+      - Linux
+      - Windows
