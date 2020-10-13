@@ -114,6 +114,17 @@ namespace PrepareRelease
                 "deploy/Datadog.Trace.ClrProfiler.WindowsInstaller/Datadog.Trace.ClrProfiler.WindowsInstaller.wixproj",
                 WixProjReplace);
 
+            // Azure Site Extension updates
+            SynchronizeVersion(
+                "deploy/Azure.Site.Extension/applicationHost.xdt",
+                text => Regex.Replace(text, VersionPattern(), VersionString()));
+            SynchronizeVersion(
+                "deploy/Azure.Site.Extension/Azure.Site.Extension.nuspec",
+                text => Regex.Replace(text, VersionPattern(), VersionString()));
+            SynchronizeVersion(
+                "deploy/Azure.Site.Extension/install.cmd",
+                text => Regex.Replace(text, VersionPattern(), VersionString()));
+
             // Buildpack updates
             SynchronizeVersion(
                 "deployments/cloudfoundry/buildpack-linux/bin/supply",
