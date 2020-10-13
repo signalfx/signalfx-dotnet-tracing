@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+  <system.webServer>
+    <runtime xdt:Transform="InsertIfMissing" >
+      <environmentVariables xdt:Transform="InsertIfMissing">
+        <add name="COMPLUS_LoaderOptimization" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
+
+        <add name="COR_ENABLE_PROFILING" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
+        <add name="COR_PROFILER" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
+        <add name="COR_PROFILER_PATH" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
+        <add name="COR_PROFILER_PATH_32" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
+        <add name="COR_PROFILER_PATH_64" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
+
+        <add name="CORECLR_ENABLE_PROFILING" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
+        <add name="CORECLR_PROFILER" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
+        <add name="CORECLR_PROFILER_PATH_32" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
+        <add name="CORECLR_PROFILER_PATH_64" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
+
+        <add name="SIGNALFX_DOTNET_TRACER_HOME" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
+        <add name="SIGNALFX_INTEGRATIONS" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
+        <add name="SIGNALFX_TRACE_LOG_PATH" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
+        <add name="SIGNALFX_AZURE_APP_SERVICES" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
+        <add name="SIGNALFX_PROFILER_EXCLUDE_PROCESSES" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
+
+        <!-- We're unable to instrument domain-neutral assemblies when our managed assemblies are not in the GAC, so force LoaderOptimization to be LoaderOptimization.SingleDomain -->
+        <add name="COMPLUS_LoaderOptimization" value="1" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
+        <add name="COR_ENABLE_PROFILING" value="1" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
+        <add name="COR_PROFILER" value="{B4C89B0F-9908-4F73-9F59-0D77C5A06874}" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
+        <add name="COR_PROFILER_PATH" value="%HOME%\signalfx\tracing\v0.1.3\x64\SignalFx.Tracing.ClrProfiler.Native.dll" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
+        <add name="COR_PROFILER_PATH_32" value="%HOME%\signalfx\tracing\v0.1.3\x86\SignalFx.Tracing.ClrProfiler.Native.dll" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
+        <add name="COR_PROFILER_PATH_64" value="%HOME%\signalfx\tracing\v0.1.3\x64\SignalFx.Tracing.ClrProfiler.Native.dll" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
+
+        <add name="CORECLR_ENABLE_PROFILING" value="1" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
+        <add name="CORECLR_PROFILER" value="{B4C89B0F-9908-4F73-9F59-0D77C5A06874}" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
+        <add name="CORECLR_PROFILER_PATH_32" value="%HOME%\signalfx\tracing\v0.1.3\x86\SignalFx.Tracing.ClrProfiler.Native.dll" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
+        <add name="CORECLR_PROFILER_PATH_64" value="%HOME%\signalfx\tracing\v0.1.3\x64\SignalFx.Tracing.ClrProfiler.Native.dll" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
+
+        <add name="SIGNALFX_DOTNET_TRACER_HOME" value="%HOME%\signalfx\tracing\v0.1.3" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
+        <add name="SIGNALFX_INTEGRATIONS" value="%HOME%\signalfx\tracing\v0.1.3\integrations.json" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
+        <add name="SIGNALFX_TRACE_LOG_PATH" value="%HOME%\LogFiles\signalfx\tracing\v0.1.3\dotnet-profiler.log" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
+        <add name="SIGNALFX_AZURE_APP_SERVICES" value="1" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
+        <add name="SIGNALFX_PROFILER_EXCLUDE_PROCESSES" value="SnapshotUploader.exe;workerforwarder.exe" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
+      </environmentVariables>
+    </runtime>
+  </system.webServer>
+</configuration>
