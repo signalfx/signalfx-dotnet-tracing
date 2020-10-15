@@ -49,12 +49,15 @@ jobs:
       - run: msbuild Datadog.Trace.proj /t:msi /p:Configuration=Release;Platform=x64
       - run: msbuild Datadog.Trace.proj /t:msi /p:Configuration=Release;Platform=x86
       - run: msbuild Datadog.Trace.proj /t:CreateHomeDirectory /p:Configuration=Release;Platform=x64
+      - run: nuget pack -suffix prerelease -p NoWarn=NU5100;NoBuild=true;NoDefaultExcludes=true -OutputDirectory src\bin\Azure.Site.Extension deploy\Azure.Site.Extension\Azure.Site.Extension.nuspec
       - store_artifacts:
           path: C:\Users\circleci\project\deploy\Datadog.Trace.ClrProfiler.WindowsInstaller\bin\Release\x64\en-us\
       - store_artifacts:
           path: C:\Users\circleci\project\deploy\Datadog.Trace.ClrProfiler.WindowsInstaller\bin\Release\x86\en-us\
       - store_artifacts:
           path: C:\Users\circleci\project\src\bin\windows-tracer-home.zip
+      - store_artifacts:
+          path: C:\Users\circleci\project\src\bin\Azure.Site.Extension\
 
 workflows:
   version: 2
