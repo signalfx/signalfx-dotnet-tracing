@@ -7,20 +7,17 @@ and run the SignalFx Tracing Library for .NET in CloudFoundry apps on the Window
 
 ## Installation
 
-**This buildpack is created automatically when the SignalFx Tracing Library for .NET tile is installed via Ops Manager on Pivotal Platform.**
-That is the preferred installation route.
-
 To build and install the buildpack without using the tile you need to have
 [Go](https://golang.org/dl/) and [cfcli](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html) installed.
 
 If you would like to install the buildpack, clone this repo, change to this directory, then run:
 
 ```sh
-# builds supply.exe executable
+# builds supply.exe executable and the whole buildpack
 $ ./build.sh
 
 # installs the buildpack on CloudFoundry
-$ cf create-buildpack signalfx_dotnet_tracing_buildpack . 99 --enable
+$ cf create-buildpack signalfx_dotnet_tracing_buildpack signalfx_dotnet_tracing_buildpack-windows.zip 99 --enable
 ```
 
 Now you can use the buildpack when running your apps (both .NET Core and .NET Framework apps are supported):

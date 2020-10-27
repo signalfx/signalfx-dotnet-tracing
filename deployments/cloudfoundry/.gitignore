@@ -1,6 +1,3 @@
-VERSION
 *.exe
 *.zip
 .DS_Store
-tile/release
-tile/product
