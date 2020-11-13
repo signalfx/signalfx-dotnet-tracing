@@ -51,6 +51,9 @@ namespace Datadog.Trace.Configuration
             TraceEnabled = source?.GetBool(ConfigurationKeys.TraceEnabled) ??
                            true;
 
+            SynchronousSend = source?.GetBool(ConfigurationKeys.SynchronousSend) ??
+                            false;
+
             var disabledIntegrationNames = source?.GetString(ConfigurationKeys.DisabledIntegrations)
                                                  ?.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries) ??
                                            Enumerable.Empty<string>();
@@ -187,6 +190,18 @@ namespace Datadog.Trace.Configuration
         /// <seealso cref="GlobalSettings.DebugEnabled"/>
         [Obsolete]
         public bool DebugEnabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the operation to send spans is
+        /// going to be synchronous when the root span is closed.
+        /// Default is <c>false</c>.
+        /// </summary>
+        /// <remarks>
+        /// Typically synchronous sending is not desired but for tests and some
+        /// special scenarios it can be useful.
+        /// </remarks>
+        /// <seealso cref="ConfigurationKeys.SynchronousSend"/>
+        public bool SynchronousSend { get; set; }
 
         /// <summary>
         /// Gets or sets the names of disabled integrations.

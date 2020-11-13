@@ -21,7 +21,7 @@ namespace Datadog.Trace
     public class Tracer : IDatadogTracer
     {
         private const string UnknownServiceName = "unnamed-dotnet-service";
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.For<Tracer>();
+        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(Tracer));
 
         /// <summary>
         /// The number of Tracer instances that have been created and not yet destroyed.
@@ -99,7 +99,7 @@ namespace Datadog.Trace
                 }
             }
 
-            _agentWriter = agentWriter ?? new AgentWriter(apiClient, Statsd);
+            _agentWriter = agentWriter ?? new AgentWriter(apiClient, Statsd, Settings.SynchronousSend);
             _scopeManager = scopeManager ?? new AsyncLocalScopeManager();
             Sampler = sampler ?? new RuleBasedSampler(new RateLimiter(Settings.MaxTracesSubmittedPerSecond));
 
@@ -322,10 +322,10 @@ namespace Datadog.Trace
 
             var env = Settings.Environment;
 
-            // automatically add the "env" tag if defined
+            // Automatically add the "environment" tag if defined.
             if (!string.IsNullOrWhiteSpace(env))
             {
-                span.SetTag(Tags.Env, env);
+                span.SetTag(Tags.Environment, env);
             }
 
             // Apply root span tags

@@ -14,7 +14,7 @@ namespace Datadog.Trace.Configuration
         public const string ConfigurationFileName = "SIGNALFX_DOTNET_TRACER_CONFIG_FILE";
 
         /// <summary>
-        /// Configuration key for the application's environment. Sets the "env" tag on every <see cref="Span"/>.
+        /// Configuration key for the application's environment. Sets the "environment" tag on every <see cref="Span"/>.
         /// </summary>
         /// <seealso cref="TracerSettings.Environment"/>
         public const string Environment = "SIGNALFX_ENV";
@@ -43,11 +43,51 @@ namespace Datadog.Trace.Configuration
         public const string TraceEnabled = "SIGNALFX_TRACING_ENABLED";
 
         /// <summary>
+        /// Gets or sets a value indicating whether the operation to send spans is
+        /// going to be synchronous when the root span is closed.
+        /// Default is <c>false</c>.
+        /// </summary>
+        /// <remarks>
+        /// Typically synchronous sending is not desired but for tests and some
+        /// special scenarios it can be useful.
+        /// </remarks>
+        /// <seealso cref="TracerSettings.SynchronousSend"/>
+        public const string SynchronousSend = "SIGNALFX_SYNC_SEND";
+
+        /// <summary>
         /// Configuration key for enabling or disabling the Tracer's debug mode.
         /// Default is value is false (disabled).
         /// </summary>
         /// <seealso cref="TracerSettings.DebugEnabled"/>
         public const string DebugEnabled = "SIGNALFX_TRACE_DEBUG";
+
+        /// <summary>
+        /// Gets a value indicating whether stdout log is enabled.
+        /// Default is <c>false</c>.
+        /// </summary>
+        /// <remarks>
+        /// Not exposed via <see cref="TracerSettings"/> since the logger
+        /// is created before it is set.
+        /// </remarks>
+        /// <seealso cref="GlobalSettings.StdoutLogEnabled"/>
+        public const string StdoutLogEnabled = "SIGNALFX_STDOUT_LOG_ENABLED";
+
+        /// <summary>
+        /// Allows to override the default output template used with stdout logging.
+        /// It is ignored if stdout log is disabled.
+        /// </summary>
+        public const string StdoutLogTemplate = "SIGNALFX_STDOUT_LOG_TEMPLATE";
+
+        /// <summary>
+        /// Gets a value indicating whether file log is enabled.
+        /// Default is <c>true</c>.
+        /// </summary>
+        /// <remarks>
+        /// Not exposed via <see cref="TracerSettings"/> since the logger
+        /// is created before it is set.
+        /// </remarks>
+        /// <seealso cref="GlobalSettings.FileLogEnabled"/>
+        public const string FileLogEnabled = "SIGNALFX_FILE_LOG_ENABLED";
 
         /// <summary>
         /// Configuration key for a list of integrations to disable. All other integrations remain enabled.
