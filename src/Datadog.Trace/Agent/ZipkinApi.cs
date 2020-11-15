@@ -50,18 +50,18 @@ namespace Datadog.Trace.Agent
                 {
                     if (ex.InnerException is InvalidOperationException ioe)
                     {
-                        Log.Error("A fatal error occurred while sending traces to {Endpoint}\n{Exception}", ex, _settings.EndpointUrl, ex.ToString());
+                        Log.Error("A fatal error occurred while sending traces to {Endpoint}\n{Exception}", _settings.EndpointUrl, ex.Message);
                         return;
                     }
 
                     if (retryCount >= retryLimit)
                     {
                         // stop retrying
-                        Log.Error("No more retries to send traces to {Endpoint}", ex, _settings.EndpointUrl);
+                        Log.Error("No more retries to send traces to {Endpoint}\n{Exception}", _settings.EndpointUrl, ex.Message);
                         return;
                     }
 
-                    Log.Debug("Error sending traces to {Endpoint}", ex, _settings.EndpointUrl);
+                    Log.Debug("Error sending traces to {Endpoint}\n{Exception}", _settings.EndpointUrl, ex.Message);
 
                     // retry
                     await Task.Delay(sleepDuration).ConfigureAwait(false);
