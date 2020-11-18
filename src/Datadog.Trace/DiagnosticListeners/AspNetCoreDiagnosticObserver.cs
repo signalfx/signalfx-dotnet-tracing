@@ -168,7 +168,7 @@ namespace Datadog.Trace.DiagnosticListeners
                     remoteIp = httpContext?.Connection?.RemoteIpAddress;
                 }
 
-                span.DecorateWebServerSpan(null, httpMethod, host, url, remoteIp);
+                span.DecorateWebServerSpan(resourceUrl, httpMethod, host, url, remoteIp);
                 span.SetTag(Tags.InstrumentationName, IntegrationName);
 
                 // set analytics sample rate if enabled
@@ -203,16 +203,24 @@ namespace Datadog.Trace.DiagnosticListeners
                     var actionDescriptor = (ActionDescriptor)BeforeActionActionDescriptorFetcher.Fetch(arg);
                     HttpRequest request = httpContext.Request;
 
-                    string httpMethod = request.Method?.ToUpperInvariant() ?? "UNKNOWN";
-                    string controllerName = actionDescriptor.RouteValues["controller"];
-                    string actionName = actionDescriptor.RouteValues["action"];
-                    string routeTemplate = actionDescriptor.AttributeRouteInfo?.Template;
-
-                    if (!string.IsNullOrEmpty(controllerName) && !string.IsNullOrEmpty(actionName))
+                    string httpMethod = request.Method?.ToUpperInvariant();
+                    if (!string.IsNullOrEmpty(httpMethod))
                     {
-                        span.OperationName = $"{controllerName}.{actionName}".ToLowerInvariant();
+                        span.Tags.Add(Tags.HttpMethod, httpMethod);
                     }
-                    else if (!string.IsNullOrEmpty(routeTemplate))
+
+                    if (actionDescriptor.RouteValues.TryGetValue("controller", out string controllerName))
+                    {
+                        span.Tags.Add(Tags.AspNetController, controllerName);
+                    }
+
+                    if (actionDescriptor.RouteValues.TryGetValue("action", out string actionName))
+                    {
+                        span.Tags.Add(Tags.AspNetAction, actionName.ToUpperInvariant());
+                    }
+
+                    string routeTemplate = actionDescriptor.AttributeRouteInfo?.Template;
+                    if (!string.IsNullOrEmpty(routeTemplate))
                     {
                         span.OperationName = routeTemplate;
                     }
