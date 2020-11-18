@@ -1,5 +1,5 @@
 // Modified by SignalFx
-#if NETCOREAPP2_1 || NETCOREAPP3_0 || NETCOREAPP3_1 
+#if NETCOREAPP3_0 || NETCOREAPP3_1
 using System;
 using System.Collections.Generic;
 using Datadog.Trace.Agent;
