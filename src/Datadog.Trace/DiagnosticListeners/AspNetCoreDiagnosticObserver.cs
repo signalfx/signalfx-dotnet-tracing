@@ -203,26 +203,33 @@ namespace Datadog.Trace.DiagnosticListeners
                     var actionDescriptor = (ActionDescriptor)BeforeActionActionDescriptorFetcher.Fetch(arg);
                     HttpRequest request = httpContext.Request;
 
-                    string httpMethod = request.Method?.ToUpperInvariant();
-                    if (!string.IsNullOrEmpty(httpMethod))
+                    if (!span.Tags.ContainsKey(Tags.HttpMethod))
                     {
-                        span.Tags.Add(Tags.HttpMethod, httpMethod);
+                        string httpMethod = request.Method?.ToUpperInvariant();
+                        if (!string.IsNullOrEmpty(httpMethod))
+                        {
+                            span.Tags.Add(Tags.HttpMethod, httpMethod);
+                        }
                     }
 
                     if (actionDescriptor.RouteValues.TryGetValue("controller", out string controllerName))
                     {
-                        span.Tags.Add(Tags.AspNetController, controllerName);
+                        span.Tags[Tags.AspNetController] = controllerName;
                     }
 
                     if (actionDescriptor.RouteValues.TryGetValue("action", out string actionName))
                     {
-                        span.Tags.Add(Tags.AspNetAction, actionName.ToUpperInvariant());
+                        span.Tags[Tags.AspNetAction] = actionName;
                     }
 
                     string routeTemplate = actionDescriptor.AttributeRouteInfo?.Template;
                     if (!string.IsNullOrEmpty(routeTemplate))
                     {
                         span.OperationName = routeTemplate;
+                    }
+                    else if (!string.IsNullOrEmpty(controllerName) && !string.IsNullOrEmpty(actionName))
+                    {
+                        span.OperationName = $"{controllerName}.{actionName}".ToLowerInvariant();
                     }
                 }
             }

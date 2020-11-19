@@ -19,6 +19,13 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             var failures = new List<string>();
             var remainingSpans = spans.Select(s => s).ToList();
 
+            var spanDump = new List<string>();
+            spanDump.Add($"{Environment.NewLine} >>>>>>> Received spans:");
+            foreach (var span in spans)
+            {
+                spanDump.Add(span.ToString());
+            }
+
             foreach (var expectation in expectations)
             {
                 var possibleSpans =
@@ -45,9 +52,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 }
             }
 
+            var spansMSg = Environment.NewLine + string.Join(Environment.NewLine, spanDump.Select(s => " * " + s));
+
             var finalMessage = Environment.NewLine + string.Join(Environment.NewLine, failures.Select(f => " - " + f));
 
-            Assert.True(!failures.Any(), finalMessage);
+            Assert.True(!failures.Any(), finalMessage + spansMSg);
             Assert.True(remainingSpans.Count == 0, $"There were {remainingSpans.Count} spans unaccounted for.");
         }
     }

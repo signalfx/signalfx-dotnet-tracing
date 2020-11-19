@@ -122,11 +122,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
             string url,
             string httpMethod,
             string httpStatus,
-            string resourceUrl,
+            string resourceName,
             bool addClientIpExpectation = false,
             Func<IMockSpan, List<string>> additionalCheck = null)
         {
-            var expectation = new AspNetCoreMvcSpanExpectation(EnvironmentHelper.FullSampleName, operationName, operationName, httpStatus, httpMethod, addClientIpExpectation)
+            var expectation = new AspNetCoreMvcSpanExpectation(EnvironmentHelper.FullSampleName, operationName, resourceName, httpStatus, httpMethod, addClientIpExpectation)
             {
                 OriginalUri = url,
             };
@@ -139,17 +139,17 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
         {
             return new List<AspNetCoreMvcSpanExpectation>()
             {
-                CreateSingleExpectation(operationName: "home.index", url: "/", httpMethod: "GET", httpStatus: "200", resourceUrl: "/", addClientIpExpectation),
-                CreateSingleExpectation(operationName: "home.delay", url: "/delay/0", httpMethod: "GET", httpStatus: "200", resourceUrl: "delay/{seconds}", addClientIpExpectation),
-                CreateSingleExpectation(operationName: "api.delay", url: "/api/delay/0", httpMethod: "GET", httpStatus: "200", resourceUrl: "api/delay/{seconds}", addClientIpExpectation),
-                CreateSingleExpectation(operationName: "aspnet_core.request", url: "/not-found", httpMethod: "GET", httpStatus: "404", resourceUrl: "/not-found", addClientIpExpectation),
-                CreateSingleExpectation(operationName: "home.statuscodetest", url: "/status-code/203", httpMethod: "GET", httpStatus: "203", resourceUrl: "status-code/{statusCode}", addClientIpExpectation),
+                CreateSingleExpectation(operationName: "home.index", url: "/", httpMethod: "GET", httpStatus: "200", resourceName: "/", addClientIpExpectation),
+                CreateSingleExpectation(operationName: "delay/{seconds}", url: "/delay/0", httpMethod: "GET", httpStatus: "200", resourceName: "/delay/?", addClientIpExpectation),
+                CreateSingleExpectation(operationName: "api/delay/{seconds}", url: "/api/delay/0", httpMethod: "GET", httpStatus: "200", resourceName: "/api/delay/?", addClientIpExpectation),
+                CreateSingleExpectation(operationName: "/not-found", url: "/not-found", httpMethod: "GET", httpStatus: "404", resourceName: "/not-found", addClientIpExpectation),
+                CreateSingleExpectation(operationName: "status-code/{statusCode}", url: "/status-code/203", httpMethod: "GET", httpStatus: "203", resourceName: "/status-code/?", addClientIpExpectation),
                 CreateSingleExpectation(
-                    operationName: "home.throwexception",
+                    operationName: "bad-request",
                     url: "/bad-request",
                     httpMethod: "GET",
                     httpStatus: "500",
-                    resourceUrl: "bad-request",
+                    resourceName: "/bad-request",
                     addClientIpExpectation,
                     additionalCheck: span =>
                     {
