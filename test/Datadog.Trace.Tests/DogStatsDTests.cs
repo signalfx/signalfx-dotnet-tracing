@@ -33,7 +33,7 @@ namespace Datadog.Trace.Tests
             statsd.VerifyNoOtherCalls();
         }
 
-        [Fact]
+        [Fact(Skip="Test is very unstable and we don't use the metics")]
         public void Send_metrics_when_enabled()
         {
             var statsd = new Mock<IStatsd>();
