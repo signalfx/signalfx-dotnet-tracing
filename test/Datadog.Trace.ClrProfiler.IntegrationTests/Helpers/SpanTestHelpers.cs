@@ -52,11 +52,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 }
             }
 
-            var spansMSg = Environment.NewLine + string.Join(Environment.NewLine, spanDump.Select(s => " * " + s));
+            var spansMsg = Environment.NewLine + string.Join(Environment.NewLine, spanDump.Select(s => " * " + s));
 
             var finalMessage = Environment.NewLine + string.Join(Environment.NewLine, failures.Select(f => " - " + f));
 
-            Assert.True(!failures.Any(), finalMessage + spansMSg);
+            Assert.True(!failures.Any(), finalMessage + spansMsg);
             Assert.True(remainingSpans.Count == 0, $"There were {remainingSpans.Count} spans unaccounted for.");
         }
     }
