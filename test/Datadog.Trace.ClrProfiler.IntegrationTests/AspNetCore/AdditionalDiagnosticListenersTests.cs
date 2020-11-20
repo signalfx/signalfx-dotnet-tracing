@@ -19,7 +19,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
         public AdditionalDiagnosticListenersTests(ITestOutputHelper output)
             : base("AdditionalDiagnosticListeners", output)
         {
-            const string operationName = "api.someaction";
+            const string operationName = "api/Api";
             const string url = "/api/api";
             const string httpMethod = "GET";
             const string httpStatus = "200";
@@ -148,7 +148,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
             bool addClientIpExpectation,
             Func<IMockSpan, List<string>> additionalCheck = null)
         {
-            var expectation = new AspNetCoreMvcSpanExpectation(EnvironmentHelper.FullSampleName, operationName, operationName, httpStatus, httpMethod, addClientIpExpectation)
+            var expectation = new AspNetCoreMvcSpanExpectation(EnvironmentHelper.FullSampleName, operationName, resourceUrl, httpStatus, httpMethod, addClientIpExpectation)
             {
                 OriginalUri = url,
             };

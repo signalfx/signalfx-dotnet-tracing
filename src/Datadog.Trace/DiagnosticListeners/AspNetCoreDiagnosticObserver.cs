@@ -168,7 +168,7 @@ namespace Datadog.Trace.DiagnosticListeners
                     remoteIp = httpContext?.Connection?.RemoteIpAddress;
                 }
 
-                span.DecorateWebServerSpan(null, httpMethod, host, url, remoteIp);
+                span.DecorateWebServerSpan(resourceUrl, httpMethod, host, url, remoteIp);
                 span.SetTag(Tags.InstrumentationName, IntegrationName);
 
                 // set analytics sample rate if enabled
@@ -201,20 +201,38 @@ namespace Datadog.Trace.DiagnosticListeners
                     // NOTE: This event is the start of the action pipeline. The action has been selected, the route
                     //       has been selected but no filters have run and model binding hasn't occured.
                     var actionDescriptor = (ActionDescriptor)BeforeActionActionDescriptorFetcher.Fetch(arg);
-                    HttpRequest request = httpContext.Request;
 
-                    string httpMethod = request.Method?.ToUpperInvariant() ?? "UNKNOWN";
-                    string controllerName = actionDescriptor.RouteValues["controller"];
-                    string actionName = actionDescriptor.RouteValues["action"];
-                    string routeTemplate = actionDescriptor.AttributeRouteInfo?.Template;
+                    // Try to use the best tag values available.
 
-                    if (!string.IsNullOrEmpty(controllerName) && !string.IsNullOrEmpty(actionName))
+                    if (!span.Tags.ContainsKey(Tags.HttpMethod))
                     {
-                        span.OperationName = $"{controllerName}.{actionName}".ToLowerInvariant();
+                        HttpRequest request = httpContext.Request;
+                        string httpMethod = request.Method?.ToUpperInvariant();
+
+                        if (!string.IsNullOrEmpty(httpMethod))
+                        {
+                            span.Tags.Add(Tags.HttpMethod, httpMethod);
+                        }
                     }
-                    else if (!string.IsNullOrEmpty(routeTemplate))
+
+                    if (actionDescriptor.RouteValues.TryGetValue("controller", out string controllerName))
+                    {
+                        span.Tags[Tags.AspNetController] = controllerName;
+                    }
+
+                    if (actionDescriptor.RouteValues.TryGetValue("action", out string actionName))
+                    {
+                        span.Tags[Tags.AspNetAction] = actionName;
+                    }
+
+                    string routeTemplate = actionDescriptor.AttributeRouteInfo?.Template;
+                    if (!string.IsNullOrEmpty(routeTemplate))
                     {
                         span.OperationName = routeTemplate;
+                    }
+                    else if (!string.IsNullOrEmpty(controllerName) && !string.IsNullOrEmpty(actionName))
+                    {
+                        span.OperationName = $"{controllerName}.{actionName}".ToLowerInvariant();
                     }
                 }
             }
