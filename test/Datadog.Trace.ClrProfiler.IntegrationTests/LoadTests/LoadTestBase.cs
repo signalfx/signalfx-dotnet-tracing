@@ -63,7 +63,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.LoadTests
             {
                 // Use different ports for every agent, to mimic individual instances IRL
                 int agentPort = TcpPortProvider.GetOpenPort();
-                loadTestPart.Agent = new MockTracerAgent(agentPort);
+                loadTestPart.Agent = new MockZipkinCollector(agentPort);
             }
 
             if (loadTestPart.IsAnchor)

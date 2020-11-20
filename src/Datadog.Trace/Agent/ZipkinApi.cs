@@ -1,14 +1,10 @@
 // Modified by SignalFx
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Datadog.Trace.Configuration;
-using Datadog.Trace.DogStatsd;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Vendors.StatsdClient;
-using MsgPack.Serialization;
-using Newtonsoft.Json;
 
 namespace Datadog.Trace.Agent
 {
@@ -19,7 +15,7 @@ namespace Datadog.Trace.Agent
         private readonly HttpClient _client;
         private readonly TracerSettings _settings;
 
-        public ZipkinApi(TracerSettings settings, DelegatingHandler delegatingHandler, IStatsd statsd)
+        public ZipkinApi(TracerSettings settings, DelegatingHandler delegatingHandler)
         {
             _settings = settings ?? throw new ArgumentNullException(nameof(settings));
 

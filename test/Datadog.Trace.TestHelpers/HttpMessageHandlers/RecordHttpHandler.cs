@@ -7,7 +7,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using MsgPack;
 using Newtonsoft.Json.Linq;
 
 namespace Datadog.Trace.TestHelpers.HttpMessageHandlers
@@ -33,11 +32,6 @@ namespace Datadog.Trace.TestHelpers.HttpMessageHandlers
 
         public List<Tuple<HttpRequestMessage, byte[]>> Requests { get; set; }
 
-        public List<IList<MessagePackObject>> Traces => Requests
-            .Where(x => x.Item1.RequestUri.ToString().Contains("/v0.4/traces"))
-            .Select(x => Unpacking.UnpackObject(x.Item2).Value.AsList())
-            .ToList();
-
         public List<JToken> ZipkinTraces => Requests
             .Where(x => x.Item1.RequestUri.ToString().Contains("/v1/trace"))
             .Select(x =>
@@ -50,11 +44,6 @@ namespace Datadog.Trace.TestHelpers.HttpMessageHandlers
                     JToken parsed = JToken.Parse(item);
                     return parsed;
                 }).ToList();
-
-        public List<MessagePackObjectDictionary> Services => Requests
-            .Where(x => x.Item1.RequestUri.ToString().Contains("/v0.4/services"))
-            .Select(x => Unpacking.UnpackObject(x.Item2).Value.AsDictionary())
-            .ToList();
 
         public List<HttpResponseMessage> Responses { get; set; }
 

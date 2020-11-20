@@ -90,34 +90,12 @@ namespace Datadog.Trace
                 Statsd = statsd ?? CreateDogStatsdClient(Settings, DefaultServiceName, Settings.DogStatsdPort);
             }
 
-            // Run this first in case the port override is ready
-            TracingProcessManager.SubscribeToTraceAgentPortOverride(
-                port =>
-                {
-                    Log.Debug("Attempting to override trace agent port with {0}", port);
-                    var builder = new UriBuilder(Settings.AgentUri) { Port = port };
-                    var baseEndpoint = builder.Uri;
-                    IApi overridingApiClient = new Api(baseEndpoint, delegatingHandler: null, Statsd);
-                    if (_agentWriter == null)
-                    {
-                        _agentWriter = _agentWriter ?? new AgentWriter(overridingApiClient, Statsd);
-                    }
-                    else
-                    {
-                        _agentWriter.OverrideApi(overridingApiClient);
-                    }
-                });
-
             IApi apiClient = null;
             if (agentWriter == null)
             {
                 if (Settings.ApiType.ToLower().Equals("zipkin"))
                 {
-                    apiClient = new ZipkinApi(Settings, delegatingHandler: null, Statsd);
-                }
-                else
-                {
-                    apiClient = new Api(Settings.AgentUri, delegatingHandler: null, Statsd);
+                    apiClient = new ZipkinApi(Settings, delegatingHandler: null);
                 }
             }
 

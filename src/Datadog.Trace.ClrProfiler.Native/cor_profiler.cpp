@@ -332,7 +332,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::ModuleLoadFinished(ModuleID module_id,
       "SignalFx.Tracing"_W,
       "SignalFx.Tracing.ClrProfiler.Managed"_W,
       "SignalFx.Tracing.OpenTracing"_W,
-      "MsgPack"_W,
+      "MsgPack"_W, // MsgPack was removed from SFx implementation but keep skipping it for back compat with manual instrumentation.
       "MsgPack.Serialization.EmittingSerializers.GeneratedSerealizers0"_W,
       "MsgPack.Serialization.EmittingSerializers.GeneratedSerealizers1"_W,
       "MsgPack.Serialization.EmittingSerializers.GeneratedSerealizers2"_W,
