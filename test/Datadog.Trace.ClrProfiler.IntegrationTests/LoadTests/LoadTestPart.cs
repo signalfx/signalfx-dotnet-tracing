@@ -17,7 +17,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.LoadTests
 
         public EnvironmentHelper EnvironmentHelper { get; set; }
 
-        public MockTracerAgent Agent { get; set; }
+        public MockZipkinCollector Agent { get; set; }
 
         public Process Process { get; set; }
 

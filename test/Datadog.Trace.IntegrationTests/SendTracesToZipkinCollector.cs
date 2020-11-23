@@ -21,7 +21,7 @@ namespace Datadog.Trace.IntegrationTests
         {
             var settings = new TracerSettings();
             _httpRecorder = new RecordHttpHandler();
-            var api = new ZipkinApi(settings, _httpRecorder, statsd: null);
+            var api = new ZipkinApi(settings, _httpRecorder);
             var agentWriter = new AgentWriter(api, statsd: null);
             _tracer = new Tracer(settings, agentWriter, sampler: null, scopeManager: null, statsd: null);
         }
@@ -59,10 +59,11 @@ namespace Datadog.Trace.IntegrationTests
                 {
                     const string serviceName = "MyService";
 
-                    var scope = _tracer.StartActive("Operation", serviceName: serviceName);
+                    var scope = _tracer.StartActive("Operation-From-SendTracesToZipkinCollector", serviceName: serviceName);
                     scope.Span.ResourceName = "This is a resource";
                     scope.Dispose();
 
+                    agent.WaitForSpans(1);
                     await _httpRecorder.WaitForCompletion(1);
                     Assert.Single(_httpRecorder.Requests);
                     Assert.Single(_httpRecorder.Responses);

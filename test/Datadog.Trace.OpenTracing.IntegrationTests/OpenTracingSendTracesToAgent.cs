@@ -18,18 +18,19 @@ namespace Datadog.Trace.OpenTracing.IntegrationTests
         {
             var settings = new TracerSettings();
 
-            var endpoint = new Uri("http://localhost:8126");
             _httpRecorder = new RecordHttpHandler();
-            var api = new Api(endpoint, _httpRecorder, statsd: null);
+            var api = new ZipkinApi(settings, _httpRecorder);
             var agentWriter = new AgentWriter(api, statsd: null);
 
             var tracer = new Tracer(settings, agentWriter, sampler: null, scopeManager: null, statsd: null);
             _tracer = new OpenTracingTracer(tracer);
         }
 
-        [Fact(Skip = "Run manually")]
+        [Fact]
         public async void MinimalSpan()
         {
+            using var mockZipkinCollector = new MockZipkinCollector();
+
             var span = (OpenTracingSpan)_tracer.BuildSpan("Operation")
                                                .Start();
             span.Finish();
@@ -40,16 +41,18 @@ namespace Datadog.Trace.OpenTracing.IntegrationTests
             Assert.Single(_httpRecorder.Responses);
             Assert.All(_httpRecorder.Responses, (x) => Assert.Equal(HttpStatusCode.OK, x.StatusCode));
 
-            var trace = _httpRecorder.Traces.Single();
-            MsgPackHelpers.AssertSpanEqual(span.DDSpan, trace.Single());
+            var trace = _httpRecorder.ZipkinTraces.Single();
+            ZipkinHelpers.AssertSpanEqual(span.DDSpan, trace.Single());
         }
 
-        [Fact(Skip = "Run manually")]
+        [Fact]
         public async void CustomServiceName()
         {
+            using var mockZipkinCollector = new MockZipkinCollector();
+
             const string ServiceName = "MyService";
 
-            var span = (OpenTracingSpan)_tracer.BuildSpan("Operation")
+            var span = (OpenTracingSpan)_tracer.BuildSpan("Operation-From-OpenTracingSendTracesToAgent")
                                                .WithTag(DatadogTags.ResourceName, "This is a resource")
                                                .WithTag(DatadogTags.ServiceName, ServiceName)
                                                .Start();
@@ -61,13 +64,15 @@ namespace Datadog.Trace.OpenTracing.IntegrationTests
             Assert.Single(_httpRecorder.Responses);
             Assert.All(_httpRecorder.Responses, (x) => Assert.Equal(HttpStatusCode.OK, x.StatusCode));
 
-            var trace = _httpRecorder.Traces.Single();
-            MsgPackHelpers.AssertSpanEqual(span.DDSpan, trace.Single());
+            var trace = _httpRecorder.ZipkinTraces.Single();
+            ZipkinHelpers.AssertSpanEqual(span.DDSpan, trace.Single());
         }
 
-        [Fact(Skip = "Run manually")]
+        [Fact]
         public async void Utf8Everywhere()
         {
+            using var mockZipkinCollector = new MockZipkinCollector();
+
             var span = (OpenTracingSpan)_tracer.BuildSpan("Aᛗᚪᚾᚾᚪ")
                                                .WithTag(DatadogTags.ResourceName, "η γλώσσα μου έδωσαν ελληνική")
                                                .WithTag(DatadogTags.ServiceName, "На берегу пустынных волн")
@@ -81,11 +86,11 @@ namespace Datadog.Trace.OpenTracing.IntegrationTests
             Assert.Single(_httpRecorder.Responses);
             Assert.All(_httpRecorder.Responses, (x) => Assert.Equal(HttpStatusCode.OK, x.StatusCode));
 
-            var trace = _httpRecorder.Traces.Single();
-            MsgPackHelpers.AssertSpanEqual(span.DDSpan, trace.Single());
+            var trace = _httpRecorder.ZipkinTraces.Single();
+            ZipkinHelpers.AssertSpanEqual(span.DDSpan, trace.Single());
         }
 
-        [Fact(Skip = "Run manually")]
+        [Fact]
         public void WithDefaultFactory()
         {
             // This test does not check anything it validates that this codepath runs without exceptions
