@@ -21,7 +21,7 @@ namespace Datadog.Trace.Agent
 
         private IApi _api;
 
-        public AgentWriter(IApi api, IStatsd statsd, bool synchronousSend)
+        public AgentWriter(IApi api, IStatsd statsd, bool synchronousSend = false)
         {
             _api = api;
             _statsd = statsd;

@@ -80,7 +80,7 @@ namespace Datadog.Trace.Tests.Sampling
         private static Span GetMyServiceSpan()
         {
             var span = new Span(new SpanContext(_id++, _id++, null, serviceName: ServiceName), DateTimeOffset.Now) { OperationName = OperationName };
-            span.SetTag(Tags.Env, Env);
+            span.SetTag(Tags.Environment, Env);
             return span;
         }
 

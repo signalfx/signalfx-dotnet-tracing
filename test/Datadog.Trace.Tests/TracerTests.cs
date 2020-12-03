@@ -299,7 +299,7 @@ namespace Datadog.Trace.Tests
             var tracer = new Tracer();
             Span span = tracer.StartSpan("operation");
 
-            Assert.Equal(env, span.GetTag(Tags.Env));
+            Assert.Equal(env, span.GetTag(Tags.Environment));
 
             // reset the environment variable to its original value (if any) when done
             Environment.SetEnvironmentVariable(name, originalEnv);
