@@ -68,9 +68,9 @@ Use these environment variables to configure the tracing library:
 | `SIGNALFX_DIAGNOSTIC_SOURCE_ENABLED` | `true` | Enable to generate troubleshooting logs with the `System.Diagnostics.DiagnosticSource` class. |
 | `SIGNALFX_DISABLED_INTEGRATIONS` |  | The integrations you want to disable, if any, separated by a semi-colon. These are the supported integrations: AspNetMvc, AspNetWebApi2, DbCommand, ElasticsearchNet5, ElasticsearchNet6, GraphQL, HttpMessageHandler, IDbCommand, MongoDb, NpgsqlCommand, OpenTracing, ServiceStackRedis, SqlCommand, StackExchangeRedis, Wcf, WebRequest |
 | `SIGNALFX_RECORDED_VALUE_MAX_LENGTH` | `1200` | The maximum length an attribute value can have. Values longer than this are truncated. |
-| `SIGNALFX_FILE_LOG_ENABLED` | `true` | Enable file logging (this is enabled by default). |
-| `SIGNALFX_STDOUT_LOG_ENABLED` | `false` | Enables `stdout` logging (disabled by default). |
-| `SIGNALFX_SYNC_SEND` | `false` | Enable to send spans in synchronous mode when the root span is closed.Y ypically synchronous sending is not desired but for tests and some special scenarios it can be useful. |
+| `SIGNALFX_FILE_LOG_ENABLED` | `true` | Enable file logging. This is enabled by default. |
+| `SIGNALFX_STDOUT_LOG_ENABLED` | `false` | Enables `stdout` logging. This is disabled by default. |
+| `SIGNALFX_SYNC_SEND` | `false` | Enable to send spans in synchronous mode when the root span is closed. Sending spans in synchronous mode is generally recommended for only tests, but can also be useful for some special scenarios.|
 
 ### Linux
 
