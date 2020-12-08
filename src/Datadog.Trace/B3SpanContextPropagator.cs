@@ -7,8 +7,10 @@ using Datadog.Trace.Logging;
 
 namespace Datadog.Trace
 {
-    // Modeled from SpanContextPropagator
-    internal class B3SpanContextPropagator
+    /// <summary>
+    /// Class that hanbles B3 style context propagation.
+    /// </summary>
+    public class B3SpanContextPropagator
     {
         private const NumberStyles NumberStyle = System.Globalization.NumberStyles.HexNumber;
         private static readonly CultureInfo InvariantCulture = CultureInfo.InvariantCulture;
@@ -19,6 +21,9 @@ namespace Datadog.Trace
         {
         }
 
+        /// <summary>
+        /// Gets the singleton instance of the propagator.
+        /// </summary>
         public static B3SpanContextPropagator Instance { get; } = new B3SpanContextPropagator();
 
         /// <summary>

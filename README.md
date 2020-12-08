@@ -46,7 +46,7 @@ Use these environment variables to configure the tracing library:
 
 | Environment variable | Default value | Description |
 |-|-|-|
-| `SIGNALFX_ENV` |  | The value for the `env` tag added to every span. This determines the environment in which the service is available in SignalFx µAPM.  |
+| `SIGNALFX_ENV` |  | The value for the `environment` tag added to every span. This determines the environment in which the service is available in SignalFx µAPM.  |
 | `SIGNALFX_SERVICE_NAME` |  | The name of the service. |
 | `SIGNALFX_SERVICE_NAME_PER_SPAN_ENABLED` |  | Enable to allow manual instrumentation to have a different service name than the one you specify with `SIGNALFX_SERVICE_NAME`.  Add a tag `service.name` with the desired name to the manual instrumentation. |
 | `SIGNALFX_TRACING_ENABLED` | `true` | Enable to activate the tracer. |
@@ -68,6 +68,9 @@ Use these environment variables to configure the tracing library:
 | `SIGNALFX_DIAGNOSTIC_SOURCE_ENABLED` | `true` | Enable to generate troubleshooting logs with the `System.Diagnostics.DiagnosticSource` class. |
 | `SIGNALFX_DISABLED_INTEGRATIONS` |  | The integrations you want to disable, if any, separated by a semi-colon. These are the supported integrations: AspNetMvc, AspNetWebApi2, DbCommand, ElasticsearchNet5, ElasticsearchNet6, GraphQL, HttpMessageHandler, IDbCommand, MongoDb, NpgsqlCommand, OpenTracing, ServiceStackRedis, SqlCommand, StackExchangeRedis, Wcf, WebRequest |
 | `SIGNALFX_RECORDED_VALUE_MAX_LENGTH` | `1200` | The maximum length an attribute value can have. Values longer than this are truncated. |
+| `SIGNALFX_FILE_LOG_ENABLED` | `true` | Enable file logging. This is enabled by default. |
+| `SIGNALFX_STDOUT_LOG_ENABLED` | `false` | Enables `stdout` logging. This is disabled by default. |
+| `SIGNALFX_SYNC_SEND` | `false` | Enable to send spans in synchronous mode when the root span is closed. Sending spans in synchronous mode is generally recommended for only tests, but can also be useful for some special scenarios.|
 
 ### Linux
 

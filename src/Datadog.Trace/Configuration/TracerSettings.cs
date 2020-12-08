@@ -18,6 +18,15 @@ namespace Datadog.Trace.Configuration
         public const string DefaultEndpointUrl = "http://localhost:9080/v1/trace";
 
         /// <summary>
+        /// The fallback path to be used if the url value <see cref="EndpointUrl"/>
+        /// nor the <see cref="ConfigurationKeys.AgentPath"/> specified one.
+        /// </summary>
+        /// <remarks>
+        /// This fallback value is expected to work with the SignalFx ingest endpoint.
+        /// </remarks>
+        public const string FallbackUriPath = "/v2/trace";
+
+        /// <summary>
         /// The default API for <see cref="ApiType"/>.
         /// </summary>
         public const string DefaultApiType = "zipkin";
@@ -51,6 +60,9 @@ namespace Datadog.Trace.Configuration
             TraceEnabled = source?.GetBool(ConfigurationKeys.TraceEnabled) ??
                            true;
 
+            SynchronousSend = source?.GetBool(ConfigurationKeys.SynchronousSend) ??
+                            false;
+
             var disabledIntegrationNames = source?.GetString(ConfigurationKeys.DisabledIntegrations)
                                                  ?.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries) ??
                                            Enumerable.Empty<string>();
@@ -79,7 +91,11 @@ namespace Datadog.Trace.Configuration
 
             AgentUri = new Uri(agentUri);
 
-            var agentPath = source?.GetString(ConfigurationKeys.AgentPath) ?? EndpointUrl.PathAndQuery;
+            var endpointPath = EndpointUrl.PathAndQuery != "/"
+                ? EndpointUrl.PathAndQuery
+                : FallbackUriPath;
+
+            var agentPath = source?.GetString(ConfigurationKeys.AgentPath) ?? endpointPath;
 
             // We still want tests and users to be able to configure Uri elements, so reform Endpoint Url
             EndpointUrl = new Uri(AgentUri, agentPath);
@@ -187,6 +203,18 @@ namespace Datadog.Trace.Configuration
         /// <seealso cref="GlobalSettings.DebugEnabled"/>
         [Obsolete]
         public bool DebugEnabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the operation to send spans is
+        /// going to be synchronous when the root span is closed.
+        /// Default is <c>false</c>.
+        /// </summary>
+        /// <remarks>
+        /// Typically synchronous sending is not desired but for tests and some
+        /// special scenarios it can be useful.
+        /// </remarks>
+        /// <seealso cref="ConfigurationKeys.SynchronousSend"/>
+        public bool SynchronousSend { get; set; }
 
         /// <summary>
         /// Gets or sets the names of disabled integrations.

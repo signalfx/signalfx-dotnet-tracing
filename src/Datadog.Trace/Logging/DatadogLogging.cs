@@ -7,6 +7,7 @@ using Datadog.Trace.Configuration;
 using Datadog.Trace.Vendors.Serilog;
 using Datadog.Trace.Vendors.Serilog.Core;
 using Datadog.Trace.Vendors.Serilog.Events;
+using Datadog.Trace.Vendors.Serilog.Formatting.Display;
 using Datadog.Trace.Vendors.Serilog.Sinks.File;
 
 namespace Datadog.Trace.Logging
@@ -21,11 +22,14 @@ namespace Datadog.Trace.Logging
 
         static DatadogLogging()
         {
-            // No-op for if we fail to construct the file logger
+            // No-op for if we fail to construct a logger.
             SharedLogger =
                 new LoggerConfiguration()
                    .WriteTo.Sink<NullSink>()
                    .CreateLogger();
+
+            LoggerConfiguration loggerConfiguration = null;
+            var currentProcess = Process.GetCurrentProcess();
             try
             {
                 if (GlobalSettings.Source.DebugEnabled)
@@ -33,35 +37,18 @@ namespace Datadog.Trace.Logging
                     LoggingLevelSwitch.MinimumLevel = LogEventLevel.Verbose;
                 }
 
-                var maxLogSizeVar = Environment.GetEnvironmentVariable(ConfigurationKeys.MaxLogFileSize);
-                if (long.TryParse(maxLogSizeVar, out var maxLogSize))
-                {
-                    // No verbose or debug logs
-                    MaxLogFileSize = maxLogSize;
-                }
-
-                var logDirectory = GetLogDirectory();
-
-                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-                if (logDirectory == null)
-                {
-                    return;
-                }
-
-                var currentProcess = Process.GetCurrentProcess();
-                // Ends in a dash because of the date postfix
-                var managedLogPath = Path.Combine(logDirectory, $"dotnet-tracer-{currentProcess.ProcessName}-.log");
-
-                var loggerConfiguration =
+                loggerConfiguration =
                     new LoggerConfiguration()
                        .Enrich.FromLogContext()
-                       .MinimumLevel.ControlledBy(LoggingLevelSwitch)
-                       .WriteTo.File(
-                            managedLogPath,
-                            outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}{Properties}{NewLine}",
-                            rollingInterval: RollingInterval.Day,
-                            rollOnFileSizeLimit: true,
-                            fileSizeLimitBytes: MaxLogFileSize);
+                       .MinimumLevel.ControlledBy(LoggingLevelSwitch);
+
+                if (GlobalSettings.Source.StdoutLogEnabled)
+                {
+                    var outputTemplate = Environment.GetEnvironmentVariable(ConfigurationKeys.StdoutLogTemplate) ??
+                        "[{Level:u3}] {Message:lj} {NewLine}{Exception}{NewLine}";
+
+                    loggerConfiguration.WriteTo.Sink(new ConsoleSink(outputTemplate), LogEventLevel.Verbose);
+                }
 
                 try
                 {
@@ -76,16 +63,49 @@ namespace Datadog.Trace.Logging
                     // At all costs, make sure the logger works when possible.
                 }
 
+                if (GlobalSettings.Source.FileLogEnabled)
+                {
+                    var maxLogSizeVar = Environment.GetEnvironmentVariable(ConfigurationKeys.MaxLogFileSize);
+                    if (long.TryParse(maxLogSizeVar, out var maxLogSize))
+                    {
+                        // No verbose or debug logs
+                        MaxLogFileSize = maxLogSize;
+                    }
+
+                    var logDirectory = GetLogDirectory();
+
+                    // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                    if (logDirectory == null)
+                    {
+                        SharedLogger = loggerConfiguration.CreateLogger();
+                        return;
+                    }
+
+                    // Ends in a dash because of the date postfix
+                    var managedLogPath = Path.Combine(logDirectory, $"dotnet-tracer-{currentProcess.ProcessName}-.log");
+                    Console.WriteLine("[Info] managedLogPath: \"" + managedLogPath + "\"");
+
+                    loggerConfiguration
+                           .WriteTo.File(
+                                managedLogPath,
+                                outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}{Properties}{NewLine}",
+                                rollingInterval: RollingInterval.Day,
+                                rollOnFileSizeLimit: true,
+                                fileSizeLimitBytes: MaxLogFileSize);
+                }
+
                 SharedLogger = loggerConfiguration.CreateLogger();
             }
-            catch
+            catch (Exception ex)
             {
                 // Don't let this exception bubble up as this logger is for debugging and is non-critical
+                Console.WriteLine($"[Error] {nameof(DatadogLogging)}: Failed to setup file logging: {ex.Message}");
             }
             finally
             {
                 // Log some information to correspond with the app domain
-                SharedLogger.Information(FrameworkDescription.Create().ToString());
+                var msg = $"{FrameworkDescription.Create()} {{ MachineName: \"{currentProcess.MachineName}\", ProcessName: \"{currentProcess.ProcessName}\", PID: {currentProcess.Id}, AppDomainName: \"{AppDomain.CurrentDomain.FriendlyName}\" }}";
+                SharedLogger.Information(msg);
             }
         }
 
@@ -166,6 +186,23 @@ namespace Datadog.Trace.Logging
             }
 
             return logDirectory;
+        }
+
+        private class ConsoleSink : ILogEventSink
+        {
+            private readonly MessageTemplateTextFormatter _formatter;
+
+            public ConsoleSink(string outputTemplate)
+            {
+                outputTemplate = outputTemplate ?? throw new ArgumentNullException(nameof(outputTemplate));
+
+                _formatter = new MessageTemplateTextFormatter(outputTemplate, null);
+            }
+
+            public void Emit(LogEvent logEvent)
+            {
+                _formatter.Format(logEvent, Console.Out);
+            }
         }
     }
 }

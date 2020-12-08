@@ -10,7 +10,7 @@ namespace Datadog.Trace.Agent
 {
     internal class ZipkinApi : IApi
     {
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.For<ZipkinApi>();
+        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(ZipkinApi));
 
         private readonly HttpClient _client;
         private readonly TracerSettings _settings;
@@ -48,19 +48,20 @@ namespace Datadog.Trace.Agent
                 }
                 catch (Exception ex)
                 {
-#if DEBUG
                     if (ex.InnerException is InvalidOperationException ioe)
                     {
-                        Log.Error("An error occurred while sending traces to {Endpoint}\n{Exception}", ex, _settings.EndpointUrl, ex.ToString());
+                        Log.Error("A fatal error occurred while sending traces to {Endpoint}\n{Exception}", _settings.EndpointUrl, ex.Message);
                         return;
                     }
-#endif
+
                     if (retryCount >= retryLimit)
                     {
                         // stop retrying
-                        Log.Error("An error occurred while sending traces to {Endpoint}", ex, _settings.EndpointUrl);
+                        Log.Error("No more retries to send traces to {Endpoint}\n{Exception}", _settings.EndpointUrl, ex.Message);
                         return;
                     }
+
+                    Log.Debug("Error sending traces to {Endpoint}\n{Exception}", _settings.EndpointUrl, ex.Message);
 
                     // retry
                     await Task.Delay(sleepDuration).ConfigureAwait(false);

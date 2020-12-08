@@ -11,7 +11,7 @@ namespace Datadog.Trace
         /// <summary>
         /// The environment of the profiled service.
         /// </summary>
-        public const string Env = "env";
+        public const string Environment = "environment";
 
         /// <summary>
         /// The name of the integration that generated the span.

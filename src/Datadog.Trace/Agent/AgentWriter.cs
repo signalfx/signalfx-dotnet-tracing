@@ -11,20 +11,29 @@ namespace Datadog.Trace.Agent
     {
         private const int TraceBufferSize = 1000;
 
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.For<AgentWriter>();
+        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(AgentWriter));
 
         private readonly AgentWriterBuffer<Span[]> _tracesBuffer = new AgentWriterBuffer<Span[]>(TraceBufferSize);
         private readonly IStatsd _statsd;
         private readonly Task _flushTask;
+        private readonly bool _synchronousSend;
         private readonly TaskCompletionSource<bool> _processExit = new TaskCompletionSource<bool>();
 
         private IApi _api;
 
-        public AgentWriter(IApi api, IStatsd statsd)
+        public AgentWriter(IApi api, IStatsd statsd, bool synchronousSend = false)
         {
             _api = api;
             _statsd = statsd;
-            _flushTask = Task.Run(FlushTracesTaskLoopAsync);
+            _synchronousSend = synchronousSend;
+            if (synchronousSend)
+            {
+                _flushTask = Task.FromResult(false); // NET45 doesn't have completed task.
+            }
+            else
+            {
+                _flushTask = Task.Run(FlushTracesTaskLoopAsync);
+            }
         }
 
         public void OverrideApi(IApi api)
@@ -34,6 +43,12 @@ namespace Datadog.Trace.Agent
 
         public void WriteTrace(Span[] trace)
         {
+            if (_synchronousSend)
+            {
+                _api.SendTracesAsync(new[] { trace }).Wait();
+                return;
+            }
+
             var success = _tracesBuffer.Push(trace);
 
             if (!success)

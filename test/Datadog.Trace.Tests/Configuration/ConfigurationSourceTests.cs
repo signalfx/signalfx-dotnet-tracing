@@ -62,6 +62,10 @@ namespace Datadog.Trace.Tests.Configuration
             yield return new object[] { ConfigurationKeys.AgentHost, "test-host", CreateFunc(s => s.AgentUri), new Uri("http://test-host:9080/") };
             yield return new object[] { ConfigurationKeys.AgentPort, "9000", CreateFunc(s => s.AgentUri), new Uri("http://localhost:9000/") };
 
+            yield return new object[] { ConfigurationKeys.EndpointUrl, "http://localhost:9411/api/v2/spans", CreateFunc(s => s.EndpointUrl), new Uri("http://localhost:9411/api/v2/spans") };
+            yield return new object[] { ConfigurationKeys.EndpointUrl, "https://ingest.realm.sfx.com", CreateFunc(s => s.EndpointUrl), new Uri("https://ingest.realm.sfx.com/v2/trace") };
+            yield return new object[] { ConfigurationKeys.EndpointUrl, "https://ingest.realm.sfx.com/", CreateFunc(s => s.EndpointUrl), new Uri("https://ingest.realm.sfx.com/v2/trace") };
+
             yield return new object[] { ConfigurationKeys.Environment, "staging", CreateFunc(s => s.Environment), "staging" };
 
             yield return new object[] { ConfigurationKeys.ServiceName, "web-service", CreateFunc(s => s.ServiceName), "web-service" };

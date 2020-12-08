@@ -8,8 +8,15 @@ namespace Datadog.Trace
     /// </summary>
     public static class CorrelationIdentifier
     {
-        internal static readonly string TraceIdKey = "signalfx.trace_id";
-        internal static readonly string SpanIdKey = "signalfx.span_id";
+        /// <summary>
+        /// Key used to correlate the trace ID on logs.
+        /// </summary>
+        public static readonly string TraceIdKey = "signalfx.trace_id";
+
+        /// <summary>
+        /// Key used to correlate the span ID on logs.
+        /// </summary>
+        public static readonly string SpanIdKey = "signalfx.span_id";
 
         /// <summary>
         /// Gets the trace id
