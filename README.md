@@ -282,7 +282,6 @@ The proper binary needs to be selected when deploying to Linux, eg.: the default
 based on Debian and should use the `deb` package, see the [Linux](#Linux) setup section.
 
 If you are not sure what is the Linux distribution being used try the following commands:
-
     - `lsb_release -a`
     - `cat /etc/*release`
     - `cat /etc/issue*`
