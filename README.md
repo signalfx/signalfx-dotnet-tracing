@@ -75,7 +75,6 @@ Use these environment variables to configure the tracing library:
 | `SIGNALFX_PROFILER_PROCESSES` |  | Sets the filename of executables the profiler can attach to. If not defined (default), the profiler will attach to any process. Supports multiple values separated with semi-colons, for example: `MyApp.exe;dotnet.exe` |
 | `SIGNALFX_PROFILER_EXCLUDE_PROCESSES` |  | Sets the filename of executables the profiler cannot attach to. If not defined (default), the profiler will attach to any process. Supports multiple values separated with semi-colons, for example: `MyApp.exe;dotnet.exe` |
 
-<a name="linux_setup"></a>
 ### Linux
 
 After downloading the library, install the CLR Profiler and its components
@@ -280,7 +279,7 @@ the CLR profiler can't instrument many libraries/frameworks under IIS.
 
 ### Linux instrumentation not working
 The proper binary needs to be selected when deploying to Linux, eg.: the default Microsoft .NET images are
-based on Debian and should use the `deb` package, see the [Linux](#linux_setup) setup section.
+based on Debian and should use the `deb` package, see the [Linux](#Linux) setup section.
 
 If you are not sure what is the Linux distribution being used try the following commands:
 
