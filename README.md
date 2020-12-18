@@ -71,6 +71,9 @@ Use these environment variables to configure the tracing library:
 | `SIGNALFX_FILE_LOG_ENABLED` | `true` | Enable file logging. This is enabled by default. |
 | `SIGNALFX_STDOUT_LOG_ENABLED` | `false` | Enables `stdout` logging. This is disabled by default. |
 | `SIGNALFX_SYNC_SEND` | `false` | Enable to send spans in synchronous mode when the root span is closed. Sending spans in synchronous mode is generally recommended for only tests, but can also be useful for some special scenarios.|
+| `SIGNALFX_TRACE_DOMAIN_NEUTRAL_INSTRUMENTATION` | `false` |  Sets whether to intercept method calls when the caller method is inside a domain-neutral assembly. This is recommended when instrumenting IIS applications. |
+| `SIGNALFX_PROFILER_PROCESSES` |  | Sets the filename of executables the profiler can attach to. If not defined (default), the profiler will attach to any process. Supports multiple values separated with semi-colons, for example: `MyApp.exe;dotnet.exe` |
+| `SIGNALFX_PROFILER_EXCLUDE_PROCESSES` |  | Sets the filename of executables the profiler cannot attach to. If not defined (default), the profiler will attach to any process. Supports multiple values separated with semi-colons, for example: `MyApp.exe;dotnet.exe` |
 
 ### Linux
 
@@ -194,10 +197,14 @@ the trace data:
    set SIGNALFX_ENDPOINT_URL='http://<YourSmartAgentOrCollector>:9080/v1/trace'
    ```
 5. Optionally, enable trace injection in logs:
-   ```bash
-   $ export SIGNALFX_LOGS_INJECTION=true
+   ```batch
+   set SIGNALFX_LOGS_INJECTION=true
    ```
-6. Restart your application ensuring that all environment variables above are properly
+6. Optionally, if instrumenting IIS applications add the following environmet variable set to `true`:
+    ```batch
+    set SIGNALFX_TRACE_DOMAIN_NEUTRAL_INSTRUMENTATION=true
+    ```
+7. Restart your application ensuring that all environment variables above are properly
 configured. If you need to check the environment variables for a process use a tool
 like [Process Explorer](https://docs.microsoft.com/en-us/sysinternals/downloads/process-explorer).
 
@@ -261,6 +268,45 @@ For more examples and information on how to do manual instrumentation see:
 
 - https://github.com/signalfx/tracing-examples/tree/master/dotnet-manual-instrumentation
 - https://github.com/signalfx/tracing-examples/tree/master/signalfx-tracing/signalfx-dotnet-tracing
+
+## Troubleshooting
+
+Check if you are not hitting one of the issues listed below.
+
+### IIS applications not instrumenting expected services
+Set the environment variable `SIGNALFX_TRACE_DOMAIN_NEUTRAL_INSTRUMENTATION` to `true` - without it
+the CLR profiler can't instrument many libraries/frameworks under IIS.
+
+### Linux instrumentation not working
+The proper binary needs to be selected when deploying to Linux, eg.: the default Microsoft .NET images are
+based on Debian and should use the `deb` package, see the [Linux](#Linux) setup section.
+
+If you are not sure what is the Linux distribution being used try the following commands:
+```terminal
+$ lsb_release -a
+$ cat /etc/*release
+$ cat /etc/issue*
+$ cat /proc/version
+```
+
+### High CPU usage
+The default installation of auto-instrumentation enables tracing all .NET processes on the box.
+In the typical scenarios (dedicated VMs or containers), this is not a problem.
+Use the environment variables `SIGNALFX_PROFILER_EXCLUDE_PROCESSES` and `SIGNALFX_PROFILER_PROCESSES`
+to include/exclude applications from the tracing auto-instrumentation.
+These are ";" delimited lists that control the inclusion/exclusion of processes.
+
+### Investigating other issues
+If none of the suggestions above solves your issue, detailed logs are necessary.
+Follow the steps below to get the detailed logs from SignalFx Tracing for .NET:
+
+Set the environment variable `SIGNALFX_TRACE_DEBUG` to `true` before the instrumented process starts.
+By default, the library writes the log files under the below predefined locations.
+If needed, change the default location by updating the environment variable `SIGNALFX_TRACE_LOG_PATH` to an appropriate path. 
+On Linux, the default log location is `/var/log/signalfx/dotnet/`
+On Windows, the default log location is `%ProgramData%\SignalFx .NET Tracing\logs\`
+Compress the whole folder to capture the multiple log files and send the compressed folder to us.
+After obtaining the logs, remember to remove the environment variable `SIGNALFX_TRACE_DEBUG` to avoid unnecessary overhead.
 
 ## About
 The SignalFx-Tracing Library for .NET is a fork of the .NET
