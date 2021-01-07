@@ -5,10 +5,11 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
 using Datadog.Trace.ClrProfiler.Emit;
-using Datadog.Trace.ExtensionMethods;
-using Datadog.Trace.Headers;
-using Datadog.Trace.Logging;
-using Datadog.Trace.Util;
+using SignalFx.Tracing;
+using SignalFx.Tracing.ExtensionMethods;
+using SignalFx.Tracing.Headers;
+using SignalFx.Tracing.Logging;
+using SignalFx.Tracing.Util;
 
 namespace Datadog.Trace.ClrProfiler.Integrations
 {
@@ -17,7 +18,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         private static readonly string HttpContextKey = "__Datadog_web_request_ambient_context__";
         private static readonly string TopLevelOperationName = "web.request";
         private static readonly string StartupDiagnosticMethod = "DEBUG";
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(AspNetAmbientContext));
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(AspNetAmbientContext));
 
         private readonly ConcurrentStack<IDisposable> _disposables = new ConcurrentStack<IDisposable>();
         private readonly ConcurrentDictionary<string, Scope> _scopeStorage = new ConcurrentDictionary<string, Scope>();

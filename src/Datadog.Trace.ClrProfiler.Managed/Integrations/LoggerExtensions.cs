@@ -1,13 +1,14 @@
 using System;
 using Datadog.Trace.ClrProfiler.Helpers;
-using Datadog.Trace.DogStatsd;
+using SignalFx.Tracing;
+using SignalFx.Tracing.DogStatsd;
 
 namespace Datadog.Trace.ClrProfiler.Integrations
 {
     internal static class LoggerExtensions
     {
         public static void ErrorRetrievingMethod(
-            this Vendors.Serilog.ILogger logger,
+            this SignalFx.Tracing.Vendors.Serilog.ILogger logger,
             Exception exception,
             long moduleVersionPointer,
             int mdToken,

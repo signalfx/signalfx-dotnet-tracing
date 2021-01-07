@@ -18,7 +18,7 @@
 
 using System;
 
-namespace Datadog.Trace.Vendors.Serilog.Sinks.File
+namespace SignalFx.Tracing.Vendors.Serilog.Sinks.File
 {
     static class Clock
     {

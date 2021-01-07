@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Datadog.Trace.Logging;
-using Datadog.Trace.PlatformHelpers;
+using SignalFx.Tracing.Logging;
+using SignalFx.Tracing.PlatformHelpers;
 
-namespace Datadog.Trace
+namespace SignalFx.Tracing
 {
     internal class TraceContext : ITraceContext
     {
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.For<TraceContext>();
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.For<TraceContext>();
 
         private readonly DateTimeOffset _utcStart = DateTimeOffset.UtcNow;
         private readonly Stopwatch _stopwatch = Stopwatch.StartNew();
@@ -18,7 +18,7 @@ namespace Datadog.Trace
         private SamplingPriority? _samplingPriority;
         private bool _samplingPriorityLocked;
 
-        public TraceContext(IDatadogTracer tracer)
+        public TraceContext(ISignalFxTracer tracer)
         {
             Tracer = tracer;
         }
@@ -27,7 +27,7 @@ namespace Datadog.Trace
 
         public DateTimeOffset UtcNow => _utcStart.Add(_stopwatch.Elapsed);
 
-        public IDatadogTracer Tracer { get; }
+        public ISignalFxTracer Tracer { get; }
 
         /// <summary>
         /// Gets or sets sampling priority.

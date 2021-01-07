@@ -1,6 +1,7 @@
 // Modified by SignalFx
 using System.Collections.Generic;
 using Datadog.Trace.TestHelpers;
+using SignalFx.Tracing;
 
 namespace Datadog.Trace.ClrProfiler.IntegrationTests
 {

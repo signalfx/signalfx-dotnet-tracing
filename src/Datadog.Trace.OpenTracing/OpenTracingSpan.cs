@@ -5,7 +5,7 @@ using System.Globalization;
 using OpenTracing;
 using OpenTracing.Tag;
 
-namespace Datadog.Trace.OpenTracing
+namespace SignalFx.Tracing.OpenTracing
 {
     internal class OpenTracingSpan : ISpan
     {
@@ -20,10 +20,6 @@ namespace Datadog.Trace.OpenTracing
         global::OpenTracing.ISpanContext ISpan.Context => Context;
 
         internal Span Span { get; }
-
-        // TODO lucas: inline this in a separate commit, it will modify a lot of files
-        // This is only exposed for tests
-        internal Span DDSpan => Span;
 
         internal string OperationName => Span.OperationName;
 
@@ -111,13 +107,13 @@ namespace Datadog.Trace.OpenTracing
 
             switch (key)
             {
-                case DatadogTags.ResourceName:
+                case CustomTags.ResourceName:
                     Span.ResourceName = value;
                     return this;
-                case DatadogTags.SpanType:
+                case CustomTags.SpanType:
                     Span.Type = value;
                     return this;
-                case DatadogTags.ServiceName:
+                case CustomTags.ServiceName:
                     Span.ServiceName = value;
                     return this;
             }

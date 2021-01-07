@@ -1,5 +1,6 @@
 // Modified by SignalFx
 using Datadog.Trace.TestHelpers;
+using SignalFx.Tracing;
 using Xunit;
 using Xunit.Abstractions;
 

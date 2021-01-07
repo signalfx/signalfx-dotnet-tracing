@@ -1,8 +1,8 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using Datadog.Trace.ExtensionMethods;
+using SignalFx.Tracing.ExtensionMethods;
 
-namespace Datadog.Trace.Configuration
+namespace SignalFx.Tracing.Configuration
 {
     /// <summary>
     /// A base <see cref="IConfigurationSource"/> implementation

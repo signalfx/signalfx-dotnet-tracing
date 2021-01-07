@@ -1,13 +1,13 @@
-using Datadog.Trace;
-using Datadog.Trace.Configuration;
-using log4net;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Tracer = Datadog.Trace.Tracer;
+using log4net;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Configuration;
+using Tracer = SignalFx.Tracing.Tracer;
 
 namespace TraceContext.InvalidOperationException
 {

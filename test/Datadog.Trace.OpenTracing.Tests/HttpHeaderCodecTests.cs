@@ -1,5 +1,7 @@
 // Modified by SignalFx
 using System;
+using SignalFx.Tracing;
+using SignalFx.Tracing.OpenTracing;
 using Xunit;
 
 namespace Datadog.Trace.OpenTracing.Tests

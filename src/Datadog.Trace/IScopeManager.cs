@@ -1,6 +1,6 @@
 using System;
 
-namespace Datadog.Trace
+namespace SignalFx.Tracing
 {
     /// <summary>
     /// Interface for managing a scope.

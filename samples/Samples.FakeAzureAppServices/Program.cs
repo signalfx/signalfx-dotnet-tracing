@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using Datadog.Trace;
+using SignalFx.Tracing;
 
 namespace Samples.FakeAzureAppServices
 {

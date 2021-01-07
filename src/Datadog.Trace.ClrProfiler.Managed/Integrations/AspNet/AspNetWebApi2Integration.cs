@@ -10,9 +10,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Datadog.Trace.ClrProfiler.Emit;
-using Datadog.Trace.ExtensionMethods;
-using Datadog.Trace.Logging;
-using Datadog.Trace.Util;
+using SignalFx.Tracing;
+using SignalFx.Tracing.ExtensionMethods;
+using SignalFx.Tracing.Logging;
+using SignalFx.Tracing.Util;
 
 namespace Datadog.Trace.ClrProfiler.Integrations
 {
@@ -30,7 +31,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         private const string HttpControllerTypeName = "System.Web.Http.Controllers.IHttpController";
         private const string HttpControllerContextTypeName = "System.Web.Http.Controllers.HttpControllerContext";
 
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(AspNetWebApi2Integration));
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(AspNetWebApi2Integration));
 
         /// <summary>
         /// Calls the underlying ExecuteAsync and traces the request.

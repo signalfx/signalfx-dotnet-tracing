@@ -2,9 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Datadog.Trace.ExtensionMethods;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SignalFx.Tracing;
+using SignalFx.Tracing.ExtensionMethods;
 using Xunit;
 
 namespace Datadog.Trace.TestHelpers
@@ -38,7 +39,7 @@ namespace Datadog.Trace.TestHelpers
         public static string ResourceName(this JToken obj)
         {
             string value;
-            return Tags(obj).TryGetValue(Trace.Tags.ResourceName, out value) ? value : OperationName(obj);
+            return Tags(obj).TryGetValue(SignalFx.Tracing.Tags.ResourceName, out value) ? value : OperationName(obj);
         }
 
         public static string ServiceName(this JToken obj)
@@ -60,7 +61,7 @@ namespace Datadog.Trace.TestHelpers
         public static string Type(this JToken obj)
         {
             string value;
-            return Tags(obj).TryGetValue(Trace.Tags.SpanType, out value) ? value : null;
+            return Tags(obj).TryGetValue(SignalFx.Tracing.Tags.SpanType, out value) ? value : null;
         }
 
         public static bool Error(this JToken obj)
@@ -117,12 +118,12 @@ namespace Datadog.Trace.TestHelpers
                 actualTags.Remove("resource.name");
                 actualTags.Remove("error");
 
-                var expectedSpanKind = DictionaryExtensions.GetValueOrDefault(expectedTags, Datadog.Trace.Tags.SpanKind);
+                var expectedSpanKind = DictionaryExtensions.GetValueOrDefault(expectedTags, SignalFx.Tracing.Tags.SpanKind);
                 if (expectedSpanKind != null)
                 {
                     var actualSpanKind = actual.FirstDictionary()["kind"];
                     Assert.Equal(expectedSpanKind.ToUpper(), actualSpanKind);
-                    expectedTags.Remove(Datadog.Trace.Tags.SpanKind);
+                    expectedTags.Remove(SignalFx.Tracing.Tags.SpanKind);
                 }
 
                 Assert.Equal(expectedTags, actualTags);

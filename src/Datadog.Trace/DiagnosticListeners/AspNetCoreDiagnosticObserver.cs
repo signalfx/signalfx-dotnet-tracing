@@ -2,16 +2,16 @@
 #if NETSTANDARD
 using System;
 using System.Net;
-using Datadog.Trace.Abstractions;
-using Datadog.Trace.ExtensionMethods;
-using Datadog.Trace.Headers;
-using Datadog.Trace.Logging;
-using Datadog.Trace.Util;
-using Datadog.Trace.Vendors.Serilog.Events;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Abstractions;
+using SignalFx.Tracing.Abstractions;
+using SignalFx.Tracing.ExtensionMethods;
+using SignalFx.Tracing.Headers;
+using SignalFx.Tracing.Logging;
+using SignalFx.Tracing.Util;
+using SignalFx.Tracing.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.DiagnosticListeners
+namespace SignalFx.Tracing.DiagnosticListeners
 {
     /// <summary>
     /// Instruments ASP.NET Core.
@@ -30,7 +30,7 @@ namespace Datadog.Trace.DiagnosticListeners
         private const string HttpRequestInOperationName = "aspnet_core.request";
         private const string NoHostSpecified = "UNKNOWN_HOST";
 
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.For<AspNetCoreDiagnosticObserver>();
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.For<AspNetCoreDiagnosticObserver>();
 
         private static readonly PropertyFetcher HttpRequestInStartHttpContextFetcher = new PropertyFetcher("HttpContext");
         private static readonly PropertyFetcher HttpRequestInStopHttpContextFetcher = new PropertyFetcher("HttpContext");
@@ -39,11 +39,11 @@ namespace Datadog.Trace.DiagnosticListeners
         private static readonly PropertyFetcher BeforeActionHttpContextFetcher = new PropertyFetcher("httpContext");
         private static readonly PropertyFetcher BeforeActionActionDescriptorFetcher = new PropertyFetcher("actionDescriptor");
 
-        private readonly IDatadogTracer _tracer;
+        private readonly ISignalFxTracer _tracer;
         private readonly AspNetCoreDiagnosticOptions _options;
         private readonly bool _isLogLevelDebugEnabled = Log.IsEnabled(LogEventLevel.Debug);
 
-        public AspNetCoreDiagnosticObserver(IDatadogTracer tracer, AspNetCoreDiagnosticOptions options)
+        public AspNetCoreDiagnosticObserver(ISignalFxTracer tracer, AspNetCoreDiagnosticOptions options)
             : base(tracer)
         {
             _tracer = tracer ?? throw new ArgumentNullException(nameof(tracer));
@@ -163,7 +163,7 @@ namespace Datadog.Trace.DiagnosticListeners
                                    .SetTag(Tags.InstrumentationName, ComponentName);
 
                 IPAddress remoteIp = null;
-                if (Trace.Tracer.Instance.Settings.AddClientIpToServerSpans)
+                if (Tracing.Tracer.Instance.Settings.AddClientIpToServerSpans)
                 {
                     remoteIp = httpContext?.Connection?.RemoteIpAddress;
                 }

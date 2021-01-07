@@ -1,4 +1,4 @@
-namespace Datadog.Trace.Sampling
+namespace SignalFx.Tracing.Sampling
 {
     internal interface ISamplingRule
     {

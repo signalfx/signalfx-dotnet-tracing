@@ -1,27 +1,27 @@
 // Modified by SignalFx
 using System;
 using System.Collections.Generic;
-using Datadog.Trace.Logging;
 using OpenTracing;
 using OpenTracing.Propagation;
+using SignalFx.Tracing.Logging;
 
-namespace Datadog.Trace.OpenTracing
+namespace SignalFx.Tracing.OpenTracing
 {
     internal class OpenTracingTracer : ITracer
     {
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.For<OpenTracingTracer>();
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.For<OpenTracingTracer>();
 
         private readonly Dictionary<string, ICodec> _codecs;
 
-        public OpenTracingTracer(IDatadogTracer datadogTracer)
-            : this(datadogTracer, new OpenTracingScopeManager(datadogTracer.ScopeManager))
+        public OpenTracingTracer(ISignalFxTracer tracer)
+            : this(tracer, new OpenTracingScopeManager(tracer.ScopeManager))
         {
         }
 
-        public OpenTracingTracer(IDatadogTracer datadogTracer, global::OpenTracing.IScopeManager scopeManager)
+        public OpenTracingTracer(ISignalFxTracer tracer, global::OpenTracing.IScopeManager scopeManager)
         {
-            DatadogTracer = datadogTracer;
-            DefaultServiceName = datadogTracer.DefaultServiceName;
+            SignalFxTracer = tracer;
+            DefaultServiceName = tracer.DefaultServiceName;
             ScopeManager = scopeManager;
             _codecs = new Dictionary<string, ICodec>
             {
@@ -30,7 +30,7 @@ namespace Datadog.Trace.OpenTracing
             };
         }
 
-        public IDatadogTracer DatadogTracer { get; }
+        public ISignalFxTracer SignalFxTracer { get; }
 
         public string DefaultServiceName { get; }
 

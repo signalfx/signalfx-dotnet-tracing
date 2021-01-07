@@ -16,14 +16,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Datadog.Trace.Vendors.Serilog.Configuration;
+using SignalFx.Tracing.Vendors.Serilog.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-namespace Datadog.Trace.Vendors.Serilog.Settings.KeyValuePairs
+namespace SignalFx.Tracing.Vendors.Serilog.Settings.KeyValuePairs
 {
     static class CallableConfigurationMethodFinder
     {

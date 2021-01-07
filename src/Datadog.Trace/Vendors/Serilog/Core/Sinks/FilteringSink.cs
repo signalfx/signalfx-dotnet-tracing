@@ -19,10 +19,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Datadog.Trace.Vendors.Serilog.Debugging;
-using Datadog.Trace.Vendors.Serilog.Events;
+using SignalFx.Tracing.Vendors.Serilog.Debugging;
+using SignalFx.Tracing.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Vendors.Serilog.Core.Sinks
+namespace SignalFx.Tracing.Vendors.Serilog.Core.Sinks
 {
     class FilteringSink : ILogEventSink
     {

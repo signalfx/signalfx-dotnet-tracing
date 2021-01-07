@@ -5,8 +5,9 @@ using System.Data;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using Datadog.Trace.ExtensionMethods;
 using Moq;
+using SignalFx.Tracing;
+using SignalFx.Tracing.ExtensionMethods;
 using Xunit;
 
 namespace Datadog.Trace.Tests.ExtensionMethods

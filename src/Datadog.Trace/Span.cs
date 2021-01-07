@@ -5,12 +5,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using Datadog.Trace.Abstractions;
-using Datadog.Trace.ExtensionMethods;
-using Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Serilog.Events;
+using SignalFx.Tracing.Abstractions;
+using SignalFx.Tracing.ExtensionMethods;
+using SignalFx.Tracing.Logging;
+using SignalFx.Tracing.Vendors.Serilog.Events;
 
-namespace Datadog.Trace
+namespace SignalFx.Tracing
 {
     /// <summary>
     /// A Span represents a logical unit of work in the system. It may be
@@ -20,7 +20,7 @@ namespace Datadog.Trace
     /// </summary>
     public class Span : IDisposable, ISpan
     {
-        private static readonly Vendors.Serilog.ILogger Logger = DatadogLogging.For<Span>();
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Logger = SignalFxLogging.For<Span>();
         private static readonly bool IsLogLevelDebugEnabled = Logger.IsEnabled(LogEventLevel.Debug);
 
         private readonly object _lock = new object();
@@ -175,7 +175,7 @@ namespace Datadog.Trace
             // some tags have special meaning
             switch (key)
             {
-                case Trace.Tags.SamplingPriority:
+                case Tracing.Tags.SamplingPriority:
                     if (Enum.TryParse(value, out SamplingPriority samplingPriority) &&
                         Enum.IsDefined(typeof(SamplingPriority), samplingPriority))
                     {
@@ -185,8 +185,8 @@ namespace Datadog.Trace
 
                     break;
 #pragma warning disable CS0618 // Type or member is obsolete
-                case Trace.Tags.ForceKeep:
-                case Trace.Tags.ManualKeep:
+                case Tracing.Tags.ForceKeep:
+                case Tracing.Tags.ManualKeep:
                     if (value.ToBoolean() ?? false)
                     {
                         // user-friendly tag to set UserKeep priority
@@ -194,8 +194,8 @@ namespace Datadog.Trace
                     }
 
                     break;
-                case Trace.Tags.ForceDrop:
-                case Trace.Tags.ManualDrop:
+                case Tracing.Tags.ForceDrop:
+                case Tracing.Tags.ManualDrop:
                     if (value.ToBoolean() ?? false)
                     {
                         // user-friendly tag to set UserReject priority
@@ -204,7 +204,7 @@ namespace Datadog.Trace
 
                     break;
 #pragma warning restore CS0618 // Type or member is obsolete
-                case Trace.Tags.Analytics:
+                case Tracing.Tags.Analytics:
                     // value is a string and can represent a bool ("true") or a double ("0.5"),
                     // so try to parse both.
                     // note that "1" and "0" can parse as either type,
@@ -214,12 +214,12 @@ namespace Datadog.Trace
                     if (boolean == true)
                     {
                         // always sample
-                        SetMetric(Trace.Tags.Analytics, 1.0);
+                        SetMetric(Tracing.Tags.Analytics, 1.0);
                     }
                     else if (boolean == false)
                     {
                         // never sample
-                        SetMetric(Trace.Tags.Analytics, 0.0);
+                        SetMetric(Tracing.Tags.Analytics, 0.0);
                     }
                     else if (double.TryParse(
                         value,
@@ -228,11 +228,11 @@ namespace Datadog.Trace
                         out double analyticsSampleRate))
                     {
                         // use specified sample rate
-                        SetMetric(Trace.Tags.Analytics, analyticsSampleRate);
+                        SetMetric(Tracing.Tags.Analytics, analyticsSampleRate);
                     }
                     else
                     {
-                        Logger.Warning("Value {0} has incorrect format for tag {1}", value, Trace.Tags.Analytics);
+                        Logger.Warning("Value {0} has incorrect format for tag {1}", value, Tracing.Tags.Analytics);
                     }
 
                     break;
@@ -325,7 +325,7 @@ namespace Datadog.Trace
         /// <returns>This span to allow method chaining.</returns>
         public Span Log(object value)
         {
-            return Log(global::Datadog.Trace.Logs.Event, value);
+            return Log(global::SignalFx.Tracing.Logs.Event, value);
         }
 
         /// <summary>
@@ -426,9 +426,9 @@ namespace Datadog.Trace
                     exception = aggregateException.InnerExceptions[0];
                 }
 
-                SetTag(Trace.Tags.ErrorMsg, exception.Message);
-                SetTag(Trace.Tags.ErrorStack, exception.ToString());
-                SetTag(Trace.Tags.ErrorKind, exception.GetType().ToString());
+                SetTag(Tracing.Tags.ErrorMsg, exception.Message);
+                SetTag(Tracing.Tags.ErrorStack, exception.ToString());
+                SetTag(Tracing.Tags.ErrorKind, exception.GetType().ToString());
             }
         }
 

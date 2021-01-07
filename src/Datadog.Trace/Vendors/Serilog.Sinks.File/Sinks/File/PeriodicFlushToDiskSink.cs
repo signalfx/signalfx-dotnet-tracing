@@ -4,11 +4,11 @@
 //------------------------------------------------------------------------------
 using System;
 using System.Threading;
-using Datadog.Trace.Vendors.Serilog.Core;
-using Datadog.Trace.Vendors.Serilog.Debugging;
-using Datadog.Trace.Vendors.Serilog.Events;
+using SignalFx.Tracing.Vendors.Serilog.Core;
+using SignalFx.Tracing.Vendors.Serilog.Debugging;
+using SignalFx.Tracing.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Vendors.Serilog.Sinks.File
+namespace SignalFx.Tracing.Vendors.Serilog.Sinks.File
 {
     /// <summary>
     /// A sink wrapper that periodically flushes the wrapped sink to disk.

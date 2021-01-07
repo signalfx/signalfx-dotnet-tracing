@@ -9,12 +9,12 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using Datadog.Trace.Configuration;
-using Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Serilog;
-using Datadog.Trace.Vendors.StatsdClient;
+using SignalFx.Tracing.Configuration;
+using SignalFx.Tracing.Logging;
+using SignalFx.Tracing.Vendors.Serilog;
+using SignalFx.Tracing.Vendors.StatsdClient;
 
-namespace Datadog.Trace
+namespace SignalFx.Tracing
 {
     internal class TracingProcessManager
     {
@@ -51,7 +51,7 @@ namespace Datadog.Trace
             DogStatsDMetadata
         };
 
-        private static readonly ILogger Log = DatadogLogging.For<TracingProcessManager>();
+        private static readonly ILogger Log = SignalFxLogging.For<TracingProcessManager>();
 
         private static CancellationTokenSource _cancellationTokenSource;
         private static string _processName;

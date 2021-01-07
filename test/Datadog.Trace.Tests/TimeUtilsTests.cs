@@ -1,7 +1,7 @@
 ﻿// Modified by SignalFx
 #if !NET45 && !NET451 && !NET452
 using System;
-using Datadog.Trace.ExtensionMethods;
+using SignalFx.Tracing.ExtensionMethods;
 using Xunit;
 
 namespace Datadog.Trace.Tests

@@ -1,6 +1,7 @@
 // Modified by SignalFx
 #if !NET452
 using Datadog.Trace.TestHelpers;
+using SignalFx.Tracing;
 using Xunit;
 using Xunit.Abstractions;
 

@@ -1,18 +1,18 @@
 // Modified by SignalFx
 using System;
 using System.Threading;
-using Datadog.Trace.Abstractions;
-using Datadog.Trace.ExtensionMethods;
-using Datadog.Trace.Logging;
+using SignalFx.Tracing.Abstractions;
+using SignalFx.Tracing.ExtensionMethods;
+using SignalFx.Tracing.Logging;
 
-namespace Datadog.Trace
+namespace SignalFx.Tracing
 {
     /// <summary>
     /// The SpanContext contains all the information needed to express relationships between spans inside or outside the process boundaries.
     /// </summary>
     public class SpanContext : ISpanContext
     {
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.For<SpanContext>();
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.For<SpanContext>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SpanContext"/> class

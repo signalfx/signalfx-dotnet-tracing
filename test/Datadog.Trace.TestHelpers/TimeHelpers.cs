@@ -1,5 +1,6 @@
 // Modified by SignalFx
 using System;
+using SignalFx.Tracing;
 
 namespace Datadog.Trace.TestHelpers
 {

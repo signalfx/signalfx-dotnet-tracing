@@ -16,11 +16,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Datadog.Trace.Vendors.Serilog.Context;
-using Datadog.Trace.Vendors.Serilog.Core;
-using Datadog.Trace.Vendors.Serilog.Events;
+using SignalFx.Tracing.Vendors.Serilog.Context;
+using SignalFx.Tracing.Vendors.Serilog.Core;
+using SignalFx.Tracing.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Vendors.Serilog.Enrichers
+namespace SignalFx.Tracing.Vendors.Serilog.Enrichers
 {
     sealed class LogContextEnricher : ILogEventEnricher
     {

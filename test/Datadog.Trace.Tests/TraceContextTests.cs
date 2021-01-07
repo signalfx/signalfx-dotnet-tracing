@@ -1,12 +1,13 @@
 using System;
 using Moq;
+using SignalFx.Tracing;
 using Xunit;
 
 namespace Datadog.Trace.Tests
 {
     public class TraceContextTests
     {
-        private readonly Mock<IDatadogTracer> _tracerMock = new Mock<IDatadogTracer>();
+        private readonly Mock<ISignalFxTracer> _tracerMock = new Mock<ISignalFxTracer>();
 
         [Fact]
         public void UtcNow_GivesLegitTime()

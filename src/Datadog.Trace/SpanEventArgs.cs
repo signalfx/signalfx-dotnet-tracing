@@ -1,6 +1,6 @@
 using System;
 
-namespace Datadog.Trace
+namespace SignalFx.Tracing
 {
     /// <summary>
     /// EventArgs for a Span

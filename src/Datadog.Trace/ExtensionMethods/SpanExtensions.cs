@@ -5,7 +5,7 @@ using System.Data.Common;
 using System.Net;
 using System.Net.Sockets;
 
-namespace Datadog.Trace.ExtensionMethods
+namespace SignalFx.Tracing.ExtensionMethods
 {
     /// <summary>
     /// Extension methods for the <see cref="Span"/> class.

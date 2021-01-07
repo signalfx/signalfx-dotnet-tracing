@@ -1,4 +1,4 @@
-namespace Datadog.Trace.OpenTracing
+namespace SignalFx.Tracing.OpenTracing
 {
     internal interface ICodec
     {

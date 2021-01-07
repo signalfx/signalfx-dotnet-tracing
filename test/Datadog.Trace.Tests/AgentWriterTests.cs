@@ -2,8 +2,9 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Datadog.Trace.Agent;
 using Moq;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Agent;
 using Xunit;
 
 namespace Datadog.Trace.Tests
@@ -15,7 +16,7 @@ namespace Datadog.Trace.Tests
         [InlineData(false)]
         public async Task WriteTrace_2Traces_SendToApi(bool synchronousSend)
         {
-            var tracer = new Mock<IDatadogTracer>();
+            var tracer = new Mock<ISignalFxTracer>();
             tracer.Setup(x => x.DefaultServiceName).Returns("Default");
 
             var api = new Mock<IApi>();

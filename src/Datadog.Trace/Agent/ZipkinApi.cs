@@ -2,15 +2,14 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Datadog.Trace.Configuration;
-using Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.StatsdClient;
+using SignalFx.Tracing.Configuration;
+using SignalFx.Tracing.Logging;
 
-namespace Datadog.Trace.Agent
+namespace SignalFx.Tracing.Agent
 {
     internal class ZipkinApi : IApi
     {
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(ZipkinApi));
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(ZipkinApi));
 
         private readonly HttpClient _client;
         private readonly TracerSettings _settings;

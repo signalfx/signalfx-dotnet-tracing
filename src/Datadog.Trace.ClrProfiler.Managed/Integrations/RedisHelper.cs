@@ -1,7 +1,7 @@
 // Modified by SignalFx
 using System;
-using Datadog.Trace.ExtensionMethods;
-using Datadog.Trace.Logging;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Logging;
 
 namespace Datadog.Trace.ClrProfiler.Integrations
 {
@@ -9,7 +9,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
     {
         private const string OperationName = "redis.command";
 
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(RedisHelper));
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(RedisHelper));
 
         internal static Scope CreateScope(Tracer tracer, string integrationName, string componentName, string host, string port, string rawCommand)
         {

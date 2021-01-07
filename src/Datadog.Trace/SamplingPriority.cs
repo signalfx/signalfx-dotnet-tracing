@@ -1,4 +1,4 @@
-namespace Datadog.Trace
+namespace SignalFx.Tracing
 {
     /// <summary>
     /// A traces sampling priority determines whether is should be kept and stored.

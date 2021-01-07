@@ -1,6 +1,6 @@
 using System;
 
-namespace Datadog.Trace
+namespace SignalFx.Tracing
 {
     internal interface ITraceContext
     {

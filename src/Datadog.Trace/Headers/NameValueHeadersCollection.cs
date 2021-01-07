@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 
-namespace Datadog.Trace.Headers
+namespace SignalFx.Tracing.Headers
 {
     internal class NameValueHeadersCollection : IHeadersCollection
     {

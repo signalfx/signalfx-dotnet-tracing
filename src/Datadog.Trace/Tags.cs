@@ -1,7 +1,7 @@
 // Modified by SignalFx
 using System;
 
-namespace Datadog.Trace
+namespace SignalFx.Tracing
 {
     /// <summary>
     /// Standard span tags used by integrations.
@@ -198,12 +198,12 @@ namespace Datadog.Trace
         public const string ForceDrop = "force.drop";
 
         /// <summary>
-        /// A user-friendly tag that sets the sampling priority to <see cref="Trace.SamplingPriority.UserKeep"/>.
+        /// A user-friendly tag that sets the sampling priority to <see cref="SamplingPriority.UserKeep"/>.
         /// </summary>
         public const string ManualKeep = "manual.keep";
 
         /// <summary>
-        /// A user-friendly tag that sets the sampling priority to <see cref="Trace.SamplingPriority.UserReject"/>.
+        /// A user-friendly tag that sets the sampling priority to <see cref="SamplingPriority.UserReject"/>.
         /// </summary>
         public const string ManualDrop = "manual.drop";
 

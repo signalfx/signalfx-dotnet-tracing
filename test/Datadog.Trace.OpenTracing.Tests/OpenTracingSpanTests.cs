@@ -3,11 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Datadog.Trace.Agent;
-using Datadog.Trace.Configuration;
-using Datadog.Trace.Sampling;
 using Moq;
 using OpenTracing;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Agent;
+using SignalFx.Tracing.Configuration;
+using SignalFx.Tracing.OpenTracing;
+using SignalFx.Tracing.Sampling;
 using Xunit;
 
 namespace Datadog.Trace.OpenTracing.Tests

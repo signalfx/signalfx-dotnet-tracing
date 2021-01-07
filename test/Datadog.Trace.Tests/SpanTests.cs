@@ -2,10 +2,11 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using Datadog.Trace.Agent;
-using Datadog.Trace.Configuration;
-using Datadog.Trace.Sampling;
 using Moq;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Agent;
+using SignalFx.Tracing.Configuration;
+using SignalFx.Tracing.Sampling;
 using Xunit;
 using Xunit.Abstractions;
 

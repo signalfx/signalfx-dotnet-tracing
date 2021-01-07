@@ -1,12 +1,15 @@
 // Modified by SignalFx
 using System;
 using System.Collections;
-using Datadog.Trace.ExtensionMethods;
-using Datadog.Trace.Logging;
+using SignalFx.Tracing.ExtensionMethods;
+using SignalFx.Tracing.Logging;
 
-namespace Datadog.Trace.PlatformHelpers
+namespace SignalFx.Tracing.PlatformHelpers
 {
-    internal class AzureAppServices
+    /// <summary>
+    /// Helper type for Azure App Services.
+    /// </summary>
+    public class AzureAppServices
     {
         /// <summary>
         /// Configuration key which is used as a flag to tell us whether we are running in the context of Azure App Services.
@@ -29,13 +32,17 @@ namespace Datadog.Trace.PlatformHelpers
         /// </summary>
         internal static readonly string SiteNameKey = "WEBSITE_DEPLOYMENT_ID";
 
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(AzureAppServices));
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(AzureAppServices));
 
         static AzureAppServices()
         {
             Metadata = new AzureAppServices(Environment.GetEnvironmentVariables());
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AzureAppServices"/> class.
+        /// </summary>
+        /// <param name="environmentVariables">Environment variables passed to the service.</param>
         public AzureAppServices(IDictionary environmentVariables)
         {
             IsRelevant = GetVariableIfExists(AzureAppServicesContextKey, environmentVariables)?.ToBoolean() ?? false;
@@ -48,16 +55,35 @@ namespace Datadog.Trace.PlatformHelpers
             }
         }
 
+        /// <summary>
+        /// Gets or sets the metadata associated to the service.
+        /// </summary>
         public static AzureAppServices Metadata { get; set; }
 
+        /// <summary>
+        /// Gets a value indicating whether the environment variable <c>SIGNALFX_AZURE_APP_SERVICES</c>
+        /// is defined and it is running as an Azure App Services.
+        /// </summary>
         public bool IsRelevant { get; }
 
+        /// <summary>
+        /// Gets the subscription ID.
+        /// </summary>
         public string SubscriptionId { get; }
 
+        /// <summary>
+        /// Gets the resource group.
+        /// </summary>
         public string ResourceGroup { get; }
 
+        /// <summary>
+        /// Gets the site name.
+        /// </summary>
         public string SiteName { get; }
 
+        /// <summary>
+        /// Gets the resource ID.
+        /// </summary>
         public string ResourceId { get; }
 
         private string CompileResourceId()

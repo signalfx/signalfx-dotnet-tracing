@@ -2,8 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.TestHelpers;
+using SignalFx.Tracing;
+using SignalFx.Tracing.ExtensionMethods;
 using Xunit;
 using Xunit.Abstractions;
 

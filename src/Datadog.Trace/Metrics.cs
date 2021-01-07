@@ -1,4 +1,4 @@
-namespace Datadog.Trace
+namespace SignalFx.Tracing
 {
     internal static class Metrics
     {

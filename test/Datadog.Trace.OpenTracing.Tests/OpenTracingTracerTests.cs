@@ -2,14 +2,16 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Datadog.Trace.Agent;
-using Datadog.Trace.Configuration;
-using Datadog.Trace.Sampling;
 using Datadog.Trace.TestHelpers;
 using Moq;
 using OpenTracing;
 using OpenTracing.Propagation;
 using OpenTracing.Util;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Agent;
+using SignalFx.Tracing.Configuration;
+using SignalFx.Tracing.OpenTracing;
+using SignalFx.Tracing.Sampling;
 using Xunit;
 
 namespace Datadog.Trace.OpenTracing.Tests
@@ -36,8 +38,8 @@ namespace Datadog.Trace.OpenTracing.Tests
             var builder = _tracer.BuildSpan("Op1");
             var span = (OpenTracingSpan)builder.Start();
 
-            Assert.Contains(span.DDSpan.ServiceName, TestRunners.ValidNames);
-            Assert.Equal("Op1", span.DDSpan.OperationName);
+            Assert.Contains(span.Span.ServiceName, TestRunners.ValidNames);
+            Assert.Equal("Op1", span.Span.OperationName);
         }
 
         [Fact]
@@ -128,14 +130,14 @@ namespace Datadog.Trace.OpenTracing.Tests
 
             Span rootDatadogSpan = ((OpenTracingSpan)root.Span).Span;
 
-            Assert.Equal(rootDatadogSpan.Context.TraceContext, (ITraceContext)syncChild.DDSpan.Context.TraceContext);
-            Assert.Equal(rootDatadogSpan.Context.SpanId, syncChild.DDSpan.Context.ParentId);
+            Assert.Equal(rootDatadogSpan.Context.TraceContext, (ITraceContext)syncChild.Span.Context.TraceContext);
+            Assert.Equal(rootDatadogSpan.Context.SpanId, syncChild.Span.Context.ParentId);
 
             foreach (var task in tasks)
             {
                 var span = await task;
-                Assert.Equal(rootDatadogSpan.Context.TraceContext, (ITraceContext)span.DDSpan.Context.TraceContext);
-                Assert.Equal(rootDatadogSpan.Context.SpanId, span.DDSpan.Context.ParentId);
+                Assert.Equal(rootDatadogSpan.Context.TraceContext, (ITraceContext)span.Span.Context.TraceContext);
+                Assert.Equal(rootDatadogSpan.Context.SpanId, span.Span.Context.ParentId);
             }
         }
 
@@ -147,8 +149,8 @@ namespace Datadog.Trace.OpenTracing.Tests
 
             _tracer.Inject(span.Context, BuiltinFormats.HttpHeaders, headers);
 
-            Assert.Equal(span.DDSpan.Context.TraceId.ToString("x16"), headers.Get(HttpHeaderNames.B3TraceId));
-            Assert.Equal(span.DDSpan.Context.SpanId.ToString("x16"), headers.Get(HttpHeaderNames.B3SpanId));
+            Assert.Equal(span.Span.Context.TraceId.ToString("x16"), headers.Get(HttpHeaderNames.B3TraceId));
+            Assert.Equal(span.Span.Context.SpanId.ToString("x16"), headers.Get(HttpHeaderNames.B3SpanId));
         }
 
         [Fact]
@@ -159,8 +161,8 @@ namespace Datadog.Trace.OpenTracing.Tests
 
             _tracer.Inject(span.Context, BuiltinFormats.TextMap, headers);
 
-            Assert.Equal(span.DDSpan.Context.TraceId.ToString("x16"), headers.Get(HttpHeaderNames.B3TraceId));
-            Assert.Equal(span.DDSpan.Context.SpanId.ToString("x16"), headers.Get(HttpHeaderNames.B3SpanId));
+            Assert.Equal(span.Span.Context.TraceId.ToString("x16"), headers.Get(HttpHeaderNames.B3TraceId));
+            Assert.Equal(span.Span.Context.SpanId.ToString("x16"), headers.Get(HttpHeaderNames.B3SpanId));
         }
 
         [Fact]
@@ -209,8 +211,8 @@ namespace Datadog.Trace.OpenTracing.Tests
             const ulong parentId = 10;
             const ulong traceId = 42;
             var headers = new MockTextMap();
-            headers.Set(HttpHeaderNames.ParentId, parentId.ToString());
-            headers.Set(HttpHeaderNames.TraceId, traceId.ToString());
+            headers.Set(HttpHeaderNames.B3ParentId, parentId.ToString());
+            headers.Set(HttpHeaderNames.B3TraceId, traceId.ToString());
             var mockFormat = new Mock<IFormat<ITextMap>>();
 
             Assert.Throws<NotSupportedException>(() => _tracer.Extract(mockFormat.Object, headers));
@@ -246,7 +248,7 @@ namespace Datadog.Trace.OpenTracing.Tests
         public void SetServiceName_WithTag()
         {
             var scope = _tracer.BuildSpan("Operation")
-                               .WithTag(DatadogTags.ServiceName, "MyAwesomeService")
+                               .WithTag(CustomTags.ServiceName, "MyAwesomeService")
                                .StartActive();
 
             var otSpan = (OpenTracingSpan)scope.Span;
@@ -261,7 +263,7 @@ namespace Datadog.Trace.OpenTracing.Tests
             var scope = _tracer.BuildSpan("Operation")
                                .StartActive();
 
-            scope.Span.SetTag(DatadogTags.ServiceName, "MyAwesomeService");
+            scope.Span.SetTag(CustomTags.ServiceName, "MyAwesomeService");
             var otSpan = (OpenTracingSpan)scope.Span;
             var ddSpan = otSpan.Span;
 
@@ -274,7 +276,7 @@ namespace Datadog.Trace.OpenTracing.Tests
             ITracer tracer = OpenTracingTracerFactory.CreateTracer(defaultServiceName: "DefaultServiceName");
 
             var scope = tracer.BuildSpan("Operation")
-                              .WithTag(DatadogTags.ServiceName, "MyAwesomeService")
+                              .WithTag(CustomTags.ServiceName, "MyAwesomeService")
                               .StartActive();
 
             var otSpan = (OpenTracingSpan)scope.Span;
@@ -291,7 +293,7 @@ namespace Datadog.Trace.OpenTracing.Tests
             var scope = tracer.BuildSpan("Operation")
                               .StartActive();
 
-            scope.Span.SetTag(DatadogTags.ServiceName, "MyAwesomeService");
+            scope.Span.SetTag(CustomTags.ServiceName, "MyAwesomeService");
             var otSpan = (OpenTracingSpan)scope.Span;
             var ddSpan = otSpan.Span;
 
@@ -302,7 +304,7 @@ namespace Datadog.Trace.OpenTracing.Tests
         public void InheritParentServiceName_WithTag()
         {
             var parentScope = _tracer.BuildSpan("ParentOperation")
-                                     .WithTag(DatadogTags.ServiceName, "MyAwesomeService")
+                                     .WithTag(CustomTags.ServiceName, "MyAwesomeService")
                                      .StartActive();
 
             var childScope = _tracer.BuildSpan("ChildOperation")
@@ -321,7 +323,7 @@ namespace Datadog.Trace.OpenTracing.Tests
             var parentScope = _tracer.BuildSpan("ParentOperation")
                                      .StartActive();
 
-            parentScope.Span.SetTag(DatadogTags.ServiceName, "MyAwesomeService");
+            parentScope.Span.SetTag(CustomTags.ServiceName, "MyAwesomeService");
 
             var childScope = _tracer.BuildSpan("ChildOperation")
                                     .AsChildOf(parentScope.Span)
@@ -339,7 +341,7 @@ namespace Datadog.Trace.OpenTracing.Tests
             ITracer tracer = OpenTracingTracerFactory.CreateTracer(defaultServiceName: "DefaultServiceName");
 
             var parentScope = tracer.BuildSpan("ParentOperation")
-                                    .WithTag(DatadogTags.ServiceName, "MyAwesomeService")
+                                    .WithTag(CustomTags.ServiceName, "MyAwesomeService")
                                     .StartActive();
 
             var childScope = tracer.BuildSpan("ChildOperation")
@@ -360,7 +362,7 @@ namespace Datadog.Trace.OpenTracing.Tests
             var parentScope = tracer.BuildSpan("ParentOperation")
                                     .StartActive();
 
-            parentScope.Span.SetTag(DatadogTags.ServiceName, "MyAwesomeService");
+            parentScope.Span.SetTag(CustomTags.ServiceName, "MyAwesomeService");
 
             var childScope = tracer.BuildSpan("ChildOperation")
                                    .AsChildOf(parentScope.Span)
@@ -376,7 +378,7 @@ namespace Datadog.Trace.OpenTracing.Tests
         public void RegisteredAsGlobalTracer_ByDefault()
         {
             var globalTracerRep = GlobalTracer.Instance.ToString();
-            Assert.Contains("Datadog.Trace.OpenTracing.OpenTracingTracer", globalTracerRep);
+            Assert.Contains("SignalFx.Tracing.OpenTracing.OpenTracingTracer", globalTracerRep);
         }
 
         [Fact]

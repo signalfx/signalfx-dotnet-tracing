@@ -19,18 +19,18 @@
 using System;
 using System.ComponentModel;
 using System.Text;
-using Datadog.Trace.Vendors.Serilog.Configuration;
-using Datadog.Trace.Vendors.Serilog.Core;
-using Datadog.Trace.Vendors.Serilog.Debugging;
-using Datadog.Trace.Vendors.Serilog.Events;
-using Datadog.Trace.Vendors.Serilog.Formatting;
-using Datadog.Trace.Vendors.Serilog.Formatting.Display;
-using Datadog.Trace.Vendors.Serilog.Formatting.Json;
-using Datadog.Trace.Vendors.Serilog.Sinks.File;
+using SignalFx.Tracing.Vendors.Serilog.Configuration;
+using SignalFx.Tracing.Vendors.Serilog.Core;
+using SignalFx.Tracing.Vendors.Serilog.Debugging;
+using SignalFx.Tracing.Vendors.Serilog.Events;
+using SignalFx.Tracing.Vendors.Serilog.Formatting;
+using SignalFx.Tracing.Vendors.Serilog.Formatting.Display;
+using SignalFx.Tracing.Vendors.Serilog.Formatting.Json;
+using SignalFx.Tracing.Vendors.Serilog.Sinks.File;
 
 // ReSharper disable MethodOverloadWithOptionalParameter
 
-namespace Datadog.Trace.Vendors.Serilog
+namespace SignalFx.Tracing.Vendors.Serilog
 {
     /// <summary>Extends <see cref="LoggerConfiguration"/> with methods to add file sinks.</summary>
     internal static class FileLoggerConfigurationExtensions

@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using Datadog.Trace.Headers;
 using OpenTracing.Propagation;
+using SignalFx.Tracing.Headers;
 
-namespace Datadog.Trace.OpenTracing
+namespace SignalFx.Tracing.OpenTracing
 {
     internal class TextMapHeadersCollection : IHeadersCollection
     {

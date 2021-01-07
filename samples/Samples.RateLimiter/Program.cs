@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
-using Datadog.Trace;
-using Datadog.Trace.Configuration;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Configuration;
 
 namespace Samples.RateLimiter
 {

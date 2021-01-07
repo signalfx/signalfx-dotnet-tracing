@@ -1,4 +1,4 @@
-namespace Datadog.Trace.DiagnosticListeners
+namespace SignalFx.Tracing.DiagnosticListeners
 {
     internal interface IDiagnosticManager
     {

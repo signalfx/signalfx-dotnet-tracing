@@ -8,9 +8,10 @@ using System.Net;
 using System.Web;
 using System.Web.Routing;
 using Datadog.Trace.ClrProfiler.Emit;
-using Datadog.Trace.ExtensionMethods;
-using Datadog.Trace.Logging;
-using Datadog.Trace.Util;
+using SignalFx.Tracing;
+using SignalFx.Tracing.ExtensionMethods;
+using SignalFx.Tracing.Logging;
+using SignalFx.Tracing.Util;
 
 namespace Datadog.Trace.ClrProfiler.Integrations
 {
@@ -30,7 +31,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         private const string ControllerContextTypeName = "System.Web.Mvc.ControllerContext";
         private const string RouteCollectionRouteTypeName = "System.Web.Mvc.Routing.RouteCollectionRoute";
 
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(AspNetMvcIntegration));
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(AspNetMvcIntegration));
 
         /// <summary>
         /// Creates a scope used to instrument an MVC action and populates some common details.

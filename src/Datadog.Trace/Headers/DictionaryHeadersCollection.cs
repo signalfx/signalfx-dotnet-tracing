@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Datadog.Trace.Headers
+namespace SignalFx.Tracing.Headers
 {
     /// <summary>
-    /// Type to wrap a <see cref="System.Collections.Generic.IDictionary{TKey, TValue}"/> into a
+    /// Type to wrap an IDictionary&gt;string, IList&gt;string&lt;&lt; into a
     /// <see cref="IHeadersCollection"/>.
     /// </summary>
     public class DictionaryHeadersCollection : IHeadersCollection

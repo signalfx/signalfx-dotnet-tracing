@@ -2,7 +2,7 @@
 using System;
 using System.Collections;
 using System.Linq;
-using Datadog.Trace.ExtensionMethods;
+using SignalFx.Tracing.ExtensionMethods;
 using Xunit;
 
 namespace Datadog.Trace.Tests.ExtensionMethods

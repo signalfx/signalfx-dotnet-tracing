@@ -1,4 +1,4 @@
-namespace Datadog.Trace
+namespace SignalFx.Tracing
 {
 #if NET45
     using System;
@@ -7,7 +7,7 @@ namespace Datadog.Trace
 
     internal class AsyncLocalCompat<T>
     {
-        private readonly string _name = "__Datadog_Scope_Current__" + Guid.NewGuid();
+        private readonly string _name = "__SignalFx_Scope_Current__" + Guid.NewGuid();
 
         public T Get()
         {

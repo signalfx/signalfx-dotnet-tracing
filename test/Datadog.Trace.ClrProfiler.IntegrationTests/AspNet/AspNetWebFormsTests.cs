@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using SignalFx.Tracing;
 using Xunit;
 using Xunit.Abstractions;
 

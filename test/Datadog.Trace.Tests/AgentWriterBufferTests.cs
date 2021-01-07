@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Datadog.Trace.Agent;
+using SignalFx.Tracing.Agent;
 using Xunit;
 
 namespace Datadog.Trace.Tests

@@ -3,7 +3,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Datadog.Trace.ClrProfiler.Emit;
-using Datadog.Trace.Logging;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Logging;
 
 namespace Datadog.Trace.ClrProfiler.Integrations
 {
@@ -18,7 +19,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         private const string ElasticsearchAssemblyName = "Elasticsearch.Net";
         private const string RequestPipelineInterfaceTypeName = "Elasticsearch.Net.IRequestPipeline";
 
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(ElasticsearchNet6Integration));
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(ElasticsearchNet6Integration));
 
         /// <summary>
         /// Traces a synchronous call to Elasticsearch.

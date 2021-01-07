@@ -6,8 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Datadog.Trace.ClrProfiler.Emit;
 using Datadog.Trace.ClrProfiler.Helpers;
-using Datadog.Trace.ExtensionMethods;
-using Datadog.Trace.Logging;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Logging;
 
 namespace Datadog.Trace.ClrProfiler.Integrations
 {
@@ -34,7 +34,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
         private const string TaskOfGraphQLExecutionResult = "System.Threading.Tasks.Task`1<" + GraphQLExecutionResultName + ">";
 
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(GraphQLIntegration));
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(GraphQLIntegration));
 
         /// <summary>
         /// Wrap the original method by adding instrumentation code around it.
@@ -326,9 +326,9 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             {
                 span.Error = true;
 
-                span.SetTag(Trace.Tags.ErrorMsg, $"{errorCount} error(s)");
-                span.SetTag(Trace.Tags.ErrorKind, errorType);
-                span.SetTag(Trace.Tags.ErrorStack, ConstructErrorMessage(executionErrors));
+                span.SetTag(Tags.ErrorMsg, $"{errorCount} error(s)");
+                span.SetTag(Tags.ErrorKind, errorType);
+                span.SetTag(Tags.ErrorStack, ConstructErrorMessage(executionErrors));
             }
         }
 

@@ -1,10 +1,10 @@
 using System;
-using Datadog.Trace.Configuration;
-using Datadog.Trace.Sampling;
+using SignalFx.Tracing.Configuration;
+using SignalFx.Tracing.Sampling;
 
-namespace Datadog.Trace
+namespace SignalFx.Tracing
 {
-    internal interface IDatadogTracer
+    internal interface ISignalFxTracer
     {
         string DefaultServiceName { get; }
 

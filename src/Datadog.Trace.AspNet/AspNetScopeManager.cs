@@ -1,6 +1,6 @@
 using System;
 using System.Web;
-using Datadog.Trace.Logging;
+using SignalFx.Tracing;
 
 namespace Datadog.Trace.AspNet
 {

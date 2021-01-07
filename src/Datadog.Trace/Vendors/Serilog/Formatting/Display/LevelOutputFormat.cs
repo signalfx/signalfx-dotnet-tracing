@@ -16,10 +16,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Datadog.Trace.Vendors.Serilog.Events;
-using Datadog.Trace.Vendors.Serilog.Rendering;
+using SignalFx.Tracing.Vendors.Serilog.Events;
+using SignalFx.Tracing.Vendors.Serilog.Rendering;
 
-namespace Datadog.Trace.Vendors.Serilog.Formatting.Display
+namespace SignalFx.Tracing.Vendors.Serilog.Formatting.Display
 {
     /// <summary>
     /// Implements the {Level} element.

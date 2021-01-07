@@ -3,15 +3,15 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Datadog.Trace.Logging;
+using SignalFx.Tracing.Logging;
 
-namespace Datadog.Trace.DiagnosticListeners
+namespace SignalFx.Tracing.DiagnosticListeners
 {
     internal abstract class DiagnosticObserver : IObserver<KeyValuePair<string, object>>
     {
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.For<DiagnosticObserver>();
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.For<DiagnosticObserver>();
 
-        protected DiagnosticObserver(IDatadogTracer tracer)
+        protected DiagnosticObserver(ISignalFxTracer tracer)
         {
             Tracer = tracer ?? throw new ArgumentNullException(nameof(tracer));
 
@@ -20,7 +20,7 @@ namespace Datadog.Trace.DiagnosticListeners
             ListenerNames.AddRange(tracer.Settings.AdditionalDiagnosticListeners);
         }
 
-        protected IDatadogTracer Tracer { get; }
+        protected ISignalFxTracer Tracer { get; }
 
         protected List<string> ListenerNames { get; }
 

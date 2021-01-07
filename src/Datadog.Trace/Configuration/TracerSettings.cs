@@ -3,9 +3,9 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using Datadog.Trace.Sampling;
+using SignalFx.Tracing.Sampling;
 
-namespace Datadog.Trace.Configuration
+namespace SignalFx.Tracing.Configuration
 {
     /// <summary>
     /// Contains Tracer settings.
@@ -403,7 +403,7 @@ namespace Datadog.Trace.Configuration
 
         /// <summary>
         /// Creates a <see cref="IConfigurationSource"/> by combining environment variables,
-        /// AppSettings where available, and a local datadog.json file, if present.
+        /// AppSettings where available, and a local signalfx.json file, if present.
         /// </summary>
         /// <returns>A new <see cref="IConfigurationSource"/> instance.</returns>
         public static CompositeConfigurationSource CreateDefaultConfigurationSource()

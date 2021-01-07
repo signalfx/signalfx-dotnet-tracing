@@ -2,10 +2,11 @@
 using System;
 using System.Linq;
 using System.Net;
-using Datadog.Trace.Agent;
-using Datadog.Trace.Configuration;
 using Datadog.Trace.TestHelpers;
 using Datadog.Trace.TestHelpers.HttpMessageHandlers;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Agent;
+using SignalFx.Tracing.Configuration;
 using Xunit;
 
 namespace Datadog.Trace.IntegrationTests
@@ -22,7 +23,7 @@ namespace Datadog.Trace.IntegrationTests
             var settings = new TracerSettings();
             _httpRecorder = new RecordHttpHandler();
             var api = new ZipkinApi(settings, _httpRecorder);
-            var agentWriter = new AgentWriter(api, statsd: null);
+            var agentWriter = new AgentWriter(api, statsd: null, synchronousSend: false);
             _tracer = new Tracer(settings, agentWriter, sampler: null, scopeManager: null, statsd: null);
         }
 

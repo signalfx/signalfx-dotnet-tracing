@@ -4,7 +4,8 @@ using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 using Datadog.Trace.ClrProfiler.Emit;
-using Datadog.Trace.Logging;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Logging;
 
 namespace Datadog.Trace.ClrProfiler.Integrations.AdoNet
 {
@@ -21,7 +22,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.AdoNet
         private const string DbCommandTypeName = "System.Data.Common.DbCommand";
         private const string DbDataReaderTypeName = "System.Data.Common.DbDataReader";
 
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(DbCommandIntegration));
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(DbCommandIntegration));
 
         /// <summary>
         /// Instrumentation wrapper for <see cref="DbCommand.ExecuteReader()"/>.

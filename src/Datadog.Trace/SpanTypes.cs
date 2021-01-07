@@ -1,4 +1,4 @@
-namespace Datadog.Trace
+namespace SignalFx.Tracing
 {
     /// <summary>
     /// A set of standard span types that can be used by integrations.

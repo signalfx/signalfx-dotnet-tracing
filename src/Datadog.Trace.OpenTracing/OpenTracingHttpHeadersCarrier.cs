@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http.Headers;
 using OpenTracing.Propagation;
 
-namespace Datadog.Trace.OpenTracing
+namespace SignalFx.Tracing.OpenTracing
 {
     /// <summary>
     /// This class wraps a <see cref="HttpHeaders"/> to implement the <see cref="ITextMap"/> interface

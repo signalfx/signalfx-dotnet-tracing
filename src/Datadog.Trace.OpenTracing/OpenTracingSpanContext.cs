@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Datadog.Trace.Logging;
+using SignalFx.Tracing.Logging;
 
-namespace Datadog.Trace.OpenTracing
+namespace SignalFx.Tracing.OpenTracing
 {
     internal class OpenTracingSpanContext : global::OpenTracing.ISpanContext
     {
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.For<OpenTracingSpanContext>();
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.For<OpenTracingSpanContext>();
 
         public OpenTracingSpanContext(ISpanContext context)
         {

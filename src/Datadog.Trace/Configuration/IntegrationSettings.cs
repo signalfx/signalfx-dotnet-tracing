@@ -1,6 +1,6 @@
 using System;
 
-namespace Datadog.Trace.Configuration
+namespace SignalFx.Tracing.Configuration
 {
     /// <summary>
     /// Contains integration-specific settings.

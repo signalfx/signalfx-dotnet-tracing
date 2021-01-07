@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Datadog.Trace.ExtensionMethods
+namespace SignalFx.Tracing.ExtensionMethods
 {
     internal static class DictionaryExtensions
     {

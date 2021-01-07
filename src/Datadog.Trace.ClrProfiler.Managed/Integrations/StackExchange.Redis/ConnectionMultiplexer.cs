@@ -2,7 +2,8 @@
 using System;
 using System.Threading.Tasks;
 using Datadog.Trace.ClrProfiler.Emit;
-using Datadog.Trace.Logging;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Logging;
 
 namespace Datadog.Trace.ClrProfiler.Integrations.StackExchange.Redis
 {
@@ -24,7 +25,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.StackExchange.Redis
         private const string StackExchangeRedisResultProcessorGeneric = "StackExchange.Redis.ResultProcessor`1<T>";
         private const string StackExchangeRedisResultProcessor = "StackExchange.Redis.ResultProcessor`1";
 
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(ConnectionMultiplexer));
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(ConnectionMultiplexer));
 
         /// <summary>
         /// Execute a synchronous redis operation.

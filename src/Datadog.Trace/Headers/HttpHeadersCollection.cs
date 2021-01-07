@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
 
-namespace Datadog.Trace.Headers
+namespace SignalFx.Tracing.Headers
 {
     internal class HttpHeadersCollection : IHeadersCollection
     {

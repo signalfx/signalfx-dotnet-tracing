@@ -1,7 +1,7 @@
 // Modified by SignalFx
 using System;
 
-namespace Datadog.Trace
+namespace SignalFx.Tracing
 {
     /// <summary>
     /// An API to access the active trace and span ids.

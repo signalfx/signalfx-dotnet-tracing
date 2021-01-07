@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using Datadog.Trace.Logging;
-using Datadog.Trace.Logging.LogProviders;
 using log4net.Appender;
 using log4net.Config;
 using log4net.Core;
 using log4net.Layout;
 using Newtonsoft.Json;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Logging;
+using SignalFx.Tracing.Logging.LogProviders;
 using Xunit;
 
 namespace Datadog.Trace.Tests.Logging

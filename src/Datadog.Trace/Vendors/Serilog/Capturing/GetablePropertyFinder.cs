@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Datadog.Trace.Vendors.Serilog.Capturing
+namespace SignalFx.Tracing.Vendors.Serilog.Capturing
 {
     static class GetablePropertyFinder
     {

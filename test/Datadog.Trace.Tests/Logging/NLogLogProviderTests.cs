@@ -1,11 +1,12 @@
 // Modified by SignalFx
 using System.Collections.Generic;
-using Datadog.Trace.Logging;
-using Datadog.Trace.Logging.LogProviders;
 using NLog;
 using NLog.Config;
 using NLog.Layouts;
 using NLog.Targets;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Logging;
+using SignalFx.Tracing.Logging.LogProviders;
 using Xunit;
 
 namespace Datadog.Trace.Tests.Logging

@@ -4,7 +4,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 
-namespace Datadog.Trace.Util
+namespace SignalFx.Tracing.Util
 {
     internal class PropertyFetcher
     {

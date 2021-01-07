@@ -3,10 +3,9 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using Datadog.Trace.ExtensionMethods;
-using Datadog.Trace.Headers;
-// using Datadog.Trace.TestHelpers;
-using Moq;
+using SignalFx.Tracing;
+using SignalFx.Tracing.ExtensionMethods;
+using SignalFx.Tracing.Headers;
 using Xunit;
 
 namespace Datadog.Trace.Tests
@@ -160,7 +159,29 @@ namespace Datadog.Trace.Tests
             IHeadersCollection headers = new HttpRequestMessage().Headers.Wrap();
             headers.Add(HttpHeaderNames.B3TraceId, traceId);
             headers.Add(HttpHeaderNames.B3SpanId, spanId);
-            headers.Add(HttpHeaderNames.B3Sampled, samplingPriority);
+
+            // Mimick the B3 injection mapping of samplingPriority
+            switch (samplingPriority)
+            {
+                case "-1":
+                // SamplingPriority.UserReject
+                case "0":
+                    // SamplingPriority.AutoReject
+                    headers.Add(HttpHeaderNames.B3Flags, "0");
+                    break;
+                case "1":
+                    // SamplingPriority.AutoKeep
+                    headers.Add(HttpHeaderNames.B3Sampled, "1");
+                    break;
+                case "2":
+                    // SamplingPriority.UserKeep
+                    headers.Add(HttpHeaderNames.B3Flags, "1");
+                    break;
+                default:
+                    // Invalid samplingPriority
+                    break;
+            }
+
             return headers;
         }
 

@@ -19,9 +19,9 @@
 using System;
 using System.IO;
 
-using Datadog.Trace.Vendors.Serilog.Events;
+using SignalFx.Tracing.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Vendors.Serilog.Formatting.Display.Obsolete
+namespace SignalFx.Tracing.Vendors.Serilog.Formatting.Display.Obsolete
 {
     [Obsolete("Not used by the current output formatting implementation.")]
     class LogEventLevelValue : LogEventPropertyValue

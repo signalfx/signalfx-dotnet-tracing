@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Datadog.Trace.Abstractions
+namespace SignalFx.Tracing.Abstractions
 {
     internal interface ISpan
     {

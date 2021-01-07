@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Datadog.Trace.Agent
+namespace SignalFx.Tracing.Agent
 {
     internal interface IAgentWriter
     {

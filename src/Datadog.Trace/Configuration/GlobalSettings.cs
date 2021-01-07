@@ -1,11 +1,11 @@
 using System.IO;
-using Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Serilog.Events;
+using SignalFx.Tracing.Logging;
+using SignalFx.Tracing.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Configuration
+namespace SignalFx.Tracing.Configuration
 {
     /// <summary>
-    /// Contains global datadog settings.
+    /// Contains global settings.
     /// </summary>
     public class GlobalSettings
     {
@@ -71,11 +71,11 @@ namespace Datadog.Trace.Configuration
 
             if (enabled)
             {
-                DatadogLogging.SetLogLevel(LogEventLevel.Verbose);
+                SignalFxLogging.SetLogLevel(LogEventLevel.Verbose);
             }
             else
             {
-                DatadogLogging.UseDefaultLevel();
+                SignalFxLogging.UseDefaultLevel();
             }
         }
 
@@ -101,12 +101,12 @@ namespace Datadog.Trace.Configuration
 
         /// <summary>
         /// Creates a <see cref="IConfigurationSource"/> by combining environment variables,
-        /// AppSettings where available, and a local datadog.json file, if present.
+        /// AppSettings where available, and a local signalfx.json file, if present.
         /// </summary>
         /// <returns>A new <see cref="IConfigurationSource"/> instance.</returns>
         internal static CompositeConfigurationSource CreateDefaultConfigurationSource()
         {
-            // env > AppSettings > datadog.json
+            // env > AppSettings > signalfx.json
             var configurationSource = new CompositeConfigurationSource
             {
                 new EnvironmentConfigurationSource(),
@@ -121,7 +121,7 @@ namespace Datadog.Trace.Configuration
 
 #if !NETSTANDARD2_0
             // on .NET Framework only, use application's root folder
-            // as default path when looking for datadog.json
+            // as default path when looking for signalfx.json
             if (System.Web.Hosting.HostingEnvironment.IsHosted)
             {
                 currentDirectory = System.Web.Hosting.HostingEnvironment.MapPath("~");
@@ -130,7 +130,7 @@ namespace Datadog.Trace.Configuration
 
             // if environment variable is not set, look for default file name in the current directory
             var configurationFileName = configurationSource.GetString(ConfigurationKeys.ConfigurationFileName) ??
-                                        Path.Combine(currentDirectory, "datadog.json");
+                                        Path.Combine(currentDirectory, "signalfx.json");
 
             if (Path.GetExtension(configurationFileName).ToUpperInvariant() == ".JSON" &&
                 File.Exists(configurationFileName))

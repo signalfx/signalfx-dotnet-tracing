@@ -18,10 +18,10 @@
 
 using System;
 using System.Collections;
-using Datadog.Trace.Vendors.Serilog.Core;
-using Datadog.Trace.Vendors.Serilog.Policies;
+using SignalFx.Tracing.Vendors.Serilog.Core;
+using SignalFx.Tracing.Vendors.Serilog.Policies;
 
-namespace Datadog.Trace.Vendors.Serilog.Configuration
+namespace SignalFx.Tracing.Vendors.Serilog.Configuration
 {
     /// <summary>
     /// Controls template parameter destructuring configuration.

@@ -21,11 +21,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using Datadog.Trace.Vendors.Serilog.Configuration;
-using Datadog.Trace.Vendors.Serilog.Core;
-using Datadog.Trace.Vendors.Serilog.Events;
+using SignalFx.Tracing.Vendors.Serilog.Configuration;
+using SignalFx.Tracing.Vendors.Serilog.Core;
+using SignalFx.Tracing.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Vendors.Serilog.Settings.KeyValuePairs
+namespace SignalFx.Tracing.Vendors.Serilog.Settings.KeyValuePairs
 {
     class KeyValuePairSettings : ILoggerSettings
     {

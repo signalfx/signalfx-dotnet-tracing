@@ -18,9 +18,9 @@
 
 using System;
 using System.Collections.Generic;
-using Datadog.Trace.Vendors.Serilog.Events;
+using SignalFx.Tracing.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Vendors.Serilog.Data
+namespace SignalFx.Tracing.Vendors.Serilog.Data
 {
     /// <summary>
     /// A base class for visitors that rewrite the value with modifications. For example, implementations

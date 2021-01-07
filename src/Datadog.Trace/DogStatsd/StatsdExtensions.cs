@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
-using Datadog.Trace.Vendors.StatsdClient;
+using SignalFx.Tracing.Vendors.StatsdClient;
 
-namespace Datadog.Trace.DogStatsd
+namespace SignalFx.Tracing.DogStatsd
 {
     internal static class StatsdExtensions
     {

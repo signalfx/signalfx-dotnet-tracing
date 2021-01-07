@@ -17,9 +17,9 @@
 // limitations under the License.
 
 using System.IO;
-using Datadog.Trace.Vendors.Serilog.Events;
+using SignalFx.Tracing.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Vendors.Serilog.Formatting
+namespace SignalFx.Tracing.Vendors.Serilog.Formatting
 {
     /// <summary>
     /// Formats log events in a textual representation.

@@ -1,10 +1,11 @@
 // Modified by SignalFx
 using System;
 using System.Collections.Generic;
-using Datadog.Trace.Logging;
-using Datadog.Trace.Logging.LogProviders;
 using Serilog;
 using Serilog.Events;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Logging;
+using SignalFx.Tracing.Logging.LogProviders;
 using Xunit;
 
 namespace Datadog.Trace.Tests.Logging

@@ -5,8 +5,9 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Datadog.Trace.ClrProfiler.Emit;
-using Datadog.Trace.ExtensionMethods;
-using Datadog.Trace.Logging;
+using SignalFx.Tracing;
+using SignalFx.Tracing.ExtensionMethods;
+using SignalFx.Tracing.Logging;
 
 namespace Datadog.Trace.ClrProfiler.Integrations
 {
@@ -23,7 +24,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         private const string HttpClientHandler = "System.Net.Http.HttpClientHandler";
         private const string SendAsync = "SendAsync";
 
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(HttpMessageHandlerIntegration));
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(HttpMessageHandlerIntegration));
 
         /// <summary>
         /// Instrumentation wrapper for <see cref="HttpMessageHandler.SendAsync"/>.
