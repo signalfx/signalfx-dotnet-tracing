@@ -108,7 +108,7 @@ namespace SignalFx.Tracing
             var sampled = headers.GetValues(HttpHeaderNames.B3Sampled).ToList();
             if (debugged.Count != 0 && (debugged[0] == "0" || debugged[0] == "1"))
             {
-                 return debugged[0] == "1" ? SamplingPriority.UserKeep : null;
+                 return debugged[0] == "1" ? SamplingPriority.UserKeep : (SamplingPriority?)null;
             }
             else if (sampled.Count != 0 && (sampled[0] == "0" || sampled[0] == "1"))
             {
