@@ -31,7 +31,7 @@ namespace Datadog.Trace.Tests
             agentWriter.WriteTrace(trace);
             if (!synchronousSend)
             {
-                await Task.Delay(TimeSpan.FromSeconds(3));
+                await Task.Delay(TimeSpan.FromSeconds(5));
             }
 
             api.Verify(x => x.SendTracesAsync(It.Is<Span[][]>(y => y.Single().Equals(trace))), Times.Once);
