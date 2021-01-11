@@ -80,8 +80,8 @@ namespace Datadog.Trace.Tests.Sampling
             var expectedLimit = totalMilliseconds * actualIntervalLimit / 1_000;
 
             var acceptableVariance = (actualIntervalLimit * 1.0);
-            var upperLimit = expectedLimit + acceptableVariance;
-            var lowerLimit = expectedLimit - acceptableVariance;
+            var upperLimit = Math.Ceiling(expectedLimit + acceptableVariance);
+            var lowerLimit = Math.Floor(expectedLimit - acceptableVariance);
 
             Assert.True(
                 result.TotalAllowed >= lowerLimit && result.TotalAllowed <= upperLimit,
