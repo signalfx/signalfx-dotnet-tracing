@@ -5,8 +5,8 @@ RUN apt-get update && \
         git \
         wget
 
-RUN echo "deb http://llvm.org/apt/trusty/ llvm-toolchain-trusty-3.9 main" | sudo tee /etc/apt/sources.list.d/llvm.list
-RUN wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
+RUN echo "deb https://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.9 main" | sudo tee /etc/apt/sources.list.d/llvm.list
+RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
 RUN sudo apt-get update
 
 RUN sudo apt-get install -y \
