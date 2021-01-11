@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿// Modified by SignalFx
+using System.Linq;
 using SignalFx.Tracing.Agent;
 using Xunit;
 

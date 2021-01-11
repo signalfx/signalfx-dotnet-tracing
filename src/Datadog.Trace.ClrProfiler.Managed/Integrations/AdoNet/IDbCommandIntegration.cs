@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Data;
 using Datadog.Trace.ClrProfiler.Emit;

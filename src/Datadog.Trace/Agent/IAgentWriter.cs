@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System.Threading.Tasks;
 
 namespace SignalFx.Tracing.Agent

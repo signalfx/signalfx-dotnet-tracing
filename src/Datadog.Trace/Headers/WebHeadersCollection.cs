@@ -1,3 +1,4 @@
+// Modified by SignalFx
 #if !NETSTANDARD2_0
 
 using System;

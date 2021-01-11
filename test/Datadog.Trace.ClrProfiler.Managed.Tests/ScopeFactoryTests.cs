@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using SignalFx.Tracing.Util;
 using Xunit;

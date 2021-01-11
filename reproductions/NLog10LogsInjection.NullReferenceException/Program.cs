@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Threading.Tasks;
 using NLog;

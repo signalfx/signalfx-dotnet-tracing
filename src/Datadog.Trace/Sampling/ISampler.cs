@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System.Collections.Generic;
 
 namespace SignalFx.Tracing.Sampling

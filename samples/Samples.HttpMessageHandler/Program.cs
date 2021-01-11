@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.IO;
 using System.Linq;

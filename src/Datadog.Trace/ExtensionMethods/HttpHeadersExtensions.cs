@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Net.Http.Headers;
 using SignalFx.Tracing.Headers;

@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System.IO;
 using SignalFx.Tracing.Logging;
 using SignalFx.Tracing.Vendors.Serilog.Events;

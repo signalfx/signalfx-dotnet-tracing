@@ -1,4 +1,5 @@
-﻿using System;
+﻿// Modified by SignalFx
+using System;
 
 namespace SignalFx.Tracing
 {

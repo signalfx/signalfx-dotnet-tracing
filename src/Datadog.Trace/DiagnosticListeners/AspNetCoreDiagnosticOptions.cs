@@ -1,3 +1,4 @@
+// Modified by SignalFx
 #if NETSTANDARD
 using System;
 using System.Collections.Generic;

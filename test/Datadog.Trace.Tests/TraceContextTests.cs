@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using Moq;
 using SignalFx.Tracing;

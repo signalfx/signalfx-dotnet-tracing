@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using SignalFx.Tracing.ExtensionMethods;

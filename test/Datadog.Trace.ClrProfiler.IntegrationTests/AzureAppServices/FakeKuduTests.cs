@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System.Threading;
 using Datadog.Trace.TestHelpers;
 using Xunit;

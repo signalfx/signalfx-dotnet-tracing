@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using SignalFx.Tracing.Configuration;
 using SignalFx.Tracing.Sampling;

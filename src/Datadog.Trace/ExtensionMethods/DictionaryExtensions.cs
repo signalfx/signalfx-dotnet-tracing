@@ -1,3 +1,5 @@
+// Modified by SignalFx
+
 using System;
 using System.Collections;
 using System.Collections.Generic;

@@ -1,3 +1,5 @@
+// Modified by SignalFx
+
 namespace SignalFx.Tracing.OpenTracing
 {
     internal interface ICodec

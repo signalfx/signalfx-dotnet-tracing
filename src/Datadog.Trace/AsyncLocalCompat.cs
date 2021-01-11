@@ -1,3 +1,5 @@
+// Modified by SignalFx
+
 namespace SignalFx.Tracing
 {
 #if NET45

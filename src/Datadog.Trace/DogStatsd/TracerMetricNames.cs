@@ -1,3 +1,5 @@
+// Modified by SignalFx
+
 namespace SignalFx.Tracing.DogStatsd
 {
     internal static class TracerMetricNames

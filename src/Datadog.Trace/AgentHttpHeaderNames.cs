@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System.Runtime.InteropServices;
 
 namespace SignalFx.Tracing
