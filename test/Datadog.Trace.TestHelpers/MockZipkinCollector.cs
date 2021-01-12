@@ -190,10 +190,14 @@ namespace Datadog.Trace.TestHelpers
                         using (var reader = new StreamReader(ctx.Request.InputStream))
                         {
                             var zspans = JsonConvert.DeserializeObject<List<Span>>(reader.ReadToEnd());
-                            IList<IMockSpan> spans = (IList<IMockSpan>)zspans.ConvertAll(x => (IMockSpan)x);
-                            OnRequestDeserialized(spans);
+                            if (zpans != null)
+                            {
+                                IList<IMockSpan> spans = (IList<IMockSpan>)zspans.ConvertAll(x => (IMockSpan)x);
+                                OnRequestDeserialized(spans);
 
-                            Spans = Spans.AddRange(spans);
+                                Spans = Spans.AddRange(spans);
+                            }
+
                             RequestHeaders = RequestHeaders.Add(new NameValueCollection(ctx.Request.Headers));
                         }
                     }
