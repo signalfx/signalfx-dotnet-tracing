@@ -194,7 +194,7 @@ you're instrumenting.
 4. Set the endpoint of a Smart Agent or OpenTelemetry Collector that will forward
 the trace data:
    ```batch
-   set SIGNALFX_ENDPOINT_URL='http://<YourSmartAgentOrCollector>:9080/v1/trace'
+   set SIGNALFX_ENDPOINT_URL=http://localhost:9080/v1/trace
    ```
 5. Optionally, enable trace injection in logs:
    ```batch
