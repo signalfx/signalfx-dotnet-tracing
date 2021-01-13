@@ -180,7 +180,7 @@ you're instrumenting.
     - For .NET Framework applications:
     ```batch
     set COR_ENABLE_PROFILING=1
-    set COR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874} 
+    set COR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}
     ```
    - For .NET Core applications:
    ```batch
@@ -194,7 +194,7 @@ you're instrumenting.
 4. Set the endpoint of a Smart Agent or OpenTelemetry Collector that will forward
 the trace data:
    ```batch
-   set SIGNALFX_ENDPOINT_URL='http://<YourSmartAgentOrCollector>:9080/v1/trace'
+   set SIGNALFX_ENDPOINT_URL=http://localhost:9080/v1/trace
    ```
 5. Optionally, enable trace injection in logs:
    ```batch
