@@ -1,7 +1,7 @@
 // Modified by SignalFx
 using OpenTracing;
 
-namespace Datadog.Trace.OpenTracing
+namespace SignalFx.Tracing.OpenTracing
 {
     internal class OpenTracingScopeManager : global::OpenTracing.IScopeManager
     {

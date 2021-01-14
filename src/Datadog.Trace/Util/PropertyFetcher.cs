@@ -1,10 +1,11 @@
+// Modified by SignalFx
 // From https://github.com/dotnet/runtime/blob/master/src/libraries/System.Diagnostics.DiagnosticSource/src/System/Diagnostics/DiagnosticSourceEventSource.cs
 
 using System;
 using System.Linq;
 using System.Reflection;
 
-namespace Datadog.Trace.Util
+namespace SignalFx.Tracing.Util
 {
     internal class PropertyFetcher
     {

@@ -1,9 +1,10 @@
+// Modified by SignalFx
 using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Datadog.Trace;
 using Datadog.Trace.ClrProfiler;
+using SignalFx.Tracing;
 
 namespace HttpMessageHandler.StackOverflowException
 {

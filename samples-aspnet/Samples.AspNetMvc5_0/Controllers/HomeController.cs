@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using Datadog.Trace;
+using SignalFx.Tracing;
 
 namespace Samples.AspNetMvc5_0.Controllers
 {

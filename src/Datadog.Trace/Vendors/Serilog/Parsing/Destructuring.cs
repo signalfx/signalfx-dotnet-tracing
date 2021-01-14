@@ -16,7 +16,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Datadog.Trace.Vendors.Serilog.Parsing
+namespace SignalFx.Tracing.Vendors.Serilog.Parsing
 {
     /// <summary>
     /// Instructs the logger on how to store information about provided

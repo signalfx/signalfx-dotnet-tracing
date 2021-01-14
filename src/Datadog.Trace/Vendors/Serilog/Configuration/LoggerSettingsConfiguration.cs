@@ -18,9 +18,9 @@
 
 using System;
 using System.Collections.Generic;
-using Datadog.Trace.Vendors.Serilog.Settings.KeyValuePairs;
+using SignalFx.Tracing.Vendors.Serilog.Settings.KeyValuePairs;
 
-namespace Datadog.Trace.Vendors.Serilog.Configuration
+namespace SignalFx.Tracing.Vendors.Serilog.Configuration
 {
     /// <summary>
     /// Allows additional setting sources to drive the logger configuration.

@@ -1,10 +1,11 @@
+// Modified by SignalFx
 #if NETSTANDARD
 using System;
 using System.Collections.Generic;
-using Datadog.Trace.Abstractions;
 using Microsoft.AspNetCore.Http;
+using SignalFx.Tracing.Abstractions;
 
-namespace Datadog.Trace.DiagnosticListeners
+namespace SignalFx.Tracing.DiagnosticListeners
 {
     internal class AspNetCoreDiagnosticOptions
     {

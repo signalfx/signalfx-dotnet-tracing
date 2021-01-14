@@ -1,10 +1,11 @@
+// Modified by SignalFx
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Datadog.Trace.Configuration
+namespace SignalFx.Tracing.Configuration
 {
     /// <summary>
     /// Represents one or more configuration sources.

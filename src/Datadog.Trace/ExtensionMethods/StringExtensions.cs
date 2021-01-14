@@ -1,7 +1,8 @@
+// Modified by SignalFx
 using System;
 using System.Text.RegularExpressions;
 
-namespace Datadog.Trace.ExtensionMethods
+namespace SignalFx.Tracing.ExtensionMethods
 {
     internal static class StringExtensions
     {

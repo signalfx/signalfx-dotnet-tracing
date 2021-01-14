@@ -1,5 +1,7 @@
+// Modified by SignalFx
 using System;
 using System.Runtime.InteropServices;
+using SignalFx.Tracing;
 
 // ReSharper disable MemberHidesStaticFromOuterClass
 namespace Datadog.Trace.ClrProfiler

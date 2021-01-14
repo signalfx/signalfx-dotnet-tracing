@@ -1,6 +1,7 @@
+// Modified by SignalFx
 using System.Collections.Concurrent;
 
-namespace Datadog.Trace.Configuration
+namespace SignalFx.Tracing.Configuration
 {
     /// <summary>
     /// A collection of <see cref="IntegrationSettings"/> instances, referenced by name.

@@ -1,8 +1,8 @@
 // Modified by SignalFx
-namespace Datadog.Trace.Configuration
+namespace SignalFx.Tracing.Configuration
 {
     /// <summary>
-    /// String constants for standard Datadog configuration keys.
+    /// String constants for standard SignalFx configuration keys.
     /// </summary>
     public static class ConfigurationKeys
     {

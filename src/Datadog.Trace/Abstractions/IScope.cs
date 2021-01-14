@@ -1,6 +1,7 @@
+// Modified by SignalFx
 using System;
 
-namespace Datadog.Trace.Abstractions
+namespace SignalFx.Tracing.Abstractions
 {
     internal interface IScope : IDisposable
     {

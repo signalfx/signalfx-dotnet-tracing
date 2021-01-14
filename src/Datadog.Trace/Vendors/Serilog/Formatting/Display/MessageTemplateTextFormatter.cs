@@ -18,11 +18,11 @@
 
 using System;
 using System.IO;
-using Datadog.Trace.Vendors.Serilog.Events;
-using Datadog.Trace.Vendors.Serilog.Parsing;
-using Datadog.Trace.Vendors.Serilog.Rendering;
+using SignalFx.Tracing.Vendors.Serilog.Events;
+using SignalFx.Tracing.Vendors.Serilog.Parsing;
+using SignalFx.Tracing.Vendors.Serilog.Rendering;
 
-namespace Datadog.Trace.Vendors.Serilog.Formatting.Display
+namespace SignalFx.Tracing.Vendors.Serilog.Formatting.Display
 {
     /// <summary>
     /// A <see cref="ITextFormatter"/> that supports the Serilog

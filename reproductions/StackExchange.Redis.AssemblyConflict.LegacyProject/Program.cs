@@ -19,7 +19,7 @@ namespace StackExchange.Redis.AssemblyConflict.LegacyProject
             {
                 var instrumentationType = Type.GetType("Datadog.Trace.ClrProfiler.Instrumentation, SignalFx.Tracing.ClrProfiler.Managed");
                 var profilerAttached = instrumentationType?.GetProperty("ProfilerAttached", BindingFlags.Public | BindingFlags.Static)?.GetValue(null) ?? false;
-                var tracerAssemblyLocation = Type.GetType("Datadog.Trace.Tracer, SignalFx.Tracing")?.Assembly.Location ?? "(none)";
+                var tracerAssemblyLocation = Type.GetType("SignalFx.Tracing.Tracer, SignalFx.Tracing")?.Assembly.Location ?? "(none)";
                 var clrProfilerAssemblyLocation = instrumentationType?.Assembly.Location ?? "(none)";
                 var sigilAssemblyLocation = Type.GetType("Sigil.Local, Sigil")?.Assembly.Location ?? "(none)";
 

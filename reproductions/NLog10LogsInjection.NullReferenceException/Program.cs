@@ -1,7 +1,8 @@
-using Datadog.Trace;
-using NLog;
+// Modified by SignalFx
 using System;
 using System.Threading.Tasks;
+using NLog;
+using SignalFx.Tracing;
 
 namespace NLog10LogsInjection.NullReferenceException
 {

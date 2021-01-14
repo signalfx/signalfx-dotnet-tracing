@@ -18,9 +18,9 @@
 
 using System;
 using System.IO;
-using Datadog.Trace.Vendors.Serilog.Events;
+using SignalFx.Tracing.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Vendors.Serilog.Formatting.Raw
+namespace SignalFx.Tracing.Vendors.Serilog.Formatting.Raw
 {
     /// <summary>
     /// Formats log events as a raw dump of the message template and properties.

@@ -1,15 +1,16 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using Datadog.Trace.Logging;
 using OpenTracing;
 using OpenTracing.Tag;
+using SignalFx.Tracing.Logging;
 
-namespace Datadog.Trace.OpenTracing
+namespace SignalFx.Tracing.OpenTracing
 {
     internal class OpenTracingSpanBuilder : ISpanBuilder
     {
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.For<OpenTracingSpanBuilder>();
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.For<OpenTracingSpanBuilder>();
 
         private readonly OpenTracingTracer _tracer;
         private readonly object _lock = new object();
@@ -70,8 +71,8 @@ namespace Datadog.Trace.OpenTracing
             lock (_lock)
             {
                 ISpanContext parentContext = GetParentContext();
-                Span ddSpan = _tracer.DatadogTracer.StartSpan(_operationName, parentContext, _serviceName, _start, _ignoreActiveSpan);
-                var otSpan = new OpenTracingSpan(ddSpan);
+                Span span = _tracer.SignalFxTracer.StartSpan(_operationName, parentContext, _serviceName, _start, _ignoreActiveSpan);
+                var otSpan = new OpenTracingSpan(span);
 
                 if (_tags != null)
                 {
@@ -144,7 +145,7 @@ namespace Datadog.Trace.OpenTracing
         {
             lock (_lock)
             {
-                if (key == DatadogTags.ServiceName)
+                if (key == CustomTags.ServiceName)
                 {
                     _serviceName = value;
                     return this;

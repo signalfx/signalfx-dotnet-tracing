@@ -1,6 +1,7 @@
+// Modified by SignalFx
 using System;
 
-namespace Datadog.Trace.Agent
+namespace SignalFx.Tracing.Agent
 {
     internal class AgentWriterBuffer<T>
     {

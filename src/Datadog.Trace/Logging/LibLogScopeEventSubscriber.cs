@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using Datadog.Trace.Logging.LogProviders;
+using SignalFx.Tracing.Logging.LogProviders;
 
-namespace Datadog.Trace.Logging
+namespace SignalFx.Tracing.Logging
 {
     /// <summary>
     /// Subscriber to ScopeManager events that sets/unsets correlation identifier

@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -5,10 +6,11 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using Datadog.Trace.ClrProfiler.Helpers;
-using Datadog.Trace.Configuration;
-using Datadog.Trace.DogStatsd;
-using Datadog.Trace.Logging;
 using Sigil;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Configuration;
+using SignalFx.Tracing.DogStatsd;
+using SignalFx.Tracing.Logging;
 
 namespace Datadog.Trace.ClrProfiler.Emit
 {
@@ -18,7 +20,7 @@ namespace Datadog.Trace.ClrProfiler.Emit
         /// Global dictionary for caching reflected delegates
         /// </summary>
         private static readonly ConcurrentDictionary<Key, TDelegate> Cache = new ConcurrentDictionary<Key, TDelegate>(new KeyComparer());
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(MethodBuilder<TDelegate>));
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(MethodBuilder<TDelegate>));
 
         /// <summary>
         /// Feature flag used primarily for forcing testing of the token lookup strategy.

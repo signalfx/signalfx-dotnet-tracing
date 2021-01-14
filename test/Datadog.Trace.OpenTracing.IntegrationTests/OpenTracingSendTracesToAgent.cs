@@ -1,10 +1,13 @@
+// Modified by SignalFx
 using System;
 using System.Linq;
 using System.Net;
-using Datadog.Trace.Agent;
-using Datadog.Trace.Configuration;
 using Datadog.Trace.TestHelpers;
 using Datadog.Trace.TestHelpers.HttpMessageHandlers;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Agent;
+using SignalFx.Tracing.Configuration;
+using SignalFx.Tracing.OpenTracing;
 using Xunit;
 
 namespace Datadog.Trace.OpenTracing.IntegrationTests
@@ -20,7 +23,7 @@ namespace Datadog.Trace.OpenTracing.IntegrationTests
 
             _httpRecorder = new RecordHttpHandler();
             var api = new ZipkinApi(settings, _httpRecorder);
-            var agentWriter = new AgentWriter(api, statsd: null);
+            var agentWriter = new AgentWriter(api, statsd: null, synchronousSend: false);
 
             var tracer = new Tracer(settings, agentWriter, sampler: null, scopeManager: null, statsd: null);
             _tracer = new OpenTracingTracer(tracer);
@@ -42,7 +45,7 @@ namespace Datadog.Trace.OpenTracing.IntegrationTests
             Assert.All(_httpRecorder.Responses, (x) => Assert.Equal(HttpStatusCode.OK, x.StatusCode));
 
             var trace = _httpRecorder.ZipkinTraces.Single();
-            ZipkinHelpers.AssertSpanEqual(span.DDSpan, trace.Single());
+            ZipkinHelpers.AssertSpanEqual(span.Span, trace.Single());
         }
 
         [Fact]
@@ -53,8 +56,8 @@ namespace Datadog.Trace.OpenTracing.IntegrationTests
             const string ServiceName = "MyService";
 
             var span = (OpenTracingSpan)_tracer.BuildSpan("Operation-From-OpenTracingSendTracesToAgent")
-                                               .WithTag(DatadogTags.ResourceName, "This is a resource")
-                                               .WithTag(DatadogTags.ServiceName, ServiceName)
+                                               .WithTag(Tags.ResourceName, "This is a resource")
+                                               .WithTag(CustomTags.ServiceName, ServiceName)
                                                .Start();
             span.Finish();
 
@@ -65,7 +68,7 @@ namespace Datadog.Trace.OpenTracing.IntegrationTests
             Assert.All(_httpRecorder.Responses, (x) => Assert.Equal(HttpStatusCode.OK, x.StatusCode));
 
             var trace = _httpRecorder.ZipkinTraces.Single();
-            ZipkinHelpers.AssertSpanEqual(span.DDSpan, trace.Single());
+            ZipkinHelpers.AssertSpanEqual(span.Span, trace.Single());
         }
 
         [Fact]
@@ -74,8 +77,8 @@ namespace Datadog.Trace.OpenTracing.IntegrationTests
             using var mockZipkinCollector = new MockZipkinCollector();
 
             var span = (OpenTracingSpan)_tracer.BuildSpan("Aᛗᚪᚾᚾᚪ")
-                                               .WithTag(DatadogTags.ResourceName, "η γλώσσα μου έδωσαν ελληνική")
-                                               .WithTag(DatadogTags.ServiceName, "На берегу пустынных волн")
+                                               .WithTag(Tags.ResourceName, "η γλώσσα μου έδωσαν ελληνική")
+                                               .WithTag(CustomTags.ServiceName, "На берегу пустынных волн")
                                                .WithTag("யாமறிந்த", "ნუთუ კვლა")
                                                .Start();
             span.Finish();
@@ -87,7 +90,7 @@ namespace Datadog.Trace.OpenTracing.IntegrationTests
             Assert.All(_httpRecorder.Responses, (x) => Assert.Equal(HttpStatusCode.OK, x.StatusCode));
 
             var trace = _httpRecorder.ZipkinTraces.Single();
-            ZipkinHelpers.AssertSpanEqual(span.DDSpan, trace.Single());
+            ZipkinHelpers.AssertSpanEqual(span.Span, trace.Single());
         }
 
         [Fact]

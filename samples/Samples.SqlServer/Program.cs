@@ -1,10 +1,11 @@
+// Modified by SignalFx
 using System;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
-using Datadog.Trace;
 using Samples.DatabaseHelper;
+using SignalFx.Tracing;
 
 namespace Samples.SqlServer
 {

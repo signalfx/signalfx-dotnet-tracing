@@ -1,7 +1,8 @@
+// Modified by SignalFx
 using System;
 using System.Linq;
 
-namespace Datadog.Trace.Util
+namespace SignalFx.Tracing.Util
 {
     internal static class UriHelpers
     {

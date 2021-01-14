@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Datadog.Core.Tools;
 using Datadog.Trace.TestHelpers;
+using SignalFx.Tracing;
 using Xunit;
 using Xunit.Abstractions;
 

@@ -17,11 +17,11 @@
 // limitations under the License.
 
 using System;
-using Datadog.Trace.Vendors.Serilog.Core;
-using Datadog.Trace.Vendors.Serilog.Core.Enrichers;
-using Datadog.Trace.Vendors.Serilog.Enrichers;
+using SignalFx.Tracing.Vendors.Serilog.Core;
+using SignalFx.Tracing.Vendors.Serilog.Core.Enrichers;
+using SignalFx.Tracing.Vendors.Serilog.Enrichers;
 
-namespace Datadog.Trace.Vendors.Serilog.Configuration
+namespace SignalFx.Tracing.Vendors.Serilog.Configuration
 {
     /// <summary>
     /// Controls enrichment configuration.

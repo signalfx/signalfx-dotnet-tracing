@@ -3,16 +3,16 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using Datadog.Trace.Configuration;
-using Datadog.Trace.Vendors.Serilog;
-using Datadog.Trace.Vendors.Serilog.Core;
-using Datadog.Trace.Vendors.Serilog.Events;
-using Datadog.Trace.Vendors.Serilog.Formatting.Display;
-using Datadog.Trace.Vendors.Serilog.Sinks.File;
+using SignalFx.Tracing.Configuration;
+using SignalFx.Tracing.Vendors.Serilog;
+using SignalFx.Tracing.Vendors.Serilog.Core;
+using SignalFx.Tracing.Vendors.Serilog.Events;
+using SignalFx.Tracing.Vendors.Serilog.Formatting.Display;
+using SignalFx.Tracing.Vendors.Serilog.Sinks.File;
 
-namespace Datadog.Trace.Logging
+namespace SignalFx.Tracing.Logging
 {
-    internal static class DatadogLogging
+    internal static class SignalFxLogging
     {
         private const string NixDefaultDirectory = "/var/log/signalfx/dotnet";
 
@@ -20,7 +20,7 @@ namespace Datadog.Trace.Logging
         private static readonly LoggingLevelSwitch LoggingLevelSwitch = new LoggingLevelSwitch(LogEventLevel.Information);
         private static readonly ILogger SharedLogger = null;
 
-        static DatadogLogging()
+        static SignalFxLogging()
         {
             // No-op for if we fail to construct a logger.
             SharedLogger =
@@ -99,7 +99,7 @@ namespace Datadog.Trace.Logging
             catch (Exception ex)
             {
                 // Don't let this exception bubble up as this logger is for debugging and is non-critical
-                Console.WriteLine($"[Error] {nameof(DatadogLogging)}: Failed to setup file logging: {ex.Message}");
+                Console.WriteLine($"[Error] {nameof(SignalFxLogging)}: Failed to setup file logging: {ex.Message}");
             }
             finally
             {

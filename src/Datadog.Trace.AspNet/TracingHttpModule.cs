@@ -3,9 +3,10 @@ using System;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Web;
-using Datadog.Trace.ExtensionMethods;
-using Datadog.Trace.Logging;
-using Datadog.Trace.Util;
+using SignalFx.Tracing;
+using SignalFx.Tracing.ExtensionMethods;
+using SignalFx.Tracing.Logging;
+using SignalFx.Tracing.Util;
 
 namespace Datadog.Trace.AspNet
 {
@@ -19,7 +20,7 @@ namespace Datadog.Trace.AspNet
         /// </summary>
         public const string IntegrationName = "AspNet";
 
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(TracingHttpModule));
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(TracingHttpModule));
 
         // there is no ConcurrentHashSet, so use a ConcurrentDictionary
         // where we only care about the key, not the value
@@ -111,7 +112,7 @@ namespace Datadog.Trace.AspNet
                     {
                         // extract propagated http headers
                         var headers = httpRequest.Headers.Wrap();
-                        propagatedContext = SpanContextPropagator.Instance.Extract(headers);
+                        propagatedContext = B3SpanContextPropagator.Instance.Extract(headers);
                     }
                     catch (Exception ex)
                     {

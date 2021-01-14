@@ -2,16 +2,17 @@
 #if NETCOREAPP3_0 || NETCOREAPP3_1
 using System;
 using System.Collections.Generic;
-using Datadog.Trace.Agent;
-using Datadog.Trace.Configuration;
-using Datadog.Trace.DiagnosticListeners;
-using Datadog.Trace.Sampling;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Diagnostics;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
 using Moq;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Agent;
+using SignalFx.Tracing.Configuration;
+using SignalFx.Tracing.DiagnosticListeners;
+using SignalFx.Tracing.Sampling;
 using Xunit;
 
 namespace Datadog.Trace.Tests.DiagnosticListeners

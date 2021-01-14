@@ -1,6 +1,7 @@
+// Modified by SignalFx
 using System.Collections.Generic;
 
-namespace Datadog.Trace.Configuration
+namespace SignalFx.Tracing.Configuration
 {
     /// <summary>
     /// A source of configuration settings, identifiable by a string key.

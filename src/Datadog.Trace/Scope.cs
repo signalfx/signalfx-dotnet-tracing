@@ -1,6 +1,7 @@
-using Datadog.Trace.Abstractions;
+// Modified by SignalFx
+using SignalFx.Tracing.Abstractions;
 
-namespace Datadog.Trace
+namespace SignalFx.Tracing
 {
     /// <summary>
     /// A scope is a handle used to manage the concept of an active span.

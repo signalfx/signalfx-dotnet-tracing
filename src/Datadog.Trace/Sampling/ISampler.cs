@@ -1,6 +1,7 @@
+// Modified by SignalFx
 using System.Collections.Generic;
 
-namespace Datadog.Trace.Sampling
+namespace SignalFx.Tracing.Sampling
 {
     internal interface ISampler
     {

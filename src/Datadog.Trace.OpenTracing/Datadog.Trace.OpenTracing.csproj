@@ -3,7 +3,7 @@
 
   <PropertyGroup>
     <!-- NuGet -->
-    <Version>0.1.3</Version>
+    <Version>0.1.7-rc.3</Version>
     <Title>SignalFx Tracing OpenTracing</Title>
     <Description>Provides OpenTracing support for SignalFx Tracing</Description>
     <PackageTags>$(PackageTags);OpenTracing</PackageTags>

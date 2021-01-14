@@ -1,9 +1,10 @@
+// Modified by SignalFx
 using System;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
-using Datadog.Trace;
+using SignalFx.Tracing;
 
 namespace Samples.DatabaseHelper
 {

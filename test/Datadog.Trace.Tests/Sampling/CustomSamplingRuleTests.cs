@@ -1,7 +1,9 @@
+// Modified by SignalFx
 using System;
 using System.IO;
 using System.Linq;
-using Datadog.Trace.Sampling;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Sampling;
 using Xunit;
 
 namespace Datadog.Trace.Tests.Sampling

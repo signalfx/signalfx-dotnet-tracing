@@ -5,23 +5,23 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Datadog.Trace.Agent;
-using Datadog.Trace.Configuration;
-using Datadog.Trace.DiagnosticListeners;
-using Datadog.Trace.DogStatsd;
-using Datadog.Trace.Logging;
-using Datadog.Trace.Sampling;
-using Datadog.Trace.Vendors.StatsdClient;
+using SignalFx.Tracing.Agent;
+using SignalFx.Tracing.Configuration;
+using SignalFx.Tracing.DiagnosticListeners;
+using SignalFx.Tracing.DogStatsd;
+using SignalFx.Tracing.Logging;
+using SignalFx.Tracing.Sampling;
+using SignalFx.Tracing.Vendors.StatsdClient;
 
-namespace Datadog.Trace
+namespace SignalFx.Tracing
 {
     /// <summary>
     /// The tracer is responsible for creating spans and flushing them to the Datadog agent
     /// </summary>
-    public class Tracer : IDatadogTracer
+    public class Tracer : ISignalFxTracer
     {
         private const string UnknownServiceName = "unnamed-dotnet-service";
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(Tracer));
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(Tracer));
 
         /// <summary>
         /// The number of Tracer instances that have been created and not yet destroyed.
@@ -177,12 +177,12 @@ namespace Datadog.Trace
         /// <summary>
         /// Gets the tracer's scope manager, which determines which span is currently active, if any.
         /// </summary>
-        IScopeManager IDatadogTracer.ScopeManager => _scopeManager;
+        IScopeManager ISignalFxTracer.ScopeManager => _scopeManager;
 
         /// <summary>
-        /// Gets the <see cref="ISampler"/> instance used by this <see cref="IDatadogTracer"/> instance.
+        /// Gets the <see cref="ISampler"/> instance used by this <see cref="ISignalFxTracer"/> instance.
         /// </summary>
-        ISampler IDatadogTracer.Sampler => Sampler;
+        ISampler ISignalFxTracer.Sampler => Sampler;
 
         internal IDiagnosticManager DiagnosticManager { get; set; }
 
@@ -222,7 +222,7 @@ namespace Datadog.Trace
         /// </summary>
         /// <param name="span">The span to activate.</param>
         /// <returns>A Scope object wrapping this span.</returns>
-        Scope IDatadogTracer.ActivateSpan(Span span)
+        Scope ISignalFxTracer.ActivateSpan(Span span)
         {
             return ActivateSpan(span);
         }
@@ -260,7 +260,7 @@ namespace Datadog.Trace
         /// </summary>
         /// <param name="operationName">The span's operation name</param>
         /// <returns>The newly created span</returns>
-        Span IDatadogTracer.StartSpan(string operationName)
+        Span ISignalFxTracer.StartSpan(string operationName)
         {
             return StartSpan(operationName);
         }
@@ -271,7 +271,7 @@ namespace Datadog.Trace
         /// <param name="operationName">The span's operation name</param>
         /// <param name="parent">The span's parent</param>
         /// <returns>The newly created span</returns>
-        Span IDatadogTracer.StartSpan(string operationName, ISpanContext parent)
+        Span ISignalFxTracer.StartSpan(string operationName, ISpanContext parent)
         {
             return StartSpan(operationName, parent);
         }
@@ -352,7 +352,7 @@ namespace Datadog.Trace
         /// Writes the specified <see cref="Span"/> collection to the agent writer.
         /// </summary>
         /// <param name="trace">The <see cref="Span"/> collection to write.</param>
-        void IDatadogTracer.Write(Span[] trace)
+        void ISignalFxTracer.Write(Span[] trace)
         {
             _agentWriter.WriteTrace(trace);
         }
@@ -459,8 +459,8 @@ namespace Datadog.Trace
         {
             try
             {
-                Assembly asm = Assembly.Load(new AssemblyName("SignalFx.Tracing.OpenTracing, Version=0.1.3.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb"));
-                Type openTracingTracerFactory = asm.GetType("Datadog.Trace.OpenTracing.OpenTracingTracerFactory");
+                Assembly asm = Assembly.Load(new AssemblyName("SignalFx.Tracing.OpenTracing, Version=0.1.7.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb"));
+                Type openTracingTracerFactory = asm.GetType("SignalFx.Tracing.OpenTracing.OpenTracingTracerFactory");
                 var methodInfo = openTracingTracerFactory.GetMethod("RegisterGlobalTracer");
                 object[] args = new object[] { instance };
                 methodInfo.Invoke(null, args);

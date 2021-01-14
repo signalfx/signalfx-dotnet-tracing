@@ -1,5 +1,7 @@
+// Modified by SignalFx
 using System.Web;
 using Datadog.Trace.AspNet;
+using SignalFx.Tracing;
 
 [assembly: PreApplicationStartMethod(typeof(HttpApplicationStartup), "Register")]
 

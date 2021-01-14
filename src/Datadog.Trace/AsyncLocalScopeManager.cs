@@ -1,7 +1,8 @@
+// Modified by SignalFx
 using System;
-using Datadog.Trace.Logging;
+using SignalFx.Tracing.Logging;
 
-namespace Datadog.Trace
+namespace SignalFx.Tracing
 {
     internal class AsyncLocalScopeManager : ScopeManagerBase
     {

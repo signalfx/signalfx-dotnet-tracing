@@ -18,10 +18,10 @@
 
 using System;
 using System.Collections.Generic;
-using Datadog.Trace.Vendors.Serilog.Core;
-using Datadog.Trace.Vendors.Serilog.Events;
+using SignalFx.Tracing.Vendors.Serilog.Core;
+using SignalFx.Tracing.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.Vendors.Serilog.Policies
+namespace SignalFx.Tracing.Vendors.Serilog.Policies
 {
     class SimpleScalarConversionPolicy : IScalarConversionPolicy
     {

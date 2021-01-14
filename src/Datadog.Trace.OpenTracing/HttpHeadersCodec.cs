@@ -1,10 +1,10 @@
 // Modified by SignalFx
 using System;
 using System.Globalization;
-using Datadog.Trace.Headers;
 using OpenTracing.Propagation;
+using SignalFx.Tracing.Headers;
 
-namespace Datadog.Trace.OpenTracing
+namespace SignalFx.Tracing.OpenTracing
 {
     internal class HttpHeadersCodec : ICodec
     {
@@ -35,16 +35,17 @@ namespace Datadog.Trace.OpenTracing
 
             IHeadersCollection headers = new TextMapHeadersCollection(map);
 
-            if (context is OpenTracingSpanContext otSpanContext && otSpanContext.Context is SpanContext ddSpanContext)
+            if (context is OpenTracingSpanContext otSpanContext && otSpanContext.Context is SpanContext spanContext)
             {
-                // this is a Datadog context
-                B3SpanContextPropagator.Instance.Inject(ddSpanContext, headers);
+                // this is a SignalFx context
+                B3SpanContextPropagator.Instance.Inject(spanContext, headers);
             }
             else
             {
                 // any other OpenTracing.ISpanContext
-                headers.Set(HttpHeaderNames.TraceId, context.TraceId.ToString(InvariantCulture));
-                headers.Set(HttpHeaderNames.ParentId, context.SpanId.ToString(InvariantCulture));
+                // TODO: this assumes that the IDs are on a B3 compatible format.
+                headers.Set(HttpHeaderNames.B3TraceId, context.TraceId);
+                headers.Set(HttpHeaderNames.B3ParentId, context.SpanId);
             }
         }
     }

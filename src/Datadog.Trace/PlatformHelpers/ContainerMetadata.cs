@@ -1,17 +1,18 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
-using Datadog.Trace.Logging;
+using SignalFx.Tracing.Logging;
 
-namespace Datadog.Trace.PlatformHelpers
+namespace SignalFx.Tracing.PlatformHelpers
 {
     /// <summary>
     /// Utility class with methods to interact with container hosts.
     /// </summary>
-    internal static class ContainerMetadata
+    public static class ContainerMetadata
     {
         private const string ControlGroupsFilePath = "/proc/self/cgroup";
 
@@ -19,7 +20,7 @@ namespace Datadog.Trace.PlatformHelpers
 
         private static readonly Lazy<string> ContainerId = new Lazy<string>(GetContainerIdInternal, LazyThreadSafetyMode.ExecutionAndPublication);
 
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(ContainerMetadata));
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(ContainerMetadata));
 
         /// <summary>
         /// Gets the id of the container executing the code.

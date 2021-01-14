@@ -1,17 +1,18 @@
+// Modified by SignalFx
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Datadog.Trace.DogStatsd;
-using Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.StatsdClient;
+using SignalFx.Tracing.DogStatsd;
+using SignalFx.Tracing.Logging;
+using SignalFx.Tracing.Vendors.StatsdClient;
 
-namespace Datadog.Trace.Agent
+namespace SignalFx.Tracing.Agent
 {
     internal class AgentWriter : IAgentWriter
     {
         private const int TraceBufferSize = 1000;
 
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(AgentWriter));
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(AgentWriter));
 
         private readonly AgentWriterBuffer<Span[]> _tracesBuffer = new AgentWriterBuffer<Span[]>(TraceBufferSize);
         private readonly IStatsd _statsd;
@@ -21,7 +22,7 @@ namespace Datadog.Trace.Agent
 
         private IApi _api;
 
-        public AgentWriter(IApi api, IStatsd statsd, bool synchronousSend = false)
+        public AgentWriter(IApi api, IStatsd statsd, bool synchronousSend)
         {
             _api = api;
             _statsd = statsd;

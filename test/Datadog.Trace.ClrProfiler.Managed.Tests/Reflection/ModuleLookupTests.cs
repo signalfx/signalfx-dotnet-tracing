@@ -1,3 +1,4 @@
+// Modified by SignalFx
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -5,6 +6,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Datadog.Trace.ClrProfiler.Emit;
+using SignalFx.Tracing;
 using Xunit;
 
 namespace Datadog.Trace.ClrProfiler.Managed.Tests

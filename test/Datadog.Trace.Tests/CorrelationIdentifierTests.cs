@@ -1,7 +1,5 @@
-using Datadog.Trace.Agent;
-using Datadog.Trace.Configuration;
-using Datadog.Trace.Sampling;
-using Moq;
+// Modified by SignalFx
+using SignalFx.Tracing;
 using Xunit;
 
 namespace Datadog.Trace.Tests

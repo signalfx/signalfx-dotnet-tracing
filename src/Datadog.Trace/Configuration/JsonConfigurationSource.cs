@@ -1,12 +1,13 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using Datadog.Trace.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SignalFx.Tracing.Logging;
 
-namespace Datadog.Trace.Configuration
+namespace SignalFx.Tracing.Configuration
 {
     /// <summary>
     /// Represents a configuration source that retrieves
@@ -14,7 +15,7 @@ namespace Datadog.Trace.Configuration
     /// </summary>
     public class JsonConfigurationSource : IConfigurationSource
     {
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(JsonConfigurationSource));
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(JsonConfigurationSource));
 
         private readonly JObject _configuration;
 

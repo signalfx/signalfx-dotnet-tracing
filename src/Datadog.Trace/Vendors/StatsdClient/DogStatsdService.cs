@@ -4,7 +4,7 @@
 //------------------------------------------------------------------------------
 using System;
 
-namespace Datadog.Trace.Vendors.StatsdClient
+namespace SignalFx.Tracing.Vendors.StatsdClient
 {
     internal class DogStatsdService : IDogStatsd, IDisposable
     {

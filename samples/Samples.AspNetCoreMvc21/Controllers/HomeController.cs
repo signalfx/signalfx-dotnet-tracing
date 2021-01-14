@@ -17,7 +17,7 @@ namespace Samples.AspNetCoreMvc.Controllers
         {
             var instrumentationType = Type.GetType("Datadog.Trace.ClrProfiler.Instrumentation, SignalFx.Tracing.ClrProfiler.Managed");
             ViewBag.ProfilerAttached = instrumentationType?.GetProperty("ProfilerAttached", BindingFlags.Public | BindingFlags.Static)?.GetValue(null) ?? false;
-            ViewBag.TracerAssemblyLocation = Type.GetType("Datadog.Trace.Tracer, SignalFx.Tracing")?.Assembly.Location;
+            ViewBag.TracerAssemblyLocation = Type.GetType("SignalFx.Tracing.Tracer, SignalFx.Tracing")?.Assembly.Location;
             ViewBag.ClrProfilerAssemblyLocation = instrumentationType?.Assembly.Location;
             ViewBag.StackTrace = StackTraceHelper.GetUsefulStack();
 

@@ -1,9 +1,11 @@
-﻿namespace Datadog.Trace.OpenTracing
+// Modified by SignalFx
+
+namespace SignalFx.Tracing.OpenTracing
 {
     /// <summary>
-    /// This set of tags is used by the OpenTracing compatible tracer to set DataDog specific fields.
+    /// This set of tags is used by the OpenTracing compatible tracer to set custom fields.
     /// </summary>
-    public static class DatadogTags
+    public static class CustomTags
     {
         /// <summary>
         /// This tag sets the service name

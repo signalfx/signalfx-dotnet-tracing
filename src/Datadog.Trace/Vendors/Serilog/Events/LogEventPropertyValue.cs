@@ -19,7 +19,7 @@
 using System;
 using System.IO;
 
-namespace Datadog.Trace.Vendors.Serilog.Events
+namespace SignalFx.Tracing.Vendors.Serilog.Events
 {
     /// <summary>
     /// The value associated with a <see cref="LogEventProperty"/>. Divided into scalar,

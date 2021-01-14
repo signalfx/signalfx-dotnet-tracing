@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Threading;
 using Datadog.Trace.ClrProfiler.IntegrationTests.Helpers;
 using Datadog.Trace.TestHelpers;
+using SignalFx.Tracing;
 using Xunit;
 using Xunit.Abstractions;
 

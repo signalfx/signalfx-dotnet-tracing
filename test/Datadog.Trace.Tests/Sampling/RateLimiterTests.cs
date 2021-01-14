@@ -1,8 +1,10 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
-using Datadog.Trace.Sampling;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Sampling;
 using Xunit;
 
 namespace Datadog.Trace.Tests.Sampling
@@ -78,8 +80,8 @@ namespace Datadog.Trace.Tests.Sampling
             var expectedLimit = totalMilliseconds * actualIntervalLimit / 1_000;
 
             var acceptableVariance = (actualIntervalLimit * 1.0);
-            var upperLimit = expectedLimit + acceptableVariance;
-            var lowerLimit = expectedLimit - acceptableVariance;
+            var upperLimit = Math.Ceiling(expectedLimit + acceptableVariance);
+            var lowerLimit = Math.Floor(expectedLimit - acceptableVariance);
 
             Assert.True(
                 result.TotalAllowed >= lowerLimit && result.TotalAllowed <= upperLimit,

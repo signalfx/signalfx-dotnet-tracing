@@ -1,9 +1,12 @@
+// Modified by SignalFx
 using System;
-using Datadog.Trace.Agent;
-using Datadog.Trace.Configuration;
-using Datadog.Trace.Sampling;
 using Moq;
 using OpenTracing;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Agent;
+using SignalFx.Tracing.Configuration;
+using SignalFx.Tracing.OpenTracing;
+using SignalFx.Tracing.Sampling;
 using Xunit;
 
 namespace Datadog.Trace.OpenTracing.Tests
@@ -33,7 +36,7 @@ namespace Datadog.Trace.OpenTracing.Tests
         {
             var span = (OpenTracingSpan)_tracer.BuildSpan(null).Start();
 
-            Assert.Equal(DefaultServiceName, span.DDSpan.ServiceName);
+            Assert.Equal(DefaultServiceName, span.Span.ServiceName);
         }
 
         [Fact]
@@ -56,12 +59,12 @@ namespace Datadog.Trace.OpenTracing.Tests
                                                 .AsChildOf(root)
                                                 .Start();
 
-            Assert.Null(root.DDSpan.Context.ParentId);
-            Assert.NotEqual<ulong>(0, root.DDSpan.Context.SpanId);
-            Assert.NotEqual<ulong>(0, root.DDSpan.Context.TraceId);
-            Assert.Equal(root.DDSpan.Context.SpanId, child.DDSpan.Context.ParentId);
-            Assert.Equal(root.DDSpan.Context.TraceId, child.DDSpan.Context.TraceId);
-            Assert.NotEqual<ulong>(0, child.DDSpan.Context.SpanId);
+            Assert.Null(root.Span.Context.ParentId);
+            Assert.NotEqual<ulong>(0, root.Span.Context.SpanId);
+            Assert.NotEqual<ulong>(0, root.Span.Context.TraceId);
+            Assert.Equal(root.Span.Context.SpanId, child.Span.Context.ParentId);
+            Assert.Equal(root.Span.Context.TraceId, child.Span.Context.TraceId);
+            Assert.NotEqual<ulong>(0, child.Span.Context.SpanId);
         }
 
         [Fact]
@@ -72,12 +75,12 @@ namespace Datadog.Trace.OpenTracing.Tests
                                                 .AsChildOf(root.Context)
                                                 .Start();
 
-            Assert.Null(root.DDSpan.Context.ParentId);
-            Assert.NotEqual<ulong>(0, root.DDSpan.Context.SpanId);
-            Assert.NotEqual<ulong>(0, root.DDSpan.Context.TraceId);
-            Assert.Equal(root.DDSpan.Context.SpanId, child.DDSpan.Context.ParentId);
-            Assert.Equal(root.DDSpan.Context.TraceId, child.DDSpan.Context.TraceId);
-            Assert.NotEqual<ulong>(0, child.DDSpan.Context.SpanId);
+            Assert.Null(root.Span.Context.ParentId);
+            Assert.NotEqual<ulong>(0, root.Span.Context.SpanId);
+            Assert.NotEqual<ulong>(0, root.Span.Context.TraceId);
+            Assert.Equal(root.Span.Context.SpanId, child.Span.Context.ParentId);
+            Assert.Equal(root.Span.Context.TraceId, child.Span.Context.TraceId);
+            Assert.NotEqual<ulong>(0, child.Span.Context.SpanId);
         }
 
         [Fact]
@@ -88,12 +91,12 @@ namespace Datadog.Trace.OpenTracing.Tests
                                                 .AddReference(References.ChildOf, root.Context)
                                                 .Start();
 
-            Assert.Null(root.DDSpan.Context.ParentId);
-            Assert.NotEqual<ulong>(0, root.DDSpan.Context.SpanId);
-            Assert.NotEqual<ulong>(0, root.DDSpan.Context.TraceId);
-            Assert.Equal(root.DDSpan.Context.SpanId, child.DDSpan.Context.ParentId);
-            Assert.Equal(root.DDSpan.Context.TraceId, child.DDSpan.Context.TraceId);
-            Assert.NotEqual<ulong>(0, child.DDSpan.Context.SpanId);
+            Assert.Null(root.Span.Context.ParentId);
+            Assert.NotEqual<ulong>(0, root.Span.Context.SpanId);
+            Assert.NotEqual<ulong>(0, root.Span.Context.TraceId);
+            Assert.Equal(root.Span.Context.SpanId, child.Span.Context.ParentId);
+            Assert.Equal(root.Span.Context.TraceId, child.Span.Context.TraceId);
+            Assert.NotEqual<ulong>(0, child.Span.Context.SpanId);
         }
 
         [Fact]
@@ -106,27 +109,27 @@ namespace Datadog.Trace.OpenTracing.Tests
                                                .WithTag("BoolKey", true)
                                                .Start();
 
-            Assert.Equal("What's tracing", span.DDSpan.GetTag("StringKey"));
-            Assert.Equal("42", span.DDSpan.GetTag("IntKey"));
-            Assert.Equal("1.618", span.DDSpan.GetTag("DoubleKey"));
-            Assert.Equal("True", span.DDSpan.GetTag("BoolKey"));
+            Assert.Equal("What's tracing", span.Span.GetTag("StringKey"));
+            Assert.Equal("42", span.Span.GetTag("IntKey"));
+            Assert.Equal("1.618", span.Span.GetTag("DoubleKey"));
+            Assert.Equal("True", span.Span.GetTag("BoolKey"));
         }
 
         [Fact]
         public void Start_SettingService_ServiceIsSet()
         {
             var span = (OpenTracingSpan)_tracer.BuildSpan(null)
-                                               .WithTag(DatadogTags.ServiceName, "MyService")
+                                               .WithTag(CustomTags.ServiceName, "MyService")
                                                .Start();
 
-            Assert.Equal("MyService", span.DDSpan.ServiceName);
+            Assert.Equal("MyService", span.Span.ServiceName);
         }
 
         [Fact]
         public void Start_SettingServiceInParent_ImplicitChildInheritServiceName()
         {
             IScope root = _tracer.BuildSpan(null)
-                                 .WithTag(DatadogTags.ServiceName, "MyService")
+                                 .WithTag(CustomTags.ServiceName, "MyService")
                                  .StartActive(finishSpanOnDispose: true);
             IScope child = _tracer.BuildSpan(null)
                                   .StartActive(finishSpanOnDispose: true);
@@ -139,7 +142,7 @@ namespace Datadog.Trace.OpenTracing.Tests
         public void Start_SettingServiceInParent_ExplicitChildInheritServiceName()
         {
             IScope root = _tracer.BuildSpan(null)
-                                 .WithTag(DatadogTags.ServiceName, "MyService")
+                                 .WithTag(CustomTags.ServiceName, "MyService")
                                  .StartActive(finishSpanOnDispose: true);
             IScope child = _tracer.BuildSpan(null)
                                   .AsChildOf(root.Span)
@@ -153,7 +156,7 @@ namespace Datadog.Trace.OpenTracing.Tests
         public void Start_SettingServiceInParent_NotChildDontInheritServiceName()
         {
             ISpan span1 = _tracer.BuildSpan(null)
-                                 .WithTag(DatadogTags.ServiceName, "MyService")
+                                 .WithTag(CustomTags.ServiceName, "MyService")
                                  .Start();
             IScope root = _tracer.BuildSpan(null)
                                  .StartActive(finishSpanOnDispose: true);
@@ -166,14 +169,14 @@ namespace Datadog.Trace.OpenTracing.Tests
         public void Start_SettingServiceInChild_ServiceNameOverrideParent()
         {
             var root = (OpenTracingSpan)_tracer.BuildSpan(null)
-                                               .WithTag(DatadogTags.ServiceName, "MyService")
+                                               .WithTag(CustomTags.ServiceName, "MyService")
                                                .Start();
             var child = (OpenTracingSpan)_tracer.BuildSpan(null)
-                                                .WithTag(DatadogTags.ServiceName, "AnotherService")
+                                                .WithTag(CustomTags.ServiceName, "AnotherService")
                                                 .Start();
 
-            Assert.Equal("MyService", root.DDSpan.ServiceName);
-            Assert.Equal("AnotherService", child.DDSpan.ServiceName);
+            Assert.Equal("MyService", root.Span.ServiceName);
+            Assert.Equal("AnotherService", child.Span.ServiceName);
         }
 
         [Fact]
@@ -183,7 +186,7 @@ namespace Datadog.Trace.OpenTracing.Tests
                                                .WithTag("resource.name", "MyResource")
                                                .Start();
 
-            Assert.Equal("MyResource", span.DDSpan.ResourceName);
+            Assert.Equal("MyResource", span.Span.ResourceName);
         }
 
         [Fact]
@@ -193,7 +196,7 @@ namespace Datadog.Trace.OpenTracing.Tests
                                                .WithTag("span.type", "web")
                                                .Start();
 
-            Assert.Equal("web", span.DDSpan.Type);
+            Assert.Equal("web", span.Span.Type);
         }
 
         [Fact]
@@ -203,7 +206,7 @@ namespace Datadog.Trace.OpenTracing.Tests
                                                .WithTag(global::OpenTracing.Tag.Tags.Error.Key, true)
                                                .Start();
 
-            Assert.True(span.DDSpan.Error);
+            Assert.True(span.Span.Error);
         }
 
         [Fact]
@@ -214,7 +217,7 @@ namespace Datadog.Trace.OpenTracing.Tests
                                                .WithStartTimestamp(startTime)
                                                .Start();
 
-            Assert.Equal(startTime, span.DDSpan.StartTime);
+            Assert.Equal(startTime, span.Span.StartTime);
         }
 
         [Fact]
@@ -224,7 +227,7 @@ namespace Datadog.Trace.OpenTracing.Tests
 
             var span = (OpenTracingSpan)spanBuilder.Start();
 
-            Assert.Equal("Op1", span.DDSpan.OperationName);
+            Assert.Equal("Op1", span.Span.OperationName);
         }
     }
 }

@@ -1,6 +1,7 @@
+// Modified by SignalFx
 using System.Collections.Generic;
 using System.IO;
-using Datadog.Trace.PlatformHelpers;
+using SignalFx.Tracing.PlatformHelpers;
 using Xunit;
 
 namespace Datadog.Trace.Tests.PlatformHelpers

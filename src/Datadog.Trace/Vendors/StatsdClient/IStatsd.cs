@@ -6,7 +6,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace Datadog.Trace.Vendors.StatsdClient
+namespace SignalFx.Tracing.Vendors.StatsdClient
 {
     internal interface IStatsd
     {

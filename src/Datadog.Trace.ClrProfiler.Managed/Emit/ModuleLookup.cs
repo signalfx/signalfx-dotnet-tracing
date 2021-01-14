@@ -1,9 +1,11 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Concurrent;
 using System.Reflection;
 using System.Threading;
 using Datadog.Trace.ClrProfiler.Helpers;
-using Datadog.Trace.Logging;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Logging;
 
 namespace Datadog.Trace.ClrProfiler.Emit
 {
@@ -14,7 +16,7 @@ namespace Datadog.Trace.ClrProfiler.Emit
         /// </summary>
         private const int MaxFailures = 50;
 
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(ModuleLookup));
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(ModuleLookup));
 
         private static ManualResetEventSlim _populationResetEvent = new ManualResetEventSlim(initialState: true);
         private static ConcurrentDictionary<Guid, Module> _modules = new ConcurrentDictionary<Guid, Module>();

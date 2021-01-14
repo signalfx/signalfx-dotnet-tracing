@@ -1,10 +1,11 @@
+// Modified by SignalFx
 #if !NETSTANDARD2_0
 
 using System;
 using System.Net;
-using Datadog.Trace.Headers;
+using SignalFx.Tracing.Headers;
 
-namespace Datadog.Trace.ExtensionMethods
+namespace SignalFx.Tracing.ExtensionMethods
 {
     /// <summary>
     /// Extension methods for <see cref="WebHeaderCollection"/> objects.

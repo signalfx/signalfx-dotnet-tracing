@@ -2,11 +2,12 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Datadog.Trace.Agent;
-using Datadog.Trace.Configuration;
-using Datadog.Trace.Sampling;
 using Datadog.Trace.TestHelpers;
 using Moq;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Agent;
+using SignalFx.Tracing.Configuration;
+using SignalFx.Tracing.Sampling;
 using Xunit;
 
 namespace Datadog.Trace.Tests

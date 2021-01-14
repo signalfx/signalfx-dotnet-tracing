@@ -1,8 +1,9 @@
+// Modified by SignalFx
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using Datadog.Trace;
 using Samples.Shared.Web;
+using SignalFx.Tracing;
 
 namespace Samples.AspNetMvc5.Controllers
 {

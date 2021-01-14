@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using SignalFx.Tracing;
 using Xunit;
 using Xunit.Abstractions;
 

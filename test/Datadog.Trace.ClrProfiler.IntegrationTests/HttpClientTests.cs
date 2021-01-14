@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using Datadog.Trace.TestHelpers;
+using SignalFx.Tracing;
 using Xunit;
 using Xunit.Abstractions;
 

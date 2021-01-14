@@ -1,12 +1,13 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Generic;
-using Datadog.Trace.Logging;
+using SignalFx.Tracing.Logging;
 
-namespace Datadog.Trace.Sampling
+namespace SignalFx.Tracing.Sampling
 {
     internal class DefaultSamplingRule : ISamplingRule
     {
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.For<DefaultSamplingRule>();
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.For<DefaultSamplingRule>();
 
         private static Dictionary<string, float> _sampleRates = new Dictionary<string, float>();
 

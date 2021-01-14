@@ -3,7 +3,8 @@ using System;
 using System.Linq;
 using System.Text;
 using Datadog.Trace.ClrProfiler.Emit;
-using Datadog.Trace.Logging;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Logging;
 
 namespace Datadog.Trace.ClrProfiler.Integrations
 {
@@ -18,7 +19,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         private const string Major5 = "5";
         private const string RedisNativeClient = "ServiceStack.Redis.RedisNativeClient";
 
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(ServiceStackRedisIntegration));
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(ServiceStackRedisIntegration));
 
         /// <summary>
         /// Traces SendReceive.

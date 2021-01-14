@@ -1,7 +1,8 @@
 // Modified by SignalFx
 using System;
-using Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Serilog.Events;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Logging;
+using SignalFx.Tracing.Vendors.Serilog.Events;
 
 namespace Datadog.Trace.ClrProfiler
 {
@@ -15,7 +16,7 @@ namespace Datadog.Trace.ClrProfiler
         /// </summary>
         public static readonly string ProfilerClsid = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}";
 
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(Instrumentation));
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(Instrumentation));
 
         /// <summary>
         /// Gets a value indicating whether Datadog's profiler is attached to the current process.

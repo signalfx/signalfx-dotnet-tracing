@@ -2,8 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using Datadog.Trace.Configuration;
 using Newtonsoft.Json;
+using SignalFx.Tracing.Configuration;
 using Xunit;
 
 namespace Datadog.Trace.Tests.Configuration

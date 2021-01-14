@@ -1,9 +1,10 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
-using Datadog.Trace;
+using SignalFx.Tracing;
 
 namespace Samples.TracingWithoutLimits
 {

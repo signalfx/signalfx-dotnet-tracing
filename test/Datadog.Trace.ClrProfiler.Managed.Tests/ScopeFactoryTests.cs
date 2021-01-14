@@ -1,5 +1,6 @@
+// Modified by SignalFx
 using System;
-using Datadog.Trace.Util;
+using SignalFx.Tracing.Util;
 using Xunit;
 
 namespace Datadog.Trace.ClrProfiler.Managed.Tests

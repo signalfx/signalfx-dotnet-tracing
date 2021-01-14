@@ -9,7 +9,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 
-namespace Datadog.Trace.Vendors.StatsdClient
+namespace SignalFx.Tracing.Vendors.StatsdClient
 {
     internal class Statsd : IStatsd
     {

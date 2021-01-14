@@ -5,13 +5,13 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Datadog.Trace;
-using Datadog.Trace.Configuration;
-using Datadog.Trace.ExtensionMethods;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Configuration;
+using SignalFx.Tracing.ExtensionMethods;
 
-namespace Datadog.Trace.Agent
+namespace SignalFx.Tracing.Agent
 {
     internal class ZipkinSerializer
     {
@@ -26,7 +26,7 @@ namespace Datadog.Trace.Agent
             var recordedValueMaxLength = settings.RecordedValueMaxLength;
             foreach (var entry in span.Tags)
             {
-                if (!entry.Key.Equals(Trace.Tags.SpanKind))
+                if (!entry.Key.Equals(Tracing.Tags.SpanKind))
                 {
                     var truncatedValue = entry.Value.Truncate(recordedValueMaxLength);
                     tags[entry.Key] = truncatedValue;
@@ -35,29 +35,29 @@ namespace Datadog.Trace.Agent
 
             // Perform any DB statement sanitization only after truncating the string to avoid replacing truncated
             // part of the statement.
-            if (settings.SanitizeSqlStatements && tags.TryGetValue(Trace.Tags.DbStatement, out var dbStatement))
+            if (settings.SanitizeSqlStatements && tags.TryGetValue(Tracing.Tags.DbStatement, out var dbStatement))
             {
                 var sanitizedDbStatement = dbStatement.SanitizeSqlStatement();
                 if (!ReferenceEquals(dbStatement, sanitizedDbStatement))
                 {
-                    tags[Trace.Tags.DbStatement] = sanitizedDbStatement;
+                    tags[Tracing.Tags.DbStatement] = sanitizedDbStatement;
                 }
             }
 
             // Store Resource and Type when unique as tags so as not to lose
             if (!string.Equals(span.OperationName, span.ResourceName))
             {
-                tags[Trace.Tags.ResourceName] = span.ResourceName;
+                tags[Tracing.Tags.ResourceName] = span.ResourceName;
             }
 
             if (span.Type != null)
             {
-                tags[Trace.Tags.SpanType] = span.Type;
+                tags[Tracing.Tags.SpanType] = span.Type;
             }
 
             if (span.Error)
             {
-                tags[Trace.Tags.Error] = "true";
+                tags[Tracing.Tags.Error] = "true";
             }
 
             return tags;
@@ -132,7 +132,7 @@ namespace Datadog.Trace.Agent
 
             public string Kind
             {
-                get => _span.GetTag(Trace.Tags.SpanKind)?.ToUpper();
+                get => _span.GetTag(Tracing.Tags.SpanKind)?.ToUpper();
             }
 
             public Dictionary<string, string> LocalEndpoint
@@ -203,7 +203,7 @@ namespace Datadog.Trace.Agent
 
             public bool ShouldSerializeKind()
             {
-                return _span.Tags != null && _span.Tags.ContainsKey(Trace.Tags.SpanKind);
+                return _span.Tags != null && _span.Tags.ContainsKey(Tracing.Tags.SpanKind);
             }
         }
     }

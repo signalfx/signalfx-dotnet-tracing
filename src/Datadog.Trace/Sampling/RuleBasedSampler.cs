@@ -1,13 +1,14 @@
+// Modified by SignalFx
 using System.Collections.Generic;
-using Datadog.Trace.Logging;
+using SignalFx.Tracing.Logging;
 
-namespace Datadog.Trace.Sampling
+namespace SignalFx.Tracing.Sampling
 {
     internal class RuleBasedSampler : ISampler
     {
         private const ulong KnuthFactor = 1_111_111_111_111_111_111;
 
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.For<RuleBasedSampler>();
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.For<RuleBasedSampler>();
         private static bool _tracingWithoutLimitsEnabled = false;
 
         private readonly IRateLimiter _limiter;

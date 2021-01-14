@@ -1,7 +1,8 @@
 // Modified by SignalFx
 using System.Linq;
-using Datadog.Trace.Agent;
-using Datadog.Trace.Configuration;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Agent;
+using SignalFx.Tracing.Configuration;
 using Xunit;
 
 namespace Datadog.Trace.Tests

@@ -2,14 +2,16 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Datadog.Trace.Agent;
-using Datadog.Trace.Configuration;
-using Datadog.Trace.Sampling;
 using Datadog.Trace.TestHelpers;
 using Moq;
 using OpenTracing;
 using OpenTracing.Propagation;
 using OpenTracing.Util;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Agent;
+using SignalFx.Tracing.Configuration;
+using SignalFx.Tracing.OpenTracing;
+using SignalFx.Tracing.Sampling;
 using Xunit;
 
 namespace Datadog.Trace.OpenTracing.Tests
@@ -30,7 +32,7 @@ namespace Datadog.Trace.OpenTracing.Tests
         [Fact]
         public void NewScopeManager_FromExistingDDScopeManager()
         {
-            var ddScopeManager = ((IDatadogTracer)_datadogTracer).ScopeManager;
+            var ddScopeManager = ((ISignalFxTracer)_datadogTracer).ScopeManager;
             OpenTracingScopeManager otScopeManager = new OpenTracingScopeManager(ddScopeManager);
 
             Assert.True(ddScopeManager == otScopeManager.ScopeManager);
@@ -39,7 +41,7 @@ namespace Datadog.Trace.OpenTracing.Tests
         [Fact]
         public void ScopeManager_ActivatesWithFinishOnDispose()
         {
-            var ddScopeManager = ((IDatadogTracer)_datadogTracer).ScopeManager;
+            var ddScopeManager = ((ISignalFxTracer)_datadogTracer).ScopeManager;
             OpenTracingScopeManager otScopeManager = new OpenTracingScopeManager(ddScopeManager);
 
             var tracer = new OpenTracingTracer(_datadogTracer, otScopeManager);
@@ -69,7 +71,7 @@ namespace Datadog.Trace.OpenTracing.Tests
         [Fact]
         public void ScopeManager_ActivatesWithoutFinishOnDispose()
         {
-            var ddScopeManager = ((IDatadogTracer)_datadogTracer).ScopeManager;
+            var ddScopeManager = ((ISignalFxTracer)_datadogTracer).ScopeManager;
             OpenTracingScopeManager otScopeManager = new OpenTracingScopeManager(ddScopeManager);
 
             var tracer = new OpenTracingTracer(_datadogTracer, otScopeManager);

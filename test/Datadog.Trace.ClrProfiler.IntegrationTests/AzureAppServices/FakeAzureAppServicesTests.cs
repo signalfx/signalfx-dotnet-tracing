@@ -1,6 +1,5 @@
 // Modified by SignalFx
 using System.IO;
-using Datadog.Trace.PlatformHelpers;
 using Datadog.Trace.TestHelpers;
 using Xunit;
 using Xunit.Abstractions;
@@ -14,7 +13,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AzureAppServices
         public FakeAzureAppServicesTests(ITestOutputHelper output)
             : base(SampleName, output)
         {
-            SetEnvironmentVariable(PlatformHelpers.AzureAppServices.AzureAppServicesContextKey, "1");
+            SetEnvironmentVariable(SignalFx.Tracing.PlatformHelpers.AzureAppServices.AzureAppServicesContextKey, "1");
         }
 
         [Fact(Skip = "TODO: Traces from the sub process are not coming through")]

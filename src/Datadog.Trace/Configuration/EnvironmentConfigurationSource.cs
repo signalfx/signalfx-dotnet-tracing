@@ -1,6 +1,7 @@
+// Modified by SignalFx
 using System;
 
-namespace Datadog.Trace.Configuration
+namespace SignalFx.Tracing.Configuration
 {
     /// <summary>
     /// Represents a configuration source that

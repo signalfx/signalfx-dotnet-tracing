@@ -1,5 +1,6 @@
-﻿using System.Linq;
-using Datadog.Trace.Agent;
+﻿// Modified by SignalFx
+using System.Linq;
+using SignalFx.Tracing.Agent;
 using Xunit;
 
 namespace Datadog.Trace.Tests

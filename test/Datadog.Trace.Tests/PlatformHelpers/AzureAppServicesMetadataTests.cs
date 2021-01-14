@@ -1,8 +1,10 @@
+// Modified by SignalFx
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Datadog.Trace.PlatformHelpers;
+using SignalFx.Tracing;
+using SignalFx.Tracing.PlatformHelpers;
 using Xunit;
 
 namespace Datadog.Trace.Tests.PlatformHelpers

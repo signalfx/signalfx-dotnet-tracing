@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿// Modified by SignalFx
+using System.Linq;
 using System.Net.Http;
+using SignalFx.Tracing.OpenTracing;
 using Xunit;
 
 namespace Datadog.Trace.OpenTracing.Tests

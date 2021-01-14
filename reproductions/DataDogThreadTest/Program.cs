@@ -1,12 +1,12 @@
 // Modified by SignalFx
-using Datadog.Trace.Configuration;
 using log4net;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using log4net.Core;
-using Tracer = Datadog.Trace.Tracer;
+using SignalFx.Tracing.Configuration;
+using Tracer = SignalFx.Tracing.Tracer;
 
 namespace DataDogThreadTest
 {

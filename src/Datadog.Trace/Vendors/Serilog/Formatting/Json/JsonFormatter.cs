@@ -23,11 +23,11 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using Datadog.Trace.Vendors.Serilog.Events;
-using Datadog.Trace.Vendors.Serilog.Parsing;
-using Datadog.Trace.Vendors.Serilog.Rendering;
+using SignalFx.Tracing.Vendors.Serilog.Events;
+using SignalFx.Tracing.Vendors.Serilog.Parsing;
+using SignalFx.Tracing.Vendors.Serilog.Rendering;
 
-namespace Datadog.Trace.Vendors.Serilog.Formatting.Json
+namespace SignalFx.Tracing.Vendors.Serilog.Formatting.Json
 {
     /// <summary>
     /// Formats log events in a simple JSON structure. Instances of this class

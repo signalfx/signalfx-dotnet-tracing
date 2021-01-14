@@ -1,4 +1,6 @@
 // Modified by SignalFx
+using SignalFx.Tracing;
+
 namespace Datadog.Trace.ClrProfiler.IntegrationTests
 {
     public class WebServerSpanExpectation : SpanExpectation

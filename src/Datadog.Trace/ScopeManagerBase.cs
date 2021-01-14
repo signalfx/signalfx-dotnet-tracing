@@ -1,11 +1,12 @@
+// Modified by SignalFx
 using System;
-using Datadog.Trace.Logging;
+using SignalFx.Tracing.Logging;
 
-namespace Datadog.Trace
+namespace SignalFx.Tracing
 {
     internal abstract class ScopeManagerBase : IScopeManager
     {
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.GetLogger(typeof(ScopeManagerBase));
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(ScopeManagerBase));
 
         public event EventHandler<SpanEventArgs> SpanOpened;
 

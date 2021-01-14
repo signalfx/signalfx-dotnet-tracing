@@ -2,7 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Datadog.Trace.Abstractions;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Abstractions;
 
 namespace Datadog.Trace.TestHelpers
 {
@@ -41,9 +42,9 @@ namespace Datadog.Trace.TestHelpers
         {
             Error = true;
 
-            SetTagInternal(Trace.Tags.ErrorMsg, exception.Message);
-            SetTagInternal(Trace.Tags.ErrorStack, exception.StackTrace);
-            SetTagInternal(Trace.Tags.ErrorKind, exception.GetType().ToString());
+            SetTagInternal(SignalFx.Tracing.Tags.ErrorMsg, exception.Message);
+            SetTagInternal(SignalFx.Tracing.Tags.ErrorStack, exception.StackTrace);
+            SetTagInternal(SignalFx.Tracing.Tags.ErrorKind, exception.GetType().ToString());
         }
 
         private void SetTagInternal(string key, string value)

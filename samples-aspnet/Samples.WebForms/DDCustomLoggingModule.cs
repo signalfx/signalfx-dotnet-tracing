@@ -1,10 +1,11 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Web;
-using Datadog.Trace;
+using SignalFx.Tracing;
 
 namespace Samples.WebForms
 {

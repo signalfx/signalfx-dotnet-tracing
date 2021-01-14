@@ -19,9 +19,9 @@
 
 using System;
 using System.ComponentModel;
-using Datadog.Trace.Vendors.Serilog.Core;
-using Datadog.Trace.Vendors.Serilog.Core.Enrichers;
-using Datadog.Trace.Vendors.Serilog.Events;
+using SignalFx.Tracing.Vendors.Serilog.Core;
+using SignalFx.Tracing.Vendors.Serilog.Core.Enrichers;
+using SignalFx.Tracing.Vendors.Serilog.Events;
 
 #if ASYNCLOCAL
 using System.Threading;
@@ -31,7 +31,7 @@ using System.Runtime.Remoting.Lifetime;
 using System.Runtime.Remoting.Messaging;
 #endif
 
-namespace Datadog.Trace.Vendors.Serilog.Context
+namespace SignalFx.Tracing.Vendors.Serilog.Context
 {
     /// <summary>
     /// Holds ambient properties that can be attached to log events. To

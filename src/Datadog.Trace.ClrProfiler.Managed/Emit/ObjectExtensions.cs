@@ -1,7 +1,7 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Concurrent;
 using System.Reflection;
-using Datadog.Trace.Util;
 using Sigil;
 
 namespace Datadog.Trace.ClrProfiler.Emit

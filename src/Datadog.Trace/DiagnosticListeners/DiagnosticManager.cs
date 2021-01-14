@@ -1,15 +1,16 @@
+// Modified by SignalFx
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.Serilog.Events;
+using SignalFx.Tracing.Logging;
+using SignalFx.Tracing.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.DiagnosticListeners
+namespace SignalFx.Tracing.DiagnosticListeners
 {
     internal sealed class DiagnosticManager : IDiagnosticManager, IObserver<DiagnosticListener>, IDisposable
     {
-        private static readonly Vendors.Serilog.ILogger Log = DatadogLogging.For<DiagnosticManager>();
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.For<DiagnosticManager>();
 
         private readonly IEnumerable<DiagnosticObserver> _diagnosticObservers;
         private readonly List<IDisposable> _subscriptions = new List<IDisposable>();

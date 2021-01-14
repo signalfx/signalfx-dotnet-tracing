@@ -18,15 +18,15 @@
 
 using System;
 using System.Collections.Generic;
-using Datadog.Trace.Vendors.Serilog.Capturing;
-using Datadog.Trace.Vendors.Serilog.Core.Enrichers;
-using Datadog.Trace.Vendors.Serilog.Core.Pipeline;
-using Datadog.Trace.Vendors.Serilog.Debugging;
-using Datadog.Trace.Vendors.Serilog.Events;
+using SignalFx.Tracing.Vendors.Serilog.Capturing;
+using SignalFx.Tracing.Vendors.Serilog.Core.Enrichers;
+using SignalFx.Tracing.Vendors.Serilog.Core.Pipeline;
+using SignalFx.Tracing.Vendors.Serilog.Debugging;
+using SignalFx.Tracing.Vendors.Serilog.Events;
 
 #pragma warning disable Serilog004 // Constant MessageTemplate verifier
 
-namespace Datadog.Trace.Vendors.Serilog.Core
+namespace SignalFx.Tracing.Vendors.Serilog.Core
 {
     /// <summary>
     /// The core Serilog logging pipeline. A <see cref="Logger"/> must

@@ -1,6 +1,7 @@
+// Modified by SignalFx
 using System.Collections.Generic;
 
-namespace Datadog.Trace.Headers
+namespace SignalFx.Tracing.Headers
 {
     /// <summary>
     /// Specified a common interface that can be used to manipulate collections of headers.

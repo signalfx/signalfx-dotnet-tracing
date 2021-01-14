@@ -18,7 +18,7 @@
 
 using System.IO;
 
-namespace Datadog.Trace.Vendors.Serilog.Sinks.File
+namespace SignalFx.Tracing.Vendors.Serilog.Sinks.File
 {
     static class IOErrors
     {

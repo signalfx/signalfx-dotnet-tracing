@@ -1,7 +1,7 @@
 ﻿// Modified by SignalFx
 using System;
 
-namespace Datadog.Trace.ExtensionMethods
+namespace SignalFx.Tracing.ExtensionMethods
 {
     internal static class TimeExtensions
     {

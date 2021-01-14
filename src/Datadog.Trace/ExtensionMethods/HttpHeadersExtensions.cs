@@ -1,8 +1,9 @@
+// Modified by SignalFx
 using System;
 using System.Net.Http.Headers;
-using Datadog.Trace.Headers;
+using SignalFx.Tracing.Headers;
 
-namespace Datadog.Trace.ExtensionMethods
+namespace SignalFx.Tracing.ExtensionMethods
 {
     /// <summary>
     /// Extension methods for <see cref="HttpHeaders"/> objects.
