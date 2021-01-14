@@ -34,14 +34,14 @@ namespace Samples.AspNetCore31
                              {
                                  endpoints.MapGet("/", async context =>
                                                        {
-                                                           var instrumentationType = Type.GetType("Datadog.Trace.ClrProfiler.Instrumentation, Datadog.Trace.ClrProfiler.Managed");
+                                                           var instrumentationType = Type.GetType("Datadog.Trace.ClrProfiler.Instrumentation, SignalFx.Tracing.ClrProfiler.Managed");
                                                            var profilerAttached = instrumentationType?.GetProperty("ProfilerAttached", BindingFlags.Public | BindingFlags.Static)?.GetValue(null) ?? false;
-                                                           var tracerAssemblyLocation = Type.GetType("Datadog.Trace.Tracer, Datadog.Trace")?.Assembly.Location;
+                                                           var tracerAssemblyLocation = Type.GetType("SignalFx.Tracing.Tracer, SignalFx.Tracing")?.Assembly.Location;
                                                            var clrProfilerAssemblyLocation = instrumentationType?.Assembly.Location;
                                                            var nl = Environment.NewLine;
 
                                                            await context.Response.WriteAsync($"Profiler attached: {profilerAttached}{nl}");
-                                                           await context.Response.WriteAsync($"Datadog.Trace: {tracerAssemblyLocation}{nl}");
+                                                           await context.Response.WriteAsync($"SignalFx.Tracing: {tracerAssemblyLocation}{nl}");
                                                            await context.Response.WriteAsync($"Datadog.Trace.ClrProfiler.Managed: {clrProfilerAssemblyLocation}{nl}");
 
                                                            foreach (var envVar in GetEnvironmentVariables())
