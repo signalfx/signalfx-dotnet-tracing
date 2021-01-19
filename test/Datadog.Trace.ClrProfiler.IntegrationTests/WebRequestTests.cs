@@ -24,7 +24,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("RunOnWindows", "True")]
         public void SubmitsTraces()
         {
-            int expectedSpanCount = EnvironmentHelper.IsCoreClr() ? 70 : 26; // .NET Framework automatic instrumentation doesn't cover Async / TaskAsync operations
+            int expectedSpanCount = EnvironmentHelper.IsCoreClr() ? 88 : 44; // .NET Framework automatic instrumentation doesn't cover Async / TaskAsync operations
             const string expectedServiceName = "Samples.WebRequest";
             var expectedSpanNamePrefixes = new string[] { "GET", "POST" };
 
@@ -49,7 +49,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 #pragma warning restore xUnit2012 // Do not use Enumerable.Any() to check if a value exists in a collection
                     Assert.Equal(expectedServiceName, span.Service);
                     Assert.Null(span.Type);
-                    Assert.True(string.Equals(span.Tags[Tags.InstrumentationName], "WebRequest") || string.Equals(span.Tags[Tags.InstrumentationName], "HttpMessageHandler"));
+                    Assert.True(span.Tags[Tags.InstrumentationName].StartsWith("WebRequest") || string.Equals(span.Tags[Tags.InstrumentationName], "HttpMessageHandler"));
                     Assert.False(span.Tags?.ContainsKey(Tags.Version), "External service span should not have service version tag.");
                 }
 
