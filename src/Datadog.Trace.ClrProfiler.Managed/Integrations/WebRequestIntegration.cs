@@ -17,7 +17,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
     {
         private const string WebRequestTypeName = "System.Net.WebRequest";
         private const string IntegrationName = "WebRequest";
-        private const string Major2 = "2";
         private const string Major4 = "4";
 
         private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(WebRequestIntegration));
@@ -34,7 +33,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             TargetAssembly = "System", // .NET Framework
             TargetType = WebRequestTypeName,
             TargetSignatureTypes = new[] { "System.IO.Stream" },
-            TargetMinimumVersion = Major2,
+            TargetMinimumVersion = Major4,
             TargetMaximumVersion = Major4)]
         [InterceptMethod(
             TargetAssembly = "System.Net.Requests", // .NET Core
