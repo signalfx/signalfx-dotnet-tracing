@@ -13,7 +13,7 @@ namespace SignalFx.Tracing
     {
         private static readonly Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(FrameworkDescription));
 
-        private static readonly Assembly RootAssembly = typeof(object).Assembly;
+        private static readonly Assembly RootAssembly = typeof(object).Assembly ?? Assembly.GetAssembly(typeof(object));
 
         private static readonly Tuple<int, string>[] DotNetFrameworkVersionMapping =
         {
@@ -59,9 +59,9 @@ namespace SignalFx.Tracing
 
         public static FrameworkDescription Create()
         {
-            var assemblyName = RootAssembly.GetName();
+            var assemblyName = RootAssembly?.GetName();
 
-            if (string.Equals(assemblyName.Name, "mscorlib", StringComparison.OrdinalIgnoreCase))
+            if (assemblyName != null && string.Equals(assemblyName.Name, "mscorlib", StringComparison.OrdinalIgnoreCase))
             {
                 // .NET Framework
                 return new FrameworkDescription(
@@ -176,7 +176,7 @@ namespace SignalFx.Tracing
                 {
                     // try to get product version from assembly path
                     Match match = Regex.Match(
-                        RootAssembly.CodeBase,
+                        RootAssembly?.CodeBase ?? string.Empty,
                         @"/[^/]*microsoft\.netcore\.app/(\d+\.\d+\.\d+[^/]*)/",
                         RegexOptions.IgnoreCase);
 
@@ -214,7 +214,7 @@ namespace SignalFx.Tracing
             try
             {
                 // if we fail to extract version from assembly path, fall back to the [AssemblyInformationalVersion],
-                var informationalVersionAttribute = (AssemblyInformationalVersionAttribute)RootAssembly.GetCustomAttribute(typeof(AssemblyInformationalVersionAttribute));
+                var informationalVersionAttribute = (AssemblyInformationalVersionAttribute)RootAssembly?.GetCustomAttribute(typeof(AssemblyInformationalVersionAttribute));
 
                 // split remove the commit hash from pre-release versions
                 productVersion = informationalVersionAttribute?.InformationalVersion?.Split('+')[0];
@@ -229,7 +229,7 @@ namespace SignalFx.Tracing
                 try
                 {
                     // and if that fails, try [AssemblyFileVersion]
-                    var fileVersionAttribute = (AssemblyFileVersionAttribute)RootAssembly.GetCustomAttribute(typeof(AssemblyFileVersionAttribute));
+                    var fileVersionAttribute = (AssemblyFileVersionAttribute)RootAssembly?.GetCustomAttribute(typeof(AssemblyFileVersionAttribute));
                     productVersion = fileVersionAttribute?.Version;
                 }
                 catch (Exception e)
