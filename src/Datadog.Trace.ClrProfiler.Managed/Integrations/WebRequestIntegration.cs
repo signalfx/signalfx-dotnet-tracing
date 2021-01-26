@@ -50,7 +50,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             }
 
             const string methodName = nameof(GetRequestStream);
-            const string integrationAndMethod = IntegrationName + "." + methodName;
 
             Func<object, Stream> callGetRequestStream;
 
@@ -84,24 +83,15 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 return callGetRequestStream(webRequest);
             }
 
-            using (var scope = ScopeFactory.CreateOutboundHttpScope(Tracer.Instance, request.Method, request.RequestUri, integrationAndMethod))
+            var spanContext = ScopeFactory.CreateHttpSpanContext(Tracer.Instance, request.Method, request.RequestUri, IntegrationName);
+            if (spanContext != null)
             {
-                try
-                {
-                    if (scope != null)
-                    {
-                        // add distributed tracing headers to the HTTP request
-                        B3SpanContextPropagator.Instance.Inject(scope.Span.Context, request.Headers.Wrap());
-                    }
-
-                    return callGetRequestStream(webRequest);
-                }
-                catch (Exception ex)
-                {
-                    scope?.Span.SetException(ex);
-                    throw;
-                }
+                // Add distributed tracing headers to the HTTP request. The actual span is going to be created
+                // when GetResponse is called.
+                B3SpanContextPropagator.Instance.Inject(spanContext, request.Headers.Wrap());
             }
+
+            return callGetRequestStream(webRequest);
         }
 
         /// <summary>
@@ -132,7 +122,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             }
 
             const string methodName = nameof(GetResponse);
-            const string integrationAndMethod = IntegrationName + "." + methodName;
 
             Func<object, WebResponse> callGetResponse;
 
@@ -166,7 +155,16 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 return callGetResponse(webRequest);
             }
 
-            using (var scope = ScopeFactory.CreateOutboundHttpScope(Tracer.Instance, request.Method, request.RequestUri, integrationAndMethod))
+            // The headers may have been set/propagated to the server on a previous method call, but no actual span was created for it yet.
+            // Try to extract the context and if available use the already propagated span ID.
+            var headers = request?.Headers?.Wrap();
+            SpanContext spanContext = null;
+            if (headers != null)
+            {
+                spanContext = B3SpanContextPropagator.Instance.Extract(headers);
+            }
+
+            using (var scope = ScopeFactory.CreateOutboundHttpScope(Tracer.Instance, request.Method, request.RequestUri, IntegrationName, propagatedSpanId: spanContext?.SpanId))
             {
                 try
                 {
@@ -251,8 +249,11 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 return await originalMethod(webRequest).ConfigureAwait(false);
             }
 
-            const string integrationAndMethod = IntegrationName + "." + nameof(GetResponseAsync);
-            using (var scope = ScopeFactory.CreateOutboundHttpScope(Tracer.Instance, webRequest.Method, webRequest.RequestUri, integrationAndMethod))
+            // The headers may have been set/propagated to the server on a previous method call, but no actual span was created for it yet.
+            // Try to extract the context and if available use the already propagated span ID.
+            SpanContext spanContext = B3SpanContextPropagator.Instance.Extract(webRequest.Headers.Wrap());
+
+            using (var scope = ScopeFactory.CreateOutboundHttpScope(Tracer.Instance, webRequest.Method, webRequest.RequestUri, IntegrationName, propagatedSpanId: spanContext?.SpanId))
             {
                 try
                 {
