@@ -11,7 +11,7 @@ namespace SignalFx.Tracing
 {
     internal class FrameworkDescription
     {
-        private static readonly ILog Log = LogProvider.GetCurrentClassLogger();
+        private static readonly Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(FrameworkDescription));
 
         private static readonly Assembly RootAssembly = typeof(object).Assembly;
 
@@ -99,7 +99,7 @@ namespace SignalFx.Tracing
             }
             catch (Exception e)
             {
-                Log.ErrorException("Error getting framework name from RuntimeInformation", e);
+                Log.Error(e, "Error getting framework name from RuntimeInformation");
             }
 
             if (RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
@@ -146,7 +146,7 @@ namespace SignalFx.Tracing
             }
             catch (Exception e)
             {
-                Log.ErrorException("Error getting .NET Framework version from Windows Registry", e);
+                Log.Error(e, "Error getting .NET Framework version from Windows Registry");
             }
 
             if (productVersion == null)
@@ -187,7 +187,7 @@ namespace SignalFx.Tracing
                 }
                 catch (Exception e)
                 {
-                    Log.ErrorException("Error getting .NET Core version from assembly path", e);
+                    Log.Error(e, "Error getting .NET Core version from assembly path");
                 }
             }
 
@@ -221,7 +221,7 @@ namespace SignalFx.Tracing
             }
             catch (Exception e)
             {
-                Log.ErrorException("Error getting framework version from [AssemblyInformationalVersion]", e);
+                Log.Error(e, "Error getting framework version from [AssemblyInformationalVersion]");
             }
 
             if (productVersion == null)
@@ -234,7 +234,7 @@ namespace SignalFx.Tracing
                 }
                 catch (Exception e)
                 {
-                    Log.ErrorException("Error getting framework version from [AssemblyFileVersion]", e);
+                    Log.Error(e, "Error getting framework version from [AssemblyFileVersion]");
                 }
             }
 
