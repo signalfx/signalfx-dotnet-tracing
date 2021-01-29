@@ -16,6 +16,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         // NOTE: keep this name without the 6 to avoid breaking changes
         private const string IntegrationName = "ElasticsearchNet";
         private const string Version6 = "6";
+        private const string Version7 = "7";
         private const string ElasticsearchAssemblyName = "Elasticsearch.Net";
         private const string RequestPipelineInterfaceTypeName = "Elasticsearch.Net.IRequestPipeline";
 
@@ -37,7 +38,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             TargetType = RequestPipelineInterfaceTypeName,
             TargetSignatureTypes = new[] { "T", "Elasticsearch.Net.RequestData" },
             TargetMinimumVersion = Version6,
-            TargetMaximumVersion = Version6)]
+            TargetMaximumVersion = Version7)]
         public static object CallElasticsearch<TResponse>(
             object pipeline,
             object requestData,
@@ -113,7 +114,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             TargetType = RequestPipelineInterfaceTypeName,
             TargetSignatureTypes = new[] { "System.Threading.Tasks.Task`1<T>", "Elasticsearch.Net.RequestData", ClrNames.CancellationToken },
             TargetMinimumVersion = Version6,
-            TargetMaximumVersion = Version6)]
+            TargetMaximumVersion = Version7)]
         public static object CallElasticsearchAsync<TResponse>(
             object pipeline,
             object requestData,
