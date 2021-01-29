@@ -239,7 +239,7 @@ namespace SignalFx.Tracing
         }
 
         /// <summary>
-        /// This is a shortcut for <see cref="StartSpan(string, ISpanContext, string, DateTimeOffset?, bool)"/>
+        /// This is a shortcut for <see cref="StartSpan(string, ISpanContext, string, DateTimeOffset?, bool, ulong?)"/>
         /// and <see cref="ActivateSpan(Span, bool)"/>, it creates a new span with the given parameters and makes it active.
         /// </summary>
         /// <param name="operationName">The span's operation name</param>
@@ -248,10 +248,18 @@ namespace SignalFx.Tracing
         /// <param name="startTime">An explicit start time for that span</param>
         /// <param name="ignoreActiveScope">If set the span will not be a child of the currently active span</param>
         /// <param name="finishOnClose">If set to false, closing the returned scope will not close the enclosed span </param>
+        /// <param name="spanId">The span ID.</param>
         /// <returns>A scope wrapping the newly created span</returns>
-        public Scope StartActive(string operationName, ISpanContext parent = null, string serviceName = null, DateTimeOffset? startTime = null, bool ignoreActiveScope = false, bool finishOnClose = true)
+        public Scope StartActive(
+            string operationName,
+            ISpanContext parent = null,
+            string serviceName = null,
+            DateTimeOffset? startTime = null,
+            bool ignoreActiveScope = false,
+            bool finishOnClose = true,
+            ulong? spanId = null)
         {
-            var span = StartSpan(operationName, parent, serviceName, startTime, ignoreActiveScope);
+            var span = StartSpan(operationName, parent, serviceName, startTime, ignoreActiveScope, spanId);
             return _scopeManager.Activate(span, finishOnClose);
         }
 
@@ -284,36 +292,18 @@ namespace SignalFx.Tracing
         /// <param name="serviceName">The span's service name</param>
         /// <param name="startTime">An explicit start time for that span</param>
         /// <param name="ignoreActiveScope">If set the span will not be a child of the currently active span</param>
+        /// <param name="spanId">The span ID.</param>
         /// <returns>The newly created span</returns>
-        public Span StartSpan(string operationName, ISpanContext parent = null, string serviceName = null, DateTimeOffset? startTime = null, bool ignoreActiveScope = false)
+        public Span StartSpan(
+            string operationName,
+            ISpanContext parent = null,
+            string serviceName = null,
+            DateTimeOffset? startTime = null,
+            bool ignoreActiveScope = false,
+            ulong? spanId = null)
         {
-            if (parent == null && !ignoreActiveScope)
-            {
-                parent = _scopeManager.Active?.Span?.Context;
-            }
-
-            ITraceContext traceContext;
-
-            // try to get the trace context (from local spans) or
-            // sampling priority (from propagated spans),
-            // otherwise start a new trace context
-            var isRootSpan = false;
-            if (parent is SpanContext parentSpanContext)
-            {
-                traceContext = parentSpanContext.TraceContext ??
-                               new TraceContext(this)
-                               {
-                                   SamplingPriority = parentSpanContext.SamplingPriority
-                               };
-            }
-            else
-            {
-                isRootSpan = true;
-                traceContext = new TraceContext(this);
-            }
-
-            var finalServiceName = serviceName ?? parent?.ServiceName ?? DefaultServiceName;
-            var spanContext = new SpanContext(parent, traceContext, finalServiceName);
+            bool isRootSpan;
+            SpanContext spanContext = CreateSpanContext(out isRootSpan, parent, serviceName, ignoreActiveScope, spanId);
 
             var span = new Span(spanContext, startTime)
             {
@@ -344,8 +334,53 @@ namespace SignalFx.Tracing
                 }
             }
 
-            traceContext.AddSpan(span);
+            spanContext.TraceContext.AddSpan(span);
             return span;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="SpanContext"/> with the specified parameters.
+        /// </summary>
+        /// <param name="isRootSpan">Output boolean to indicate if the created context refers to a root span or not.</param>
+        /// <param name="parent">The span's parent</param>
+        /// <param name="serviceName">The span's service name</param>
+        /// <param name="ignoreActiveScope">If set the span will not be a child of the currently active span</param>
+        /// <param name="spanId">The span ID.</param>
+        /// <returns>The newly created span</returns>
+        public SpanContext CreateSpanContext(
+            out bool isRootSpan,
+            ISpanContext parent = null,
+            string serviceName = null,
+            bool ignoreActiveScope = false,
+            ulong? spanId = null)
+        {
+            if (parent == null && !ignoreActiveScope)
+            {
+                parent = _scopeManager.Active?.Span?.Context;
+            }
+
+            // try to get the trace context (from local spans) or
+            // sampling priority (from propagated spans),
+            // otherwise start a new trace context
+            isRootSpan = false;
+            ITraceContext traceContext = null;
+            if (parent is SpanContext parentSpanContext)
+            {
+                traceContext = parentSpanContext.TraceContext ??
+                               new TraceContext(this)
+                               {
+                                   SamplingPriority = parentSpanContext.SamplingPriority
+                               };
+            }
+            else
+            {
+                isRootSpan = true;
+                traceContext = new TraceContext(this);
+            }
+
+            var finalServiceName = serviceName ?? parent?.ServiceName ?? DefaultServiceName;
+
+            return new SpanContext(parent, traceContext, finalServiceName, spanId);
         }
 
         /// <summary>

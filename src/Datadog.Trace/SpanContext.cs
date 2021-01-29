@@ -37,11 +37,20 @@ namespace SignalFx.Tracing
         /// <param name="parent">The parent context.</param>
         /// <param name="traceContext">The trace context.</param>
         /// <param name="serviceName">The service name to propagate to child spans.</param>
-        internal SpanContext(ISpanContext parent, ITraceContext traceContext, string serviceName)
+        /// <param name="spanId">The span ID.</param>
+        internal SpanContext(ISpanContext parent, ITraceContext traceContext, string serviceName, ulong? spanId = null)
             : this(parent?.TraceId, serviceName)
         {
             Parent = parent;
             TraceContext = traceContext;
+
+            // If spanId was provided this means that a span context already existed but no span was created for it.
+            // This can happen when a span context is propagated or created for a network call but no actual span
+            // was created for it yet. See WebRequest.GetRequestStream for an example.
+            if (spanId != null)
+            {
+                SpanId = spanId.Value;
+            }
 
             if (SpanId == 0)
             {
