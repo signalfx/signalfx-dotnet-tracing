@@ -71,7 +71,7 @@ namespace SignalFx.Tracing.OpenTracing
             lock (_lock)
             {
                 ISpanContext parentContext = GetParentContext();
-                Span span = _tracer.SignalFxTracer.StartSpan(_operationName, parentContext, _serviceName, _start, _ignoreActiveSpan);
+                Span span = _tracer.SignalFxTracer.StartSpan(_operationName, parentContext, _serviceName, _start, _ignoreActiveSpan, spanId: null);
                 var otSpan = new OpenTracingSpan(span);
 
                 if (_tags != null)

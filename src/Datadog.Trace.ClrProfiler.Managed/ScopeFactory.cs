@@ -18,14 +18,84 @@ namespace Datadog.Trace.ClrProfiler
         private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(ScopeFactory));
 
         /// <summary>
+        /// Gets a scope for outbound HTTP requests if one is the current active scope.
+        /// </summary>
+        /// <param name="tracer">The tracer instance to use to create the new scope.</param>
+        /// <param name="httpMethod">The HTTP method used by the request.</param>
+        /// <param name="requestUri">The URI requested by the request.</param>
+        /// <returns>
+        /// A scope for the outbound HTTP requests if one is current active, null if the
+        /// HTTP call was already instrumented or the current scope is not for an HTTP
+        /// request.
+        /// </returns>
+        public static Scope GetActiveHttpScope(Tracer tracer, string httpMethod, Uri requestUri)
+        {
+            var scope = tracer.ActiveScope;
+
+            var parent = scope?.Span;
+
+            if (parent != null &&
+                StringComparer.OrdinalIgnoreCase.Equals(parent.GetTag(Tags.SpanKind), SpanKinds.Client) &&
+                StringComparer.OrdinalIgnoreCase.Equals(parent.GetTag(Tags.HttpMethod), httpMethod) &&
+                StringComparer.OrdinalIgnoreCase.Equals(parent.GetTag(Tags.HttpUrl), UriHelpers.CleanUri(requestUri, removeScheme: false, tryRemoveIds: false)))
+            {
+                return scope;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Creates a span context for outbound http requests, or get the active one.
+        /// Used to propagate headers without changing the active span.
+        /// </summary>
+        /// <param name="tracer">The tracer instance to use to create the span.</param>
+        /// <param name="httpMethod">The HTTP method used by the request.</param>
+        /// <param name="requestUri">The URI requested by the request.</param>
+        /// <param name="integrationName">The name of the integration creating this scope.</param>
+        /// <returns>A span context to use to populate headers</returns>
+        public static SpanContext CreateHttpSpanContext(
+            Tracer tracer,
+            string httpMethod,
+            Uri requestUri,
+            string integrationName)
+        {
+            if (!tracer.Settings.IsIntegrationEnabled(integrationName))
+            {
+                // integration disabled, skip this trace
+                return null;
+            }
+
+            try
+            {
+                var activeScope = GetActiveHttpScope(tracer, httpMethod, requestUri);
+
+                if (activeScope != null)
+                {
+                    // This HTTP request was already instrumented return the active HTTP context.
+                    return activeScope.Span.Context;
+                }
+
+                return tracer.CreateSpanContext(out bool _);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error creating or populating span context.");
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Creates a scope for outbound http requests and populates some common details.
         /// </summary>
         /// <param name="tracer">The tracer instance to use to create the new scope.</param>
         /// <param name="httpMethod">The HTTP method used by the request.</param>
         /// <param name="requestUri">The URI requested by the request.</param>
         /// <param name="integrationName">The name of the integration creating this scope.</param>
+        /// <param name="propagatedSpanId">The propagated span ID.</param>
         /// <returns>A new pre-populated scope.</returns>
-        public static Scope CreateOutboundHttpScope(Tracer tracer, string httpMethod, Uri requestUri, string integrationName)
+        public static Scope CreateOutboundHttpScope(Tracer tracer, string httpMethod, Uri requestUri, string integrationName, ulong? propagatedSpanId = null)
         {
             if (!tracer.Settings.IsIntegrationEnabled(integrationName))
             {
@@ -37,12 +107,7 @@ namespace Datadog.Trace.ClrProfiler
 
             try
             {
-                Span parent = tracer.ActiveScope?.Span;
-
-                if (parent != null &&
-                    StringComparer.OrdinalIgnoreCase.Equals(parent.GetTag(Tags.SpanKind), SpanKinds.Client) &&
-                    StringComparer.OrdinalIgnoreCase.Equals(parent.GetTag(Tags.HttpMethod), httpMethod) &&
-                    StringComparer.OrdinalIgnoreCase.Equals(parent.GetTag(Tags.HttpUrl), UriHelpers.CleanUri(requestUri, removeScheme: false, tryRemoveIds: false)))
+                if (GetActiveHttpScope(tracer, httpMethod, requestUri) != null)
                 {
                     // we are already instrumenting this,
                     // don't instrument nested methods that belong to the same stacktrace
@@ -56,7 +121,7 @@ namespace Datadog.Trace.ClrProfiler
                     spanName += ":" + requestUri.AbsolutePath;
                 }
 
-                scope = tracer.StartActive(spanName);
+                scope = tracer.StartActive(spanName, spanId: propagatedSpanId);
                 var span = scope.Span;
 
                 span.ServiceName = tracer.DefaultServiceName;

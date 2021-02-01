@@ -19,7 +19,7 @@ namespace SignalFx.Tracing
 
         Span StartSpan(string operationName, ISpanContext parent);
 
-        Span StartSpan(string operationName, ISpanContext parent, string serviceName, DateTimeOffset? startTime, bool ignoreActiveScope);
+        Span StartSpan(string operationName, ISpanContext parent, string serviceName, DateTimeOffset? startTime, bool ignoreActiveScope, ulong? spanId);
 
         void Write(Span[] span);
 
