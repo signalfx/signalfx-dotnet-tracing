@@ -1,5 +1,6 @@
 // Modified by SignalFx
 using System;
+using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using Datadog.Trace.ClrProfiler.Emit;
@@ -19,6 +20,78 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         private const string Major4 = "4";
 
         private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(WebRequestIntegration));
+
+        /// <summary>
+        /// Instrumentation wrapper for <see cref="WebRequest.GetRequestStream"/>.
+        /// </summary>
+        /// <param name="webRequest">The <see cref="WebRequest"/> instance to instrument.</param>
+        /// <param name="opCode">The OpCode used in the original method call.</param>
+        /// <param name="mdToken">The mdToken of the original method call.</param>
+        /// <param name="moduleVersionPtr">A pointer to the module version GUID.</param>
+        /// <returns>Returns the value returned by the inner method call.</returns>
+        [InterceptMethod(
+            TargetAssembly = "System", // .NET Framework
+            TargetType = WebRequestTypeName,
+            TargetSignatureTypes = new[] { "System.IO.Stream" },
+            TargetMinimumVersion = Major4,
+            TargetMaximumVersion = Major4)]
+        [InterceptMethod(
+            TargetAssembly = "System.Net.Requests", // .NET Core
+            TargetType = WebRequestTypeName,
+            TargetSignatureTypes = new[] { "System.IO.Stream" },
+            TargetMinimumVersion = Major4,
+            TargetMaximumVersion = Major4)]
+        public static object GetRequestStream(object webRequest, int opCode, int mdToken, long moduleVersionPtr)
+        {
+            if (webRequest == null)
+            {
+                throw new ArgumentNullException(nameof(webRequest));
+            }
+
+            const string methodName = nameof(GetRequestStream);
+
+            Func<object, Stream> callGetRequestStream;
+
+            try
+            {
+                var instrumentedType = webRequest.GetInstrumentedType("System.Net.WebRequest");
+                callGetRequestStream =
+                    MethodBuilder<Func<object, Stream>>
+                        .Start(moduleVersionPtr, mdToken, opCode, methodName)
+                        .WithConcreteType(instrumentedType)
+                        .WithNamespaceAndNameFilters("System.IO.Stream")
+                        .Build();
+            }
+            catch (Exception ex)
+            {
+                Log.ErrorRetrievingMethod(
+                    exception: ex,
+                    moduleVersionPointer: moduleVersionPtr,
+                    mdToken: mdToken,
+                    opCode: opCode,
+                    instrumentedType: WebRequestTypeName,
+                    methodName: methodName,
+                    instanceType: webRequest.GetType().AssemblyQualifiedName);
+                throw;
+            }
+
+            var request = (WebRequest)webRequest;
+
+            if (!(request is HttpWebRequest) || !IsTracingEnabled(request))
+            {
+                return callGetRequestStream(webRequest);
+            }
+
+            var spanContext = ScopeFactory.CreateHttpSpanContext(Tracer.Instance, request.Method, request.RequestUri, IntegrationName);
+            if (spanContext != null)
+            {
+                // Add distributed tracing headers to the HTTP request. The actual span is going to be created
+                // when GetResponse is called.
+                B3SpanContextPropagator.Instance.Inject(spanContext, request.Headers.Wrap());
+            }
+
+            return callGetRequestStream(webRequest);
+        }
 
         /// <summary>
         /// Instrumentation wrapper for <see cref="WebRequest.GetResponse"/>.
@@ -81,7 +154,16 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 return callGetResponse(webRequest);
             }
 
-            using (var scope = ScopeFactory.CreateOutboundHttpScope(Tracer.Instance, request.Method, request.RequestUri, IntegrationName))
+            // The headers may have been set/propagated to the server on a previous method call, but no actual span was created for it yet.
+            // Try to extract the context and if available use the already propagated span ID.
+            var headers = request?.Headers?.Wrap();
+            SpanContext spanContext = null;
+            if (headers != null)
+            {
+                spanContext = B3SpanContextPropagator.Instance.Extract(headers);
+            }
+
+            using (var scope = ScopeFactory.CreateOutboundHttpScope(Tracer.Instance, request.Method, request.RequestUri, IntegrationName, propagatedSpanId: spanContext?.SpanId))
             {
                 try
                 {
@@ -166,7 +248,11 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 return await originalMethod(webRequest).ConfigureAwait(false);
             }
 
-            using (var scope = ScopeFactory.CreateOutboundHttpScope(Tracer.Instance, webRequest.Method, webRequest.RequestUri, IntegrationName))
+            // The headers may have been set/propagated to the server on a previous method call, but no actual span was created for it yet.
+            // Try to extract the context and if available use the already propagated span ID.
+            SpanContext spanContext = B3SpanContextPropagator.Instance.Extract(webRequest.Headers.Wrap());
+
+            using (var scope = ScopeFactory.CreateOutboundHttpScope(Tracer.Instance, webRequest.Method, webRequest.RequestUri, IntegrationName, propagatedSpanId: spanContext?.SpanId))
             {
                 try
                 {

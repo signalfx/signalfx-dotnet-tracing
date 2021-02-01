@@ -11,9 +11,9 @@ namespace SignalFx.Tracing
 {
     internal class FrameworkDescription
     {
-        private static readonly ILog Log = LogProvider.GetCurrentClassLogger();
+        private static readonly Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(FrameworkDescription));
 
-        private static readonly Assembly RootAssembly = typeof(object).Assembly;
+        private static readonly Assembly RootAssembly = typeof(object).Assembly ?? Assembly.GetAssembly(typeof(object));
 
         private static readonly Tuple<int, string>[] DotNetFrameworkVersionMapping =
         {
@@ -59,9 +59,9 @@ namespace SignalFx.Tracing
 
         public static FrameworkDescription Create()
         {
-            var assemblyName = RootAssembly.GetName();
+            var assemblyName = RootAssembly?.GetName();
 
-            if (string.Equals(assemblyName.Name, "mscorlib", StringComparison.OrdinalIgnoreCase))
+            if (assemblyName != null && string.Equals(assemblyName.Name, "mscorlib", StringComparison.OrdinalIgnoreCase))
             {
                 // .NET Framework
                 return new FrameworkDescription(
@@ -99,7 +99,7 @@ namespace SignalFx.Tracing
             }
             catch (Exception e)
             {
-                Log.ErrorException("Error getting framework name from RuntimeInformation", e);
+                Log.Error(e, "Error getting framework name from RuntimeInformation");
             }
 
             if (RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
@@ -146,7 +146,7 @@ namespace SignalFx.Tracing
             }
             catch (Exception e)
             {
-                Log.ErrorException("Error getting .NET Framework version from Windows Registry", e);
+                Log.Error(e, "Error getting .NET Framework version from Windows Registry");
             }
 
             if (productVersion == null)
@@ -176,7 +176,7 @@ namespace SignalFx.Tracing
                 {
                     // try to get product version from assembly path
                     Match match = Regex.Match(
-                        RootAssembly.CodeBase,
+                        RootAssembly?.CodeBase ?? string.Empty,
                         @"/[^/]*microsoft\.netcore\.app/(\d+\.\d+\.\d+[^/]*)/",
                         RegexOptions.IgnoreCase);
 
@@ -187,7 +187,7 @@ namespace SignalFx.Tracing
                 }
                 catch (Exception e)
                 {
-                    Log.ErrorException("Error getting .NET Core version from assembly path", e);
+                    Log.Error(e, "Error getting .NET Core version from assembly path");
                 }
             }
 
@@ -214,14 +214,14 @@ namespace SignalFx.Tracing
             try
             {
                 // if we fail to extract version from assembly path, fall back to the [AssemblyInformationalVersion],
-                var informationalVersionAttribute = (AssemblyInformationalVersionAttribute)RootAssembly.GetCustomAttribute(typeof(AssemblyInformationalVersionAttribute));
+                var informationalVersionAttribute = (AssemblyInformationalVersionAttribute)RootAssembly?.GetCustomAttribute(typeof(AssemblyInformationalVersionAttribute));
 
                 // split remove the commit hash from pre-release versions
                 productVersion = informationalVersionAttribute?.InformationalVersion?.Split('+')[0];
             }
             catch (Exception e)
             {
-                Log.ErrorException("Error getting framework version from [AssemblyInformationalVersion]", e);
+                Log.Error(e, "Error getting framework version from [AssemblyInformationalVersion]");
             }
 
             if (productVersion == null)
@@ -229,12 +229,12 @@ namespace SignalFx.Tracing
                 try
                 {
                     // and if that fails, try [AssemblyFileVersion]
-                    var fileVersionAttribute = (AssemblyFileVersionAttribute)RootAssembly.GetCustomAttribute(typeof(AssemblyFileVersionAttribute));
+                    var fileVersionAttribute = (AssemblyFileVersionAttribute)RootAssembly?.GetCustomAttribute(typeof(AssemblyFileVersionAttribute));
                     productVersion = fileVersionAttribute?.Version;
                 }
                 catch (Exception e)
                 {
-                    Log.ErrorException("Error getting framework version from [AssemblyFileVersion]", e);
+                    Log.Error(e, "Error getting framework version from [AssemblyFileVersion]");
                 }
             }
 

@@ -94,6 +94,7 @@ namespace Datadog.Trace.TestHelpers
         /// <param name="operationName">The integration we're testing</param>
         /// <param name="minDateTime">Minimum time to check for spans from</param>
         /// <param name="returnAllOperations">When true, returns every span regardless of operation name</param>
+        /// <param name="operationNameContainsAny">Set of words that need to be present of selected span names</param>
         /// <returns>The list of spans.</returns>
         public IImmutableList<IMockSpan> WaitForSpans(
             int count,
@@ -129,7 +130,9 @@ namespace Datadog.Trace.TestHelpers
             {
                 relevantSpans =
                     relevantSpans
-                       .Where(s => operationNameContainsAny.Any(contains => s.Name.Contains(contains)) || operationName == null || s.Name == operationName)
+                       .Where(s => operationNameContainsAny.Any(contains => s.Name.Contains(contains))
+                            || (operationNameContainsAny.Length == 0 && operationName == null)
+                            || s.Name == operationName)
                        .ToImmutableList();
             }
 
