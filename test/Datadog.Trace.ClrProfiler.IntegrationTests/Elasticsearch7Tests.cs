@@ -132,20 +132,66 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     });
             }
 
-            const int expectedSpanCount = 164;
             var mockSpans = agent.WaitForSpans(expected.Count)
                                  .Where(s => DictionaryExtensions.GetValueOrDefault(s.Tags, Tags.InstrumentationName) == "elasticsearch-net")
                                  .OrderBy(s => s.Start)
                                  .ToList();
             var spans = mockSpans;
 
+            var statementNames = new List<string>
+            {
+                "PUT http://elasticsearch7:9200/test_index_1/_alias/test_index_3",
+                "POST http://elasticsearch7:9200/_aliases",
+                "PUT http://elasticsearch7:9200/test_index_1/_settings",
+                "PUT http://elasticsearch7:9200/test_index_1",
+                "POST http://elasticsearch7:9200/_cluster/allocation/explain",
+                "PUT http://elasticsearch7:9200/test_index_1/_split/test_index_4",
+                "POST http://elasticsearch7:9200/_ml/anomaly_detectors/test_job/model_snapshots",
+                "POST http://elasticsearch7:9200/_ml/anomaly_detectors/test_job/results/categories/",
+                "POST http://elasticsearch7:9200/_ml/anomaly_detectors/test_job/_flush",
+                "PUT http://elasticsearch7:9200/_security/user/test_user_1/_password",
+                "POST http://elasticsearch7:9200/_cluster/reroute",
+                "PUT http://elasticsearch7:9200/_security/role_mapping/test_role_1",
+                "PUT http://elasticsearch7:9200/_template/test_template_1",
+                "POST http://elasticsearch7:9200/_ml/anomaly_detectors/test_job/results/influencers",
+                "POST http://elasticsearch7:9200/_reindex",
+                "POST http://elasticsearch7:9200/_ml/anomaly_detectors/test_job/results/buckets",
+                "POST http://elasticsearch7:9200/test_index/_bulk",
+                "POST http://elasticsearch7:9200/_ml/anomaly_detectors/test_job/results/records",
+                "PUT http://elasticsearch7:9200/test_index/_create/2",
+                "POST http://elasticsearch7:9200/_ml/anomaly_detectors/test_job/results/overall_buckets",
+                "PUT http://elasticsearch7:9200/_security/user/test_user_1",
+                "PUT http://elasticsearch7:9200/_cluster/settings",
+                "POST http://elasticsearch7:9200/test_index/_delete_by_query",
+                "PUT http://elasticsearch7:9200/_security/role/test_role_1",
+                "PUT http://elasticsearch7:9200/_ml/anomaly_detectors/test_job",
+                "GET http://localhost:5000/A/s",
+                "POST http://elasticsearch7:9200/_ml/anomaly_detectors/_validate",
+                "PUT http://elasticsearch7:9200/test_index_4",
+                "PUT http://elasticsearch7:9200/elastic-net-example/_create/3",
+                "POST http://elasticsearch7:9200/elastic-net-example/_search?typed_keys=true",
+                "POST http://elasticsearch7:9200/test_index/_delete_by_query?size=0",
+                "POST http://elasticsearch7:9200/_ml/anomaly_detectors/test_job/_close"
+            };
+
             foreach (var span in spans)
             {
                 Assert.Equal("Samples.Elasticsearch.V7", span.Service);
                 Assert.Equal("elasticsearch", span.Tags["db.type"]);
+
+                span.Tags.TryGetValue(Tags.DbStatement, out var statement);
+                if (tagQueries.Equals("true") && statementNames.Contains($"{span.Tags["elasticsearch.method"]} {span.Tags["elasticsearch.url"]}"))
+                {
+                    Assert.NotNull(statement);
+                    Assert.DoesNotContain(statement, "test_user");
+                    Assert.DoesNotContain(statement, "supersecret");
+                }
+                else
+                {
+                    Assert.Null(statement);
+                }
             }
 
-            Assert.Equal(expectedSpanCount, spans.Count);
             ValidateSpans(spans, span => $"{span.Tags["elasticsearch.method"]} {span.Tags["elasticsearch.url"]}", expected);
         }
     }
