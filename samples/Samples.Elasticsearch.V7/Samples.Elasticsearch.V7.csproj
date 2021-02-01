@@ -5,7 +5,6 @@
     <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net461;netcoreapp2.1;netcoreapp3.0;netcoreapp3.1</TargetFrameworks>
 
     <ApiVersion Condition="'$(ApiVersion)' == ''">7.10.1</ApiVersion>
-    <DefineConstants Condition="'$(ApiVersion)'>='7.10.1'">$(DefineConstants);ELASTICSEARCH_7_10</DefineConstants>
 
     <!-- Required to build multiple projects with the same Configuration|Platform, which is needed for the CI library/version matrix -->
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
