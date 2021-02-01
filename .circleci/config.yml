@@ -58,6 +58,10 @@ jobs:
           path: C:\Users\circleci\project\src\bin\windows-tracer-home.zip
       - store_artifacts:
           path: C:\Users\circleci\project\src\bin\Azure.Site.Extension\
+      - store_artifacts:
+          path: C:\Users\cirecleci\project\src\Datadog.Trace\bin\Release\
+      - store_artifacts:
+          path: C:\Users\cirecleci\project\src\Datadog.Trace.OpenTracing\bin\Release\
 
 workflows:
   version: 2
