@@ -10,6 +10,7 @@ using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
+using Castle.Core.Internal;
 using Datadog.Core.Tools;
 using Datadog.Trace.TestHelpers;
 using SignalFx.Tracing;
@@ -192,7 +193,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             return process;
         }
 
-        protected void ValidateSpans<T>(IEnumerable<IMockSpan> spans, Func<IMockSpan, T> mapper, IEnumerable<T> expected)
+        protected static void ValidateSpans<T>(IEnumerable<IMockSpan> spans, Func<IMockSpan, T> mapper, IEnumerable<T> expected)
         {
             var spanLookup = new Dictionary<T, int>();
             foreach (var span in spans)
@@ -225,10 +226,14 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 }
             }
 
-            foreach (var e in missing)
+            if (missing.IsNullOrEmpty())
             {
-                Assert.True(false, $"no span found for `{e}`, remaining spans: `{string.Join(", ", spanLookup.Select(kvp => $"{kvp.Key}").ToArray())}`");
+                return;
             }
+
+            var errorMessage = $"No spans found for:\n{string.Join("\n", missing)}\n" +
+                               $"Remaining spans:\n{string.Join("\n", spanLookup.Select(kvp => $"{kvp.Key}: {kvp.Value}"))}";
+            Assert.True(condition: false, errorMessage);
         }
 
         protected void EnableDebugMode()
