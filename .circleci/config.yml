@@ -59,9 +59,9 @@ jobs:
       - store_artifacts:
           path: C:\Users\circleci\project\src\bin\Azure.Site.Extension\
       - store_artifacts:
-          path: C:\Users\cirecleci\project\src\Datadog.Trace\bin\Release\
+          path: C:\Users\circleci\project\src\Datadog.Trace\bin\Release\*.nupkg
       - store_artifacts:
-          path: C:\Users\cirecleci\project\src\Datadog.Trace.OpenTracing\bin\Release\
+          path: C:\Users\circleci\project\src\Datadog.Trace.OpenTracing\bin\Release\*.nupkg
 
 workflows:
   version: 2
