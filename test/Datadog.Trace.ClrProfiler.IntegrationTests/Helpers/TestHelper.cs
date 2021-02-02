@@ -10,7 +10,6 @@ using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
-using Castle.Core.Internal;
 using Datadog.Core.Tools;
 using Datadog.Trace.TestHelpers;
 using SignalFx.Tracing;
@@ -226,7 +225,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 }
             }
 
-            if (missing.IsNullOrEmpty())
+            if (missing.Count == 0)
             {
                 return;
             }
