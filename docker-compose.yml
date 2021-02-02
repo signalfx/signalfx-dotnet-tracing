@@ -18,6 +18,14 @@ services:
       - "127.0.0.1:27017:27017"
     command: mongod
 
+  elasticsearch7:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
+    ports:
+    - "127.0.0.1:9210:9200"
+    - "127.0.0.1:9310:9300"
+    environment:
+    - discovery.type=single-node
+
   elasticsearch6:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.4.2
     ports:
@@ -238,6 +246,7 @@ services:
     - MONGO_HOST=mongo
     - SERVICESTACK_REDIS_HOST=servicestackredis:6379
     - STACKEXCHANGE_REDIS_HOST=stackexchangeredis:6379
+    - ELASTICSEARCH7_HOST=elasticsearch7:9200
     - ELASTICSEARCH6_HOST=elasticsearch6:9200
     - ELASTICSEARCH5_HOST=elasticsearch5:9200
     - SQLSERVER_CONNECTION_STRING=Server=sqlserver;User=sa;Password=Strong!Passw0rd
@@ -249,6 +258,7 @@ services:
     depends_on:
     - servicestackredis
     - stackexchangeredis
+    - elasticsearch7
     - elasticsearch6
     - elasticsearch5
     - sqlserver
@@ -268,6 +278,7 @@ services:
     - MONGO_HOST=mongo
     - SERVICESTACK_REDIS_HOST=servicestackredis:6379
     - STACKEXCHANGE_REDIS_HOST=stackexchangeredis:6379
+    - ELASTICSEARCH7_HOST=elasticsearch7:9200
     - ELASTICSEARCH6_HOST=elasticsearch6:9200
     - ELASTICSEARCH5_HOST=elasticsearch5:9200
     - SQLSERVER_CONNECTION_STRING=Server=sqlserver;User=sa;Password=Strong!Passw0rd
@@ -279,6 +290,7 @@ services:
     depends_on:
     - servicestackredis
     - stackexchangeredis
+    - elasticsearch7
     - elasticsearch6
     - elasticsearch5
     - sqlserver
@@ -298,6 +310,7 @@ services:
     - MONGO_HOST=mongo
     - SERVICESTACK_REDIS_HOST=servicestackredis:6379
     - STACKEXCHANGE_REDIS_HOST=stackexchangeredis:6379
+    - ELASTICSEARCH7_HOST=elasticsearch7:9200
     - ELASTICSEARCH6_HOST=elasticsearch6:9200
     - ELASTICSEARCH5_HOST=elasticsearch5:9200
     - SQLSERVER_CONNECTION_STRING=Server=sqlserver;User=sa;Password=Strong!Passw0rd
@@ -309,6 +322,7 @@ services:
     depends_on:
     - servicestackredis
     - stackexchangeredis
+    - elasticsearch7
     - elasticsearch6
     - elasticsearch5
     - sqlserver
@@ -328,6 +342,7 @@ services:
     - MONGO_HOST=mongo
     - SERVICESTACK_REDIS_HOST=servicestackredis:6379
     - STACKEXCHANGE_REDIS_HOST=stackexchangeredis:6379
+    - ELASTICSEARCH7_HOST=elasticsearch7:9200
     - ELASTICSEARCH6_HOST=elasticsearch6:9200
     - ELASTICSEARCH5_HOST=elasticsearch5:9200
     - SQLSERVER_CONNECTION_STRING=Server=sqlserver;User=sa;Password=Strong!Passw0rd
@@ -339,6 +354,7 @@ services:
     depends_on:
     - servicestackredis
     - stackexchangeredis
+    - elasticsearch7
     - elasticsearch6
     - elasticsearch5
     - sqlserver

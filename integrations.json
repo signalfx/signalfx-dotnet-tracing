@@ -521,7 +521,7 @@
           "minimum_major": 6,
           "minimum_minor": 0,
           "minimum_patch": 0,
-          "maximum_major": 6,
+          "maximum_major": 7,
           "maximum_minor": 65535,
           "maximum_patch": 65535
         },
@@ -549,7 +549,7 @@
           "minimum_major": 6,
           "minimum_minor": 0,
           "minimum_patch": 0,
-          "maximum_major": 6,
+          "maximum_major": 7,
           "maximum_minor": 65535,
           "maximum_patch": 65535
         },
