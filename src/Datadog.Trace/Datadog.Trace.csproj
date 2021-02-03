@@ -1,9 +1,9 @@
-﻿<!-- Modified by SignalFx -->
+<!-- Modified by SignalFx -->
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <!-- NuGet -->
-    <Version>0.1.7-rc.3</Version>
+    <Version>0.1.8</Version>
     <Title>SignalFx Tracing</Title>
     <Description>Manual instrumentation library for SignalFx Tracing</Description>
     <AssemblyName>SignalFx.Tracing</AssemblyName>

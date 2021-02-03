@@ -10,7 +10,7 @@ import (
 )
 
 // Please don't change the formatting of this line - it's automatically updated by SetAllVersions.cs
-const LatestVersion = "0.1.3"
+const LatestVersion = "0.1.8"
 
 func getAgentVersion() string {
 	version, ok := os.LookupEnv("SIGNALFX_DOTNET_TRACING_VERSION")
