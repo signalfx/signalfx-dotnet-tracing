@@ -1,6 +1,6 @@
 # Modified by SignalFx
 FROM mcr.microsoft.com/dotnet/core/runtime:2.1-stretch-slim AS base
-ARG TRACER_VERSION=0.1.3
+ARG TRACER_VERSION=0.1.8
 RUN mkdir -p /opt/datadog
 RUN mkdir -p /var/log/signalfx/dotnet
 RUN curl -L https://github.com/DataDog/dd-trace-dotnet/releases/download/v$TRACER_VERSION/datadog-dotnet-apm-$TRACER_VERSION.tar.gz | tar xzf - -C /opt/datadog
