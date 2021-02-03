@@ -42,8 +42,8 @@ jobs:
       - run: choco install wixtoolset
       - run: nuget restore Datadog.Trace.sln
       - run: msbuild Datadog.Trace.proj /t:BuildCsharp /p:Configuration=Release
-      - run: dotnet pack -c Release src\Datadog.Trace\Datadog.Trace.csproj
-      - run: dotnet pack -c Release src\Datadog.Trace.OpenTracing\Datadog.Trace.OpenTracing.csproj
+      - run: dotnet pack -c Release -o src\bin\SignalFx.Tracing src\Datadog.Trace\Datadog.Trace.csproj
+      - run: dotnet pack -c Release -o src\bin\SignalFx.Tracing.OpenTracing src\Datadog.Trace.OpenTracing\Datadog.Trace.OpenTracing.csproj
       - run: msbuild Datadog.Trace.proj /t:BuildCpp /p:Configuration=Release;Platform=x64
       - run: msbuild Datadog.Trace.proj /t:BuildCpp /p:Configuration=Release;Platform=x86
       - run: msbuild Datadog.Trace.proj /t:msi /p:Configuration=Release;Platform=x64
@@ -59,9 +59,9 @@ jobs:
       - store_artifacts:
           path: C:\Users\circleci\project\src\bin\Azure.Site.Extension\
       - store_artifacts:
-          path: C:\Users\circleci\project\src\Datadog.Trace\bin\Release\
+          path: C:\Users\circleci\project\src\bin\SignalFx.Tracing\
       - store_artifacts:
-          path: C:\Users\circleci\project\src\Datadog.Trace.OpenTracing\bin\Release\
+          path: C:\Users\circleci\project\src\bin\SignalFx.Tracing.OpenTracing\
 
 workflows:
   version: 2
