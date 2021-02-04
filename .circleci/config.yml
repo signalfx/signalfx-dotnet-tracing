@@ -61,12 +61,12 @@ jobs:
       - run: msbuild Datadog.Trace.proj /t:CreateHomeDirectory /p:Configuration=Release;Platform=x64
       - run: nuget pack -p NoWarn=NU5100;NoBuild=true;NoDefaultExcludes=true -OutputDirectory src\bin\Azure.Site.Extension deploy\Azure.Site.Extension\Azure.Site.Extension.nuspec
       - run: mkdir artifacts
-      - run: cp -r C:\Users\circleci\project\deploy\Datadog.Trace.ClrProfiler.WindowsInstaller\bin\Release\x64\en-us\* artifacts
-      - run: cp -r C:\Users\circleci\project\deploy\Datadog.Trace.ClrProfiler.WindowsInstaller\bin\Release\x86\en-us\* artifacts
-      - run: cp C:\Users\circleci\project\src\bin\windows-tracer-home.zip artifacts\
-      - run: cp -r C:\Users\circleci\project\src\bin\Azure.Site.Extension\* artifacts
-      - run: cp -r C:\Users\circleci\project\src\bin\SignalFx.Tracing\* artifacts
-      - run: cp -r C:\Users\circleci\project\src\bin\SignalFx.Tracing.OpenTracing\* artifacts
+      - run: Xcopy /E C:\Users\circleci\project\deploy\Datadog.Trace.ClrProfiler.WindowsInstaller\bin\Release\x64\en-us artifacts\
+      - run: Xcopy /E C:\Users\circleci\project\deploy\Datadog.Trace.ClrProfiler.WindowsInstaller\bin\Release\x86\en-us artifacts\
+      - run: copy C:\Users\circleci\project\src\bin\windows-tracer-home.zip artifacts\
+      - run: Xcopy /E C:\Users\circleci\project\src\bin\Azure.Site.Extension artifacts\
+      - run: Xcopy /E C:\Users\circleci\project\src\bin\SignalFx.Tracing artifacts\
+      - run: Xcopy /E C:\Users\circleci\project\src\bin\SignalFx.Tracing.OpenTracing artifacts\
       - store_artifacts:
           path: artifacts/
       - persist_to_workspace:
