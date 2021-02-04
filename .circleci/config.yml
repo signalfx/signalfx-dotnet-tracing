@@ -14,28 +14,38 @@ jobs:
       - run: docker-compose run build
       - run: docker-compose run Profiler.Alpine
       - run: docker-compose run package.alpine
+      - run: mkdir artifacts
+      - run: cp -a deploy/linux/. artifacts/
       - store_artifacts:
-          path: deploy/linux/
+          path: artifacts/
+      - persist_to_workspace:
+          root: ./
+          paths:
+              - artifacts
 
   Linux:
     machine:
       image: ubuntu-1604:202007-01
     environment:
       buildConfiguration: Release
-
     steps:
       - checkout
       - run: docker-compose run build
       - run: docker-compose run Profiler
       - run: docker-compose run package
+      - run: mkdir artifacts
+      - run: cp -a deploy/linux/. artifacts/
       - store_artifacts:
-          path: deploy/linux/
+          path: artifacts/
+      - persist_to_workspace:
+          root: ./
+          paths:
+              - artifacts
 
   Windows:
     executor: 
       name: win/default
       shell: cmd.exe
-
     steps:
       - checkout
       - run: dotnet --list-sdks
@@ -50,23 +60,54 @@ jobs:
       - run: msbuild Datadog.Trace.proj /t:msi /p:Configuration=Release;Platform=x86
       - run: msbuild Datadog.Trace.proj /t:CreateHomeDirectory /p:Configuration=Release;Platform=x64
       - run: nuget pack -p NoWarn=NU5100;NoBuild=true;NoDefaultExcludes=true -OutputDirectory src\bin\Azure.Site.Extension deploy\Azure.Site.Extension\Azure.Site.Extension.nuspec
+      - run: mkdir artifacts
+      - run: cp -r C:\Users\circleci\project\deploy\Datadog.Trace.ClrProfiler.WindowsInstaller\bin\Release\x64\en-us\* artifacts
+      - run: cp -r C:\Users\circleci\project\deploy\Datadog.Trace.ClrProfiler.WindowsInstaller\bin\Release\x86\en-us\* artifacts
+      - run: cp C:\Users\circleci\project\src\bin\windows-tracer-home.zip artifacts\
+      - run: cp -r C:\Users\circleci\project\src\bin\Azure.Site.Extension\* artifacts
+      - run: cp -r C:\Users\circleci\project\src\bin\SignalFx.Tracing\* artifacts
+      - run: cp -r C:\Users\circleci\project\src\bin\SignalFx.Tracing.OpenTracing\* artifacts
       - store_artifacts:
-          path: C:\Users\circleci\project\deploy\Datadog.Trace.ClrProfiler.WindowsInstaller\bin\Release\x64\en-us\
-      - store_artifacts:
-          path: C:\Users\circleci\project\deploy\Datadog.Trace.ClrProfiler.WindowsInstaller\bin\Release\x86\en-us\
-      - store_artifacts:
-          path: C:\Users\circleci\project\src\bin\windows-tracer-home.zip
-      - store_artifacts:
-          path: C:\Users\circleci\project\src\bin\Azure.Site.Extension\
-      - store_artifacts:
-          path: C:\Users\circleci\project\src\bin\SignalFx.Tracing\
-      - store_artifacts:
-          path: C:\Users\circleci\project\src\bin\SignalFx.Tracing.OpenTracing\
+          path: artifacts/
+      - persist_to_workspace:
+          root: ./
+          paths:
+              - artifacts
+
+  PublishRelease:
+    docker:
+      - image: cibuilds/github:0.10
+    steps:
+      - attach_workspace:
+          at: ./
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} ${CIRCLE_TAG} ./artifacts/
 
 workflows:
   version: 2
   build:
     jobs:
-      - Alpine
-      - Linux
-      - Windows
+      - Alpine:
+          filters:
+            tags:
+              only: /.*/
+      - Linux:
+          filters:
+            tags:
+              only: /.*/
+      - Windows:
+          filters:
+            tags:
+              only: /.*/
+      - PublishRelease:
+          requires:
+            - Alpine
+            - Linux
+            - Windows
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v\d+\.\d+\.\d+$/
