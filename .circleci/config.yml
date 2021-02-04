@@ -85,6 +85,17 @@ jobs:
           command: |
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} ${CIRCLE_TAG} ./artifacts/
 
+  PublishNuGetPackages:
+    docker:
+      - image: mcr.microsoft.com/dotnet/sdk:3.1
+    steps:
+      - attach_workspace:
+          at: ./
+      - run:
+          name: "Publish NuGet Packages"
+          command: |
+            for i in ./artifacts/*.nupkg; do dotnet nuget push $i --source "${NUGET_FEED_URL}" --api-key ${NUGET_KEY}; done
+           
 workflows:
   version: 2
   build:
@@ -111,3 +122,14 @@ workflows:
               ignore: /.*/
             tags:
               only: /^v\d+\.\d+\.\d+$/
+      - PublishNuGetPackages:
+          requires:
+            - Alpine
+            - Linux
+            - Windows
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v\d+\.\d+\.\d+$/
+
