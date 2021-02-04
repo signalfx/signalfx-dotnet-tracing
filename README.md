@@ -225,7 +225,7 @@ of your application, clients, and framework.
 
 1. Add the OpenTracing dependency to your project:
     ```xml
-    <PackageReference Include="OpenTracing" Version="0.12.1" />
+    <PackageReference Include="OpenTracing" Version="0.12.0" />
     ```
 2. Obtain the `OpenTracing.Util.GlobalTracer` instance and create spans that
 automatically become child spans of any existing spans in the same context:
@@ -298,6 +298,31 @@ In the typical scenarios (dedicated VMs or containers), this is not a problem.
 Use the environment variables `SIGNALFX_PROFILER_EXCLUDE_PROCESSES` and `SIGNALFX_PROFILER_PROCESSES`
 to include/exclude applications from the tracing auto-instrumentation.
 These are ";" delimited lists that control the inclusion/exclusion of processes.
+
+### Custom instrumentation not being captured
+If the code accessing `GlobalTracer.Instance` is executed before any auto-instrumentation is injected
+into the process the call to `GlobalTracer.Instance` will return the OpenTracing No-Operation tracer.
+In this case it is necessary to force the injection of the SignalFx tracer by running a method like the one below
+before accessing `GlobalTracer.Instance`.
+
+```c#
+        static void InitTracer()
+        {
+            try
+            {
+                Assembly tracingAssembly = Assembly.Load(new AssemblyName("SignalFx.Tracing, Culture=neutral, PublicKeyToken=def86d061d0d2eeb"));
+                Type tracerType = tracingAssembly.GetType("SignalFx.Tracing.Tracer");
+
+                PropertyInfo tracerInstanceProperty = tracerType.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static);
+                object tracerInstance = tracerInstanceProperty.GetValue(null);
+            }
+            catch (Exception ex)
+            {
+                // TODO: Replace Console.WriteLine with proper log of the application.
+                Console.WriteLine("Unable to load SignalFx.Tracing.Tracer library. Exception: {0}", ex);
+            }
+        }
+```
 
 ### Investigating other issues
 
