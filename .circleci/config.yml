@@ -17,9 +17,9 @@ jobs:
       - run: mkdir artifacts
       - run: cp -a deploy/linux/. artifacts/
       - store_artifacts:
-          path: artifacts/
+          path: artifacts
       - persist_to_workspace:
-          root: ./
+          root: .
           paths:
               - artifacts
 
@@ -36,9 +36,9 @@ jobs:
       - run: mkdir artifacts
       - run: cp -a deploy/linux/. artifacts/
       - store_artifacts:
-          path: artifacts/
+          path: artifacts
       - persist_to_workspace:
-          root: ./
+          root: .
           paths:
               - artifacts
 
@@ -61,16 +61,16 @@ jobs:
       - run: msbuild Datadog.Trace.proj /t:CreateHomeDirectory /p:Configuration=Release;Platform=x64
       - run: nuget pack -p NoWarn=NU5100;NoBuild=true;NoDefaultExcludes=true -OutputDirectory src\bin\Azure.Site.Extension deploy\Azure.Site.Extension\Azure.Site.Extension.nuspec
       - run: mkdir artifacts
-      - run: Xcopy /E C:\Users\circleci\project\deploy\Datadog.Trace.ClrProfiler.WindowsInstaller\bin\Release\x64\en-us artifacts\
-      - run: Xcopy /E C:\Users\circleci\project\deploy\Datadog.Trace.ClrProfiler.WindowsInstaller\bin\Release\x86\en-us artifacts\
-      - run: copy C:\Users\circleci\project\src\bin\windows-tracer-home.zip artifacts\
-      - run: Xcopy /E C:\Users\circleci\project\src\bin\Azure.Site.Extension artifacts\
-      - run: Xcopy /E C:\Users\circleci\project\src\bin\SignalFx.Tracing artifacts\
-      - run: Xcopy /E C:\Users\circleci\project\src\bin\SignalFx.Tracing.OpenTracing artifacts\
+      - run: cp -r deploy\Datadog.Trace.ClrProfiler.WindowsInstaller\bin\Release\x64\en-us\* artifacts
+      - run: cp -r deploy\Datadog.Trace.ClrProfiler.WindowsInstaller\bin\Release\x86\en-us\* artifacts
+      - run: cp src\bin\windows-tracer-home.zip artifacts\
+      - run: cp -r src\bin\Azure.Site.Extension\* artifacts
+      - run: cp -r src\bin\SignalFx.Tracing\* artifacts
+      - run: cp -r src\bin\SignalFx.Tracing.OpenTracing\* artifacts
       - store_artifacts:
-          path: artifacts/
+          path: artifacts
       - persist_to_workspace:
-          root: ./
+          root: .
           paths:
               - artifacts
 
@@ -79,7 +79,7 @@ jobs:
       - image: cibuilds/github:0.10
     steps:
       - attach_workspace:
-          at: ./
+          at: .
       - run:
           name: "Publish Release on GitHub"
           command: |
@@ -87,10 +87,10 @@ jobs:
 
   PublishNuGetPackages:
     docker:
-      - image: mcr.microsoft.com/dotnet/sdk:3.1
+      - image: mcr.microsoft.com/dotnet/sdk:5.0
     steps:
       - attach_workspace:
-          at: ./
+          at: .
       - run:
           name: "Publish NuGet Packages"
           command: |
