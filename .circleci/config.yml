@@ -103,7 +103,7 @@ workflows:
       - Alpine:
           filters:
             tags:
-              only: /.*/
+              only: /.*/ # this assures that the step will be run when the tag is pushed
       - Linux:
           filters:
             tags:
