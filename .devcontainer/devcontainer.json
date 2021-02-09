@@ -22,7 +22,7 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "dotnet restore Datadog.Trace.sln",
+	"postCreateCommand": "dotnet build Datadog.Trace.sln || true",
 
 	// Comment out connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	// "remoteUser": "vscode"
