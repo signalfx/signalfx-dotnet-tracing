@@ -274,10 +274,12 @@ For more examples and information on how to do manual instrumentation see:
 Check if you are not hitting one of the issues listed below.
 
 ### IIS applications not instrumenting expected services
+
 Set the environment variable `SIGNALFX_TRACE_DOMAIN_NEUTRAL_INSTRUMENTATION` to `true` - without it
 the CLR profiler can't instrument many libraries/frameworks under IIS.
 
 ### Linux instrumentation not working
+
 The proper binary needs to be selected when deploying to Linux, eg.: the default Microsoft .NET images are
 based on Debian and should use the `deb` package, see the [Linux](#Linux) setup section.
 
@@ -290,6 +292,7 @@ $ cat /proc/version
 ```
 
 ### High CPU usage
+
 The default installation of auto-instrumentation enables tracing all .NET processes on the box.
 In the typical scenarios (dedicated VMs or containers), this is not a problem.
 Use the environment variables `SIGNALFX_PROFILER_EXCLUDE_PROCESSES` and `SIGNALFX_PROFILER_PROCESSES`
@@ -297,6 +300,7 @@ to include/exclude applications from the tracing auto-instrumentation.
 These are ";" delimited lists that control the inclusion/exclusion of processes.
 
 ### Investigating other issues
+
 If none of the suggestions above solves your issue, detailed logs are necessary.
 Follow the steps below to get the detailed logs from SignalFx Tracing for .NET:
 
@@ -308,9 +312,13 @@ On Windows, the default log location is `%ProgramData%\SignalFx .NET Tracing\log
 Compress the whole folder to capture the multiple log files and send the compressed folder to us.
 After obtaining the logs, remember to remove the environment variable `SIGNALFX_TRACE_DEBUG` to avoid unnecessary overhead.
 
+## Contributing
+
+See [docs/README.md](docs/README.md) and [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
+
 ## About
-The SignalFx-Tracing Library for .NET is a fork of the .NET
-Tracer for Datadog APM that has been modified to provide Zipkin v2 JSON
-formatting, a complete OpenTracing API implementation, B3 propagation, and
-properly annotated trace data for handling by
+
+The SignalFx-Tracing Library for .NET is a fork of the [.NET Tracer for Datadog APM](https://github.com/DataDog/dd-trace-dotnet)
+that has been modified to provide Zipkin v2 JSON formatting, a complete OpenTracing API implementation, B3 propagation,
+and properly annotated trace data for handling by 
 [SignalFx Microservices APM](https://docs.signalfx.com/en/latest/apm/apm-overview/index.html).
