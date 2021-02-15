@@ -300,7 +300,8 @@ to include/exclude applications from the tracing auto-instrumentation.
 These are ";" delimited lists that control the inclusion/exclusion of processes.
 
 ### Custom instrumentation not being captured
-If the code accessing `GlobalTracer.Instance` is executed before any auto-instrumentation is injected
+
+If the code accessing `GlobalTracer.Instance` executes before anyg auto-instrumentation is injected
 into the process the call to `GlobalTracer.Instance` will return the OpenTracing No-Operation tracer.
 In this case it is necessary to force the injection of the SignalFx tracer by running a method like the one below
 before accessing `GlobalTracer.Instance`.
