@@ -310,7 +310,7 @@ before accessing `GlobalTracer.Instance`.
         {
             try
             {
-                Assembly tracingAssembly = Assembly.Load(new AssemblyName("SignalFx.Tracing, Culture=neutral, PublicKeyToken=def86d061d0d2eeb"));
+                Assembly tracingAssembly = Assembly.Load(new AssemblyName("SignalFx.Tracing, Version=0.1.8.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb"));
                 Type tracerType = tracingAssembly.GetType("SignalFx.Tracing.Tracer");
 
                 PropertyInfo tracerInstanceProperty = tracerType.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static);

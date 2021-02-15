@@ -44,6 +44,11 @@ namespace PrepareRelease
                 "src/Datadog.Trace/Tracer.cs",
                 PartialAssemblyNameReplace);
 
+            // Replace assembly name on README.md to cover any code snippets
+            SynchronizeVersion(
+                "README.md",
+                PartialAssemblyNameReplace);
+
             SynchronizeVersion(
                 "src/Datadog.Trace.AspNet/Datadog.Trace.AspNet.csproj",
                 NugetVersionReplace);
