@@ -13,7 +13,8 @@ namespace SerilogExample
         static void Main(string[] args)
         {
             // Regardless of the output layout, your LoggerConfiguration must be
-            // enriched from the LogContext to extract the `signalfx.trace_id` and `signalfx.span_id`
+            // enriched from the LogContext to extract the `signalfx.trace_id`, `signalfx.span_id`, `signalfx.service`
+            // and `signalfx.environment`
             // properties that are automatically injected by the .NET tracer
             //
             // Additions to LoggerConfiguration:

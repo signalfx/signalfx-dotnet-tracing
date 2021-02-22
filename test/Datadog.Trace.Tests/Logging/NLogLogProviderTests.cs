@@ -73,22 +73,19 @@ namespace Datadog.Trace.Tests.Logging
             // Scope: Parent scope
             // Custom property: N/A
             logString = filteredLogs[logIndex++];
-            Assert.Contains(string.Format(ExpectedIdStringFormat, CorrelationIdentifier.SpanIdKey, parentScope.Span.SpanId), logString);
-            Assert.Contains(string.Format(ExpectedIdStringFormat, CorrelationIdentifier.TraceIdKey, parentScope.Span.TraceId), logString);
+            AssertCorrelationIdentifiers(parentScope, logString);
             Assert.DoesNotContain($"\"{LoggingProviderTestHelpers.CustomPropertyName}\"", logString);
 
             // Scope: Parent scope
             // Custom property: SET
             logString = filteredLogs[logIndex++];
-            Assert.Contains(string.Format(ExpectedIdStringFormat, CorrelationIdentifier.SpanIdKey, parentScope.Span.SpanId), logString);
-            Assert.Contains(string.Format(ExpectedIdStringFormat, CorrelationIdentifier.TraceIdKey, parentScope.Span.TraceId), logString);
+            AssertCorrelationIdentifiers(parentScope, logString);
             Assert.Contains(string.Format(ExpectedStringFormat, LoggingProviderTestHelpers.CustomPropertyName, LoggingProviderTestHelpers.CustomPropertyValue), logString);
 
             // Scope: Child scope
             // Custom property: SET
             logString = filteredLogs[logIndex++];
-            Assert.Contains(string.Format(ExpectedIdStringFormat, CorrelationIdentifier.SpanIdKey, childScope.Span.SpanId), logString);
-            Assert.Contains(string.Format(ExpectedIdStringFormat, CorrelationIdentifier.TraceIdKey, childScope.Span.TraceId), logString);
+            AssertCorrelationIdentifiers(childScope, logString);
             Assert.Contains(string.Format(ExpectedStringFormat, LoggingProviderTestHelpers.CustomPropertyName, LoggingProviderTestHelpers.CustomPropertyValue), logString);
 
             // Scope: Parent scope
@@ -110,6 +107,8 @@ namespace Datadog.Trace.Tests.Logging
             logString = filteredLogs[logIndex++];
             Assert.Contains(string.Format(ExpectedIdStringFormat, CorrelationIdentifier.SpanIdKey, 0), logString);
             Assert.Contains(string.Format(ExpectedIdStringFormat, CorrelationIdentifier.TraceIdKey, 0), logString);
+            Assert.Contains(string.Format(ExpectedStringFormat, CorrelationIdentifier.ServiceNameKey, string.Empty), logString);
+            Assert.Contains(string.Format(ExpectedStringFormat, CorrelationIdentifier.ServiceEnvironmentKey, string.Empty), logString);
             Assert.DoesNotContain($"\"{LoggingProviderTestHelpers.CustomPropertyName}\"", logString);
         }
 
@@ -133,51 +132,60 @@ namespace Datadog.Trace.Tests.Logging
             // Scope: N/A
             // Custom property: N/A
             logString = filteredLogs[logIndex++];
-            Assert.DoesNotContain($"\"{CorrelationIdentifier.SpanIdKey}\"", logString);
-            Assert.DoesNotContain($"\"{CorrelationIdentifier.TraceIdKey}\"", logString);
+            AssertNoCorrelationIdentifiers(logString);
             Assert.DoesNotContain($"\"{LoggingProviderTestHelpers.CustomPropertyName}\"", logString);
 
             // Scope: N/A
             // Custom property: N/A
             logString = filteredLogs[logIndex++];
-            Assert.DoesNotContain($"\"{CorrelationIdentifier.SpanIdKey}\"", logString);
-            Assert.DoesNotContain($"\"{CorrelationIdentifier.TraceIdKey}\"", logString);
+            AssertNoCorrelationIdentifiers(logString);
             Assert.DoesNotContain($"\"{LoggingProviderTestHelpers.CustomPropertyName}\"", logString);
 
             // Scope: N/A
             // Custom property: SET
             logString = filteredLogs[logIndex++];
-            Assert.DoesNotContain($"\"{CorrelationIdentifier.SpanIdKey}\"", logString);
-            Assert.DoesNotContain($"\"{CorrelationIdentifier.TraceIdKey}\"", logString);
+            AssertNoCorrelationIdentifiers(logString);
             Assert.Contains(string.Format(ExpectedStringFormat, LoggingProviderTestHelpers.CustomPropertyName, LoggingProviderTestHelpers.CustomPropertyValue), logString);
 
             // Scope: N/A
             // Custom property: SET
             logString = filteredLogs[logIndex++];
-            Assert.DoesNotContain($"\"{CorrelationIdentifier.SpanIdKey}\"", logString);
-            Assert.DoesNotContain($"\"{CorrelationIdentifier.TraceIdKey}\"", logString);
+            AssertNoCorrelationIdentifiers(logString);
             Assert.Contains(string.Format(ExpectedStringFormat, LoggingProviderTestHelpers.CustomPropertyName, LoggingProviderTestHelpers.CustomPropertyValue), logString);
 
             // Scope: N/A
             // Custom property: SET
             logString = filteredLogs[logIndex++];
-            Assert.DoesNotContain($"\"{CorrelationIdentifier.SpanIdKey}\"", logString);
-            Assert.DoesNotContain($"\"{CorrelationIdentifier.TraceIdKey}\"", logString);
+            AssertNoCorrelationIdentifiers(logString);
             Assert.Contains(string.Format(ExpectedStringFormat, LoggingProviderTestHelpers.CustomPropertyName, LoggingProviderTestHelpers.CustomPropertyValue), logString);
 
             // Scope: N/A
             // Custom property: N/A
             logString = filteredLogs[logIndex++];
-            Assert.DoesNotContain($"\"{CorrelationIdentifier.SpanIdKey}\"", logString);
-            Assert.DoesNotContain($"\"{CorrelationIdentifier.TraceIdKey}\"", logString);
+            AssertNoCorrelationIdentifiers(logString);
             Assert.DoesNotContain($"\"{LoggingProviderTestHelpers.CustomPropertyName}\"", logString);
 
             // Scope: N/A
             // Custom property: N/A
             logString = filteredLogs[logIndex++];
+            AssertNoCorrelationIdentifiers(logString);
+            Assert.DoesNotContain($"\"{LoggingProviderTestHelpers.CustomPropertyName}\"", logString);
+        }
+
+        private static void AssertCorrelationIdentifiers(Scope scope, string logString)
+        {
+            Assert.Contains(string.Format(ExpectedIdStringFormat, CorrelationIdentifier.SpanIdKey, scope.Span.SpanId), logString);
+            Assert.Contains(string.Format(ExpectedIdStringFormat, CorrelationIdentifier.TraceIdKey, scope.Span.TraceId), logString);
+            Assert.Contains(string.Format(ExpectedStringFormat, CorrelationIdentifier.ServiceNameKey, LoggingProviderTestHelpers.ServiceName), logString);
+            Assert.Contains(string.Format(ExpectedStringFormat, CorrelationIdentifier.ServiceEnvironmentKey, LoggingProviderTestHelpers.ServiceEnvironment), logString);
+        }
+
+        private static void AssertNoCorrelationIdentifiers(string logString)
+        {
             Assert.DoesNotContain($"\"{CorrelationIdentifier.SpanIdKey}\"", logString);
             Assert.DoesNotContain($"\"{CorrelationIdentifier.TraceIdKey}\"", logString);
-            Assert.DoesNotContain($"\"{LoggingProviderTestHelpers.CustomPropertyName}\"", logString);
+            Assert.DoesNotContain($"\"{CorrelationIdentifier.ServiceNameKey}\"", logString);
+            Assert.DoesNotContain($"\"{CorrelationIdentifier.ServiceEnvironmentKey}\"", logString);
         }
     }
 }

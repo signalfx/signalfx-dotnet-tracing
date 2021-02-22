@@ -19,6 +19,16 @@ namespace SignalFx.Tracing
         public static readonly string SpanIdKey = "signalfx.span_id";
 
         /// <summary>
+        /// Key used to correlate the environment on logs.
+        /// </summary>
+        public static readonly string ServiceNameKey = "signalfx.service";
+
+        /// <summary>
+        /// Key used to correlate the environment on logs.
+        /// </summary>
+        public static readonly string ServiceEnvironmentKey = "signalfx.environment";
+
+        /// <summary>
         /// Gets the trace id
         /// </summary>
         public static ulong TraceId

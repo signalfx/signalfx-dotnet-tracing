@@ -54,7 +54,7 @@ Use these environment variables to configure the tracing library:
 | `SIGNALFX_ENDPOINT_URL` | `http://localhost:9080/v1/trace` | The hostname and port for a SignalFx Smart Agent or OpenTelemetry Collector. |
 | `SIGNALFX_ACCESS_TOKEN` |  | The access token for your SignalFx organization. Providing a token enables you to send traces to a SignalFx ingest endpoint. |
 | `SIGNALFX_TRACE_GLOBAL_TAGS` |  | Comma-separated list of key-value pairs to specify global span tags. For example: `"key1:val1,key2:val2"` |
-| `SIGNALFX_LOGS_INJECTION` | `false` | Enable to inject trace IDs and span IDs in logs. This requires a compatible logger or manual configuration. |
+| `SIGNALFX_LOGS_INJECTION` | `false` | Enable to inject trace IDs, span IDs, service name and environment into logs. This requires a compatible logger or manual configuration. |
 | `SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS` |  | Enable to tag the Mongo command `BsonDocument` as a `db.statement`. |
 | `SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES` |  | Enable to tag the Elasticsearch command `PostData` as a `db.statement`. |
 | `SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS` |  | Enable to tag Redis commands as a `db.statement`. |

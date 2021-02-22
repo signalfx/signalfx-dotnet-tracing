@@ -45,3 +45,10 @@ Layouts configured in the sample:
 - JSON format: `JsonFormatter`
 - JSON format: `CompactJsonFormatter` (from the `Serilog.Formatting.Compact` NuGet package)
 - Raw format: output template (requires manual configuration)
+
+## Fields injected into log context
+
+- `signalfx.trace_id`
+- `signalfx.span_id`
+- `signalfx.service` - [`SIGNALFX_SERVICE_NAME`](/README.md#configuration-values) configuration option
+- `signalfx.environment` - [`SIGNALFX_ENV`](/README.md#configuration-values) configuration option
