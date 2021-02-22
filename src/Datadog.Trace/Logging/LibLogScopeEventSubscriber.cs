@@ -61,7 +61,7 @@ namespace SignalFx.Tracing.Logging
 
         public void StackOnSpanOpened(object sender, SpanEventArgs spanEventArgs)
         {
-            SetCorrelationIdentifierContext(spanEventArgs.Span.TraceId, spanEventArgs.Span.SpanId);
+            SetCorrelationIdentifierContext(new LogCorrelationFields(spanEventArgs.Span));
         }
 
         public void StackOnSpanClosed(object sender, SpanEventArgs spanEventArgs)
@@ -72,13 +72,13 @@ namespace SignalFx.Tracing.Logging
         public void MapOnSpanActivated(object sender, SpanEventArgs spanEventArgs)
         {
             RemoveAllCorrelationIdentifierContexts();
-            SetCorrelationIdentifierContext(spanEventArgs.Span.TraceId, spanEventArgs.Span.SpanId);
+            SetCorrelationIdentifierContext(new LogCorrelationFields(spanEventArgs.Span));
         }
 
         public void MapOnTraceEnded(object sender, SpanEventArgs spanEventArgs)
         {
             RemoveAllCorrelationIdentifierContexts();
-            SetDefaultValues();
+            SetCorrelationIdentifierContext(new LogCorrelationFields());
         }
 
         public void Dispose()
@@ -97,15 +97,10 @@ namespace SignalFx.Tracing.Logging
             RemoveAllCorrelationIdentifierContexts();
         }
 
-        private void SetDefaultValues()
-        {
-            SetCorrelationIdentifierContext(0, 0);
-        }
-
         private void RemoveLastCorrelationIdentifierContext()
         {
             // TODO: Debug logs
-            for (int i = 0; i < 2; i++)
+            for (var i = 0; i < 4; i++)
             {
                 if (_contextDisposalStack.TryPop(out IDisposable ctxDisposable))
                 {
@@ -130,7 +125,7 @@ namespace SignalFx.Tracing.Logging
             }
         }
 
-        private void SetCorrelationIdentifierContext(ulong traceId, ulong spanId)
+        private void SetCorrelationIdentifierContext(LogCorrelationFields fields)
         {
             if (!_safeToAddToMdc)
             {
@@ -142,16 +137,49 @@ namespace SignalFx.Tracing.Logging
                 // TODO: Debug logs
                 _contextDisposalStack.Push(
                     LogProvider.OpenMappedContext(
-                        CorrelationIdentifier.TraceIdKey, traceId.ToString("x16"), destructure: false));
+                        CorrelationIdentifier.TraceIdKey, fields.TraceId.ToString("x16"), destructure: false));
                 _contextDisposalStack.Push(
                     LogProvider.OpenMappedContext(
-                        CorrelationIdentifier.SpanIdKey, spanId.ToString("x16"), destructure: false));
+                        CorrelationIdentifier.SpanIdKey, fields.SpanId.ToString("x16"), destructure: false));
+                _contextDisposalStack.Push(
+                    LogProvider.OpenMappedContext(
+                        CorrelationIdentifier.ServiceNameKey, fields.Service, destructure: false));
+                _contextDisposalStack.Push(
+                    LogProvider.OpenMappedContext(
+                        CorrelationIdentifier.ServiceEnvironmentKey, fields.Environment, destructure: false));
             }
             catch (Exception)
             {
                 _safeToAddToMdc = false;
                 RemoveAllCorrelationIdentifierContexts();
             }
+        }
+
+        private class LogCorrelationFields
+        {
+            public LogCorrelationFields(Span span)
+            {
+                TraceId = span.TraceId;
+                SpanId = span.SpanId;
+                Service = span.ServiceName;
+                Environment = span.GetTag(Tags.Environment) ?? string.Empty;
+            }
+
+            public LogCorrelationFields()
+            {
+                TraceId = 0;
+                SpanId = 0;
+                Service = string.Empty;
+                Environment = string.Empty;
+            }
+
+            public ulong TraceId { get; }
+
+            public ulong SpanId { get; }
+
+            public string Service { get; }
+
+            public string Environment { get; }
         }
     }
 }
