@@ -184,11 +184,11 @@ you're instrumenting.
 2. Configure the required environment variables to enable the CLR Profiler:
     - For .NET Framework applications:
     ```batch
-    setx COR_PROFILER {B4C89B0F-9908-4F73-9F59-0D77C5A06874} /m
+    setx COR_PROFILER "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}" /m
     ```
    - For .NET Core applications:
    ```batch
-   setx CORECLR_PROFILER {B4C89B0F-9908-4F73-9F59-0D77C5A06874} /m
+   setx CORECLR_PROFILER "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}" /m
    ```
 3. Set the "service name" that better describes your application:
    ```batch
