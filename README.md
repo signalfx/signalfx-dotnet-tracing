@@ -172,10 +172,11 @@ the [Azure documentation](https://docs.microsoft.com/en-us/azure/azure-functions
 
 ### Windows
 
-**Warning**: pay close attention to the scope of environment variables and ensure they
-are properly set prior to launching the targeted process. The steps below set the environment
-variables at the machine level, with the exception of the variables used for finer control
-of which processes will be instrumented.
+**Warning**: Pay close attention to the scope of environment variables. Ensure they
+are properly set prior to launching the targeted process. The following steps set the
+environment variables at the machine level, with the exception of the variables used
+for finer control of which processes will be instrumented, which are set in the current
+command session.
 
 1. Install the CLR Profiler using an installer file (`.msi` file) from the
 [latest release](https://github.com/signalfx/signalfx-dotnet-tracing/releases/latest).
@@ -208,12 +209,15 @@ the trace data:
     setx SIGNALFX_TRACE_DOMAIN_NEUTRAL_INSTRUMENTATION true /m
     ```
 7. Enable instrumentation for the targeted application by setting
-the appropriate __CLR enable profiling__ environment variable,
-according to the .NET runtime being used,
-to **1** for the targeted application.
-The snippet below sets the variable only for the current command
-session (see below for other some alternatives on how
-to set it to different scopes):
+the appropriate __CLR enable profiling__ environment variable.
+You can enable instrumentation at these levels:
+ - For current command session
+ - For a specific Windows Service
+ - For a specific user
+The follow snippet describes how to enable instrumentation for
+the current command session according to the .NET runtime.
+To enable instrumentation at different levels, see
+[this](#enable-instrumentation-at-different-levels) section.
    - For .NET Framework applications:
    ```batch
    set COR_ENABLE_PROFILING=1
@@ -226,7 +230,9 @@ to set it to different scopes):
 configured. If you need to check the environment variables for a process use a tool
 like [Process Explorer](https://docs.microsoft.com/en-us/sysinternals/downloads/process-explorer).
 
-- To enable instrumentation for a specific Windows service:
+#### Enable instrumentation at different levels
+
+Enable instrumentation for a specific Windows service:
    - For .NET Framework applications:
    ```batch
    reg add HKLM\SYSTEM\CurrentControlSet\Services\<ServiceName>\Environment /v COR_ENABLE_PROFILING /d 1
@@ -235,7 +241,8 @@ like [Process Explorer](https://docs.microsoft.com/en-us/sysinternals/downloads/
    ```batch
    reg add HKLM\SYSTEM\CurrentControlSet\Services\<ServiceName>\Environment /v CORECLR_ENABLE_PROFILING /d 1
    ```
-- To enable instrumentation for a specific user:
+
+Enable instrumentation for a specific user:
    - For .NET Framework applications:
    ```batch
    setx /s %COMPUTERNAME% /u <[domain/]user> COR_ENABLE_PROFILING 1
