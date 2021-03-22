@@ -32,7 +32,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         /// </summary>
         /// <param name="wireProtocol">The IWireProtocol instance we are replacing.</param>
         /// <param name="connection">The connection.</param>
-        /// <param name="cancellationTokenSource">A cancellation token source.</param>
+        /// <param name="boxedCancellationToken">A cancellation token.</param>
         /// <param name="opCode">The OpCode used in the original method call.</param>
         /// <param name="mdToken">The mdToken of the original method call.</param>
         /// <param name="moduleVersionPtr">A pointer to the module version GUID.</param>
@@ -46,7 +46,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         public static object Execute(
             object wireProtocol,
             object connection,
-            object cancellationTokenSource,
+            object boxedCancellationToken,
             int opCode,
             int mdToken,
             long moduleVersionPtr)
@@ -57,8 +57,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             Func<object, object, CancellationToken, object> execute;
             var wireProtocolType = wireProtocol.GetType();
 
-            var tokenSource = cancellationTokenSource as CancellationTokenSource;
-            var cancellationToken = tokenSource?.Token ?? CancellationToken.None;
+            var cancellationToken = (CancellationToken)boxedCancellationToken;
 
             try
             {
@@ -102,7 +101,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         /// </summary>
         /// <param name="wireProtocol">The IWireProtocol`1 instance we are replacing.</param>
         /// <param name="connection">The connection.</param>
-        /// <param name="cancellationTokenSource">A cancellation token source.</param>
+        /// <param name="boxedCancellationToken">A cancellation token.</param>
         /// <param name="opCode">The OpCode used in the original method call.</param>
         /// <param name="mdToken">The mdToken of the original method call.</param>
         /// <param name="moduleVersionPtr">A pointer to the module version GUID.</param>
@@ -117,7 +116,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         public static object ExecuteGeneric(
             object wireProtocol,
             object connection,
-            object cancellationTokenSource,
+            object boxedCancellationToken,
             int opCode,
             int mdToken,
             long moduleVersionPtr)
@@ -128,8 +127,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             Func<object, object, CancellationToken, object> execute;
             var wireProtocolType = wireProtocol.GetType();
 
-            var tokenSource = cancellationTokenSource as CancellationTokenSource;
-            var cancellationToken = tokenSource?.Token ?? CancellationToken.None;
+            var cancellationToken = (CancellationToken)boxedCancellationToken;
 
             try
             {
@@ -173,7 +171,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         /// </summary>
         /// <param name="wireProtocol">The IWireProtocol instance we are replacing.</param>
         /// <param name="connection">The connection.</param>
-        /// <param name="cancellationTokenSource">A cancellation token source.</param>
+        /// <param name="boxedCancellationToken">A cancellation token.</param>
         /// <param name="opCode">The OpCode used in the original method call.</param>
         /// <param name="mdToken">The mdToken of the original method call.</param>
         /// <param name="moduleVersionPtr">A pointer to the module version GUID.</param>
@@ -188,15 +186,14 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         public static object ExecuteAsync(
             object wireProtocol,
             object connection,
-            object cancellationTokenSource,
+            object boxedCancellationToken,
             int opCode,
             int mdToken,
             long moduleVersionPtr)
         {
             if (wireProtocol == null) { throw new ArgumentNullException(nameof(wireProtocol)); }
 
-            var tokenSource = cancellationTokenSource as CancellationTokenSource;
-            var cancellationToken = tokenSource?.Token ?? CancellationToken.None;
+            var cancellationToken = (CancellationToken)boxedCancellationToken;
 
             const string methodName = nameof(ExecuteAsync);
             var wireProtocolType = wireProtocol.GetType();
@@ -236,7 +233,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         /// </summary>
         /// <param name="wireProtocol">The IWireProtocol`1 instance we are replacing.</param>
         /// <param name="connection">The connection.</param>
-        /// <param name="cancellationTokenSource">A cancellation token source.</param>
+        /// <param name="boxedCancellationToken">A cancellation token.</param>
         /// <param name="opCode">The OpCode used in the original method call.</param>
         /// <param name="mdToken">The mdToken of the original method call.</param>
         /// <param name="moduleVersionPtr">A pointer to the module version GUID.</param>
@@ -251,7 +248,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         public static object ExecuteAsyncGeneric(
             object wireProtocol,
             object connection,
-            object cancellationTokenSource,
+            object boxedCancellationToken,
             int opCode,
             int mdToken,
             long moduleVersionPtr)
@@ -259,8 +256,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             // The generic type for this method comes from the declaring type of wireProtocol
             if (wireProtocol == null) { throw new ArgumentNullException(nameof(wireProtocol)); }
 
-            var tokenSource = cancellationTokenSource as CancellationTokenSource;
-            var cancellationToken = tokenSource?.Token ?? CancellationToken.None;
+            var cancellationToken = (CancellationToken)boxedCancellationToken;
 
             var wireProtocolType = wireProtocol.GetType();
             var wireProtocolGenericArgs = GetGenericsFromWireProtocol(wireProtocolType);
