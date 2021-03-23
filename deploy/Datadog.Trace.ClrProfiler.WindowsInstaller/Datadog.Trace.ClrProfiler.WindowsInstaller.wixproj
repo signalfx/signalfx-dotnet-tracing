@@ -15,11 +15,11 @@
     <IntermediateOutputPath>obj\$(Configuration)\$(Platform)\</IntermediateOutputPath>
     <SuppressPdbOutput>True</SuppressPdbOutput>
     <DefineSolutionProperties>false</DefineSolutionProperties>
-    <OutputName>signalfx-dotnet-tracing-0.1.8-$(Platform)</OutputName>
+    <OutputName>signalfx-dotnet-tracing-0.1.9-$(Platform)</OutputName>
   </PropertyGroup>
 
   <PropertyGroup>
-    <DefineConstants>InstallerVersion=0.1.8</DefineConstants>
+    <DefineConstants>InstallerVersion=0.1.9</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
