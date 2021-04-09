@@ -1,7 +1,8 @@
 // Modified by SignalFx
-using System;
+
 using SignalFx.Tracing;
 using SignalFx.Tracing.OpenTracing;
+using SignalFx.Tracing.Propagation;
 using Xunit;
 
 namespace Datadog.Trace.OpenTracing.Tests
@@ -14,16 +15,16 @@ namespace Datadog.Trace.OpenTracing.Tests
         private const string HttpHeaderSamplingPriority = "x-b3-sampled";
         private const string HttpHeaderDebugSamplingPriority = "x-b3-flags";
 
-        private readonly HttpHeadersCodec _codec = new HttpHeadersCodec();
+        private readonly HttpHeadersCodec _codec = new HttpHeadersCodec(new B3SpanContextPropagator());
 
         [Fact]
         public void Extract_ValidParentAndTraceId_ProperSpanContext()
         {
-            const ulong traceId = 10;
+            var traceId = TraceId.CreateFromInt(10);
             const ulong parentId = 120;
 
             var headers = new MockTextMap();
-            headers.Set(HttpHeaderTraceId, traceId.ToString("x16"));
+            headers.Set(HttpHeaderTraceId, traceId.ToString());
             headers.Set(HttpHeaderParentId, parentId.ToString("x16"));
 
             var spanContext = _codec.Extract(headers) as OpenTracingSpanContext;
@@ -36,12 +37,12 @@ namespace Datadog.Trace.OpenTracing.Tests
         [Fact]
         public void Extract_WrongHeaderCase_ExtractionStillWorks()
         {
-            const ulong traceId = 10;
+            var traceId = TraceId.CreateFromInt(10);
             const ulong parentId = 120;
             const SamplingPriority samplingPriority = SamplingPriority.AutoKeep;
 
             var headers = new MockTextMap();
-            headers.Set(HttpHeaderTraceId.ToUpper(), traceId.ToString("x16"));
+            headers.Set(HttpHeaderTraceId.ToUpper(), traceId.ToString());
             headers.Set(HttpHeaderParentId.ToUpper(), parentId.ToString("x16"));
             headers.Set(HttpHeaderSamplingPriority.ToUpper(), ((int)samplingPriority).ToString());
 
@@ -56,7 +57,7 @@ namespace Datadog.Trace.OpenTracing.Tests
         public void Inject_SpanContext_HeadersWithCorrectInfo()
         {
             const ulong spanId = 10;
-            const ulong traceId = 7;
+            var traceId = TraceId.CreateFromInt(7);
             const SamplingPriority samplingPriority = SamplingPriority.UserKeep;
 
             var ddSpanContext = new SpanContext(traceId, spanId, samplingPriority);
@@ -66,7 +67,7 @@ namespace Datadog.Trace.OpenTracing.Tests
             _codec.Inject(spanContext, headers);
 
             Assert.Equal(spanId.ToString("x16"), headers.Get(HttpHeaderParentId));
-            Assert.Equal(traceId.ToString("x16"), headers.Get(HttpHeaderTraceId));
+            Assert.Equal(traceId.ToString(), headers.Get(HttpHeaderTraceId));
             Assert.Equal("1", headers.Get(HttpHeaderDebugSamplingPriority));
         }
     }

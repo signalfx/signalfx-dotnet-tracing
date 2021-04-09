@@ -31,11 +31,11 @@ namespace SignalFx.Tracing
         /// <summary>
         /// Gets the trace id
         /// </summary>
-        public static ulong TraceId
+        public static TraceId TraceId
         {
             get
             {
-                return Tracer.Instance.ActiveScope?.Span?.TraceId ?? 0;
+                return Tracer.Instance.ActiveScope?.Span?.TraceId ?? Tracing.TraceId.Zero;
             }
         }
 

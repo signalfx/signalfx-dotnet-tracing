@@ -83,7 +83,7 @@ namespace SignalFx.Tracing.Sampling
 
         private SamplingPriority GetSamplingPriority(Span span, float rate)
         {
-            var sample = ((span.TraceId * KnuthFactor) % TracerConstants.MaxTraceId) <= (rate * TracerConstants.MaxTraceId);
+            var sample = ((span.TraceId.Lower * KnuthFactor) % TracerConstants.MaxTraceId) <= (rate * TracerConstants.MaxTraceId);
             var priority = SamplingPriority.AutoReject;
 
             if (sample)

@@ -263,6 +263,17 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 httpClient.DefaultRequestHeaders.Add(HttpHeaderNames.TracingEnabled, "false");
                 var testStart = DateTime.UtcNow;
                 var response = await httpClient.GetAsync($"http://localhost:{httpPort}" + path);
+
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    Assert.True(
+                        response.Headers.Contains("Server-Timing"),
+                        $"No Server-Timing header attached. Headers present: {string.Join(", ", response.Headers.Select(h => $"{h.Key}={h.Value}"))}");
+                    Assert.True(
+                        response.Headers.Contains("Access-Control-Expose-Headers"),
+                        $"No Access-Control-Expose-Headers header attached. Headers present: {string.Join(", ", response.Headers.Select(h => $"{h.Key}={h.Value}"))}");
+                }
+
                 var content = await response.Content.ReadAsStringAsync();
                 Output.WriteLine($"[http] {response.StatusCode} {content}");
                 Assert.Equal(expectedHttpStatusCode, response.StatusCode);

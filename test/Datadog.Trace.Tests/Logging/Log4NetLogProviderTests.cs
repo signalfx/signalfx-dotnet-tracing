@@ -93,7 +93,7 @@ namespace Datadog.Trace.Tests.Logging
             // Scope: Default values of TraceId=0,SpanId=0
             // Custom property: N/A
             logEvent = filteredLogs[logIndex++];
-            logEvent.Contains(traceId: 0, spanId: 0, service: string.Empty, environment: string.Empty);
+            logEvent.Contains(traceId: TraceId.Zero, spanId: 0, service: string.Empty, environment: string.Empty);
             Assert.DoesNotContain(LoggingProviderTestHelpers.CustomPropertyName, logEvent.Properties.GetKeys());
         }
 

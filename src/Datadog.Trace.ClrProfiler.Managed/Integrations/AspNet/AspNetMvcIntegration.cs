@@ -7,10 +7,12 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Routing;
+using System.Xml.Serialization;
 using Datadog.Trace.ClrProfiler.Emit;
 using SignalFx.Tracing;
 using SignalFx.Tracing.ExtensionMethods;
 using SignalFx.Tracing.Logging;
+using SignalFx.Tracing.Propagation;
 using SignalFx.Tracing.Util;
 
 namespace Datadog.Trace.ClrProfiler.Integrations
@@ -119,7 +121,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     {
                         // extract propagated http headers
                         var headers = httpContext.Request.Headers.Wrap();
-                        propagatedContext = B3SpanContextPropagator.Instance.Extract(headers);
+                        propagatedContext = tracer.Propagator.Extract(headers);
                     }
                     catch (Exception ex)
                     {
@@ -247,7 +249,14 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             try
             {
                 // call the original method, inspecting (but not catching) any unhandled exceptions
-                return instrumentedMethod(asyncControllerActionInvoker, controllerContext, actionName, callback, state);
+                var response = instrumentedMethod(asyncControllerActionInvoker, controllerContext, actionName, callback, state);
+
+                if (HttpContext.Current != null && scope != null)
+                {
+                    ServerTimingHeader.SetHeaders(scope.Span.Context, HttpContext.Current.Response, (resp, name, value) => resp.Headers.Add(name, value));
+                }
+
+                return response;
             }
             catch (Exception ex)
             {
@@ -346,6 +355,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     }
                 }
 
+                ServerTimingHeader.SetHeaders(scope.Span.Context, response, (resp, name, value) => resp.Headers.Add(name, value));
                 return res;
             }
             catch (Exception ex)

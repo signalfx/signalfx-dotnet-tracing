@@ -6,6 +6,7 @@ using System.Web;
 using SignalFx.Tracing;
 using SignalFx.Tracing.ExtensionMethods;
 using SignalFx.Tracing.Logging;
+using SignalFx.Tracing.Propagation;
 using SignalFx.Tracing.Util;
 
 namespace Datadog.Trace.AspNet
@@ -112,7 +113,7 @@ namespace Datadog.Trace.AspNet
                     {
                         // extract propagated http headers
                         var headers = httpRequest.Headers.Wrap();
-                        propagatedContext = B3SpanContextPropagator.Instance.Extract(headers);
+                        propagatedContext = tracer.Propagator.Extract(headers);
                     }
                     catch (Exception ex)
                     {

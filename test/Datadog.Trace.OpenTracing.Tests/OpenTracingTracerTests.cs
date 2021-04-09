@@ -11,6 +11,7 @@ using SignalFx.Tracing;
 using SignalFx.Tracing.Agent;
 using SignalFx.Tracing.Configuration;
 using SignalFx.Tracing.OpenTracing;
+using SignalFx.Tracing.Propagation;
 using SignalFx.Tracing.Sampling;
 using Xunit;
 
@@ -149,8 +150,8 @@ namespace Datadog.Trace.OpenTracing.Tests
 
             _tracer.Inject(span.Context, BuiltinFormats.HttpHeaders, headers);
 
-            Assert.Equal(span.Span.Context.TraceId.ToString("x16"), headers.Get(HttpHeaderNames.B3TraceId));
-            Assert.Equal(span.Span.Context.SpanId.ToString("x16"), headers.Get(HttpHeaderNames.B3SpanId));
+            Assert.Equal(span.Span.Context.TraceId.ToString(), headers.Get(B3HttpHeaderNames.B3TraceId));
+            Assert.Equal(span.Span.Context.SpanId.ToString("x16"), headers.Get(B3HttpHeaderNames.B3SpanId));
         }
 
         [Fact]
@@ -161,8 +162,8 @@ namespace Datadog.Trace.OpenTracing.Tests
 
             _tracer.Inject(span.Context, BuiltinFormats.TextMap, headers);
 
-            Assert.Equal(span.Span.Context.TraceId.ToString("x16"), headers.Get(HttpHeaderNames.B3TraceId));
-            Assert.Equal(span.Span.Context.SpanId.ToString("x16"), headers.Get(HttpHeaderNames.B3SpanId));
+            Assert.Equal(span.Span.Context.TraceId.ToString(), headers.Get(B3HttpHeaderNames.B3TraceId));
+            Assert.Equal(span.Span.Context.SpanId.ToString("x16"), headers.Get(B3HttpHeaderNames.B3SpanId));
         }
 
         [Fact]
@@ -179,10 +180,10 @@ namespace Datadog.Trace.OpenTracing.Tests
         public void Extract_HttpHeadersFormat_HeadersProperlySet_SpanContext()
         {
             const ulong parentId = 10;
-            const ulong traceId = 42;
+            var traceId = TraceId.CreateFromInt(42);
             var headers = new MockTextMap();
-            headers.Set(HttpHeaderNames.B3SpanId, parentId.ToString("x16"));
-            headers.Set(HttpHeaderNames.B3TraceId, traceId.ToString("x16"));
+            headers.Set(B3HttpHeaderNames.B3SpanId, parentId.ToString("x16"));
+            headers.Set(B3HttpHeaderNames.B3TraceId, traceId.ToString());
 
             var otSpanContext = (OpenTracingSpanContext)_tracer.Extract(BuiltinFormats.HttpHeaders, headers);
 
@@ -194,10 +195,10 @@ namespace Datadog.Trace.OpenTracing.Tests
         public void Extract_TextMapFormat_HeadersProperlySet_SpanContext()
         {
             const ulong parentId = 10;
-            const ulong traceId = 42;
+            var traceId = TraceId.CreateFromInt(42);
             var headers = new MockTextMap();
-            headers.Set(HttpHeaderNames.B3SpanId, parentId.ToString("x16"));
-            headers.Set(HttpHeaderNames.B3TraceId, traceId.ToString("x16"));
+            headers.Set(B3HttpHeaderNames.B3SpanId, parentId.ToString("x16"));
+            headers.Set(B3HttpHeaderNames.B3TraceId, traceId.ToString());
 
             var otSpanContext = (OpenTracingSpanContext)_tracer.Extract(BuiltinFormats.TextMap, headers);
 
@@ -211,8 +212,8 @@ namespace Datadog.Trace.OpenTracing.Tests
             const ulong parentId = 10;
             const ulong traceId = 42;
             var headers = new MockTextMap();
-            headers.Set(HttpHeaderNames.B3ParentId, parentId.ToString());
-            headers.Set(HttpHeaderNames.B3TraceId, traceId.ToString());
+            headers.Set(B3HttpHeaderNames.B3ParentId, parentId.ToString());
+            headers.Set(B3HttpHeaderNames.B3TraceId, traceId.ToString());
             var mockFormat = new Mock<IFormat<ITextMap>>();
 
             Assert.Throws<NotSupportedException>(() => _tracer.Extract(mockFormat.Object, headers));

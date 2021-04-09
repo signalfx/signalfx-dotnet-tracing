@@ -7,6 +7,7 @@ using Datadog.Trace.ClrProfiler.Emit;
 using SignalFx.Tracing;
 using SignalFx.Tracing.ExtensionMethods;
 using SignalFx.Tracing.Logging;
+using SignalFx.Tracing.Propagation;
 
 namespace Datadog.Trace.ClrProfiler.Integrations
 {
@@ -131,7 +132,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                         try
                         {
                             var headers = httpRequestMessageProperty.Headers.Wrap();
-                            propagatedContext = B3SpanContextPropagator.Instance.Extract(headers);
+                            propagatedContext = tracer.Propagator.Extract(headers);
                         }
                         catch (Exception ex)
                         {

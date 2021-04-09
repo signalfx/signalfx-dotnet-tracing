@@ -106,7 +106,7 @@ namespace Datadog.Trace.Tests.Logging
             // Custom property: N/A
             logString = filteredLogs[logIndex++];
             Assert.Contains(string.Format(ExpectedIdStringFormat, CorrelationIdentifier.SpanIdKey, 0), logString);
-            Assert.Contains(string.Format(ExpectedIdStringFormat, CorrelationIdentifier.TraceIdKey, 0), logString);
+            Assert.Contains(string.Format(ExpectedIdStringFormat, CorrelationIdentifier.TraceIdKey, TraceId.Zero), logString);
             Assert.Contains(string.Format(ExpectedStringFormat, CorrelationIdentifier.ServiceNameKey, string.Empty), logString);
             Assert.Contains(string.Format(ExpectedStringFormat, CorrelationIdentifier.ServiceEnvironmentKey, string.Empty), logString);
             Assert.DoesNotContain($"\"{LoggingProviderTestHelpers.CustomPropertyName}\"", logString);

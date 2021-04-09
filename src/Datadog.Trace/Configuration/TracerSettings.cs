@@ -1,6 +1,6 @@
 // Modified by SignalFx
+
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using SignalFx.Tracing.Sampling;
@@ -168,6 +168,12 @@ namespace SignalFx.Tracing.Configuration
             {
                 RecordedValueMaxLength = DefaultRecordedValueMaxLength;
             }
+
+            Enum.TryParse(source?.GetString(ConfigurationKeys.Propagator) ?? "default", ignoreCase: true, out PropagatorType propagatorType);
+            Propagator = propagatorType;
+
+            TraceResponseHeaderEnabled = source?.GetBool(ConfigurationKeys.TraceResponseHeaderEnabled) ??
+                                               true;
         }
 
         /// <summary>
@@ -389,6 +395,18 @@ namespace SignalFx.Tracing.Configuration
         /// </summary>
         /// <seealso cref="ConfigurationKeys.RecordedValueMaxLength"/>
         public int RecordedValueMaxLength { get; set; }
+
+        /// <summary>
+        /// Gets or sets the propagator logic to be used.
+        /// Default is <c>Datadog</c>
+        /// <seealso cref="ConfigurationKeys.Propagator"/>
+        /// </summary>
+        public PropagatorType Propagator { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether context server timing header will be added.
+        /// </summary>
+        public bool TraceResponseHeaderEnabled { get; set; }
 
         /// <summary>
         /// Create a <see cref="TracerSettings"/> populated from the default sources

@@ -1,10 +1,10 @@
 // Modified by SignalFx
-using System.Globalization;
+
 using System.Linq;
-using Datadog.Core.Tools;
 using Datadog.Trace.ClrProfiler.IntegrationTests.Helpers;
 using Datadog.Trace.TestHelpers;
 using SignalFx.Tracing;
+using SignalFx.Tracing.Propagation;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -54,10 +54,10 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 }
 
                 var firstSpan = spans.First();
-                var traceId = StringUtil.GetHeader(processResult.StandardOutput, HttpHeaderNames.B3TraceId);
-                var parentSpanId = StringUtil.GetHeader(processResult.StandardOutput, HttpHeaderNames.B3SpanId);
+                var traceId = StringUtil.GetHeader(processResult.StandardOutput, B3HttpHeaderNames.B3TraceId);
+                var parentSpanId = StringUtil.GetHeader(processResult.StandardOutput, B3HttpHeaderNames.B3SpanId);
 
-                Assert.Equal(firstSpan.TraceId.ToString("x16"), traceId);
+                Assert.Equal(firstSpan.TraceId.ToString(), traceId);
                 Assert.Equal(firstSpan.SpanId.ToString("x16"), parentSpanId);
             }
         }
@@ -80,8 +80,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 var spans = agent.WaitForSpans(1, 2000, operationName: expectedOperationName);
                 Assert.Equal(0, spans.Count);
 
-                var traceId = StringUtil.GetHeader(processResult.StandardOutput, HttpHeaderNames.B3TraceId);
-                var parentSpanId = StringUtil.GetHeader(processResult.StandardOutput, HttpHeaderNames.B3ParentId);
+                var traceId = StringUtil.GetHeader(processResult.StandardOutput, B3HttpHeaderNames.B3TraceId);
+                var parentSpanId = StringUtil.GetHeader(processResult.StandardOutput, B3HttpHeaderNames.B3ParentId);
                 var tracingEnabled = StringUtil.GetHeader(processResult.StandardOutput, HttpHeaderNames.TracingEnabled);
 
                 Assert.Null(traceId);

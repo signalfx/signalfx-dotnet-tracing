@@ -14,6 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SignalFx.Tracing;
 using SignalFx.Tracing.ExtensionMethods;
 
 namespace Datadog.Trace.TestHelpers
@@ -236,9 +237,9 @@ namespace Datadog.Trace.TestHelpers
                 _zipkinData = new Dictionary<string, JToken>();
             }
 
-            public ulong TraceId
+            public TraceId TraceId
             {
-                get => Convert.ToUInt64(_zipkinData["traceId"].ToString(), 16);
+                get => TraceId.CreateFromString(_zipkinData["traceId"].ToString());
             }
 
             public ulong SpanId

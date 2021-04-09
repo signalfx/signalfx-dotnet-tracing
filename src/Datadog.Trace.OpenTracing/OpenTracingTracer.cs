@@ -25,8 +25,8 @@ namespace SignalFx.Tracing.OpenTracing
             ScopeManager = scopeManager;
             _codecs = new Dictionary<string, ICodec>
             {
-                { BuiltinFormats.HttpHeaders.ToString(), new HttpHeadersCodec() },
-                { BuiltinFormats.TextMap.ToString(), new HttpHeadersCodec() } // the HttpHeadersCodec can support an unconstrained ITextMap
+                { BuiltinFormats.HttpHeaders.ToString(), new HttpHeadersCodec(tracer.Propagator) },
+                { BuiltinFormats.TextMap.ToString(), new HttpHeadersCodec(tracer.Propagator) } // the HttpHeadersCodec can support an unconstrained ITextMap
             };
         }
 

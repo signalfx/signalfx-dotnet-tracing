@@ -48,7 +48,7 @@ namespace Datadog.Trace.OpenTracing.Tests
             Assert.NotNull(ddSpanContext);
             Assert.Null(ddSpanContext.ParentId);
             Assert.NotEqual<ulong>(0, ddSpanContext.SpanId);
-            Assert.NotEqual<ulong>(0, ddSpanContext.TraceId);
+            Assert.NotEqual(TraceId.Zero, ddSpanContext.TraceId);
         }
 
         [Fact]
@@ -61,7 +61,7 @@ namespace Datadog.Trace.OpenTracing.Tests
 
             Assert.Null(root.Span.Context.ParentId);
             Assert.NotEqual<ulong>(0, root.Span.Context.SpanId);
-            Assert.NotEqual<ulong>(0, root.Span.Context.TraceId);
+            Assert.NotEqual(TraceId.Zero, root.Span.Context.TraceId);
             Assert.Equal(root.Span.Context.SpanId, child.Span.Context.ParentId);
             Assert.Equal(root.Span.Context.TraceId, child.Span.Context.TraceId);
             Assert.NotEqual<ulong>(0, child.Span.Context.SpanId);
@@ -77,7 +77,7 @@ namespace Datadog.Trace.OpenTracing.Tests
 
             Assert.Null(root.Span.Context.ParentId);
             Assert.NotEqual<ulong>(0, root.Span.Context.SpanId);
-            Assert.NotEqual<ulong>(0, root.Span.Context.TraceId);
+            Assert.NotEqual(TraceId.Zero, root.Span.Context.TraceId);
             Assert.Equal(root.Span.Context.SpanId, child.Span.Context.ParentId);
             Assert.Equal(root.Span.Context.TraceId, child.Span.Context.TraceId);
             Assert.NotEqual<ulong>(0, child.Span.Context.SpanId);
@@ -93,7 +93,7 @@ namespace Datadog.Trace.OpenTracing.Tests
 
             Assert.Null(root.Span.Context.ParentId);
             Assert.NotEqual<ulong>(0, root.Span.Context.SpanId);
-            Assert.NotEqual<ulong>(0, root.Span.Context.TraceId);
+            Assert.NotEqual(TraceId.Zero, root.Span.Context.TraceId);
             Assert.Equal(root.Span.Context.SpanId, child.Span.Context.ParentId);
             Assert.Equal(root.Span.Context.TraceId, child.Span.Context.TraceId);
             Assert.NotEqual<ulong>(0, child.Span.Context.SpanId);
