@@ -64,11 +64,11 @@ namespace Datadog.Trace.Tests.Logging
             logEvent.Contains(scope.Span.TraceId, scope.Span.SpanId, ServiceName, ServiceEnvironment);
         }
 
-        internal static void Contains(this log4net.Core.LoggingEvent logEvent, ulong traceId, ulong spanId, string service, string environment)
+        internal static void Contains(this log4net.Core.LoggingEvent logEvent, TraceId traceId, ulong spanId, string service, string environment)
         {
             // First, verify that the properties are attached to the LogEvent
             Assert.Contains(CorrelationIdentifier.TraceIdKey, logEvent.Properties.GetKeys());
-            Assert.Equal<ulong>(traceId, Convert.ToUInt64(logEvent.Properties[CorrelationIdentifier.TraceIdKey].ToString(), 16));
+            Assert.Equal(traceId, TraceId.CreateFromString(logEvent.Properties[CorrelationIdentifier.TraceIdKey].ToString()));
             Assert.Contains(CorrelationIdentifier.SpanIdKey, logEvent.Properties.GetKeys());
             Assert.Equal<ulong>(spanId, Convert.ToUInt64(logEvent.Properties[CorrelationIdentifier.SpanIdKey].ToString(), 16));
             Assert.Contains(CorrelationIdentifier.ServiceNameKey, logEvent.Properties.GetKeys());
@@ -95,7 +95,7 @@ namespace Datadog.Trace.Tests.Logging
             var spanId = scope.Span.SpanId;
             // First, verify that the properties are attached to the LogEvent
             Assert.True(logEvent.Properties.ContainsKey(CorrelationIdentifier.TraceIdKey));
-            Assert.Equal<ulong>(traceId, Convert.ToUInt64(SanitizedProperty(CorrelationIdentifier.TraceIdKey), fromBase: 16));
+            Assert.Equal(traceId, TraceId.CreateFromString(SanitizedProperty(CorrelationIdentifier.TraceIdKey)));
             Assert.True(logEvent.Properties.ContainsKey(CorrelationIdentifier.SpanIdKey));
             Assert.Equal<ulong>(spanId, Convert.ToUInt64(SanitizedProperty(CorrelationIdentifier.SpanIdKey), fromBase: 16));
             Assert.True(logEvent.Properties.ContainsKey(CorrelationIdentifier.ServiceNameKey));

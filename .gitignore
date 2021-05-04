@@ -278,3 +278,5 @@ deploy/linux/
 deploy/AzureAppServices/
 
 !deployments/cloudfoundry/buildpack-*/bin
+
+.DS_Store

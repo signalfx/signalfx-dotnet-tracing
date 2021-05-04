@@ -10,6 +10,7 @@ using SignalFx.Tracing.Configuration;
 using SignalFx.Tracing.DiagnosticListeners;
 using SignalFx.Tracing.DogStatsd;
 using SignalFx.Tracing.Logging;
+using SignalFx.Tracing.Propagation;
 using SignalFx.Tracing.Sampling;
 using SignalFx.Tracing.Vendors.StatsdClient;
 
@@ -103,6 +104,8 @@ namespace SignalFx.Tracing
             _scopeManager = scopeManager ?? new AsyncLocalScopeManager();
             Sampler = sampler ?? new RuleBasedSampler(new RateLimiter(Settings.MaxTracesSubmittedPerSecond));
 
+            Propagator = ContextPropagatorBuilder.BuildPropagator(Settings.Propagator);
+
             if (!string.IsNullOrWhiteSpace(Settings.CustomSamplingRules))
             {
                 // User has opted in, ensure rate limiter is used
@@ -173,6 +176,11 @@ namespace SignalFx.Tracing
         /// Gets this tracer's settings.
         /// </summary>
         public TracerSettings Settings { get; }
+
+        /// <summary>
+        /// Gets the propagator logic <see cref="TracerSettings.Propagator"/>.
+        /// </summary>
+        public IPropagator Propagator { get; }
 
         /// <summary>
         /// Gets the tracer's scope manager, which determines which span is currently active, if any.

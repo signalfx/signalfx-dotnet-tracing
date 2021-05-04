@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Threading;
 using Datadog.Trace.TestHelpers;
 using SignalFx.Tracing;
+using Xunit;
 using Xunit.Abstractions;
 
 namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
@@ -77,7 +78,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
                 {
                     try
                     {
-                        serverReady = SubmitRequest(aspNetCorePort, "/alive-check") == HttpStatusCode.OK;
+                        serverReady = SubmitRequest(aspNetCorePort, "/alive-check").StatusCode == HttpStatusCode.OK;
                     }
                     catch
                     {
@@ -100,7 +101,17 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
                 var testStart = DateTime.Now;
 
                 var paths = expectations.Select(e => e.OriginalUri).ToArray();
-                SubmitRequests(aspNetCorePort, paths);
+                var responses = SubmitRequests(aspNetCorePort, paths);
+
+                foreach (var response in responses.Where(res => res.StatusCode == HttpStatusCode.OK))
+                {
+                    Assert.True(
+                        response.Headers.Contains("Server-Timing"),
+                        $"No Server-Timing header attached. Headers present: {string.Join(", ", response.Headers.Select(h => $"{h.Key}={h.Value}"))}");
+                    Assert.True(
+                        response.Headers.Contains("Access-Control-Expose-Headers"),
+                        $"No Access-Control-Expose-Headers header attached. Headers present: {string.Join(", ", response.Headers.Select(h => $"{h.Key}={h.Value}"))}");
+                }
 
                 var spans =
                     agent.WaitForSpans(
@@ -178,20 +189,20 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
         };
     }
 
-    protected void SubmitRequests(int aspNetCorePort, string[] paths)
+        protected IEnumerable<HttpResponseMessage> SubmitRequests(int aspNetCorePort, string[] paths)
         {
             foreach (var path in paths)
             {
-                SubmitRequest(aspNetCorePort, path);
+                yield return SubmitRequest(aspNetCorePort, path);
             }
         }
 
-        protected HttpStatusCode SubmitRequest(int aspNetCorePort, string path)
+        protected HttpResponseMessage SubmitRequest(int aspNetCorePort, string path)
         {
             HttpResponseMessage response = HttpClient.GetAsync($"http://localhost:{aspNetCorePort}{path}").Result;
             string responseText = response.Content.ReadAsStringAsync().Result;
             Output.WriteLine($"[http] {response.StatusCode} {responseText}");
-            return response.StatusCode;
+            return response;
         }
 
         private bool IsNotServerLifeCheck(IMockSpan span)

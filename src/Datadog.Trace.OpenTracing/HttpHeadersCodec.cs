@@ -3,12 +3,19 @@ using System;
 using System.Globalization;
 using OpenTracing.Propagation;
 using SignalFx.Tracing.Headers;
+using SignalFx.Tracing.Propagation;
 
 namespace SignalFx.Tracing.OpenTracing
 {
     internal class HttpHeadersCodec : ICodec
     {
         private static readonly CultureInfo InvariantCulture = CultureInfo.InvariantCulture;
+        private readonly IPropagator _propagator;
+
+        public HttpHeadersCodec(IPropagator propagator)
+        {
+            _propagator = propagator;
+        }
 
         public global::OpenTracing.ISpanContext Extract(object carrier)
         {
@@ -20,7 +27,7 @@ namespace SignalFx.Tracing.OpenTracing
             }
 
             IHeadersCollection headers = new TextMapHeadersCollection(map);
-            var propagationContext = B3SpanContextPropagator.Instance.Extract(headers);
+            var propagationContext = _propagator.Extract(headers);
             return new OpenTracingSpanContext(propagationContext);
         }
 
@@ -38,14 +45,14 @@ namespace SignalFx.Tracing.OpenTracing
             if (context is OpenTracingSpanContext otSpanContext && otSpanContext.Context is SpanContext spanContext)
             {
                 // this is a SignalFx context
-                B3SpanContextPropagator.Instance.Inject(spanContext, headers);
+                _propagator.Inject(spanContext, headers);
             }
             else
             {
                 // any other OpenTracing.ISpanContext
                 // TODO: this assumes that the IDs are on a B3 compatible format.
-                headers.Set(HttpHeaderNames.B3TraceId, context.TraceId);
-                headers.Set(HttpHeaderNames.B3ParentId, context.SpanId);
+                headers.Set(B3HttpHeaderNames.B3TraceId, context.TraceId);
+                headers.Set(B3HttpHeaderNames.B3ParentId, context.SpanId);
             }
         }
     }

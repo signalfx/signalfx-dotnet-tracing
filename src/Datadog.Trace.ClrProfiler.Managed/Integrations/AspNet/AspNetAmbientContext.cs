@@ -9,6 +9,7 @@ using SignalFx.Tracing;
 using SignalFx.Tracing.ExtensionMethods;
 using SignalFx.Tracing.Headers;
 using SignalFx.Tracing.Logging;
+using SignalFx.Tracing.Propagation;
 using SignalFx.Tracing.Util;
 
 namespace Datadog.Trace.ClrProfiler.Integrations
@@ -75,7 +76,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                                 }
                             }
 
-                            propagatedContext = B3SpanContextPropagator.Instance.Extract(headersCollection);
+                            propagatedContext = Tracer.Instance.Propagator.Extract(headersCollection);
                         }
                     }
                     catch (Exception ex)

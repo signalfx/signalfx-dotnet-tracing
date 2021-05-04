@@ -7,6 +7,7 @@ using Datadog.Trace.ClrProfiler.Emit;
 using SignalFx.Tracing;
 using SignalFx.Tracing.ExtensionMethods;
 using SignalFx.Tracing.Logging;
+using SignalFx.Tracing.Propagation;
 
 namespace Datadog.Trace.ClrProfiler.Integrations
 {
@@ -87,7 +88,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             {
                 // Add distributed tracing headers to the HTTP request. The actual span is going to be created
                 // when GetResponse is called.
-                B3SpanContextPropagator.Instance.Inject(spanContext, request.Headers.Wrap());
+                Tracer.Instance.Propagator.Inject(spanContext, request.Headers.Wrap());
             }
 
             return callGetRequestStream(webRequest);
@@ -160,7 +161,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             SpanContext spanContext = null;
             if (headers != null)
             {
-                spanContext = B3SpanContextPropagator.Instance.Extract(headers);
+                spanContext = Tracer.Instance.Propagator.Extract(headers);
             }
 
             using (var scope = ScopeFactory.CreateOutboundHttpScope(Tracer.Instance, request.Method, request.RequestUri, IntegrationName, propagatedSpanId: spanContext?.SpanId))
@@ -170,7 +171,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     if (scope != null)
                     {
                         // add distributed tracing headers to the HTTP request
-                        B3SpanContextPropagator.Instance.Inject(scope.Span.Context, request.Headers.Wrap());
+                        Tracer.Instance.Propagator.Inject(scope.Span.Context, request.Headers.Wrap());
                     }
 
                     WebResponse response = callGetResponse(webRequest);
@@ -250,7 +251,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
             // The headers may have been set/propagated to the server on a previous method call, but no actual span was created for it yet.
             // Try to extract the context and if available use the already propagated span ID.
-            SpanContext spanContext = B3SpanContextPropagator.Instance.Extract(webRequest.Headers.Wrap());
+            SpanContext spanContext = Tracer.Instance.Propagator.Extract(webRequest.Headers.Wrap());
 
             using (var scope = ScopeFactory.CreateOutboundHttpScope(Tracer.Instance, webRequest.Method, webRequest.RequestUri, IntegrationName, propagatedSpanId: spanContext?.SpanId))
             {
@@ -259,7 +260,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     if (scope != null)
                     {
                         // add distributed tracing headers to the HTTP request
-                        B3SpanContextPropagator.Instance.Inject(scope.Span.Context, webRequest.Headers.Wrap());
+                        Tracer.Instance.Propagator.Inject(scope.Span.Context, webRequest.Headers.Wrap());
                     }
 
                     WebResponse response = await originalMethod(webRequest).ConfigureAwait(false);

@@ -8,6 +8,7 @@ using SignalFx.Tracing.Abstractions;
 using SignalFx.Tracing.ExtensionMethods;
 using SignalFx.Tracing.Headers;
 using SignalFx.Tracing.Logging;
+using SignalFx.Tracing.Propagation;
 using SignalFx.Tracing.Util;
 using SignalFx.Tracing.Vendors.Serilog.Events;
 
@@ -90,7 +91,7 @@ namespace SignalFx.Tracing.DiagnosticListeners
             return $"{request.Scheme}://{NoHostSpecified}{request.PathBase.Value}{request.Path.Value}";
         }
 
-        private static SpanContext ExtractPropagatedContext(HttpRequest request)
+        private static SpanContext ExtractPropagatedContext(IPropagator propagator, HttpRequest request)
         {
             try
             {
@@ -112,7 +113,7 @@ namespace SignalFx.Tracing.DiagnosticListeners
                         }
                     }
 
-                    return B3SpanContextPropagator.Instance.Extract(headersCollection);
+                    return propagator.Extract(headersCollection);
                 }
             }
             catch (Exception ex)
@@ -157,7 +158,8 @@ namespace SignalFx.Tracing.DiagnosticListeners
                 string resourceUrl = UriHelpers.GetRelativeUrl(new Uri(url), tryRemoveIds: true)
                                                .ToLowerInvariant();
 
-                SpanContext propagatedContext = ExtractPropagatedContext(request);
+                var propagator = _tracer.Propagator;
+                SpanContext propagatedContext = ExtractPropagatedContext(propagator, request);
 
                 Span span = _tracer.StartSpan(HttpRequestInOperationName, propagatedContext)
                                    .SetTag(Tags.InstrumentationName, ComponentName);
@@ -234,6 +236,8 @@ namespace SignalFx.Tracing.DiagnosticListeners
                     {
                         span.OperationName = $"{controllerName}.{actionName}".ToLowerInvariant();
                     }
+
+                    ServerTimingHeader.SetHeaders(span.Context, httpContext.Response.Headers, (headers, name, value) => headers.Add(name, value));
                 }
             }
         }

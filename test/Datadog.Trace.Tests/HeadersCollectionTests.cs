@@ -5,6 +5,7 @@ using System.Net.Http;
 using SignalFx.Tracing;
 using SignalFx.Tracing.ExtensionMethods;
 using SignalFx.Tracing.Headers;
+using SignalFx.Tracing.Propagation;
 using Xunit;
 
 namespace Datadog.Trace.Tests
@@ -20,15 +21,17 @@ namespace Datadog.Trace.Tests
         [Fact]
         public void HttpRequestMessage_InjectExtract_Identity()
         {
-            const int traceId = 9;
+            var propagator = new B3SpanContextPropagator();
+
+            var traceId = TraceId.CreateFromInt(9);
             const int spanId = 7;
             const SamplingPriority samplingPriority = SamplingPriority.UserKeep;
 
             IHeadersCollection headers = new HttpRequestMessage().Headers.Wrap();
             var context = new SpanContext(traceId, spanId, samplingPriority);
 
-            B3SpanContextPropagator.Instance.Inject(context, headers);
-            var resultContext = B3SpanContextPropagator.Instance.Extract(headers);
+            propagator.Inject(context, headers);
+            var resultContext = propagator.Extract(headers);
 
             Assert.NotNull(resultContext);
             Assert.Equal(context.SpanId, resultContext.SpanId);
@@ -39,15 +42,17 @@ namespace Datadog.Trace.Tests
         [Fact]
         public void WebRequest_InjectExtract_Identity()
         {
-            const int traceId = 9;
+            var propagator = new B3SpanContextPropagator();
+
+            var traceId = TraceId.CreateFromInt(9);
             const int spanId = 7;
             const SamplingPriority samplingPriority = SamplingPriority.UserKeep;
 
             IHeadersCollection headers = WebRequest.CreateHttp("http://localhost").Headers.Wrap();
             var context = new SpanContext(traceId, spanId, samplingPriority);
 
-            B3SpanContextPropagator.Instance.Inject(context, headers);
-            var resultContext = B3SpanContextPropagator.Instance.Extract(headers);
+            propagator.Inject(context, headers);
+            var resultContext = propagator.Extract(headers);
 
             Assert.NotNull(resultContext);
             Assert.Equal(context.SpanId, resultContext.SpanId);
@@ -61,11 +66,13 @@ namespace Datadog.Trace.Tests
         [InlineData("trace.id")]
         public void Extract_InvalidTraceId(string traceId)
         {
+            var propagator = new B3SpanContextPropagator();
+
             const string spanId = "7";
             const string samplingPriority = "2";
 
             var headers = InjectContext(traceId, spanId, samplingPriority);
-            var resultContext = B3SpanContextPropagator.Instance.Extract(headers);
+            var resultContext = propagator.Extract(headers);
 
             // invalid traceId should return a null context even if other values are set
             Assert.Null(resultContext);
@@ -77,15 +84,17 @@ namespace Datadog.Trace.Tests
         [InlineData("span.id")]
         public void Extract_InvalidSpanId(string spanId)
         {
-            const ulong traceId = 9;
+            var propagator = new B3SpanContextPropagator();
+
+            var traceId = TraceId.CreateFromInt(9);
             const SamplingPriority samplingPriority = SamplingPriority.UserKeep;
 
             var headers = InjectContext(
-                traceId.ToString(CultureInfo.InvariantCulture),
+                traceId.ToString(),
                 spanId,
                 ((int)samplingPriority).ToString(CultureInfo.InvariantCulture));
 
-            var resultContext = B3SpanContextPropagator.Instance.Extract(headers);
+            var resultContext = propagator.Extract(headers);
 
             Assert.NotNull(resultContext);
             Assert.Equal(traceId, resultContext.TraceId);
@@ -99,15 +108,17 @@ namespace Datadog.Trace.Tests
         [InlineData("sampling.priority")]
         public void Extract_InvalidSamplingPriority(string samplingPriority)
         {
-            const ulong traceId = 9;
+            var propagator = new B3SpanContextPropagator();
+
+            var traceId = TraceId.CreateFromInt(9);
             const ulong spanId = 7;
 
             var headers = InjectContext(
-                traceId.ToString("x16", CultureInfo.InvariantCulture),
+                traceId.ToString(),
                 spanId.ToString("x16", CultureInfo.InvariantCulture),
                 samplingPriority);
 
-            var resultContext = B3SpanContextPropagator.Instance.Extract(headers);
+            var resultContext = propagator.Extract(headers);
 
             Assert.NotNull(resultContext);
             Assert.Equal(traceId, resultContext.TraceId);
@@ -118,8 +129,8 @@ namespace Datadog.Trace.Tests
         private static IHeadersCollection InjectContext(string traceId, string spanId, string samplingPriority)
         {
             IHeadersCollection headers = new HttpRequestMessage().Headers.Wrap();
-            headers.Add(HttpHeaderNames.B3TraceId, traceId);
-            headers.Add(HttpHeaderNames.B3SpanId, spanId);
+            headers.Add(B3HttpHeaderNames.B3TraceId, traceId);
+            headers.Add(B3HttpHeaderNames.B3SpanId, spanId);
 
             // Mimick the B3 injection mapping of samplingPriority
             switch (samplingPriority)
@@ -128,15 +139,15 @@ namespace Datadog.Trace.Tests
                     // SamplingPriority.UserReject
                 case "0":
                     // SamplingPriority.AutoReject
-                    headers.Add(HttpHeaderNames.B3Flags, "0");
+                    headers.Add(B3HttpHeaderNames.B3Flags, "0");
                     break;
                 case "1":
                     // SamplingPriority.AutoKeep
-                    headers.Add(HttpHeaderNames.B3Sampled, "1");
+                    headers.Add(B3HttpHeaderNames.B3Sampled, "1");
                     break;
                 case "2":
                     // SamplingPriority.UserKeep
-                    headers.Add(HttpHeaderNames.B3Flags, "1");
+                    headers.Add(B3HttpHeaderNames.B3Flags, "1");
                     break;
                 default:
                     // Invalid samplingPriority

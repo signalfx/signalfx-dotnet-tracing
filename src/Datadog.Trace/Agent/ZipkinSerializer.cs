@@ -1,5 +1,5 @@
 // Modified by SignalFx
-using System;
+
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using SignalFx.Tracing;
 using SignalFx.Tracing.Configuration;
 using SignalFx.Tracing.ExtensionMethods;
 
@@ -107,7 +106,7 @@ namespace SignalFx.Tracing.Agent
 
             public string TraceId
             {
-                get => _span.Context.TraceId.ToString("x16");
+                get => _span.Context.TraceId.ToString();
             }
 
             public string ParentId

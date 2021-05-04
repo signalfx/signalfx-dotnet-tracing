@@ -335,6 +335,18 @@ namespace SignalFx.Tracing.Configuration
         public const string RecordedValueMaxLength = "SIGNALFX_RECORDED_VALUE_MAX_LENGTH";
 
         /// <summary>
+        /// Configuration key for the propagator logic to be used.
+        /// Default is <c>B3</c>.
+        /// <seealso cref="TracerSettings.Propagator"/>
+        /// </summary>
+        public const string Propagator = "SIGNALFX_PROPAGATOR";
+
+        /// <summary>
+        /// Configuration key for enabling splunk context server timing header.
+        /// </summary>
+        public const string TraceResponseHeaderEnabled = "SIGNALFX_TRACE_RESPONSE_HEADER_ENABLED";
+
+        /// <summary>
         /// String format patterns used to match integration-specific configuration keys.
         /// </summary>
         public static class Integrations

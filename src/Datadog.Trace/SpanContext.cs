@@ -23,11 +23,13 @@ namespace SignalFx.Tracing
         /// <param name="spanId">The propagated span id.</param>
         /// <param name="samplingPriority">The propagated sampling priority.</param>
         /// <param name="serviceName">The service name to propagate to child spans.</param>
-        public SpanContext(ulong? traceId, ulong spanId, SamplingPriority? samplingPriority, string serviceName = null)
+        /// <param name="traceState">The W3C tracestate.</param>
+        public SpanContext(TraceId? traceId, ulong spanId, SamplingPriority? samplingPriority, string serviceName = null, string traceState = null)
             : this(traceId, serviceName)
         {
             SpanId = spanId;
             SamplingPriority = samplingPriority;
+            TraceState = traceState;
         }
 
         /// <summary>
@@ -58,18 +60,17 @@ namespace SignalFx.Tracing
             }
         }
 
-        private SpanContext(ulong? traceId, string serviceName)
+        private SpanContext(TraceId? traceId, string serviceName)
         {
             ServiceName = serviceName;
-            if (traceId > 0)
+            if (traceId.HasValue)
             {
                 TraceId = traceId.Value;
                 return;
             }
 
-            // This is the root span.
-            TraceId = GenerateId();
-            SpanId = TraceId;
+            TraceId = TraceId.CreateRandom();
+            SpanId = GenerateId();
         }
 
         /// <summary>
@@ -80,7 +81,7 @@ namespace SignalFx.Tracing
         /// <summary>
         /// Gets the trace id
         /// </summary>
-        public ulong TraceId { get; }
+        public TraceId TraceId { get; }
 
         /// <summary>
         /// Gets the span id of the parent span
@@ -91,6 +92,11 @@ namespace SignalFx.Tracing
         /// Gets the span id
         /// </summary>
         public ulong SpanId { get; }
+
+        /// <summary>
+        /// Gets the trace state for W3C propagation
+        /// </summary>
+        public string TraceState { get; }
 
         /// <summary>
         /// Gets or sets the service name to propagate to child spans.

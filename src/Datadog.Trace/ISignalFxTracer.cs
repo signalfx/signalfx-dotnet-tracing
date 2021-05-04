@@ -1,6 +1,7 @@
 // Modified by SignalFx
 using System;
 using SignalFx.Tracing.Configuration;
+using SignalFx.Tracing.Propagation;
 using SignalFx.Tracing.Sampling;
 
 namespace SignalFx.Tracing
@@ -12,6 +13,8 @@ namespace SignalFx.Tracing
         IScopeManager ScopeManager { get; }
 
         ISampler Sampler { get; }
+
+        IPropagator Propagator { get; }
 
         TracerSettings Settings { get; }
 

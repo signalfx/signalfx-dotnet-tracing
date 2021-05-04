@@ -13,6 +13,7 @@ using Datadog.Trace.ClrProfiler.Emit;
 using SignalFx.Tracing;
 using SignalFx.Tracing.ExtensionMethods;
 using SignalFx.Tracing.Logging;
+using SignalFx.Tracing.Propagation;
 using SignalFx.Tracing.Util;
 
 namespace Datadog.Trace.ClrProfiler.Integrations
@@ -133,6 +134,8 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                                 scope.Span.SetTag(Tags.HttpStatusText, responseMessage.ReasonPhrase);
                             }
                         }
+
+                        ServerTimingHeader.SetHeaders(scope.Span.Context, responseMessage, (response, name, value) => response.Headers.Add(name, value));
                     }
 
                     return responseMessage;
@@ -174,7 +177,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     {
                         // extract propagated http headers
                         var headers = request.Headers.Wrap();
-                        propagatedContext = B3SpanContextPropagator.Instance.Extract(headers);
+                        propagatedContext = tracer.Propagator.Extract(headers);
                     }
                     catch (Exception ex)
                     {

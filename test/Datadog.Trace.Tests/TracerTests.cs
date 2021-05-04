@@ -117,7 +117,7 @@ namespace Datadog.Trace.Tests
         [Fact]
         public void StartActive_SetParentManuallyFromExternalContext_ParentIsSet()
         {
-            const ulong traceId = 11;
+            var traceId = TraceId.CreateFromInt(11);
             const ulong parentId = 7;
             const SamplingPriority samplingPriority = SamplingPriority.UserKeep;
 

@@ -8,6 +8,7 @@ using Datadog.Trace.ClrProfiler.Emit;
 using SignalFx.Tracing;
 using SignalFx.Tracing.ExtensionMethods;
 using SignalFx.Tracing.Logging;
+using SignalFx.Tracing.Propagation;
 
 namespace Datadog.Trace.ClrProfiler.Integrations
 {
@@ -179,8 +180,9 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             }
 
             string httpMethod = request.Method?.Method;
+            var tracer = Tracer.Instance;
 
-            using (var scope = ScopeFactory.CreateOutboundHttpScope(Tracer.Instance, httpMethod, request.RequestUri, IntegrationName))
+            using (var scope = ScopeFactory.CreateOutboundHttpScope(tracer, httpMethod, request.RequestUri, IntegrationName))
             {
                 try
                 {
@@ -189,7 +191,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                         scope.Span.SetTag("http-client-handler-type", reportedType.FullName);
 
                         // add distributed tracing headers to the HTTP request
-                        B3SpanContextPropagator.Instance.Inject(scope.Span.Context, request.Headers.Wrap());
+                        tracer.Propagator.Inject(scope.Span.Context, request.Headers.Wrap());
                     }
 
                     HttpResponseMessage response = await sendAsync(handler, request, cancellationToken).ConfigureAwait(false);

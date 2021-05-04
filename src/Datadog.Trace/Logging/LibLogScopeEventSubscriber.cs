@@ -137,7 +137,7 @@ namespace SignalFx.Tracing.Logging
                 // TODO: Debug logs
                 _contextDisposalStack.Push(
                     LogProvider.OpenMappedContext(
-                        CorrelationIdentifier.TraceIdKey, fields.TraceId.ToString("x16"), destructure: false));
+                        CorrelationIdentifier.TraceIdKey, fields.TraceId.ToString(), destructure: false));
                 _contextDisposalStack.Push(
                     LogProvider.OpenMappedContext(
                         CorrelationIdentifier.SpanIdKey, fields.SpanId.ToString("x16"), destructure: false));
@@ -167,13 +167,13 @@ namespace SignalFx.Tracing.Logging
 
             public LogCorrelationFields()
             {
-                TraceId = 0;
+                TraceId = TraceId.Zero;
                 SpanId = 0;
                 Service = string.Empty;
                 Environment = string.Empty;
             }
 
-            public ulong TraceId { get; }
+            public TraceId TraceId { get; }
 
             public ulong SpanId { get; }
 
