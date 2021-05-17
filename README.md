@@ -104,7 +104,7 @@ See example with `SIGNALFX_SERVICE_NAME` overload.
 
 ### Json configuration file
 
-By default, if `OTEL_TRACE_CONFIG_FILE` is unset, the application is searching for `signalfx.json` in the current working directory (acquired by [`Environment.CurrentDirectory`](https://docs.microsoft.com/en-us/dotnet/api/system.environment.currentdirectory?view=net-5.0)).
+By default, if `SIGNALFX_DOTNET_TRACER_CONFIG_FILE` is unset, the application is searching for `signalfx.json` in the current working directory (acquired by [`Environment.CurrentDirectory`](https://docs.microsoft.com/en-us/dotnet/api/system.environment.currentdirectory?view=net-5.0)).
 
 See example with `SIGNALFX_SERVICE_NAME` overload.
 
