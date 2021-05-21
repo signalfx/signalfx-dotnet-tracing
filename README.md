@@ -47,7 +47,7 @@ Use these environment variables to configure the tracing library:
 | Environment variable | Default value | Description |
 |-|-|-|
 | `SIGNALFX_ENV` |  | The value for the `environment` tag added to every span. This determines the environment in which the service is available in SignalFx µAPM.  |
-| `SIGNALFX_DOTNET_TRACER_CONFIG_FILE` | ```{Environment.CurrentDirectory}/signalfx.json``` | Loads the json configuration file with configuration values. Overloaded value must be set via Environment variable. |
+| `SIGNALFX_DOTNET_TRACER_CONFIG_FILE` | ```%WorkingDirectory%/signalfx.json``` | The file path of a JSON configuration file that will be loaded. |
 | `SIGNALFX_SERVICE_NAME` |  | The name of the service. |
 | `SIGNALFX_SERVICE_NAME_PER_SPAN_ENABLED` |  | Enable to allow manual instrumentation to have a different service name than the one you specify with `SIGNALFX_SERVICE_NAME`.  Add a tag `service.name` with the desired name to the manual instrumentation. |
 | `SIGNALFX_TRACING_ENABLED` | `true` | Enable to activate the tracer. |
@@ -78,19 +78,19 @@ Use these environment variables to configure the tracing library:
 
 ## Ways to configure
 
-There are 3 ways to apply configuration values (Priority is from first to last):
+There are following ways to apply configuration settings (priority is from first to last):
 
-1. Environment Variables
-2. Web.config / App.config
-3. Json configuration file
+1. [Environment variables)(#environment-variables)
+2. [`web.config` or `app.config` file](#web.config-and-app.config)
+3. [JSON configuration file](#json-configuration-file)
 
 ### Environment variables
 
-Environment variables are the main way to configure values. After setting up environment variable, it can't be overridden by lower priority configuration option. 
+Environment variables are the main way to configure values.  A setting configured via an environment variable cannot be overridden.
 
 ### Web.config and app.config
 
-When your application is running on .NET Framework (Does not work with .NET Core or later), all unset configuration values can be set via web configuration file (web.config) or application configuration file (app.config).
+For an application running on .NET Framework, web configuration file (`web.config`) or application configuration file (`app.config`) can be used to configure settings.
 
 See example with `SIGNALFX_SERVICE_NAME` overload.
 
@@ -104,7 +104,7 @@ See example with `SIGNALFX_SERVICE_NAME` overload.
 
 ### Json configuration file
 
-Json configuration file has the least priority. To use this option, all values that need to be overridden must be unset at first. By default if `SIGNALFX_DOTNET_TRACER_CONFIG_FILE` is unset, the application is searching for `signalfx.json` in current working directory (acquired by `Environment.CurrentDirectory`).
+By default, if `SIGNALFX_DOTNET_TRACER_CONFIG_FILE` is unset, the application is searching for `signalfx.json` in the current working directory (acquired by [`Environment.CurrentDirectory`](https://docs.microsoft.com/en-us/dotnet/api/system.environment.currentdirectory?view=net-5.0)).
 
 See example with `SIGNALFX_SERVICE_NAME` overload.
 
