@@ -223,6 +223,7 @@ jobs:
     inputs:
       command: build
       projects: |
+        customer-samples/**/*.csproj
         reproductions/**/*.csproj
         samples/**/*.csproj
         test/Datadog.Trace.IntegrationTests/Datadog.Trace.IntegrationTests.csproj

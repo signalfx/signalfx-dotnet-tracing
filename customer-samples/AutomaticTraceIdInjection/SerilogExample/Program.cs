@@ -1,10 +1,9 @@
 // Modified by SignalFx
-using System.IO;
-using Datadog.Trace;
 using Serilog;
 using Serilog.Context;
 using Serilog.Formatting.Compact;
 using Serilog.Formatting.Json;
+using SignalFx.Tracing;
 
 namespace SerilogExample
 {

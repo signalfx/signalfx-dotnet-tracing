@@ -1,5 +1,6 @@
-using Datadog.Trace;
+// Modified by SignalFx.
 using NLog;
+using SignalFx.Tracing;
 
 namespace NLog45Example
 {

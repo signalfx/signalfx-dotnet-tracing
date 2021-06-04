@@ -1,7 +1,8 @@
+// Modified by SignalFx.
 using System.IO;
-using Datadog.Trace;
 using log4net;
 using log4net.Config;
+using SignalFx.Tracing;
 
 namespace Log4NetExample
 {

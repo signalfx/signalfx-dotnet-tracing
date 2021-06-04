@@ -31,7 +31,7 @@ Layouts configured in the sample:
 
 ### NLog
 
-Versions 4.5.11 and 4.6.7
+Versions 4.5.11 and 4.6.8
 
 Layouts configured in the sample:
 - JSON format: `JsonLayout`
