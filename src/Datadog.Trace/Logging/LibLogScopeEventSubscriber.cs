@@ -46,23 +46,22 @@ namespace SignalFx.Tracing.Logging
             _scopeManager = scopeManager;
 
             _logProvider = LogProvider.CurrentLogProvider ?? LogProvider.ResolveLogProvider();
-            switch (_logProvider)
+            if (_logProvider is SerilogLogProvider)
             {
-                case SerilogLogProvider:
                     // Do not set default values for Serilog because it is unsafe to set
                     // except at the application startup, but this would require auto-instrumentation
                     _scopeManager.SpanOpened += StackOnSpanOpened;
                     _scopeManager.SpanClosed += StackOnSpanClosed;
-                    break;
-
-                case NLogLogProvider when UseNLogOptimized():
-                    UseValueReaders(settings);
-                    break;
-
-                default:
-                    _scopeManager.SpanActivated += MapOnSpanActivated;
-                    _scopeManager.TraceEnded += MapOnTraceEnded;
-                    break;
+            }
+            else if (_logProvider is NLogLogProvider && UseNLogOptimized())
+            {
+                // This NLog version can use the value readers optimization.
+                UseValueReaders(settings);
+            }
+            else
+            {
+                _scopeManager.SpanActivated += MapOnSpanActivated;
+                _scopeManager.TraceEnded += MapOnTraceEnded;
             }
         }
 
