@@ -40,7 +40,6 @@ namespace NLog46
             var newLogInjectionSettings = new TracerSettings
             {
                 LogsInjectionEnabled = true,
-                UseWebServerResourceAsOperationName = false,
             };
             NewLogInjectionTracer = new Tracer(newLogInjectionSettings);
 
