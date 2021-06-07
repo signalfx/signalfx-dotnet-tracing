@@ -50,13 +50,13 @@ namespace Datadog.Trace.Tests.Sampling
             Assert.Equal(expected: DefaultLimitPerSecond, actual: allowedCount);
         }
 
-        [Fact]
+        [Fact(Skip = "Flaky test")]
         public void Limits_Approximately_To_Defaults()
         {
             Run_Limit_Test(intervalLimit: null, numberPerBurst: 200, numberOfBursts: 20, millisecondsBetweenBursts: 247);
         }
 
-        [Fact]
+        [Fact(Skip = "Flaky test")]
         public void Limits_To_Custom_Amount_Per_Second()
         {
             Run_Limit_Test(intervalLimit: 500, numberPerBurst: 200, numberOfBursts: 20, millisecondsBetweenBursts: 247);

@@ -144,7 +144,7 @@ namespace SignalFx.Tracing
             // LibLog logging context when a scope is activated/closed
             if (Settings.LogsInjectionEnabled)
             {
-                InitializeLibLogScopeEventSubscriber(_scopeManager);
+                InitializeLibLogScopeEventSubscriber(_scopeManager, Settings);
             }
         }
 
@@ -514,9 +514,9 @@ namespace SignalFx.Tracing
             }
         }
 
-        private void InitializeLibLogScopeEventSubscriber(IScopeManager scopeManager)
+        private void InitializeLibLogScopeEventSubscriber(IScopeManager scopeManager, TracerSettings settings)
         {
-            new LibLogScopeEventSubscriber(scopeManager);
+            new LibLogScopeEventSubscriber(scopeManager, settings);
         }
 
         private void CurrentDomain_ProcessExit(object sender, EventArgs e)
