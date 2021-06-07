@@ -173,10 +173,6 @@ namespace SignalFx.Tracing.DiagnosticListeners
                 span.DecorateWebServerSpan(resourceUrl, httpMethod, host, url, remoteIp);
                 span.SetTag(Tags.InstrumentationName, IntegrationName);
 
-                // set analytics sample rate if enabled
-                var analyticsSampleRate = _tracer.Settings.GetIntegrationAnalyticsSampleRate(IntegrationName, enabledWithGlobalSetting: true);
-                span.SetMetric(Tags.Analytics, analyticsSampleRate);
-
                 Scope scope = _tracer.ActivateSpan(span);
 
                 _options.OnRequest?.Invoke(scope.Span, httpContext);

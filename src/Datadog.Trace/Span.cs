@@ -401,10 +401,5 @@ namespace SignalFx.Tracing
             SetException(exception);
             return false;
         }
-
-        internal Span SetMetric(string key, double? value)
-        {
-            return this;
-        }
     }
 }
