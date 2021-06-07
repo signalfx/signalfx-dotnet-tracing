@@ -111,9 +111,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 {
                     span.SetTag(Tags.HttpStatusCode, statusCode.Value.ToString());
                 }
-
-                var analyticSampleRate = Tracer.Settings.GetIntegrationAnalyticsSampleRate(integrationName, enabledWithGlobalSetting: true);
-                span.SetMetric(Tags.Analytics, analyticSampleRate);
             }
             catch (Exception ex)
             {
@@ -234,11 +231,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         internal void SetTagOnRootSpan(string tag, string value)
         {
             _rootScope?.Span?.SetTag(tag, value);
-        }
-
-        internal void SetMetricOnRootSpan(string tag, double? value)
-        {
-            _rootScope?.Span?.SetMetric(tag, value);
         }
 
         internal bool SetExceptionOnRootSpan(Exception ex)

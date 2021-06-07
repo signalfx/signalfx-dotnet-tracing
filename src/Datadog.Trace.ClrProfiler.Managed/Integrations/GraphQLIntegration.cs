@@ -260,10 +260,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 var span = scope.Span;
                 DecorateSpan(span);
                 span.SetTag(Tags.GraphQLSource, source);
-
-                // set analytics sample rate if enabled
-                var analyticsSampleRate = tracer.Settings.GetIntegrationAnalyticsSampleRate(IntegrationName, enabledWithGlobalSetting: false);
-                span.SetMetric(Tags.Analytics, analyticsSampleRate);
             }
             catch (Exception ex)
             {
@@ -305,10 +301,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 span.SetTag(Tags.GraphQLSource, source);
                 span.SetTag(Tags.GraphQLOperationName, operationName);
                 span.SetTag(Tags.GraphQLOperationType, operationType);
-
-                // set analytics sample rate if enabled
-                var analyticsSampleRate = tracer.Settings.GetIntegrationAnalyticsSampleRate(IntegrationName, enabledWithGlobalSetting: false);
-                span.SetMetric(Tags.Analytics, analyticsSampleRate);
             }
             catch (Exception ex)
             {

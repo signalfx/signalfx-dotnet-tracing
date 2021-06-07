@@ -141,10 +141,6 @@ namespace Datadog.Trace.ClrProfiler
                 span.SetTag(Tags.HttpMethod, httpMethod?.ToUpperInvariant());
                 span.SetTag(Tags.HttpUrl, UriHelpers.CleanUri(requestUri, removeScheme: false, tryRemoveIds: false));
                 span.SetTag(Tags.InstrumentationName, integrationName);
-
-                // set analytics sample rate if enabled
-                var analyticsSampleRate = tracer.Settings.GetIntegrationAnalyticsSampleRate(integrationName, enabledWithGlobalSetting: false);
-                span.SetMetric(Tags.Analytics, analyticsSampleRate);
             }
             catch (Exception ex)
             {
@@ -196,10 +192,6 @@ namespace Datadog.Trace.ClrProfiler
                 span.SetTag(Tags.DbType, dbType);
                 span.SetTag(Tags.InstrumentationName, integrationName);
                 span.AddTagsFromDbCommand(command, statement);
-
-                // set analytics sample rate if enabled
-                var analyticsSampleRate = tracer.Settings.GetIntegrationAnalyticsSampleRate(integrationName, enabledWithGlobalSetting: false);
-                span.SetMetric(Tags.Analytics, analyticsSampleRate);
             }
             catch (Exception ex)
             {
