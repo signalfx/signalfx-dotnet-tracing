@@ -102,12 +102,14 @@ namespace SignalFx.Tracing
 
             _agentWriter = agentWriter ?? new AgentWriter(apiClient, Statsd, Settings.SynchronousSend);
             _scopeManager = scopeManager ?? new AsyncLocalScopeManager();
-            Sampler = sampler ?? new RuleBasedSampler(new RateLimiter(Settings.MaxTracesSubmittedPerSecond));
+            Sampler = sampler;
 
             Propagator = ContextPropagatorBuilder.BuildPropagator(Settings.Propagator);
 
             if (!string.IsNullOrWhiteSpace(Settings.CustomSamplingRules))
             {
+                Sampler ??= new RuleBasedSampler(new RateLimiter(Settings.MaxTracesSubmittedPerSecond));
+
                 // User has opted in, ensure rate limiter is used
                 RuleBasedSampler.OptInTracingWithoutLimits();
 
@@ -127,6 +129,7 @@ namespace SignalFx.Tracing
                 }
                 else
                 {
+                    Sampler ??= new RuleBasedSampler(new RateLimiter(Settings.MaxTracesSubmittedPerSecond));
                     Sampler.RegisterRule(new GlobalSamplingRule(globalRate));
                 }
             }
