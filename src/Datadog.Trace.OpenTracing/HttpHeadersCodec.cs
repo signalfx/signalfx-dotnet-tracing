@@ -1,6 +1,5 @@
 // Modified by SignalFx
 using System;
-using System.Globalization;
 using OpenTracing.Propagation;
 using SignalFx.Tracing.Headers;
 using SignalFx.Tracing.Propagation;
@@ -9,7 +8,6 @@ namespace SignalFx.Tracing.OpenTracing
 {
     internal class HttpHeadersCodec : ICodec
     {
-        private static readonly CultureInfo InvariantCulture = CultureInfo.InvariantCulture;
         private readonly IPropagator _propagator;
 
         public HttpHeadersCodec(IPropagator propagator)

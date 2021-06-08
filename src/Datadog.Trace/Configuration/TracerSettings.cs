@@ -398,7 +398,7 @@ namespace SignalFx.Tracing.Configuration
 
         /// <summary>
         /// Gets or sets the propagator logic to be used.
-        /// Default is <c>Datadog</c>
+        /// Default is <c>B3</c>.
         /// <seealso cref="ConfigurationKeys.Propagator"/>
         /// </summary>
         public PropagatorType Propagator { get; set; }
