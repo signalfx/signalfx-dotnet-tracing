@@ -108,7 +108,7 @@ namespace SignalFx.Tracing
 
             if (!string.IsNullOrWhiteSpace(Settings.CustomSamplingRules))
             {
-                Sampler = Sampler ?? new RuleBasedSampler(new RateLimiter(Settings.MaxTracesSubmittedPerSecond));
+                Sampler ??= new RuleBasedSampler(new RateLimiter(Settings.MaxTracesSubmittedPerSecond));
 
                 // User has opted in, ensure rate limiter is used
                 RuleBasedSampler.OptInTracingWithoutLimits();
@@ -129,7 +129,7 @@ namespace SignalFx.Tracing
                 }
                 else
                 {
-                    Sampler = Sampler ?? new RuleBasedSampler(new RateLimiter(Settings.MaxTracesSubmittedPerSecond));
+                    Sampler ??= new RuleBasedSampler(new RateLimiter(Settings.MaxTracesSubmittedPerSecond));
                     Sampler.RegisterRule(new GlobalSamplingRule(globalRate));
                 }
             }
