@@ -1,5 +1,4 @@
 // Modified by SignalFx
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,30 +9,29 @@ namespace SignalFx.Tracing.Propagation
     {
         public static TraceId ParseTraceId<T>(T carrier, Func<T, string, IEnumerable<string>> getter, string headerName, Vendors.Serilog.ILogger logger)
         {
-            var headerValues = getter(carrier, headerName).ToList();
-
-            foreach (var traceId in headerValues.Select(TraceId.CreateFromString).Where(traceId => traceId != TraceId.Zero))
+            var enumerableHeaderValues = getter(carrier, headerName);
+            if (enumerableHeaderValues == Enumerable.Empty<string>())
             {
-                return traceId;
+                return TraceId.Zero;
             }
 
-            logger.Warning("Could not parse {HeaderName} headers: {HeaderValues}", headerName, string.Join(",", headerValues));
-            return TraceId.Zero;
-        }
-
-        public static string ParseString<T>(T carrier, Func<T, string, IEnumerable<string>> getter, string headerName)
-        {
-            var headerValues = getter(carrier, headerName);
-
-            foreach (var headerValue in headerValues)
+            var headerValues = enumerableHeaderValues.ToList();
+            if (headerValues.Count == 0)
             {
-                if (!string.IsNullOrEmpty(headerValue))
+                return TraceId.Zero;
+            }
+
+            for (var i = 0; i < headerValues.Count; ++i)
+            {
+                var traceId = TraceId.CreateFromString(headerValues[i]);
+                if (traceId != TraceId.Zero)
                 {
-                    return headerValue;
+                    return traceId;
                 }
             }
 
-            return null;
+            logger.Debug("Could not parse {HeaderName} headers: {HeaderValues}", headerName, string.Join(",", headerValues));
+            return TraceId.Zero;
         }
     }
 }

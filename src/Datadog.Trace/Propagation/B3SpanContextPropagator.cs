@@ -1,9 +1,9 @@
 // Modified by SignalFx
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using SignalFx.Tracing.Logging;
 
 namespace SignalFx.Tracing.Propagation
@@ -16,7 +16,6 @@ namespace SignalFx.Tracing.Propagation
         private const NumberStyles NumberStyle = NumberStyles.HexNumber;
 
         private static readonly CultureInfo InvariantCulture = CultureInfo.InvariantCulture;
-        private static readonly string UserKeep = ((int)SamplingPriority.UserKeep).ToString(InvariantCulture);
         private static readonly Vendors.Serilog.ILogger Log = SignalFxLogging.For<B3SpanContextPropagator>();
 
         public void Inject<T>(SpanContext context, T carrier, Action<T, string, string> setter)
@@ -60,45 +59,64 @@ namespace SignalFx.Tracing.Propagation
             }
 
             var spanId = ParseHexUInt64(carrier, getter, B3HttpHeaderNames.B3SpanId);
-            var samplingPriority = ParseB3Sampling(carrier, getter);
+            var samplingPriority = ParseB3FlagsAndSampled(carrier, getter);
 
             return new SpanContext(traceId, spanId, samplingPriority);
         }
 
         private static ulong ParseHexUInt64<T>(T carrier, Func<T, string, IEnumerable<string>> getter, string headerName)
         {
-            var headerValues = getter(carrier, headerName).ToList();
-
-            if (!headerValues.Any())
+            var enumerableHeaderValues = getter(carrier, headerName);
+            if (enumerableHeaderValues == Enumerable.Empty<string>())
             {
                 return 0;
             }
 
-            foreach (var headerValue in headerValues)
+            var headerValues = enumerableHeaderValues.ToList();
+            if (headerValues.Count == 0)
             {
-                if (ulong.TryParse(headerValue, NumberStyle, InvariantCulture, out var result))
+                return 0;
+            }
+
+            for (var i = 0; i < headerValues.Count; ++i)
+            {
+                if (ulong.TryParse(headerValues[i], NumberStyle, InvariantCulture, out var result))
                 {
                     return result;
                 }
             }
 
-            Log.Information("Could not parse {0} headers: {1}", headerName, string.Join(",", headerValues));
-
+            Log.Debug("Could not parse {0} headers: {1}", headerName, string.Join(",", headerValues));
             return 0;
         }
 
-        private static SamplingPriority? ParseB3Sampling<T>(T carrier, Func<T, string, IEnumerable<string>> getter)
+        private static SamplingPriority? ParseB3FlagsAndSampled<T>(T carrier, Func<T, string, IEnumerable<string>> getter)
         {
-            var debugged = getter(carrier, B3HttpHeaderNames.B3Flags).ToList();
-            var sampled = getter(carrier, B3HttpHeaderNames.B3Sampled).ToList();
-
-            if (debugged.Count != 0 && (debugged[0] == "0" || debugged[0] == "1"))
+            var enumerableDebugged = getter(carrier, B3HttpHeaderNames.B3Flags);
+            if (enumerableDebugged != Enumerable.Empty<string>())
             {
-                return debugged[0] == "1" ? SamplingPriority.UserKeep : (SamplingPriority?)null;
+                var debugged = enumerableDebugged.ToList();
+                if (debugged.Count != 0 && (debugged[0] == "0" || debugged[0] == "1"))
+                {
+                    return debugged[0] == "1" ? SamplingPriority.UserKeep : (SamplingPriority?)null;
+                }
             }
-            else if (sampled.Count != 0 && (sampled[0] == "0" || sampled[0] == "1"))
+
+            // Failed to "parse" debugged try sampling.
+            return ParseB3Sampled(carrier, getter);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static SamplingPriority? ParseB3Sampled<T>(T carrier, Func<T, string, IEnumerable<string>> getter)
+        {
+            var enumerableSampled = getter(carrier, B3HttpHeaderNames.B3Sampled);
+            if (enumerableSampled != Enumerable.Empty<string>())
             {
-                return sampled[0] == "1" ? SamplingPriority.AutoKeep : SamplingPriority.AutoReject;
+                var sampled = enumerableSampled.ToList();
+                if (sampled.Count != 0 && (sampled[0] == "0" || sampled[0] == "1"))
+                {
+                    return sampled[0] == "1" ? SamplingPriority.AutoKeep : SamplingPriority.AutoReject;
+                }
             }
 
             return (SamplingPriority?)null;
