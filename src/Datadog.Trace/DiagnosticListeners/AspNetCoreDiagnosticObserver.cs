@@ -102,20 +102,7 @@ namespace SignalFx.Tracing.DiagnosticListeners
 
                 if (requestHeaders != null)
                 {
-                    var headersCollection = new DictionaryHeadersCollection();
-
-                    foreach (var header in requestHeaders)
-                    {
-                        string key = header.Key;
-                        string[] values = header.Value.ToArray();
-
-                        if (key != null && values.Length > 0)
-                        {
-                            headersCollection.Add(key, values);
-                        }
-                    }
-
-                    return propagator.Extract(headersCollection);
+                    return propagator.Extract(new WrapIHeadersCollection(requestHeaders));
                 }
             }
             catch (Exception ex)
