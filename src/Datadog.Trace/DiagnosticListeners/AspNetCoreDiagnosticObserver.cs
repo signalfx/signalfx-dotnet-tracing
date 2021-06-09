@@ -1,6 +1,8 @@
 // Modified by SignalFx
 #if NETSTANDARD
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -268,6 +270,38 @@ namespace SignalFx.Tracing.DiagnosticListeners
 
                 span.SetException(exception);
                 _options.OnError?.Invoke(span, exception, httpContext);
+            }
+        }
+
+        private struct WrapIHeadersCollection : IHeadersCollection
+        {
+            private readonly IHeaderDictionary _headerDictionary;
+
+            public WrapIHeadersCollection(IHeaderDictionary headerDictionary)
+            {
+                _headerDictionary = headerDictionary;
+            }
+
+            public IEnumerable<string> GetValues(string name)
+            {
+                return _headerDictionary.TryGetValue(name, out var stringValues)
+                    ? stringValues
+                    : Enumerable.Empty<string>();
+            }
+
+            public void Set(string name, string value)
+            {
+                _headerDictionary[name] = value;
+            }
+
+            public void Add(string name, string value)
+            {
+                _headerDictionary.Add(name, value);
+            }
+
+            public void Remove(string name)
+            {
+                _headerDictionary.Remove(name);
             }
         }
     }
