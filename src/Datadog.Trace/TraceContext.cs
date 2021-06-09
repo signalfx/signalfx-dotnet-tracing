@@ -89,15 +89,6 @@ namespace SignalFx.Tracing
             {
                 // lock sampling priority and set metric when root span finishes
                 LockSamplingPriority();
-
-                if (_samplingPriority == null)
-                {
-                    Log.Warning("Cannot set span metric for sampling priority before it has been set.");
-                }
-                else
-                {
-                    span.SetMetric(Metrics.SamplingPriority, (int)_samplingPriority);
-                }
             }
 
             Span[] spansToWrite = null;

@@ -25,7 +25,6 @@ namespace SignalFx.Tracing
 
         private readonly object _lock = new object();
         private readonly object _tagsLock = new object();
-        private readonly object _metricLock = new object();
 
         internal Span(SpanContext context, DateTimeOffset? start)
         {
@@ -141,20 +140,6 @@ namespace SignalFx.Tracing
                 }
             }
 
-            sb.AppendLine("Metrics:");
-
-            if (Metrics?.Count > 0)
-            {
-                // lock because we're iterating the collection, not reading a single value
-                lock (_metricLock)
-                {
-                    foreach (var kv in Metrics)
-                    {
-                        sb.Append($"\t{kv.Key}:{kv.Value}");
-                    }
-                }
-            }
-
             return sb.ToString();
         }
 
@@ -204,38 +189,6 @@ namespace SignalFx.Tracing
 
                     break;
 #pragma warning restore CS0618 // Type or member is obsolete
-                case Tracing.Tags.Analytics:
-                    // value is a string and can represent a bool ("true") or a double ("0.5"),
-                    // so try to parse both.
-                    // note that "1" and "0" can parse as either type,
-                    // but they mean the same thing in this case, so it's fine.
-                    bool? boolean = value.ToBoolean();
-
-                    if (boolean == true)
-                    {
-                        // always sample
-                        SetMetric(Tracing.Tags.Analytics, 1.0);
-                    }
-                    else if (boolean == false)
-                    {
-                        // never sample
-                        SetMetric(Tracing.Tags.Analytics, 0.0);
-                    }
-                    else if (double.TryParse(
-                        value,
-                        NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite,
-                        CultureInfo.InvariantCulture,
-                        out double analyticsSampleRate))
-                    {
-                        // use specified sample rate
-                        SetMetric(Tracing.Tags.Analytics, analyticsSampleRate);
-                    }
-                    else
-                    {
-                        Logger.Warning("Value {0} has incorrect format for tag {1}", value, Tracing.Tags.Analytics);
-                    }
-
-                    break;
                 default:
                     if (value == null)
                     {
@@ -447,44 +400,6 @@ namespace SignalFx.Tracing
         {
             SetException(exception);
             return false;
-        }
-
-        internal double? GetMetric(string key)
-        {
-            // no need to lock on single reads
-            return Metrics != null && Metrics.TryGetValue(key, out double value) ? value : default;
-        }
-
-        internal Span SetMetric(string key, double? value)
-        {
-            if (value == null)
-            {
-                if (Metrics != null)
-                {
-                    // lock when modifying the collection
-                    lock (_metricLock)
-                    {
-                        Metrics.Remove(key);
-                    }
-                }
-            }
-            else
-            {
-                // lock when modifying the collection
-                lock (_metricLock)
-                {
-                    if (Metrics == null)
-                    {
-                        // defer instantiation until needed to
-                        // avoid unnecessary allocations per span
-                        Metrics = new Dictionary<string, double>();
-                    }
-
-                    Metrics[key] = value.Value;
-                }
-            }
-
-            return this;
         }
     }
 }

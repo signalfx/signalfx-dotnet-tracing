@@ -490,10 +490,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 span.SetTag(Tags.MongoDbCollection, collectionName);
                 span.SetTag(Tags.OutHost, host);
                 span.SetTag(Tags.OutPort, port);
-
-                // set analytics sample rate if enabled
-                var analyticsSampleRate = tracer.Settings.GetIntegrationAnalyticsSampleRate(IntegrationName, enabledWithGlobalSetting: false);
-                span.SetMetric(Tags.Analytics, analyticsSampleRate);
             }
             catch (Exception ex)
             {

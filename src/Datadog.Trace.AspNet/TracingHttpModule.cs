@@ -137,10 +137,6 @@ namespace Datadog.Trace.AspNet
 
                 scope.Span.DecorateWebServerSpan(resourceName, httpMethod, host, url, remoteIp);
 
-                // set analytics sample rate if enabled
-                var analyticsSampleRate = tracer.Settings.GetIntegrationAnalyticsSampleRate(IntegrationName, enabledWithGlobalSetting: true);
-                scope.Span.SetMetric(Tags.Analytics, analyticsSampleRate);
-
                 httpContext.Items[_httpContextScopeKey] = scope;
             }
             catch (Exception ex)
