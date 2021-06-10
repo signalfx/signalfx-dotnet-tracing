@@ -72,13 +72,13 @@ namespace SignalFx.Tracing.Propagation
                 return 0;
             }
 
-            var headerValues = enumerableHeaderValues.ToList();
-            if (headerValues.Count == 0)
+            var headerValues = enumerableHeaderValues.ToArray();
+            if (headerValues.Length == 0)
             {
                 return 0;
             }
 
-            for (var i = 0; i < headerValues.Count; ++i)
+            for (var i = 0; i < headerValues.Length; ++i)
             {
                 if (ulong.TryParse(headerValues[i], NumberStyle, InvariantCulture, out var result))
                 {
@@ -95,8 +95,8 @@ namespace SignalFx.Tracing.Propagation
             var enumerableDebugged = getter(carrier, B3HttpHeaderNames.B3Flags);
             if (enumerableDebugged != Enumerable.Empty<string>())
             {
-                var debugged = enumerableDebugged.ToList();
-                if (debugged.Count != 0 && (debugged[0] == "0" || debugged[0] == "1"))
+                var debugged = enumerableDebugged.ToArray();
+                if (debugged.Length != 0 && (debugged[0] == "0" || debugged[0] == "1"))
                 {
                     return debugged[0] == "1" ? SamplingPriority.UserKeep : (SamplingPriority?)null;
                 }
@@ -112,8 +112,8 @@ namespace SignalFx.Tracing.Propagation
             var enumerableSampled = getter(carrier, B3HttpHeaderNames.B3Sampled);
             if (enumerableSampled != Enumerable.Empty<string>())
             {
-                var sampled = enumerableSampled.ToList();
-                if (sampled.Count != 0 && (sampled[0] == "0" || sampled[0] == "1"))
+                var sampled = enumerableSampled.ToArray();
+                if (sampled.Length != 0 && (sampled[0] == "0" || sampled[0] == "1"))
                 {
                     return sampled[0] == "1" ? SamplingPriority.AutoKeep : SamplingPriority.AutoReject;
                 }
