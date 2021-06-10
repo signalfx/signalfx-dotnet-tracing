@@ -15,13 +15,13 @@ namespace SignalFx.Tracing.Propagation
                 return TraceId.Zero;
             }
 
-            var headerValues = enumerableHeaderValues.ToList();
-            if (headerValues.Count == 0)
+            var headerValues = enumerableHeaderValues.ToArray();
+            if (headerValues.Length == 0)
             {
                 return TraceId.Zero;
             }
 
-            for (var i = 0; i < headerValues.Count; ++i)
+            for (var i = 0; i < headerValues.Length; ++i)
             {
                 var traceId = TraceId.CreateFromString(headerValues[i]);
                 if (traceId != TraceId.Zero)
