@@ -56,7 +56,7 @@ namespace SignalFx.Tracing
 
             if (SpanId == 0)
             {
-                SpanId = GenerateId();
+                SpanId = RandomNumberGenerator.Current.Next();
             }
         }
 
@@ -70,7 +70,7 @@ namespace SignalFx.Tracing
             }
 
             TraceId = TraceId.CreateRandom();
-            SpanId = GenerateId();
+            SpanId = RandomNumberGenerator.Current.Next();
         }
 
         /// <summary>
@@ -119,13 +119,5 @@ namespace SignalFx.Tracing
         /// Gets or sets the span associated with this context.
         /// </summary>
         internal ISpan Span { get; set; }
-
-        private static ulong GenerateId()
-        {
-            var guidBytes = Guid.NewGuid().ToByteArray();
-
-            // Remove the fixed byte from the GUID in order to have all 64 bits random.
-            return (BitConverter.ToUInt64(guidBytes, 8) & 0xffffffffffffff00) | guidBytes[0];
-        }
     }
 }
