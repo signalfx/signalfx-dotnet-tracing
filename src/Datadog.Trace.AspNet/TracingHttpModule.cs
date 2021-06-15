@@ -124,7 +124,7 @@ namespace Datadog.Trace.AspNet
                 string host = httpRequest.Headers.Get("Host");
                 string httpMethod = httpRequest.HttpMethod.ToUpperInvariant();
                 string url = httpRequest.RawUrl.ToLowerInvariant();
-                string path = UriHelpers.GetRelativeUrl(httpRequest.Url, tryRemoveIds: true);
+                string path = UriHelpers.GetCleanUriPath(httpRequest.Url);
                 string resourceName = $"{httpMethod} {path.ToLowerInvariant()}";
 
                 scope = tracer.StartActive(_requestOperationName, propagatedContext);
@@ -138,6 +138,14 @@ namespace Datadog.Trace.AspNet
                 scope.Span.DecorateWebServerSpan(resourceName, httpMethod, host, url, remoteIp);
 
                 httpContext.Items[_httpContextScopeKey] = scope;
+
+                // Decorate the incoming HTTP Request with distributed tracing headers
+                // in case the next processor cannot access the stored Scope
+                // (e.g. WCF being hosted in IIS)
+                if (HttpRuntime.UsingIntegratedPipeline)
+                {
+                    Tracer.Instance.Propagator.Inject(scope.Span.Context, httpRequest.Headers.Wrap());
+                }
             }
             catch (Exception ex)
             {
@@ -160,6 +168,19 @@ namespace Datadog.Trace.AspNet
                 if (sender is HttpApplication app &&
                     app.Context.Items[_httpContextScopeKey] is Scope scope)
                 {
+                    scope.Span.SetHttpStatusCode(app.Context.Response);
+
+                    if (app.Context.Items[SharedConstants.HttpContextPropagatedResourceNameKey] is string resourceName
+                        && !string.IsNullOrEmpty(resourceName))
+                    {
+                        scope.Span.ResourceName = resourceName;
+                    }
+                    else
+                    {
+                        string path = UriHelpers.GetCleanUriPath(app.Request.Url);
+                        scope.Span.ResourceName = $"{app.Request.HttpMethod.ToUpperInvariant()} {path.ToLowerInvariant()}";
+                    }
+
                     scope.Dispose();
                 }
             }

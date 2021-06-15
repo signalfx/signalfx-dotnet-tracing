@@ -382,5 +382,16 @@ namespace SignalFx.Tracing.Configuration
             /// </summary>
             public const string ForceFallbackLookup = "SIGNALFX_TRACE_DEBUG_LOOKUP_FALLBACK";
         }
+
+        internal static class FeatureFlags
+        {
+            /// <summary>
+            /// Feature Flag: enables updated resource names on `aspnet.request`, `aspnet-mvc.request`,
+            /// `aspnet-webapi.request`, and `aspnet_core.request` spans. Enables `aspnet_core_mvc.request` spans and
+            /// additional features on `aspnet_core.request` spans.
+            /// </summary>
+            /// <seealso cref="TracerSettings.RouteTemplateResourceNamesEnabled"/>
+            public const string RouteTemplateResourceNamesEnabled = "SIGNALFX_TRACE_ROUTE_TEMPLATE_RESOURCE_NAMES_ENABLED";
+        }
     }
 }

@@ -2,8 +2,10 @@
 using System;
 using System.Data;
 using System.Data.Common;
+using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
+using System.Web;
 
 namespace SignalFx.Tracing.ExtensionMethods
 {
@@ -90,6 +92,24 @@ namespace SignalFx.Tracing.ExtensionMethods
                     break;
             }
         }
+
+#if NETFRAMEWORK
+        internal static void SetHttpStatusCode(this Span span, HttpResponse response)
+        {
+            if (response?.StatusCode == 200)
+            {
+                span.SetTag(Tags.HttpStatusCode, "200");
+            }
+            else if (response?.StatusCode != null)
+            {
+                span.SetTag(Tags.HttpStatusCode, response.StatusCode.ToString(CultureInfo.InvariantCulture));
+                if (!string.IsNullOrWhiteSpace(response?.StatusDescription))
+                {
+                    span.SetTag(Tags.HttpStatusText, response.StatusDescription);
+                }
+            }
+        }
+#endif
 
         private static string GetConnectionStringValue(DbConnectionStringBuilder builder, params string[] names)
         {

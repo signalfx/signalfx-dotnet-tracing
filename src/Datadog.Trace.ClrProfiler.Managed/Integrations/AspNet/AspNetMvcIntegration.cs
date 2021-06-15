@@ -8,6 +8,7 @@ using System.Net;
 using System.Web;
 using System.Web.Routing;
 using System.Xml.Serialization;
+using Datadog.Trace.AspNet;
 using Datadog.Trace.ClrProfiler.Emit;
 using SignalFx.Tracing;
 using SignalFx.Tracing.ExtensionMethods;
@@ -72,6 +73,8 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 RouteData routeData = controllerContext.GetProperty<RouteData>("RouteData").GetValueOrDefault();
                 Route route = routeData?.Route as Route;
                 RouteValueDictionary routeValues = routeData?.Values;
+                bool wasAttributeRouted = false;
+                bool newResourceNamesEnabled = Tracer.Instance.Settings.RouteTemplateResourceNamesEnabled;
 
                 if (route == null && routeData?.Route.GetType().FullName == RouteCollectionRouteTypeName)
                 {
@@ -81,6 +84,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     {
                         // route was defined using attribute routing i.e. [Route("/path/{id}")]
                         // get route and routeValues from the RouteData in routeMatches
+                        wasAttributeRouted = true;
                         route = routeMatches[0].Route as Route;
                         routeValues = routeMatches[0].Values;
 
@@ -97,19 +101,50 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     }
                 }
 
-                if (string.IsNullOrEmpty(resourceName) && httpContext.Request.Url != null)
-                {
-                    var cleanUri = UriHelpers.GetRelativeUrl(httpContext.Request.Url, tryRemoveIds: true);
-                    resourceName = $"{httpMethod} {cleanUri.ToLowerInvariant()}";
-                }
-
+                string routeUrl = route?.Url;
+                string areaName = (routeValues?.GetValueOrDefault("area") as string)?.ToLowerInvariant();
                 string controllerName = (routeValues?.GetValueOrDefault("controller") as string)?.ToLowerInvariant();
                 string actionName = (routeValues?.GetValueOrDefault("action") as string)?.ToLowerInvariant();
+
+                if (newResourceNamesEnabled && string.IsNullOrEmpty(resourceName) && !string.IsNullOrEmpty(routeUrl))
+                {
+                    resourceName = $"{httpMethod} /{routeUrl.ToLowerInvariant()}";
+                }
+
+                if (string.IsNullOrEmpty(resourceName) && httpContext.Request.Url != null)
+                {
+                    var cleanUri = UriHelpers.GetCleanUriPath(httpContext.Request.Url);
+                    resourceName = $"{httpMethod} {cleanUri.ToLowerInvariant()}";
+                }
 
                 if (string.IsNullOrEmpty(resourceName))
                 {
                     // Keep the legacy resource name, just to have something
                     resourceName = $"{httpMethod} {controllerName}.{actionName}";
+                }
+
+                // Replace well-known routing tokens
+                resourceName =
+                    resourceName
+                       .Replace("{area}", areaName)
+                       .Replace("{controller}", controllerName)
+                       .Replace("{action}", actionName);
+
+                if (newResourceNamesEnabled && !wasAttributeRouted && routeValues is not null && route is not null)
+                {
+                    // Remove unused parameters from conventional route templates
+                    // Don't bother with routes defined using attribute routing
+                    foreach (var parameter in route.Defaults)
+                    {
+                        var parameterName = parameter.Key;
+                        if (parameterName != "area"
+                            && parameterName != "controller"
+                            && parameterName != "action"
+                            && !routeValues.ContainsKey(parameterName))
+                        {
+                            resourceName = resourceName.Replace($"/{{{parameterName}}}", string.Empty);
+                        }
+                    }
                 }
 
                 SpanContext propagatedContext = null;
@@ -132,12 +167,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 scope = Tracer.Instance.StartActive(OperationName, propagatedContext);
                 Span span = scope.Span;
 
-                // Fail safe to catch templates in routing values
-                resourceName =
-                    resourceName
-                       .Replace("{controller}", controllerName)
-                       .Replace("{action}", actionName);
-
                 IPAddress remoteIp = null;
                 if (Tracer.Instance.Settings.AddClientIpToServerSpans)
                 {
@@ -150,9 +179,17 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     host: host,
                     httpUrl: url,
                     remoteIp: remoteIp);
-                span.SetTag(Tags.AspNetRoute, route?.Url);
+
+                span.SetTag(Tags.AspNetRoute, routeUrl);
+                span.SetTag(Tags.AspNetArea, areaName);
                 span.SetTag(Tags.AspNetController, controllerName);
                 span.SetTag(Tags.AspNetAction, actionName);
+
+                if (newResourceNamesEnabled)
+                {
+                    // set the resource name in the HttpContext so TracingHttpModule can update root span
+                    httpContext.Items[SharedConstants.HttpContextPropagatedResourceNameKey] = resourceName;
+                }
             }
             catch (Exception ex)
             {
@@ -337,21 +374,9 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     return res;
                 }
 
-                var response = httpContext?.Response;
-                if (response?.StatusCode == 200)
-                {
-                    scope.Span.SetTag(Tags.HttpStatusCode, "200");
-                }
-                else if (response?.StatusCode != null)
-                {
-                    scope.Span.SetTag(Tags.HttpStatusCode, response.StatusCode.ToString(CultureInfo.InvariantCulture));
-                    if (!string.IsNullOrWhiteSpace(response?.StatusDescription))
-                    {
-                        scope.Span.SetTag(Tags.HttpStatusText, response.StatusDescription);
-                    }
-                }
+                scope.Span.SetHttpStatusCode(httpContext?.Response);
 
-                ServerTimingHeader.SetHeaders(scope.Span.Context, response, (resp, name, value) => resp.Headers.Add(name, value));
+                ServerTimingHeader.SetHeaders(scope.Span.Context, httpContext?.Response, (resp, name, value) => resp.Headers.Add(name, value));
                 return res;
             }
             catch (Exception ex)
