@@ -11,6 +11,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Tests
         private const string Id = "?";
 
         [Theory]
+        [Obsolete]
         [InlineData("users/", "users/")]
         [InlineData("users", "users")]
         [InlineData("123/", Id + "/")]
