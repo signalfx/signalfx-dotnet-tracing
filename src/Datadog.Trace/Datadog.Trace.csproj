@@ -3,7 +3,7 @@
 
   <PropertyGroup>
     <!-- NuGet -->
-    <Version>0.1.10</Version>
+    <Version>0.1.11</Version>
     <Title>SignalFx Tracing</Title>
     <Description>Manual instrumentation library for SignalFx Tracing</Description>
     <AssemblyName>SignalFx.Tracing</AssemblyName>
