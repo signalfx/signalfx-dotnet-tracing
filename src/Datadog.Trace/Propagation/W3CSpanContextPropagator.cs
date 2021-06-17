@@ -51,7 +51,6 @@ namespace SignalFx.Tracing.Propagation
             var traceParentCollection = getter(carrier, W3CHeaderNames.TraceParent).ToList();
             if (traceParentCollection.Count != 1)
             {
-                Log.Warning("Header {HeaderName} needs exactly 1 value", W3CHeaderNames.TraceParent);
                 return null;
             }
 
@@ -60,14 +59,13 @@ namespace SignalFx.Tracing.Propagation
             var traceId = TraceId.CreateFromString(traceIdString);
             if (traceId == TraceId.Zero)
             {
-                Log.Warning("Could not parse {HeaderName} headers: {HeaderValues}", W3CHeaderNames.TraceParent, string.Join(",", traceParentCollection));
                 return null;
             }
 
             var spanIdString = traceParentHeader.Substring(VersionAndTraceIdLength, SpanIdLength);
             if (!ulong.TryParse(spanIdString, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var spanId))
             {
-                Log.Warning("Could not parse {HeaderName} headers: {HeaderValues}", W3CHeaderNames.TraceParent, string.Join(",", traceParentCollection));
+                Log.Debug("Could not retrieve SpanId from header {HeaderName}: {HeaderValues}", W3CHeaderNames.TraceParent, traceParentHeader);
                 return null;
             }
 

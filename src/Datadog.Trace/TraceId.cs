@@ -3,6 +3,7 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using SignalFx.Tracing.Logging;
 
 namespace SignalFx.Tracing
 {
@@ -12,6 +13,7 @@ namespace SignalFx.Tracing
     public readonly struct TraceId : IEquatable<TraceId>
     {
         private readonly string _string;
+        private static readonly Vendors.Serilog.ILogger Log = SignalFxLogging.For<TraceId>();
 
         private TraceId(ulong higher, ulong lower)
         {
@@ -114,6 +116,7 @@ namespace SignalFx.Tracing
             }
             catch (Exception ex) when (ex is ArgumentOutOfRangeException || ex is InvalidOperationException || ex is OverflowException || ex is FormatException)
             {
+                Log.Debug($"Could not parse TraceId from string {id}. {ex.Message}");
                 return Zero;
             }
         }
