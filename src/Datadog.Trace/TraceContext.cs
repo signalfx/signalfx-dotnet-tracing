@@ -13,7 +13,7 @@ namespace SignalFx.Tracing
         private static readonly Tracing.SamplingPriority? DefaultSamplingPriority = new Tracing.SamplingPriority?(Tracing.SamplingPriority.AutoKeep);
 
         private readonly DateTimeOffset _utcStart = DateTimeOffset.UtcNow;
-        private readonly Stopwatch _stopwatch = Stopwatch.StartNew();
+        private readonly long _startTimestamp = Stopwatch.GetTimestamp();
         private readonly List<Span> _spans = new List<Span>();
 
         private int _openSpans;
@@ -27,7 +27,7 @@ namespace SignalFx.Tracing
 
         public Span RootSpan { get; private set; }
 
-        public DateTimeOffset UtcNow => _utcStart.Add(_stopwatch.Elapsed);
+        public DateTimeOffset UtcNow => _utcStart.AddTicks(Stopwatch.GetTimestamp() - _startTimestamp);
 
         public ISignalFxTracer Tracer { get; }
 
