@@ -21,7 +21,7 @@ namespace SignalFx.Tracing.Agent
 
         public static IDictionary<string, string> BuildTags(Span span, TracerSettings settings)
         {
-            var tags = new Dictionary<string, string>();
+            var tags = new Dictionary<string, string>(span.Tags.Count);
             var recordedValueMaxLength = settings.RecordedValueMaxLength;
             foreach (var entry in span.Tags)
             {
@@ -96,7 +96,7 @@ namespace SignalFx.Tracing.Agent
             {
                 _span = span;
                 _settings = settings;
-                _tags = span.Tags != null ? BuildTags(span, settings) : emptyTags;
+                _tags = span.Tags.Count > 0 ? BuildTags(span, settings) : emptyTags;
             }
 
             public string Id
@@ -202,7 +202,7 @@ namespace SignalFx.Tracing.Agent
 
             public bool ShouldSerializeKind()
             {
-                return _span.Tags != null && _span.Tags.ContainsKey(Tracing.Tags.SpanKind);
+                return _span.Tags.ContainsKey(Tracing.Tags.SpanKind);
             }
         }
     }
