@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using System.ServiceModel.Channels;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
@@ -201,7 +202,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         {
             try
             {
-                var newResourceNamesEnabled = Tracer.Instance.Settings.RouteTemplateResourceNamesEnabled;
                 var request = controllerContext.Request;
                 Uri requestUri = request.RequestUri;
 
@@ -218,6 +218,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 }
 
                 string resourceName;
+                bool newResourceNamesEnabled = Tracer.Instance.Settings.RouteTemplateResourceNamesEnabled;
 
                 if (route != null)
                 {
@@ -251,8 +252,8 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 }
 
                 // Replace well-known routing tokens
-                resourceName =
-                    resourceName
+                var resourceNameBuilder = new StringBuilder(resourceName);
+                resourceNameBuilder
                        .Replace("{area}", area)
                        .Replace("{controller}", controller)
                        .Replace("{action}", action);
@@ -275,6 +276,8 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     }
                 }
 
+                resourceName = resourceNameBuilder.ToString();
+
                 span.DecorateWebServerSpan(
                     resourceName: resourceName,
                     method: method,
@@ -290,7 +293,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 if (newResourceNamesEnabled)
                 {
                     // set the resource name in the HttpContext so TracingHttpModule can update root span
-                    var httpContext = System.Web.HttpContext.Current;
+                    var httpContext = HttpContext.Current;
                     if (httpContext is not null)
                     {
                         httpContext.Items[SharedConstants.HttpContextPropagatedResourceNameKey] = resourceName;

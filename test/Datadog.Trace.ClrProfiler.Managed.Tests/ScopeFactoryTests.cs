@@ -11,7 +11,6 @@ namespace Datadog.Trace.ClrProfiler.Managed.Tests
         private const string Id = "?";
 
         [Theory]
-        [Obsolete]
         [InlineData("users/", "users/")]
         [InlineData("users", "users")]
         [InlineData("123/", Id + "/")]
@@ -24,7 +23,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Tests
         [InlineData("E653C852227B4F0C9E48D30D83C68BF3", Id)]
         public void CleanUriSegment(string segment, string expected)
         {
-            string actual = UriHelpers.CleanUriSegment(segment);
+            string actual = UriHelpers.GetCleanUriPath(segment);
 
             Assert.Equal(expected, actual);
         }

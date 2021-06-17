@@ -96,17 +96,25 @@ namespace SignalFx.Tracing.ExtensionMethods
 #if NETFRAMEWORK
         internal static void SetHttpStatusCode(this Span span, HttpResponse response)
         {
-            if (response?.StatusCode == 200)
+            if (response == null)
             {
-                span.SetTag(Tags.HttpStatusCode, "200");
+                return;
             }
-            else if (response?.StatusCode != null)
+
+            string statusCode = response.StatusCode switch
             {
-                span.SetTag(Tags.HttpStatusCode, response.StatusCode.ToString(CultureInfo.InvariantCulture));
-                if (!string.IsNullOrWhiteSpace(response?.StatusDescription))
-                {
-                    span.SetTag(Tags.HttpStatusText, response.StatusDescription);
-                }
+                200 => "200",
+                400 => "400",
+                404 => "404",
+                500 => "500",
+                _ => response.StatusCode.ToString(CultureInfo.InvariantCulture)
+            };
+
+            span.SetTag(Tags.HttpStatusCode, statusCode);
+
+            if (!string.IsNullOrWhiteSpace(response.StatusDescription))
+            {
+                span.SetTag(Tags.HttpStatusText, response.StatusDescription);
             }
         }
 #endif

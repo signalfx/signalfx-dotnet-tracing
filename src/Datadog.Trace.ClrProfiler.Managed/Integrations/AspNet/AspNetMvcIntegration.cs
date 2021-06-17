@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Web;
 using System.Web.Routing;
 using System.Xml.Serialization;
@@ -25,7 +26,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
     {
         private const string IntegrationName = "AspNetMvc";
         private const string OperationName = "aspnet-mvc.request";
-        private const string HttpContextKey = "__Datadog.Trace.ClrProfiler.Integrations.AspNetMvcIntegration";
+        private const string HttpContextKey = "__SignalFx.Tracing.ClrProfiler.Integrations.AspNetMvcIntegration";
         private const string MinimumVersion = "4";
         private const string MaximumVersion = "5";
         private const string AssemblyName = "System.Web.Mvc";
@@ -74,7 +75,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 Route route = routeData?.Route as Route;
                 RouteValueDictionary routeValues = routeData?.Values;
                 bool wasAttributeRouted = false;
-                bool newResourceNamesEnabled = Tracer.Instance.Settings.RouteTemplateResourceNamesEnabled;
 
                 if (route == null && routeData?.Route.GetType().FullName == RouteCollectionRouteTypeName)
                 {
@@ -106,6 +106,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 string controllerName = (routeValues?.GetValueOrDefault("controller") as string)?.ToLowerInvariant();
                 string actionName = (routeValues?.GetValueOrDefault("action") as string)?.ToLowerInvariant();
 
+                bool newResourceNamesEnabled = Tracer.Instance.Settings.RouteTemplateResourceNamesEnabled;
                 if (newResourceNamesEnabled && string.IsNullOrEmpty(resourceName) && !string.IsNullOrEmpty(routeUrl))
                 {
                     resourceName = $"{httpMethod} /{routeUrl.ToLowerInvariant()}";
@@ -124,8 +125,8 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 }
 
                 // Replace well-known routing tokens
-                resourceName =
-                    resourceName
+                var resourceNameBuilder = new StringBuilder(resourceName);
+                resourceNameBuilder
                        .Replace("{area}", areaName)
                        .Replace("{controller}", controllerName)
                        .Replace("{action}", actionName);
@@ -142,7 +143,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                             && parameterName != "action"
                             && !routeValues.ContainsKey(parameterName))
                         {
-                            resourceName = resourceName.Replace($"/{{{parameterName}}}", string.Empty);
+                            resourceNameBuilder.Replace($"/{{{parameterName}}}", string.Empty);
                         }
                     }
                 }
@@ -172,6 +173,8 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 {
                     IPAddress.TryParse(httpContext.Request.UserHostAddress, out remoteIp);
                 }
+
+                resourceName = resourceNameBuilder.ToString();
 
                 span.DecorateWebServerSpan(
                     resourceName: resourceName,
@@ -374,9 +377,11 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     return res;
                 }
 
-                scope.Span.SetHttpStatusCode(httpContext?.Response);
+                var response = httpContext?.Response;
 
-                ServerTimingHeader.SetHeaders(scope.Span.Context, httpContext?.Response, (resp, name, value) => resp.Headers.Add(name, value));
+                scope.Span.SetHttpStatusCode(response);
+                ServerTimingHeader.SetHeaders(scope.Span.Context, response, (resp, name, value) => resp.Headers.Add(name, value));
+
                 return res;
             }
             catch (Exception ex)
