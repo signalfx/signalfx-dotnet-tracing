@@ -48,13 +48,13 @@ namespace SignalFx.Tracing.Propagation
 
         public SpanContext Extract<T>(T carrier, Func<T, string, IEnumerable<string>> getter)
         {
-            var traceParentCollection = getter(carrier, W3CHeaderNames.TraceParent).ToList();
-            if (traceParentCollection.Count != 1)
+            var enumerableHeaderValues = getter(carrier, W3CHeaderNames.TraceParent);
+            if (enumerableHeaderValues == Enumerable.Empty<string>())
             {
                 return null;
             }
 
-            var traceParentHeader = traceParentCollection.First();
+            var traceParentHeader = enumerableHeaderValues.First();
             var traceIdString = traceParentHeader.Substring(VersionPrefixIdLength, TraceIdLength);
             var traceId = TraceId.CreateFromString(traceIdString);
             if (traceId == TraceId.Zero)
