@@ -75,6 +75,7 @@ Use these environment variables to configure the tracing library:
 | `SIGNALFX_TRACE_DOMAIN_NEUTRAL_INSTRUMENTATION` | `false` |  Sets whether to intercept method calls when the caller method is inside a domain-neutral assembly. This is recommended when instrumenting IIS applications. |
 | `SIGNALFX_PROFILER_PROCESSES` |  | Sets the filename of executables the profiler can attach to. If not defined (default), the profiler will attach to any process. Supports multiple values separated with semi-colons, for example: `MyApp.exe;dotnet.exe` |
 | `SIGNALFX_PROFILER_EXCLUDE_PROCESSES` |  | Sets the filename of executables the profiler cannot attach to. If not defined (default), the profiler will attach to any process. Supports multiple values separated with semi-colons, for example: `MyApp.exe;dotnet.exe` |
+| `SIGNALFX_TRACE_RESPONSE_HEADER_ENABLED` | `true` | If set to true enables adding `Server-Timing` header to the server HTTP responses. |
 
 ## Ways to configure
 
