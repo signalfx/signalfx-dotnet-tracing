@@ -155,7 +155,7 @@ namespace SignalFx.Tracing.Agent
             {
                 get
                 {
-                    if (_span.Logs.Count == 0)
+                    if (!_span.HasLogs || _span.Logs.Count == 0)
                     {
                         return emptyAnnotations;
                     }

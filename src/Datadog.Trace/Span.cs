@@ -98,6 +98,8 @@ namespace SignalFx.Tracing
 
         internal ConcurrentDictionary<DateTimeOffset, Dictionary<string, string>> Logs => _lazyLogs.Value;
 
+        internal bool HasLogs => _lazyLogs.IsValueCreated;
+
         internal bool IsFinished { get; private set; }
 
         internal bool IsRootSpan => Context?.TraceContext?.RootSpan == this;
@@ -135,13 +137,16 @@ namespace SignalFx.Tracing
                 }
             }
 
-            sb.AppendLine("Logs:");
-            foreach (var e in Logs)
+            if (_lazyLogs.IsValueCreated)
             {
-                sb.Append($"\t{e.Key}:\n");
-                foreach (var kv in e.Value)
+                sb.AppendLine("Logs:");
+                foreach (var e in Logs)
                 {
-                    sb.Append($"\t\t{kv.Key}:{kv.Value}\n");
+                    sb.Append($"\t{e.Key}:\n");
+                    foreach (var kv in e.Value)
+                    {
+                        sb.Append($"\t\t{kv.Key}:{kv.Value}\n");
+                    }
                 }
             }
 
