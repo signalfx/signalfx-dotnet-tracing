@@ -12,7 +12,6 @@ namespace SignalFx.Tracing
     /// </summary>
     public readonly struct TraceId : IEquatable<TraceId>
     {
-        private static readonly Vendors.Serilog.ILogger Log = SignalFxLogging.For<TraceId>();
         private readonly string _string;
 
         private TraceId(ulong higher, ulong lower)
