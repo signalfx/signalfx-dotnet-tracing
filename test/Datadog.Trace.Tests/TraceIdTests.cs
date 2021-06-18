@@ -22,12 +22,38 @@ namespace Datadog.Trace.Tests
         }
 
         [Fact]
-        public void CreateFromString_CreatesIdCorrectly()
+        public void Parse_CreatesIdCorrectly()
         {
             var traceId = TraceId.CreateRandom();
-            var recreatedId = TraceId.CreateFromString(traceId.ToString());
+            var recreatedId = TraceId.Parse(traceId.ToString());
 
             recreatedId.Should().Be(traceId);
+        }
+
+        [Fact]
+        public void TryParse_CreatesIdCorrectly()
+        {
+            var traceId = TraceId.CreateRandom();
+            var result = TraceId.TryParse(traceId.ToString(), out var recreatedId);
+
+            using (new AssertionScope())
+            {
+                result.Should().BeTrue();
+                recreatedId.Should().Be(traceId);
+            }
+        }
+
+        [Fact]
+        public void TryParse_ForInvalidTraceId_ReturnsFalse()
+        {
+            var traceId = "321521";
+            var result = TraceId.TryParse(traceId, out var recreatedId);
+
+            using (new AssertionScope())
+            {
+                result.Should().BeFalse();
+                recreatedId.Should().Be(TraceId.Zero);
+            }
         }
 
         [Fact]
@@ -59,7 +85,7 @@ namespace Datadog.Trace.Tests
         {
             var traceId1 = TraceId.CreateRandom();
 
-            traceId1.Should().Be(TraceId.CreateFromString(traceId1.ToString()));
+            traceId1.Should().Be(TraceId.Parse(traceId1.ToString()));
         }
 
         [Fact]

@@ -18,7 +18,7 @@ namespace Datadog.Trace.TestHelpers
     {
         public static TraceId TraceId(this JToken obj)
         {
-            return SignalFx.Tracing.TraceId.CreateFromString(obj.FirstDictionary()["traceId"].ToString());
+            return SignalFx.Tracing.TraceId.TryParse(obj.FirstDictionary()["traceId"].ToString(), out var traceId) ? traceId : SignalFx.Tracing.TraceId.Zero;
         }
 
         public static ulong SpanId(this JToken obj)

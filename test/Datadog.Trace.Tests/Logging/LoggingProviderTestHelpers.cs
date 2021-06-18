@@ -68,7 +68,7 @@ namespace Datadog.Trace.Tests.Logging
         {
             // First, verify that the properties are attached to the LogEvent
             Assert.Contains(CorrelationIdentifier.TraceIdKey, logEvent.Properties.GetKeys());
-            Assert.Equal(traceId, TraceId.CreateFromString(logEvent.Properties[CorrelationIdentifier.TraceIdKey].ToString()));
+            Assert.Equal(traceId, TraceId.TryParse(logEvent.Properties[CorrelationIdentifier.TraceIdKey].ToString(), out var parsedTraceId) ? parsedTraceId : TraceId.Zero);
             Assert.Contains(CorrelationIdentifier.SpanIdKey, logEvent.Properties.GetKeys());
             Assert.Equal<ulong>(spanId, Convert.ToUInt64(logEvent.Properties[CorrelationIdentifier.SpanIdKey].ToString(), 16));
             Assert.Contains(CorrelationIdentifier.ServiceNameKey, logEvent.Properties.GetKeys());
@@ -95,7 +95,7 @@ namespace Datadog.Trace.Tests.Logging
             var spanId = scope.Span.SpanId;
             // First, verify that the properties are attached to the LogEvent
             Assert.True(logEvent.Properties.ContainsKey(CorrelationIdentifier.TraceIdKey));
-            Assert.Equal(traceId, TraceId.CreateFromString(SanitizedProperty(CorrelationIdentifier.TraceIdKey)));
+            Assert.Equal(traceId, TraceId.TryParse(SanitizedProperty(CorrelationIdentifier.TraceIdKey), out var parsedTraceId) ? parsedTraceId : TraceId.Zero);
             Assert.True(logEvent.Properties.ContainsKey(CorrelationIdentifier.SpanIdKey));
             Assert.Equal<ulong>(spanId, Convert.ToUInt64(SanitizedProperty(CorrelationIdentifier.SpanIdKey), fromBase: 16));
             Assert.True(logEvent.Properties.ContainsKey(CorrelationIdentifier.ServiceNameKey));

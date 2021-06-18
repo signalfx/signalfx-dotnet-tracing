@@ -1,6 +1,7 @@
 // Modified by SignalFx
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace SignalFx.Tracing.Propagation
@@ -23,8 +24,7 @@ namespace SignalFx.Tracing.Propagation
 
             for (var i = 0; i < headerValues.Length; ++i)
             {
-                var traceId = TraceId.CreateFromString(headerValues[i]);
-                if (traceId != TraceId.Zero)
+                if (TraceId.TryParse(headerValues[i], out var traceId))
                 {
                     return traceId;
                 }

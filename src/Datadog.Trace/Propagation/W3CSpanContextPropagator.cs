@@ -56,7 +56,12 @@ namespace SignalFx.Tracing.Propagation
 
             var traceParentHeader = enumerableHeaderValues.First();
             var traceIdString = traceParentHeader.Substring(VersionPrefixIdLength, TraceIdLength);
-            var traceId = TraceId.CreateFromString(traceIdString);
+            if (!TraceId.TryParse(traceIdString, out var traceId))
+            {
+                Log.Debug("Could not parse correct TraceId from header {HeaderName}: {HeaderValues}", W3CHeaderNames.TraceParent, traceParentHeader);
+                return null;
+            }
+
             if (traceId == TraceId.Zero)
             {
                 return null;
