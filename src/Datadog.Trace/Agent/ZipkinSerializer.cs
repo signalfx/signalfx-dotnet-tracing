@@ -1,5 +1,5 @@
 // Modified by SignalFx
-
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -14,196 +14,155 @@ namespace SignalFx.Tracing.Agent
 {
     internal class ZipkinSerializer
     {
-        private readonly JsonSerializer serializer = new JsonSerializer();
-
         // Don't serialize with BOM
-        private readonly Encoding utf8 = new UTF8Encoding(false);
+        private static readonly Encoding DefaultEncoding = new UTF8Encoding(false);
 
-        public static IDictionary<string, string> BuildTags(Span span, TracerSettings settings)
+        public void Serialize(Stream stream, Span[][] traces, TracerSettings settings)
         {
-            var tags = new Dictionary<string, string>(span.Tags.Count);
-            var recordedValueMaxLength = settings.RecordedValueMaxLength;
-            foreach (var entry in span.Tags)
+            // Don't close stream as IDisposable
+            using (var sw = new StreamWriter(stream, DefaultEncoding, 4096, true))
+            using (var writer = new JsonTextWriter(sw))
             {
-                if (!entry.Key.Equals(Tracing.Tags.SpanKind))
+                writer.WriteStartArray();
+                for (var i = 0; i < traces.Length; ++i)
                 {
-                    var truncatedValue = entry.Value.Truncate(recordedValueMaxLength);
-                    tags[entry.Key] = truncatedValue;
+                    var trace = traces[i];
+                    traces[i] = null;
+                    for (var j = 0; j < trace.Length; ++j)
+                    {
+                        var span = trace[j];
+                        trace[j] = null;
+                        WriteSpanAsJson(writer, span, settings);
+                    }
                 }
+
+                writer.WriteEndArray();
+            }
+        }
+
+        private void WriteSpanAsJson(JsonTextWriter writer, Span span, TracerSettings settings)
+        {
+            writer.WriteStartObject();
+
+            writer.WritePropertyName("id");
+            writer.WriteValue(span.SpanId.ToString("x16"));
+
+            writer.WritePropertyName("traceId");
+            writer.WriteValue(span.TraceId.ToString());
+
+            if (span.Context.ParentId != null)
+            {
+                writer.WritePropertyName("parentId");
+                writer.WriteValue(span.Context.ParentId.Value.ToString("x16"));
             }
 
-            // Perform any DB statement sanitization only after truncating the string to avoid replacing truncated
-            // part of the statement.
-            if (settings.SanitizeSqlStatements && tags.TryGetValue(Tracing.Tags.DbStatement, out var dbStatement))
+            writer.WritePropertyName("name");
+            writer.WriteValue(span.OperationName);
+
+            writer.WritePropertyName("timestamp");
+            writer.WriteValue(span.StartTime.ToUnixTimeMicroseconds());
+
+            writer.WritePropertyName("duration");
+            writer.WriteValue(span.Duration.ToMicroseconds());
+
+            var spanKind = span.GetTag(Tracing.Tags.SpanKind);
+            if (spanKind != null)
             {
-                var sanitizedDbStatement = dbStatement.SanitizeSqlStatement();
-                if (!ReferenceEquals(dbStatement, sanitizedDbStatement))
+                writer.WritePropertyName("kind");
+                writer.WriteValue(spanKind.ToUpper());
+            }
+
+            var actualServiceName = settings.ServiceNamePerSpanEnabled && !string.IsNullOrWhiteSpace(span.ServiceName)
+                ? span.ServiceName
+                : Tracer.Instance.DefaultServiceName;
+            writer.WritePropertyName("localEndpoint");
+            writer.WriteStartObject();
+            writer.WritePropertyName("serviceName");
+            writer.WriteValue(actualServiceName);
+            writer.WriteEndObject();
+
+            SerializeTags(writer, span, settings);
+
+            SerializeLogs(writer, span, settings);
+
+            writer.WriteEndObject();
+        }
+
+        private void SerializeTags(JsonTextWriter writer, Span span, TracerSettings settings)
+        {
+            writer.WritePropertyName("tags");
+            writer.WriteStartObject();
+
+            if (span.Tags?.Count > 0)
+            {
+                var recordedValueMaxLength = settings.RecordedValueMaxLength;
+                foreach (var entry in span.Tags)
                 {
-                    tags[Tracing.Tags.DbStatement] = sanitizedDbStatement;
+                    if (entry.Key.Equals(Tracing.Tags.SpanKind, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    var truncatedValue = entry.Value.Truncate(recordedValueMaxLength);
+                    if (settings.SanitizeSqlStatements && entry.Key.Equals(Tracing.Tags.DbStatement, StringComparison.OrdinalIgnoreCase))
+                    {
+                        truncatedValue = truncatedValue.SanitizeSqlStatement();
+                    }
+
+                    writer.WritePropertyName(entry.Key);
+                    writer.WriteValue(truncatedValue);
                 }
             }
 
             // Store Resource and Type when unique as tags so as not to lose
             if (!string.Equals(span.OperationName, span.ResourceName))
             {
-                tags[Tracing.Tags.ResourceName] = span.ResourceName;
+                writer.WritePropertyName(Tracing.Tags.ResourceName);
+                writer.WriteValue(span.ResourceName);
             }
 
             if (span.Type != null)
             {
-                tags[Tracing.Tags.SpanType] = span.Type;
+                writer.WritePropertyName(Tracing.Tags.SpanType);
+                writer.WriteValue(span.Type);
             }
 
             if (span.Error)
             {
-                tags[Tracing.Tags.Error] = "true";
+                writer.WritePropertyName(Tracing.Tags.Error);
+                writer.WriteValue("true");
             }
 
-            return tags;
+            writer.WriteEndObject();
         }
 
-        public void Serialize(Stream stream, Span[][] traces, TracerSettings settings)
+        private void SerializeLogs(JsonTextWriter writer, Span span, TracerSettings settings)
         {
-            var zipkinTraces = new List<ZipkinSpan>();
+            writer.WritePropertyName("annotations");
+            writer.WriteStartArray();
 
-            foreach (var trace in traces)
+            foreach (var log in span.Logs)
             {
-                foreach (var span in trace)
+                // Zipkin doesn't support an enumeration of objects for a single
+                // timestamp as suggested by OpenTracing. For Zipkin it is necessary
+                // to repeat the stamp multiple time.
+                foreach (var entry in log.Value)
                 {
-                    var zspan = new ZipkinSpan(span, settings);
-                    zipkinTraces.Add(zspan);
+                    writer.WriteStartObject();
+
+                    writer.WritePropertyName("timestamp");
+                    writer.WriteValue(log.Key.ToUnixTimeMicroseconds());
+
+                    // Zipkin doesn't have a way to represent the key, a mismatch to
+                    // OpenTracing representation.
+                    writer.WritePropertyName("value");
+                    writer.WriteValue(entry.Value.Truncate(settings.RecordedValueMaxLength));
+
+                    writer.WriteEndObject();
                 }
             }
 
-            // Don't close stream as IDisposable
-            using (var sw = new StreamWriter(stream, utf8, 4096, true))
-            {
-                serializer.Serialize(sw, zipkinTraces);
-            }
-        }
-
-        [JsonObject(NamingStrategyType = typeof(CamelCaseNamingStrategy))]
-        internal class ZipkinSpan
-        {
-            private static IDictionary<string, string> emptyTags = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>());
-            private static ReadOnlyCollection<ReadOnlyDictionary<string, object>> emptyAnnotations = (new List<ReadOnlyDictionary<string, object>>()).AsReadOnly();
-
-            private readonly Span _span;
-            private readonly TracerSettings _settings;
-            private readonly IDictionary<string, string> _tags;
-
-            public ZipkinSpan(Span span, TracerSettings settings)
-            {
-                _span = span;
-                _settings = settings;
-                _tags = span.Tags.Count > 0 ? BuildTags(span, settings) : emptyTags;
-            }
-
-            public string Id
-            {
-                get => _span.Context.SpanId.ToString("x16");
-            }
-
-            public string TraceId
-            {
-                get => _span.Context.TraceId.ToString();
-            }
-
-            public string ParentId
-            {
-                get => _span.Context.ParentId?.ToString("x16");
-            }
-
-            public string Name
-            {
-                get => _span.OperationName;
-            }
-
-            public long Timestamp
-            {
-                get => _span.StartTime.ToUnixTimeMicroseconds();
-            }
-
-            public long Duration
-            {
-                get => _span.Duration.ToMicroseconds();
-            }
-
-            public string Kind
-            {
-                get => _span.GetTag(Tracing.Tags.SpanKind)?.ToUpper();
-            }
-
-            public Dictionary<string, string> LocalEndpoint
-            {
-                get
-                {
-                    var actualServiceName = _settings.ServiceNamePerSpanEnabled && !string.IsNullOrWhiteSpace(_span.ServiceName)
-                        ? _span.ServiceName
-                        : Tracer.Instance.DefaultServiceName;
-
-                    return new Dictionary<string, string>() { { "serviceName", actualServiceName } };
-                }
-            }
-
-            public IDictionary<string, string> Tags
-            {
-                get => _tags;
-            }
-
-            public IEnumerable<IDictionary<string, object>> Annotations
-            {
-                get
-                {
-                    if (!_span.HasLogs || _span.Logs.Count == 0)
-                    {
-                        return emptyAnnotations;
-                    }
-
-                    var annotations = new List<IDictionary<string, object>>(_span.Logs.Count);
-                    foreach (var e in _span.Logs)
-                    {
-                        foreach (var kvp in e.Value.ToList())
-                        {
-                            var truncated = kvp.Value.Truncate(_settings.RecordedValueMaxLength);
-                            if (!ReferenceEquals(kvp.Value, truncated))
-                            {
-                                e.Value[kvp.Key] = truncated;
-                            }
-                        }
-
-                        var ts = e.Key.ToUnixTimeMicroseconds();
-                        var fields = JsonConvert.SerializeObject(e.Value);
-                        var item = new Dictionary<string, object>() { { "timestamp", ts }, { "value", fields } };
-                        annotations.Add(item);
-                    }
-
-                    return annotations;
-                }
-            }
-
-            // Methods below are used by Newtonsoft JSON serializer to decide if should serialize
-            // some properties when they are null.
-
-            public bool ShouldSerializeTags()
-            {
-                return _tags != null;
-            }
-
-            public bool ShouldSerializeAnnotations()
-            {
-                return _span.Logs != null;
-            }
-
-            public bool ShouldSerializeParentId()
-            {
-                return _span.Context.ParentId != null;
-            }
-
-            public bool ShouldSerializeKind()
-            {
-                return _span.Tags.ContainsKey(Tracing.Tags.SpanKind);
-            }
+            writer.WriteEndArray();
         }
     }
 }

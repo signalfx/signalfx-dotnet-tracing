@@ -14,6 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using SignalFx.Tracing;
 using SignalFx.Tracing.ExtensionMethods;
 
@@ -290,13 +291,19 @@ namespace Datadog.Trace.TestHelpers
             {
                 get
                 {
-                    var annotations = _zipkinData["annotations"].ToObject<List<Dictionary<string, object>>>();
+                    var annotations = _zipkinData["annotations"].ToObject<List<ZipkinAnnotation>>();
                     var logs = new Dictionary<DateTimeOffset, Dictionary<string, string>>();
                     foreach (var item in annotations)
                     {
-                        DateTimeOffset timestamp = TimeHelpers.UnixMicrosecondsToDateTimeOffset((long)item["timestamp"]);
-                        Dictionary<string, string> fields = JsonConvert.DeserializeObject<Dictionary<string, string>>(item["value"].ToString());
-                        logs[timestamp] = fields;
+                        DateTimeOffset timestamp = TimeHelpers.UnixMicrosecondsToDateTimeOffset(item.Timestamp);
+                        if (!logs.TryGetValue(timestamp, out var events))
+                        {
+                            events = new Dictionary<string, string>();
+                            logs[timestamp] = events;
+                        }
+
+                        // It is not possible to store the correct key on Zipkin, create a placeholder.
+                        events.Add($"event#{events.Count:x2}", item.Value);
                     }
 
                     return logs;
@@ -355,6 +362,14 @@ namespace Datadog.Trace.TestHelpers
                 {
                     Tags["span.kind"] = spanKind.ToLowerInvariant();
                 }
+            }
+
+            [JsonObject(NamingStrategyType = typeof(CamelCaseNamingStrategy))]
+            private class ZipkinAnnotation
+            {
+                public long Timestamp { get; set; }
+
+                public string Value { get; set; }
             }
         }
     }

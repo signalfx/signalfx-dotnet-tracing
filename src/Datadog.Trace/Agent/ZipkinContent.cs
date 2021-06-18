@@ -13,7 +13,9 @@ namespace SignalFx.Tracing.Agent
 {
     internal class ZipkinContent : HttpContent
     {
-        private readonly ZipkinSerializer _serializer = new ZipkinSerializer();
+        private static readonly ZipkinSerializer _serializer = new ZipkinSerializer();
+        private static readonly Task _completedTask = Task.FromResult(0);
+
         private readonly Span[][] _spans;
         private readonly TracerSettings _settings;
 
@@ -30,10 +32,8 @@ namespace SignalFx.Tracing.Agent
 
         protected override Task SerializeToStreamAsync(Stream stream, TransportContext context)
         {
-            return Task.Factory.StartNew(() =>
-                {
-                    _serializer.Serialize(stream, _spans, _settings);
-                });
+            _serializer.Serialize(stream, _spans, _settings);
+            return _completedTask;
         }
 
         protected override bool TryComputeLength(out long length)

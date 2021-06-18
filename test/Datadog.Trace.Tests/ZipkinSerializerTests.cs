@@ -1,5 +1,9 @@
 // Modified by SignalFx
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Datadog.Trace.TestHelpers;
+using Newtonsoft.Json;
 using SignalFx.Tracing;
 using SignalFx.Tracing.Agent;
 using SignalFx.Tracing.Configuration;
@@ -24,7 +28,9 @@ namespace Datadog.Trace.Tests
             {
                 RecordedValueMaxLength = expected.Length,
             };
-            var zipkinSpan = new ZipkinSerializer.ZipkinSpan(span, settings);
+
+            var zspans = SerializeDeserializeSpan(span, settings);
+            var zipkinSpan = zspans[0];
             var tags = zipkinSpan.Tags;
             Assert.Single(tags);
             Assert.Equal(expected, tags.First().Value);
@@ -49,7 +55,9 @@ namespace Datadog.Trace.Tests
                 SanitizeSqlStatements = sanitizeSqlStatements,
                 RecordedValueMaxLength = expected.Length,
             };
-            var zipkinSpan = new ZipkinSerializer.ZipkinSpan(span, settings);
+
+            var zspans = SerializeDeserializeSpan(span, settings);
+            var zipkinSpan = zspans[0];
             var tags = zipkinSpan.Tags;
             Assert.Single(tags);
             Assert.Equal(expected, tags.First().Value);
@@ -70,10 +78,32 @@ namespace Datadog.Trace.Tests
             {
                 RecordedValueMaxLength = expected.Length,
             };
-            var zipkinSpan = new ZipkinSerializer.ZipkinSpan(span, settings);
-            var annotations = zipkinSpan.Annotations;
+
+            var zspans = SerializeDeserializeSpan(span, settings);
+            var zipkinSpan = zspans[0];
+            var annotations = zipkinSpan.Logs;
             Assert.Single(annotations);
-            Assert.Equal($"{{\"event\":\"{expected}\"}}", annotations.First()["value"]);
+            Assert.Equal(expected, annotations.First().Value["event#00"]);
+        }
+
+        private List<MockZipkinCollector.Span> SerializeDeserializeSpan(Span span, TracerSettings settings)
+        {
+            var serializer = new ZipkinSerializer();
+            using Stream stream = new MemoryStream();
+            serializer.Serialize(stream, new Span[][] { new Span[] { span } }, settings);
+
+            var jsonSettings = new JsonSerializerSettings
+            {
+                Error = (o, args) =>
+                {
+                    args.ErrorContext.Handled = false;
+                },
+            };
+            using var reader = new StreamReader(stream);
+            reader.BaseStream.Position = 0;
+            var zspans = JsonConvert.DeserializeObject<List<MockZipkinCollector.Span>>(reader.ReadToEnd(), jsonSettings);
+
+            return zspans;
         }
     }
 }
