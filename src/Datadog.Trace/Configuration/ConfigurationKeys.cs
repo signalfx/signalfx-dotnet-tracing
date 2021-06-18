@@ -391,7 +391,7 @@ namespace SignalFx.Tracing.Configuration
             /// additional features on `aspnet_core.request` spans.
             /// </summary>
             /// <seealso cref="TracerSettings.RouteTemplateResourceNamesEnabled"/>
-            public const string RouteTemplateResourceNamesEnabled = "SIGNALFX_TRACE_ROUTE_TEMPLATE_RESOURCE_NAMES_ENABLED";
+            public const string RouteTemplateResourceNamesEnabled = "SIGNALFX_ASPNET_TEMPLATE_NAMES_ENABLED";
         }
     }
 }

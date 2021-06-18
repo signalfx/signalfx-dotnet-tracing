@@ -112,27 +112,14 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     resourceName = $"{httpMethod} /{routeUrl.ToLowerInvariant()}";
                 }
 
-                if (string.IsNullOrEmpty(resourceName) && httpContext.Request.Url != null)
-                {
-                    var cleanUri = UriHelpers.GetCleanUriPath(httpContext.Request.Url);
-                    resourceName = $"{httpMethod} {cleanUri.ToLowerInvariant()}";
-                }
-
-                if (string.IsNullOrEmpty(resourceName))
-                {
-                    // Keep the legacy resource name, just to have something
-                    resourceName = $"{httpMethod} {controllerName}.{actionName}";
-                }
-
-                // Replace well-known routing tokens
-                var resourceNameBuilder = new StringBuilder(resourceName);
-                resourceNameBuilder
-                       .Replace("{area}", areaName)
-                       .Replace("{controller}", controllerName)
-                       .Replace("{action}", actionName);
-
                 if (newResourceNamesEnabled && !wasAttributeRouted && routeValues is not null && route is not null)
                 {
+                    // Replace well-known routing tokens
+                    var resourceNameBuilder = new StringBuilder(resourceName)
+                           .Replace("{area}", areaName)
+                           .Replace("{controller}", controllerName)
+                           .Replace("{action}", actionName);
+
                     // Remove unused parameters from conventional route templates
                     // Don't bother with routes defined using attribute routing
                     foreach (var parameter in route.Defaults)
@@ -146,6 +133,20 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                             resourceNameBuilder.Replace($"/{{{parameterName}}}", string.Empty);
                         }
                     }
+
+                    resourceName = resourceNameBuilder.ToString();
+                }
+
+                if (string.IsNullOrEmpty(resourceName) && httpContext.Request.Url != null)
+                {
+                    var cleanUri = UriHelpers.GetCleanUriPath(httpContext.Request.Url);
+                    resourceName = $"{httpMethod} {cleanUri.ToLowerInvariant()}";
+                }
+
+                if (string.IsNullOrEmpty(resourceName))
+                {
+                    // Keep the legacy resource name, just to have something
+                    resourceName = $"{httpMethod} {controllerName}.{actionName}";
                 }
 
                 SpanContext propagatedContext = null;
@@ -173,8 +174,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 {
                     IPAddress.TryParse(httpContext.Request.UserHostAddress, out remoteIp);
                 }
-
-                resourceName = resourceNameBuilder.ToString();
 
                 span.DecorateWebServerSpan(
                     resourceName: resourceName,

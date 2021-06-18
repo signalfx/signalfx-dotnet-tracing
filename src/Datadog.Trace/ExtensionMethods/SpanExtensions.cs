@@ -72,10 +72,7 @@ namespace SignalFx.Tracing.ExtensionMethods
         {
             span.Type = SpanTypes.Web;
             span.ResourceName = resourceName?.Trim();
-            if (Tracer.Instance.Settings.UseWebServerResourceAsOperationName && !string.IsNullOrEmpty(span.ResourceName))
-            {
-                span.OperationName = span.ResourceName;
-            }
+            span.OverrideOperationNameWhenEnabled();
 
             span.SetTag(Tags.SpanKind, SpanKinds.Server);
             span.SetTag(Tags.HttpMethod, method);
@@ -90,6 +87,14 @@ namespace SignalFx.Tracing.ExtensionMethods
                 case AddressFamily.InterNetworkV6:
                     span.SetTag(Tags.PeerIpV6, remoteIp.ToString());
                     break;
+            }
+        }
+
+        internal static void OverrideOperationNameWhenEnabled(this Span span)
+        {
+            if (Tracer.Instance.Settings.UseWebServerResourceAsOperationName && !string.IsNullOrEmpty(span.ResourceName))
+            {
+                span.OperationName = span.ResourceName;
             }
         }
 

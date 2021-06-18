@@ -217,26 +217,10 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 {
                 }
 
-                string resourceName;
-                bool newResourceNamesEnabled = Tracer.Instance.Settings.RouteTemplateResourceNamesEnabled;
-
-                if (route != null)
-                {
-                    resourceName = $"{method} {(newResourceNamesEnabled ? "/" : string.Empty)}{route.ToLowerInvariant()}";
-                }
-                else if (requestUri != null)
-                {
-                    var cleanUri = UriHelpers.GetCleanUriPath(requestUri);
-                    resourceName = $"{method} {cleanUri.ToLowerInvariant()}";
-                }
-                else
-                {
-                    resourceName = $"{method}";
-                }
-
                 string controller = string.Empty;
                 string action = string.Empty;
                 string area = string.Empty;
+
                 try
                 {
                     var routeValues = controllerContext.RouteData.Values;
@@ -251,12 +235,27 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 {
                 }
 
-                // Replace well-known routing tokens
-                var resourceNameBuilder = new StringBuilder(resourceName);
-                resourceNameBuilder
+                string resourceName;
+                bool newResourceNamesEnabled = Tracer.Instance.Settings.RouteTemplateResourceNamesEnabled;
+
+                if (route != null)
+                {
+                    // Replace well-known routing tokens
+                    resourceName = new StringBuilder($"{method} {(newResourceNamesEnabled ? "/" : string.Empty)}{route.ToLowerInvariant()}")
                        .Replace("{area}", area)
                        .Replace("{controller}", controller)
-                       .Replace("{action}", action);
+                       .Replace("{action}", action)
+                       .ToString();
+                }
+                else if (requestUri != null)
+                {
+                    var cleanUri = UriHelpers.GetCleanUriPath(requestUri);
+                    resourceName = $"{method} {cleanUri.ToLowerInvariant()}";
+                }
+                else
+                {
+                    resourceName = $"{method}";
+                }
 
                 IPAddress remoteIp = null;
                 if (request != null && Tracer.Instance.Settings.AddClientIpToServerSpans)
@@ -275,8 +274,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                         }
                     }
                 }
-
-                resourceName = resourceNameBuilder.ToString();
 
                 span.DecorateWebServerSpan(
                     resourceName: resourceName,
