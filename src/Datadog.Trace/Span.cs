@@ -92,7 +92,7 @@ namespace SignalFx.Tracing
 
         internal TimeSpan Duration { get; private set; }
 
-        internal IDictionary<string, string> Tags { get; } = new Dictionary<string, string>(16);
+        internal Dictionary<string, string> Tags { get; } = new Dictionary<string, string>(16);
 
         internal Dictionary<string, double> Metrics { get; private set; }
 
