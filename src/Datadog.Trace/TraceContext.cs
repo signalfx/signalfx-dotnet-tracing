@@ -10,6 +10,7 @@ namespace SignalFx.Tracing
     internal class TraceContext : ITraceContext
     {
         private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.For<TraceContext>();
+        private static readonly Tracing.SamplingPriority? DefaultSamplingPriority = new Tracing.SamplingPriority?(Tracing.SamplingPriority.AutoKeep);
 
         private readonly DateTimeOffset _utcStart = DateTimeOffset.UtcNow;
         private readonly Stopwatch _stopwatch = Stopwatch.StartNew();
@@ -70,8 +71,9 @@ namespace SignalFx.Tracing
                         {
                             // this is a local root span (i.e. not propagated).
                             // determine an initial sampling priority for this trace, but don't lock it yet
-                            _samplingPriority =
-                                Tracer.Sampler?.GetSamplingPriority(RootSpan);
+                            _samplingPriority = Tracer.Sampler == null
+                                ? DefaultSamplingPriority
+                                : Tracer.Sampler.GetSamplingPriority(RootSpan);
                         }
                     }
                 }
@@ -87,15 +89,6 @@ namespace SignalFx.Tracing
             {
                 // lock sampling priority and set metric when root span finishes
                 LockSamplingPriority();
-
-                if (_samplingPriority == null)
-                {
-                    Log.Warning("Cannot set span metric for sampling priority before it has been set.");
-                }
-                else
-                {
-                    span.SetMetric(Metrics.SamplingPriority, (int)_samplingPriority);
-                }
             }
 
             Span[] spansToWrite = null;

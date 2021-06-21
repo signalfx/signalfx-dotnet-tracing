@@ -102,12 +102,14 @@ namespace SignalFx.Tracing
 
             _agentWriter = agentWriter ?? new AgentWriter(apiClient, Statsd, Settings.SynchronousSend);
             _scopeManager = scopeManager ?? new AsyncLocalScopeManager();
-            Sampler = sampler ?? new RuleBasedSampler(new RateLimiter(Settings.MaxTracesSubmittedPerSecond));
+            Sampler = sampler;
 
             Propagator = ContextPropagatorBuilder.BuildPropagator(Settings.Propagator);
 
             if (!string.IsNullOrWhiteSpace(Settings.CustomSamplingRules))
             {
+                Sampler ??= new RuleBasedSampler(new RateLimiter(Settings.MaxTracesSubmittedPerSecond));
+
                 // User has opted in, ensure rate limiter is used
                 RuleBasedSampler.OptInTracingWithoutLimits();
 
@@ -127,6 +129,7 @@ namespace SignalFx.Tracing
                 }
                 else
                 {
+                    Sampler ??= new RuleBasedSampler(new RateLimiter(Settings.MaxTracesSubmittedPerSecond));
                     Sampler.RegisterRule(new GlobalSamplingRule(globalRate));
                 }
             }
@@ -144,7 +147,7 @@ namespace SignalFx.Tracing
             // LibLog logging context when a scope is activated/closed
             if (Settings.LogsInjectionEnabled)
             {
-                InitializeLibLogScopeEventSubscriber(_scopeManager);
+                InitializeLibLogScopeEventSubscriber(_scopeManager, Settings);
             }
         }
 
@@ -502,7 +505,7 @@ namespace SignalFx.Tracing
         {
             try
             {
-                Assembly asm = Assembly.Load(new AssemblyName("SignalFx.Tracing.OpenTracing, Version=0.1.9.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb"));
+                Assembly asm = Assembly.Load(new AssemblyName("SignalFx.Tracing.OpenTracing, Version=0.1.11.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb"));
                 Type openTracingTracerFactory = asm.GetType("SignalFx.Tracing.OpenTracing.OpenTracingTracerFactory");
                 var methodInfo = openTracingTracerFactory.GetMethod("RegisterGlobalTracer");
                 object[] args = new object[] { instance };
@@ -514,9 +517,9 @@ namespace SignalFx.Tracing
             }
         }
 
-        private void InitializeLibLogScopeEventSubscriber(IScopeManager scopeManager)
+        private void InitializeLibLogScopeEventSubscriber(IScopeManager scopeManager, TracerSettings settings)
         {
-            new LibLogScopeEventSubscriber(scopeManager);
+            new LibLogScopeEventSubscriber(scopeManager, settings);
         }
 
         private void CurrentDomain_ProcessExit(object sender, EventArgs e)

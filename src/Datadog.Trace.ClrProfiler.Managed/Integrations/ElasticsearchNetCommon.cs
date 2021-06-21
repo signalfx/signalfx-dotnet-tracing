@@ -61,10 +61,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 span.SetTag(Tags.SpanKind, SpanKinds.Client);
                 span.SetTag(ElasticsearchMethodKey, method);
                 span.SetTag(ElasticsearchUrlKey, url);
-
-                // set analytics sample rate if enabled
-                var analyticsSampleRate = tracer.Settings.GetIntegrationAnalyticsSampleRate(integrationName, enabledWithGlobalSetting: false);
-                span.SetMetric(Tags.Analytics, analyticsSampleRate);
             }
             catch (Exception ex)
             {

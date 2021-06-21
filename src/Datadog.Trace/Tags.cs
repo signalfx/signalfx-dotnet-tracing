@@ -20,11 +20,6 @@ namespace SignalFx.Tracing
         public const string InstrumentationName = "component";
 
         /// <summary>
-        /// The name of the method that was instrumented to generate the span.
-        /// </summary>
-        public const string InstrumentedMethod = "instrumented.method";
-
-        /// <summary>
         /// The kind of span (e.g. client, server). Not to be confused with <see cref="Span.Type"/>.
         /// </summary>
         /// <seealso cref="SpanKinds"/>
@@ -106,16 +101,6 @@ namespace SignalFx.Tracing
         public const string DbStatement = "db.statement";
 
         /// <summary>
-        /// The query text
-        /// </summary>
-        public const string SqlQuery = "sql.query";
-
-        /// <summary>
-        /// The number of rows returned by a query
-        /// </summary>
-        public const string SqlRows = "sql.rows";
-
-        /// <summary>
         /// The ASP.NET routing template.
         /// </summary>
         public const string AspNetRoute = "aspnet.route";
@@ -149,11 +134,6 @@ namespace SignalFx.Tracing
         /// The port of a outgoing server connection.
         /// </summary>
         public const string OutPort = "peer.port";
-
-        /// <summary>
-        /// The raw command sent to Redis.
-        /// </summary>
-        public const string RedisRawCommand = "redis.raw_command";
 
         /// <summary>
         /// A MongoDB query.
@@ -206,11 +186,6 @@ namespace SignalFx.Tracing
         /// A user-friendly tag that sets the sampling priority to <see cref="SamplingPriority.UserReject"/>.
         /// </summary>
         public const string ManualDrop = "manual.drop";
-
-        /// <summary>
-        /// Configures Trace Analytics.
-        /// </summary>
-        public const string Analytics = "_dd1.sr.eausr";
 
         /// <summary>
         /// Language tag, applied to all spans with other globals.

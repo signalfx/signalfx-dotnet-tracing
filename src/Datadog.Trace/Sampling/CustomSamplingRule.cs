@@ -85,7 +85,6 @@ namespace SignalFx.Tracing.Sampling
 
         public float GetSamplingRate(Span span)
         {
-            span.SetMetric(Metrics.SamplingRuleDecision, _samplingRate);
             return _samplingRate;
         }
 

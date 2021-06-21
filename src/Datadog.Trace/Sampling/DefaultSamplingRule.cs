@@ -34,7 +34,6 @@ namespace SignalFx.Tracing.Sampling
 
             if (_sampleRates.TryGetValue(key, out var sampleRate))
             {
-                span.SetMetric(Metrics.SamplingAgentDecision, sampleRate);
                 return sampleRate;
             }
 

@@ -187,10 +187,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
                 scope = tracer.StartActive(OperationName, propagatedContext);
                 UpdateSpan(controllerContext, scope.Span);
-
-                // set analytics sample rate if enabled
-                var analyticsSampleRate = tracer.Settings.GetIntegrationAnalyticsSampleRate(IntegrationName, enabledWithGlobalSetting: true);
-                scope.Span.SetMetric(Tags.Analytics, analyticsSampleRate);
             }
             catch (Exception ex)
             {
