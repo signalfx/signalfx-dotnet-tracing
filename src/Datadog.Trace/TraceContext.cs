@@ -11,6 +11,7 @@ namespace SignalFx.Tracing
     {
         private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.For<TraceContext>();
         private static readonly Tracing.SamplingPriority? DefaultSamplingPriority = new Tracing.SamplingPriority?(Tracing.SamplingPriority.AutoKeep);
+        private static readonly double TickFrequency = (double)TimeSpan.TicksPerSecond / Stopwatch.Frequency;
 
         private readonly DateTimeOffset _utcStart = DateTimeOffset.UtcNow;
         private readonly long _startTimestamp = Stopwatch.GetTimestamp();
@@ -27,7 +28,7 @@ namespace SignalFx.Tracing
 
         public Span RootSpan { get; private set; }
 
-        public DateTimeOffset UtcNow => _utcStart.AddTicks(Stopwatch.GetTimestamp() - _startTimestamp);
+        public DateTimeOffset UtcNow => _utcStart.AddTicks((long)((Stopwatch.GetTimestamp() - _startTimestamp) * TickFrequency));
 
         public ISignalFxTracer Tracer { get; }
 
