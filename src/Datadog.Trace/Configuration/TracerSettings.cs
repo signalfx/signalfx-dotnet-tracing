@@ -174,7 +174,7 @@ namespace SignalFx.Tracing.Configuration
 
             TraceResponseHeaderEnabled = source?.GetBool(ConfigurationKeys.TraceResponseHeaderEnabled) ?? true;
 
-            RouteTemplateResourceNamesEnabled = source?.GetBool(ConfigurationKeys.FeatureFlags.RouteTemplateResourceNamesEnabled) ?? false;
+            RouteTemplateResourceNamesEnabled = source?.GetBool(ConfigurationKeys.FeatureFlags.RouteTemplateResourceNamesEnabled) ?? true;
         }
 
         /// <summary>
