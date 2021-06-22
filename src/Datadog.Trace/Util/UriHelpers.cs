@@ -1,16 +1,21 @@
 // Modified by SignalFx
 using System;
-using System.Linq;
 
 namespace SignalFx.Tracing.Util
 {
     internal static class UriHelpers
     {
-        public const string UrlIdPlaceholder = "?";
-
+        /// <summary>
+        /// Remove the querystring, user information, and fragment from a URL.
+        /// Optionally reduce cardinality by replacing segments that look like IDs with <c>?</c>.
+        /// </summary>
+        /// <param name="uri">The URI to clean</param>
+        /// <param name="removeScheme">Should the scheme be removed?</param>
+        /// <param name="tryRemoveIds">Should IDs be replaced with <c>?</c></param>
+        /// <returns>Cleaned uri</returns>
         public static string CleanUri(Uri uri, bool removeScheme, bool tryRemoveIds)
         {
-            var path = GetRelativeUrl(uri, tryRemoveIds);
+            var path = tryRemoveIds ? GetCleanUriPath(uri.AbsolutePath) : uri.AbsolutePath;
 
             if (removeScheme)
             {
@@ -24,40 +29,98 @@ namespace SignalFx.Tracing.Util
             return $"{uri.Scheme}{Uri.SchemeDelimiter}{uri.Authority}{path}";
         }
 
-        public static string GetRelativeUrl(Uri uri, bool tryRemoveIds)
+        public static string GetCleanUriPath(Uri uri)
         {
-            // try to remove segments that look like ids
-            string path = tryRemoveIds
-                              ? string.Concat(uri.Segments.Select(CleanUriSegment))
-                              : uri.AbsolutePath;
-            return path;
+            return GetCleanUriPath(uri.AbsolutePath);
         }
 
-        public static string CleanUriSegment(string segment)
+        public static string GetCleanUriPath(string absolutePath)
         {
-            if (string.IsNullOrWhiteSpace(segment))
+            if (string.IsNullOrWhiteSpace(absolutePath) || (absolutePath.Length == 1 && absolutePath[0] == '/'))
             {
-                return string.Empty;
+                return absolutePath;
             }
 
-            bool hasTrailingSlash = segment.EndsWith("/", StringComparison.Ordinal);
+            // Sanitized url will be at worse as long as the original
+            var sb = StringBuilderCache.Acquire(absolutePath.Length);
 
-            // remove trailing slash
-            if (hasTrailingSlash)
+            int previousIndex = 0;
+            int index;
+            int segmentLength;
+
+            do
             {
-                segment = segment.Substring(0, segment.Length - 1);
+                index = absolutePath.IndexOf('/', previousIndex);
+
+                if (index == -1)
+                {
+                    // Last segment
+                    segmentLength = absolutePath.Length - previousIndex;
+                }
+                else
+                {
+                    segmentLength = index - previousIndex;
+                }
+
+                if (IsIdentifierSegment(absolutePath, previousIndex, segmentLength))
+                {
+                    sb.Append('?');
+                }
+                else
+                {
+                    sb.Append(absolutePath, previousIndex, segmentLength);
+                }
+
+                if (index != -1)
+                {
+                    sb.Append('/');
+                }
+
+                previousIndex = index + 1;
+            }
+            while (index != -1);
+
+            return StringBuilderCache.GetStringAndRelease(sb);
+        }
+
+        private static bool IsIdentifierSegment(string absolutePath, int startIndex, int segmentLength)
+        {
+            if (segmentLength == 0)
+            {
+                return false;
             }
 
-            // remove path segments that look like int or guid (with or without dashes)
-            segment = long.TryParse(segment, out _) ||
-                      Guid.TryParseExact(segment, "N", out _) ||
-                      Guid.TryParseExact(segment, "D", out _)
-                          ? UrlIdPlaceholder
-                          : segment;
+            int lastIndex = startIndex + segmentLength;
+            var containsNumber = false;
 
-            return hasTrailingSlash
-                       ? segment + "/"
-                       : segment;
+            for (int index = startIndex; index < lastIndex && index < absolutePath.Length; index++)
+            {
+                char c = absolutePath[index];
+
+                switch (c)
+                {
+                    case >= '0' and <= '9':
+                        containsNumber = true;
+                        continue;
+                    case >= 'a' and <= 'f':
+                    case >= 'A' and <= 'F':
+                        if (segmentLength < 16)
+                        {
+                            // don't be too aggressive replacing
+                            // short hex segments like "/a" or "/cab",
+                            // they are likely not ids
+                            return false;
+                        }
+
+                        continue;
+                    case '-':
+                        continue;
+                    default:
+                        return false;
+                }
+            }
+
+            return containsNumber;
         }
     }
 }

@@ -277,7 +277,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
             url = $"{pathBase}{path}{queryString}";
 
-            string resourceUrl = UriHelpers.GetRelativeUrl(new Uri($"{scheme}://{host}{url}"), tryRemoveIds: true).ToLowerInvariant();
+            string resourceUrl = UriHelpers.GetCleanUriPath(new Uri($"{scheme}://{host}{url}")).ToLowerInvariant();
 
             resourceName = $"{httpMethod} {resourceUrl}";
         }

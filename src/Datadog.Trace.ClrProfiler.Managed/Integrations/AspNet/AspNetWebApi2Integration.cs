@@ -6,9 +6,11 @@ using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using System.ServiceModel.Channels;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using Datadog.Trace.AspNet;
 using Datadog.Trace.ClrProfiler.Emit;
 using SignalFx.Tracing;
 using SignalFx.Tracing.ExtensionMethods;
@@ -200,64 +202,72 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         {
             try
             {
-                var req = controllerContext?.Request as HttpRequestMessage;
+                var request = controllerContext.Request;
+                Uri requestUri = request.RequestUri;
 
-                string host = req?.Headers?.Host ?? string.Empty;
-                string rawUrl = req?.RequestUri?.ToString().ToLowerInvariant() ?? string.Empty;
-                string absoluteUri = req?.RequestUri?.AbsoluteUri?.ToLowerInvariant() ?? string.Empty;
-                string method = controllerContext?.Request?.Method?.Method?.ToUpperInvariant() ?? "GET";
+                string host = request.Headers.Host ?? string.Empty;
+                string rawUrl = requestUri?.ToString().ToLowerInvariant() ?? string.Empty;
+                string method = request.Method.Method?.ToUpperInvariant() ?? "GET";
                 string route = null;
                 try
                 {
-                    route = controllerContext?.RouteData?.Route?.RouteTemplate;
+                    route = controllerContext.RouteData.Route.RouteTemplate;
                 }
                 catch
                 {
                 }
 
-                string resourceName = $"{method} {absoluteUri.ToLowerInvariant()}";
-
-                if (route != null)
-                {
-                    resourceName = $"{method} {route.ToLowerInvariant()}";
-                }
-                else if (req?.RequestUri != null)
-                {
-                    var cleanUri = UriHelpers.GetRelativeUrl(req?.RequestUri, tryRemoveIds: true);
-                    resourceName = $"{method} {cleanUri.ToLowerInvariant()}";
-                }
-
                 string controller = string.Empty;
                 string action = string.Empty;
+                string area = string.Empty;
+
                 try
                 {
-                    if (controllerContext?.RouteData?.Values is IDictionary<string, object> routeValues)
+                    var routeValues = controllerContext.RouteData.Values;
+                    if (routeValues != null)
                     {
                         controller = (routeValues.GetValueOrDefault("controller") as string)?.ToLowerInvariant();
                         action = (routeValues.GetValueOrDefault("action") as string)?.ToLowerInvariant();
+                        area = (routeValues.GetValueOrDefault("area") as string)?.ToLowerInvariant();
                     }
                 }
                 catch
                 {
                 }
 
-                // Fail safe to catch templates in routing values
-                resourceName =
-                    resourceName
+                string resourceName;
+                bool newResourceNamesEnabled = Tracer.Instance.Settings.RouteTemplateResourceNamesEnabled;
+
+                if (route != null)
+                {
+                    // Replace well-known routing tokens
+                    resourceName = new StringBuilder($"{method} {(newResourceNamesEnabled ? "/" : string.Empty)}{route.ToLowerInvariant()}")
+                       .Replace("{area}", area)
                        .Replace("{controller}", controller)
-                       .Replace("{action}", action);
+                       .Replace("{action}", action)
+                       .ToString();
+                }
+                else if (requestUri != null)
+                {
+                    var cleanUri = UriHelpers.GetCleanUriPath(requestUri);
+                    resourceName = $"{method} {cleanUri.ToLowerInvariant()}";
+                }
+                else
+                {
+                    resourceName = $"{method}";
+                }
 
                 IPAddress remoteIp = null;
-                if (req != null && Tracer.Instance.Settings.AddClientIpToServerSpans)
+                if (request != null && Tracer.Instance.Settings.AddClientIpToServerSpans)
                 {
-                    var httpContextWrapper = req.Properties.GetValueOrDefault("MS_HttpContext") as HttpContextWrapper;
+                    var httpContextWrapper = request.Properties.GetValueOrDefault("MS_HttpContext") as HttpContextWrapper;
                     if (httpContextWrapper != null)
                     {
                         IPAddress.TryParse(httpContextWrapper.Request.UserHostAddress, out remoteIp);
                     }
                     else
                     {
-                        var remoteEndpoint = req.Properties.GetValueOrDefault(RemoteEndpointMessageProperty.Name) as RemoteEndpointMessageProperty;
+                        var remoteEndpoint = request.Properties.GetValueOrDefault(RemoteEndpointMessageProperty.Name) as RemoteEndpointMessageProperty;
                         if (remoteEndpoint != null)
                         {
                             IPAddress.TryParse(remoteEndpoint.Address, out remoteIp);
@@ -271,9 +281,21 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     host: host,
                     httpUrl: rawUrl,
                     remoteIp: remoteIp);
+
                 span.SetTag(Tags.AspNetAction, action);
                 span.SetTag(Tags.AspNetController, controller);
+                span.SetTag(Tags.AspNetArea, area);
                 span.SetTag(Tags.AspNetRoute, route);
+
+                if (newResourceNamesEnabled)
+                {
+                    // set the resource name in the HttpContext so TracingHttpModule can update root span
+                    var httpContext = HttpContext.Current;
+                    if (httpContext is not null)
+                    {
+                        httpContext.Items[SharedConstants.HttpContextPropagatedResourceNameKey] = resourceName;
+                    }
+                }
             }
             catch (Exception ex)
             {

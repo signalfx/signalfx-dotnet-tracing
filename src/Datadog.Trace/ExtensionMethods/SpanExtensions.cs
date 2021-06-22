@@ -2,8 +2,10 @@
 using System;
 using System.Data;
 using System.Data.Common;
+using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
+using System.Web;
 
 namespace SignalFx.Tracing.ExtensionMethods
 {
@@ -70,10 +72,7 @@ namespace SignalFx.Tracing.ExtensionMethods
         {
             span.Type = SpanTypes.Web;
             span.ResourceName = resourceName?.Trim();
-            if (Tracer.Instance.Settings.UseWebServerResourceAsOperationName && !string.IsNullOrEmpty(span.ResourceName))
-            {
-                span.OperationName = span.ResourceName;
-            }
+            span.OverrideOperationNameWhenEnabled();
 
             span.SetTag(Tags.SpanKind, SpanKinds.Server);
             span.SetTag(Tags.HttpMethod, method);
@@ -90,6 +89,40 @@ namespace SignalFx.Tracing.ExtensionMethods
                     break;
             }
         }
+
+        internal static void OverrideOperationNameWhenEnabled(this Span span)
+        {
+            if (Tracer.Instance.Settings.UseWebServerResourceAsOperationName && !string.IsNullOrEmpty(span.ResourceName))
+            {
+                span.OperationName = span.ResourceName;
+            }
+        }
+
+#if NETFRAMEWORK
+        internal static void SetHttpStatusCode(this Span span, HttpResponse response)
+        {
+            if (response == null)
+            {
+                return;
+            }
+
+            string statusCode = response.StatusCode switch
+            {
+                200 => "200",
+                400 => "400",
+                404 => "404",
+                500 => "500",
+                _ => response.StatusCode.ToString(CultureInfo.InvariantCulture)
+            };
+
+            span.SetTag(Tags.HttpStatusCode, statusCode);
+
+            if (!string.IsNullOrWhiteSpace(response.StatusDescription))
+            {
+                span.SetTag(Tags.HttpStatusText, response.StatusDescription);
+            }
+        }
+#endif
 
         private static string GetConnectionStringValue(DbConnectionStringBuilder builder, params string[] names)
         {

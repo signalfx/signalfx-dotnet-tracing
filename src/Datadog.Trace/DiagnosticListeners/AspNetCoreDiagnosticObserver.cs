@@ -144,7 +144,7 @@ namespace SignalFx.Tracing.DiagnosticListeners
                 string httpMethod = request.Method?.ToUpperInvariant() ?? "UNKNOWN";
                 string url = GetUrl(request);
 
-                string resourceUrl = UriHelpers.GetRelativeUrl(new Uri(url), tryRemoveIds: true)
+                string resourceUrl = UriHelpers.GetCleanUriPath(new Uri(url))
                                                .ToLowerInvariant();
 
                 var propagator = _tracer.Propagator;

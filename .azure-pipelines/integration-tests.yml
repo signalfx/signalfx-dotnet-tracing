@@ -28,7 +28,7 @@ jobs:
         publishTargetFramework: netcoreapp3.1
 
   pool:
-    vmImage: ubuntu-16.04
+    vmImage: ubuntu-18.04
   
   variables:
     TestAllPackageVersions: true
@@ -73,7 +73,7 @@ jobs:
         publishTargetFramework: netcoreapp3.1
 
   pool:
-    vmImage: ubuntu-16.04
+    vmImage: ubuntu-18.04
   
   variables:
     TestAllPackageVersions: true
@@ -147,6 +147,12 @@ jobs:
     inputs:
       packageType: sdk
       version: 3.1.302
+
+  - task: UseDotNet@2
+    displayName: install dotnet core sdk 5.0
+    inputs:
+      packageType: sdk
+      version: 5.0.x
 
   - task: NuGetToolInstaller@1
     displayName: install nuget

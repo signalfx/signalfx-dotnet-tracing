@@ -20,7 +20,7 @@ jobs:
       windows:
         imageName: windows-2019
       linux:
-        imageName: ubuntu-16.04
+        imageName: ubuntu-18.04
 
   pool:
     vmImage: $(imageName)
@@ -43,6 +43,12 @@ jobs:
     inputs:
       packageType: sdk
       version: 3.1.302
+
+  - task: UseDotNet@2
+    displayName: install dotnet core sdk 5.0
+    inputs:
+      packageType: sdk
+      version: 5.0.x
 
   - task: DotNetCoreCLI@2
     displayName: dotnet restore
@@ -82,10 +88,10 @@ jobs:
   steps:
 
   - task: UseDotNet@2
-    displayName: install dotnet core sdk 3.1
+    displayName: install dotnet core sdk 5.0
     inputs:
       packageType: sdk
-      version: 3.1.302
+      version: 5.0.x
 
   - task: DotNetCoreCLI@2
     displayName: dotnet build
