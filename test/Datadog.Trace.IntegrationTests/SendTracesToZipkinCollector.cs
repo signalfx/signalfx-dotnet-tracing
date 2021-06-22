@@ -131,7 +131,7 @@ namespace Datadog.Trace.IntegrationTests
                 Assert.Contains(scope1.Span.Tags, kvp => kvp.Key == Tags.Version && kvp.Value == TracerConstants.AssemblyVersion);
 
                 // Child spans should not have root spans tags.
-                Assert.Null(scope2.Span.Tags);
+                Assert.Empty(scope2.Span.Tags);
             }
         }
 
