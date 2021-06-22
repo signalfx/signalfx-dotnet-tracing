@@ -263,7 +263,7 @@ jobs:
       projects: |
         test/Datadog.Trace.IntegrationTests/Datadog.Trace.IntegrationTests.csproj
         test/Datadog.Trace.OpenTracing.IntegrationTests/Datadog.Trace.OpenTracing.IntegrationTests.csproj
-      arguments: '-p:Platform=$(buildPlatform)'
+      arguments: '-p:Platform=$(buildPlatform) --blame-hang --blame-hang-timeout 180s'
 
   - task: DotNetCoreCLI@2
     displayName: dotnet test
@@ -271,4 +271,4 @@ jobs:
       command: test
       configuration: $(buildConfiguration)
       projects: test/Datadog.Trace.ClrProfiler.IntegrationTests/Datadog.Trace.ClrProfiler.IntegrationTests.csproj
-      arguments: '--filter "RunOnWindows=True|Category=Smoke" -p:Platform=$(buildPlatform)'
+      arguments: '--filter "RunOnWindows=True|Category=Smoke" -p:Platform=$(buildPlatform) --blame-hang --blame-hang-timeout 180s'
