@@ -36,7 +36,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
 
         protected List<AspNetCoreMvcSpanExpectation> ExpectationsWithClientIp { get; set; } = new List<AspNetCoreMvcSpanExpectation>();
 
-        [TargetFrameworkVersionsTheory("netcoreapp3.0;netcoreapp3.1")]
+        [TargetFrameworkVersionsTheory("netcoreapp3.0;netcoreapp3.1;net5.0")]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         [InlineData(false)]
