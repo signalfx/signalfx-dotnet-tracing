@@ -19,6 +19,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         private const string WebRequestTypeName = "System.Net.WebRequest";
         private const string IntegrationName = "WebRequest";
         private const string Major4 = "4";
+        private const string Major5 = "5";
 
         private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(WebRequestIntegration));
 
@@ -35,13 +36,13 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             TargetType = WebRequestTypeName,
             TargetSignatureTypes = new[] { "System.IO.Stream" },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major4)]
+            TargetMaximumVersion = Major5)]
         [InterceptMethod(
             TargetAssembly = "System.Net.Requests", // .NET Core
             TargetType = WebRequestTypeName,
             TargetSignatureTypes = new[] { "System.IO.Stream" },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major4)]
+            TargetMaximumVersion = Major5)]
         public static object GetRequestStream(object webRequest, int opCode, int mdToken, long moduleVersionPtr)
         {
             if (webRequest == null)
@@ -107,13 +108,13 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             TargetType = WebRequestTypeName,
             TargetSignatureTypes = new[] { "System.Net.WebResponse" },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major4)]
+            TargetMaximumVersion = Major5)]
         [InterceptMethod(
             TargetAssembly = "System.Net.Requests", // .NET Core
             TargetType = WebRequestTypeName,
             TargetSignatureTypes = new[] { "System.Net.WebResponse" },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major4)]
+            TargetMaximumVersion = Major5)]
         public static object GetResponse(object webRequest, int opCode, int mdToken, long moduleVersionPtr)
         {
             if (webRequest == null)
@@ -204,13 +205,13 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             TargetType = WebRequestTypeName,
             TargetSignatureTypes = new[] { "System.Threading.Tasks.Task`1<System.Net.WebResponse>" },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major4)]
+            TargetMaximumVersion = Major5)]
         [InterceptMethod(
             TargetAssembly = "System.Net.Requests", // .NET Core
             TargetType = WebRequestTypeName,
             TargetSignatureTypes = new[] { "System.Threading.Tasks.Task`1<System.Net.WebResponse>" },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major4)]
+            TargetMaximumVersion = Major5)]
         public static object GetResponseAsync(object webRequest, int opCode, int mdToken, long moduleVersionPtr)
         {
             const string methodName = nameof(GetResponseAsync);

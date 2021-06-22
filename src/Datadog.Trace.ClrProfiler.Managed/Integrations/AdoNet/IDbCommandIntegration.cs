@@ -15,6 +15,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.AdoNet
     {
         private const string IntegrationName = "AdoNet";
         private const string Major4 = "4";
+        private const string Major5 = "5";
 
         private const string DbCommandTypeName = "System.Data.IDbCommand";
         private const string DataReaderTypeName = "System.Data.IDataReader";
@@ -34,7 +35,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.AdoNet
             TargetType = DbCommandTypeName,
             TargetSignatureTypes = new[] { DataReaderTypeName },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major4)]
+            TargetMaximumVersion = Major5)]
         public static object ExecuteReader(
             object command,
             int opCode,
@@ -96,7 +97,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.AdoNet
             TargetType = DbCommandTypeName,
             TargetSignatureTypes = new[] { DataReaderTypeName, AdoNetConstants.TypeNames.CommandBehavior },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major4)]
+            TargetMaximumVersion = Major5)]
         public static object ExecuteReaderWithBehavior(
             object command,
             int behavior,
@@ -159,7 +160,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.AdoNet
             TargetType = DbCommandTypeName,
             TargetSignatureTypes = new[] { ClrNames.Int32 },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major4)]
+            TargetMaximumVersion = Major5)]
         public static int ExecuteNonQuery(
             object command,
             int opCode,
@@ -212,7 +213,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.AdoNet
             TargetType = DbCommandTypeName,
             TargetSignatureTypes = new[] { ClrNames.Object },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major4)]
+            TargetMaximumVersion = Major5)]
         public static object ExecuteScalar(
             object command,
             int opCode,
