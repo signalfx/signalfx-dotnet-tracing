@@ -55,10 +55,11 @@ namespace Datadog.Trace.TestHelpers
 
         private static int GetStartingPort()
         {
-            // pick a starting port from the ephemeral port range (49152 – 65535),
+            // pick a low starting port from the port range since the use of process id and thread id can make
+            // the range very limited.
             // use process and threads ids to try to get different ports for each thread.
             // https://stackoverflow.com/questions/263400/what-is-the-best-algorithm-for-an-overridden-system-object-gethashcode
-            const int startPort = 49152;
+            const int startPort = 4000;
             const int endPort = 65535;
             const int poolSize = endPort - startPort;
             int hash = 17;
