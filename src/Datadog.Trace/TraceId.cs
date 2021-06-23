@@ -1,9 +1,6 @@
 // Modified by SignalFx
 
 using System;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using SignalFx.Tracing.Logging;
 
 namespace SignalFx.Tracing
 {
@@ -80,9 +77,9 @@ namespace SignalFx.Tracing
         }
 
         /// <summary>
-        /// Creates traceId from given 16 or 32 sign string representing traceId in hexadecimal format.
+        /// Creates traceId from given 16 or 32 character string representing traceId in hexadecimal format.
         /// </summary>
-        /// <param name="id">16 or 32 sign string ID to be parsed.</param>
+        /// <param name="id">16 or 32 character string ID to be parsed.</param>
         /// <returns>Instance of <see cref="TraceId"/> representing the same traceId as the passed string.</returns>
         public static TraceId Parse(string id)
         {
@@ -107,7 +104,7 @@ namespace SignalFx.Tracing
 
                 default:
                 {
-                    throw new FormatException("The passed string must have 16 or 32 signs");
+                    throw new FormatException("The passed string must have 16 or 32 character");
                 }
             }
         }
@@ -115,7 +112,7 @@ namespace SignalFx.Tracing
         /// <summary>
         /// Tries to convert the specified string representation of a TraceId to its <see cref="TraceId" /> equivalent. A return value indicates whether the conversion succeeded or failed.
         /// </summary>
-        /// <param name="id">16 or 32 sign string ID to be parsed.</param>
+        /// <param name="id">16 or 32 character string ID to be parsed.</param>
         /// <param name="traceId">Output <see cref="TraceId"/></param>
         /// <returns>Value indicating whether the conversion succeeded or failed.</returns>
         public static bool TryParse(string id, out TraceId traceId)
