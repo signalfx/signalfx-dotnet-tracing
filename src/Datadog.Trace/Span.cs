@@ -25,6 +25,8 @@ namespace SignalFx.Tracing
 
         private readonly object _lock = new object();
         private readonly object _tagsLock = new object();
+        private readonly Lazy<ConcurrentDictionary<DateTimeOffset, Dictionary<string, string>>> _lazyLogs =
+            new Lazy<ConcurrentDictionary<DateTimeOffset, Dictionary<string, string>>>();
 
         internal Span(SpanContext context, DateTimeOffset? start)
         {
@@ -33,11 +35,14 @@ namespace SignalFx.Tracing
             ServiceName = context.ServiceName;
             StartTime = start ?? Context.TraceContext.UtcNow;
 
-            Logger.Debug(
-                "Span started: [s_id: {0}, p_id: {1}, t_id: {2}]",
-                SpanId,
-                Context.ParentId,
-                TraceId);
+            if (IsLogLevelDebugEnabled)
+            {
+                Logger.Debug(
+                    "Span started: [s_id: {0}, p_id: {1}, t_id: {2}]",
+                    SpanId,
+                    Context.ParentId,
+                    TraceId);
+            }
         }
 
         /// <summary>
@@ -87,11 +92,13 @@ namespace SignalFx.Tracing
 
         internal TimeSpan Duration { get; private set; }
 
-        internal Dictionary<string, string> Tags { get; private set; }
+        internal Dictionary<string, string> Tags { get; } = new Dictionary<string, string>(16);
 
         internal Dictionary<string, double> Metrics { get; private set; }
 
-        internal ConcurrentDictionary<DateTimeOffset, Dictionary<string, string>> Logs { get; } = new ConcurrentDictionary<DateTimeOffset, Dictionary<string, string>>();
+        internal ConcurrentDictionary<DateTimeOffset, Dictionary<string, string>> Logs => _lazyLogs.Value;
+
+        internal bool HasLogs => _lazyLogs.IsValueCreated;
 
         internal bool IsFinished { get; private set; }
 
@@ -118,7 +125,7 @@ namespace SignalFx.Tracing
             sb.AppendLine($"Error: {Error}");
             sb.AppendLine("Meta:");
 
-            if (Tags?.Count > 0)
+            if (Tags.Count > 0)
             {
                 // lock because we're iterating the collection, not reading a single value
                 lock (_tagsLock)
@@ -130,13 +137,16 @@ namespace SignalFx.Tracing
                 }
             }
 
-            sb.AppendLine("Logs:");
-            foreach (var e in Logs)
+            if (_lazyLogs.IsValueCreated)
             {
-                sb.Append($"\t{e.Key}:\n");
-                foreach (var kv in e.Value)
+                sb.AppendLine("Logs:");
+                foreach (var e in Logs)
                 {
-                    sb.Append($"\t\t{kv.Key}:{kv.Value}\n");
+                    sb.Append($"\t{e.Key}:\n");
+                    foreach (var kv in e.Value)
+                    {
+                        sb.Append($"\t\t{kv.Key}:{kv.Value}\n");
+                    }
                 }
             }
 
@@ -192,15 +202,12 @@ namespace SignalFx.Tracing
                 default:
                     if (value == null)
                     {
-                        if (Tags != null)
+                        // lock when modifying the collection
+                        lock (_tagsLock)
                         {
-                            // lock when modifying the collection
-                            lock (_tagsLock)
-                            {
-                                // Agent doesn't accept null tag values,
-                                // remove them instead
-                                Tags.Remove(key);
-                            }
+                            // Agent doesn't accept null tag values,
+                            // remove them instead
+                            Tags.Remove(key);
                         }
                     }
                     else
@@ -208,13 +215,6 @@ namespace SignalFx.Tracing
                         // lock when modifying the collection
                         lock (_tagsLock)
                         {
-                            if (Tags == null)
-                            {
-                                // defer instantiation until needed to
-                                // avoid unnecessary allocations per span
-                                Tags = new Dictionary<string, string>();
-                            }
-
                             // if not a special tag, just add it to the tag bag
                             Tags[key] = value;
                         }
@@ -347,7 +347,7 @@ namespace SignalFx.Tracing
                         ServiceName,
                         ResourceName,
                         OperationName,
-                        Tags == null ? string.Empty : string.Join(",", Tags.Keys));
+                        Tags.Count == 0 ? string.Empty : string.Join(",", Tags.Keys));
                 }
             }
         }
@@ -393,7 +393,7 @@ namespace SignalFx.Tracing
         public string GetTag(string key)
         {
             // no need to lock on single reads
-            return Tags != null && Tags.TryGetValue(key, out var value) ? value : null;
+            return Tags.TryGetValue(key, out var value) ? value : null;
         }
 
         internal bool SetExceptionForFilter(Exception exception)

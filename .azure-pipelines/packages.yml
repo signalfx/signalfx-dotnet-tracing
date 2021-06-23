@@ -7,7 +7,7 @@ pr: none
 
 variables:
   buildConfiguration: release
-  dotnetCoreSdkVersion: 3.1.302
+  dotnetCoreSdkVersion: 3.1.x
   publishOutput: $(Build.SourcesDirectory)/src/bin/managed-publish
 
 jobs:
@@ -110,7 +110,7 @@ jobs:
 - job: linux_packages
 
   pool:
-    vmImage: ubuntu-16.04
+    vmImage: ubuntu-18.04
 
   steps:
   - task: UseDotNet@2
@@ -162,7 +162,7 @@ jobs:
 - job: linux_alpine_packages
 
   pool:
-    vmImage: ubuntu-16.04
+    vmImage: ubuntu-18.04
 
   steps:
   - task: UseDotNet@2
@@ -219,7 +219,7 @@ jobs:
     - linux_packages
 
   pool:
-    vmImage: ubuntu-16.04
+    vmImage: ubuntu-18.04
 
   steps:
   - task: GitVersion@5

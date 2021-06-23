@@ -172,8 +172,9 @@ namespace SignalFx.Tracing.Configuration
             Enum.TryParse(source?.GetString(ConfigurationKeys.Propagator) ?? "default", ignoreCase: true, out PropagatorType propagatorType);
             Propagator = propagatorType;
 
-            TraceResponseHeaderEnabled = source?.GetBool(ConfigurationKeys.TraceResponseHeaderEnabled) ??
-                                               true;
+            TraceResponseHeaderEnabled = source?.GetBool(ConfigurationKeys.TraceResponseHeaderEnabled) ?? true;
+
+            RouteTemplateResourceNamesEnabled = source?.GetBool(ConfigurationKeys.FeatureFlags.RouteTemplateResourceNamesEnabled) ?? true;
         }
 
         /// <summary>
@@ -407,6 +408,12 @@ namespace SignalFx.Tracing.Configuration
         /// Gets or sets a value indicating whether context server timing header will be added.
         /// </summary>
         public bool TraceResponseHeaderEnabled { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the feature flag to enable the updated ASP.NET resource names is enabled
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.FeatureFlags.RouteTemplateResourceNamesEnabled"/>
+        internal bool RouteTemplateResourceNamesEnabled { get; }
 
         /// <summary>
         /// Create a <see cref="TracerSettings"/> populated from the default sources

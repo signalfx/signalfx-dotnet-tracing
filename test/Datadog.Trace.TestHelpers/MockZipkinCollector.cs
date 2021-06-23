@@ -186,30 +186,38 @@ namespace Datadog.Trace.TestHelpers
                     var getCtxTask = Task.Run(() => _listener.GetContext());
                     getCtxTask.Wait(_listenerCts.Token);
 
-                    var ctx = getCtxTask.Result;
-                    OnRequestReceived(ctx);
-
-                    if (ShouldDeserializeTraces)
+                    lock (_listener)
                     {
-                        using (var reader = new StreamReader(ctx.Request.InputStream))
+                        if (!_listener.IsListening)
                         {
-                            var zspans = JsonConvert.DeserializeObject<List<Span>>(reader.ReadToEnd());
-                            if (zspans != null)
-                            {
-                                IList<IMockSpan> spans = (IList<IMockSpan>)zspans.ConvertAll(x => (IMockSpan)x);
-                                OnRequestDeserialized(spans);
-
-                                Spans = Spans.AddRange(spans);
-                            }
-
-                            RequestHeaders = RequestHeaders.Add(new NameValueCollection(ctx.Request.Headers));
+                            return;
                         }
-                    }
 
-                    ctx.Response.ContentType = "application/json";
-                    var buffer = Encoding.UTF8.GetBytes("{}");
-                    ctx.Response.OutputStream.Write(buffer, 0, buffer.Length);
-                    ctx.Response.Close();
+                        var ctx = getCtxTask.Result;
+                        OnRequestReceived(ctx);
+
+                        if (ShouldDeserializeTraces)
+                        {
+                            using (var reader = new StreamReader(ctx.Request.InputStream))
+                            {
+                                var zspans = JsonConvert.DeserializeObject<List<Span>>(reader.ReadToEnd());
+                                if (zspans != null)
+                                {
+                                    IList<IMockSpan> spans = (IList<IMockSpan>)zspans.ConvertAll(x => (IMockSpan)x);
+                                    OnRequestDeserialized(spans);
+
+                                    Spans = Spans.AddRange(spans);
+                                }
+
+                                RequestHeaders = RequestHeaders.Add(new NameValueCollection(ctx.Request.Headers));
+                            }
+                        }
+
+                        ctx.Response.ContentType = "application/json";
+                        var buffer = Encoding.UTF8.GetBytes("{}");
+                        ctx.Response.OutputStream.Write(buffer, 0, buffer.Length);
+                        ctx.Response.Close();
+                    }
                 }
                 catch (Exception ex) when (ex is HttpListenerException || ex is OperationCanceledException || ex is AggregateException)
                 {
