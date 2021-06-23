@@ -1,8 +1,6 @@
 // Modified by SignalFx
 
 using System;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
 
 namespace SignalFx.Tracing
 {
@@ -79,42 +77,55 @@ namespace SignalFx.Tracing
         }
 
         /// <summary>
-        /// Creates traceId from given 16 or 32 sign string representing traceId in hexadecimal format.
+        /// Creates traceId from given 16 or 32 character string representing traceId in hexadecimal format.
         /// </summary>
-        /// <param name="id">16 or 32 sign string ID to be parsed.</param>
+        /// <param name="id">16 or 32 character string ID to be parsed.</param>
         /// <returns>Instance of <see cref="TraceId"/> representing the same traceId as the passed string.</returns>
-        public static TraceId CreateFromString(string id)
+        public static TraceId Parse(string id)
+        {
+            switch (id.Length)
+            {
+                case 16:
+                {
+                    var lower = Convert.ToUInt64(id, fromBase: 16);
+                    return new TraceId(higher: 0, lower);
+                }
+
+                case 32:
+                {
+                    var higherAsString = id.Substring(startIndex: 0, length: 16);
+                    var lowerAsString = id.Substring(startIndex: 16, length: 16);
+
+                    var higher = Convert.ToUInt64(higherAsString, fromBase: 16);
+                    var lower = Convert.ToUInt64(lowerAsString, fromBase: 16);
+
+                    return new TraceId(higher, lower);
+                }
+
+                default:
+                {
+                    throw new FormatException("The passed string must have 16 or 32 character");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Tries to convert the specified string representation of a TraceId to its <see cref="TraceId" /> equivalent. A return value indicates whether the conversion succeeded or failed.
+        /// </summary>
+        /// <param name="id">16 or 32 character string ID to be parsed.</param>
+        /// <param name="traceId">Output <see cref="TraceId"/></param>
+        /// <returns>Value indicating whether the conversion succeeded or failed.</returns>
+        public static bool TryParse(string id, out TraceId traceId)
         {
             try
             {
-                switch (id.Length)
-                {
-                    case 16:
-                    {
-                        var lower = Convert.ToUInt64(id, fromBase: 16);
-                        return new TraceId(higher: 0, lower);
-                    }
-
-                    case 32:
-                    {
-                        var higherAsString = id.Substring(startIndex: 0, length: 16);
-                        var lowerAsString = id.Substring(startIndex: 16, length: 16);
-
-                        var higher = Convert.ToUInt64(higherAsString, fromBase: 16);
-                        var lower = Convert.ToUInt64(lowerAsString, fromBase: 16);
-
-                        return new TraceId(higher, lower);
-                    }
-
-                    default:
-                    {
-                        return Zero;
-                    }
-                }
+                traceId = Parse(id);
+                return true;
             }
             catch (Exception ex) when (ex is ArgumentOutOfRangeException || ex is InvalidOperationException || ex is OverflowException || ex is FormatException)
             {
-                return Zero;
+                traceId = Zero;
+                return false;
             }
         }
 
