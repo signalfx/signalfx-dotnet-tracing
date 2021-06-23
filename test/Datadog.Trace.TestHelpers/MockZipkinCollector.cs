@@ -247,7 +247,7 @@ namespace Datadog.Trace.TestHelpers
 
             public TraceId TraceId
             {
-                get => TraceId.CreateFromString(_zipkinData["traceId"].ToString());
+                get => TraceId.TryParse(_zipkinData["traceId"].ToString(), out var traceId) ? traceId : TraceId.Zero;
             }
 
             public ulong SpanId

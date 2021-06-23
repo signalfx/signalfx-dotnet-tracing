@@ -48,26 +48,29 @@ namespace SignalFx.Tracing.Propagation
 
         public SpanContext Extract<T>(T carrier, Func<T, string, IEnumerable<string>> getter)
         {
-            var traceParentCollection = getter(carrier, W3CHeaderNames.TraceParent).ToList();
-            if (traceParentCollection.Count != 1)
+            var enumerableHeaderValues = getter(carrier, W3CHeaderNames.TraceParent);
+            if (enumerableHeaderValues == Enumerable.Empty<string>())
             {
-                Log.Warning("Header {HeaderName} needs exactly 1 value", W3CHeaderNames.TraceParent);
                 return null;
             }
 
-            var traceParentHeader = traceParentCollection.First();
+            var traceParentHeader = enumerableHeaderValues.First();
             var traceIdString = traceParentHeader.Substring(VersionPrefixIdLength, TraceIdLength);
-            var traceId = TraceId.CreateFromString(traceIdString);
+            if (!TraceId.TryParse(traceIdString, out var traceId))
+            {
+                Log.Debug("Could not parse correct TraceId from header {HeaderName}: {HeaderValues}", W3CHeaderNames.TraceParent, traceParentHeader);
+                return null;
+            }
+
             if (traceId == TraceId.Zero)
             {
-                Log.Warning("Could not parse {HeaderName} headers: {HeaderValues}", W3CHeaderNames.TraceParent, string.Join(",", traceParentCollection));
                 return null;
             }
 
             var spanIdString = traceParentHeader.Substring(VersionAndTraceIdLength, SpanIdLength);
             if (!ulong.TryParse(spanIdString, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var spanId))
             {
-                Log.Warning("Could not parse {HeaderName} headers: {HeaderValues}", W3CHeaderNames.TraceParent, string.Join(",", traceParentCollection));
+                Log.Debug("Could not retrieve SpanId from header {HeaderName}: {HeaderValues}", W3CHeaderNames.TraceParent, traceParentHeader);
                 return null;
             }
 

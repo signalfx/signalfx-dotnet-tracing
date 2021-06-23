@@ -16,7 +16,7 @@ namespace Datadog.Trace.Tests.Propagators
         [MemberData(nameof(GetHeaderCollectionImplementations))]
         internal void Inject_CratesCorrectTraceParentHeader(IHeadersCollection headers)
         {
-            var traceId = TraceId.CreateFromString("0af7651916cd43dd8448eb211c80319c");
+            var traceId = TraceId.Parse("0af7651916cd43dd8448eb211c80319c");
             const ulong spanId = 67667974448284343;
             var spanContext = new SpanContext(traceId, spanId, samplingPriority: null);
             var propagator = W3CSpanContextPropagator.Instance;
@@ -30,7 +30,7 @@ namespace Datadog.Trace.Tests.Propagators
         [MemberData(nameof(GetHeaderCollectionImplementations))]
         internal void Inject_CreateCorrectTraceStateHeaderIfPresent(IHeadersCollection headers)
         {
-            var traceId = TraceId.CreateFromString("0af7651916cd43dd8448eb211c80319c");
+            var traceId = TraceId.Parse("0af7651916cd43dd8448eb211c80319c");
             const ulong spanId = 67667974448284343;
             var spanContext = new SpanContext(traceId, spanId, samplingPriority: null, serviceName: null, "state");
             var propagator = W3CSpanContextPropagator.Instance;
@@ -44,7 +44,7 @@ namespace Datadog.Trace.Tests.Propagators
         [MemberData(nameof(GetHeaderCollectionImplementations))]
         internal void Inject_DoNotCreateCorrectTraceStateHeaderIfNotPresent(IHeadersCollection headers)
         {
-            var traceId = TraceId.CreateFromString("0af7651916cd43dd8448eb211c80319c");
+            var traceId = TraceId.Parse("0af7651916cd43dd8448eb211c80319c");
             const ulong spanId = 67667974448284343;
             var spanContext = new SpanContext(traceId, spanId, samplingPriority: null);
             var propagator = W3CSpanContextPropagator.Instance;
@@ -66,7 +66,7 @@ namespace Datadog.Trace.Tests.Propagators
             using (new AssertionScope())
             {
                 spanContext.SpanId.Should().Be(67667974448284343);
-                spanContext.TraceId.Should().Be(TraceId.CreateFromString("0af7651916cd43dd8448eb211c80319c"));
+                spanContext.TraceId.Should().Be(TraceId.Parse("0af7651916cd43dd8448eb211c80319c"));
             }
         }
 
