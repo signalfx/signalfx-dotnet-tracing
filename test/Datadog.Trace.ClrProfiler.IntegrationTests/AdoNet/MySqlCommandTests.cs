@@ -1,4 +1,5 @@
 // Modified by SignalFx
+using Datadog.Trace.ClrProfiler.IntegrationTests.Helpers;
 using Datadog.Trace.TestHelpers;
 using SignalFx.Tracing;
 using Xunit;
@@ -13,7 +14,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
         {
         }
 
-        [Fact]
+        // Skipping on net5.0 due to SSL_ERROR_SSL on Alpine, see https://github.com/dotnet/SqlClient/issues/776
+        [TargetFrameworkVersionsFact("net452;net461netcoreapp2.1;netcoreapp3.0;netcoreapp3.1")]
         [Trait("Category", "EndToEnd")]
         public void SubmitsTraces()
         {
