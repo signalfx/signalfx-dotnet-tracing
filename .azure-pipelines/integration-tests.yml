@@ -1,8 +1,9 @@
-trigger: none
-pr:
+trigger:
   branches:
     include:
-      - main
+      - '*'
+    exclude:
+      - refs/pull/*/head
   paths:
     exclude:
       - docs/*
