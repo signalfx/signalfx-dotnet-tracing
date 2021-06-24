@@ -104,6 +104,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
             if (!process.WaitForExit((int)timeout.TotalMilliseconds))
             {
+                Output.WriteLine($"Timeout after {timeout}");
                 process.Kill();
                 process.WaitForExit();
             }
