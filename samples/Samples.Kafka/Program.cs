@@ -13,7 +13,7 @@ namespace Samples.Kafka
     {
         static void Main(string[] args)
         {
-            string kafkaUrl = Environment.GetEnvironmentVariable("KAFKA_HOST") ?? "localhost:9092";
+            string kafkaUrl = Environment.GetEnvironmentVariable("KAFKA_HOST") ?? "localhost:29092";
             string topic = "dotnet-test-topic";
 
             var pConfig = new ProducerConfig { BootstrapServers = kafkaUrl };

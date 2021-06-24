@@ -169,6 +169,26 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 #endif
             };
 
+        public static IEnumerable<object[]> Kafka =>
+
+            new List<object[]>
+            {
+#if DEFAULT_SAMPLES
+                new object[] { string.Empty },
+#else
+                new object[] { "1.4.3" },
+                new object[] { "1.4.4" },
+                new object[] { "1.5.0" },
+                new object[] { "1.5.1" },
+                new object[] { "1.5.2" },
+                new object[] { "1.5.3" },
+                new object[] { "1.6.1" },
+                new object[] { "1.6.2" },
+                new object[] { "1.6.3" },
+                new object[] { "1.7.0" },
+#endif
+            };
+
         public static IEnumerable<object[]> Npgsql =>
 
             new List<object[]>

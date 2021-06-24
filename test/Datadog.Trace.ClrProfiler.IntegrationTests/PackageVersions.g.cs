@@ -33,6 +33,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
         public static IEnumerable<object[]> ElasticSearch5 => IsComprehensive ? PackageVersionsComprehensive.ElasticSearch5 : PackageVersionsLatestMinors.ElasticSearch5;
 
+        public static IEnumerable<object[]> Kafka => IsComprehensive ? PackageVersionsComprehensive.Kafka : PackageVersionsLatestMinors.Kafka;
+
         public static IEnumerable<object[]> Npgsql => IsComprehensive ? PackageVersionsComprehensive.Npgsql : PackageVersionsLatestMinors.Npgsql;
 
         public static IEnumerable<object[]> SqlClient => IsComprehensive ? PackageVersionsComprehensive.SqlClient : PackageVersionsLatestMinors.SqlClient;
