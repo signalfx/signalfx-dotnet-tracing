@@ -151,28 +151,28 @@ jobs:
     displayName: Download dotnet-install.ps1 script
 
   - powershell: |
-      ./dotnet-install.ps1 -Channel 2.1 -Architecture ${Env:architecture} -InstallDir "${Env:installDir}\dotnet";
+      ./dotnet-install.ps1 -Channel 2.1 -Architecture ${Env:architecture} -InstallDir "${Env:installDir}";
     displayName: install dotnet core sdk 2.1
     env:
       architecture: $(buildPlatform)
       installDir: $(programFileDir)
 
   - powershell: |
-      ./dotnet-install.ps1 -Channel 3.0 -Architecture ${Env:architecture} -InstallDir "${Env:installDir}\dotnet";
+      ./dotnet-install.ps1 -Channel 3.0 -Architecture ${Env:architecture} -InstallDir "${Env:installDir}";
     displayName: install dotnet core sdk 3.0
     env:
       architecture: $(buildPlatform)
       installDir: $(programFileDir)
 
   - powershell: |
-      ./dotnet-install.ps1 -Channel 3.1 -Architecture ${Env:architecture} -InstallDir "${Env:installDir}\dotnet";
+      ./dotnet-install.ps1 -Channel 3.1 -Architecture ${Env:architecture} -InstallDir "${Env:installDir}";
     displayName: install dotnet core sdk 3.1
     env:
       architecture: $(buildPlatform)
       installDir: $(programFileDir)
 
   - powershell: |
-      ./dotnet-install.ps1 -Channel 5.0 -Architecture ${Env:architecture} -InstallDir "${Env:installDir}\dotnet";
+      ./dotnet-install.ps1 -Channel 5.0 -Architecture ${Env:architecture} -InstallDir "${Env:installDir}";
     displayName: install dotnet core sdk 5.0
     env:
       architecture: $(buildPlatform)
