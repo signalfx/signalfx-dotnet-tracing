@@ -275,7 +275,7 @@ jobs:
   #     arguments: '-c $(buildConfiguration) -p:Platform=$(buildPlatform) --blame-hang --blame-hang-timeout 180s'
 
   - script: |
-      "%installDir%\dotnet.exe" -c %config% -p:Platform=%architecture% --blame-hang --blame-hang-timeout 180s test\Datadog.Trace.IntegrationTests\Datadog.Trace.IntegrationTests.csproj
+      "%installDir%\dotnet.exe" test -c %config% -p:Platform=%architecture% --blame-hang --blame-hang-timeout 180s test\Datadog.Trace.IntegrationTests\Datadog.Trace.IntegrationTests.csproj
     displayName: dotnet test IntegrationTests
     env:
       architecture: $(buildPlatform)
@@ -283,7 +283,7 @@ jobs:
       config: $(buildConfiguration)
 
   - script: |
-      "%installDir%\dotnet.exe" -c %config% -p:Platform=%architecture% --blame-hang --blame-hang-timeout 180s test\Datadog.Trace.OpenTracing.IntegrationTests\Datadog.Trace.OpenTracing.IntegrationTests.csproj
+      "%installDir%\dotnet.exe" test -c %config% -p:Platform=%architecture% --blame-hang --blame-hang-timeout 180s test\Datadog.Trace.OpenTracing.IntegrationTests\Datadog.Trace.OpenTracing.IntegrationTests.csproj
     displayName: dotnet test OpenTracing.IntegrationTests
     env:
       architecture: $(buildPlatform)
@@ -291,7 +291,7 @@ jobs:
       config: $(buildConfiguration)
 
   - script: |
-      "%installDir%\dotnet.exe" -c %config% -p:Platform=%architecture% --filter "RunOnWindows=True|Category=Smoke" --blame-hang --blame-hang-timeout 180s test\Datadog.Trace.ClrProfiler.IntegrationTests\Datadog.Trace.ClrProfiler.IntegrationTests.csproj
+      "%installDir%\dotnet.exe" test -c %config% -p:Platform=%architecture% --filter "RunOnWindows=True|Category=Smoke" --blame-hang --blame-hang-timeout 180s test\Datadog.Trace.ClrProfiler.IntegrationTests\Datadog.Trace.ClrProfiler.IntegrationTests.csproj
     displayName: dotnet test ClrProfiler.IntegrationTests
     env:
       architecture: $(buildPlatform)
