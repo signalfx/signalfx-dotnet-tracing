@@ -96,10 +96,10 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
             Process process = StartSample(traceAgentPort, arguments, packageVersion, aspNetCorePort: 5000, envVars);
             var stdout = new StringBuilder();
-            process.OutputDataReceived += (sender, args) => { lock (stdout) { stdout.Append(args.Data); } };
+            process.OutputDataReceived += (sender, args) => { lock (stdout) { stdout.AppendLine(args.Data); } };
             process.BeginOutputReadLine();
             var stderr = new StringBuilder();
-            process.ErrorDataReceived += (sender, args) => { lock (stderr) { stderr.Append(args.Data); } };
+            process.ErrorDataReceived += (sender, args) => { lock (stderr) { stderr.AppendLine(args.Data); } };
             process.BeginErrorReadLine();
 
             if (!process.WaitForExit((int)timeout.TotalMilliseconds))
