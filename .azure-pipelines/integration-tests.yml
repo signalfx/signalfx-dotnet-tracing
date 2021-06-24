@@ -150,6 +150,12 @@ jobs:
       packageType: sdk
       version: 2.1.x
 
+  - powershell: |
+      Invoke-WebRequest 'https://dot.net/v1/dotnet-install.ps1' -OutFile 'dotnet-install.ps1';
+      ./dotnet-install.ps1 -Channel 2.1 -Architecture x86 -Runtime dotnet -InstallDir "${Env:ProgramFiles(x86)}\dotnet";
+    displayName: install dotnet core sdk 2.1 for x86
+    condition: eq(variables['buildPlatform'], 'x86')
+
   - task: UseDotNet@2
     displayName: install dotnet core sdk 3.0
     inputs:
