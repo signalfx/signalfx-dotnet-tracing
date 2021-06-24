@@ -29,6 +29,13 @@
     "MaxVersionExclusive": "6.0.0"
   },
   {
+    "IntegrationName": "Kafka",
+    "SampleProjectName": "Samples.Kafka",
+    "NugetPackageSearchName": "Confluent.Kafka",
+    "MinVersion": "1.4.3",
+    "MaxVersionExclusive": "2.0.0"
+  },
+  {
     "IntegrationName": "Npgsql",
     "SampleProjectName": "Samples.Npgsql",
     "NugetPackageSearchName": "Npgsql",
