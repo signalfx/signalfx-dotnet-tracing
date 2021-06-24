@@ -138,41 +138,45 @@ jobs:
     matrix:
       x64:
         buildPlatform: x64
+        programFileDir: "C:\\Program Files\\dotnet"
       x86:
         buildPlatform: x86
+        programFileDir: "C:\\Program Files (x86)\\dotnet"
   pool:
     vmImage: windows-2019
 
   steps:
-  - task: UseDotNet@2
-    displayName: install dotnet core sdk 2.1
-    inputs:
-      packageType: sdk
-      version: 2.1.x
-
   - powershell: |
       Invoke-WebRequest 'https://dot.net/v1/dotnet-install.ps1' -OutFile 'dotnet-install.ps1';
-      ./dotnet-install.ps1 -Channel 2.1 -Architecture x86 -Runtime dotnet -InstallDir "${Env:ProgramFiles(x86)}\dotnet";
-    displayName: install dotnet core sdk 2.1 for x86
-    condition: eq(variables['buildPlatform'], 'x86')
+    displayName: Download dotnet-install.ps1 script
 
-  - task: UseDotNet@2
+  - powershell: |
+      ./dotnet-install.ps1 -Channel 2.1 -Architecture ${Env:architecture} -InstallDir "${Env:installDir}\dotnet";
+    displayName: install dotnet core sdk 2.1
+    env:
+      architecture: $(buildPlatform)
+      installDir: $(programFileDir)
+
+  - powershell: |
+      ./dotnet-install.ps1 -Channel 3.0 -Architecture ${Env:architecture} -InstallDir "${Env:installDir}\dotnet";
     displayName: install dotnet core sdk 3.0
-    inputs:
-      packageType: sdk
-      version: 3.0.x
+    env:
+      architecture: $(buildPlatform)
+      installDir: $(programFileDir)
 
-  - task: UseDotNet@2
+  - powershell: |
+      ./dotnet-install.ps1 -Channel 3.1 -Architecture ${Env:architecture} -InstallDir "${Env:installDir}\dotnet";
     displayName: install dotnet core sdk 3.1
-    inputs:
-      packageType: sdk
-      version: 3.1.302
+    env:
+      architecture: $(buildPlatform)
+      installDir: $(programFileDir)
 
-  - task: UseDotNet@2
+  - powershell: |
+      ./dotnet-install.ps1 -Channel 5.0 -Architecture ${Env:architecture} -InstallDir "${Env:installDir}\dotnet";
     displayName: install dotnet core sdk 5.0
-    inputs:
-      packageType: sdk
-      version: 5.0.x
+    env:
+      architecture: $(buildPlatform)
+      installDir: $(programFileDir)
 
   - task: NuGetToolInstaller@1
     displayName: install nuget
