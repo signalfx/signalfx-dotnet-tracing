@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Datadog.Core.Tools;
@@ -86,26 +87,43 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 envVars: envVars);
         }
 
-        public ProcessResult RunSampleAndWaitForExit(int traceAgentPort, string arguments = null, string packageVersion = "", Dictionary<string, string> envVars = null)
+        public ProcessResult RunSampleAndWaitForExit(int traceAgentPort, string arguments = null, string packageVersion = "", Dictionary<string, string> envVars = null, TimeSpan timeout = default)
         {
+            if (timeout == default)
+            {
+                timeout = TimeSpan.FromMinutes(1);
+            }
+
             Process process = StartSample(traceAgentPort, arguments, packageVersion, aspNetCorePort: 5000, envVars);
+            var stdout = new StringBuilder();
+            process.OutputDataReceived += (sender, args) => { lock (stdout) { stdout.AppendLine(args.Data); } };
+            process.BeginOutputReadLine();
+            var stderr = new StringBuilder();
+            process.ErrorDataReceived += (sender, args) => { lock (stderr) { stderr.AppendLine(args.Data); } };
+            process.BeginErrorReadLine();
 
-            string standardOutput = process.StandardOutput.ReadToEnd();
-            string standardError = process.StandardError.ReadToEnd();
-            process.WaitForExit();
-            int exitCode = process.ExitCode;
+            if (!process.WaitForExit((int)timeout.TotalMilliseconds))
+            {
+                Output.WriteLine($"Timeout after {timeout}");
+                process.Kill();
+                process.WaitForExit();
+            }
 
+            string standardOutput = null;
+            lock (stdout) { standardOutput = stdout.ToString(); }
             if (!string.IsNullOrWhiteSpace(standardOutput))
             {
                 Output.WriteLine($"StandardOutput:{Environment.NewLine}{standardOutput}");
             }
 
+            string standardError = null;
+            lock (stderr) { standardError = stderr.ToString(); }
             if (!string.IsNullOrWhiteSpace(standardError))
             {
                 Output.WriteLine($"StandardError:{Environment.NewLine}{standardError}");
             }
 
-            return new ProcessResult(process, standardOutput, standardError, exitCode);
+            return new ProcessResult(process, standardOutput, standardError, process.ExitCode);
         }
 
         public Process StartIISExpress(int traceAgentPort, int iisPort, bool addClientIp)

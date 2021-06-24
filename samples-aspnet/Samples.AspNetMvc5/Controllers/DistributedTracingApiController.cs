@@ -40,7 +40,7 @@ namespace Samples.AspNetMvc5.Controllers
                         span.ServiceName,
                         span.OperationName,
                         span.ResourceName,
-                        span.TraceId,
+                        span.TraceId.Lower,
                         span.SpanId);
                 }
 
