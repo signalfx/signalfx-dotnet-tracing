@@ -265,18 +265,42 @@ jobs:
         !reproductions/**/StackExchange.Redis.AssemblyConflict.LegacyProject.csproj
       arguments: --configuration $(buildConfiguration) -p:Platform=$(buildPlatform) -p:ManagedProfilerOutputDirectory=$(publishOutput)
 
-  - task: DotNetCoreCLI@2
-    displayName: dotnet test
-    inputs:
-      command: test
-      projects: |
-        test/Datadog.Trace.IntegrationTests/Datadog.Trace.IntegrationTests.csproj
-        test/Datadog.Trace.OpenTracing.IntegrationTests/Datadog.Trace.OpenTracing.IntegrationTests.csproj
-      arguments: '-c $(buildConfiguration) -p:Platform=$(buildPlatform) --blame-hang --blame-hang-timeout 180s'
+  # - task: DotNetCoreCLI@2
+  #   displayName: dotnet test
+  #   inputs:
+  #     command: test
+  #     projects: |
+  #       test/Datadog.Trace.IntegrationTests/Datadog.Trace.IntegrationTests.csproj
+  #       test/Datadog.Trace.OpenTracing.IntegrationTests/Datadog.Trace.OpenTracing.IntegrationTests.csproj
+  #     arguments: '-c $(buildConfiguration) -p:Platform=$(buildPlatform) --blame-hang --blame-hang-timeout 180s'
 
-  - task: DotNetCoreCLI@2
-    displayName: dotnet test
-    inputs:
-      command: test
-      projects: test/Datadog.Trace.ClrProfiler.IntegrationTests/Datadog.Trace.ClrProfiler.IntegrationTests.csproj
-      arguments: '-c $(buildConfiguration) --filter "RunOnWindows=True|Category=Smoke" -p:Platform=$(buildPlatform) --blame-hang --blame-hang-timeout 180s'
+  - script: |
+      "%installDir%\dotnet.exe" -c %config% -p:Platform=%architecture% --blame-hang --blame-hang-timeout 180s test\Datadog.Trace.IntegrationTests\Datadog.Trace.IntegrationTests.csproj
+    displayName: dotnet test IntegrationTests
+    env:
+      architecture: $(buildPlatform)
+      installDir: $(programFileDir)
+      config: $(buildConfiguration)
+
+  - script: |
+      "%installDir%\dotnet.exe" -c %config% -p:Platform=%architecture% --blame-hang --blame-hang-timeout 180s test\Datadog.Trace.OpenTracing.IntegrationTests\Datadog.Trace.OpenTracing.IntegrationTests.csproj
+    displayName: dotnet test OpenTracing.IntegrationTests
+    env:
+      architecture: $(buildPlatform)
+      installDir: $(programFileDir)
+      config: $(buildConfiguration)
+
+  - script: |
+      "%installDir%\dotnet.exe" -c %config% -p:Platform=%architecture% --filter "RunOnWindows=True|Category=Smoke" --blame-hang --blame-hang-timeout 180s test\Datadog.Trace.ClrProfiler.IntegrationTests\Datadog.Trace.ClrProfiler.IntegrationTests.csproj
+    displayName: dotnet test ClrProfiler.IntegrationTests
+    env:
+      architecture: $(buildPlatform)
+      installDir: $(programFileDir)
+      config: $(buildConfiguration)
+
+  # - task: DotNetCoreCLI@2
+  #   displayName: dotnet test
+  #   inputs:
+  #     command: test
+  #     projects: test/Datadog.Trace.ClrProfiler.IntegrationTests/Datadog.Trace.ClrProfiler.IntegrationTests.csproj
+  #     arguments: '-c $(buildConfiguration) --filter "RunOnWindows=True|Category=Smoke" -p:Platform=$(buildPlatform) --blame-hang --blame-hang-timeout 180s'
