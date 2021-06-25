@@ -2,7 +2,8 @@
 
 ## [Unreleased]
 
-- 
+- Support for .NET 5.0
+- New instrumentations for SqlCommand: ExecuteXmlReader and ExecuteXmlReaderAsync methods
 
 [Commits](https://github.com/signalfx/signalfx-dotnet-tracing/v0.1.11...HEAD)
 
