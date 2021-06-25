@@ -34,12 +34,11 @@ namespace Datadog.Trace.TestHelpers
                 // seems like we can't reuse a listener if it fails to start,
                 // so create a new listener each time we retry
                 var listener = new HttpListener();
-                var currPrefix = $"http://localhost:{port}/";
-                listener.Prefixes.Add(currPrefix);
 
                 try
                 {
                     listener.Start();
+                    listener.Prefixes.Add($"http://localhost:{port}/");
 
                     // successfully listening
                     Port = port;
@@ -55,7 +54,6 @@ namespace Datadog.Trace.TestHelpers
                     // only catch the exception if there are retries left
                     port++;
                     retries--;
-                    listener.Prefixes.Remove(currPrefix); // Always remove the prefix because Close doesn't if the state is not "listening"
                 }
 
                 // always close listener if exception is thrown,

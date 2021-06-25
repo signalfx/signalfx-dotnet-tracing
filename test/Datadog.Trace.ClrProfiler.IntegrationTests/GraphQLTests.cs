@@ -94,7 +94,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 process.BeginErrorReadLine();
 
                 // wait for server to start
-                wh.WaitOne(10000);
+                Assert.True(wh.WaitOne(30000), "Samples.GraphQL not ready after wait");
 
                 SubmitRequests(aspNetCorePort);
                 var graphQLValidateSpans = agent.WaitForSpans(_expectedGraphQLValidateSpanCount, operationName: _graphQLValidateOperationName, returnAllOperations: false)

@@ -154,7 +154,7 @@ namespace Datadog.Trace.TestHelpers
             string processPath,
             StringDictionary environmentVariables)
         {
-            var processName = processPath;
+            var processName = Path.GetFileName(processPath);
             string profilerEnabled = _requiresProfiling ? "1" : "0";
             string profilerPath;
 
@@ -175,8 +175,6 @@ namespace Datadog.Trace.TestHelpers
                 profilerPath = GetProfilerPath();
                 environmentVariables["COR_PROFILER_PATH"] = profilerPath;
                 environmentVariables["SIGNALFX_DOTNET_TRACER_HOME"] = Path.GetDirectoryName(profilerPath);
-
-                processName = Path.GetFileName(processPath);
             }
 
             if (DebugModeEnabled)
