@@ -5,12 +5,12 @@ using Datadog.Trace.ClrProfiler.Emit;
 using SignalFx.Tracing;
 using SignalFx.Tracing.Logging;
 
-namespace Datadog.Trace.ClrProfiler.Integrations
+namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
 {
     /// <summary>
     /// Tracer integration for Kafka.
     /// </summary>
-    public static class KafkaIntegration
+    public static class ProduceKafkaIntegration
     {
         private const string IntegrationName = "Kafka";
         private const string ProducerType = "Confluent.Kafka.Producer`2";
@@ -22,9 +22,9 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         private const string MessageTypeName = "Confluent.Kafka.Message`2[!0,!1]";
         private const string ActionOfDeliveryReportTypeName = "System.Action`1[Confluent.Kafka.DeliveryReport`2[!0,!1]]";
 
-        private const string ProduceOperationName = "kafka.produce";
+        private const string ProduceSyncOperationName = "kafka.produce";
 
-        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(KafkaIntegration));
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(ProduceKafkaIntegration));
 
         /// <summary>
         /// Traces a synchronous Produce call to Kafka.
@@ -86,7 +86,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 throw;
             }
 
-            using var scope = CreateScope(topic);
+            using var scope = CreateScope(topic, ProduceSyncOperationName);
             try
             {
                 var returned = produce(topic, message, deliveryHandler);
@@ -99,7 +99,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             }
         }
 
-        private static Scope CreateScope(object topic)
+        private static Scope CreateScope(object topic, string operationName)
         {
             if (!Tracer.Instance.Settings.IsIntegrationEnabled(IntegrationName))
             {
@@ -118,7 +118,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
             if (parentSpan != null &&
                 parentSpan.GetTag(Tags.DbType) == SpanTypes.MongoDb &&
-                parentSpan.OperationName == ProduceOperationName &&
+                parentSpan.OperationName == operationName &&
                 parentSpan.GetTag(Tags.KafkaTopic) == topicName)
             {
                 // we are already instrumenting this,
@@ -128,7 +128,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             Scope scope = null;
             try
             {
-                scope = tracer.StartActive(ProduceOperationName, serviceName: tracer.DefaultServiceName);
+                scope = tracer.StartActive(operationName, serviceName: tracer.DefaultServiceName);
                 var span = scope.Span;
                 span.Type = SpanTypes.Kafka;
                 span.SetTag(Tags.InstrumentationName, IntegrationName);
