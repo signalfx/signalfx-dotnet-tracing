@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
+using System;
 using Confluent.Kafka;
 
 namespace Samples.Kafka
@@ -9,18 +7,18 @@ namespace Samples.Kafka
     //   docker-compose up kafka
     // Based mostly on:
     // - https://github.com/confluentinc/confluent-kafka-dotnet/blob/v1.7.0/examples/ConfluentCloud/Program.cs
-    class Program
+    public static class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            string kafkaUrl = Environment.GetEnvironmentVariable("KAFKA_HOST") ?? "localhost:29092";
-            string topic = "dotnet-test-topic";
+            var kafkaUrl = Environment.GetEnvironmentVariable("KAFKA_HOST") ?? "localhost:29092";
+            const string topic = "dotnet-test-topic";
 
             var pConfig = new ProducerConfig { BootstrapServers = kafkaUrl };
             using (var producer = new ProducerBuilder<Null, string>(pConfig).Build())
             {
                 producer.Produce(topic, new Message<Null, string> { Value = "test value" });
-                producer.Flush(TimeSpan.FromSeconds(10));
+                producer.Flush(TimeSpan.FromSeconds(value: 10));
             }
 
             var cConfig = new ConsumerConfig
