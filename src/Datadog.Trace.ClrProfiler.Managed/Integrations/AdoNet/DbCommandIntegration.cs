@@ -19,6 +19,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.AdoNet
         // "AdoNet" (backwards compatibility) when reading configuration settings
         private const string IntegrationName = "AdoNet";
         private const string Major4 = "4";
+        private const string Major5 = "5";
 
         private const string DbCommandTypeName = "System.Data.Common.DbCommand";
         private const string DbDataReaderTypeName = "System.Data.Common.DbDataReader";
@@ -38,7 +39,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.AdoNet
             TargetType = DbCommandTypeName,
             TargetSignatureTypes = new[] { DbDataReaderTypeName },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major4)]
+            TargetMaximumVersion = Major5)]
         public static object ExecuteReader(
             object command,
             int opCode,
@@ -100,7 +101,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.AdoNet
             TargetType = DbCommandTypeName,
             TargetSignatureTypes = new[] { DbDataReaderTypeName, AdoNetConstants.TypeNames.CommandBehavior },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major4)]
+            TargetMaximumVersion = Major5)]
         public static object ExecuteReaderWithBehavior(
             object command,
             int behavior,
@@ -165,7 +166,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.AdoNet
             TargetType = DbCommandTypeName,
             TargetSignatureTypes = new[] { "System.Threading.Tasks.Task`1<System.Data.Common.DbDataReader>", AdoNetConstants.TypeNames.CommandBehavior, ClrNames.CancellationToken },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major4)]
+            TargetMaximumVersion = Major5)]
         public static object ExecuteReaderAsync(
             object command,
             int behavior,
@@ -245,7 +246,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.AdoNet
             TargetType = DbCommandTypeName,
             TargetSignatureTypes = new[] { ClrNames.Int32 },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major4)]
+            TargetMaximumVersion = Major5)]
         public static int ExecuteNonQuery(
             object command,
             int opCode,
@@ -299,7 +300,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.AdoNet
             TargetType = DbCommandTypeName,
             TargetSignatureTypes = new[] { "System.Threading.Tasks.Task`1<System.Int32>", ClrNames.CancellationToken },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major4)]
+            TargetMaximumVersion = Major5)]
         public static object ExecuteNonQueryAsync(
             object command,
             object boxedCancellationToken,
@@ -369,7 +370,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.AdoNet
             TargetType = DbCommandTypeName,
             TargetSignatureTypes = new[] { ClrNames.Object },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major4)]
+            TargetMaximumVersion = Major5)]
         public static object ExecuteScalar(
             object command,
             int opCode,
@@ -423,7 +424,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.AdoNet
             TargetType = DbCommandTypeName,
             TargetSignatureTypes = new[] { "System.Threading.Tasks.Task`1<System.Object>", ClrNames.CancellationToken },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major4)]
+            TargetMaximumVersion = Major5)]
         public static object ExecuteScalarAsync(
             object command,
             object boxedCancellationToken,

@@ -27,6 +27,9 @@ jobs:
       netcoreapp3_1:
         dotnetCoreSdkVersion: 3.1.302
         publishTargetFramework: netcoreapp3.1
+      net5_0:
+        dotnetCoreSdkVersion: 5.0.x
+        publishTargetFramework: net5.0
 
   pool:
     vmImage: ubuntu-18.04
@@ -72,6 +75,9 @@ jobs:
       netcoreapp3_1:
         dotnetCoreSdkVersion: 3.1.302
         publishTargetFramework: netcoreapp3.1
+      net5_0:
+        dotnetCoreSdkVersion: 5.0.x
+        publishTargetFramework: net5.0
 
   pool:
     vmImage: ubuntu-18.04
@@ -113,6 +119,13 @@ jobs:
       containerregistrytype: Container Registry
       dockerComposeCommand: run -e TestAllPackageVersions=true -e buildConfiguration=$(buildConfiguration) IntegrationTests.Alpine.Core31
 
+  - task: DockerCompose@0
+    displayName: docker-compose run IntegrationTests.Alpine.Core50
+    condition: eq(variables['publishTargetFramework'], 'net5.0')
+    inputs:
+      containerregistrytype: Container Registry
+      dockerComposeCommand: run -e TestAllPackageVersions=true -e buildConfiguration=$(buildConfiguration) IntegrationTests.Alpine.Core50
+
   - task: PublishTestResults@2
     displayName: publish test results
     inputs:
@@ -125,35 +138,45 @@ jobs:
     matrix:
       x64:
         buildPlatform: x64
+        programFileDir: "C:\\Program Files\\dotnet"
       x86:
         buildPlatform: x86
+        programFileDir: "C:\\Program Files (x86)\\dotnet"
   pool:
     vmImage: windows-2019
 
   steps:
-  - task: UseDotNet@2
+  - powershell: |
+      Invoke-WebRequest 'https://dot.net/v1/dotnet-install.ps1' -OutFile 'dotnet-install.ps1';
+    displayName: Download dotnet-install.ps1 script
+
+  - powershell: |
+      ./dotnet-install.ps1 -Channel 2.1 -Architecture ${Env:architecture} -InstallDir "${Env:installDir}";
     displayName: install dotnet core sdk 2.1
-    inputs:
-      packageType: sdk
-      version: 2.1.x
+    env:
+      architecture: $(buildPlatform)
+      installDir: $(programFileDir)
 
-  - task: UseDotNet@2
+  - powershell: |
+      ./dotnet-install.ps1 -Channel 3.0 -Architecture ${Env:architecture} -InstallDir "${Env:installDir}";
     displayName: install dotnet core sdk 3.0
-    inputs:
-      packageType: sdk
-      version: 3.0.x
+    env:
+      architecture: $(buildPlatform)
+      installDir: $(programFileDir)
 
-  - task: UseDotNet@2
+  - powershell: |
+      ./dotnet-install.ps1 -Channel 3.1 -Architecture ${Env:architecture} -InstallDir "${Env:installDir}";
     displayName: install dotnet core sdk 3.1
-    inputs:
-      packageType: sdk
-      version: 3.1.302
+    env:
+      architecture: $(buildPlatform)
+      installDir: $(programFileDir)
 
-  - task: UseDotNet@2
+  - powershell: |
+      ./dotnet-install.ps1 -Channel 5.0 -Architecture ${Env:architecture} -InstallDir "${Env:installDir}";
     displayName: install dotnet core sdk 5.0
-    inputs:
-      packageType: sdk
-      version: 5.0.x
+    env:
+      architecture: $(buildPlatform)
+      installDir: $(programFileDir)
 
   - task: NuGetToolInstaller@1
     displayName: install nuget
@@ -242,20 +265,26 @@ jobs:
         !reproductions/**/StackExchange.Redis.AssemblyConflict.LegacyProject.csproj
       arguments: --configuration $(buildConfiguration) -p:Platform=$(buildPlatform) -p:ManagedProfilerOutputDirectory=$(publishOutput)
 
-  - task: DotNetCoreCLI@2
-    displayName: dotnet test
-    inputs:
-      command: test
-      configuration: $(buildConfiguration)
-      projects: |
-        test/Datadog.Trace.IntegrationTests/Datadog.Trace.IntegrationTests.csproj
-        test/Datadog.Trace.OpenTracing.IntegrationTests/Datadog.Trace.OpenTracing.IntegrationTests.csproj
-      arguments: '-p:Platform=$(buildPlatform)'
+  - script: |
+      "%installDir%\dotnet.exe" test -c %config% -p:Platform=%architecture% --blame-hang --blame-hang-timeout 180s test\Datadog.Trace.IntegrationTests\Datadog.Trace.IntegrationTests.csproj
+    displayName: dotnet test IntegrationTests
+    env:
+      architecture: $(buildPlatform)
+      installDir: $(programFileDir)
+      config: $(buildConfiguration)
 
-  - task: DotNetCoreCLI@2
-    displayName: dotnet test
-    inputs:
-      command: test
-      configuration: $(buildConfiguration)
-      projects: test/Datadog.Trace.ClrProfiler.IntegrationTests/Datadog.Trace.ClrProfiler.IntegrationTests.csproj
-      arguments: '--filter "RunOnWindows=True|Category=Smoke" -p:Platform=$(buildPlatform)'
+  - script: |
+      "%installDir%\dotnet.exe" test -c %config% -p:Platform=%architecture% --blame-hang --blame-hang-timeout 180s test\Datadog.Trace.OpenTracing.IntegrationTests\Datadog.Trace.OpenTracing.IntegrationTests.csproj
+    displayName: dotnet test OpenTracing.IntegrationTests
+    env:
+      architecture: $(buildPlatform)
+      installDir: $(programFileDir)
+      config: $(buildConfiguration)
+
+  - script: |
+      "%installDir%\dotnet.exe" test -c %config% -p:Platform=%architecture% --filter "RunOnWindows=True|Category=Smoke" --blame-hang --blame-hang-timeout 180s test\Datadog.Trace.ClrProfiler.IntegrationTests\Datadog.Trace.ClrProfiler.IntegrationTests.csproj
+    displayName: dotnet test ClrProfiler.IntegrationTests
+    env:
+      architecture: $(buildPlatform)
+      installDir: $(programFileDir)
+      config: $(buildConfiguration)

@@ -18,6 +18,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
     {
         private const string IntegrationName = "Wcf";
         private const string Major4 = "4";
+        private const string Major5 = "5";
 
         private const string ChannelHandlerTypeName = "System.ServiceModel.Dispatcher.ChannelHandler";
 
@@ -38,7 +39,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             TargetType = ChannelHandlerTypeName,
             TargetSignatureTypes = new[] { ClrNames.Bool, "System.ServiceModel.Channels.RequestContext", "System.ServiceModel.OperationContext" },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major4)]
+            TargetMaximumVersion = Major5)]
         public static bool HandleRequest(
             object channelHandler,
             object requestContext,

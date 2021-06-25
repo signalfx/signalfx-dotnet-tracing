@@ -24,10 +24,10 @@ if %errorlevel% neq 0 exit /b %errorlevel%
 msbuild Datadog.Trace.proj /t:BuildFrameworkReproductions /p:Configuration=%buildConfiguration%;Platform=%buildPlatform%
 if %errorlevel% neq 0 exit /b %errorlevel%
 
-for /f %%i in ('dir /s/b %publishOutput%\net45\*.dll') do  (
-    gacutil /i %%i /f
-    if !errorlevel! neq 0 exit /b !errorlevel!
-)
+@REM for /f %%i in ('dir /s/b %publishOutput%\net45\*.dll') do  (
+@REM     gacutil /i %%i /f
+@REM     if !errorlevel! neq 0 exit /b !errorlevel!
+@REM )
 
 for /f %%i in ('dir /s/b .\samples\*.csproj') do  (
     dotnet build --configuration %buildConfiguration% -p:Platform=%buildPlatform% -p:ManagedProfilerOutputDirectory=%publishOutput% %%i

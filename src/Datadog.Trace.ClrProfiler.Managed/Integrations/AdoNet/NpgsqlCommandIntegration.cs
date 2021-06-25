@@ -17,6 +17,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.AdoNet
     {
         private const string IntegrationName = "AdoNet";
         private const string Major4 = "4";
+        private const string Major5 = "5";
 
         private const string NpgsqlAssemblyName = "Npgsql";
         private const string NpgsqlCommandTypeName = "Npgsql.NpgsqlCommand";
@@ -38,7 +39,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.AdoNet
             TargetMethod = AdoNetConstants.MethodNames.ExecuteReader,
             TargetSignatureTypes = new[] { NpgsqlDataReaderTypeName },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major4)]
+            TargetMaximumVersion = Major5)]
         public static object ExecuteReader(
             object command,
             int opCode,
@@ -93,7 +94,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.AdoNet
             TargetMethod = AdoNetConstants.MethodNames.ExecuteReader,
             TargetSignatureTypes = new[] { NpgsqlDataReaderTypeName, AdoNetConstants.TypeNames.CommandBehavior },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major4)]
+            TargetMaximumVersion = Major5)]
         public static object ExecuteReaderWithBehavior(
             object command,
             int behavior,
@@ -150,7 +151,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.AdoNet
             TargetType = NpgsqlCommandTypeName,
             TargetSignatureTypes = new[] { "System.Threading.Tasks.Task`1<Npgsql.NpgsqlDataReader>", ClrNames.CancellationToken },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major4)]
+            TargetMaximumVersion = Major5)]
         public static object ExecuteReaderAsync(
             object command,
             object boxedCancellationToken,
@@ -225,7 +226,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.AdoNet
             TargetType = NpgsqlCommandTypeName,
             TargetSignatureTypes = new[] { "System.Threading.Tasks.Task`1<Npgsql.NpgsqlDataReader>", AdoNetConstants.TypeNames.CommandBehavior, ClrNames.CancellationToken },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major4)]
+            TargetMaximumVersion = Major5)]
         public static object ExecuteReaderAsyncTwoParams(
             object command,
             int behavior,
@@ -300,7 +301,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.AdoNet
             TargetType = NpgsqlCommandTypeName,
             TargetSignatureTypes = new[] { ClrNames.Int32 },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major4)]
+            TargetMaximumVersion = Major5)]
         public static int ExecuteNonQuery(
             object command,
             int opCode,
@@ -356,7 +357,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.AdoNet
             TargetType = NpgsqlCommandTypeName,
             TargetSignatureTypes = new[] { "System.Threading.Tasks.Task`1<System.Int32>", ClrNames.CancellationToken },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major4)]
+            TargetMaximumVersion = Major5)]
         public static object ExecuteNonQueryAsync(
             object command,
             object boxedCancellationToken,
@@ -428,7 +429,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.AdoNet
             TargetType = NpgsqlCommandTypeName,
             TargetSignatureTypes = new[] { ClrNames.Object },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major4)]
+            TargetMaximumVersion = Major5)]
         public static object ExecuteScalar(
             object command,
             int opCode,
@@ -484,7 +485,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.AdoNet
             TargetType = NpgsqlCommandTypeName,
             TargetSignatureTypes = new[] { "System.Threading.Tasks.Task`1<System.Object>", ClrNames.CancellationToken },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major4)]
+            TargetMaximumVersion = Major5)]
         public static object ExecuteScalarAsync(
             object command,
             object boxedCancellationToken,
