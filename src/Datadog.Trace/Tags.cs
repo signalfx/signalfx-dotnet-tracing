@@ -151,6 +151,11 @@ namespace SignalFx.Tracing
         public const string MongoDbCollection = "mongodb.collection";
 
         /// <summary>
+        /// A Kafka topic name.
+        /// </summary>
+        public const string KafkaTopic = "kafka.topic";
+
+        /// <summary>
         /// The operation name of the GraphQL request.
         /// </summary>
         public const string GraphQLOperationName = "graphql.operation.name";
