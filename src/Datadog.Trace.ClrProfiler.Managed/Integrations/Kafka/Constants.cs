@@ -7,7 +7,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
         internal const string ConsumerType = "Confluent.Kafka.Consumer`2";
         internal const string ConfluentKafkaAssemblyName = "Confluent.Kafka";
         internal const string MinimumVersion = "1.4.0";
-        internal const string MaximumVersion = "1.*.*";
+        internal const string MaximumVersion = "1.7.0";
 
         internal const string ConsumeResultTypeName = "Confluent.Kafka.ConsumeResult`2[!0,!1]";
         internal const string TopicPartitionTypeName = "Confluent.Kafka.TopicPartition";

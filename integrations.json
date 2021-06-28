@@ -93,6 +93,38 @@
     ]
   },
   {
+    "name": "ConsumeKafka",
+    "method_replacements": [
+      {
+        "caller": {
+          "assembly": "Confluent.Kafka"
+        },
+        "target": {
+          "assembly": "Confluent.Kafka",
+          "type": "Confluent.Kafka.Consumer`2",
+          "method": "Consume",
+          "signature_types": [
+            "Confluent.Kafka.ConsumeResult`2[!0,!1]",
+            "System.Int32"
+          ],
+          "minimum_major": 1,
+          "minimum_minor": 4,
+          "minimum_patch": 0,
+          "maximum_major": 1,
+          "maximum_minor": 7,
+          "maximum_patch": 0
+        },
+        "wrapper": {
+          "assembly": "SignalFx.Tracing.ClrProfiler.Managed, Version=0.1.11.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb",
+          "type": "Datadog.Trace.ClrProfiler.Integrations.Kafka.ConsumeKafkaIntegration",
+          "method": "Consume",
+          "signature": "00 05 1C 1C 1C 08 08 0A",
+          "action": "ReplaceTargetMethod"
+        }
+      }
+    ]
+  },
+  {
     "name": "DbCommand",
     "method_replacements": [
       {
@@ -1335,6 +1367,40 @@
           "type": "Datadog.Trace.ClrProfiler.Integrations.OpenTracingIntegration",
           "method": "NoopWithoutMatchingMethod",
           "signature": "00 03 1C 08 08 0A",
+          "action": "ReplaceTargetMethod"
+        }
+      }
+    ]
+  },
+  {
+    "name": "ProduceKafka",
+    "method_replacements": [
+      {
+        "caller": {
+          "assembly": "Confluent.Kafka"
+        },
+        "target": {
+          "assembly": "Confluent.Kafka",
+          "type": "Confluent.Kafka.Producer`2",
+          "method": "Produce",
+          "signature_types": [
+            "System.Void",
+            "Confluent.Kafka.TopicPartition",
+            "Confluent.Kafka.Message`2[!0,!1]",
+            "System.Action`1[Confluent.Kafka.DeliveryReport`2[!0,!1]]"
+          ],
+          "minimum_major": 1,
+          "minimum_minor": 4,
+          "minimum_patch": 0,
+          "maximum_major": 1,
+          "maximum_minor": 7,
+          "maximum_patch": 0
+        },
+        "wrapper": {
+          "assembly": "SignalFx.Tracing.ClrProfiler.Managed, Version=0.1.11.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb",
+          "type": "Datadog.Trace.ClrProfiler.Integrations.Kafka.ProduceKafkaIntegration",
+          "method": "Produce",
+          "signature": "00 07 1C 1C 1C 1C 1C 08 08 0A",
           "action": "ReplaceTargetMethod"
         }
       }
