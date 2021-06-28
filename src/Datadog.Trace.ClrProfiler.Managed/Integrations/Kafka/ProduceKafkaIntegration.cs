@@ -98,11 +98,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             }
 
             var tracer = Tracer.Instance;
-            if (topic.TryGetPropertyValue("Topic", out string topicName))
-            {
-                topicName = string.Empty;
-                Log.Warning("Unable to access DatabaseName property.");
-            }
+            var topicName = KafkaHelper.GetProperty<string>(topic, "Topic");
 
             var parentSpan = tracer.ActiveScope?.Span;
 
