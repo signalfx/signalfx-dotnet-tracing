@@ -39,6 +39,8 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             int mdToken,
             long moduleVersionPtr)
         {
+            Log.Information(">>> ENTERING CONSUME INTERCEPT");
+
             if (consumer == null)
             {
                 throw new ArgumentNullException(nameof(consumer));
