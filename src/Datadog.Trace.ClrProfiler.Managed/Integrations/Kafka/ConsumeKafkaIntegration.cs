@@ -104,7 +104,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 return null;
             }
 
-            var headers = KafkaHelper.GetProperty<object>(result, "Headers");
+            var headers = KafkaHelper.GetPropertyValue<object>(result, "Headers");
 
             SpanContext propagatedContext = null;
             // Try to extract propagated context from headers
@@ -124,37 +124,37 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             Scope scope = null;
             try
             {
-                var message = KafkaHelper.GetProperty<object>(result, "Message");
-                var topicName = KafkaHelper.GetProperty<string>(result, "Topic");
-                var partition = KafkaHelper.GetProperty<object>(result, "Partition");
+                var message = KafkaHelper.GetPropertyValue<object>(result, "Message");
+                var topicName = KafkaHelper.GetPropertyValue<string>(result, "Topic");
+                var partition = KafkaHelper.GetPropertyValue<object>(result, "Partition");
 
                 scope = tracer.StartActive(ConsumeSyncOperationName, propagatedContext, tracer.DefaultServiceName);
                 var span = scope.Span;
                 if (partition is not null)
                 {
-                    span.Tags.Add("kafka.partition", partition.ToString());
+                    span.Tags.Add(Tags.KafkaPartition, partition.ToString());
                 }
 
                 if (message is not null)
                 {
-                    var timestamp = KafkaHelper.GetProperty<object>(result, "Timestamp");
+                    var timestamp = KafkaHelper.GetPropertyValue<object>(result, "Timestamp");
                     if (timestamp is not null)
                     {
-                        var dateTime = KafkaHelper.GetProperty<DateTime>(timestamp, "UtcDateTime");
+                        var dateTime = KafkaHelper.GetPropertyValue<DateTime>(timestamp, "UtcDateTime");
                         if (dateTime != default)
                         {
                             var consumeTime = span.StartTime.UtcDateTime;
                             var messageQueueTimeMs = Math.Max(0, (consumeTime - dateTime).TotalMilliseconds);
-                            span.Tags.Add("kafka.messageQueueTimeMs", messageQueueTimeMs.ToString(CultureInfo.InvariantCulture));
+                            span.Tags.Add(Tags.KafkaMessageQueueTimeMs, messageQueueTimeMs.ToString(CultureInfo.InvariantCulture));
                         }
                     }
 
-                    var value = KafkaHelper.GetProperty<object>(message, "Value");
-                    span.Tags.Add("kafka.tombstone", value is null ? "true" : "false");
+                    var value = KafkaHelper.GetPropertyValue<object>(message, "Value");
+                    span.Tags.Add(Tags.KafkaTombstone, value is null ? "true" : "false");
 
                     if (!string.IsNullOrEmpty(topicName))
                     {
-                        span.Tags.Add("kafka.topic", topicName);
+                        span.Tags.Add(Tags.KafkaTopic, topicName);
                     }
                 }
 
