@@ -80,7 +80,9 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             }
 
             var result = consume(millisecondsTimeout);
-            var span = CreateScope(result);
+            var scope = CreateScope(result);
+
+            scope.Dispose();
 
             return result;
         }

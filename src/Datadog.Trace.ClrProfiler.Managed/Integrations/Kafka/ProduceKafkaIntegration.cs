@@ -48,6 +48,13 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 throw new ArgumentNullException(nameof(producer));
             }
 
+            var scope = CreateScope(topic, message, ProduceSyncOperationName);
+
+            var headers = KafkaHelper.GetPropertyValue<object>(message, "Headers");
+            var headerAdapter = new KafkaHeadersCollectionAdapter(headers);
+            Tracer.Instance.Propagator
+                .Inject(scope.Span.Context, headerAdapter, (collectionAdapter, key, value) => collectionAdapter.Add(key, value));
+
             const string methodName = nameof(Produce);
             Func<object, object, object, object> produce;
             var producerType = producer.GetType();
@@ -76,20 +83,23 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 throw;
             }
 
-            using var scope = CreateScope(topic, ProduceSyncOperationName);
             try
             {
                 var returned = produce(topic, message, deliveryHandler);
                 return returned;
             }
-            catch (Exception ex) when (scope?.Span.SetExceptionForFilter(ex) ?? false)
+            catch (Exception ex) when (scope.Span.SetExceptionForFilter(ex))
             {
                 // unreachable code
                 throw;
             }
+            finally
+            {
+                scope.Dispose();
+            }
         }
 
-        private static Scope CreateScope(object topic, string operationName)
+        private static Scope CreateScope(string topicName, object message, string operationName)
         {
             if (!Tracer.Instance.Settings.IsIntegrationEnabled(Constants.IntegrationName))
             {
@@ -98,16 +108,13 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             }
 
             var tracer = Tracer.Instance;
-            var topicName = KafkaHelper.GetProperty<string>(topic, "Topic");
 
             var parentSpan = tracer.ActiveScope?.Span;
-
-            if (parentSpan != null &&
-                parentSpan.GetTag(Tags.DbType) == SpanTypes.MongoDb &&
+            if (parentSpan is not null &&
                 parentSpan.OperationName == operationName &&
                 parentSpan.GetTag(Tags.KafkaTopic) == topicName)
             {
-                // we are already instrumenting this,
+                // we are already instrumenting this
                 return null;
             }
 
@@ -127,6 +134,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             }
 
             return scope;
+        }
+
+        private static Scope CreateScope(object topicPartition, object message, string operationName)
+        {
+            var topicName = KafkaHelper.GetPropertyValue<string>(topicPartition, "Topic");
+            return CreateScope(topicName, message, operationName);
         }
     }
 }
