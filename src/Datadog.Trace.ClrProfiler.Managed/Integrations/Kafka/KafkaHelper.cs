@@ -7,7 +7,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
     {
         private static readonly ILogger Log = SignalFxLogging.GetLogger(typeof(ConsumeKafkaIntegration));
 
-        internal static T GetProperty<T>(object obj, string propertyName)
+        internal static T GetPropertyValue<T>(object obj, string propertyName)
         {
             if (obj.TryGetPropertyValue("propertyName", out T property))
             {
