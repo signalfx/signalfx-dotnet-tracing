@@ -13,8 +13,9 @@ namespace Samples.Kafka
         public static void Main(string[] args)
         {
             var kafkaUrl = Environment.GetEnvironmentVariable("KAFKA_HOST") ?? "localhost:29092";
-            const string topic = "dotnet-test-topic";
-
+            var topicName = "dotnet-test-topic";
+            var topic = new TopicPartition(topicName, Partition.Any);
+;
             var pConfig = new ProducerConfig { BootstrapServers = kafkaUrl };
             using (var producer = new ProducerBuilder<Null, string>(pConfig).Build())
             {
@@ -30,10 +31,10 @@ namespace Samples.Kafka
             };
             using (var consumer = new ConsumerBuilder<Null, string>(cConfig).Build())
             {
-                consumer.Subscribe(topic);
+                consumer.Subscribe(topicName);
                 try
                 {
-                    var consumeResult = consumer.Consume();
+                    var consumeResult = consumer.Consume(1000);
                     Console.WriteLine($"consumed: {consumeResult.Message.Value}");
                 }
                 catch (ConsumeException ex)
