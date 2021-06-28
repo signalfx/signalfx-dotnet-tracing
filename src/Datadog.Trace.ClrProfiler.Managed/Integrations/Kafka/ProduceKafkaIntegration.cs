@@ -43,6 +43,8 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             int mdToken,
             long moduleVersionPtr)
         {
+            Log.Information(">>> ENTERING PRODUCE INTERCEPT");
+
             if (producer == null)
             {
                 throw new ArgumentNullException(nameof(producer));
