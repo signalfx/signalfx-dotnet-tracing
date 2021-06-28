@@ -8,20 +8,10 @@ using SignalFx.Tracing.Logging;
 namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
 {
     /// <summary>
-    /// Tracer integration for Kafka.
+    /// Tracer integration for Kafka Produce method.
     /// </summary>
     public static class ProduceKafkaIntegration
     {
-        private const string IntegrationName = "Kafka";
-        private const string ProducerType = "Confluent.Kafka.Producer`2";
-        private const string ConfluentKafkaAssemblyName = "Confluent.Kafka";
-        private const string MinimumVersion = "1.4.0";
-        private const string MaximumVersion = "1.*.*";
-
-        private const string TopicPartitionTypeName = "Confluent.Kafka.TopicPartition";
-        private const string MessageTypeName = "Confluent.Kafka.Message`2[!0,!1]";
-        private const string ActionOfDeliveryReportTypeName = "System.Action`1[Confluent.Kafka.DeliveryReport`2[!0,!1]]";
-
         private const string ProduceSyncOperationName = "kafka.produce";
 
         private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(ProduceKafkaIntegration));
@@ -38,12 +28,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
         /// <param name="moduleVersionPtr">A pointer to the module version GUID.</param>
         /// <returns>The original result</returns>
         [InterceptMethod(
-            CallerAssembly = ConfluentKafkaAssemblyName,
-            TargetAssembly = ConfluentKafkaAssemblyName,
-            TargetType = ProducerType,
-            TargetSignatureTypes = new[] { ClrNames.Void, TopicPartitionTypeName, MessageTypeName, ActionOfDeliveryReportTypeName },
-            TargetMinimumVersion = MinimumVersion,
-            TargetMaximumVersion = MaximumVersion)]
+            CallerAssembly = Constants.ConfluentKafkaAssemblyName,
+            TargetAssembly = Constants.ConfluentKafkaAssemblyName,
+            TargetType = Constants.ProducerType,
+            TargetSignatureTypes = new[] { ClrNames.Void, Constants.TopicPartitionTypeName, Constants.MessageTypeName, Constants.ActionOfDeliveryReportTypeName },
+            TargetMinimumVersion = Constants.MinimumVersion,
+            TargetMaximumVersion = Constants.MaximumVersion)]
         public static object Produce(
             object producer,
             object topic,
@@ -69,7 +59,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                        .Start(moduleVersionPtr, mdToken, opCode, methodName)
                        .WithConcreteType(producerType)
                        .WithParameters(topic, message, deliveryHandler)
-                       .WithNamespaceAndNameFilters(ClrNames.Void, TopicPartitionTypeName, MessageTypeName, ActionOfDeliveryReportTypeName)
+                       .WithNamespaceAndNameFilters(ClrNames.Void, Constants.TopicPartitionTypeName, Constants.MessageTypeName, Constants.ActionOfDeliveryReportTypeName)
                        .Build();
             }
             catch (Exception ex)
@@ -80,7 +70,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                     moduleVersionPointer: moduleVersionPtr,
                     mdToken: mdToken,
                     opCode: opCode,
-                    instrumentedType: ProducerType,
+                    instrumentedType: Constants.ProducerType,
                     methodName: methodName,
                     instanceType: producer.GetType().AssemblyQualifiedName);
                 throw;
@@ -101,7 +91,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
 
         private static Scope CreateScope(object topic, string operationName)
         {
-            if (!Tracer.Instance.Settings.IsIntegrationEnabled(IntegrationName))
+            if (!Tracer.Instance.Settings.IsIntegrationEnabled(Constants.IntegrationName))
             {
                 // integration disabled, don't create a scope, skip this trace
                 return null;
@@ -131,7 +121,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 scope = tracer.StartActive(operationName, serviceName: tracer.DefaultServiceName);
                 var span = scope.Span;
                 span.Type = SpanTypes.Kafka;
-                span.SetTag(Tags.InstrumentationName, IntegrationName);
+                span.SetTag(Tags.InstrumentationName, Constants.IntegrationName);
                 span.SetTag(Tags.SpanKind, SpanKinds.Client);
                 span.SetTag(Tags.KafkaTopic, topicName);
             }
