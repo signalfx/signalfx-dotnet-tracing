@@ -26,7 +26,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
         /// <param name="moduleVersionPtr">A pointer to the module version GUID.</param>
         /// <returns>The original result</returns>
         [InterceptMethod(
-            CallerAssembly = Constants.ConfluentKafkaAssemblyName,
             TargetAssembly = Constants.ConfluentKafkaAssemblyName,
             TargetType = Constants.ConsumerType,
             TargetSignatureTypes = new[] { Constants.ConsumeResultTypeName, ClrNames.Int32 },
