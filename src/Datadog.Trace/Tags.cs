@@ -153,22 +153,22 @@ namespace SignalFx.Tracing
         /// <summary>
         /// The Kafka topic name.
         /// </summary>
-        public const string KafkaTopic = "kafka.topic";
+        public const string KafkaTopic = "massaging.kafka.topic";
 
         /// <summary>
         /// The Kafka partition name.
         /// </summary>
-        public const string KafkaPartition = "kafka.partition";
+        public const string KafkaPartition = "massaging.kafka.partition";
 
         /// <summary>
         /// The Kafka message queue time in milliseconds.
         /// </summary>
-        public const string KafkaMessageQueueTimeMs = "kafka.messageQueueTimeMs";
+        public const string KafkaMessageQueueTimeMs = "massaging.kafka.messageQueueTimeMs";
 
         /// <summary>
         /// The Kafka tombstone indicator.
         /// </summary>
-        public const string KafkaTombstone = "kafka.tombstone";
+        public const string KafkaTombstone = "massaging.kafka.tombstone";
 
         /// <summary>
         /// The operation name of the GraphQL request.
