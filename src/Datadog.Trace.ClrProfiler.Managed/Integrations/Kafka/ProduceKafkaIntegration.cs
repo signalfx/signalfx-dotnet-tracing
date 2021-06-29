@@ -92,7 +92,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             }
             catch (Exception ex) when (scope.Span.SetExceptionForFilter(ex))
             {
-                // unreachable code
                 throw;
             }
             finally

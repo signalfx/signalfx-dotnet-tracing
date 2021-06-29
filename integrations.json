@@ -104,7 +104,7 @@
           "type": "Confluent.Kafka.Consumer`2",
           "method": "Consume",
           "signature_types": [
-            "Confluent.Kafka.ConsumeResult`2[!0,!1]",
+            "Confluent.Kafka.ConsumeResult`2<TKey,TValue>",
             "System.Int32"
           ],
           "minimum_major": 1,
@@ -1386,8 +1386,8 @@
           "signature_types": [
             "System.Void",
             "Confluent.Kafka.TopicPartition",
-            "Confluent.Kafka.Message`2[!0,!1]",
-            "System.Action`1[Confluent.Kafka.DeliveryReport`2[!0,!1]]"
+            "Confluent.Kafka.Message`2<TKey,TValue>",
+            "System.Action`1<Confluent.Kafka.DeliveryReport`2<TKey,TValue>>"
           ],
           "minimum_major": 1,
           "minimum_minor": 4,
