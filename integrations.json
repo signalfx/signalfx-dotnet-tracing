@@ -96,9 +96,7 @@
     "name": "ConsumeKafka",
     "method_replacements": [
       {
-        "caller": {
-          "assembly": "Confluent.Kafka"
-        },
+        "caller": {},
         "target": {
           "assembly": "Confluent.Kafka",
           "type": "Confluent.Kafka.Consumer`2",
@@ -1376,9 +1374,7 @@
     "name": "ProduceKafka",
     "method_replacements": [
       {
-        "caller": {
-          "assembly": "Confluent.Kafka"
-        },
+        "caller": {},
         "target": {
           "assembly": "Confluent.Kafka",
           "type": "Confluent.Kafka.Producer`2",
