@@ -116,7 +116,7 @@
           "assembly": "SignalFx.Tracing.ClrProfiler.Managed, Version=0.1.11.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb",
           "type": "Datadog.Trace.ClrProfiler.Integrations.Kafka.ConsumeKafkaIntegration",
           "method": "Consume",
-          "signature": "00 05 1C 1C 1C 08 08 0A",
+          "signature": "00 05 1C 1C 08 08 08 0A",
           "action": "ReplaceTargetMethod"
         }
       }

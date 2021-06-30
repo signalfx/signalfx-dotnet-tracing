@@ -20,7 +20,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
         /// Traces a synchronous Consume call to Kafka.
         /// </summary>
         /// <param name="consumer">The consumer for the original method.</param>
-        /// <param name="boxedMillisecondsTimeout">The wait timeout in ms.</param>
+        /// <param name="millisecondsTimeout">The wait timeout in ms.</param>
         /// <param name="opCode">The OpCode used in the original method call.</param>
         /// <param name="mdToken">The mdToken of the original method call.</param>
         /// <param name="moduleVersionPtr">A pointer to the module version GUID.</param>
@@ -33,7 +33,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             TargetMaximumVersion = Constants.MaximumVersion)]
         public static object Consume(
             object consumer,
-            object boxedMillisecondsTimeout,
+            int millisecondsTimeout,
             int opCode,
             int mdToken,
             long moduleVersionPtr)
@@ -58,12 +58,11 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
 
             try
             {
-                Log.Information(">>> Building consume method");
                 consume =
                     MethodBuilder<Func<object, int, object>>
                        .Start(moduleVersionPtr, mdToken, opCode, methodName)
                        .WithConcreteType(consumerType)
-                       .WithParameters(10000)
+                       .WithParameters(millisecondsTimeout)
                        .WithNamespaceAndNameFilters("Confluent.Kafka.ConsumeResult`2", ClrNames.Int32)
                        .Build();
             }
@@ -81,9 +80,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 throw;
             }
 
-            Log.Information(">>> Calling consume method");
-            var result = consume(consumer, 10000);
-            Log.Information(">>> Creating scope");
+            var result = consume(consumer, millisecondsTimeout);
             var scope = CreateScope(result);
 
             scope.Dispose();
