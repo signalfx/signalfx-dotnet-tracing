@@ -27,7 +27,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 var headers = Activator.CreateInstance(Assembly.Load(Constants.ConfluentKafkaAssemblyName).GetType(Constants.HeadersType));
                 var headersProperty = message.GetType().GetProperty("Headers");
                 var setter = headersProperty.GetSetMethod(nonPublic: false);
-                setter.Invoke(message, new object[] { headers });
+                setter.Invoke(message, new[] { headers });
 
                 return headers;
             }
