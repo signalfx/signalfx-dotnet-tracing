@@ -31,6 +31,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             var parameters = new object[] { name, null };
             if (!(bool)_tryGetLastBytes.Invoke(_headers, parameters))
             {
+                Log.Information("Could not retrieve header {header}.", name);
                 return Enumerable.Empty<string>();
             }
 
