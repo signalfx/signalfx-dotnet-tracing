@@ -142,6 +142,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
         private static Scope CreateScope(object topicPartition, object message, string operationName)
         {
             var topicName = KafkaHelper.GetPropertyValue<string>(topicPartition, "Topic");
+            
             return CreateScope(topicName, message, operationName);
         }
     }

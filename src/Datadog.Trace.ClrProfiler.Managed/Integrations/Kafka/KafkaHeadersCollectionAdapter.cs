@@ -20,9 +20,10 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
         public KafkaHeadersCollectionAdapter(object headers)
         {
             _headers = headers;
-            _tryGetLastBytes = _headers.GetType().GetMethod("TryGetLastBytes");
-            _add = _headers.GetType().GetMethod("Add");
-            _remove = _headers.GetType().GetMethod("Remove");
+            var methods = _headers.GetType().GetMethods().ToList();
+            _tryGetLastBytes = methods.FirstOrDefault(m => m.Name == "TryGetLastBytes");
+            _add = methods.FirstOrDefault(m => m.Name == "Add" && m.GetParameters().Length == 2);
+            _remove = methods.FirstOrDefault(m => m.Name == "Remove");
         }
 
         public IEnumerable<string> GetValues(string name)
@@ -54,7 +55,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
 
         public void Add(string name, string value)
         {
-            _add.Invoke(_headers, new object[] { Encoding.UTF8.GetBytes(value) });
+            _add.Invoke(_headers, new object[] { name, Encoding.UTF8.GetBytes(value) });
         }
 
         public void Remove(string name)
