@@ -12,6 +12,13 @@ namespace Samples.Kafka
     {
         public static void Main(string[] args)
         {
+            // If calls of instrumented methods are directly on Main the instrumentation doesn't happen:
+            // [warn] JITCompilationStarted skipping method: Method replacement found but the managed profiler has not yet been loaded into AppDomain
+            ProduceConsumeUsingKafka();
+        }
+        
+        private static void ProduceConsumeUsingKafka()
+        {
             var kafkaUrl = Environment.GetEnvironmentVariable("KAFKA_HOST") ?? "localhost:29092";
             var topicName = "dotnet-test-topic";
             var topic = new TopicPartition(topicName, Partition.Any);
@@ -35,7 +42,7 @@ namespace Samples.Kafka
                 try
                 {
                     var consumeResult = consumer.Consume(10000);
-                    Console.WriteLine($"consumed: {consumeResult.Message.Value}");
+                    Console.WriteLine($"consumed: {consumeResult?.Message?.Value}");
                 }
                 catch (ConsumeException ex)
                 {

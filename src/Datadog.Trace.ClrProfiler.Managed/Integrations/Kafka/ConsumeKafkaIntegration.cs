@@ -33,7 +33,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             TargetMaximumVersion = Constants.MaximumVersion)]
         public static object Consume(
             object consumer,
-            object millisecondsTimeout,
+            int millisecondsTimeout,
             int opCode,
             int mdToken,
             long moduleVersionPtr)
@@ -46,7 +46,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             }
 
             const string methodName = nameof(Consume);
-            Func<object, object> consume;
+            Func<object, int, object> consume;
             var consumerType = consumer.GetType();
 
             var activeScope = Tracer.Instance.ActiveScope;
@@ -59,11 +59,11 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             try
             {
                 consume =
-                    MethodBuilder<Func<object, object>>
+                    MethodBuilder<Func<object, int, object>>
                        .Start(moduleVersionPtr, mdToken, opCode, methodName)
                        .WithConcreteType(consumerType)
                        .WithParameters(millisecondsTimeout)
-                       .WithNamespaceAndNameFilters(Constants.ConsumeResultTypeName, ClrNames.Int32)
+                       .WithNamespaceAndNameFilters("Confluent.Kafka.ConsumeResult`2", ClrNames.Int32)
                        .Build();
             }
             catch (Exception ex)
@@ -74,13 +74,13 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                     moduleVersionPointer: moduleVersionPtr,
                     mdToken: mdToken,
                     opCode: opCode,
-                    instrumentedType: Constants.ProducerType,
+                    instrumentedType: Constants.ConsumerType,
                     methodName: methodName,
                     instanceType: consumer.GetType().AssemblyQualifiedName);
                 throw;
             }
 
-            var result = consume(millisecondsTimeout);
+            var result = consume(consumer, millisecondsTimeout);
             var scope = CreateScope(result);
 
             scope.Dispose();
@@ -105,21 +105,23 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 return null;
             }
 
-            var headers = KafkaHelper.GetPropertyValue<object>(result, "Headers");
-
             SpanContext propagatedContext = null;
-            // Try to extract propagated context from headers
 
-            var headersAdapter = new KafkaHeadersCollectionAdapter(headers);
+            // Try to extract propagated context from headers.
+            var headers = KafkaHelper.GetPropertyValue<object>(result, "Headers");
+            if (headers != null)
+            {
+                var headersAdapter = new KafkaHeadersCollectionAdapter(headers);
 
-            try
-            {
-                propagatedContext = tracer.Propagator
-                    .Extract(headersAdapter, (h, name) => h.GetValues(name));
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Error extracting propagated headers from Kafka message");
+                try
+                {
+                    propagatedContext = tracer.Propagator
+                        .Extract(headersAdapter, (h, name) => h.GetValues(name));
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Error extracting propagated headers from Kafka message");
+                }
             }
 
             Scope scope = null;
