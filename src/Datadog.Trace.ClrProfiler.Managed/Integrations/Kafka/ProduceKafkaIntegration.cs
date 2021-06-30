@@ -52,18 +52,21 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             var scope = CreateScope(topic, message, ProduceSyncOperationName);
 
             var headers = KafkaHelper.GetPropertyValue<object>(message, "Headers");
-            var headerAdapter = new KafkaHeadersCollectionAdapter(headers);
-            Tracer.Instance.Propagator
-                .Inject(scope.Span.Context, headerAdapter, (collectionAdapter, key, value) => collectionAdapter.Add(key, value));
+            if (headers != null)
+            {
+                var headerAdapter = new KafkaHeadersCollectionAdapter(headers);
+                Tracer.Instance.Propagator
+                    .Inject(scope.Span.Context, headerAdapter, (collectionAdapter, key, value) => collectionAdapter.Add(key, value));
+            }
 
             const string methodName = nameof(Produce);
-            Func<object, object, object, object> produce;
+            Action<object, object, object, object> produce;
             var producerType = producer.GetType();
 
             try
             {
                 produce =
-                    MethodBuilder<Func<object, object, object, object>>
+                    MethodBuilder<Action<object, object, object, object>>
                        .Start(moduleVersionPtr, mdToken, opCode, methodName)
                        .WithConcreteType(producerType)
                        .WithParameters(topic, message, deliveryHandler)
@@ -86,8 +89,8 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
 
             try
             {
-                var returned = produce(topic, message, deliveryHandler);
-                return returned;
+                produce(producer, topic, message, deliveryHandler);
+                return null;
             }
             catch (Exception ex) when (scope.Span.SetExceptionForFilter(ex))
             {
