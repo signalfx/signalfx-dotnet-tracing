@@ -9,7 +9,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
 
         internal static T GetPropertyValue<T>(object obj, string propertyName)
         {
-            if (obj.TryGetPropertyValue("propertyName", out T property))
+            if (!obj.TryGetPropertyValue(propertyName, out T property))
             {
                 property = default;
                 Log.Warning($"Unable to access {propertyName} property.");
