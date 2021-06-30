@@ -108,26 +108,29 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             SpanContext propagatedContext = null;
 
             // Try to extract propagated context from headers.
-            var headers = KafkaHelper.GetPropertyValue<object>(result, "Headers");
-            if (headers != null)
+            var message = KafkaHelper.GetPropertyValue<object>(result, "Message");
+            if (message is not null)
             {
-                var headersAdapter = new KafkaHeadersCollectionAdapter(headers);
+                var headers = KafkaHelper.GetPropertyValue<object>(message, "Headers");
+                if (headers is not null)
+                {
+                    var headersAdapter = new KafkaHeadersCollectionAdapter(headers);
 
-                try
-                {
-                    propagatedContext = tracer.Propagator
-                        .Extract(headersAdapter, (h, name) => h.GetValues(name));
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex, "Error extracting propagated headers from Kafka message");
+                    try
+                    {
+                        propagatedContext = tracer.Propagator
+                            .Extract(headersAdapter, (h, name) => h.GetValues(name));
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex, "Error extracting propagated headers from Kafka message");
+                    }
                 }
             }
 
             Scope scope = null;
             try
             {
-                var message = KafkaHelper.GetPropertyValue<object>(result, "Message");
                 var topicName = KafkaHelper.GetPropertyValue<string>(result, "Topic");
                 var partition = KafkaHelper.GetPropertyValue<object>(result, "Partition");
 
