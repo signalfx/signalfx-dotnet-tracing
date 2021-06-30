@@ -44,19 +44,19 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
         {
             Log.Information(">>> ENTERING PRODUCE INTERCEPT");
 
-            if (producer == null)
+            if (producer is null)
             {
                 throw new ArgumentNullException(nameof(producer));
             }
 
             var scope = CreateScope(topic, message, ProduceSyncOperationName);
 
-            var headers = KafkaHelper.GetPropertyValue<object>(message, "Headers");
-            if (headers != null)
+            var headers = KafkaHelper.GetPropertyValue<object>(message, "Headers") ?? KafkaHelper.CreateHeaders(message);
+            if (headers is not null)
             {
                 var headerAdapter = new KafkaHeadersCollectionAdapter(headers);
                 Tracer.Instance.Propagator
-                    .Inject(scope.Span.Context, headerAdapter, (collectionAdapter, key, value) => collectionAdapter.Add(key, value));
+                      .Inject(scope.Span.Context, headerAdapter, (collectionAdapter, key, value) => collectionAdapter.Add(key, value));
             }
 
             const string methodName = nameof(Produce);
@@ -142,7 +142,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
         private static Scope CreateScope(object topicPartition, object message, string operationName)
         {
             var topicName = KafkaHelper.GetPropertyValue<string>(topicPartition, "Topic");
-            
             return CreateScope(topicName, message, operationName);
         }
     }
