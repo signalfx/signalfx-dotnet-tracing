@@ -1383,6 +1383,104 @@
         "target": {
           "assembly": "System.Data",
           "type": "System.Data.SqlClient.SqlCommand",
+          "method": "ExecuteXmlReader",
+          "signature_types": [
+            "System.Xml.XmlReader"
+          ],
+          "minimum_major": 4,
+          "minimum_minor": 0,
+          "minimum_patch": 0,
+          "maximum_major": 5,
+          "maximum_minor": 65535,
+          "maximum_patch": 65535
+        },
+        "wrapper": {
+          "assembly": "SignalFx.Tracing.ClrProfiler.Managed, Version=0.1.11.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb",
+          "type": "Datadog.Trace.ClrProfiler.Integrations.AdoNet.SqlCommandIntegration",
+          "method": "ExecuteXmlReader",
+          "signature": "00 04 1C 1C 08 08 0A",
+          "action": "ReplaceTargetMethod"
+        }
+      },
+      {
+        "caller": {},
+        "target": {
+          "assembly": "System.Data.SqlClient",
+          "type": "System.Data.SqlClient.SqlCommand",
+          "method": "ExecuteXmlReader",
+          "signature_types": [
+            "System.Xml.XmlReader"
+          ],
+          "minimum_major": 4,
+          "minimum_minor": 0,
+          "minimum_patch": 0,
+          "maximum_major": 5,
+          "maximum_minor": 65535,
+          "maximum_patch": 65535
+        },
+        "wrapper": {
+          "assembly": "SignalFx.Tracing.ClrProfiler.Managed, Version=0.1.11.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb",
+          "type": "Datadog.Trace.ClrProfiler.Integrations.AdoNet.SqlCommandIntegration",
+          "method": "ExecuteXmlReader",
+          "signature": "00 04 1C 1C 08 08 0A",
+          "action": "ReplaceTargetMethod"
+        }
+      },
+      {
+        "caller": {},
+        "target": {
+          "assembly": "System.Data",
+          "type": "System.Data.SqlClient.SqlCommand",
+          "method": "ExecuteXmlReaderAsync",
+          "signature_types": [
+            "System.Threading.Tasks.Task`1<System.Xml.XmlReader>",
+            "System.Threading.CancellationToken"
+          ],
+          "minimum_major": 4,
+          "minimum_minor": 0,
+          "minimum_patch": 0,
+          "maximum_major": 5,
+          "maximum_minor": 65535,
+          "maximum_patch": 65535
+        },
+        "wrapper": {
+          "assembly": "SignalFx.Tracing.ClrProfiler.Managed, Version=0.1.11.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb",
+          "type": "Datadog.Trace.ClrProfiler.Integrations.AdoNet.SqlCommandIntegration",
+          "method": "ExecuteXmlReaderAsync",
+          "signature": "00 05 1C 1C 1C 08 08 0A",
+          "action": "ReplaceTargetMethod"
+        }
+      },
+      {
+        "caller": {},
+        "target": {
+          "assembly": "System.Data.SqlClient",
+          "type": "System.Data.SqlClient.SqlCommand",
+          "method": "ExecuteXmlReaderAsync",
+          "signature_types": [
+            "System.Threading.Tasks.Task`1<System.Xml.XmlReader>",
+            "System.Threading.CancellationToken"
+          ],
+          "minimum_major": 4,
+          "minimum_minor": 0,
+          "minimum_patch": 0,
+          "maximum_major": 5,
+          "maximum_minor": 65535,
+          "maximum_patch": 65535
+        },
+        "wrapper": {
+          "assembly": "SignalFx.Tracing.ClrProfiler.Managed, Version=0.1.11.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb",
+          "type": "Datadog.Trace.ClrProfiler.Integrations.AdoNet.SqlCommandIntegration",
+          "method": "ExecuteXmlReaderAsync",
+          "signature": "00 05 1C 1C 1C 08 08 0A",
+          "action": "ReplaceTargetMethod"
+        }
+      },
+      {
+        "caller": {},
+        "target": {
+          "assembly": "System.Data",
+          "type": "System.Data.SqlClient.SqlCommand",
           "method": "ExecuteReader",
           "signature_types": [
             "System.Data.SqlClient.SqlDataReader"

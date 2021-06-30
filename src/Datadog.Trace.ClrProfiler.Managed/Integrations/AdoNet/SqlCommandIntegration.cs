@@ -2,8 +2,12 @@
 using System;
 using System.Data;
 using System.Data.Common;
+#if NETFRAMEWORK
+using System.Data.SqlClient;
+#endif
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 using Datadog.Trace.ClrProfiler.Emit;
 using SignalFx.Tracing;
 using SignalFx.Tracing.Logging;
@@ -22,7 +26,139 @@ namespace Datadog.Trace.ClrProfiler.Integrations.AdoNet
         private const string SqlCommandTypeName = "System.Data.SqlClient.SqlCommand";
         private const string SqlDataReaderTypeName = "System.Data.SqlClient.SqlDataReader";
 
+        // ExceuteXmlReader and ExceuteXmlReaderAsync are only available on SqlCommand.
+        private const string ExecuteXmlReaderMethodName = "ExecuteXmlReader";
+        private const string ExecuteXmlReaderAsyncMethodName = "ExecuteXmlReaderAsync";
+        private const string XmlReaderTypeName = "System.Xml.XmlReader";
+
         private static readonly ILog Log = LogProvider.GetCurrentClassLogger();
+
+        /// <summary>
+        /// Instrumentation wrapper for SqlCommand.ExecuteXmlReader().
+        /// </summary>
+        /// <param name="command">The object referenced by this in the instrumented method.</param>
+        /// <param name="opCode">The OpCode used in the original method call.</param>
+        /// <param name="mdToken">The mdToken of the original method call.</param>
+        /// <param name="moduleVersionPtr">A pointer to the module version GUID.</param>
+        /// <returns>The value returned by the instrumented method.</returns>
+        [InterceptMethod(
+            TargetAssemblies = new[] { AdoNetConstants.AssemblyNames.SystemData, AdoNetConstants.AssemblyNames.SystemDataSqlClient },
+            TargetType = SqlCommandTypeName,
+            TargetMethod = ExecuteXmlReaderMethodName,
+            TargetSignatureTypes = new[] { XmlReaderTypeName },
+            TargetMinimumVersion = Major4,
+            TargetMaximumVersion = Major5)]
+        public static object ExecuteXmlReader(
+            object command,
+            int opCode,
+            int mdToken,
+            long moduleVersionPtr)
+        {
+            Func<object, object> instrumentedMethod;
+
+            try
+            {
+                var targetType = command.GetInstrumentedType(SqlCommandTypeName);
+
+                instrumentedMethod =
+                    MethodBuilder<Func<object, object>>
+                       .Start(moduleVersionPtr, mdToken, opCode, ExecuteXmlReaderMethodName)
+                       .WithConcreteType(targetType)
+                       .WithNamespaceAndNameFilters(XmlReaderTypeName)
+                       .Build();
+            }
+            catch (Exception ex)
+            {
+                Log.ErrorException($"Error resolving {SqlCommandTypeName}.{ExecuteXmlReaderMethodName}(...)", ex);
+                throw;
+            }
+
+            using (var scope = ScopeFactory.CreateDbCommandScope(Tracer.Instance, command as DbCommand, IntegrationName))
+            {
+                try
+                {
+                    return instrumentedMethod(command);
+                }
+                catch (Exception ex)
+                {
+                    scope?.Span.SetException(ex);
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Instrumentation wrapper for SqlCommand.ExecuteXmlReaderAsync().
+        /// </summary>
+        /// <param name="command">The object referenced by this in the instrumented method.</param>
+        /// <param name="boxedCancellationToken">The <see cref="CancellationToken"/> value used in the original method call.</param>
+        /// <param name="opCode">The OpCode used in the original method call.</param>
+        /// <param name="mdToken">The mdToken of the original method call.</param>
+        /// <param name="moduleVersionPtr">A pointer to the module version GUID.</param>
+        /// <returns>The value returned by the instrumented method.</returns>
+        [InterceptMethod(
+            TargetAssemblies = new[] { AdoNetConstants.AssemblyNames.SystemData, AdoNetConstants.AssemblyNames.SystemDataSqlClient },
+            TargetType = SqlCommandTypeName,
+            TargetSignatureTypes = new[] { "System.Threading.Tasks.Task`1<System.Xml.XmlReader>", ClrNames.CancellationToken },
+            TargetMinimumVersion = Major4,
+            TargetMaximumVersion = Major5)]
+        public static object ExecuteXmlReaderAsync(
+            object command,
+            object boxedCancellationToken,
+            int opCode,
+            int mdToken,
+            long moduleVersionPtr)
+        {
+            var cancellationToken = (CancellationToken)boxedCancellationToken;
+
+            return ExecuteXmlReaderAsyncInternal(
+                (DbCommand)command,
+                cancellationToken,
+                opCode,
+                mdToken,
+                moduleVersionPtr);
+        }
+
+        private static async Task<XmlReader> ExecuteXmlReaderAsyncInternal(
+            DbCommand command,
+            CancellationToken cancellationToken,
+            int opCode,
+            int mdToken,
+            long moduleVersionPtr)
+        {
+            Func<DbCommand, CancellationToken, Task<XmlReader>> instrumentedMethod;
+
+            try
+            {
+                var targetType = command.GetInstrumentedType(SqlCommandTypeName);
+
+                instrumentedMethod =
+                    MethodBuilder<Func<DbCommand, CancellationToken, Task<XmlReader>>>
+                       .Start(moduleVersionPtr, mdToken, opCode, nameof(ExecuteXmlReaderAsync))
+                       .WithConcreteType(targetType)
+                       .WithParameters(cancellationToken)
+                       .WithNamespaceAndNameFilters(ClrNames.GenericTask, ClrNames.CancellationToken)
+                       .Build();
+            }
+            catch (Exception ex)
+            {
+                Log.ErrorException($"Error resolving {SqlCommandTypeName}.{ExecuteXmlReaderAsyncMethodName}(...)", ex);
+                throw;
+            }
+
+            using (var scope = ScopeFactory.CreateDbCommandScope(Tracer.Instance, command, IntegrationName))
+            {
+                try
+                {
+                    return await instrumentedMethod(command, cancellationToken).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    scope?.Span.SetException(ex);
+                    throw;
+                }
+            }
+        }
 
         /// <summary>
         /// Instrumentation wrapper for SqlCommand.ExecuteReader().

@@ -17,6 +17,12 @@ namespace Samples.SqlServer
             {
                 using (var connection = CreateConnection())
                 {
+                    var xmlQueries = new SqlClientXmlQueries(connection);
+                    await xmlQueries.RunAsync().ConfigureAwait(false);
+                }
+
+                using (var connection = CreateConnection())
+                {
                     var testQueries = new RelationalDatabaseTestHarness<SqlConnection, SqlCommand, SqlDataReader>(
                         connection,
                         command => command.ExecuteNonQuery(),
