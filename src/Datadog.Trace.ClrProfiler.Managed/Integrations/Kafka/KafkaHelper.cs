@@ -100,7 +100,42 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             return scope;
         }
 
-        internal static Scope CreateProduceScope(string topicName, object message, string operationName)
+        public static Scope CreateProduceScope(object topic, object message, string operationName)
+        {
+            var topicName = topic is string t ? t : GetPropertyValue<string>(topic, "Topic");
+            return CreateProduceScope(topicName, message, operationName);
+        }
+
+        internal static T GetPropertyValue<T>(object obj, string propertyName)
+        {
+            if (!obj.TryGetPropertyValue(propertyName, out T property))
+            {
+                property = default;
+                Log.Warning($"Unable to access {propertyName} property.");
+            }
+
+            return property;
+        }
+
+        internal static object CreateHeaders(object message)
+        {
+            try
+            {
+                var headers = Activator.CreateInstance(Assembly.Load(Constants.ConfluentKafkaAssemblyName).GetType(Constants.HeadersType));
+                var headersProperty = message.GetType().GetProperty("Headers");
+                var setter = headersProperty.GetSetMethod(nonPublic: false);
+                setter.Invoke(message, new[] { headers });
+
+                return headers;
+            }
+            catch (Exception)
+            {
+                Log.Warning("Failed to create headers");
+                return null;
+            }
+        }
+
+        private static Scope CreateProduceScope(string topicName, object message, string operationName)
         {
             if (!Tracer.Instance.Settings.IsIntegrationEnabled(Constants.IntegrationName))
             {
@@ -141,41 +176,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             }
 
             return scope;
-        }
-
-        public static Scope CreateProduceScope(object topicPartition, object message, string operationName)
-        {
-            var topicName = GetPropertyValue<string>(topicPartition, "Topic");
-            return CreateProduceScope(topicName, message, operationName);
-        }
-
-        internal static T GetPropertyValue<T>(object obj, string propertyName)
-        {
-            if (!obj.TryGetPropertyValue(propertyName, out T property))
-            {
-                property = default;
-                Log.Warning($"Unable to access {propertyName} property.");
-            }
-
-            return property;
-        }
-
-        internal static object CreateHeaders(object message)
-        {
-            try
-            {
-                var headers = Activator.CreateInstance(Assembly.Load(Constants.ConfluentKafkaAssemblyName).GetType(Constants.HeadersType));
-                var headersProperty = message.GetType().GetProperty("Headers");
-                var setter = headersProperty.GetSetMethod(nonPublic: false);
-                setter.Invoke(message, new[] { headers });
-
-                return headers;
-            }
-            catch (Exception)
-            {
-                Log.Warning("Failed to create headers");
-                return null;
-            }
         }
     }
 }

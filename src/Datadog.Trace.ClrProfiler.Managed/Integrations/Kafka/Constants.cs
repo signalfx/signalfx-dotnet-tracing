@@ -4,6 +4,10 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
     {
         internal const string IntegrationName = "Kafka";
         internal const string ConsumeSyncOperationName = "kafka.consume";
+        internal const string ProduceSyncMethodName = "Produce";
+        internal const string ProduceAsyncMethodName = "ProduceAsync";
+        internal const string ConsumeSyncMethodName = "Consume";
+        internal const string ConsumeAsyncMethodName = "ConsumeAsync";
         internal const string ProducerType = "Confluent.Kafka.IProducer`2";
         internal const string ConsumerType = "Confluent.Kafka.IConsumer`2";
         internal const string HeadersType = "Confluent.Kafka.Headers";
