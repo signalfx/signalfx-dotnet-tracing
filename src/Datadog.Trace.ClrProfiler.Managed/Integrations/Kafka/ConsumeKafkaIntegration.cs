@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using Datadog.Trace.ClrProfiler.Emit;
 using SignalFx.Tracing;
 using SignalFx.Tracing.Logging;
@@ -25,10 +26,11 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
         [InterceptMethod(
             TargetAssembly = Constants.ConfluentKafkaAssemblyName,
             TargetType = Constants.ConsumerType,
+            TargetMethod = Constants.ConsumeSyncMethodName,
             TargetSignatureTypes = new[] { Constants.ConsumeResultTypeName, ClrNames.Int32 },
             TargetMinimumVersion = Constants.MinimumVersion,
             TargetMaximumVersion = Constants.MaximumVersion)]
-        public static object Consume(
+        public static object ConsumeInt32(
             object consumer,
             int millisecondsTimeout,
             int opCode,
@@ -40,7 +42,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 throw new ArgumentNullException(nameof(consumer));
             }
 
-            const string methodName = nameof(Consume);
+            const string methodName = Constants.ConsumeSyncMethodName;
             Func<object, int, object> consume;
             var consumerType = consumer.GetType();
 
@@ -76,6 +78,77 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             }
 
             var result = consume(consumer, millisecondsTimeout);
+            var scope = KafkaHelper.CreateConsumeScope(result);
+
+            scope.Dispose();
+
+            return result;
+        }
+
+        /// <summary>
+        /// Traces a synchronous Consume call to Kafka.
+        /// </summary>
+        /// <param name="consumer">The consumer for the original method.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <param name="opCode">The OpCode used in the original method call.</param>
+        /// <param name="mdToken">The mdToken of the original method call.</param>
+        /// <param name="moduleVersionPtr">A pointer to the module version GUID.</param>
+        /// <returns>The original result</returns>
+        [InterceptMethod(
+            TargetAssembly = Constants.ConfluentKafkaAssemblyName,
+            TargetType = Constants.ConsumerType,
+            TargetMethod = Constants.ConsumeSyncMethodName,
+            TargetSignatureTypes = new[] { Constants.ConsumeResultTypeName, ClrNames.CancellationToken },
+            TargetMinimumVersion = Constants.MinimumVersion,
+            TargetMaximumVersion = Constants.MaximumVersion)]
+        public static object ConsumeCancellationToken(
+            object consumer,
+            object cancellationToken,
+            int opCode,
+            int mdToken,
+            long moduleVersionPtr)
+        {
+            if (consumer == null)
+            {
+                throw new ArgumentNullException(nameof(consumer));
+            }
+
+            const string methodName = Constants.ConsumeSyncMethodName;
+            Func<object, object, object> consume;
+            var consumerType = consumer.GetType();
+
+            var activeScope = Tracer.Instance.ActiveScope;
+            var currentSpan = activeScope?.Span;
+            if (currentSpan?.OperationName == Constants.ConsumeSyncOperationName)
+            {
+                activeScope.Dispose();
+            }
+
+            try
+            {
+                consume =
+                    MethodBuilder<Func<object, object, object>>
+                       .Start(moduleVersionPtr, mdToken, opCode, methodName)
+                       .WithConcreteType(consumerType)
+                       .WithParameters(cancellationToken)
+                       .WithNamespaceAndNameFilters("Confluent.Kafka.ConsumeResult`2", ClrNames.CancellationToken)
+                       .Build();
+            }
+            catch (Exception ex)
+            {
+                // profiled app will not continue working as expected without this method
+                Log.ErrorRetrievingMethod(
+                    exception: ex,
+                    moduleVersionPointer: moduleVersionPtr,
+                    mdToken: mdToken,
+                    opCode: opCode,
+                    instrumentedType: Constants.ConsumerType,
+                    methodName: methodName,
+                    instanceType: consumer.GetType().AssemblyQualifiedName);
+                throw;
+            }
+
+            var result = consume(consumer, cancellationToken);
             var scope = KafkaHelper.CreateConsumeScope(result);
 
             scope.Dispose();

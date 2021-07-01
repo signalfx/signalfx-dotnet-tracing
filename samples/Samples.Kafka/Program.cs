@@ -1,5 +1,6 @@
 // Modified by SignalFx
 using System;
+using System.Threading;
 using Confluent.Kafka;
 
 namespace Samples.Kafka
@@ -47,7 +48,7 @@ namespace Samples.Kafka
                     consumer.Commit(consumeResult);
                     Console.WriteLine($"consumed: {consumeResult?.Message?.Value}");
 
-                    var consumeResult2 = consumer.Consume(10000);
+                    var consumeResult2 = consumer.Consume();
                     consumer.Commit(consumeResult2);
                     Console.WriteLine($"consumed: {consumeResult2?.Message?.Value}");
                 }
