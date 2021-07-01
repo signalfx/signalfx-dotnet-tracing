@@ -26,7 +26,8 @@ namespace Samples.Kafka
             var pConfig = new ProducerConfig { BootstrapServers = kafkaUrl };
             using (var producer = new ProducerBuilder<Null, string>(pConfig).Build())
             {
-                producer.Produce(topic, new Message<Null, string> { Value = "test value" });
+                producer.Produce(topicName, new Message<Null, string> { Value = "test value" });
+                producer.Produce(topic, new Message<Null, string> { Value = "test value 2" });
                 producer.Flush(TimeSpan.FromSeconds(value: 10));
             }
 
@@ -45,6 +46,10 @@ namespace Samples.Kafka
                     var consumeResult = consumer.Consume(10000);
                     consumer.Commit(consumeResult);
                     Console.WriteLine($"consumed: {consumeResult?.Message?.Value}");
+
+                    var consumeResult2 = consumer.Consume(10000);
+                    consumer.Commit(consumeResult2);
+                    Console.WriteLine($"consumed: {consumeResult2?.Message?.Value}");
                 }
                 catch (ConsumeException ex)
                 {

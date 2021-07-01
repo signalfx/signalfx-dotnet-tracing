@@ -3,6 +3,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
     internal static class Constants
     {
         internal const string IntegrationName = "Kafka";
+        internal const string ProduceSyncOperationName = "kafka.produce";
         internal const string ConsumeSyncOperationName = "kafka.consume";
         internal const string ProduceSyncMethodName = "Produce";
         internal const string ProduceAsyncMethodName = "ProduceAsync";
