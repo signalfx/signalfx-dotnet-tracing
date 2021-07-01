@@ -1,7 +1,4 @@
-using System;
 using System.Threading;
-using Datadog.Trace.ClrProfiler.Emit;
-using SignalFx.Tracing;
 using SignalFx.Tracing.Logging;
 using SignalFx.Tracing.Vendors.Serilog;
 
@@ -37,52 +34,14 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             int mdToken,
             long moduleVersionPtr)
         {
-            if (consumer == null)
-            {
-                throw new ArgumentNullException(nameof(consumer));
-            }
-
-            const string methodName = Constants.ConsumeSyncMethodName;
-            Func<object, int, object> consume;
-            var consumerType = consumer.GetType();
-
-            var activeScope = Tracer.Instance.ActiveScope;
-            var currentSpan = activeScope?.Span;
-            if (currentSpan?.OperationName == Constants.ConsumeSyncOperationName)
-            {
-                activeScope.Dispose();
-            }
-
-            try
-            {
-                consume =
-                    MethodBuilder<Func<object, int, object>>
-                       .Start(moduleVersionPtr, mdToken, opCode, methodName)
-                       .WithConcreteType(consumerType)
-                       .WithParameters(millisecondsTimeout)
-                       .WithNamespaceAndNameFilters("Confluent.Kafka.ConsumeResult`2", ClrNames.Int32)
-                       .Build();
-            }
-            catch (Exception ex)
-            {
-                // profiled app will not continue working as expected without this method
-                Log.ErrorRetrievingMethod(
-                    exception: ex,
-                    moduleVersionPointer: moduleVersionPtr,
-                    mdToken: mdToken,
-                    opCode: opCode,
-                    instrumentedType: Constants.ConsumerType,
-                    methodName: methodName,
-                    instanceType: consumer.GetType().AssemblyQualifiedName);
-                throw;
-            }
-
-            var result = consume(consumer, millisecondsTimeout);
-            var scope = KafkaHelper.CreateConsumeScope(result);
-
-            scope.Dispose();
-
-            return result;
+            return ConsumeKafkaIntegrationHelper.Consume(
+                consumer,
+                millisecondsTimeout,
+                opCode,
+                mdToken,
+                moduleVersionPtr,
+                ClrNames.Int32,
+                Log);
         }
 
         /// <summary>
@@ -108,52 +67,14 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             int mdToken,
             long moduleVersionPtr)
         {
-            if (consumer == null)
-            {
-                throw new ArgumentNullException(nameof(consumer));
-            }
-
-            const string methodName = Constants.ConsumeSyncMethodName;
-            Func<object, object, object> consume;
-            var consumerType = consumer.GetType();
-
-            var activeScope = Tracer.Instance.ActiveScope;
-            var currentSpan = activeScope?.Span;
-            if (currentSpan?.OperationName == Constants.ConsumeSyncOperationName)
-            {
-                activeScope.Dispose();
-            }
-
-            try
-            {
-                consume =
-                    MethodBuilder<Func<object, object, object>>
-                       .Start(moduleVersionPtr, mdToken, opCode, methodName)
-                       .WithConcreteType(consumerType)
-                       .WithParameters(cancellationToken)
-                       .WithNamespaceAndNameFilters("Confluent.Kafka.ConsumeResult`2", ClrNames.CancellationToken)
-                       .Build();
-            }
-            catch (Exception ex)
-            {
-                // profiled app will not continue working as expected without this method
-                Log.ErrorRetrievingMethod(
-                    exception: ex,
-                    moduleVersionPointer: moduleVersionPtr,
-                    mdToken: mdToken,
-                    opCode: opCode,
-                    instrumentedType: Constants.ConsumerType,
-                    methodName: methodName,
-                    instanceType: consumer.GetType().AssemblyQualifiedName);
-                throw;
-            }
-
-            var result = consume(consumer, cancellationToken);
-            var scope = KafkaHelper.CreateConsumeScope(result);
-
-            scope.Dispose();
-
-            return result;
+            return ConsumeKafkaIntegrationHelper.Consume(
+                consumer,
+                cancellationToken,
+                opCode,
+                mdToken,
+                moduleVersionPtr,
+                ClrNames.CancellationToken,
+                Log);
         }
     }
 }
