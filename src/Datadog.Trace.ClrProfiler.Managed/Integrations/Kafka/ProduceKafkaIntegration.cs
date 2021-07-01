@@ -42,14 +42,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             int mdToken,
             long moduleVersionPtr)
         {
-            Log.Information(">>> ENTERING PRODUCE INTERCEPT");
-
             if (producer is null)
             {
                 throw new ArgumentNullException(nameof(producer));
             }
 
-            var scope = CreateScope(topic, message, ProduceSyncOperationName);
+            var scope = KafkaHelper.CreateProduceScope(topic, message, ProduceSyncOperationName);
 
             var headers = KafkaHelper.GetPropertyValue<object>(message, "Headers") ?? KafkaHelper.CreateHeaders(message);
             if (headers is not null)
@@ -100,49 +98,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             {
                 scope.Dispose();
             }
-        }
-
-        private static Scope CreateScope(string topicName, object message, string operationName)
-        {
-            if (!Tracer.Instance.Settings.IsIntegrationEnabled(Constants.IntegrationName))
-            {
-                // integration disabled, don't create a scope, skip this trace
-                return null;
-            }
-
-            var tracer = Tracer.Instance;
-
-            var parentSpan = tracer.ActiveScope?.Span;
-            if (parentSpan is not null &&
-                parentSpan.OperationName == operationName &&
-                parentSpan.GetTag(Tags.KafkaTopic) == topicName)
-            {
-                // we are already instrumenting this
-                return null;
-            }
-
-            Scope scope = null;
-            try
-            {
-                scope = tracer.StartActive(operationName, serviceName: tracer.DefaultServiceName);
-                var span = scope.Span;
-                span.Type = SpanTypes.Kafka;
-                span.SetTag(Tags.InstrumentationName, Constants.IntegrationName);
-                span.SetTag(Tags.SpanKind, SpanKinds.Client);
-                span.SetTag(Tags.KafkaTopic, topicName);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Error creating or populating scope.");
-            }
-
-            return scope;
-        }
-
-        private static Scope CreateScope(object topicPartition, object message, string operationName)
-        {
-            var topicName = KafkaHelper.GetPropertyValue<string>(topicPartition, "Topic");
-            return CreateScope(topicName, message, operationName);
         }
     }
 }

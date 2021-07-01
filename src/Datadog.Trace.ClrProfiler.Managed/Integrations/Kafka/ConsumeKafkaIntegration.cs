@@ -1,5 +1,4 @@
 using System;
-using System.Globalization;
 using Datadog.Trace.ClrProfiler.Emit;
 using SignalFx.Tracing;
 using SignalFx.Tracing.Logging;
@@ -12,8 +11,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
     /// </summary>
     public static class ConsumeKafkaIntegration
     {
-        private const string ConsumeSyncOperationName = "kafka.consume";
-
         private static readonly ILogger Log = SignalFxLogging.GetLogger(typeof(ConsumeKafkaIntegration));
 
         /// <summary>
@@ -38,8 +35,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             int mdToken,
             long moduleVersionPtr)
         {
-            Log.Information(">>> ENTERING CONSUME INTERCEPT");
-
             if (consumer == null)
             {
                 throw new ArgumentNullException(nameof(consumer));
@@ -51,7 +46,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
 
             var activeScope = Tracer.Instance.ActiveScope;
             var currentSpan = activeScope?.Span;
-            if (currentSpan?.OperationName == ConsumeSyncOperationName)
+            if (currentSpan?.OperationName == Constants.ConsumeSyncOperationName)
             {
                 activeScope.Dispose();
             }
@@ -81,99 +76,11 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             }
 
             var result = consume(consumer, millisecondsTimeout);
-            var scope = CreateScope(result);
+            var scope = KafkaHelper.CreateConsumeScope(result);
 
             scope.Dispose();
 
             return result;
-        }
-
-        private static Scope CreateScope(object result)
-        {
-            var tracer = Tracer.Instance;
-            if (!tracer.Settings.IsIntegrationEnabled(Constants.IntegrationName))
-            {
-                // integration disabled, don't create a scope/span, skip this trace
-                return null;
-            }
-
-            var parent = tracer.ActiveScope?.Span;
-            if (parent is not null &&
-                parent.OperationName == ConsumeSyncOperationName &&
-                parent.GetTag(Tags.InstrumentationName) != null)
-            {
-                return null;
-            }
-
-            SpanContext propagatedContext = null;
-
-            // Try to extract propagated context from headers.
-            var message = KafkaHelper.GetPropertyValue<object>(result, "Message");
-            if (message is not null)
-            {
-                var headers = KafkaHelper.GetPropertyValue<object>(message, "Headers");
-                if (headers is not null)
-                {
-                    var headersAdapter = new KafkaHeadersCollectionAdapter(headers);
-
-                    try
-                    {
-                        propagatedContext = tracer.Propagator
-                            .Extract(headersAdapter, (h, name) => h.GetValues(name));
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Error(ex, "Error extracting propagated headers from Kafka message");
-                    }
-                }
-            }
-
-            Scope scope = null;
-            try
-            {
-                var topicName = KafkaHelper.GetPropertyValue<string>(result, "Topic");
-                var partition = KafkaHelper.GetPropertyValue<object>(result, "Partition");
-
-                scope = tracer.StartActive(ConsumeSyncOperationName, propagatedContext, tracer.DefaultServiceName);
-                var span = scope.Span;
-                if (partition is not null)
-                {
-                    span.Tags.Add(Tags.KafkaPartition, partition.ToString());
-                }
-
-                if (message is not null)
-                {
-                    var timestamp = KafkaHelper.GetPropertyValue<object>(result, "Timestamp");
-                    if (timestamp is not null)
-                    {
-                        var dateTime = KafkaHelper.GetPropertyValue<DateTime>(timestamp, "UtcDateTime");
-                        if (dateTime != default)
-                        {
-                            var consumeTime = span.StartTime.UtcDateTime;
-                            var messageQueueTimeMs = Math.Max(0, (consumeTime - dateTime).TotalMilliseconds);
-                            span.Tags.Add(Tags.KafkaMessageQueueTimeMs, messageQueueTimeMs.ToString(CultureInfo.InvariantCulture));
-                        }
-                    }
-
-                    var value = KafkaHelper.GetPropertyValue<object>(message, "Value");
-                    span.Tags.Add(Tags.KafkaTombstone, value is null ? "true" : "false");
-
-                    if (!string.IsNullOrEmpty(topicName))
-                    {
-                        span.Tags.Add(Tags.KafkaTopic, topicName);
-                    }
-                }
-
-                span.Type = SpanTypes.Kafka;
-                span.SetTag(Tags.InstrumentationName, Constants.IntegrationName);
-                span.SetTag(Tags.SpanKind, SpanKinds.Client);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Error creating or populating scope.");
-            }
-
-            return scope;
         }
     }
 }
