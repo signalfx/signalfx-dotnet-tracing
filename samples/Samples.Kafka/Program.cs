@@ -33,15 +33,17 @@ namespace Samples.Kafka
             var cConfig = new ConsumerConfig
             {
                 BootstrapServers = kafkaUrl,
-                GroupId = Guid.NewGuid().ToString(),
+                GroupId = "b412aa02-509b-40dc-9452-ad872d75f3f2",
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };
+
             using (var consumer = new ConsumerBuilder<Null, string>(cConfig).Build())
             {
                 consumer.Subscribe(topicName);
                 try
                 {
                     var consumeResult = consumer.Consume(10000);
+                    consumer.Commit(consumeResult);
                     Console.WriteLine($"consumed: {consumeResult?.Message?.Value}");
                 }
                 catch (ConsumeException ex)
