@@ -1451,6 +1451,60 @@
           "signature": "00 07 1C 1C 1C 1C 1C 08 08 0A",
           "action": "ReplaceTargetMethod"
         }
+      },
+      {
+        "caller": {},
+        "target": {
+          "assembly": "Confluent.Kafka",
+          "type": "Confluent.Kafka.IProducer`2",
+          "method": "ProduceAsync",
+          "signature_types": [
+            "System.Threading.Tasks.Task`1<Confluent.Kafka.DeliveryResult`2<T, T>>",
+            "System.String",
+            "Confluent.Kafka.Message`2<T, T>",
+            "System.Threading.CancellationToken"
+          ],
+          "minimum_major": 1,
+          "minimum_minor": 4,
+          "minimum_patch": 0,
+          "maximum_major": 1,
+          "maximum_minor": 65535,
+          "maximum_patch": 65535
+        },
+        "wrapper": {
+          "assembly": "SignalFx.Tracing.ClrProfiler.Managed, Version=0.1.11.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb",
+          "type": "Datadog.Trace.ClrProfiler.Integrations.Kafka.ProduceKafkaIntegration",
+          "method": "ProduceAsyncTopicPartitionTopic",
+          "signature": "00 07 1C 1C 1C 1C 1C 08 08 0A",
+          "action": "ReplaceTargetMethod"
+        }
+      },
+      {
+        "caller": {},
+        "target": {
+          "assembly": "Confluent.Kafka",
+          "type": "Confluent.Kafka.IProducer`2",
+          "method": "ProduceAsync",
+          "signature_types": [
+            "System.Threading.Tasks.Task`1<Confluent.Kafka.DeliveryResult`2<T, T>>",
+            "Confluent.Kafka.TopicPartition",
+            "Confluent.Kafka.Message`2<T, T>",
+            "System.Threading.CancellationToken"
+          ],
+          "minimum_major": 1,
+          "minimum_minor": 4,
+          "minimum_patch": 0,
+          "maximum_major": 1,
+          "maximum_minor": 65535,
+          "maximum_patch": 65535
+        },
+        "wrapper": {
+          "assembly": "SignalFx.Tracing.ClrProfiler.Managed, Version=0.1.11.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb",
+          "type": "Datadog.Trace.ClrProfiler.Integrations.Kafka.ProduceKafkaIntegration",
+          "method": "ProduceAsyncWithStringTopic",
+          "signature": "00 07 1C 1C 1C 1C 1C 08 08 0A",
+          "action": "ReplaceTargetMethod"
+        }
       }
     ]
   },
