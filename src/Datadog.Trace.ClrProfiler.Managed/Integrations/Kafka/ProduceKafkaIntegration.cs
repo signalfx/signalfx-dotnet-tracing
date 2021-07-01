@@ -90,5 +90,85 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 ClrNames.String,
                 Log);
         }
+
+        /// <summary>
+        /// Traces an asynchronous Produce call to Kafka.
+        /// </summary>
+        /// <param name="producer">The producer for the original method.</param>
+        /// <param name="topic">The topic to produce the message to.</param>
+        /// <param name="message">The message to produce.</param>
+        /// <param name="cancellationToken">A cancellation token to observe whilst waiting the returned task to complete.</param>
+        /// <param name="opCode">The OpCode used in the original method call.</param>
+        /// <param name="mdToken">The mdToken of the original method call.</param>
+        /// <param name="moduleVersionPtr">A pointer to the module version GUID.</param>
+        /// <returns>The original result</returns>
+        [InterceptMethod(
+            TargetAssembly = Constants.ConfluentKafkaAssemblyName,
+            TargetType = Constants.ProducerType,
+            TargetMethod = Constants.ProduceAsyncMethodName,
+            TargetSignatureTypes = new[] { "System.Threading.Tasks.Task`1<Confluent.Kafka.DeliveryResult`2<T, T>>", ClrNames.String, Constants.MessageTypeName, ClrNames.CancellationToken },
+            TargetMinimumVersion = Constants.MinimumVersion,
+            TargetMaximumVersion = Constants.MaximumVersion)]
+        public static object ProduceAsyncTopicPartitionTopic(
+            object producer,
+            object topic,
+            object message,
+            object cancellationToken,
+            int opCode,
+            int mdToken,
+            long moduleVersionPtr)
+        {
+            return ProducKafkaIntegrationHelper.ProduceAsync(
+                producer,
+                topic,
+                message,
+                cancellationToken,
+                opCode,
+                mdToken,
+                moduleVersionPtr,
+                Constants.ProduceAsyncOperationName,
+                Constants.TopicPartitionTypeName,
+                Log);
+        }
+
+        /// <summary>
+        /// Traces an asynchronous Produce call to Kafka.
+        /// </summary>
+        /// <param name="producer">The producer for the original method.</param>
+        /// <param name="topic">The topic to produce the message to.</param>
+        /// <param name="message">The message to produce.</param>
+        /// <param name="cancellationToken">A cancellation token to observe whilst waiting the returned task to complete.</param>
+        /// <param name="opCode">The OpCode used in the original method call.</param>
+        /// <param name="mdToken">The mdToken of the original method call.</param>
+        /// <param name="moduleVersionPtr">A pointer to the module version GUID.</param>
+        /// <returns>The original result</returns>
+        [InterceptMethod(
+            TargetAssembly = Constants.ConfluentKafkaAssemblyName,
+            TargetType = Constants.ProducerType,
+            TargetMethod = Constants.ProduceAsyncMethodName,
+            TargetSignatureTypes = new[] { "System.Threading.Tasks.Task`1<Confluent.Kafka.DeliveryResult`2<T, T>>", Constants.TopicPartitionTypeName, Constants.MessageTypeName, ClrNames.CancellationToken },
+            TargetMinimumVersion = Constants.MinimumVersion,
+            TargetMaximumVersion = Constants.MaximumVersion)]
+        public static object ProduceAsyncWithStringTopic(
+            object producer,
+            object topic,
+            object message,
+            object cancellationToken,
+            int opCode,
+            int mdToken,
+            long moduleVersionPtr)
+        {
+            return ProducKafkaIntegrationHelper.ProduceAsync(
+                producer,
+                topic,
+                message,
+                cancellationToken,
+                opCode,
+                mdToken,
+                moduleVersionPtr,
+                Constants.ProduceAsyncOperationName,
+                ClrNames.String,
+                Log);
+        }
     }
 }
