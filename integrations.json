@@ -115,8 +115,33 @@
         "wrapper": {
           "assembly": "SignalFx.Tracing.ClrProfiler.Managed, Version=0.1.11.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb",
           "type": "Datadog.Trace.ClrProfiler.Integrations.Kafka.ConsumeKafkaIntegration",
-          "method": "Consume",
+          "method": "ConsumeInt32",
           "signature": "00 05 1C 1C 08 08 08 0A",
+          "action": "ReplaceTargetMethod"
+        }
+      },
+      {
+        "caller": {},
+        "target": {
+          "assembly": "Confluent.Kafka",
+          "type": "Confluent.Kafka.IConsumer`2",
+          "method": "Consume",
+          "signature_types": [
+            "Confluent.Kafka.ConsumeResult`2<T, T>",
+            "System.Threading.CancellationToken"
+          ],
+          "minimum_major": 1,
+          "minimum_minor": 4,
+          "minimum_patch": 0,
+          "maximum_major": 1,
+          "maximum_minor": 65535,
+          "maximum_patch": 65535
+        },
+        "wrapper": {
+          "assembly": "SignalFx.Tracing.ClrProfiler.Managed, Version=0.1.11.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb",
+          "type": "Datadog.Trace.ClrProfiler.Integrations.Kafka.ConsumeKafkaIntegration",
+          "method": "ConsumeCancellationToken",
+          "signature": "00 05 1C 1C 1C 08 08 0A",
           "action": "ReplaceTargetMethod"
         }
       }
