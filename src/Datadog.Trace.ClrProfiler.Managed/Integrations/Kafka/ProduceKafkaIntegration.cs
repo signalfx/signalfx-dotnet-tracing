@@ -56,7 +56,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             {
                 var headerAdapter = new KafkaHeadersCollectionAdapter(headers);
                 Tracer.Instance.Propagator
-                      .Inject(scope.Span.Context, headerAdapter, (collectionAdapter, key, value) => collectionAdapter.Add(key, value));
+                    .Inject(scope.Span.Context, headerAdapter, (collectionAdapter, key, value) => collectionAdapter.Set(key, value));
             }
 
             const string methodName = nameof(Produce);
