@@ -1446,7 +1446,7 @@
           "assembly": "SignalFx.Tracing.ClrProfiler.Managed, Version=0.1.11.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb",
           "type": "Datadog.Trace.ClrProfiler.Integrations.Kafka.ProduceKafkaIntegration",
           "method": "ProduceWithTopicPartitionTopic",
-          "signature": "00 07 1C 1C 1C 1C 1C 08 08 0A",
+          "signature": "00 07 01 1C 1C 1C 1C 08 08 0A",
           "action": "ReplaceTargetMethod"
         }
       },
@@ -1473,7 +1473,7 @@
           "assembly": "SignalFx.Tracing.ClrProfiler.Managed, Version=0.1.11.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb",
           "type": "Datadog.Trace.ClrProfiler.Integrations.Kafka.ProduceKafkaIntegration",
           "method": "ProduceWithStringTopic",
-          "signature": "00 07 1C 1C 1C 1C 1C 08 08 0A",
+          "signature": "00 07 01 1C 1C 1C 1C 08 08 0A",
           "action": "ReplaceTargetMethod"
         }
       },

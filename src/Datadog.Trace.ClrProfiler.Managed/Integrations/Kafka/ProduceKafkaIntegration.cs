@@ -21,7 +21,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
         /// <param name="opCode">The OpCode used in the original method call.</param>
         /// <param name="mdToken">The mdToken of the original method call.</param>
         /// <param name="moduleVersionPtr">A pointer to the module version GUID.</param>
-        /// <returns>The original result</returns>
         [InterceptMethod(
             TargetAssembly = Constants.ConfluentKafkaAssemblyName,
             TargetType = Constants.ProducerType,
@@ -29,7 +28,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             TargetSignatureTypes = new[] { ClrNames.Void, Constants.TopicPartitionTypeName, Constants.MessageTypeName, Constants.ActionOfDeliveryReportTypeName },
             TargetMinimumVersion = Constants.MinimumVersion,
             TargetMaximumVersion = Constants.MaximumVersion)]
-        public static object ProduceWithTopicPartitionTopic(
+        public static void ProduceWithTopicPartitionTopic(
             object producer,
             object topic,
             object message,
@@ -38,7 +37,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             int mdToken,
             long moduleVersionPtr)
         {
-            return ProducKafkaIntegrationHelper.Produce(
+            ProducKafkaIntegrationHelper.Produce(
                 producer,
                 topic,
                 message,
@@ -61,7 +60,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
         /// <param name="opCode">The OpCode used in the original method call.</param>
         /// <param name="mdToken">The mdToken of the original method call.</param>
         /// <param name="moduleVersionPtr">A pointer to the module version GUID.</param>
-        /// <returns>The original result</returns>
         [InterceptMethod(
             TargetAssembly = Constants.ConfluentKafkaAssemblyName,
             TargetType = Constants.ProducerType,
@@ -69,7 +67,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             TargetSignatureTypes = new[] { ClrNames.Void, ClrNames.String, Constants.MessageTypeName, Constants.ActionOfDeliveryReportTypeName },
             TargetMinimumVersion = Constants.MinimumVersion,
             TargetMaximumVersion = Constants.MaximumVersion)]
-        public static object ProduceWithStringTopic(
+        public static void ProduceWithStringTopic(
             object producer,
             object topic,
             object message,
@@ -78,7 +76,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             int mdToken,
             long moduleVersionPtr)
         {
-            return ProducKafkaIntegrationHelper.Produce(
+            ProducKafkaIntegrationHelper.Produce(
                 producer,
                 topic,
                 message,

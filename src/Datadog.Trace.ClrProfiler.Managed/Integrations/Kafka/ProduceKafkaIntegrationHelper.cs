@@ -8,7 +8,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
 {
     internal static class ProducKafkaIntegrationHelper
     {
-        public static object Produce(
+        public static void Produce(
             object producer,
             object topic,
             object message,
@@ -52,7 +52,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             try
             {
                 produce(producer, topic, message, deliveryHandler);
-                return null;
             }
             catch (Exception ex) when (scope.Span.SetExceptionForFilter(ex))
             {
