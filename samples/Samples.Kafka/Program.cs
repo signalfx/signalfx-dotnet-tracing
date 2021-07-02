@@ -28,11 +28,11 @@ namespace Samples.Kafka
             var pConfig = new ProducerConfig { BootstrapServers = kafkaUrl };
             using (var producer = new ProducerBuilder<Null, string>(pConfig).Build())
             {
-               producer.Produce(topicName, new Message<Null, string> { Value = "test value" });
-               producer.Produce(topic, new Message<Null, string> { Value = "test value 2" });
-               producer.ProduceAsync(topicName, new Message<Null, string> { Value = "test value 3" });
-               producer.ProduceAsync(topic, new Message<Null, string> { Value = "test value 4" });
-               producer.Flush(TimeSpan.FromSeconds(value: 10));
+                producer.Produce(topicName, new Message<Null, string> { Value = "test value" });
+                producer.Produce(topic, new Message<Null, string> { Value = "test value 2" });
+                producer.ProduceAsync(topicName, new Message<Null, string> { Value = "test value 3" });
+                producer.ProduceAsync(topic, new Message<Null, string> { Value = "test value 4" });
+                producer.Flush(TimeSpan.FromSeconds(value: 10));
             }
 
             var cConfig = new ConsumerConfig
@@ -59,6 +59,8 @@ namespace Samples.Kafka
                        // Expected, just ignore it.
                        Console.WriteLine("Consume timedout");
                     }
+
+                    DispalyAndCommitResult(consumer, consumer.Consume(TimeSpan.FromSeconds(10)));
 
                     DispalyAndCommitResult(consumer, consumer.Consume(TimeSpan.FromSeconds(10)));
                 }

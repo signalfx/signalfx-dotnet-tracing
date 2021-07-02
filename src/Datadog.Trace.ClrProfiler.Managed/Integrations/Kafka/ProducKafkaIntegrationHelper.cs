@@ -27,13 +27,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
 
             var scope = KafkaHelper.CreateProduceScope(topic, message, operationName);
 
-            var headers = KafkaHelper.GetPropertyValue<object>(message, "Headers") ?? KafkaHelper.CreateHeaders(message);
-            if (headers is not null)
-            {
-                var headerAdapter = new KafkaHeadersCollectionAdapter(headers);
-                Tracer.Instance.Propagator
-                    .Inject(scope.Span.Context, headerAdapter, (collectionAdapter, key, value) => collectionAdapter.Set(key, value));
-            }
+            InjectHeaders(message, scope);
 
             const string methodName = Constants.ProduceSyncMethodName;
             Action<object, object, object, object> produce;
@@ -51,15 +45,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             }
             catch (Exception ex)
             {
-                // profiled app will not continue working as expected without this method
-                log.ErrorRetrievingMethod(
-                    exception: ex,
-                    moduleVersionPointer: moduleVersionPtr,
-                    mdToken: mdToken,
-                    opCode: opCode,
-                    instrumentedType: Constants.ProducerType,
-                    methodName: methodName,
-                    instanceType: producer.GetType().AssemblyQualifiedName);
+                LogError(producer, opCode, mdToken, moduleVersionPtr, log, ex, methodName);
                 throw;
             }
 
@@ -97,13 +83,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
 
             var scope = KafkaHelper.CreateProduceScope(topic, message, operationName);
 
-            var headers = KafkaHelper.GetPropertyValue<object>(message, "Headers") ?? KafkaHelper.CreateHeaders(message);
-            if (headers is not null)
-            {
-                var headerAdapter = new KafkaHeadersCollectionAdapter(headers);
-                Tracer.Instance.Propagator
-                    .Inject(scope.Span.Context, headerAdapter, (collectionAdapter, key, value) => collectionAdapter.Set(key, value));
-            }
+            InjectHeaders(message, scope);
 
             const string methodName = Constants.ProduceAsyncMethodName;
             Func<object, object, object, object, Task<object>> produce;
@@ -121,15 +101,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             }
             catch (Exception ex)
             {
-                // profiled app will not continue working as expected without this method
-                log.ErrorRetrievingMethod(
-                    exception: ex,
-                    moduleVersionPointer: moduleVersionPtr,
-                    mdToken: mdToken,
-                    opCode: opCode,
-                    instrumentedType: Constants.ProducerType,
-                    methodName: methodName,
-                    instanceType: producer.GetType().AssemblyQualifiedName);
+                LogError(producer, opCode, mdToken, moduleVersionPtr, log, ex, methodName);
                 throw;
             }
 
@@ -145,6 +117,32 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             {
                 scope.Dispose();
             }
+        }
+
+        private static void LogError(object producer, int opCode, int mdToken, long moduleVersionPtr, ILogger log, Exception ex, string methodName)
+        {
+            // profiled app will not continue working as expected without this method
+            log.ErrorRetrievingMethod(
+                exception: ex,
+                moduleVersionPointer: moduleVersionPtr,
+                mdToken: mdToken,
+                opCode: opCode,
+                instrumentedType: Constants.ProducerType,
+                methodName: methodName,
+                instanceType: producer.GetType().AssemblyQualifiedName);
+        }
+
+        private static void InjectHeaders(object message, Scope scope)
+        {
+            var headers = KafkaHelper.GetPropertyValue<object>(message, "Headers") ?? KafkaHelper.CreateHeaders(message);
+            if (headers is null)
+            {
+                return;
+            }
+
+            var headerAdapter = new KafkaHeadersCollectionAdapter(headers);
+            Tracer.Instance.Propagator
+                  .Inject(scope.Span.Context, headerAdapter, (collectionAdapter, key, value) => collectionAdapter.Set(key, value));
         }
     }
 }

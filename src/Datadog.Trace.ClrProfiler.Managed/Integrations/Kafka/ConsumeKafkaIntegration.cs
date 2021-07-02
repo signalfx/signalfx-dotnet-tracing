@@ -35,14 +35,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             int mdToken,
             long moduleVersionPtr)
         {
-            System.Console.WriteLine(">>>> ConsumeInt32");
             return ConsumeKafkaIntegrationHelper.Consume(
                 consumer,
                 millisecondsTimeout,
                 opCode,
                 mdToken,
                 moduleVersionPtr,
-                ClrNames.Int32,
                 Log);
         }
 
@@ -50,7 +48,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
         /// Traces a synchronous Consume call to Kafka.
         /// </summary>
         /// <param name="consumer">The consumer for the original method.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <param name="boxedCancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <param name="opCode">The OpCode used in the original method call.</param>
         /// <param name="mdToken">The mdToken of the original method call.</param>
         /// <param name="moduleVersionPtr">A pointer to the module version GUID.</param>
@@ -64,19 +62,17 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             TargetMaximumVersion = Constants.MaximumVersion)]
         public static object ConsumeCancellationToken(
             object consumer,
-            object cancellationToken,
+            object boxedCancellationToken,
             int opCode,
             int mdToken,
             long moduleVersionPtr)
         {
-            System.Console.WriteLine(">>>> ConsumeCancellationToken");
             return ConsumeKafkaIntegrationHelper.Consume(
                 consumer,
-                (CancellationToken)cancellationToken,
+                (CancellationToken)boxedCancellationToken,
                 opCode,
                 mdToken,
                 moduleVersionPtr,
-                ClrNames.CancellationToken,
                 Log);
         }
 
@@ -103,14 +99,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             int mdToken,
             long moduleVersionPtr)
         {
-            Console.WriteLine(">>>> ConsumeTimeSpan");
             return ConsumeKafkaIntegrationHelper.Consume(
                 consumer,
                 (TimeSpan)boxedTimeSpan,
                 opCode,
                 mdToken,
                 moduleVersionPtr,
-                ClrNames.TimeSpan,
                 Log);
         }
     }
