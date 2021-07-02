@@ -6,7 +6,7 @@ using SignalFx.Tracing.Vendors.Serilog;
 
 namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
 {
-    internal static class ProducKafkaIntegrationHelper
+    internal static class ProduceKafkaIntegrationHelper
     {
         public static void Produce(
             object producer,

@@ -76,7 +76,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             int mdToken,
             long moduleVersionPtr)
         {
-            ProducKafkaIntegrationHelper.Produce(
+            ProduceKafkaIntegrationHelper.Produce(
                 producer,
                 topic,
                 message,
@@ -116,7 +116,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             int mdToken,
             long moduleVersionPtr)
         {
-            return ProducKafkaIntegrationHelper.ProduceAsync(
+            return ProduceKafkaIntegrationHelper.ProduceAsync(
                 producer,
                 topic,
                 message,
@@ -156,7 +156,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             int mdToken,
             long moduleVersionPtr)
         {
-            return ProducKafkaIntegrationHelper.ProduceAsync(
+            return ProduceKafkaIntegrationHelper.ProduceAsync(
                 producer,
                 topic,
                 message,
