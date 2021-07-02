@@ -14,4 +14,9 @@
     <PackageReference Include="Confluent.Kafka" Version="$(ApiVersion)" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
+
+  <ItemGroup Condition=" $(TargetFramework.StartsWith('net45')) ">
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+
 </Project>

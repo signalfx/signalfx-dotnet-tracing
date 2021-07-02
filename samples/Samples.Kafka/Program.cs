@@ -68,7 +68,7 @@ namespace Samples.Kafka
 
                 // The Kafka calls are all actually happen in the background give it a delay
                 // to ensure that the first consume call works.
-                Thread.Sleep(TimeSpan.FromSeconds(2));
+                Thread.Sleep(DefaultTimeoutMilliseconds);
 
                 try
                 {
