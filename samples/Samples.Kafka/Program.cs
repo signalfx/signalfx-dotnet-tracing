@@ -12,14 +12,14 @@ namespace Samples.Kafka
     // - https://github.com/confluentinc/confluent-kafka-dotnet/blob/v1.7.0/examples/ConfluentCloud/Program.cs
     public static class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             // If calls of instrumented methods are directly on Main the instrumentation doesn't happen:
             // [warn] JITCompilationStarted skipping method: Method replacement found but the managed profiler has not yet been loaded into AppDomain
-            ProduceConsumeUsingKafka();
+            await ProduceConsumeUsingKafka();
         }
         
-        private static void ProduceConsumeUsingKafka()
+        private static async Task ProduceConsumeUsingKafka()
         {
             var kafkaUrl = Environment.GetEnvironmentVariable("KAFKA_HOST") ?? "localhost:29092";
             var topicName = "dotnet-test-topic";
@@ -30,8 +30,8 @@ namespace Samples.Kafka
             {
                 producer.Produce(topicName, new Message<Null, string> { Value = "test value" });
                 producer.Produce(topic, new Message<Null, string> { Value = "test value 2" });
-                producer.ProduceAsync(topicName, new Message<Null, string> { Value = "test value 3" });
-                producer.ProduceAsync(topic, new Message<Null, string> { Value = "test value 4" });
+                await producer.ProduceAsync(topicName, new Message<Null, string> { Value = "test value 3" });
+                await producer.ProduceAsync(topic, new Message<Null, string> { Value = "test value 4" });
                 producer.Flush(TimeSpan.FromSeconds(value: 10));
             }
 
