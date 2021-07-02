@@ -56,13 +56,18 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             {
                 var topicName = GetPropertyValue<string>(consumeResult, "Topic");
                 var partition = GetPropertyValue<object>(consumeResult, "Partition");
+                int? partitionValue = null;
+                if (partition is not null)
+                {
+                    partitionValue = GetPropertyValue<int>(partition, "Value");
+                }
 
                 scope = tracer.StartActive(Constants.ConsumeSyncOperationName, propagatedContext, tracer.DefaultServiceName);
 
                 var span = scope.Span;
-                if (partition is not null)
+                if (partitionValue.HasValue)
                 {
-                    span.Tags.Add(Tags.KafkaPartition, partition.ToString());
+                    span.Tags.Add(Tags.KafkaPartition, partitionValue.Value.ToString());
                 }
 
                 if (message is not null)
@@ -100,10 +105,22 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             return scope;
         }
 
-        public static Scope CreateProduceScope(object topic, object message, string operationName)
+        internal static Scope CreateProduceScope(object topic, object message, string operationName)
         {
-            var topicName = topic is string t ? t : GetPropertyValue<string>(topic, "Topic");
-            return CreateProduceScope(topicName, message, operationName);
+            if (topic is string topicName)
+            {
+                return CreateProduceScope(topicName, partition: null, message, operationName);
+            }
+
+            topicName = GetPropertyValue<string>(topic, "Topic");
+            int? partitionValue = null;
+            var partition = GetPropertyValue<object>(topic, "Partition");
+            if (partition is not null)
+            {
+                partitionValue = GetPropertyValue<int>(partition, "Value");
+            }
+
+            return CreateProduceScope(topicName, partitionValue, message, operationName);
         }
 
         internal static T GetPropertyValue<T>(object obj, string propertyName)
@@ -135,7 +152,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             }
         }
 
-        private static Scope CreateProduceScope(string topicName, object message, string operationName)
+        private static Scope CreateProduceScope(string topicName, int? partition, object message, string operationName)
         {
             if (!Tracer.Instance.Settings.IsIntegrationEnabled(Constants.IntegrationName))
             {
@@ -163,6 +180,11 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 span.SetTag(Tags.InstrumentationName, Constants.IntegrationName);
                 span.SetTag(Tags.SpanKind, SpanKinds.Client);
                 span.SetTag(Tags.KafkaTopic, topicName);
+
+                if (partition.HasValue)
+                {
+                    span.SetTag(Tags.KafkaPartition, partition.Value.ToString());
+                }
 
                 if (message != null)
                 {
