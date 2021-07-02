@@ -1,5 +1,6 @@
 // Modified by SignalFx
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Confluent.Kafka;
 
@@ -27,11 +28,11 @@ namespace Samples.Kafka
             var pConfig = new ProducerConfig { BootstrapServers = kafkaUrl };
             using (var producer = new ProducerBuilder<Null, string>(pConfig).Build())
             {
-                producer.Produce(topicName, new Message<Null, string> { Value = "test value" });
-                producer.Produce(topic, new Message<Null, string> { Value = "test value 2" });
-                producer.ProduceAsync(topicName, new Message<Null, string> { Value = "test value 3" });
-                producer.ProduceAsync(topic, new Message<Null, string> { Value = "test value 4" });
-                producer.Flush(TimeSpan.FromSeconds(value: 10));
+               producer.Produce(topicName, new Message<Null, string> { Value = "test value" });
+               producer.Produce(topic, new Message<Null, string> { Value = "test value 2" });
+               producer.ProduceAsync(topicName, new Message<Null, string> { Value = "test value 3" });
+               producer.ProduceAsync(topic, new Message<Null, string> { Value = "test value 4" });
+               producer.Flush(TimeSpan.FromSeconds(value: 10));
             }
 
             var cConfig = new ConsumerConfig
@@ -46,26 +47,38 @@ namespace Samples.Kafka
                 consumer.Subscribe(topicName);
                 try
                 {
-                    var consumeResult = consumer.Consume(10000);
-                    consumer.Commit(consumeResult);
-                    Console.WriteLine($"consumed: {consumeResult?.Message?.Value}");
+                    DispalyAndCommitResult(consumer, consumer.Consume(10000));
 
-                    var consumeResult2 = consumer.Consume();
-                    consumer.Commit(consumeResult2);
-                    Console.WriteLine($"consumed: {consumeResult2?.Message?.Value}");
+                    try
+                    {
+                       var cts = new CancellationTokenSource(5000);
+                       DispalyAndCommitResult(consumer, consumer.Consume(cts.Token));
+                    }
+                    catch (OperationCanceledException)
+                    {
+                       // Expected, just ignore it.
+                       Console.WriteLine("Consume timedout");
+                    }
 
-                    var consumeResult3 = consumer.Consume();
-                    consumer.Commit(consumeResult3);
-                    Console.WriteLine($"consumed: {consumeResult3?.Message?.Value}");
-
-                    var consumeResult4 = consumer.Consume();
-                    consumer.Commit(consumeResult4);
-                    Console.WriteLine($"consumed: {consumeResult4?.Message?.Value}");
+                    DispalyAndCommitResult(consumer, consumer.Consume(TimeSpan.FromSeconds(10)));
                 }
                 catch (ConsumeException ex)
                 {
                     Console.WriteLine($"consume error: {ex.Error.Reason}");
                 }
+            }
+        }
+
+        private static void DispalyAndCommitResult<TKey, TValue>(IConsumer<TKey, TValue> consumer, ConsumeResult<TKey, TValue> result)
+        {
+            if (result == null)
+            {
+                Console.WriteLine("result is null");
+            }
+            else
+            {
+                consumer.Commit(result);
+                Console.WriteLine($"consumed: {result.Message.Value}");
             }
         }
     }
