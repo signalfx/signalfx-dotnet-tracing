@@ -37,7 +37,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             int mdToken,
             long moduleVersionPtr)
         {
-            ProducKafkaIntegrationHelper.Produce(
+            ProduceKafkaIntegrationHelper.Produce(
                 producer,
                 topic,
                 message,
