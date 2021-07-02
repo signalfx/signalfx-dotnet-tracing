@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using SignalFx.Tracing.Logging;
 using SignalFx.Tracing.Vendors.Serilog;
@@ -40,7 +41,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 opCode,
                 mdToken,
                 moduleVersionPtr,
-                ClrNames.Int32,
                 Log);
         }
 
@@ -48,7 +48,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
         /// Traces a synchronous Consume call to Kafka.
         /// </summary>
         /// <param name="consumer">The consumer for the original method.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <param name="boxedCancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <param name="opCode">The OpCode used in the original method call.</param>
         /// <param name="mdToken">The mdToken of the original method call.</param>
         /// <param name="moduleVersionPtr">A pointer to the module version GUID.</param>
@@ -62,18 +62,19 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             TargetMaximumVersion = Constants.MaximumVersion)]
         public static object ConsumeCancellationToken(
             object consumer,
-            object cancellationToken,
+            object boxedCancellationToken,
             int opCode,
             int mdToken,
             long moduleVersionPtr)
         {
+            var cancellationToken = (CancellationToken)boxedCancellationToken;
+
             return ConsumeKafkaIntegrationHelper.Consume(
                 consumer,
                 cancellationToken,
                 opCode,
                 mdToken,
                 moduleVersionPtr,
-                ClrNames.CancellationToken,
                 Log);
         }
     }

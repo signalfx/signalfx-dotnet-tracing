@@ -13,7 +13,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                int opCode,
                int mdToken,
                long moduleVersionPtr,
-               string inputType,
                ILogger log)
         {
             if (consumer == null)
@@ -21,6 +20,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 throw new ArgumentNullException(nameof(consumer));
             }
 
+            var inputType = typeof(T).FullName;
             const string methodName = Constants.ConsumeSyncMethodName;
             Func<object, T, object> consume;
             var consumerType = consumer.GetType();
