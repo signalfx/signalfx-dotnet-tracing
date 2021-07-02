@@ -64,7 +64,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             }
         }
 
-        public static Task<object> ProduceAsync(
+        public static async Task<object> ProduceAsync(
             object producer,
             object topic,
             object message,
@@ -107,7 +107,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
 
             try
             {
-                return produce(producer, topic, message, cancellationToken);
+                return await produce(producer, topic, message, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
             }
             catch (Exception ex) when (scope.Span.SetExceptionForFilter(ex))
             {
