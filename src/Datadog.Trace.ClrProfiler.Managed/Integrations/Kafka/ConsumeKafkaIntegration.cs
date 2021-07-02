@@ -67,11 +67,41 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             int mdToken,
             long moduleVersionPtr)
         {
-            var cancellationToken = (CancellationToken)boxedCancellationToken;
-
             return ConsumeKafkaIntegrationHelper.Consume(
                 consumer,
-                cancellationToken,
+                (CancellationToken)boxedCancellationToken,
+                opCode,
+                mdToken,
+                moduleVersionPtr,
+                Log);
+        }
+
+        /// <summary>
+        /// Traces a synchronous Consume call to Kafka.
+        /// </summary>
+        /// <param name="consumer">The consumer for the original method.</param>
+        /// <param name="boxedTimeSpan">The <see cref="TimeSpan"/>.</param>
+        /// <param name="opCode">The OpCode used in the original method call.</param>
+        /// <param name="mdToken">The mdToken of the original method call.</param>
+        /// <param name="moduleVersionPtr">A pointer to the module version GUID.</param>
+        /// <returns>The original result</returns>
+        [InterceptMethod(
+            TargetAssembly = Constants.ConfluentKafkaAssemblyName,
+            TargetType = Constants.ConsumerType,
+            TargetMethod = Constants.ConsumeSyncMethodName,
+            TargetSignatureTypes = new[] { Constants.ConsumeResultTypeName, ClrNames.TimeSpan },
+            TargetMinimumVersion = Constants.MinimumVersion,
+            TargetMaximumVersion = Constants.MaximumVersion)]
+        public static object ConsumeTimeSpan(
+            object consumer,
+            object boxedTimeSpan,
+            int opCode,
+            int mdToken,
+            long moduleVersionPtr)
+        {
+            return ConsumeKafkaIntegrationHelper.Consume(
+                consumer,
+                (TimeSpan)boxedTimeSpan,
                 opCode,
                 mdToken,
                 moduleVersionPtr,

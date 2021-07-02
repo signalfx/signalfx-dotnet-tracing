@@ -25,6 +25,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Tests
             yield return new object[] { ClrNames.UInt32, typeof(uint) };
             yield return new object[] { ClrNames.UInt64, typeof(ulong) };
             yield return new object[] { ClrNames.CancellationToken, typeof(System.Threading.CancellationToken) };
+            yield return new object[] { ClrNames.TimeSpan, typeof(System.TimeSpan) };
             yield return new object[] { ClrNames.Task, typeof(Task) };
             yield return new object[] { ClrNames.IAsyncResult, typeof(IAsyncResult) };
             yield return new object[] { ClrNames.AsyncCallback, typeof(AsyncCallback) };

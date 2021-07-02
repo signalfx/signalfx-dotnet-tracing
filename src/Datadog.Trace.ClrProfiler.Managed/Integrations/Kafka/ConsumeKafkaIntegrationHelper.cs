@@ -56,10 +56,17 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 throw;
             }
 
-            var result = consume(consumer, input);
-            var scope = KafkaHelper.CreateConsumeScope(result);
+            object result = null;
 
-            scope.Dispose();
+            try
+            {
+                result = consume(consumer, input);
+                using var scope = KafkaHelper.CreateConsumeScope(result);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Consume exception: " + ex);
+            }
 
             return result;
         }
