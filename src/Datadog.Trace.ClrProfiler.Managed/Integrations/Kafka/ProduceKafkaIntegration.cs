@@ -22,12 +22,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
         /// <param name="mdToken">The mdToken of the original method call.</param>
         /// <param name="moduleVersionPtr">A pointer to the module version GUID.</param>
         [InterceptMethod(
-            TargetAssembly = Constants.ConfluentKafkaAssemblyName,
-            TargetType = Constants.ProducerType,
-            TargetMethod = Constants.ProduceSyncMethodName,
-            TargetSignatureTypes = new[] { ClrNames.Void, Constants.TopicPartitionTypeName, Constants.MessageTypeName, Constants.ActionOfDeliveryReportTypeName },
-            TargetMinimumVersion = Constants.MinimumVersion,
-            TargetMaximumVersion = Constants.MaximumVersion)]
+            TargetAssembly = ConfluentKafka.AssemblyName,
+            TargetType = ConfluentKafka.IProducerTypeName,
+            TargetMethod = ConfluentKafka.ProduceSyncMethodName,
+            TargetSignatureTypes = new[] { ClrNames.Void, ConfluentKafka.TopicPartitionTypeName, ConfluentKafka.MessageTypeName, ConfluentKafka.ActionOfDeliveryReportTypeName },
+            TargetMinimumVersion = ConfluentKafka.MinimumVersion,
+            TargetMaximumVersion = ConfluentKafka.MaximumVersion)]
         public static void ProduceWithTopicPartitionTopic(
             object producer,
             object topic,
@@ -45,8 +45,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 opCode,
                 mdToken,
                 moduleVersionPtr,
-                Constants.ProduceSyncOperationName,
-                Constants.TopicPartitionTypeName,
+                ConfluentKafka.TopicPartitionTypeName,
                 Log);
         }
 
@@ -61,12 +60,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
         /// <param name="mdToken">The mdToken of the original method call.</param>
         /// <param name="moduleVersionPtr">A pointer to the module version GUID.</param>
         [InterceptMethod(
-            TargetAssembly = Constants.ConfluentKafkaAssemblyName,
-            TargetType = Constants.ProducerType,
-            TargetMethod = Constants.ProduceSyncMethodName,
-            TargetSignatureTypes = new[] { ClrNames.Void, ClrNames.String, Constants.MessageTypeName, Constants.ActionOfDeliveryReportTypeName },
-            TargetMinimumVersion = Constants.MinimumVersion,
-            TargetMaximumVersion = Constants.MaximumVersion)]
+            TargetAssembly = ConfluentKafka.AssemblyName,
+            TargetType = ConfluentKafka.IProducerTypeName,
+            TargetMethod = ConfluentKafka.ProduceSyncMethodName,
+            TargetSignatureTypes = new[] { ClrNames.Void, ClrNames.String, ConfluentKafka.MessageTypeName, ConfluentKafka.ActionOfDeliveryReportTypeName },
+            TargetMinimumVersion = ConfluentKafka.MinimumVersion,
+            TargetMaximumVersion = ConfluentKafka.MaximumVersion)]
         public static void ProduceWithStringTopic(
             object producer,
             object topic,
@@ -84,7 +83,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 opCode,
                 mdToken,
                 moduleVersionPtr,
-                Constants.ProduceSyncOperationName,
                 ClrNames.String,
                 Log);
         }
@@ -101,12 +99,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
         /// <param name="moduleVersionPtr">A pointer to the module version GUID.</param>
         /// <returns>The original result</returns>
         [InterceptMethod(
-            TargetAssembly = Constants.ConfluentKafkaAssemblyName,
-            TargetType = Constants.ProducerType,
-            TargetMethod = Constants.ProduceAsyncMethodName,
-            TargetSignatureTypes = new[] { "System.Threading.Tasks.Task`1<Confluent.Kafka.DeliveryResult`2<T, T>>", ClrNames.String, Constants.MessageTypeName, ClrNames.CancellationToken },
-            TargetMinimumVersion = Constants.MinimumVersion,
-            TargetMaximumVersion = Constants.MaximumVersion)]
+            TargetAssembly = ConfluentKafka.AssemblyName,
+            TargetType = ConfluentKafka.IProducerTypeName,
+            TargetMethod = ConfluentKafka.ProduceAsyncMethodName,
+            TargetSignatureTypes = new[] { "System.Threading.Tasks.Task`1<Confluent.Kafka.DeliveryResult`2<T, T>>", ConfluentKafka.TopicPartitionTypeName, ConfluentKafka.MessageTypeName, ClrNames.CancellationToken },
+            TargetMinimumVersion = ConfluentKafka.MinimumVersion,
+            TargetMaximumVersion = ConfluentKafka.MaximumVersion)]
         public static object ProduceAsyncTopicPartitionTopic(
             object producer,
             object topic,
@@ -124,8 +122,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 opCode,
                 mdToken,
                 moduleVersionPtr,
-                Constants.ProduceAsyncOperationName,
-                Constants.TopicPartitionTypeName,
+                ConfluentKafka.TopicPartitionTypeName,
                 Log);
         }
 
@@ -141,12 +138,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
         /// <param name="moduleVersionPtr">A pointer to the module version GUID.</param>
         /// <returns>The original result</returns>
         [InterceptMethod(
-            TargetAssembly = Constants.ConfluentKafkaAssemblyName,
-            TargetType = Constants.ProducerType,
-            TargetMethod = Constants.ProduceAsyncMethodName,
-            TargetSignatureTypes = new[] { "System.Threading.Tasks.Task`1<Confluent.Kafka.DeliveryResult`2<T, T>>", Constants.TopicPartitionTypeName, Constants.MessageTypeName, ClrNames.CancellationToken },
-            TargetMinimumVersion = Constants.MinimumVersion,
-            TargetMaximumVersion = Constants.MaximumVersion)]
+            TargetAssembly = ConfluentKafka.AssemblyName,
+            TargetType = ConfluentKafka.IProducerTypeName,
+            TargetMethod = ConfluentKafka.ProduceAsyncMethodName,
+            TargetSignatureTypes = new[] { "System.Threading.Tasks.Task`1<Confluent.Kafka.DeliveryResult`2<T, T>>", ClrNames.String, ConfluentKafka.MessageTypeName, ClrNames.CancellationToken },
+            TargetMinimumVersion = ConfluentKafka.MinimumVersion,
+            TargetMaximumVersion = ConfluentKafka.MaximumVersion)]
         public static object ProduceAsyncWithStringTopic(
             object producer,
             object topic,
@@ -164,7 +161,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 opCode,
                 mdToken,
                 moduleVersionPtr,
-                Constants.ProduceAsyncOperationName,
                 ClrNames.String,
                 Log);
         }

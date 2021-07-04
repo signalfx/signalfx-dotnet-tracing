@@ -22,12 +22,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
         /// <param name="moduleVersionPtr">A pointer to the module version GUID.</param>
         /// <returns>The original result</returns>
         [InterceptMethod(
-            TargetAssembly = Constants.ConfluentKafkaAssemblyName,
-            TargetType = Constants.ConsumerType,
-            TargetMethod = Constants.ConsumeSyncMethodName,
-            TargetSignatureTypes = new[] { Constants.ConsumeResultTypeName, ClrNames.Int32 },
-            TargetMinimumVersion = Constants.MinimumVersion,
-            TargetMaximumVersion = Constants.MaximumVersion)]
+            TargetAssembly = ConfluentKafka.AssemblyName,
+            TargetType = ConfluentKafka.ConsumerType,
+            TargetMethod = ConfluentKafka.ConsumeSyncMethodName,
+            TargetSignatureTypes = new[] { ConfluentKafka.ConsumeResultTypeName, ClrNames.Int32 },
+            TargetMinimumVersion = ConfluentKafka.MinimumVersion,
+            TargetMaximumVersion = ConfluentKafka.MaximumVersion)]
         public static object ConsumeInt32(
             object consumer,
             int millisecondsTimeout,
@@ -54,12 +54,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
         /// <param name="moduleVersionPtr">A pointer to the module version GUID.</param>
         /// <returns>The original result</returns>
         [InterceptMethod(
-            TargetAssembly = Constants.ConfluentKafkaAssemblyName,
-            TargetType = Constants.ConsumerType,
-            TargetMethod = Constants.ConsumeSyncMethodName,
-            TargetSignatureTypes = new[] { Constants.ConsumeResultTypeName, ClrNames.CancellationToken },
-            TargetMinimumVersion = Constants.MinimumVersion,
-            TargetMaximumVersion = Constants.MaximumVersion)]
+            TargetAssembly = ConfluentKafka.AssemblyName,
+            TargetType = ConfluentKafka.ConsumerType,
+            TargetMethod = ConfluentKafka.ConsumeSyncMethodName,
+            TargetSignatureTypes = new[] { ConfluentKafka.ConsumeResultTypeName, ClrNames.CancellationToken },
+            TargetMinimumVersion = ConfluentKafka.MinimumVersion,
+            TargetMaximumVersion = ConfluentKafka.MaximumVersion)]
         public static object ConsumeCancellationToken(
             object consumer,
             object boxedCancellationToken,
@@ -86,12 +86,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
         /// <param name="moduleVersionPtr">A pointer to the module version GUID.</param>
         /// <returns>The original result</returns>
         [InterceptMethod(
-            TargetAssembly = Constants.ConfluentKafkaAssemblyName,
-            TargetType = Constants.ConsumerType,
-            TargetMethod = Constants.ConsumeSyncMethodName,
-            TargetSignatureTypes = new[] { Constants.ConsumeResultTypeName, ClrNames.TimeSpan },
-            TargetMinimumVersion = Constants.MinimumVersion,
-            TargetMaximumVersion = Constants.MaximumVersion)]
+            TargetAssembly = ConfluentKafka.AssemblyName,
+            TargetType = ConfluentKafka.ConsumerType,
+            TargetMethod = ConfluentKafka.ConsumeSyncMethodName,
+            TargetSignatureTypes = new[] { ConfluentKafka.ConsumeResultTypeName, ClrNames.TimeSpan },
+            TargetMinimumVersion = ConfluentKafka.MinimumVersion,
+            TargetMaximumVersion = ConfluentKafka.MaximumVersion)]
         public static object ConsumeTimeSpan(
             object consumer,
             object boxedTimeSpan,

@@ -1,6 +1,8 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Datadog.Trace.ClrProfiler.Emit;
+using Datadog.Trace.ClrProfiler.Helpers;
 using SignalFx.Tracing;
 using SignalFx.Tracing.Vendors.Serilog;
 
@@ -8,6 +10,9 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
 {
     internal static class ProduceKafkaIntegrationHelper
     {
+        private static readonly Type IProducerType = Type.GetType(ConfluentKafka.IProducerTypeName + ", " + ConfluentKafka.AssemblyName);
+        private static readonly Type ProduceAsyncResponseType = Type.GetType("Confluent.Kafka.DeliveryResult`2, Confluent.Kafka");
+
         public static void Produce(
             object producer,
             object topic,
@@ -16,7 +21,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             int opCode,
             int mdToken,
             long moduleVersionPtr,
-            string operationName,
             string topicType,
             ILogger log)
         {
@@ -25,11 +29,15 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 throw new ArgumentNullException(nameof(producer));
             }
 
-            var scope = KafkaHelper.CreateProduceScope(topic, message, operationName);
+            Scope scope = null;
+            if (Tracer.Instance.Settings.IsIntegrationEnabled(ConfluentKafka.IntegrationName))
+            {
+                // Pay-for-play: only create scope and inject headers if instrumentation is enabled.
+                // Produce method is of type PRODUCER per OTel spec since it doesn't wait for a response.
+                scope = KafkaHelper.CreateProduceScope(topic, message, SpanKinds.Producer);
+                InjectHeaders(message, scope);
+            }
 
-            InjectHeaders(message, scope);
-
-            const string methodName = Constants.ProduceSyncMethodName;
             Action<object, object, object, object> produce;
             var producerType = producer.GetType();
 
@@ -37,15 +45,15 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             {
                 produce =
                     MethodBuilder<Action<object, object, object, object>>
-                       .Start(moduleVersionPtr, mdToken, opCode, methodName)
+                       .Start(moduleVersionPtr, mdToken, opCode, ConfluentKafka.ProduceSyncMethodName)
                        .WithConcreteType(producerType)
                        .WithParameters(topic, message, deliveryHandler)
-                       .WithNamespaceAndNameFilters(ClrNames.Void, topicType, Constants.MessageTypeName, Constants.ActionOfDeliveryReportTypeName)
+                       .WithNamespaceAndNameFilters(ClrNames.Void, topicType, ConfluentKafka.MessageTypeName, ConfluentKafka.ActionOfDeliveryReportTypeName)
                        .Build();
             }
             catch (Exception ex)
             {
-                LogError(producer, opCode, mdToken, moduleVersionPtr, log, ex, methodName);
+                LogError(producer, opCode, mdToken, moduleVersionPtr, log, ex, ConfluentKafka.ProduceSyncMethodName);
                 throw;
             }
 
@@ -53,25 +61,25 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             {
                 produce(producer, topic, message, deliveryHandler);
             }
-            catch (Exception ex) when (scope.Span.SetExceptionForFilter(ex))
+            catch (Exception ex)
             {
+                scope?.Span.SetExceptionForFilter(ex);
                 throw;
             }
             finally
             {
-                scope.Dispose();
+                scope?.Dispose();
             }
         }
 
-        public static async Task<object> ProduceAsync(
+        public static object ProduceAsync(
             object producer,
             object topic,
             object message,
-            object cancellationToken,
+            object boxedCancellationToken,
             int opCode,
             int mdToken,
             long moduleVersionPtr,
-            string operationName,
             string topicType,
             ILogger log)
         {
@@ -80,41 +88,70 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 throw new ArgumentNullException(nameof(producer));
             }
 
-            var scope = KafkaHelper.CreateProduceScope(topic, message, operationName);
+            var cancellationToken = (CancellationToken)boxedCancellationToken;
 
-            InjectHeaders(message, scope);
+            var genericResponseArguments = producer.GetType().GetGenericArguments();
+            var genericResponseType = ProduceAsyncResponseType.MakeGenericType(genericResponseArguments);
 
-            const string methodName = Constants.ProduceAsyncMethodName;
-            Func<object, object, object, object, Task<object>> produce;
-            var producerType = producer.GetType();
+            Func<object, object, object, CancellationToken, object> produce;
 
             try
             {
                 produce =
-                    MethodBuilder<Func<object, object, object, object, Task<object>>>
-                       .Start(moduleVersionPtr, mdToken, opCode, methodName)
-                       .WithConcreteType(producerType)
+                    MethodBuilder<Func<object, object, object, CancellationToken, object>>
+                       .Start(moduleVersionPtr, mdToken, opCode, ConfluentKafka.ProduceAsyncMethodName)
+                       .WithConcreteType(producer.GetType())
                        .WithParameters(topic, message, cancellationToken)
-                       .WithNamespaceAndNameFilters(ClrNames.GenericTask, topicType, Constants.MessageTypeName, ClrNames.CancellationToken)
+                       .WithNamespaceAndNameFilters(ClrNames.GenericTask, topicType, ConfluentKafka.MessageTypeName, ClrNames.CancellationToken)
+                       .ForceMethodDefinitionResolution()
                        .Build();
             }
             catch (Exception ex)
             {
-                LogError(producer, opCode, mdToken, moduleVersionPtr, log, ex, methodName);
+                LogError(producer, opCode, mdToken, moduleVersionPtr, log, ex, ConfluentKafka.ProduceAsyncMethodName);
                 throw;
+            }
+
+            return AsyncHelper.InvokeGenericTaskDelegate(
+                owningType: IProducerType.MakeGenericType(genericResponseArguments),
+                taskResultType: genericResponseType,
+                nameOfIntegrationMethod: nameof(CallProduceAsyncInternal),
+                integrationType: typeof(ProduceKafkaIntegrationHelper),
+                producer,
+                topic,
+                message,
+                boxedCancellationToken,
+                produce);
+        }
+
+        private static async Task<T> CallProduceAsyncInternal<T>(
+            object producer,
+            object topic,
+            object message,
+            CancellationToken cancellationToken,
+            Func<object, object, object, CancellationToken, object> produce)
+        {
+            Scope scope = null;
+            if (Tracer.Instance.Settings.IsIntegrationEnabled(ConfluentKafka.IntegrationName))
+            {
+                // Pay-for-play: only create scope and inject headers if instrumentation is enabled.
+                // ProduceAsync method is of type CLIENT per OTel spec since it awaits for a response.
+                scope = KafkaHelper.CreateProduceScope(topic, message, SpanKinds.Client);
+                InjectHeaders(message, scope);
             }
 
             try
             {
-                return await produce(producer, topic, message, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+                return await (Task<T>)produce(producer, topic, message, cancellationToken);
             }
-            catch (Exception ex) when (scope.Span.SetExceptionForFilter(ex))
+            catch (Exception ex)
             {
+                scope?.Span.SetExceptionForFilter(ex);
                 throw;
             }
             finally
             {
-                scope.Dispose();
+                scope?.Dispose();
             }
         }
 
@@ -126,7 +163,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 moduleVersionPointer: moduleVersionPtr,
                 mdToken: mdToken,
                 opCode: opCode,
-                instrumentedType: Constants.ProducerType,
+                instrumentedType: ConfluentKafka.IProducerTypeName,
                 methodName: methodName,
                 instanceType: producer.GetType().AssemblyQualifiedName);
         }

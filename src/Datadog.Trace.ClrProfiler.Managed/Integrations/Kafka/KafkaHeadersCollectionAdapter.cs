@@ -20,7 +20,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
         public KafkaHeadersCollectionAdapter(object headers)
         {
             _headers = headers;
-            var methods = _headers.GetType().GetMethods().ToList();
+            var methods = _headers.GetType().GetMethods();
             _tryGetLastBytes = methods.FirstOrDefault(m => m.Name == "TryGetLastBytes");
             _add = methods.FirstOrDefault(m => m.Name == "Add" && m.GetParameters().Length == 2);
             _remove = methods.FirstOrDefault(m => m.Name == "Remove");
@@ -29,9 +29,9 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
         public IEnumerable<string> GetValues(string name)
         {
             var parameters = new object[] { name, null };
-            if (!(bool)_tryGetLastBytes.Invoke(_headers, parameters))
+            if (!(bool)_tryGetLastBytes?.Invoke(_headers, parameters))
             {
-                Log.Information("Could not retrieve header {header}.", name);
+                Log.Debug("Could not retrieve header {headerName}.", name);
                 return Enumerable.Empty<string>();
             }
 
@@ -42,7 +42,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             }
             catch (Exception ex)
             {
-                Log.Information(ex, "Could not deserialize Kafka header {headerName}", name);
+                Log.Debug(ex, "Could not deserialize Kafka header {headerName}", name);
             }
 
             return Enumerable.Empty<string>();
@@ -56,12 +56,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
 
         public void Add(string name, string value)
         {
-            _add.Invoke(_headers, new object[] { name, Encoding.UTF8.GetBytes(value) });
+            _add?.Invoke(_headers, new object[] { name, Encoding.UTF8.GetBytes(value) });
         }
 
         public void Remove(string name)
         {
-            _remove.Invoke(_headers, new object[] { name });
+            _remove?.Invoke(_headers, new object[] { name });
         }
     }
 }

@@ -151,26 +151,6 @@ namespace SignalFx.Tracing
         public const string MongoDbCollection = "mongodb.collection";
 
         /// <summary>
-        /// The Kafka topic name.
-        /// </summary>
-        public const string KafkaTopic = "massaging.kafka.topic";
-
-        /// <summary>
-        /// The Kafka partition name.
-        /// </summary>
-        public const string KafkaPartition = "massaging.kafka.partition";
-
-        /// <summary>
-        /// The Kafka message queue time in milliseconds.
-        /// </summary>
-        public const string KafkaMessageQueueTimeMs = "massaging.kafka.messageQueueTimeMs";
-
-        /// <summary>
-        /// The Kafka tombstone indicator.
-        /// </summary>
-        public const string KafkaTombstone = "massaging.kafka.tombstone";
-
-        /// <summary>
         /// The operation name of the GraphQL request.
         /// </summary>
         public const string GraphQLOperationName = "graphql.operation.name";
@@ -241,5 +221,26 @@ namespace SignalFx.Tracing
         /// Version tag, applied to all spans with other globals.
         /// </summary>
         public const string Version = "signalfx.tracing.version";
+
+        /// <summary>
+        /// Standard tags for Kafka.
+        /// </summary>
+        public static class Kafka
+        {
+            /// <summary>
+            /// Partition the message is sent to. Omitted if partition was "any" partition.
+            /// </summary>
+            public const string Partition = "messaging.kafka.partition";
+
+            /// <summary>
+            /// The Kafka message queue time in milliseconds.
+            /// </summary>
+            public const string MessageQueueTimeMs = "massaging.kafka.messageQueueTimeMs";
+
+            /// <summary>
+            /// The Kafka tombstone indicator.
+            /// </summary>
+            public const string Tombstone = "massaging.kafka.tombstone";
+        }
     }
 }

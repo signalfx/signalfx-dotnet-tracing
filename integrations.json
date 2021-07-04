@@ -1485,7 +1485,7 @@
           "method": "ProduceAsync",
           "signature_types": [
             "System.Threading.Tasks.Task`1<Confluent.Kafka.DeliveryResult`2<T, T>>",
-            "System.String",
+            "Confluent.Kafka.TopicPartition",
             "Confluent.Kafka.Message`2<T, T>",
             "System.Threading.CancellationToken"
           ],
@@ -1512,7 +1512,7 @@
           "method": "ProduceAsync",
           "signature_types": [
             "System.Threading.Tasks.Task`1<Confluent.Kafka.DeliveryResult`2<T, T>>",
-            "Confluent.Kafka.TopicPartition",
+            "System.String",
             "Confluent.Kafka.Message`2<T, T>",
             "System.Threading.CancellationToken"
           ],
@@ -2215,7 +2215,7 @@
           "minimum_major": 4,
           "minimum_minor": 0,
           "minimum_patch": 0,
-          "maximum_major": 4,
+          "maximum_major": 5,
           "maximum_minor": 65535,
           "maximum_patch": 65535
         },

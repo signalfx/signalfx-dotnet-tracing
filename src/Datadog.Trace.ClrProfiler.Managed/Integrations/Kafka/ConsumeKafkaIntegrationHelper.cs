@@ -21,13 +21,13 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             }
 
             var inputType = typeof(T).FullName;
-            const string methodName = Constants.ConsumeSyncMethodName;
+            const string methodName = ConfluentKafka.ConsumeSyncMethodName;
             Func<object, T, object> consume;
             var consumerType = consumer.GetType();
 
             var activeScope = Tracer.Instance.ActiveScope;
             var currentSpan = activeScope?.Span;
-            if (currentSpan?.OperationName == Constants.ConsumeSyncOperationName)
+            if (currentSpan?.OperationName == ConfluentKafka.ConsumeSyncOperationName)
             {
                 activeScope.Dispose();
             }
@@ -50,7 +50,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                     moduleVersionPointer: moduleVersionPtr,
                     mdToken: mdToken,
                     opCode: opCode,
-                    instrumentedType: Constants.ConsumerType,
+                    instrumentedType: ConfluentKafka.ConsumerType,
                     methodName: methodName,
                     instanceType: consumer.GetType().AssemblyQualifiedName);
                 throw;
@@ -65,7 +65,9 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Consume exception: " + ex);
+                // TODO: Remove this!
+                Console.WriteLine("\n**** Consume exception captured by instrumentationg:\n" + ex + "\n");
+                throw;
             }
 
             return result;

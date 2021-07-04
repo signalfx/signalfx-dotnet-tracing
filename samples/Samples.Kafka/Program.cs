@@ -1,9 +1,9 @@
 // Modified by SignalFx
 using System;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Confluent.Kafka;
+using SignalFx.Tracing;
 
 namespace Samples.Kafka
 {
@@ -29,40 +29,58 @@ namespace Samples.Kafka
             var topicName = "dotnet-test-topic";
             var topic = new TopicPartition(topicName, Partition.Any);
 
-            var pConfig = new ProducerConfig { BootstrapServers = kafkaUrl };
-            using (var producer = new ProducerBuilder<Null, string>(pConfig).Build())
+            var producerConfig = new ProducerConfig
             {
-                CallProduce(topicName, new Message<Null, string> { Value = "test value 1" }, producer.Produce);
+                BootstrapServers = kafkaUrl,
+            };
 
-                // Kept in the tests temporarily for a crash that is was being caused by wrong signature for Produce methods.
-                using var httpClient = new HttpClient();
-                await httpClient.GetAsync("https://google.pl");
+            var producerBuilder = new ProducerBuilder<Null, string>(producerConfig)
+                .SetErrorHandler((_, err) =>
+                {
+                    Console.WriteLine($"Producer error handler: {err}");
+                })
+                .SetLogHandler((_, logMessage) =>
+                {
+                    Console.WriteLine($"Producer log handler: {logMessage.Message}");
+                });
 
-                CallProduce(topic, new Message<Null, string> { Value = "test value 2" }, producer.Produce);
+            using (var producer = producerBuilder.Build())
+            {
+                CallProduce(topicName, new Message<Null, string> { Value = "test value 1" }, producer);
+
+                CallProduce(topic, new Message<Null, string> { Value = "test value 2" }, producer);
 
                 await CallProduceAsync(
                     topicName,
                     new Message<Null, string> { Value = "test value 3" },
-                    producer.ProduceAsync).ConfigureAwait(false);
+                    producer).ConfigureAwait(false);
 
                 await CallProduceAsync(
-                    topicName,
+                    topic,
                     new Message<Null, string> { Value = "test value 4" },
-                    producer.ProduceAsync).ConfigureAwait(false);
+                    producer).ConfigureAwait(false);
 
                 producer.Flush(DefaultTimeoutTimeSpan);
-
-                await httpClient.GetAsync("https://www.example.com");
             }
 
-            var cConfig = new ConsumerConfig
+            var consumerConfig = new ConsumerConfig
             {
                 BootstrapServers = kafkaUrl,
                 GroupId = "b412aa02-509b-40dc-9452-ad872d75f3f2",
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };
 
-            using (var consumer = new ConsumerBuilder<Null, string>(cConfig).Build())
+            var consumerBuilder = new ConsumerBuilder<Null, string>(consumerConfig)
+                .SetErrorHandler((_, err) =>
+                {
+                    Console.WriteLine($"Consumer error handler: {err}");
+                })
+                .SetLogHandler((_, logMessage) =>
+                {
+                    Console.WriteLine($"Consumer log handler: {logMessage.Message}");
+                });
+
+            using (var consumer = consumerBuilder.Build())
             {
                 consumer.Subscribe(topicName);
 
@@ -76,12 +94,12 @@ namespace Samples.Kafka
 
                     try
                     {
-                       var cts = new CancellationTokenSource(DefaultTimeoutMilliseconds);
-                       DispalyAndCommitResult(consumer, consumer.Consume(cts.Token));
+                        var cts = new CancellationTokenSource(DefaultTimeoutMilliseconds);
+                        DispalyAndCommitResult(consumer, consumer.Consume(cts.Token));
                     }
                     catch (OperationCanceledException)
                     {
-                       Console.WriteLine("Consume timeout");
+                        Console.WriteLine("Consume timeout");
                     }
 
                     DispalyAndCommitResult(consumer, consumer.Consume(DefaultTimeoutTimeSpan));
@@ -98,7 +116,7 @@ namespace Samples.Kafka
         private static void CallProduce<TTopic>(
             TTopic topic,
             Message<Null, string> message,
-            Action<TTopic, Message<Null, string>, Action<DeliveryReport<Null, string>>> produceAction)
+            IProducer<Null, string> producer)
         {
             Action<DeliveryReport<Null, string>> deliveryHandler = (DeliveryReport<Null, string> report) =>
             {
@@ -109,24 +127,69 @@ namespace Samples.Kafka
                 }
             };
 
-            produceAction(topic, message, deliveryHandler);
+            using var scope = Tracer.Instance.StartActive($"{nameof(CallProduce)}({topic.GetType()})");
+
+            try
+            {
+                if (topic is string topicName)
+                {
+                    producer.Produce(topicName, message, deliveryHandler);
+                }
+                else if (topic is TopicPartition topicPartition)
+                {
+                    producer.Produce(topicPartition, message, deliveryHandler);
+                }
+                else
+                {
+                    throw new ArgumentException("Unkonwn topic type: " + topic.GetType());
+                }
+            }
+            catch (Exception ex)
+            {
+                scope.Span.SetException(ex);
+                throw;
+            }
+
             Console.WriteLine($"Produce for message [{message.Value}] completed. Wait for error message or delivery report.");
         }
 
         private static async Task CallProduceAsync<TTopic>(
             TTopic topic,
             Message<Null, string> message,
-            Func<TTopic, Message<Null, string>, CancellationToken, Task<DeliveryResult<Null, string>>> produceFuncAsync)
+            IProducer<Null, string> producer)
         {
-            var cts = new CancellationTokenSource(DefaultTimeoutMilliseconds);
+            using var scope = Tracer.Instance.StartActive($"{nameof(CallProduceAsync)}({topic.GetType()})");
             try
             {
-                await produceFuncAsync(topic, message, cts.Token).ConfigureAwait(false);
+                var cts = new CancellationTokenSource(DefaultTimeoutMilliseconds);
+                DeliveryResult<Null, string> deliveryResult = null;
+                if (topic is string topicName)
+                {
+                    Console.WriteLine("ProduceAsynce w/ string");
+                    deliveryResult = await producer.ProduceAsync(topicName, message, cts.Token);
+                }
+                else if (topic is TopicPartition topicPartition)
+                {
+                    Console.WriteLine("ProduceAsynce w/ TopicPartition");
+                    deliveryResult = await producer.ProduceAsync(topicPartition, message, cts.Token);
+                }
+                else
+                {
+                    throw new ArgumentException("Unkonwn topic type: " + topic.GetType());
+                }
+
                 Console.WriteLine($"ProduceAsync success for message: [{message.Value}]");
+                Console.WriteLine($"\tDeliveryResult: [{deliveryResult.Status}]");
             }
-            catch (TaskCanceledException)
+            catch (TaskCanceledException tcException)
             {
                 Console.WriteLine($"ProduceAsync timeout for message: [{message.Value}]");
+                scope.Span.SetException(tcException);
+            }
+            catch (Exception ex)
+            {
+                scope.Span.SetException(ex);
+                throw;
             }
         }
 
