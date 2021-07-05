@@ -171,6 +171,11 @@ namespace SignalFx.Tracing
         public const string KafkaTombstone = "massaging.kafka.tombstone";
 
         /// <summary>
+        /// The Kafka response offset.
+        /// </summary>
+        public const string KafkaOffset = "massaging.kafka.offset";
+
+        /// <summary>
         /// The operation name of the GraphQL request.
         /// </summary>
         public const string GraphQLOperationName = "graphql.operation.name";

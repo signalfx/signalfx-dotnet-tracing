@@ -93,6 +93,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                     }
                 }
 
+                var offset = GetPropertyValue<object>(consumeResult, "Offset");
+                if (offset is not null)
+                {
+                    span.SetTag(Tags.KafkaOffset, offset.ToString());
+                }
+
                 span.Type = SpanTypes.Kafka;
                 span.SetTag(Tags.InstrumentationName, Constants.IntegrationName);
                 span.SetTag(Tags.SpanKind, SpanKinds.Client);
