@@ -263,6 +263,22 @@ namespace SignalFx.Tracing
             public const string Tombstone = "massaging.kafka.tombstone";
 
             /// <summary>
+            /// The Kafka client name.
+            /// </summary>
+            /// <remarks>
+            /// OpenTelemetry experimental specification at commit 5a19b53d71e967659517c02a69b801381d29bf1e.
+            /// </remarks>
+            public const string ClientName = "massaging.kafka.client_id";
+
+            /// <summary>
+            /// The Kafka consumer group id.
+            /// </summary>
+            /// <remarks>
+            /// OpenTelemetry experimental specification at commit 5a19b53d71e967659517c02a69b801381d29bf1e.
+            /// </remarks>
+            public const string ConsumerGroup = "massaging.kafka.consumer_group";
+
+            /// <summary>
             /// The Kafka message queue time in milliseconds.
             /// </summary>
             /// <remarks>

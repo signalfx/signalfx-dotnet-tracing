@@ -34,7 +34,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             {
                 // Pay-for-play: only create scope and inject headers if instrumentation is enabled.
                 // Produce method is of type PRODUCER per OTel spec since it doesn't wait for a response.
-                scope = KafkaHelper.CreateProduceScope(topic, message, SpanKinds.Producer);
+                scope = KafkaHelper.CreateProduceScope(producer, topic, message, SpanKinds.Producer);
                 InjectHeaders(message, scope);
             }
 
@@ -136,7 +136,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             {
                 // Pay-for-play: only create scope and inject headers if instrumentation is enabled.
                 // ProduceAsync method is of type CLIENT per OTel spec since it awaits for a response.
-                scope = KafkaHelper.CreateProduceScope(topic, message, SpanKinds.Client);
+                scope = KafkaHelper.CreateProduceScope(producer, topic, message, SpanKinds.Client);
                 InjectHeaders(message, scope);
             }
 

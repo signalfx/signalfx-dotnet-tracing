@@ -13,7 +13,7 @@ namespace Samples.Kafka
     // - https://github.com/confluentinc/confluent-kafka-dotnet/blob/v1.7.0/examples/ConfluentCloud/Program.cs
     public static class Program
     {
-        const int DefaultTimeoutMilliseconds = 5000;
+        private const int DefaultTimeoutMilliseconds = 5000;
         private static readonly TimeSpan DefaultTimeoutTimeSpan = TimeSpan.FromMilliseconds(DefaultTimeoutMilliseconds);
 
         public static async Task Main(string[] args)
@@ -90,21 +90,21 @@ namespace Samples.Kafka
 
                 try
                 {
-                    DispalyAndCommitResult(consumer, consumer.Consume(DefaultTimeoutMilliseconds));
+                    DisplayAndCommitResult(consumer, consumer.Consume(DefaultTimeoutMilliseconds));
 
                     try
                     {
                         var cts = new CancellationTokenSource(DefaultTimeoutMilliseconds);
-                        DispalyAndCommitResult(consumer, consumer.Consume(cts.Token));
+                        DisplayAndCommitResult(consumer, consumer.Consume(cts.Token));
                     }
                     catch (OperationCanceledException)
                     {
                         Console.WriteLine("Consume timeout");
                     }
 
-                    DispalyAndCommitResult(consumer, consumer.Consume(DefaultTimeoutTimeSpan));
+                    DisplayAndCommitResult(consumer, consumer.Consume(DefaultTimeoutTimeSpan));
 
-                    DispalyAndCommitResult(consumer, consumer.Consume(DefaultTimeoutTimeSpan));
+                    DisplayAndCommitResult(consumer, consumer.Consume(DefaultTimeoutTimeSpan));
                 }
                 catch (ConsumeException ex)
                 {
@@ -158,7 +158,6 @@ namespace Samples.Kafka
             Message<Null, string> message,
             IProducer<Null, string> producer)
         {
-            // In a successfull call this span won't be the parent of the instrumentation span.
             using var scope = Tracer.Instance.StartActive($"{nameof(CallProduceAsync)}({topic.GetType()})");
             try
             {
@@ -166,7 +165,7 @@ namespace Samples.Kafka
                 DeliveryResult<Null, string> deliveryResult = null;
                 if (topic is string topicName)
                 {
-                    Console.WriteLine("ProduceAsync with topic string");
+                    Console.WriteLine("ProduceAsync with string");
                     deliveryResult = await producer.ProduceAsync(topicName, message, cts.Token);
                 }
                 else if (topic is TopicPartition topicPartition)
@@ -194,7 +193,7 @@ namespace Samples.Kafka
             }
         }
 
-        private static void DispalyAndCommitResult<TKey, TValue>(IConsumer<TKey, TValue> consumer, ConsumeResult<TKey, TValue> result)
+        private static void DisplayAndCommitResult<TKey, TValue>(IConsumer<TKey, TValue> consumer, ConsumeResult<TKey, TValue> result)
         {
             if (result == null)
             {
@@ -204,6 +203,15 @@ namespace Samples.Kafka
             {
                 consumer.Commit(result);
                 Console.WriteLine($"Consume result message: [{result.Message.Value}]");
+            }
+        }
+
+        private static void DeliveryHandler(DeliveryReport<Null, string> report)
+        {
+            Console.WriteLine($"Produce delivery report received status {report.Status} for message [{report.Message.Value}]");
+            if (report.Error != null && report.Error.IsError)
+            {
+                Console.WriteLine($"\tError: [{report.Error}]");
             }
         }
     }

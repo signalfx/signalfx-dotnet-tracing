@@ -189,12 +189,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             return scope;
         }
 
-        internal static Scope CreateProduceScope(object topic, object message, string operationName)
+        internal static Scope CreateProduceScope(object producer, object topic, object message, string operationName)
         {
             string partitionValue = null;
             if (topic is string topicName)
             {
-                return CreateProduceScopeImpl(topicName, partitionValue, message, operationName);
+                return CreateProduceScopeImpl(producer, topicName, partitionValue, message, operationName);
             }
 
             topicName = GetPropertyValue<string>(topic, "Topic");
@@ -208,7 +208,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 }
             }
 
-            return CreateProduceScopeImpl(topicName, partitionValue, message, operationName);
+            return CreateProduceScopeImpl(producer, topicName, partitionValue, message, operationName);
         }
 
         internal static T GetPropertyValue<T>(object obj, string propertyName)
@@ -248,7 +248,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             }
         }
 
-        private static Scope CreateProduceScopeImpl(string topicName, string partitionValue, object message, string spanKind)
+        private static Scope CreateProduceScopeImpl(object producer, string topicName, string partitionValue, object message, string spanKind)
         {
             var tracer = Tracer.Instance;
 
@@ -283,6 +283,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                     {
                         span.Tags.Add(Tags.Kafka.Tombstone, "true");
                     }
+                }
+
+                var clientName = GetPropertyValue<string>(producer, "Name");
+                if (clientName is not null)
+                {
+                    span.Tags.Add(Tags.Kafka.ClientName, clientName);
                 }
             }
             catch (Exception ex)
