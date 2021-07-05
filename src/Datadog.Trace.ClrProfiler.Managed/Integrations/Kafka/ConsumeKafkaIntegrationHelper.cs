@@ -61,7 +61,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             try
             {
                 result = consume(consumer, input);
-                using var scope = KafkaHelper.CreateConsumeScope(result);
+                using var scope = KafkaHelper.CreateConsumeScope(consumer, result);
             }
             catch (Exception ex)
             {

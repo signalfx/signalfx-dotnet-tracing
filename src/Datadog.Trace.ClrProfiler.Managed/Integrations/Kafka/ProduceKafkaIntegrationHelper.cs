@@ -25,7 +25,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 throw new ArgumentNullException(nameof(producer));
             }
 
-            var scope = KafkaHelper.CreateProduceScope(topic, message, operationName);
+            var scope = KafkaHelper.CreateProduceScope(producer, topic, message, operationName);
 
             InjectHeaders(message, scope);
 
@@ -80,7 +80,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 throw new ArgumentNullException(nameof(producer));
             }
 
-            var scope = KafkaHelper.CreateProduceScope(topic, message, operationName);
+            var scope = KafkaHelper.CreateProduceScope(producer, topic, message, operationName);
 
             InjectHeaders(message, scope);
 

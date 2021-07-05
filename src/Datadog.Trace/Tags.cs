@@ -176,6 +176,16 @@ namespace SignalFx.Tracing
         public const string KafkaOffset = "massaging.kafka.offset";
 
         /// <summary>
+        /// The Kafka client name.
+        /// </summary>
+        public const string KafkaClientName = "massaging.kafka.client-name";
+
+        /// <summary>
+        /// The Kafka consumer group id.
+        /// </summary>
+        public const string KafkaGroupId = "massaging.kafka.group-id";
+
+        /// <summary>
         /// The operation name of the GraphQL request.
         /// </summary>
         public const string GraphQLOperationName = "graphql.operation.name";
