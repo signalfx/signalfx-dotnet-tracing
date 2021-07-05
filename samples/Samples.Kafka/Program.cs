@@ -155,7 +155,10 @@ namespace Samples.Kafka
         private static void DeliveryHandler(DeliveryReport<Null, string> report)
         {
             Console.WriteLine($"Produce delivery report received status {report.Status} for message [{report.Message.Value}]");
-            if (report.Error != null) { Console.WriteLine($"\tError: [{report.Error}]"); }
+            if (report.Error != null && report.Error.IsError)
+            {
+                Console.WriteLine($"\tError: [{report.Error}]");
+            }
         }
     }
 }
