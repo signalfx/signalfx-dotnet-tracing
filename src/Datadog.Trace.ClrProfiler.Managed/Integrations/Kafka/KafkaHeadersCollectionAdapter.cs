@@ -38,9 +38,9 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                     return Enumerable.Empty<string>();
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                Log.Warning($"Could not invoke \"TryGetLastBytes\" method of the {_headers.GetType()} class");
+                Log.Warning($"Could not invoke \"TryGetLastBytes\" method of the {_headers.GetType()} class", e);
             }
 
             var bytes = (byte[])parameters[1];
@@ -68,9 +68,9 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             {
                 _add.Invoke(_headers, new object[] { name, Encoding.UTF8.GetBytes(value) });
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                Log.Warning($"Could not invoke \"Add\" method of the {_headers.GetType()} class");
+                Log.Warning($"Could not invoke \"Add\" method of the {_headers.GetType()} class", e);
             }
         }
 
@@ -80,9 +80,9 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             {
                 _remove.Invoke(_headers, new object[] { name });
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                Log.Warning($"Could not invoke \"Remove\" method of the {_headers.GetType()} class");
+                Log.Warning($"Could not invoke \"Remove\" method of the {_headers.GetType()} class", e);
             }
         }
     }
