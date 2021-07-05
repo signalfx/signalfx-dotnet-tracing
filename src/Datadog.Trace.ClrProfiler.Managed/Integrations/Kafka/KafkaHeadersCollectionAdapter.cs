@@ -29,10 +29,18 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
         public IEnumerable<string> GetValues(string name)
         {
             var parameters = new object[] { name, null };
-            if (!(bool)_tryGetLastBytes.Invoke(_headers, parameters))
+
+            try
             {
-                Log.Information("Could not retrieve header {header}.", name);
-                return Enumerable.Empty<string>();
+                if (!(bool)_tryGetLastBytes.Invoke(_headers, parameters))
+                {
+                    Log.Information("Could not retrieve header {header}.", name);
+                    return Enumerable.Empty<string>();
+                }
+            }
+            catch (Exception)
+            {
+                Log.Warning($"Could not invoke \"TryGetLastBytes\" method of the {_headers.GetType()} class");
             }
 
             var bytes = (byte[])parameters[1];
@@ -56,12 +64,26 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
 
         public void Add(string name, string value)
         {
-            _add.Invoke(_headers, new object[] { name, Encoding.UTF8.GetBytes(value) });
+            try
+            {
+                _add.Invoke(_headers, new object[] { name, Encoding.UTF8.GetBytes(value) });
+            }
+            catch (Exception)
+            {
+                Log.Warning($"Could not invoke \"Add\" method of the {_headers.GetType()} class");
+            }
         }
 
         public void Remove(string name)
         {
-            _remove.Invoke(_headers, new object[] { name });
+            try
+            {
+                _remove.Invoke(_headers, new object[] { name });
+            }
+            catch (Exception)
+            {
+                Log.Warning($"Could not invoke \"Remove\" method of the {_headers.GetType()} class");
+            }
         }
     }
 }
