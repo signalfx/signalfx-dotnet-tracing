@@ -158,6 +158,7 @@ namespace Samples.Kafka
             Message<Null, string> message,
             IProducer<Null, string> producer)
         {
+            // In a successfull call this span won't be the parent of the instrumentation span.
             using var scope = Tracer.Instance.StartActive($"{nameof(CallProduceAsync)}({topic.GetType()})");
             try
             {
@@ -165,12 +166,12 @@ namespace Samples.Kafka
                 DeliveryResult<Null, string> deliveryResult = null;
                 if (topic is string topicName)
                 {
-                    Console.WriteLine("ProduceAsynce w/ string");
+                    Console.WriteLine("ProduceAsync with topic string");
                     deliveryResult = await producer.ProduceAsync(topicName, message, cts.Token);
                 }
                 else if (topic is TopicPartition topicPartition)
                 {
-                    Console.WriteLine("ProduceAsynce w/ TopicPartition");
+                    Console.WriteLine("ProduceAsync with TopicPartition");
                     deliveryResult = await producer.ProduceAsync(topicPartition, message, cts.Token);
                 }
                 else

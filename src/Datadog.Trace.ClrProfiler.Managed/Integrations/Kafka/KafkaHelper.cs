@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 using SignalFx.Tracing;
@@ -9,6 +10,8 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
 {
     internal static class KafkaHelper
     {
+        private const int ConfluentKafkaAnyPartitionSentinel = -1;
+
         private static readonly ILogger Log = SignalFxLogging.GetLogger(typeof(ConsumeKafkaIntegration));
 
         private static readonly Lazy<Type> HeadersType = new Lazy<Type>(() =>
@@ -37,20 +40,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             return headersType;
         });
 
-        internal static Scope CreateConsumeScope(object consumeResult)
+        internal static Scope CreateConsumeScopeFromConsumerResult(object consumeResult, DateTimeOffset startTime)
         {
             var tracer = Tracer.Instance;
             if (!tracer.Settings.IsIntegrationEnabled(ConfluentKafka.IntegrationName))
             {
                 // integration disabled, don't create a scope/span, skip this trace
-                return null;
-            }
-
-            var parent = tracer.ActiveScope?.Span;
-            if (parent is not null &&
-                parent.OperationName == ConfluentKafka.ConsumeSyncOperationName &&
-                parent.GetTag(Tags.InstrumentationName) != null)
-            {
                 return null;
             }
 
@@ -82,18 +77,19 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             {
                 var topicName = GetPropertyValue<string>(consumeResult, "Topic");
                 var partition = GetPropertyValue<object>(consumeResult, "Partition");
-                int? partitionValue = null;
+                string partitionValue = null;
                 if (partition is not null)
                 {
-                    partitionValue = GetPropertyValue<int>(partition, "Value");
+                    // Here the partition number is the actual partition where the data came from, no sentinel value.
+                    partitionValue = GetPropertyValue<int>(partition, "Value").ToString(CultureInfo.InvariantCulture);
                 }
 
-                scope = tracer.StartActive(ConfluentKafka.ConsumeSyncOperationName, propagatedContext, tracer.DefaultServiceName);
+                scope = tracer.StartActive(OpenTelemetryConsumeSpanName(topicName), propagatedContext, startTime: startTime);
 
                 var span = scope.Span;
-                if (partitionValue.HasValue)
+                if (partitionValue is not null)
                 {
-                    span.Tags.Add(Tags.Kafka.Partition, partitionValue.Value.ToString());
+                    span.Tags.Add(Tags.Kafka.Partition, partitionValue);
                 }
 
                 if (message is not null)
@@ -104,24 +100,86 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                         var dateTime = GetPropertyValue<DateTime>(timestamp, "UtcDateTime");
                         if (dateTime != default)
                         {
-                            var consumeTime = span.StartTime.UtcDateTime;
-                            var messageQueueTimeMs = Math.Max(0, (consumeTime - dateTime).TotalMilliseconds);
-                            span.Tags.Add(Tags.Kafka.MessageQueueTimeMs, messageQueueTimeMs.ToString(CultureInfo.InvariantCulture));
+                            var consumeTime = DateTime.UtcNow;
+                            var queueTimeMs = Math.Max(0, (consumeTime - dateTime).TotalMilliseconds);
+                            span.Tags.Add(Tags.Kafka.QueueTimeMs, queueTimeMs.ToString(CultureInfo.InvariantCulture));
                         }
                     }
 
                     var value = GetPropertyValue<object>(message, "Value");
-                    span.Tags.Add(Tags.Kafka.Tombstone, value is null ? "true" : "false");
+                    if (value is null)
+                    {
+                        span.Tags.Add(Tags.Kafka.Tombstone, "true");
+                    }
 
                     if (!string.IsNullOrEmpty(topicName))
                     {
-                        span.Tags.Add("messaging.destination", topicName);
+                        span.Tags.Add(Tags.Messaging.Destination, topicName);
                     }
                 }
 
-                span.Type = SpanTypes.Kafka;
                 span.SetTag(Tags.InstrumentationName, ConfluentKafka.IntegrationName);
-                span.SetTag(Tags.SpanKind, SpanKinds.Client);
+                span.SetTag(Tags.SpanKind, SpanKinds.Consumer);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error creating or populating scope.");
+            }
+
+            return scope;
+        }
+
+        internal static Scope CreateConsumeScopeFromConsumer(object consumer, DateTimeOffset startTime)
+        {
+            var tracer = Tracer.Instance;
+            if (!tracer.Settings.IsIntegrationEnabled(ConfluentKafka.IntegrationName))
+            {
+                // integration disabled, don't create a scope/span, skip this trace
+                return null;
+            }
+
+            Scope scope = null;
+            try
+            {
+                var topicNames = GetPropertyValue<List<string>>(consumer, "Subscription");
+                var assignedPartitions = GetPropertyValue<List<object>>(consumer, "Assignment");
+
+                string topicName = topicNames != null && topicNames.Count == 1 ? topicNames[0] : null;
+                scope = tracer.StartActive(OpenTelemetryConsumeSpanName(topicName), startTime: startTime);
+
+                var span = scope.Span;
+
+                if (topicNames is not null)
+                {
+                    span.Tags.Add(Tags.Kafka.SubscribedTopics, string.Join(",", topicNames));
+                }
+
+                if (assignedPartitions is not null && assignedPartitions.Count > 0)
+                {
+                    if (assignedPartitions.Count == 1)
+                    {
+                        int partitionNumber = GetPropertyValue<int>(assignedPartitions[0], "Value");
+                        span.Tags.Add(Tags.Kafka.AssignedPartitions, partitionNumber.ToString(CultureInfo.InvariantCulture));
+
+                        if (partitionNumber != ConfluentKafkaAnyPartitionSentinel)
+                        {
+                            span.Tags.Add(Tags.Kafka.AssignedPartitions, partitionNumber.ToString(CultureInfo.InvariantCulture));
+                        }
+                    }
+                    else
+                    {
+                        var partitions = new int[assignedPartitions.Count];
+                        for (int i = 0; i < assignedPartitions.Count; i++)
+                        {
+                            partitions[i] = GetPropertyValue<int>(assignedPartitions[i], "Value");
+                        }
+
+                        span.Tags.Add(Tags.Kafka.AssignedPartitions, string.Join(",", partitions));
+                    }
+                }
+
+                span.SetTag(Tags.InstrumentationName, ConfluentKafka.IntegrationName);
+                span.SetTag(Tags.SpanKind, SpanKinds.Consumer);
             }
             catch (Exception ex)
             {
@@ -143,7 +201,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             var partition = GetPropertyValue<object>(topic, "Partition");
             if (partition is not null)
             {
-                const int ConfluentKafkaAnyPartitionSentinel = -1;
                 int partitionNumber = GetPropertyValue<int>(partition, "Value");
                 if (partitionNumber != ConfluentKafkaAnyPartitionSentinel)
                 {
@@ -200,10 +257,10 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             {
                 // Following OTel experimental semantic conventions:
                 // https://github.com/open-telemetry/opentelemetry-specification/blob/5a19b53d71e967659517c02a69b801381d29bf1e/specification/trace/semantic_conventions/messaging.md#operation-names
-                scope = tracer.StartActive(OpenTelemetryProduceSpanName(topicName, spanKind));
+                scope = tracer.StartActive(OpenTelemetryProduceSpanName(topicName));
                 var span = scope.Span;
                 span.SetTag(Tags.SpanKind, spanKind);
-                span.SetTag("messaging.system", ConfluentKafka.OpenTelemetrySystemName);
+                span.SetTag(Tags.Messaging.System, ConfluentKafka.OpenTelemetrySystemName);
                 span.SetTag("messaging.destination", topicName);
 
                 // Kafka specific tags.
@@ -236,7 +293,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             return scope;
         }
 
-        private static string OpenTelemetryProduceSpanName(string topicName, string spanKind)
+        private static string OpenTelemetryProduceSpanName(string topicName)
         {
             const string OpenTelemetryProduceOperation = "send";
             if (string.IsNullOrEmpty(topicName))
@@ -245,6 +302,17 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             }
 
             return topicName + " " + OpenTelemetryProduceOperation;
+        }
+
+        private static string OpenTelemetryConsumeSpanName(string topicName)
+        {
+            const string OpenTelemetryConsumeOperation = "receive";
+            if (string.IsNullOrEmpty(topicName))
+            {
+                return OpenTelemetryConsumeOperation;
+            }
+
+            return topicName + " " + OpenTelemetryConsumeOperation;
         }
     }
 }

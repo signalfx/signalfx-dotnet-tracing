@@ -57,17 +57,31 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             }
 
             object result = null;
-
+            Scope scope = null;
+            DateTimeOffset startTimeOffset = DateTimeOffset.UtcNow;
             try
             {
                 result = consume(consumer, input);
-                using var scope = KafkaHelper.CreateConsumeScope(result);
+                scope = result != null
+                    ? KafkaHelper.CreateConsumeScopeFromConsumerResult(result, startTimeOffset)
+                    : KafkaHelper.CreateConsumeScopeFromConsumer(consumer, startTimeOffset);
             }
             catch (Exception ex)
             {
-                // TODO: Remove this!
-                Console.WriteLine("\n**** Consume exception captured by instrumentationg:\n" + ex + "\n");
+                var tracer = Tracer.Instance;
+                if (tracer.Settings.IsIntegrationEnabled(ConfluentKafka.IntegrationName))
+                {
+                    // Integration is enabled but the scope was not created since consume raised an exception.
+                    // Create a span to record the exception with the available info.
+                    scope = KafkaHelper.CreateConsumeScopeFromConsumer(consumer, startTimeOffset);
+                    scope.Span.SetException(ex);
+                }
+
                 throw;
+            }
+            finally
+            {
+                scope?.Dispose();
             }
 
             return result;

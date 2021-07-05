@@ -40,11 +40,6 @@ namespace SignalFx.Tracing
         public const string GraphQL = "graphql";
 
         /// <summary>
-        /// The span type for a Kafka integration.
-        /// </summary>
-        public const string Kafka = "kafka";
-
-        /// <summary>
         /// The span type for a custom integration.
         /// </summary>
         public const string Custom = "custom";

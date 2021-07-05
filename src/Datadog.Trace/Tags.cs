@@ -223,6 +223,25 @@ namespace SignalFx.Tracing
         public const string Version = "signalfx.tracing.version";
 
         /// <summary>
+        /// Standard tags for Messaging systems per OpenTelemetry specification.
+        /// </summary>
+        /// <remarks>
+        /// OpenTelemetry experimental specification at commit 5a19b53d71e967659517c02a69b801381d29bf1e.
+        /// </remarks>
+        public static class Messaging
+        {
+            /// <summary>
+            /// A string identifying the messaging system. Examples: "kafka", "rabbitmq", etc.
+            /// </summary>
+            public const string System = "messaging.system";
+
+            /// <summary>
+            /// The message destination name. Example the Kafka topic.
+            /// </summary>
+            public const string Destination = "messaging.destination";
+        }
+
+        /// <summary>
         /// Standard tags for Kafka.
         /// </summary>
         public static class Kafka
@@ -230,17 +249,42 @@ namespace SignalFx.Tracing
             /// <summary>
             /// Partition the message is sent to. Omitted if partition was "any" partition.
             /// </summary>
+            /// <remarks>
+            /// OpenTelemetry experimental specification at commit 5a19b53d71e967659517c02a69b801381d29bf1e.
+            /// </remarks>
             public const string Partition = "messaging.kafka.partition";
-
-            /// <summary>
-            /// The Kafka message queue time in milliseconds.
-            /// </summary>
-            public const string MessageQueueTimeMs = "massaging.kafka.messageQueueTimeMs";
 
             /// <summary>
             /// The Kafka tombstone indicator.
             /// </summary>
+            /// <remarks>
+            /// OpenTelemetry experimental specification at commit 5a19b53d71e967659517c02a69b801381d29bf1e.
+            /// </remarks>
             public const string Tombstone = "massaging.kafka.tombstone";
+
+            /// <summary>
+            /// The Kafka message queue time in milliseconds.
+            /// </summary>
+            /// <remarks>
+            /// This tag is NOT part of OpenTelemetry experimental specification at commit 5a19b53d71e967659517c02a69b801381d29bf1e.
+            /// </remarks>
+            public const string QueueTimeMs = "massaging.kafka.queue.time.ms";
+
+            /// <summary>
+            /// Topics subscribed by a consumer.
+            /// </summary>
+            /// <remarks>
+            /// This tag is NOT part of OpenTelemetry experimental specification at commit 5a19b53d71e967659517c02a69b801381d29bf1e.
+            /// </remarks>
+            public const string SubscribedTopics = "messaging.kafka.subscribed.topics";
+
+            /// <summary>
+            /// The partitions assigned to a consumer.
+            /// </summary>
+            /// <remarks>
+            /// This tag is NOT part of OpenTelemetry experimental specification at commit 5a19b53d71e967659517c02a69b801381d29bf1e.
+            /// </remarks>
+            public const string AssignedPartitions = "messaging.kafka.assigned.partitions";
         }
     }
 }
