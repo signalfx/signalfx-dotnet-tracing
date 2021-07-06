@@ -30,7 +30,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             }
 
             Scope scope = null;
-            if (Tracer.Instance.Settings.IsIntegrationEnabled(ConfluentKafka.IntegrationName))
+            if (Tracer.Instance.Settings.IsIntegrationEnabled(ConfluentKafka.IntegrationName) && !KafkaHelper.AlreadyInstrumented())
             {
                 // Pay-for-play: only create scope and inject headers if instrumentation is enabled.
                 // Produce method is of type PRODUCER per OTel spec since it doesn't wait for a response.
@@ -132,7 +132,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             Func<object, object, object, CancellationToken, object> produce)
         {
             Scope scope = null;
-            if (Tracer.Instance.Settings.IsIntegrationEnabled(ConfluentKafka.IntegrationName))
+            if (Tracer.Instance.Settings.IsIntegrationEnabled(ConfluentKafka.IntegrationName) && !KafkaHelper.AlreadyInstrumented())
             {
                 // Pay-for-play: only create scope and inject headers if instrumentation is enabled.
                 // ProduceAsync method is of type CLIENT per OTel spec since it awaits for a response.

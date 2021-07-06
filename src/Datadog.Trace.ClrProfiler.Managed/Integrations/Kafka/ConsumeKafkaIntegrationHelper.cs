@@ -69,12 +69,17 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             catch (Exception ex)
             {
                 var tracer = Tracer.Instance;
-                if (tracer.Settings.IsIntegrationEnabled(ConfluentKafka.IntegrationName))
+                if (tracer.Settings.IsIntegrationEnabled(ConfluentKafka.IntegrationName) && !KafkaHelper.AlreadyInstrumented())
                 {
                     // Integration is enabled but the scope was not created since consume raised an exception.
                     // Create a span to record the exception with the available info.
                     scope = KafkaHelper.CreateConsumeScopeFromConsumer(consumer, startTimeOffset);
-                    scope.Span.SetException(ex);
+                    if (ex is not OperationCanceledException)
+                    {
+                        // OperationCanceledException is expected in case of a clean shutdown and shouldn't
+                        // be reported as an exception.
+                        scope.Span.SetException(ex);
+                    }
                 }
 
                 throw;

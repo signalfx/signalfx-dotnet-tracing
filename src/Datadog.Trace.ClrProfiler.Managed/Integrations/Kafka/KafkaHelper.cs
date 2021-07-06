@@ -43,7 +43,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
         internal static Scope CreateConsumeScopeFromConsumerResult(object consumeResult, DateTimeOffset startTime)
         {
             var tracer = Tracer.Instance;
-            if (!tracer.Settings.IsIntegrationEnabled(ConfluentKafka.IntegrationName))
+            if (!tracer.Settings.IsIntegrationEnabled(ConfluentKafka.IntegrationName) || AlreadyInstrumented())
             {
                 // integration disabled, don't create a scope/span, skip this trace
                 return null;
@@ -87,6 +87,9 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 scope = tracer.StartActive(OpenTelemetryConsumeSpanName(topicName), propagatedContext, startTime: startTime);
 
                 var span = scope.Span;
+                span.SetTag(Tags.InstrumentationName, ConfluentKafka.IntegrationName);
+                span.SetTag(Tags.SpanKind, SpanKinds.Consumer);
+
                 if (partitionValue is not null)
                 {
                     span.Tags.Add(Tags.Kafka.Partition, partitionValue);
@@ -117,9 +120,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                         span.Tags.Add(Tags.Messaging.Destination, topicName);
                     }
                 }
-
-                span.SetTag(Tags.InstrumentationName, ConfluentKafka.IntegrationName);
-                span.SetTag(Tags.SpanKind, SpanKinds.Consumer);
             }
             catch (Exception ex)
             {
@@ -132,7 +132,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
         internal static Scope CreateConsumeScopeFromConsumer(object consumer, DateTimeOffset startTime)
         {
             var tracer = Tracer.Instance;
-            if (!tracer.Settings.IsIntegrationEnabled(ConfluentKafka.IntegrationName))
+            if (!tracer.Settings.IsIntegrationEnabled(ConfluentKafka.IntegrationName) || AlreadyInstrumented())
             {
                 // integration disabled, don't create a scope/span, skip this trace
                 return null;
@@ -148,6 +148,15 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 scope = tracer.StartActive(OpenTelemetryConsumeSpanName(topicName), startTime: startTime);
 
                 var span = scope.Span;
+
+                span.SetTag(Tags.InstrumentationName, ConfluentKafka.IntegrationName);
+                span.SetTag(Tags.SpanKind, SpanKinds.Consumer);
+                span.SetTag(Tags.Messaging.System, ConfluentKafka.OpenTelemetrySystemName);
+
+                // When constructing span from consumer it means that could mean an exception (to be
+                // recorded later) or that there no messages on the topic or that the topic end was
+                // reached. Create a tag to make that fact clear.
+                span.SetTag(Tags.Kafka.MessagedReceived, "false");
 
                 if (topicNames is not null)
                 {
@@ -177,13 +186,10 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                         span.Tags.Add(Tags.Kafka.AssignedPartitions, string.Join(",", partitions));
                     }
                 }
-
-                span.SetTag(Tags.InstrumentationName, ConfluentKafka.IntegrationName);
-                span.SetTag(Tags.SpanKind, SpanKinds.Consumer);
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Error creating or populating scope.");
+                Log.Error(ex, "Error creating or populating consumer scope.");
             }
 
             return scope;
@@ -248,6 +254,15 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             }
         }
 
+        internal static bool AlreadyInstrumented()
+        {
+            // The interfaces being instrumented can be wrapped by application code and we want to avoid
+            // multiple spans for the same logical operation.
+            var currentSpan = Tracer.Instance.ActiveScope?.Span;
+            return currentSpan != null &&
+                currentSpan.GetTag(Tags.InstrumentationName) == ConfluentKafka.IntegrationName;
+        }
+
         private static Scope CreateProduceScopeImpl(object producer, string topicName, string partitionValue, object message, string spanKind)
         {
             var tracer = Tracer.Instance;
@@ -261,7 +276,8 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 var span = scope.Span;
                 span.SetTag(Tags.SpanKind, spanKind);
                 span.SetTag(Tags.Messaging.System, ConfluentKafka.OpenTelemetrySystemName);
-                span.SetTag("messaging.destination", topicName);
+                span.SetTag(Tags.Messaging.Destination, topicName);
+                span.SetTag(Tags.InstrumentationName, ConfluentKafka.IntegrationName);
 
                 // Kafka specific tags.
 
