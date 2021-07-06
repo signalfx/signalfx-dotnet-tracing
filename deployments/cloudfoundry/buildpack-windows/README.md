@@ -50,7 +50,7 @@ If you want to use a specific version of the tracing library in your application
 environment variable before application deployment, either using `cf set-env` or the `manifest.yml` file:
 
 ```sh
-$ cf set-env SIGNALFX_DOTNET_TRACING_VERSION "0.1.11"
+$ cf set-env SIGNALFX_DOTNET_TRACING_VERSION "0.1.12"
 ```
 
 If you want to use this buildpack in a .NET Framework application deployment you have to enable HWC support by setting the `SIGNALFX_USE_HWC` environment variable to `true` either using `cf set-env` or the `manifest.yml` file:

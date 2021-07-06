@@ -6,7 +6,7 @@
     <AssemblyName>SignalFx.Tracing.ClrProfiler.Managed.Core</AssemblyName>
 
     <!-- NuGet -->
-    <Version>0.1.11</Version>
+    <Version>0.1.12</Version>
     <IsPackable>false</IsPackable>
 
     <!-- Allow the GenerateAssemblyInfo task in the .NET SDK to generate all
