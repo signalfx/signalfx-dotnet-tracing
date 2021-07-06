@@ -2,12 +2,19 @@
 
 ## [Unreleased]
 
+[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/v0.1.12...HEAD)
+
+[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/v0.1.12..HEAD)
+
+## [Release 0.1.12](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.1.12)
+
 - Support for .NET 5.0
+- Added Confluent.Kafka instrumentation for IConsumer.Consume, IProducer.Produce, and IProducer.ProduceAsync
 - New instrumentations for SqlCommand: ExecuteXmlReader and ExecuteXmlReaderAsync methods
 
-[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/v0.1.11...HEAD)
+[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/v0.1.11...v0.1.12)
 
-[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/v0.1.11..HEAD)
+[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/v0.1.11..v0.1.12)
 
 ## [Release 0.1.11](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.1.11)
 
