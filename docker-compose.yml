@@ -74,6 +74,26 @@ services:
     ports:
     - "127.0.0.1:8585:8585"
 
+  zookeeper:
+    image: confluentinc/cp-zookeeper:6.2.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    ports:
+      - 2181:2181
+
+  # based on: https://docs.confluent.io/platform/current/installation/docker/config-reference.html
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - 29092:29092
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
   build:
     build:
       context: ./
@@ -231,6 +251,17 @@ services:
     depends_on:
     - mongo
 
+  Samples.Kafka:
+    build:
+      context: ./
+      dockerfile: ./docker/dotnet.dockerfile
+    image: datadog-dotnet
+    command: bash -c "/project/docker/with-profiler-logs.bash wait-for-it kafka:9092 -- /project/docker/with-profiler.bash dotnet /project/samples/Samples.Kafka/bin/${buildConfiguration}/${publishTargetFramework}/publish/Samples.Kafka.dll"
+    volumes:
+    - ./:/project
+    depends_on:
+    - kafka
+
   # .NET Core does not have apk packages for .NET Core runtimes, they only have base images
   # Until it's resolved, have a separate Dockerfile for each runtime
   # (see: https://github.com/dotnet/runtime/issues/3406)
@@ -253,6 +284,7 @@ services:
     - POSTGRES_HOST=postgres
     - MYSQL_HOST=mysql
     - MYSQL_PORT=3306
+    - KAFKA_HOST=kafka:9092
     - buildConfiguration=${buildConfiguration}
     - publishTargetFramework=netcoreapp2.1
     depends_on:
@@ -265,6 +297,7 @@ services:
     - mongo
     - postgres
     - mysql
+    - kafka
 
   IntegrationTests.Alpine.Core30:
     build:
@@ -285,6 +318,7 @@ services:
     - POSTGRES_HOST=postgres
     - MYSQL_HOST=mysql
     - MYSQL_PORT=3306
+    - KAFKA_HOST=kafka:9092
     - buildConfiguration=${buildConfiguration}
     - publishTargetFramework=netcoreapp3.0
     depends_on:
@@ -297,6 +331,7 @@ services:
     - mongo
     - postgres
     - mysql
+    - kafka
 
   IntegrationTests.Alpine.Core31:
     build:
@@ -317,6 +352,7 @@ services:
     - POSTGRES_HOST=postgres
     - MYSQL_HOST=mysql
     - MYSQL_PORT=3306
+    - KAFKA_HOST=kafka:9092
     - buildConfiguration=${buildConfiguration}
     - publishTargetFramework=netcoreapp3.1
     depends_on:
@@ -329,6 +365,7 @@ services:
     - mongo
     - postgres
     - mysql
+    - kafka
 
   IntegrationTests.Alpine.Core50:
     build:
@@ -381,6 +418,7 @@ services:
     - POSTGRES_HOST=postgres
     - MYSQL_HOST=mysql
     - MYSQL_PORT=3306
+    - KAFKA_HOST=kafka:9092
     - buildConfiguration=${buildConfiguration}
     - publishTargetFramework=${publishTargetFramework}
     depends_on:
@@ -393,3 +431,4 @@ services:
     - mongo
     - postgres
     - mysql
+    - kafka
