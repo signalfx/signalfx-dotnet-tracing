@@ -178,13 +178,13 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 }
 
                 var groupId = KafkaHelper.GetPropertyValue<string>(consumer, "MemberId");
-                if (groupId is not null)
+                if (!string.IsNullOrWhiteSpace(groupId))
                 {
                     span.Tags.Add(Tags.Kafka.ConsumerGroup, groupId);
                 }
 
                 var clientName = KafkaHelper.GetPropertyValue<string>(consumer, "Name");
-                if (clientName is not null)
+                if (!string.IsNullOrWhiteSpace(clientName))
                 {
                     span.Tags.Add(Tags.Kafka.ClientName, clientName);
                 }
@@ -256,13 +256,13 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 }
 
                 var groupId = KafkaHelper.GetPropertyValue<string>(consumer, "MemberId");
-                if (groupId is not null)
+                if (!string.IsNullOrWhiteSpace(groupId))
                 {
                     span.Tags.Add(Tags.Kafka.ConsumerGroup, groupId);
                 }
 
                 var clientName = KafkaHelper.GetPropertyValue<string>(consumer, "Name");
-                if (clientName is not null)
+                if (!string.IsNullOrWhiteSpace(clientName))
                 {
                     span.Tags.Add(Tags.Kafka.ClientName, clientName);
                 }
