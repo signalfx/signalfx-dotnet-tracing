@@ -63,7 +63,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             {
                 result = consume(consumer, input);
                 scope = result != null
-                    ? KafkaHelper.CreateConsumeScopeFromConsumerResult(result, startTimeOffset)
+                    ? KafkaHelper.CreateConsumeScopeFromConsumerResult(result, consumer, startTimeOffset)
                     : KafkaHelper.CreateConsumeScopeFromConsumer(consumer, startTimeOffset);
             }
             catch (Exception ex)

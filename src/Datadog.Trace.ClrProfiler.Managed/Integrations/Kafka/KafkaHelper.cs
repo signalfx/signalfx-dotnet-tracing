@@ -14,9 +14,9 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
 
         private static readonly ILogger Log = SignalFxLogging.GetLogger(typeof(ConsumeKafkaIntegration));
 
-        public static readonly Lazy<Type> LazyHeadersType = new Lazy<Type>(() =>
+        public static readonly Lazy<Type> LazyHeadersType = new(() =>
         {
-            Assembly assembly = null;
+            Assembly assembly;
             try
             {
                 assembly = Assembly.Load(ConfluentKafka.AssemblyName);
@@ -40,7 +40,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             return headersType;
         });
 
-        internal static Scope CreateConsumeScopeFromConsumerResult(object consumeResult, DateTimeOffset startTime)
+        internal static Scope CreateConsumeScopeFromConsumerResult(object consumeResult, object consumer, DateTimeOffset startTime)
         {
             var tracer = Tracer.Instance;
             if (!tracer.Settings.IsIntegrationEnabled(ConfluentKafka.IntegrationName) || AlreadyInstrumented())
@@ -120,6 +120,18 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                         span.Tags.Add(Tags.Messaging.Destination, topicName);
                     }
                 }
+
+                var groupId = GetPropertyValue<string>(consumer, "MemberId");
+                if (groupId is not null)
+                {
+                    span.Tags.Add(Tags.Kafka.ConsumerGroup, groupId);
+                }
+
+                var clientName = GetPropertyValue<string>(consumer, "Name");
+                if (clientName is not null)
+                {
+                    span.Tags.Add(Tags.Kafka.ClientName, clientName);
+                }
             }
             catch (Exception ex)
             {
@@ -185,6 +197,18 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
 
                         span.Tags.Add(Tags.Kafka.AssignedPartitions, string.Join(",", partitions));
                     }
+                }
+
+                var groupId = GetPropertyValue<string>(consumer, "MemberId");
+                if (groupId is not null)
+                {
+                    span.Tags.Add(Tags.Kafka.ConsumerGroup, groupId);
+                }
+
+                var clientName = GetPropertyValue<string>(consumer, "Name");
+                if (clientName is not null)
+                {
+                    span.Tags.Add(Tags.Kafka.ClientName, clientName);
                 }
             }
             catch (Exception ex)
