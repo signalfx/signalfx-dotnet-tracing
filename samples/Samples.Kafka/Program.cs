@@ -121,7 +121,7 @@ namespace Samples.Kafka
             Action<DeliveryReport<Null, string>> deliveryHandler = (DeliveryReport<Null, string> report) =>
             {
                 Console.WriteLine($"Produce delivery report received status {report.Status} for message [{report.Message.Value}]");
-                if (report.Error != null)
+                if (report.Error != null && report.Error.IsError)
                 {
                     Console.WriteLine($"\tError: [{report.Error}]");
                 }
@@ -141,7 +141,7 @@ namespace Samples.Kafka
                 }
                 else
                 {
-                    throw new ArgumentException("Unkonwn topic type: " + topic.GetType());
+                    throw new ArgumentException("Unknown topic type: " + topic.GetType());
                 }
             }
             catch (Exception ex)
@@ -203,15 +203,6 @@ namespace Samples.Kafka
             {
                 consumer.Commit(result);
                 Console.WriteLine($"Consume result message: [{result.Message.Value}]");
-            }
-        }
-
-        private static void DeliveryHandler(DeliveryReport<Null, string> report)
-        {
-            Console.WriteLine($"Produce delivery report received status {report.Status} for message [{report.Message.Value}]");
-            if (report.Error != null && report.Error.IsError)
-            {
-                Console.WriteLine($"\tError: [{report.Error}]");
             }
         }
     }
