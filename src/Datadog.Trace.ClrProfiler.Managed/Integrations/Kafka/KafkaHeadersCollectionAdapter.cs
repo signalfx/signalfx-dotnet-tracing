@@ -54,22 +54,22 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
         public IEnumerable<string> GetValues(string name)
         {
             var parameters = new object[] { name, null };
-            if (TryGetLastBytesMethodInfo == null || !(bool)TryGetLastBytesMethodInfo.Invoke(_headers, parameters))
+            if (TryGetLastBytesMethodInfo is null || !(bool)TryGetLastBytesMethodInfo?.Invoke(_headers, parameters))
             {
-                var bytes = (byte[])parameters[1];
-                try
-                {
-                    return new[] { Encoding.UTF8.GetString(bytes) };
-                }
-                catch (Exception ex)
-                {
-                    Log.Debug(ex, "Could not deserialize Kafka header {headerName}", name);
-                }
-
+                Log.Debug("Could not retrieve header {headerName}.", name);
                 return Enumerable.Empty<string>();
             }
 
-            Log.Debug("Could not retrieve header {headerName}.", name);
+            var bytes = (byte[])parameters[1];
+            try
+            {
+                return new[] { Encoding.UTF8.GetString(bytes) };
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex, "Could not deserialize Kafka header {headerName}", name);
+            }
+
             return Enumerable.Empty<string>();
         }
 
