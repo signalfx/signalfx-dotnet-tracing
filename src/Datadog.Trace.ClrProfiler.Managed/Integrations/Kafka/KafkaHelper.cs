@@ -14,7 +14,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
 
         private static readonly ILogger Log = SignalFxLogging.GetLogger(typeof(ConsumeKafkaIntegration));
 
-        private static readonly Lazy<Type> HeadersType = new Lazy<Type>(() =>
+        public static readonly Lazy<Type> LazyHeadersType = new Lazy<Type>(() =>
         {
             Assembly assembly = null;
             try
@@ -230,7 +230,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
 
         internal static object CreateHeaders(object message)
         {
-            if (message == null || HeadersType.Value == null)
+            if (message == null || LazyHeadersType.Value == null)
             {
                 // Not expected but we want to avoid throwing and catching exceptions in this case.
                 return null;
@@ -238,7 +238,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
 
             try
             {
-                var headers = Activator.CreateInstance(HeadersType.Value);
+                var headers = Activator.CreateInstance(LazyHeadersType.Value);
                 var headersProperty = message.GetType().GetProperty("Headers")
                     ?? throw new ArgumentException("Message object doesn't have the 'Headers' property");
                 var setter = headersProperty.GetSetMethod(nonPublic: false)
