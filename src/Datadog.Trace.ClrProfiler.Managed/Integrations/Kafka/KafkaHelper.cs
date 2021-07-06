@@ -21,7 +21,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             }
             catch (Exception ex)
             {
-                Log.Error($"Failed to load ${ConfluentKafka.AssemblyName} assembly: {ex.Message}");
+                Log.Error(ex, $"Failed to load ${ConfluentKafka.AssemblyName} assembly.");
                 return null;
             }
 
@@ -32,7 +32,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             }
             catch (Exception ex)
             {
-                Log.Error($"Failed to get type ${ConfluentKafka.HeadersType}: {ex.Message}");
+                Log.Error(ex, $"Failed to get type ${ConfluentKafka.HeadersType}");
             }
 
             return headersType;
