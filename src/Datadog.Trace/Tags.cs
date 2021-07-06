@@ -221,5 +221,94 @@ namespace SignalFx.Tracing
         /// Version tag, applied to all spans with other globals.
         /// </summary>
         public const string Version = "signalfx.tracing.version";
+
+        /// <summary>
+        /// Standard tags for Messaging systems per OpenTelemetry specification.
+        /// </summary>
+        /// <remarks>
+        /// OpenTelemetry experimental specification at commit 5a19b53d71e967659517c02a69b801381d29bf1e.
+        /// </remarks>
+        public static class Messaging
+        {
+            /// <summary>
+            /// A string identifying the messaging system. Examples: "kafka", "rabbitmq", etc.
+            /// </summary>
+            public const string System = "messaging.system";
+
+            /// <summary>
+            /// The message destination name. Example the Kafka topic.
+            /// </summary>
+            public const string Destination = "messaging.destination";
+        }
+
+        /// <summary>
+        /// Standard tags for Kafka.
+        /// </summary>
+        public static class Kafka
+        {
+            /// <summary>
+            /// Partition the message is sent to. Omitted if partition was "any" partition.
+            /// </summary>
+            /// <remarks>
+            /// OpenTelemetry experimental specification at commit 5a19b53d71e967659517c02a69b801381d29bf1e.
+            /// </remarks>
+            public const string Partition = "messaging.kafka.partition";
+
+            /// <summary>
+            /// The Kafka tombstone indicator.
+            /// </summary>
+            /// <remarks>
+            /// OpenTelemetry experimental specification at commit 5a19b53d71e967659517c02a69b801381d29bf1e.
+            /// </remarks>
+            public const string Tombstone = "messaging.kafka.tombstone";
+
+            /// <summary>
+            /// The Kafka client name.
+            /// </summary>
+            /// <remarks>
+            /// OpenTelemetry experimental specification at commit 5a19b53d71e967659517c02a69b801381d29bf1e.
+            /// </remarks>
+            public const string ClientName = "massaging.kafka.client_id";
+
+            /// <summary>
+            /// The Kafka consumer group id.
+            /// </summary>
+            /// <remarks>
+            /// OpenTelemetry experimental specification at commit 5a19b53d71e967659517c02a69b801381d29bf1e.
+            /// </remarks>
+            public const string ConsumerGroup = "massaging.kafka.consumer_group";
+
+            /// <summary>
+            /// The Kafka message queue time in milliseconds.
+            /// </summary>
+            /// <remarks>
+            /// This tag is NOT part of OpenTelemetry experimental specification at commit 5a19b53d71e967659517c02a69b801381d29bf1e.
+            /// </remarks>
+            public const string QueueTimeMs = "messaging.kafka.queue_time_ms";
+
+            /// <summary>
+            /// Topics subscribed by a consumer.
+            /// </summary>
+            /// <remarks>
+            /// This tag is NOT part of OpenTelemetry experimental specification at commit 5a19b53d71e967659517c02a69b801381d29bf1e.
+            /// </remarks>
+            public const string SubscribedTopics = "messaging.kafka.subscribed_topics";
+
+            /// <summary>
+            /// The partitions assigned to a consumer.
+            /// </summary>
+            /// <remarks>
+            /// This tag is NOT part of OpenTelemetry experimental specification at commit 5a19b53d71e967659517c02a69b801381d29bf1e.
+            /// </remarks>
+            public const string AssignedPartitions = "messaging.kafka.assigned_partitions";
+
+            /// <summary>
+            /// A boolean to indicate if a message was actually received. Required if no message was received, optional otherwise.
+            /// </summary>
+            /// <remarks>
+            /// This tag is NOT part of OpenTelemetry experimental specification at commit 5a19b53d71e967659517c02a69b801381d29bf1e.
+            /// </remarks>
+            public const string MessagedReceived = "messaging.kafka.message_received";
+        }
     }
 }

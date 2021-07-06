@@ -881,9 +881,10 @@ HRESULT CorProfiler::ProcessReplacementCalls(
         pSigCurrent++;
         mdToken valuetype_type_token = CorSigUncompressToken(pSigCurrent);
 
-        // Currently, we only expect to see `System.Threading.CancellationToken` as a valuetype in this position
+        // Currently, we only expect to see `System.Threading.CancellationToken` and `System.TimeSpan` as a valuetype in this position
         // If we expand this to a general case, we would always perform the boxing regardless of type
-        if (GetTypeInfo(module_metadata->metadata_import, valuetype_type_token).name == "System.Threading.CancellationToken"_W) {
+        auto valueTypeName = GetTypeInfo(module_metadata->metadata_import, valuetype_type_token).name;
+        if (valueTypeName == "System.Threading.CancellationToken"_W || valueTypeName == "System.TimeSpan"_W) {
           rewriter_wrapper.Box(valuetype_type_token);
         }
       }
