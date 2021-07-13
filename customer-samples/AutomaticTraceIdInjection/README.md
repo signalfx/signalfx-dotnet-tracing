@@ -48,7 +48,7 @@ Layouts configured in the sample:
 
 ## Fields injected into log context
 
-- `signalfx.trace_id`
-- `signalfx.span_id`
-- `signalfx.service` - [`SIGNALFX_SERVICE_NAME`](/README.md#configuration-values) configuration option
-- `signalfx.environment` - [`SIGNALFX_ENV`](/README.md#configuration-values) configuration option
+- `trace_id`
+- `span_id`
+- `service.name` - [`SIGNALFX_SERVICE_NAME`](/README.md#configuration-values) configuration option
+- `deployment.environment` - [`SIGNALFX_ENV`](/README.md#configuration-values) configuration option

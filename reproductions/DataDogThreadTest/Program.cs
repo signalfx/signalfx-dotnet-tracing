@@ -12,8 +12,8 @@ namespace DataDogThreadTest
 {
     class Program
     {
-        internal static readonly string TraceIdKey = "signalfx.trace_id";
-        internal static readonly string SpanIdKey = "signalfx.span_id";
+        internal static readonly string TraceIdKey = "trace_id";
+        internal static readonly string SpanIdKey = "span_id";
         internal static readonly string NonTraceMessage = "TraceId: 0000000000000000, SpanId: 0000000000000000";
 
         static int Main(string[] args)

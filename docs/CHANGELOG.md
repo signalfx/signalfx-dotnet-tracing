@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Use OpenTelemetry semantic conventions for log correlation
+
 [Commits](https://github.com/signalfx/signalfx-dotnet-tracing/v0.1.12...HEAD)
 
 [Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/v0.1.12..HEAD)

@@ -51,7 +51,7 @@ namespace NLog46
 
             var target = new TextWriterTarget(writer)
             {
-                Layout = "${longdate}|${uppercase:${level}}|${logger}|{signalfx.environment=${mdlc:item=signalfx.environment},signalfx.service=${mdlc:item=signalfx.service},signalfx.trace_id=${mdlc:item=signalfx.trace_id},signalfx.span_id=${mdlc:item=signalfx.span_id}}|${message}"
+                Layout = "${longdate}|${uppercase:${level}}|${logger}|{deployment.environment=${mdlc:item=deployment.environment},service.name=${mdlc:item=service.name},trace_id=${mdlc:item=trace_id},span_id=${mdlc:item=span_id}}|${message}"
             };
 
             var config = new LoggingConfiguration();
