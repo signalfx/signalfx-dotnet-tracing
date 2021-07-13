@@ -46,7 +46,7 @@ namespace Datadog.Trace.Tests.Logging
             var logIndex = 0;
             LogEvent logEvent;
 
-            // The first log should not have signalfx.span_id or signalfx.trace_id
+            // The first log should not have span_id or trace_id
             // Scope: N/A
             // Custom property: N/A
             logEvent = _logEvents[logIndex++];

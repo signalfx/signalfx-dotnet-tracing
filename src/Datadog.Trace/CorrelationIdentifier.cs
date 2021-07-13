@@ -11,22 +11,22 @@ namespace SignalFx.Tracing
         /// <summary>
         /// Key used to correlate the trace ID on logs.
         /// </summary>
-        public static readonly string TraceIdKey = "signalfx.trace_id";
+        public static readonly string TraceIdKey = "trace_id";
 
         /// <summary>
         /// Key used to correlate the span ID on logs.
         /// </summary>
-        public static readonly string SpanIdKey = "signalfx.span_id";
+        public static readonly string SpanIdKey = "span_id";
 
         /// <summary>
         /// Key used to correlate the environment on logs.
         /// </summary>
-        public static readonly string ServiceNameKey = "signalfx.service";
+        public static readonly string ServiceNameKey = "service.name";
 
         /// <summary>
         /// Key used to correlate the environment on logs.
         /// </summary>
-        public static readonly string ServiceEnvironmentKey = "signalfx.environment";
+        public static readonly string ServiceEnvironmentKey = "deployment.environment";
 
         /// <summary>
         /// Gets the trace id
