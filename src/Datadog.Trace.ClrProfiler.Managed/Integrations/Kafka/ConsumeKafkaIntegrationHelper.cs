@@ -65,7 +65,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             {
                 result = consume(consumer, input);
                 scope = result != null
-                    ? CreateConsumeScopeFromConsumerResult(result, consumer, startTimeOffset)
+                    ? CreateConsumeScopeFromConsumerResult(result, consumer)
                     : CreateConsumeScopeFromConsumer(consumer, startTimeOffset);
             }
             catch (Exception ex)
@@ -96,7 +96,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             return result;
         }
 
-        internal static Scope CreateConsumeScopeFromConsumerResult(object consumeResult, object consumer, DateTimeOffset startTime)
+        internal static Scope CreateConsumeScopeFromConsumerResult(object consumeResult, object consumer)
         {
             var tracer = Tracer.Instance;
             if (!tracer.Settings.IsIntegrationEnabled(ConfluentKafka.IntegrationName) || KafkaHelper.AlreadyInstrumented())
@@ -140,7 +140,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                     partitionValue = KafkaHelper.GetPropertyValue<int>(partition, "Value").ToString(CultureInfo.InvariantCulture);
                 }
 
-                scope = tracer.StartActive(OpenTelemetryConsumeSpanName(topicName), propagatedContext, startTime: startTime);
+                scope = tracer.StartActive(OpenTelemetryConsumeSpanName(topicName), propagatedContext);
 
                 var span = scope.Span;
                 span.SetTag(Tags.InstrumentationName, ConfluentKafka.IntegrationName);
