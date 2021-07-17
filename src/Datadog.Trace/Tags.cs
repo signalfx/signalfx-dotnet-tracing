@@ -285,30 +285,6 @@ namespace SignalFx.Tracing
             /// This tag is NOT part of OpenTelemetry experimental specification at commit 5a19b53d71e967659517c02a69b801381d29bf1e.
             /// </remarks>
             public const string QueueTimeMs = "messaging.kafka.queue_time_ms";
-
-            /// <summary>
-            /// Topics subscribed by a consumer.
-            /// </summary>
-            /// <remarks>
-            /// This tag is NOT part of OpenTelemetry experimental specification at commit 5a19b53d71e967659517c02a69b801381d29bf1e.
-            /// </remarks>
-            public const string SubscribedTopics = "messaging.kafka.subscribed_topics";
-
-            /// <summary>
-            /// The partitions assigned to a consumer.
-            /// </summary>
-            /// <remarks>
-            /// This tag is NOT part of OpenTelemetry experimental specification at commit 5a19b53d71e967659517c02a69b801381d29bf1e.
-            /// </remarks>
-            public const string AssignedPartitions = "messaging.kafka.assigned_partitions";
-
-            /// <summary>
-            /// A boolean to indicate if a message was actually received. Required if no message was received, optional otherwise.
-            /// </summary>
-            /// <remarks>
-            /// This tag is NOT part of OpenTelemetry experimental specification at commit 5a19b53d71e967659517c02a69b801381d29bf1e.
-            /// </remarks>
-            public const string MessagedReceived = "messaging.kafka.message_received";
         }
     }
 }

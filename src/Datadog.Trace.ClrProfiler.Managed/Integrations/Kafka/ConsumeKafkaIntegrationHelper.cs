@@ -58,39 +58,10 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
                 throw;
             }
 
-            object result;
-            Scope scope = null;
-            var startTimeOffset = DateTimeOffset.UtcNow;
-            try
+            object result = consume(consumer, input);
+            if (result is not null)
             {
-                result = consume(consumer, input);
-                scope = result != null
-                    ? CreateConsumeScopeFromConsumerResult(result, consumer)
-                    : CreateConsumeScopeFromConsumer(consumer, startTimeOffset);
-            }
-            catch (Exception ex)
-            {
-                var tracer = Tracer.Instance;
-                if (!tracer.Settings.IsIntegrationEnabled(ConfluentKafka.IntegrationName) || KafkaHelper.AlreadyInstrumented())
-                {
-                    throw;
-                }
-
-                // Integration is enabled but the scope was not created since consume raised an exception.
-                // Create a span to record the exception with the available info.
-                scope = CreateConsumeScopeFromConsumer(consumer, startTimeOffset);
-                if (ex is not OperationCanceledException)
-                {
-                    // OperationCanceledException is expected in case of a clean shutdown and shouldn't
-                    // be reported as an exception.
-                    scope.Span.SetException(ex);
-                }
-
-                throw;
-            }
-            finally
-            {
-                scope?.Dispose();
+                using var scope = CreateConsumeScopeFromConsumerResult(result, consumer);
             }
 
             return result;
@@ -192,84 +163,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Kafka
             catch (Exception ex)
             {
                 Log.Error(ex, "Error creating or populating scope.");
-            }
-
-            return scope;
-        }
-
-        internal static Scope CreateConsumeScopeFromConsumer(object consumer, DateTimeOffset startTime)
-        {
-            var tracer = Tracer.Instance;
-            if (!tracer.Settings.IsIntegrationEnabled(ConfluentKafka.IntegrationName) || KafkaHelper.AlreadyInstrumented())
-            {
-                // integration disabled, don't create a scope/span, skip this trace
-                return null;
-            }
-
-            Scope scope = null;
-            try
-            {
-                var topicNames = KafkaHelper.GetPropertyValue<List<string>>(consumer, "Subscription");
-                var assignedPartitions = KafkaHelper.GetPropertyValue<List<object>>(consumer, "Assignment");
-
-                var topicName = topicNames != null && topicNames.Count == 1 ? topicNames[0] : null;
-                scope = tracer.StartActive(OpenTelemetryConsumeSpanName(topicName), startTime: startTime);
-
-                var span = scope.Span;
-
-                span.SetTag(Tags.InstrumentationName, ConfluentKafka.IntegrationName);
-                span.SetTag(Tags.SpanKind, SpanKinds.Consumer);
-                span.SetTag(Tags.Messaging.System, ConfluentKafka.OpenTelemetrySystemName);
-
-                // When constructing span from consumer it means that could mean an exception (to be
-                // recorded later) or that there no messages on the topic or that the topic end was
-                // reached. Create a tag to make that fact clear.
-                span.SetTag(Tags.Kafka.MessagedReceived, "false");
-
-                if (topicNames is not null)
-                {
-                    span.Tags.Add(Tags.Kafka.SubscribedTopics, string.Join(",", topicNames));
-                }
-
-                if (assignedPartitions is not null && assignedPartitions.Count > 0)
-                {
-                    if (assignedPartitions.Count == 1)
-                    {
-                        var partitionNumber = KafkaHelper.GetPropertyValue<int>(assignedPartitions[0], "Value");
-                        span.Tags.Add(Tags.Kafka.AssignedPartitions, partitionNumber.ToString(CultureInfo.InvariantCulture));
-
-                        if (partitionNumber != KafkaHelper.ConfluentKafkaAnyPartitionSentinel)
-                        {
-                            span.Tags.Add(Tags.Kafka.AssignedPartitions, partitionNumber.ToString(CultureInfo.InvariantCulture));
-                        }
-                    }
-                    else
-                    {
-                        var partitions = new int[assignedPartitions.Count];
-                        for (var i = 0; i < assignedPartitions.Count; i++)
-                        {
-                            partitions[i] = KafkaHelper.GetPropertyValue<int>(assignedPartitions[i], "Value");
-                        }
-
-                        span.Tags.Add(Tags.Kafka.AssignedPartitions, string.Join(",", partitions));
-                    }
-                }
-
-                var groupId = KafkaHelper.GetPropertyValue<string>(consumer, "MemberId");
-                if (!string.IsNullOrWhiteSpace(groupId))
-                {
-                    span.Tags.Add(Tags.Kafka.ConsumerGroup, groupId);
-                }
-
-                var clientName = KafkaHelper.GetPropertyValue<string>(consumer, "Name");
-                if (!string.IsNullOrWhiteSpace(clientName))
-                {
-                    span.Tags.Add(Tags.Kafka.ClientName, clientName);
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Error creating or populating consumer scope.");
             }
 
             return scope;
