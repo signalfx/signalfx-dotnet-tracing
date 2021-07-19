@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - Use OpenTelemetry semantic conventions for log correlation
+- Remove spans for Confluent.Kafka Consume calls that didn't receive a message
 
 [Commits](https://github.com/signalfx/signalfx-dotnet-tracing/v0.1.12...HEAD)
 

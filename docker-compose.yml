@@ -386,6 +386,7 @@ services:
     - POSTGRES_HOST=postgres
     - MYSQL_HOST=mysql
     - MYSQL_PORT=3306
+    - KAFKA_HOST=kafka:9092
     - buildConfiguration=${buildConfiguration}
     - publishTargetFramework=net5.0
     depends_on:
@@ -398,6 +399,7 @@ services:
     - mongo
     - postgres
     - mysql
+    - kafka
 
   IntegrationTests:
     build:
