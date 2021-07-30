@@ -69,6 +69,12 @@ namespace SignalFx.Tracing.Configuration
 
             DisabledIntegrationNames = new HashSet<string>(disabledIntegrationNames, StringComparer.OrdinalIgnoreCase);
 
+            var outboundHttpExcludedHosts = source?.GetString(ConfigurationKeys.OutboundHttpExcludedHosts)
+                                                 ?.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries) ??
+                                           Enumerable.Empty<string>();
+
+            OutboundHttpExcludedHosts = new HashSet<string>(outboundHttpExcludedHosts, StringComparer.OrdinalIgnoreCase);
+
             var endpointUrl = source?.GetString(ConfigurationKeys.EndpointUrl) ?? DefaultEndpointUrl;
             EndpointUrl = new Uri(endpointUrl);
 
@@ -408,6 +414,12 @@ namespace SignalFx.Tracing.Configuration
         /// Gets or sets a value indicating whether context server timing header will be added.
         /// </summary>
         public bool TraceResponseHeaderEnabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of hosts to exclude from HTTP outbound calls.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.OutboundHttpExcludedHosts"/>
+        public HashSet<string> OutboundHttpExcludedHosts { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether the feature flag to enable the updated ASP.NET resource names is enabled

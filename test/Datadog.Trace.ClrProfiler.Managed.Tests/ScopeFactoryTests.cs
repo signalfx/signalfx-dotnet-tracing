@@ -1,5 +1,6 @@
 // Modified by SignalFx
 using System;
+using SignalFx.Tracing.Configuration;
 using SignalFx.Tracing.Util;
 using Xunit;
 
@@ -65,6 +66,32 @@ namespace Datadog.Trace.ClrProfiler.Managed.Tests
             string actual = UriHelpers.CleanUri(new Uri(uri), removeScheme: false, tryRemoveIds: false);
 
             Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [InlineData(null, "http://168.63.129.16/", false)]
+        [InlineData("", "http://168.63.129.16/", false)]
+        [InlineData("168.63.129.16", "http://168.63.129.16/", true)]
+        [InlineData("168.63.129.16", "https://168.63.129.16/some/path", true)]
+        [InlineData("168.63.129.16", "https://some.other.host.com/", false)]
+        [InlineData("168.63.129.16;www.example.com", "https://www.example.com/api/v2/test", true)]
+        [InlineData("www.example.com;168.63.129.16;", "https://www.example.com/api/v2/test", true)]
+        public void OutboundHttpHostExclusion(string envVarValue, string uri, bool expected)
+        {
+            const string EnvVarName = "SIGNALFX_OUTBOUND_HTTP_EXCLUDED_HOSTS";
+
+            Environment.SetEnvironmentVariable(EnvVarName, envVarValue);
+
+            try
+            {
+                var settings = new TracerSettings(new EnvironmentConfigurationSource());
+                var requestUri = new Uri(uri);
+                Assert.Equal(expected, ScopeFactory.IsOutboundHttpExcludedHost(settings, requestUri.Host));
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable(EnvVarName, null);
+            }
         }
     }
 }

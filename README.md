@@ -46,37 +46,38 @@ Use these environment variables to configure the tracing library:
 
 | Environment variable | Default value | Description |
 |-|-|-|
-| `SIGNALFX_ENV` |  | The value for the `environment` tag added to every span. This determines the environment in which the service is available in SignalFx µAPM.  |
-| `SIGNALFX_DOTNET_TRACER_CONFIG_FILE` | ```%WorkingDirectory%/signalfx.json``` | The file path of a JSON configuration file that will be loaded. |
-| `SIGNALFX_SERVICE_NAME` |  | The name of the service. |
-| `SIGNALFX_SERVICE_NAME_PER_SPAN_ENABLED` |  | Enable to allow manual instrumentation to have a different service name than the one you specify with `SIGNALFX_SERVICE_NAME`.  Add a tag `service.name` with the desired name to the manual instrumentation. |
-| `SIGNALFX_TRACING_ENABLED` | `true` | Enable to activate the tracer. |
-| `SIGNALFX_TRACE_DEBUG` | `false` | Enable to activate debugging mode for the tracer. |
-| `SIGNALFX_ENDPOINT_URL` | `http://localhost:9080/v1/trace` | The hostname and port for a SignalFx Smart Agent or OpenTelemetry Collector. |
 | `SIGNALFX_ACCESS_TOKEN` |  | The access token for your SignalFx organization. Providing a token enables you to send traces to a SignalFx ingest endpoint. |
-| `SIGNALFX_TRACE_GLOBAL_TAGS` |  | Comma-separated list of key-value pairs to specify global span tags. For example: `"key1:val1,key2:val2"` |
-| `SIGNALFX_LOGS_INJECTION` | `false` | Enable to inject trace IDs, span IDs, service name and environment into logs. This requires a compatible logger or manual configuration. |
-| `SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS` |  | Enable to tag the Mongo command `BsonDocument` as a `db.statement`. |
-| `SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES` |  | Enable to tag the Elasticsearch command `PostData` as a `db.statement`. |
-| `SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS` |  | Enable to tag Redis commands as a `db.statement`. |
-| `SIGNALFX_SANITIZE_SQL_STATEMENTS` |  | Enable to stop sanitizing each SQL `db.statement`. |
-| `SIGNALFX_INSTRUMENTATION_ASPNETCORE_DIAGNOSTIC_LISTENERS` |  | Comma-separated list of diagnostic listeners that you subscribe to an observer. |
-| `SIGNALFX_MAX_LOGFILE_SIZE` | `10 MB` | The maximum size for tracer log files, in bytes. |
-| `SIGNALFX_TRACE_LOG_PATH` | Linux: `/var/log/signalfx/dotnet/dotnet-profiler.log`<br>Windows: `%ProgramData%"\SignalFx .NET Tracing\logs\dotnet-profiler.log` | The path of the profiler log file. |
-| `SIGNALFX_APPEND_URL_PATH_TO_NAME` | `false` | Enable to append the absolute URI path to the span name. |
-| `SIGNALFX_USE_WEBSERVER_RESOURCE_AS_OPERATION_NAME` | `true` | Enable to specify the resource name as the span name. This applies only to AspNetMvc and AspNetWebApi. |
 | `SIGNALFX_ADD_CLIENT_IP_TO_SERVER_SPANS` | `false` | Enable to add the client IP as a span tag when creating a server span. |
+| `SIGNALFX_APPEND_URL_PATH_TO_NAME` | `false` | Enable to append the absolute URI path to the span name. |
+| `SIGNALFX_ASPNET_TEMPLATE_NAMES_ENABLED` | `true` |  Feature Flag: enables updated resource names on `aspnet.request`, `aspnet-mvc.request`, `aspnet-webapi.request`, and `aspnet_core.request` spans. Enables `aspnet_core_mvc.request` spans and additional features on `aspnet_core.request` spans. |
 | `SIGNALFX_DIAGNOSTIC_SOURCE_ENABLED` | `true` | Enable to generate troubleshooting logs with the `System.Diagnostics.DiagnosticSource` class. |
 | `SIGNALFX_DISABLED_INTEGRATIONS` |  | The integrations you want to disable, if any, separated by a semi-colon. These are the supported integrations: AspNetMvc, AspNetWebApi2, DbCommand, ElasticsearchNet5, ElasticsearchNet6, GraphQL, HttpMessageHandler, IDbCommand, MongoDb, NpgsqlCommand, OpenTracing, ServiceStackRedis, SqlCommand, StackExchangeRedis, Wcf, WebRequest |
-| `SIGNALFX_RECORDED_VALUE_MAX_LENGTH` | `1200` | The maximum length an attribute value can have. Values longer than this are truncated. |
+| `SIGNALFX_DOTNET_TRACER_CONFIG_FILE` | ```%WorkingDirectory%/signalfx.json``` | The file path of a JSON configuration file that will be loaded. |
+| `SIGNALFX_ENDPOINT_URL` | `http://localhost:9080/v1/trace` | The hostname and port for a SignalFx Smart Agent or OpenTelemetry Collector. |
+| `SIGNALFX_ENV` |  | The value for the `environment` tag added to every span. This determines the environment in which the service is available in SignalFx µAPM.  |
 | `SIGNALFX_FILE_LOG_ENABLED` | `true` | Enable file logging. This is enabled by default. |
+| `SIGNALFX_INSTRUMENTATION_ASPNETCORE_DIAGNOSTIC_LISTENERS` |  | Comma-separated list of diagnostic listeners that you subscribe to an observer. |
+| `SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES` |  | Enable to tag the Elasticsearch command `PostData` as a `db.statement`. |
+| `SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS` |  | Enable to tag the Mongo command `BsonDocument` as a `db.statement`. |
+| `SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS` |  | Enable to tag Redis commands as a `db.statement`. |
+| `SIGNALFX_LOGS_INJECTION` | `false` | Enable to inject trace IDs, span IDs, service name and environment into logs. This requires a compatible logger or manual configuration. |
+| `SIGNALFX_MAX_LOGFILE_SIZE` | `104857600` (10MiB) | The maximum size for tracer log files, in bytes. |
+| `SIGNALFX_OUTBOUND_HTTP_EXCLUDED_HOSTS` |  | List of host for which no outbound HTTP spans should be generated, if any, separated by a semi-colon. |
+| `SIGNALFX_PROFILER_EXCLUDE_PROCESSES` |  | Sets the filename of executables the profiler cannot attach to. If not defined (default), the profiler will attach to any process. Supports multiple values separated with semi-colons, for example: `MyApp.exe;dotnet.exe` |
+| `SIGNALFX_PROFILER_PROCESSES` |  | Sets the filename of executables the profiler can attach to. If not defined (default), the profiler will attach to any process. Supports multiple values separated with semi-colons, for example: `MyApp.exe;dotnet.exe` |
+| `SIGNALFX_RECORDED_VALUE_MAX_LENGTH` | `1200` | The maximum length an attribute value can have. Values longer than this are truncated. |
+| `SIGNALFX_SANITIZE_SQL_STATEMENTS` |  | Enable to stop sanitizing each SQL `db.statement`. |
+| `SIGNALFX_SERVICE_NAME_PER_SPAN_ENABLED` |  | Enable to allow manual instrumentation to have a different service name than the one you specify with `SIGNALFX_SERVICE_NAME`.  Add a tag `service.name` with the desired name to the manual instrumentation. |
+| `SIGNALFX_SERVICE_NAME` |  | The name of the service. |
 | `SIGNALFX_STDOUT_LOG_ENABLED` | `false` | Enables `stdout` logging. This is disabled by default. |
 | `SIGNALFX_SYNC_SEND` | `false` | Enable to send spans in synchronous mode when the root span is closed. Sending spans in synchronous mode is generally recommended for only tests, but can also be useful for some special scenarios.|
+| `SIGNALFX_TRACE_DEBUG` | `false` | Enable to activate debugging mode for the tracer. |
 | `SIGNALFX_TRACE_DOMAIN_NEUTRAL_INSTRUMENTATION` | `false` |  Sets whether to intercept method calls when the caller method is inside a domain-neutral assembly. This is recommended when instrumenting IIS applications. |
-| `SIGNALFX_ASPNET_TEMPLATE_NAMES_ENABLED` | `true` |  Feature Flag: enables updated resource names on `aspnet.request`, `aspnet-mvc.request`, `aspnet-webapi.request`, and `aspnet_core.request` spans. Enables `aspnet_core_mvc.request` spans and additional features on `aspnet_core.request` spans. |
-| `SIGNALFX_PROFILER_PROCESSES` |  | Sets the filename of executables the profiler can attach to. If not defined (default), the profiler will attach to any process. Supports multiple values separated with semi-colons, for example: `MyApp.exe;dotnet.exe` |
-| `SIGNALFX_PROFILER_EXCLUDE_PROCESSES` |  | Sets the filename of executables the profiler cannot attach to. If not defined (default), the profiler will attach to any process. Supports multiple values separated with semi-colons, for example: `MyApp.exe;dotnet.exe` |
+| `SIGNALFX_TRACE_GLOBAL_TAGS` |  | Comma-separated list of key-value pairs to specify global span tags. For example: `"key1:val1,key2:val2"` |
+| `SIGNALFX_TRACE_LOG_PATH` | Linux: `/var/log/signalfx/dotnet/dotnet-profiler.log`<br>Windows: `%ProgramData%"\SignalFx .NET Tracing\logs\dotnet-profiler.log` | The path of the profiler log file. |
 | `SIGNALFX_TRACE_RESPONSE_HEADER_ENABLED` | `true` | If set to true enables adding `Server-Timing` header to the server HTTP responses. |
+| `SIGNALFX_TRACING_ENABLED` | `true` | Enable to activate the tracer. |
+| `SIGNALFX_USE_WEBSERVER_RESOURCE_AS_OPERATION_NAME` | `true` | Enable to specify the resource name as the span name. This applies only to AspNetMvc and AspNetWebApi. |
 
 ## Ways to configure
 
