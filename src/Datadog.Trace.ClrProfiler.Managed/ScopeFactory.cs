@@ -2,6 +2,7 @@
 using System;
 using System.Data;
 using SignalFx.Tracing;
+using SignalFx.Tracing.Configuration;
 using SignalFx.Tracing.ExtensionMethods;
 using SignalFx.Tracing.Logging;
 using SignalFx.Tracing.Util;
@@ -97,9 +98,9 @@ namespace Datadog.Trace.ClrProfiler
         /// <returns>A new pre-populated scope.</returns>
         public static Scope CreateOutboundHttpScope(Tracer tracer, string httpMethod, Uri requestUri, string integrationName, ulong? propagatedSpanId = null)
         {
-            if (!tracer.Settings.IsIntegrationEnabled(integrationName))
+            if (!tracer.Settings.IsIntegrationEnabled(integrationName) || IsOutboundHttpExcludedHost(tracer.Settings, requestUri.Host))
             {
-                // integration disabled, don't create a scope, skip this trace
+                // integration disabled or host excluded, don't create a scope, skip this trace
                 return null;
             }
 
@@ -221,6 +222,11 @@ namespace Datadog.Trace.ClrProfiler
                                ? commandTypeName.Substring(0, commandTypeName.Length - commandSuffix.Length).ToLowerInvariant()
                                : commandTypeName.ToLowerInvariant();
             }
+        }
+
+        internal static bool IsOutboundHttpExcludedHost(TracerSettings settings, string host)
+        {
+            return settings.OutboundHttpExcludedHosts.Contains(host);
         }
     }
 }

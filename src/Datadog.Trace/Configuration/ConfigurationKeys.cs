@@ -347,6 +347,15 @@ namespace SignalFx.Tracing.Configuration
         public const string TraceResponseHeaderEnabled = "SIGNALFX_TRACE_RESPONSE_HEADER_ENABLED";
 
         /// <summary>
+        /// Configuration key for a list of hosts for which outbound HTTP spans are not going to
+        /// be generated.
+        /// Default is empty (no host is excluded).
+        /// Supports multiple values separated with semi-colons.
+        /// </summary>
+        /// <seealso cref="TracerSettings.OutboundHttpExcludedHosts"/>
+        public const string OutboundHttpExcludedHosts = "SIGNALFX_OUTBOUND_HTTP_EXCLUDED_HOSTS";
+
+        /// <summary>
         /// String format patterns used to match integration-specific configuration keys.
         /// </summary>
         public static class Integrations
