@@ -62,7 +62,7 @@ Use these environment variables to configure the tracing library:
 | `SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS` |  | Enable to tag Redis commands as a `db.statement`. |
 | `SIGNALFX_LOGS_INJECTION` | `false` | Enable to inject trace IDs, span IDs, service name and environment into logs. This requires a compatible logger or manual configuration. |
 | `SIGNALFX_MAX_LOGFILE_SIZE` | `104857600` (10MiB) | The maximum size for tracer log files, in bytes. |
-| `SIGNALFX_OUTBOUND_HTTP_EXCLUDED_HOSTS` |  | List of host for which no outbound HTTP spans should be generated, if any, separated by a semi-colon. |
+| `SIGNALFX_OUTBOUND_HTTP_EXCLUDED_HOSTS` |  | A semicolon-separated list of hosts for which HTTP outbound spans are not created. |
 | `SIGNALFX_PROFILER_EXCLUDE_PROCESSES` |  | Sets the filename of executables the profiler cannot attach to. If not defined (default), the profiler will attach to any process. Supports multiple values separated with semi-colons, for example: `MyApp.exe;dotnet.exe` |
 | `SIGNALFX_PROFILER_PROCESSES` |  | Sets the filename of executables the profiler can attach to. If not defined (default), the profiler will attach to any process. Supports multiple values separated with semi-colons, for example: `MyApp.exe;dotnet.exe` |
 | `SIGNALFX_RECORDED_VALUE_MAX_LENGTH` | `1200` | The maximum length an attribute value can have. Values longer than this are truncated. |
