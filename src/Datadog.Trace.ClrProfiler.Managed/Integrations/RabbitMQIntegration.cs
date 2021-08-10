@@ -1,18 +1,12 @@
-// <copyright file="RabbitMQIntegration.cs" company="Datadog">
-// Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
-// This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
-// </copyright>
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Datadog.Trace.ClrProfiler.Emit;
-using Datadog.Trace.Configuration;
-using Datadog.Trace.DuckTyping;
-using Datadog.Trace.Logging;
-using Datadog.Trace.Tagging;
+using SignalFx.Tracing;
+using SignalFx.Tracing.Configuration;
+using SignalFx.Tracing.Logging;
 
 namespace Datadog.Trace.ClrProfiler.Integrations
 {
@@ -21,7 +15,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
     /// </summary>
     public static class RabbitMQIntegration
     {
-        internal const string IntegrationName = nameof(IntegrationIds.RabbitMQ);
+        internal const string IntegrationName = "RabbitMQ";
 
         private const string OperationName = "amqp.command";
         private const string ServiceName = "rabbitmq";
@@ -36,8 +30,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         private const string IBasicPropertiesTypeName = "RabbitMQ.Client.IBasicProperties";
         private const string IDictionaryArgumentsTypeName = "System.Collections.Generic.IDictionary`2[System.String,System.Object]";
 
-        internal static readonly IntegrationInfo IntegrationId = IntegrationRegistry.GetIntegrationInfo(IntegrationName);
-        private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(RabbitMQIntegration));
+        private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(RabbitMQIntegration));
         private static readonly string[] DeliveryModeStrings = { null, "1", "2" };
 
         private static Action<IDictionary<string, object>, string, string> headersSetter = ((carrier, key, value) =>
@@ -129,7 +122,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 {
                     try
                     {
-                        propagatedContext = SpanContextPropagator.Instance.Extract(basicPropertiesValue.Headers, headersGetter);
+                        propagatedContext = Tracer.Instance.Propagator.Extract(basicPropertiesValue.Headers, headersGetter);
                     }
                     catch (Exception ex)
                     {
@@ -233,7 +226,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 {
                     try
                     {
-                        propagatedContext = SpanContextPropagator.Instance.Extract(basicPropertiesValue.Headers, headersGetter);
+                        propagatedContext = Tracer.Instance.Propagator.Extract(basicPropertiesValue.Headers, headersGetter);
                     }
                     catch (Exception ex)
                     {
@@ -351,7 +344,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     {
                         try
                         {
-                            propagatedContext = SpanContextPropagator.Instance.Extract(basicPropertiesHeaders, headersGetter);
+                            propagatedContext = Tracer.Instance.Propagator.Extract(basicPropertiesHeaders, headersGetter);
                         }
                         catch (Exception ex)
                         {
@@ -469,7 +462,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                             basicPropertiesValue.Headers = new Dictionary<string, object>();
                         }
 
-                        SpanContextPropagator.Instance.Inject(scope.Span.Context, basicPropertiesValue.Headers, headersSetter);
+                        Tracer.Instance.Propagator.Inject(scope.Span.Context, basicPropertiesValue.Headers, headersSetter);
                     }
                 }
 
@@ -578,7 +571,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                             basicPropertiesValue.Headers = new Dictionary<string, object>();
                         }
 
-                        SpanContextPropagator.Instance.Inject(scope.Span.Context, basicPropertiesValue.Headers, headersSetter);
+                        Tracer.Instance.Propagator.Inject(scope.Span.Context, basicPropertiesValue.Headers, headersSetter);
                     }
                 }
 
@@ -843,11 +836,9 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 Span parent = tracer.ActiveScope?.Span;
 
                 tags = new RabbitMQTags(spanKind);
-                string serviceName = tracer.Settings.GetServiceName(tracer, ServiceName);
-                scope = tracer.StartActiveWithTags(OperationName, parent: parentContext, tags: tags, serviceName: serviceName, startTime: startTime);
+                scope = tracer.StartActive(OperationName, parent: parentContext, tags: tags, startTime: startTime);
                 var span = scope.Span;
 
-                span.Type = SpanTypes.Queue;
                 span.ResourceName = command;
                 tags.Command = command;
 
@@ -856,7 +847,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 tags.RoutingKey = routingKey;
 
                 tags.InstrumentationName = IntegrationName;
-                tags.SetAnalyticsSampleRate(IntegrationId, tracer.Settings, enabledWithGlobalSetting: false);
             }
             catch (Exception ex)
             {
