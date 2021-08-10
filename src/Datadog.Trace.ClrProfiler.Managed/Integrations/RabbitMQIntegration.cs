@@ -2,10 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Datadog.Trace.ClrProfiler.Emit;
+using Datadog.Trace.DuckTyping;
 using SignalFx.Tracing;
-using SignalFx.Tracing.Configuration;
 using SignalFx.Tracing.Logging;
 
 namespace Datadog.Trace.ClrProfiler.Integrations
@@ -823,7 +822,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         {
             tags = null;
 
-            if (!tracer.Settings.IsIntegrationEnabled(IntegrationId))
+            if (!tracer.Settings.IsIntegrationEnabled(IntegrationName))
             {
                 // integration disabled, don't create a scope, skip this trace
                 return null;
