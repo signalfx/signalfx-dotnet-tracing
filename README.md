@@ -27,16 +27,17 @@ for version 2.1.0 and 2.1.2.
 | ADO.NET | Supported .NET versions | Disable sanitization of `db.statement` with `SIGNALFX_SANITIZE_SQL_STATEMENTS=false` (`true` by default) |
 | ASP.NET Core MVC | 2.0+ | `Microsoft.AspNet.Mvc.Core` NuGet and built-in packages.  Include additional applicable Diagnostic Listeners with `SIGNALFX_INSTRUMENTATION_ASPNETCORE_DIAGNOSTIC_LISTENERS='Listener.One,Listener.Two'` |
 | ASP.NET MVC on .NET Framework | `System.Web.Mvc` 4.x and 5.x | |
-| ASP.NET Web API 2 on .NET Framework | `System.Web.Http` 5.1+ | |  
+| ASP.NET Web API 2 on .NET Framework | `System.Web.Http` 5.1+ | |
 | Elasticsearch.Net | `Elasticsearch.Net` NuGet 5.3 - 7.x | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES=false` (`true` by default, which may introduce overhead for direct streaming users). |
-| HttpClient | Supported .NET versions | by way of `System.Net.Http.HttpClientHandler` and `HttpMessageHandler` instrumentations |
 | GraphQL | `GraphQL` NuGet [2.3, 3) | Currently only instruments validation and execution functionality. |
+| HttpClient | Supported .NET versions | by way of `System.Net.Http.HttpClientHandler` and `HttpMessageHandler` instrumentations |
 | MongoDB | `MongoDB.Driver.Core` NuGet 2.1.0+ | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS=false` (`true` by default). |
 | Npgsql | `Npqsql` NuGet 4.0+ | Provided via enhanced ADO.NET instrumentation |
+| RabbitMQ | `RabbitMQ.Client` NuGet [3.6.9, 7) |  |
 | ServiceStack.Redis | `ServiceStack.Redis` NuGet 4.0+ | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS=false` (`true` by default). |
 | StackExchange.Redis | `StackExchange.Redis` NuGet 1.0+ | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS=false` (`true` by default). |
-| WebClient | Supported .NET versions | by way of `System.Net.WebRequest` instrumentation |
 | WCF (Server) | `System.ServiceModel` 4.x | Client requests using `WSHttpBinding` or `BasicHttpBinding` are instrumented via the `WebClient` instrumentation. There is no client-side span for `NetTcpBinding`. |
+| WebClient | Supported .NET versions | by way of `System.Net.WebRequest` instrumentation |
 
 ## Configure the SignalFx Tracing Library for .NET
 
