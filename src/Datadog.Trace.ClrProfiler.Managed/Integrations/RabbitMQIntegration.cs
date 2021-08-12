@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using Datadog.Trace.ClrProfiler.Emit;
@@ -131,11 +132,8 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
                 using (var scope = CreateScope(Tracer.Instance, command, parentContext: propagatedContext, spanKind: SpanKinds.Consumer, exchange: exchange, routingKey: routingKey))
                 {
-                    // TODO: Add message size tag
-                    // if (tags != null)
-                    // {
-                    //     tags.MessageSize = body?.Length.ToString() ?? "0";
-                    // }
+                    var messageSize = body?.Length.ToString(CultureInfo.InvariantCulture) ?? "0";
+                    scope?.Span.Tags.Add(Tags.Messaging.MessagePayloadSizeBytes, messageSize);
 
                     try
                     {
@@ -236,11 +234,11 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
                 using (var scope = CreateScope(Tracer.Instance, command, parentContext: propagatedContext, spanKind: SpanKinds.Consumer, exchange: exchange, routingKey: routingKey))
                 {
-                    // TODO: Add message size tag
-                    // if (tags != null && body != null && body.TryDuckCast<BodyStruct>(out var bodyStruct))
-                    // {
-                    //     tags.MessageSize = bodyStruct.Length.ToString() ?? "0";
-                    // }
+                    if (body != null && body.TryDuckCast<BodyStruct>(out var bodyStruct))
+                    {
+                        var messageSize = bodyStruct.Length.ToString(CultureInfo.InvariantCulture);
+                        scope?.Span.Tags.Add(Tags.Messaging.MessagePayloadSizeBytes, messageSize);
+                    }
 
                     try
                     {
@@ -336,7 +334,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
                 if (result != null && result.TryDuckCast<BasicGetResultStruct>(out var basicGetResult))
                 {
-                    messageSize = basicGetResult.Body.Length.ToString();
+                    messageSize = basicGetResult.Body.Length.ToString(CultureInfo.InvariantCulture);
                     var basicPropertiesHeaders = basicGetResult.BasicProperties?.Headers;
 
                     // try to extract propagated context values from headers
@@ -360,11 +358,11 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                         string queueDisplayName = string.IsNullOrEmpty(queue) || !queue.StartsWith("amq.gen-") ? queue : "<generated>";
                         scope.Span.ResourceName = $"{command} {queueDisplayName}";
 
-                        // TODO: Add message size tag
-                        // if (tags != null && messageSize != null)
-                        // {
-                        //     tags.MessageSize = messageSize;
-                        // }
+                        // TODO: Why the inconsistency in this case? Not logging instead of "0"?
+                        if (messageSize != null)
+                        {
+                            scope.Span.Tags.Add(Tags.Messaging.MessagePayloadSizeBytes, messageSize);
+                        }
 
                         if (exception != null)
                         {
@@ -445,11 +443,8 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     string routingKeyDisplayName = string.IsNullOrEmpty(routingKey) ? "<all>" : routingKey.StartsWith("amq.gen-") ? "<generated>" : routingKey;
                     scope.Span.ResourceName = $"{command} {exchangeDisplayName} -> {routingKeyDisplayName}";
 
-                    // TODO: Add message size tag.
-                    // if (tags != null)
-                    // {
-                    //     tags.MessageSize = body?.Length.ToString() ?? "0";
-                    // }
+                    var messageSize = body?.Length.ToString(CultureInfo.InvariantCulture) ?? "0";
+                    scope?.Span.Tags.Add(Tags.Messaging.MessagePayloadSizeBytes, messageSize);
 
                     if (basicProperties != null && basicProperties.TryDuckCast<IBasicProperties>(out var basicPropertiesValue))
                     {
@@ -549,18 +544,10 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     string routingKeyDisplayName = string.IsNullOrEmpty(routingKey) ? "<all>" : routingKey.StartsWith("amq.gen-") ? "<generated>" : routingKey;
                     scope.Span.ResourceName = $"{command} {exchangeDisplayName} -> {routingKeyDisplayName}";
 
-                    // TODO: Add tags for message size
-                    // if (tags != null)
-                    // {
-                    //     if (body != null && body.TryDuckCast<BodyStruct>(out var bodyStruct))
-                    //     {
-                    //         tags.MessageSize = bodyStruct.Length.ToString();
-                    //     }
-                    //     else
-                    //     {
-                    //         tags.MessageSize = "0";
-                    //     }
-                    // }
+                    string messageSize = body != null && body.TryDuckCast<BodyStruct>(out var bodyStruct)
+                        ? bodyStruct.Length.ToString(CultureInfo.InvariantCulture)
+                        : "0";
+                    scope.Span.Tags.Add(Tags.Messaging.MessagePayloadSizeBytes, messageSize);
 
                     if (basicProperties != null && basicProperties.TryDuckCast<IBasicProperties>(out var basicPropertiesValue))
                     {
@@ -842,9 +829,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 var span = scope.Span;
                 var tags = span.Tags;
 
-                tags.Add(Tags.InstrumentationName, IntegrationName);
+                tags.Add(Tags.InstrumentationName, IntegrationName); // TODO: redundant with Messaging.System tag.
 
-                // TODO: Add OTel span tags.
+                tags.Add(Tags.Messaging.System, ServiceName);
+                tags.Add(Tags.Messaging.DestinationKind, "queue"); // TODO: Q.: redundant for RabbitMQ?
+                tags.Add(Tags.Messaging.Destination, "exchange");  // TODO: pass exchange as parameter or add to proper places.
+                tags.Add(Tags.RabbitMQ.RoutingKey, "routingKey");  // TODO: get the routingKey or add to proper places.
             }
             catch (Exception ex)
             {

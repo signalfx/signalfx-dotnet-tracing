@@ -239,6 +239,18 @@ namespace SignalFx.Tracing
             /// The message destination name. Example the Kafka topic.
             /// </summary>
             public const string Destination = "messaging.destination";
+
+            /// <summary>
+            /// The kind of message destination, either 'queue' or 'topic'.
+            /// </summary>
+            public const string DestinationKind = "messaging.destination_kind";
+
+            /// <summary>
+            /// The (uncompressed) size of the message payload in bytes. Also use
+            /// this attribute if it is unknown whether the compressed or uncompressed
+            /// payload size is reported.
+            /// </summary>
+            public const string MessagePayloadSizeBytes = "messaging.message_payload_size_bytes";
         }
 
         /// <summary>
@@ -285,6 +297,20 @@ namespace SignalFx.Tracing
             /// This tag is NOT part of OpenTelemetry experimental specification at commit 5a19b53d71e967659517c02a69b801381d29bf1e.
             /// </remarks>
             public const string QueueTimeMs = "messaging.kafka.queue_time_ms";
+        }
+
+        /// <summary>
+        /// Standard tags for RabbitMQ.
+        /// </summary>
+        public static class RabbitMQ
+        {
+            /// <summary>
+            /// The RabbitMQ message routing key.
+            /// </summary>
+            /// <remarks>
+            /// OpenTelemetry experimental specification at commit 5a19b53d71e967659517c02a69b801381d29bf1e.
+            /// </remarks>
+            public const string RoutingKey = "messaging.rabbitmq.routing_key";
         }
     }
 }
