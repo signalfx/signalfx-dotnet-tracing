@@ -136,8 +136,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                                 scope.Span.SetTag(Tags.HttpStatusText, responseMessage.ReasonPhrase);
                             }
                         }
-
-                        ServerTimingHeader.SetHeaders(scope.Span.Context, responseMessage, (response, name, value) => response.Headers.Add(name, value));
                     }
 
                     return responseMessage;
@@ -148,11 +146,25 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     {
                         // some fields aren't set till after execution, so populate anything missing
                         UpdateSpan(controllerContext, scope.Span);
+
+                        scope.Span.SetException(ex);
                     }
 
-                    scope?.Span.SetException(ex);
-
                     throw;
+                }
+                finally
+                {
+                    if (scope != null)
+                    {
+                        // TracingHttpModule is expected to already have added it in the typical IIS setup
+                        // In principle we could remove adding the headers from this instrumentation, keeping
+                        // so used can disable "AspNet" instrumentation and still get the Server-Timing header added.
+                        var httpContextHeaders = HttpContext.Current?.Response?.Headers;
+                        if (httpContextHeaders != null && httpContextHeaders[ServerTimingHeader.Key] == null)
+                        {
+                            ServerTimingHeader.SetHeaders(scope.Span.Context, httpContextHeaders, (headers, name, value) => headers.Add(name, value));
+                        }
+                    }
                 }
             }
         }

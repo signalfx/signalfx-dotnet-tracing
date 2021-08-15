@@ -286,9 +286,16 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 // call the original method, inspecting (but not catching) any unhandled exceptions
                 var response = instrumentedMethod(asyncControllerActionInvoker, controllerContext, actionName, callback, state);
 
-                if (HttpContext.Current != null && scope != null)
+                if (scope != null)
                 {
-                    ServerTimingHeader.SetHeaders(scope.Span.Context, HttpContext.Current.Response, (resp, name, value) => resp.Headers.Add(name, value));
+                    // TracingHttpModule is expected to already have added it in the typical IIS setup
+                    // In principle we could remove adding the headers from this instrumentation, keeping
+                    // so used can disable "AspNet" instrumentation and still get the Server-Timing header added.
+                    var httpContextHeaders = HttpContext.Current?.Response?.Headers;
+                    if (httpContextHeaders != null && httpContextHeaders[ServerTimingHeader.Key] == null)
+                    {
+                        ServerTimingHeader.SetHeaders(scope.Span.Context, httpContextHeaders, (headers, name, value) => headers.Add(name, value));
+                    }
                 }
 
                 return response;

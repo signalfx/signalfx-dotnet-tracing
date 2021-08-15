@@ -294,10 +294,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 var testStart = DateTime.UtcNow;
                 var response = await httpClient.GetAsync($"http://localhost:{httpPort}" + path);
 
-                if (response.StatusCode == HttpStatusCode.OK)
-                {
-                    AssertServerTimingHeaders(response);
-                }
+                AssertServerTimingHeaders(response);
 
                 var content = await response.Content.ReadAsStringAsync();
                 Output.WriteLine($"[http] {response.StatusCode} {content}");
