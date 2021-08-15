@@ -379,7 +379,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 var response = httpContext?.Response;
 
                 scope.Span.SetHttpStatusCode(response);
-                ServerTimingHeader.SetHeaders(scope.Span.Context, response, (resp, name, value) => resp.Headers.Add(name, value));
 
                 return res;
             }

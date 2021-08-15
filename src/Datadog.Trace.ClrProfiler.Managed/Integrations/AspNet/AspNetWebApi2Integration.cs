@@ -198,41 +198,33 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             return scope;
         }
 
-        private static void UpdateSpan(dynamic controllerContext, Span span)
+        private static void UpdateSpan(object controllerContext, Span span)
         {
             try
             {
-                var request = controllerContext.Request;
+                var request = controllerContext?.GetProperty<HttpRequestMessage>("Request").GetValueOrDefault();
+                if (request == null)
+                {
+                    return;
+                }
+
                 Uri requestUri = request.RequestUri;
 
                 string host = request.Headers.Host ?? string.Empty;
                 string rawUrl = requestUri?.ToString().ToLowerInvariant() ?? string.Empty;
                 string method = request.Method.Method?.ToUpperInvariant() ?? "GET";
-                string route = null;
-                try
-                {
-                    route = controllerContext.RouteData.Route.RouteTemplate;
-                }
-                catch
-                {
-                }
+                string route = controllerContext.GetProperty("RouteData")?.GetProperty("Route")?.GetProperty("RouteTemplate").GetValueOrDefault() as string;
 
                 string controller = string.Empty;
                 string action = string.Empty;
                 string area = string.Empty;
 
-                try
+                var routValuesObj = controllerContext?.GetProperty("RouteData")?.GetProperty("Values").GetValueOrDefault();
+                if (routValuesObj is IDictionary<string, object> routeValues)
                 {
-                    var routeValues = controllerContext.RouteData.Values;
-                    if (routeValues != null)
-                    {
-                        controller = (routeValues.GetValueOrDefault("controller") as string)?.ToLowerInvariant();
-                        action = (routeValues.GetValueOrDefault("action") as string)?.ToLowerInvariant();
-                        area = (routeValues.GetValueOrDefault("area") as string)?.ToLowerInvariant();
-                    }
-                }
-                catch
-                {
+                    controller = (routeValues.GetValueOrDefault("controller") as string)?.ToLowerInvariant();
+                    action = (routeValues.GetValueOrDefault("action") as string)?.ToLowerInvariant();
+                    area = (routeValues.GetValueOrDefault("area") as string)?.ToLowerInvariant();
                 }
 
                 string resourceName;

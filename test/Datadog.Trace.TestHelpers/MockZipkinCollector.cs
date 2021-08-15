@@ -119,7 +119,8 @@ namespace Datadog.Trace.TestHelpers
                        .Where(s => s.Start > minimumOffset)
                        .ToImmutableList();
 
-                if (relevantSpans.Count(s => operationNameContainsAny.Any(contains => s.Name.Contains(contains)) || operationName == null || s.Name == operationName) >= count)
+                // Warning: the `ToList()` below is required or relevantSpans fails (at least for net461). Likely due to the fact that relevantSpans is immutable.
+                if (relevantSpans.ToList().Count(s => operationNameContainsAny.Any(contains => s.Name.Contains(contains)) || operationName == null || s.Name == operationName) >= count)
                 {
                     break;
                 }

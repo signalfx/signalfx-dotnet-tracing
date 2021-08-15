@@ -24,11 +24,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Theory]
         [Trait("Category", "EndToEnd")]
         [Trait("Integration", nameof(Integrations.AspNetWebApi2Integration))]
-        [InlineData("/api/environment", "GET api/environment", HttpStatusCode.OK)]
-        [InlineData("/api/delay/0", "GET api/delay/{seconds}", HttpStatusCode.OK)]
-        [InlineData("/api/delay-async/0", "GET api/delay-async/{seconds}", HttpStatusCode.OK)]
-        [InlineData("/api/transient-failure/true", "GET api/transient-failure/{value}", HttpStatusCode.OK)]
-        [InlineData("/api/transient-failure/false", "GET api/transient-failure/{value}", HttpStatusCode.InternalServerError)]
+        [InlineData("/api/environment", "GET /api/environment", HttpStatusCode.OK)]
+        [InlineData("/api/delay/0", "GET /api/delay/{seconds}", HttpStatusCode.OK)]
+        [InlineData("/api/delay-async/0", "GET /api/delay-async/{seconds}", HttpStatusCode.OK)]
+        [InlineData("/api/transient-failure/true", "GET /api/transient-failure/{value}", HttpStatusCode.OK)]
+        [InlineData("/api/transient-failure/false", "GET /api/transient-failure/{value}", HttpStatusCode.InternalServerError)]
         public async Task SubmitsTraces(
             string path,
             string expectedResourceName,
