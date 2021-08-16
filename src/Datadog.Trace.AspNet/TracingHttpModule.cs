@@ -137,6 +137,8 @@ namespace Datadog.Trace.AspNet
 
                 var span = scope.Span;
                 span.DecorateWebServerSpan(resourceName, httpMethod, host, url, remoteIp);
+                span.SetTag(Tags.InstrumentationName, IntegrationName);
+
                 ServerTimingHeader.SetHeaders(span.Context, httpContext.Response.Headers, (headers, name, value) => headers.Add(name, value));
 
                 httpContext.Items[_httpContextScopeKey] = scope;

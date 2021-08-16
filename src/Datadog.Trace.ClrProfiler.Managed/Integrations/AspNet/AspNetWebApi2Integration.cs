@@ -286,6 +286,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     httpUrl: rawUrl,
                     remoteIp: remoteIp);
 
+                span.SetTag(Tags.InstrumentationName, IntegrationName);
                 span.SetTag(Tags.AspNetAction, action);
                 span.SetTag(Tags.AspNetController, controller);
                 span.SetTag(Tags.AspNetArea, area);

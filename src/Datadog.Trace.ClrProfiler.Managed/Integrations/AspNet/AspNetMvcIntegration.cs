@@ -182,6 +182,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     httpUrl: url,
                     remoteIp: remoteIp);
 
+                span.SetTag(Tags.InstrumentationName, IntegrationName);
                 span.SetTag(Tags.AspNetRoute, routeUrl);
                 span.SetTag(Tags.AspNetArea, areaName);
                 span.SetTag(Tags.AspNetController, controllerName);

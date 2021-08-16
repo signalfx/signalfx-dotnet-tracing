@@ -155,6 +155,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     httpMethod,
                     host,
                     httpUrl: requestMessage.Headers.To?.AbsoluteUri);
+                span.SetTag(Tags.InstrumentationName, IntegrationName);
             }
             catch (Exception ex)
             {
