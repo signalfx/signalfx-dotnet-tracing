@@ -57,6 +57,7 @@ namespace SignalFx.Tracing.DiagnosticListeners
 
         protected override void OnNext(string eventName, object arg)
         {
+            Log.Information($"OnNext: [{eventName}]");
             switch (eventName)
             {
                 case "Microsoft.AspNetCore.Hosting.HttpRequestIn.Start":
@@ -165,6 +166,12 @@ namespace SignalFx.Tracing.DiagnosticListeners
                 Scope scope = _tracer.ActivateSpan(span);
 
                 _options.OnRequest?.Invoke(scope.Span, httpContext);
+
+                var httpContextHeaders = httpContext.Response.Headers;
+                if (httpContextHeaders != null && !httpContextHeaders.ContainsKey(ServerTimingHeader.Key))
+                {
+                    ServerTimingHeader.SetHeaders(scope.Span.Context, httpContextHeaders, (headers, name, value) => headers.Add(name, value));
+                }
             }
         }
 
@@ -221,8 +228,6 @@ namespace SignalFx.Tracing.DiagnosticListeners
                     {
                         span.OperationName = $"{controllerName}.{actionName}".ToLowerInvariant();
                     }
-
-                    ServerTimingHeader.SetHeaders(span.Context, httpContext.Response.Headers, (headers, name, value) => headers.Add(name, value));
                 }
             }
         }

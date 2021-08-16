@@ -101,17 +101,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
                 var testStart = DateTime.Now;
 
                 var paths = expectations.Select(e => e.OriginalUri).ToArray();
-                var responses = SubmitRequests(aspNetCorePort, paths);
-
-                foreach (var response in responses.Where(res => res.StatusCode == HttpStatusCode.OK))
-                {
-                    Assert.True(
-                        response.Headers.Contains("Server-Timing"),
-                        $"No Server-Timing header attached. Headers present: {string.Join(", ", response.Headers.Select(h => $"{h.Key}={h.Value}"))}");
-                    Assert.True(
-                        response.Headers.Contains("Access-Control-Expose-Headers"),
-                        $"No Access-Control-Expose-Headers header attached. Headers present: {string.Join(", ", response.Headers.Select(h => $"{h.Key}={h.Value}"))}");
-                }
+                var responses = SubmitRequests(aspNetCorePort, paths).ToArray();
 
                 var spans =
                     agent.WaitForSpans(
@@ -123,6 +113,26 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
                 if (!process.HasExited)
                 {
                     process.Kill();
+                }
+
+                for (var i = 0; i < spans.Count; ++i)
+                {
+                    try
+                    {
+                        if (responses[i].StatusCode == HttpStatusCode.InternalServerError)
+                        {
+                            // ASP.NET Core by default removes CORS headers in case of exception.
+                            // In this case the Server-Timing header will be missing.
+                            continue;
+                        }
+
+                        AssertServerTimingHeaders(responses[i]);
+                    }
+                    catch (Exception)
+                    {
+                        Output.WriteLine($"Exception validating Server-Timing for {spans[i].Tags["http.url"]}");
+                        throw;
+                    }
                 }
 
                 SpanTestHelpers.AssertExpectationsMet(expectations, spans);
