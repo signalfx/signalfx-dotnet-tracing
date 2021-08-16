@@ -12,7 +12,11 @@ namespace SignalFx.Tracing
     /// </summary>
     public static class ServerTimingHeader
     {
-        private const string ServerTimingHeaderName = "Server-Timing";
+        /// <summary>
+        /// Key of the "Server-Timing" header.
+        /// </summary>
+        public const string Key = "Server-Timing";
+
         private const string ExposeHeadersHeaderName = "Access-Control-Expose-Headers";
         private const string ServerTimingFormat = "traceparent;desc=\"{0}\"";
 
@@ -27,8 +31,8 @@ namespace SignalFx.Tracing
         {
             if (Tracer.Instance.Settings.TraceResponseHeaderEnabled)
             {
-                setter(carrier, ServerTimingHeaderName, ToHeaderValue(context));
-                setter(carrier, ExposeHeadersHeaderName, ServerTimingHeaderName);
+                setter(carrier, Key, ToHeaderValue(context));
+                setter(carrier, ExposeHeadersHeaderName, Key);
             }
         }
 

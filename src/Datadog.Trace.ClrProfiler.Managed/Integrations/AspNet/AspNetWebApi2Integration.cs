@@ -136,8 +136,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                                 scope.Span.SetTag(Tags.HttpStatusText, responseMessage.ReasonPhrase);
                             }
                         }
-
-                        ServerTimingHeader.SetHeaders(scope.Span.Context, responseMessage, (response, name, value) => response.Headers.Add(name, value));
                     }
 
                     return responseMessage;
@@ -148,11 +146,25 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     {
                         // some fields aren't set till after execution, so populate anything missing
                         UpdateSpan(controllerContext, scope.Span);
+
+                        scope.Span.SetException(ex);
                     }
 
-                    scope?.Span.SetException(ex);
-
                     throw;
+                }
+                finally
+                {
+                    if (scope != null)
+                    {
+                        // TracingHttpModule is expected to already have added it in the typical IIS setup
+                        // In principle we could remove adding the headers from this instrumentation, keeping
+                        // so user can disable "AspNet" instrumentation and still get the Server-Timing header added.
+                        var httpContextHeaders = HttpContext.Current?.Response?.Headers;
+                        if (httpContextHeaders != null && httpContextHeaders[ServerTimingHeader.Key] == null)
+                        {
+                            ServerTimingHeader.SetHeaders(scope.Span.Context, httpContextHeaders, (headers, name, value) => headers.Add(name, value));
+                        }
+                    }
                 }
             }
         }
@@ -198,41 +210,33 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             return scope;
         }
 
-        private static void UpdateSpan(dynamic controllerContext, Span span)
+        private static void UpdateSpan(object controllerContext, Span span)
         {
             try
             {
-                var request = controllerContext.Request;
+                var request = controllerContext?.GetProperty<HttpRequestMessage>("Request").GetValueOrDefault();
+                if (request == null)
+                {
+                    return;
+                }
+
                 Uri requestUri = request.RequestUri;
 
                 string host = request.Headers.Host ?? string.Empty;
                 string rawUrl = requestUri?.ToString().ToLowerInvariant() ?? string.Empty;
                 string method = request.Method.Method?.ToUpperInvariant() ?? "GET";
-                string route = null;
-                try
-                {
-                    route = controllerContext.RouteData.Route.RouteTemplate;
-                }
-                catch
-                {
-                }
+                string route = controllerContext.GetProperty("RouteData")?.GetProperty("Route")?.GetProperty("RouteTemplate").GetValueOrDefault() as string;
 
                 string controller = string.Empty;
                 string action = string.Empty;
                 string area = string.Empty;
 
-                try
+                var routValuesObj = controllerContext?.GetProperty("RouteData")?.GetProperty("Values").GetValueOrDefault();
+                if (routValuesObj is IDictionary<string, object> routeValues)
                 {
-                    var routeValues = controllerContext.RouteData.Values;
-                    if (routeValues != null)
-                    {
-                        controller = (routeValues.GetValueOrDefault("controller") as string)?.ToLowerInvariant();
-                        action = (routeValues.GetValueOrDefault("action") as string)?.ToLowerInvariant();
-                        area = (routeValues.GetValueOrDefault("area") as string)?.ToLowerInvariant();
-                    }
-                }
-                catch
-                {
+                    controller = (routeValues.GetValueOrDefault("controller") as string)?.ToLowerInvariant();
+                    action = (routeValues.GetValueOrDefault("action") as string)?.ToLowerInvariant();
+                    area = (routeValues.GetValueOrDefault("area") as string)?.ToLowerInvariant();
                 }
 
                 string resourceName;
@@ -282,6 +286,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     httpUrl: rawUrl,
                     remoteIp: remoteIp);
 
+                span.SetTag(Tags.InstrumentationName, IntegrationName);
                 span.SetTag(Tags.AspNetAction, action);
                 span.SetTag(Tags.AspNetController, controller);
                 span.SetTag(Tags.AspNetArea, area);

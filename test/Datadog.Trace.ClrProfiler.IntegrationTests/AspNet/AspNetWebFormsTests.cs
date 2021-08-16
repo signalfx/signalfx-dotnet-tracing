@@ -58,6 +58,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 httpClient.DefaultRequestHeaders.Add(HttpHeaderNames.TracingEnabled, "false");
 
                 var response = await httpClient.GetAsync($"http://localhost:{_iisFixture.HttpPort}" + "/Database/Elasticsearch");
+                AssertServerTimingHeaders(response);
+
                 var content = await response.Content.ReadAsStringAsync();
                 Output.WriteLine($"[http] {response.StatusCode} {content}");
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);

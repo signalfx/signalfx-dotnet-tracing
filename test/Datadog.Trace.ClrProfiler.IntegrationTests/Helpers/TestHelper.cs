@@ -263,6 +263,18 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             EnvironmentHelper.CustomEnvironmentVariables.Add(key, value);
         }
 
+        protected void AssertServerTimingHeaders(HttpResponseMessage response)
+        {
+            Assert.True(
+                response.Headers.TryGetValues("Server-Timing", out var serverTimingValues),
+                $"No Server-Timing header attached. Headers present: {string.Join(", ", response.Headers.Select(h => $"{h.Key}={h.Value}"))}");
+            Assert.Single(serverTimingValues);
+            Assert.True(
+                response.Headers.TryGetValues("Access-Control-Expose-Headers", out var accessControlExposeHeadersValues),
+                $"No Access-Control-Expose-Headers header attached. Headers present: {string.Join(", ", response.Headers.Select(h => $"{h.Key}={h.Value}"))}");
+            Assert.Single(accessControlExposeHeadersValues);
+        }
+
         protected async Task AssertHttpSpan(
             string path,
             MockZipkinCollector agent,
@@ -282,15 +294,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 var testStart = DateTime.UtcNow;
                 var response = await httpClient.GetAsync($"http://localhost:{httpPort}" + path);
 
-                if (response.StatusCode == HttpStatusCode.OK)
-                {
-                    Assert.True(
-                        response.Headers.Contains("Server-Timing"),
-                        $"No Server-Timing header attached. Headers present: {string.Join(", ", response.Headers.Select(h => $"{h.Key}={h.Value}"))}");
-                    Assert.True(
-                        response.Headers.Contains("Access-Control-Expose-Headers"),
-                        $"No Access-Control-Expose-Headers header attached. Headers present: {string.Join(", ", response.Headers.Select(h => $"{h.Key}={h.Value}"))}");
-                }
+                AssertServerTimingHeaders(response);
 
                 var content = await response.Content.ReadAsStringAsync();
                 Output.WriteLine($"[http] {response.StatusCode} {content}");
@@ -301,7 +305,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     minDateTime: testStart,
                     operationName: expectedOperationName);
 
-                Assert.True(spans.Count == 1, "expected one span");
+                Assert.True(spans.Count == 1, $"expected one span, got {spans.Count}");
             }
 
             IMockSpan span = spans[0];
