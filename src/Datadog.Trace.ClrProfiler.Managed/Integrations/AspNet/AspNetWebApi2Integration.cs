@@ -158,7 +158,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     {
                         // TracingHttpModule is expected to already have added it in the typical IIS setup
                         // In principle we could remove adding the headers from this instrumentation, keeping
-                        // so used can disable "AspNet" instrumentation and still get the Server-Timing header added.
+                        // so user can disable "AspNet" instrumentation and still get the Server-Timing header added.
                         var httpContextHeaders = HttpContext.Current?.Response?.Headers;
                         if (httpContextHeaders != null && httpContextHeaders[ServerTimingHeader.Key] == null)
                         {
