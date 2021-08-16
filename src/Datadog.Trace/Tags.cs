@@ -311,6 +311,14 @@ namespace SignalFx.Tracing
             /// OpenTelemetry experimental specification at commit 5a19b53d71e967659517c02a69b801381d29bf1e.
             /// </remarks>
             public const string RoutingKey = "messaging.rabbitmq.routing_key";
+
+            /// <summary>
+            /// The RabbitMQ delivery mode.
+            /// </summary>
+            /// <remarks>
+            /// This tag is NOT part of OpenTelemetry experimental specification at commit 5a19b53d71e967659517c02a69b801381d29bf1e.
+            /// </remarks>
+            public const string DeliveryMode = "messaging.rabbitmq.delivery_mode";
         }
     }
 }

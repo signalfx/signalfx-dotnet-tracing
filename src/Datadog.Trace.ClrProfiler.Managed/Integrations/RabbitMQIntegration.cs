@@ -18,7 +18,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         internal const string IntegrationName = "RabbitMQ";
 
         private const string OperationName = "amqp.command";
-        private const string ServiceName = "rabbitmq";
+        private const string SystemName = "rabbitmq";
 
         private const string Major3Minor6Patch9 = "3.6.9";
         private const string Major5 = "5";
@@ -29,6 +29,9 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         private const string RabbitMQDefaultBasicConsumer = "RabbitMQ.Client.DefaultBasicConsumer";
         private const string IBasicPropertiesTypeName = "RabbitMQ.Client.IBasicProperties";
         private const string IDictionaryArgumentsTypeName = "System.Collections.Generic.IDictionary`2[System.String,System.Object]";
+        private const string AmqpBasicDeliverCommand = "basic.deliver";
+        private const string AmqpBasicGetCommand = "basic.get";
+        private const string AmqpBasicPublishCommand = "basic.publish";
 
         private static readonly SignalFx.Tracing.Vendors.Serilog.ILogger Log = SignalFxLogging.GetLogger(typeof(RabbitMQIntegration));
         private static readonly string[] DeliveryModeStrings = { null, "1", "2" };
@@ -87,7 +90,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             if (model == null) { throw new ArgumentNullException(nameof(model)); }
 
             const string methodName = "HandleBasicDeliver";
-            const string command = "basic.deliver";
             Action<object, string, ulong, bool, string, string, object, byte[]> instrumentedMethod;
             var modelType = model.GetType();
 
@@ -130,7 +132,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     }
                 }
 
-                using (var scope = CreateScope(Tracer.Instance, command, parentContext: propagatedContext, spanKind: SpanKinds.Consumer, exchange: exchange, routingKey: routingKey))
+                using (var scope = CreateScope(Tracer.Instance, AmqpBasicDeliverCommand, parentContext: propagatedContext, exchange: exchange, routingKey: routingKey))
                 {
                     var messageSize = body?.Length.ToString(CultureInfo.InvariantCulture) ?? "0";
                     scope?.Span.Tags.Add(Tags.Messaging.MessagePayloadSizeBytes, messageSize);
@@ -189,7 +191,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             if (model == null) { throw new ArgumentNullException(nameof(model)); }
 
             const string methodName = "HandleBasicDeliver";
-            const string command = "basic.deliver";
             Action<object, string, ulong, bool, string, string, object, object> instrumentedMethod;
             var modelType = model.GetType();
 
@@ -232,7 +233,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     }
                 }
 
-                using (var scope = CreateScope(Tracer.Instance, command, parentContext: propagatedContext, spanKind: SpanKinds.Consumer, exchange: exchange, routingKey: routingKey))
+                using (var scope = CreateScope(Tracer.Instance, AmqpBasicDeliverCommand, parentContext: propagatedContext, exchange: exchange, routingKey: routingKey))
                 {
                     if (body != null && body.TryDuckCast<BodyStruct>(out var bodyStruct))
                     {
@@ -285,7 +286,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             if (model == null) { throw new ArgumentNullException(nameof(model)); }
 
             const string methodName = "BasicGet";
-            const string command = "basic.get";
             Func<object, string, bool, object> instrumentedMethod;
             var modelType = model.GetType();
 
@@ -330,7 +330,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             finally
             {
                 SpanContext propagatedContext = null;
-                string messageSize = null;
+                string messageSize = "0";
 
                 if (result != null && result.TryDuckCast<BasicGetResultStruct>(out var basicGetResult))
                 {
@@ -351,22 +351,22 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     }
                 }
 
-                using (var scope = CreateScope(Tracer.Instance, command, parentContext: propagatedContext, spanKind: SpanKinds.Consumer, queue: queue, startTime: startTime))
+                if (result != null || exception != null)
                 {
-                    if (scope != null)
+                    // Only create the span to reported retrieved data or an exception.
+                    using (var scope = CreateScope(Tracer.Instance, AmqpBasicGetCommand, parentContext: propagatedContext, queue: queue, startTime: startTime))
                     {
-                        string queueDisplayName = string.IsNullOrEmpty(queue) || !queue.StartsWith("amq.gen-") ? queue : "<generated>";
-                        scope.Span.ResourceName = $"{command} {queueDisplayName}";
-
-                        // TODO: Why the inconsistency in this case? Not logging instead of "0"?
-                        if (messageSize != null)
+                        if (scope != null)
                         {
+                            string queueDisplayName = string.IsNullOrEmpty(queue) || !queue.StartsWith("amq.gen-") ? queue : "<generated>";
+                            scope.Span.ResourceName = $"{AmqpBasicGetCommand} {queueDisplayName}";
+
                             scope.Span.Tags.Add(Tags.Messaging.MessagePayloadSizeBytes, messageSize);
-                        }
 
-                        if (exception != null)
-                        {
-                            scope.Span.SetException(exception);
+                            if (exception != null)
+                            {
+                                scope.Span.SetException(exception);
+                            }
                         }
                     }
                 }
@@ -408,7 +408,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             if (model == null) { throw new ArgumentNullException(nameof(model)); }
 
             const string methodName = "_Private_BasicPublish";
-            const string command = "basic.publish";
             Action<object, string, string, bool, object, byte[]> instrumentedMethod;
             var modelType = model.GetType();
 
@@ -435,24 +434,20 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 throw;
             }
 
-            using (var scope = CreateScope(Tracer.Instance, command, spanKind: SpanKinds.Producer, exchange: exchange, routingKey: routingKey))
+            using (var scope = CreateScope(Tracer.Instance, AmqpBasicPublishCommand, exchange: exchange, routingKey: routingKey))
             {
                 if (scope != null)
                 {
-                    string exchangeDisplayName = string.IsNullOrEmpty(exchange) ? "<default>" : exchange;
-                    string routingKeyDisplayName = string.IsNullOrEmpty(routingKey) ? "<all>" : routingKey.StartsWith("amq.gen-") ? "<generated>" : routingKey;
-                    scope.Span.ResourceName = $"{command} {exchangeDisplayName} -> {routingKeyDisplayName}";
-
                     var messageSize = body?.Length.ToString(CultureInfo.InvariantCulture) ?? "0";
-                    scope?.Span.Tags.Add(Tags.Messaging.MessagePayloadSizeBytes, messageSize);
+                    var tags = scope.Span.Tags;
+                    tags.Add(Tags.Messaging.MessagePayloadSizeBytes, messageSize);
 
                     if (basicProperties != null && basicProperties.TryDuckCast<IBasicProperties>(out var basicPropertiesValue))
                     {
-                        // TODO: Add delivery mode tag
-                        // if (tags != null && basicPropertiesValue.IsDeliveryModePresent())
-                        // {
-                        //     tags.DeliveryMode = DeliveryModeStrings[0x3 & basicPropertiesValue.DeliveryMode];
-                        // }
+                        if (basicPropertiesValue.IsDeliveryModePresent())
+                        {
+                            tags.Add(Tags.RabbitMQ.RoutingKey, DeliveryModeStrings[0x3 & basicPropertiesValue.DeliveryMode]);
+                        }
 
                         // add distributed tracing headers to the message
                         if (basicPropertiesValue.Headers == null)
@@ -509,7 +504,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             if (model == null) { throw new ArgumentNullException(nameof(model)); }
 
             const string methodName = "_Private_BasicPublish";
-            const string command = "basic.publish";
             Action<object, string, string, bool, object, object> instrumentedMethod;
             var modelType = model.GetType();
 
@@ -536,26 +530,22 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 throw;
             }
 
-            using (var scope = CreateScope(Tracer.Instance, command, spanKind: SpanKinds.Producer, exchange: exchange, routingKey: routingKey))
+            using (var scope = CreateScope(Tracer.Instance, AmqpBasicPublishCommand, exchange: exchange, routingKey: routingKey))
             {
                 if (scope != null)
                 {
-                    string exchangeDisplayName = string.IsNullOrEmpty(exchange) ? "<default>" : exchange;
-                    string routingKeyDisplayName = string.IsNullOrEmpty(routingKey) ? "<all>" : routingKey.StartsWith("amq.gen-") ? "<generated>" : routingKey;
-                    scope.Span.ResourceName = $"{command} {exchangeDisplayName} -> {routingKeyDisplayName}";
-
                     string messageSize = body != null && body.TryDuckCast<BodyStruct>(out var bodyStruct)
                         ? bodyStruct.Length.ToString(CultureInfo.InvariantCulture)
                         : "0";
-                    scope.Span.Tags.Add(Tags.Messaging.MessagePayloadSizeBytes, messageSize);
+                    var tags = scope.Span.Tags;
+                    tags.Add(Tags.Messaging.MessagePayloadSizeBytes, messageSize);
 
                     if (basicProperties != null && basicProperties.TryDuckCast<IBasicProperties>(out var basicPropertiesValue))
                     {
-                        // TODO: Add delivery mode tag?
-                        // if (tags != null && basicPropertiesValue.IsDeliveryModePresent())
-                        // {
-                        //     tags.DeliveryMode = DeliveryModeStrings[0x3 & basicPropertiesValue.DeliveryMode];
-                        // }
+                        if (basicPropertiesValue.IsDeliveryModePresent())
+                        {
+                            tags.Add(Tags.RabbitMQ.RoutingKey, DeliveryModeStrings[0x3 & basicPropertiesValue.DeliveryMode]);
+                        }
 
                         // add distributed tracing headers to the message
                         if (basicPropertiesValue.Headers == null)
@@ -645,7 +635,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 throw;
             }
 
-            using (var scope = CreateScope(Tracer.Instance, command, SpanKinds.Client, exchange: exchange))
+            using (var scope = CreateScope(Tracer.Instance, command, exchange: exchange))
             {
                 try
                 {
@@ -719,7 +709,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 throw;
             }
 
-            using (var scope = CreateScope(Tracer.Instance, command, SpanKinds.Client, queue: queue, exchange: exchange, routingKey: routingKey))
+            using (var scope = CreateScope(Tracer.Instance, command, queue: queue, exchange: exchange, routingKey: routingKey))
             {
                 try
                 {
@@ -797,7 +787,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 throw;
             }
 
-            using (var scope = CreateScope(Tracer.Instance, command, SpanKinds.Client, queue: queue))
+            using (var scope = CreateScope(Tracer.Instance, command, queue: queue))
             {
                 try
                 {
@@ -811,7 +801,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             }
         }
 
-        internal static Scope CreateScope(Tracer tracer, string command, string spanKind, ISpanContext parentContext = null, DateTimeOffset? startTime = null, string queue = null, string exchange = null, string routingKey = null)
+        internal static Scope CreateScope(Tracer tracer, string command, ISpanContext parentContext = null, DateTimeOffset? startTime = null, string queue = null, string exchange = null, string routingKey = null)
         {
             if (!tracer.Settings.IsIntegrationEnabled(IntegrationName))
             {
@@ -823,18 +813,42 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
             try
             {
-                Span parent = tracer.ActiveScope?.Span;
+                var normalizedExchangeName = string.IsNullOrEmpty(exchange) ? "<default>" : exchange;
+                var normalizedRoutingKey = string.IsNullOrEmpty(routingKey) ? "<all>" : routingKey.StartsWith("amq.gen-") ? "<generated>" : routingKey;
+                string operationName = null;
+                string spanKind = null;
+                if (ReferenceEquals(command, AmqpBasicDeliverCommand) || ReferenceEquals(command, AmqpBasicGetCommand))
+                {
+                    operationName = normalizedExchangeName + " receive";
+                    spanKind = SpanKinds.Consumer;
+                }
+                else if (ReferenceEquals(command, AmqpBasicPublishCommand))
+                {
+                    operationName = normalizedExchangeName + " send";
+                    spanKind = SpanKinds.Producer;
+                }
+                else
+                {
+                    operationName = OperationName + ": " + command;
+                    normalizedRoutingKey = routingKey;
+                    spanKind = SpanKinds.Client;
+                }
 
-                scope = tracer.StartActive(OperationName, parent: parentContext, startTime: startTime);
+                scope = tracer.StartActive(operationName, parent: parentContext, startTime: startTime);
                 var span = scope.Span;
                 var tags = span.Tags;
 
-                tags.Add(Tags.InstrumentationName, IntegrationName); // TODO: redundant with Messaging.System tag.
+                tags.Add(Tags.InstrumentationName, IntegrationName);
+                tags.Add(Tags.SpanKind, spanKind);
+                tags.Add(Tags.Messaging.System, SystemName);
+                tags.Add(Tags.Messaging.DestinationKind, "queue");
+                tags.Add(Tags.Messaging.Destination, normalizedExchangeName);
+                tags.Add(OperationName, command);
 
-                tags.Add(Tags.Messaging.System, ServiceName);
-                tags.Add(Tags.Messaging.DestinationKind, "queue"); // TODO: Q.: redundant for RabbitMQ?
-                tags.Add(Tags.Messaging.Destination, "exchange");  // TODO: pass exchange as parameter or add to proper places.
-                tags.Add(Tags.RabbitMQ.RoutingKey, "routingKey");  // TODO: get the routingKey or add to proper places.
+                if (normalizedRoutingKey != null)
+                {
+                    tags.Add(Tags.RabbitMQ.RoutingKey, normalizedRoutingKey);
+                }
             }
             catch (Exception ex)
             {

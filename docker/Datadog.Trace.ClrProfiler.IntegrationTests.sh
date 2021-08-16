@@ -18,4 +18,5 @@ docker/with-profiler-logs.bash \
     wait-for-it mongo:27017 -- \
     wait-for-it postgres:5432 -- \
     wait-for-it kafka:9092 -- \
+    wait-for-it rabbitmq:5672 -- \
     dotnet vstest test/Datadog.Trace.ClrProfiler.IntegrationTests/bin/$buildConfiguration/$publishTargetFramework/publish/Datadog.Trace.ClrProfiler.IntegrationTests.dll --logger:trx --ResultsDirectory:test/Datadog.Trace.ClrProfiler.IntegrationTests/results

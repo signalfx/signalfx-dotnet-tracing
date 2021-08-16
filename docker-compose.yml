@@ -94,6 +94,13 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    command: rabbitmq-server
+    ports:
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
+
   build:
     build:
       context: ./
@@ -262,6 +269,19 @@ services:
     depends_on:
     - kafka
 
+  Samples.RabbitMQ:
+    build:
+      context: ./
+      dockerfile: ./docker/dotnet.dockerfile
+    image: datadog-dotnet
+    command: bash -c "/project/docker/with-profiler-logs.bash wait-for-it rabbitmq:5672 -- /project/docker/with-profiler.bash dotnet /project/samples/Samples.RabbitMQ/bin/${buildConfiguration}/${publishTargetFramework}/publish/Samples.RabbitMQ.dll"
+    volumes:
+    - ./:/project
+    environment:
+    - RABBITMQ_HOST=rabbitmq
+    depends_on:
+    - rabbitmq
+
   # .NET Core does not have apk packages for .NET Core runtimes, they only have base images
   # Until it's resolved, have a separate Dockerfile for each runtime
   # (see: https://github.com/dotnet/runtime/issues/3406)
@@ -285,6 +305,7 @@ services:
     - MYSQL_HOST=mysql
     - MYSQL_PORT=3306
     - KAFKA_HOST=kafka:9092
+    - RABBITMQ_HOST=rabbitmq
     - buildConfiguration=${buildConfiguration}
     - publishTargetFramework=netcoreapp2.1
     depends_on:
@@ -298,6 +319,7 @@ services:
     - postgres
     - mysql
     - kafka
+    - rabbitmq
 
   IntegrationTests.Alpine.Core30:
     build:
@@ -319,6 +341,7 @@ services:
     - MYSQL_HOST=mysql
     - MYSQL_PORT=3306
     - KAFKA_HOST=kafka:9092
+    - RABBITMQ_HOST=rabbitmq
     - buildConfiguration=${buildConfiguration}
     - publishTargetFramework=netcoreapp3.0
     depends_on:
@@ -332,6 +355,7 @@ services:
     - postgres
     - mysql
     - kafka
+    - rabbitmq
 
   IntegrationTests.Alpine.Core31:
     build:
@@ -353,6 +377,7 @@ services:
     - MYSQL_HOST=mysql
     - MYSQL_PORT=3306
     - KAFKA_HOST=kafka:9092
+    - RABBITMQ_HOST=rabbitmq
     - buildConfiguration=${buildConfiguration}
     - publishTargetFramework=netcoreapp3.1
     depends_on:
@@ -366,6 +391,7 @@ services:
     - postgres
     - mysql
     - kafka
+    - rabbitmq
 
   IntegrationTests.Alpine.Core50:
     build:
@@ -387,6 +413,7 @@ services:
     - MYSQL_HOST=mysql
     - MYSQL_PORT=3306
     - KAFKA_HOST=kafka:9092
+    - RABBITMQ_HOST=rabbitmq
     - buildConfiguration=${buildConfiguration}
     - publishTargetFramework=net5.0
     depends_on:
@@ -400,6 +427,7 @@ services:
     - postgres
     - mysql
     - kafka
+    - rabbitmq
 
   IntegrationTests:
     build:
@@ -421,6 +449,7 @@ services:
     - MYSQL_HOST=mysql
     - MYSQL_PORT=3306
     - KAFKA_HOST=kafka:9092
+    - RABBITMQ_HOST=rabbitmq
     - buildConfiguration=${buildConfiguration}
     - publishTargetFramework=${publishTargetFramework}
     depends_on:
@@ -434,3 +463,4 @@ services:
     - postgres
     - mysql
     - kafka
+    - rabbitmq
