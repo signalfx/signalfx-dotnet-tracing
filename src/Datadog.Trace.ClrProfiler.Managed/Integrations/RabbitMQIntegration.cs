@@ -27,8 +27,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         private const string RabbitMQIModel = "RabbitMQ.Client.IModel";
         private const string RabbitMQImplModelBase = "RabbitMQ.Client.Impl.ModelBase";
         private const string RabbitMQDefaultBasicConsumer = "RabbitMQ.Client.DefaultBasicConsumer";
-        private const string IBasicPropertiesTypeName = "RabbitMQ.Client.IBasicProperties";
-        private const string IDictionaryArgumentsTypeName = "System.Collections.Generic.IDictionary`2[System.String,System.Object]";
         private const string AmqpBasicDeliverCommand = "basic.deliver";
         private const string AmqpBasicGetCommand = "basic.get";
         private const string AmqpBasicPublishCommand = "basic.publish";
