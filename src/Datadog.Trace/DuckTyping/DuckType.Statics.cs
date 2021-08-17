@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 
-namespace Datadog.Trace.DuckTyping
+namespace SignalFx.Tracing.DuckTyping
 {
     /// <summary>
     /// Duck Type

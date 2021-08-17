@@ -4,8 +4,8 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using Datadog.Trace.ClrProfiler.Emit;
-using Datadog.Trace.DuckTyping;
 using SignalFx.Tracing;
+using SignalFx.Tracing.DuckTyping;
 using SignalFx.Tracing.Logging;
 
 namespace Datadog.Trace.ClrProfiler.Integrations

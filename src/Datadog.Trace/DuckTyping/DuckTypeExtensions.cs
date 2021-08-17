@@ -2,7 +2,7 @@ using System;
 using System.Runtime.CompilerServices;
 using SignalFx.Tracing.Logging;
 
-namespace Datadog.Trace.DuckTyping
+namespace SignalFx.Tracing.DuckTyping
 {
     /// <summary>
     /// Duck type extensions

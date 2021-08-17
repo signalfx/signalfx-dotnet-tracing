@@ -6,7 +6,7 @@ using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 
-namespace Datadog.Trace.DuckTyping
+namespace SignalFx.Tracing.DuckTyping
 {
     /// <summary>
     /// Create struct proxy instance delegate

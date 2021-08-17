@@ -4,7 +4,7 @@ using System.Reflection;
 #pragma warning disable SA1649 // File name must match first type name
 #pragma warning disable SA1402 // File may only contain a single class
 
-namespace Datadog.Trace.DuckTyping
+namespace SignalFx.Tracing.DuckTyping
 {
     /// <summary>
     /// DuckType Exception

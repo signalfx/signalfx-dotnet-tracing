@@ -1,6 +1,6 @@
 using System;
 
-namespace Datadog.Trace.DuckTyping
+namespace SignalFx.Tracing.DuckTyping
 {
     /// <summary>
     /// Duck copy struct attribute

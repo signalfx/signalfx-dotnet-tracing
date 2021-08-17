@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
 
-namespace Datadog.Trace.DuckTyping
+namespace SignalFx.Tracing.DuckTyping
 {
     /// <summary>
     /// Duck kind

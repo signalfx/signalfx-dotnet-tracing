@@ -1,6 +1,6 @@
 using System;
 
-namespace Datadog.Trace.DuckTyping
+namespace SignalFx.Tracing.DuckTyping
 {
     /// <summary>
     /// Use to include a member that would normally be ignored
