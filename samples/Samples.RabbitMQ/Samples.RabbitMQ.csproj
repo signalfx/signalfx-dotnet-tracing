@@ -5,7 +5,7 @@
     <DefineConstants Condition="$(ApiVersion) >= 6.0.0">$(DefineConstants);RABBITMQ_6_0</DefineConstants>
 
     <!-- override to remove net452 -->
-    <TargetFrameworks>net461;netcoreapp2.1;netcoreapp3.1;net5.0</TargetFrameworks>
+    <TargetFrameworks>net461;netcoreapp2.1;netcoreapp3.0;netcoreapp3.1;net5.0</TargetFrameworks>
 
     <!-- Required to build multiple projects with the same Configuration|Platform -->
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
