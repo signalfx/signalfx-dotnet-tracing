@@ -2,14 +2,21 @@
 
 ## [Unreleased]
 
+
+[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/v0.1.13...HEAD)
+
+[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/v0.1.13..HEAD)
+
+## [Release 0.1.13](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.1.13)
+
 - Use OpenTelemetry semantic conventions for log correlation
 - Remove spans for Confluent.Kafka Consume calls that didn't receive a message
 - Add configuration setting, `SIGNALFX_OUTBOUND_HTTP_EXCLUDED_HOSTS`, that prevents the creation of outbound HTTP spans for certain hosts
 - Added Server-Timing header to ASP.NET on IIS
 
-[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/v0.1.12...HEAD)
+[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/v0.1.13...HEAD)
 
-[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/v0.1.12..HEAD)
+[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/v0.1.13..HEAD)
 
 ## [Release 0.1.12](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.1.12)
 
