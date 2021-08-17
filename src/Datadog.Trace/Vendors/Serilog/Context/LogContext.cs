@@ -191,7 +191,7 @@ namespace SignalFx.Tracing.Vendors.Serilog.Context
             return enrichers;
         }
 
-        internal static void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
+        public static void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
             var enrichers = Enrichers;
             if (enrichers == null || enrichers == ImmutableStack<ILogEventEnricher>.Empty)

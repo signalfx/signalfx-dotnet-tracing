@@ -39,6 +39,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 new object[] { "2.10.4" },
                 new object[] { "2.11.6" },
                 new object[] { "2.12.4" },
+                new object[] { "2.13.1" },
 #endif
             };
 
@@ -62,7 +63,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 new object[] { "7.10.1" },
                 new object[] { "7.11.1" },
                 new object[] { "7.12.1" },
-                new object[] { "7.13.1" },
+                new object[] { "7.13.2" },
+                new object[] { "7.14.0" },
 #endif
             };
 
@@ -81,7 +83,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 new object[] { "6.5.1" },
                 new object[] { "6.6.0" },
                 new object[] { "6.7.0" },
-                new object[] { "6.8.8" },
+                new object[] { "6.8.9" },
 #endif
             };
 
@@ -125,6 +127,25 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 #endif
             };
 
+        public static IEnumerable<object[]> RabbitMQ =>
+
+            new List<object[]>
+            {
+#if DEFAULT_SAMPLES
+                new object[] { string.Empty },
+#else
+                new object[] { "3.6.9" },
+                new object[] { "4.0.2" },
+                new object[] { "4.1.3" },
+                new object[] { "5.0.1" },
+                new object[] { "5.1.2" },
+                new object[] { "5.2.0" },
+                new object[] { "6.0.0" },
+                new object[] { "6.1.0" },
+                new object[] { "6.2.2" },
+#endif
+            };
+
         public static IEnumerable<object[]> SqlClient =>
 
             new List<object[]>
@@ -154,7 +175,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 new object[] { "1.2.6" },
                 new object[] { "2.0.601" },
                 new object[] { "2.1.58" },
-                new object[] { "2.2.50" },
+                new object[] { "2.2.62" },
 #endif
             };
 
