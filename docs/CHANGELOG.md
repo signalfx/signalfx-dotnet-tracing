@@ -13,6 +13,7 @@
 - Remove spans for Confluent.Kafka Consume calls that didn't receive a message
 - Add configuration setting, `SIGNALFX_OUTBOUND_HTTP_EXCLUDED_HOSTS`, that prevents the creation of outbound HTTP spans for certain hosts
 - Added Server-Timing header to ASP.NET on IIS
+- Added RabbitMQ instrumentation
 
 [Commits](https://github.com/signalfx/signalfx-dotnet-tracing/v0.1.13...HEAD)
 
