@@ -2,9 +2,7 @@
 
   <PropertyGroup>
     <!-- override to only build/run net452 -->
-    <TargetFramework Condition="'$(OS)' == 'Windows_NT'">net452</TargetFramework>
-    <TargetFramework Condition="'$(OS)' != 'Windows_NT'">netcoreapp3.1</TargetFramework>
-    <LoadManagedProfilerFromProfilerDirectory>true</LoadManagedProfilerFromProfilerDirectory>
+    <TargetFrameworks>net452</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>

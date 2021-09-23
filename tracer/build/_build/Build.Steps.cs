@@ -301,7 +301,7 @@ partial class Build
             }
             else
             {
-                var (architecture, ext) = GetUnixArchitectureAndExtention();
+                var (architecture, ext) = GetUnixArchitectureAndExtension(includeMuslSuffixOnAlpine: true);
                 var ddwafFileName = $"libddwaf.{ext}";
 
                 var source = LibDdwafDirectory / "runtimes" / architecture / "native" / ddwafFileName;
@@ -424,7 +424,7 @@ partial class Build
            }
 
            // Move the native file to the architecture-specific folder
-           var (architecture, ext) = GetUnixArchitectureAndExtention();
+           var (architecture, ext) = GetUnixArchitectureAndExtension(includeMuslSuffixOnAlpine: false);
 
            var profilerFileName = $"{NativeProfilerModule}.{ext}";
            var ddwafFileName = $"libddwaf.{ext}";
@@ -784,7 +784,6 @@ partial class Build
                 .EnableNoDependencies()
                 .SetConfiguration(BuildConfiguration)
                 .SetTargetPlatform(Platform)
-                .SetProperty("ManagedProfilerOutputDirectory", TracerHomeDirectory)
                 .SetTargets("BuildCsharpIntegrationTests")
                 .SetMaxCpuCount(null));
         });
@@ -822,10 +821,6 @@ partial class Build
                 .SetTargetPlatform(Platform)
                 .EnableNoDependencies()
                 .SetProperty("BuildInParallel", "false")
-                .SetProperty("ExcludeManagedProfiler", true)
-                .SetProperty("ExcludeNativeProfiler", true)
-                .SetProperty("ManagedProfilerOutputDirectory", TracerHomeDirectory)
-                .SetProperty("LoadManagedProfilerFromProfilerDirectory", false)
                 .SetProcessArgumentConfigurator(arg => arg.Add("/nowarn:NU1701"))
                 .CombineWith(projects, (s, project) => s
                     .SetProjectFile(project)));
@@ -881,6 +876,7 @@ partial class Build
                     .SetTargetPlatform(Platform)
                     .EnableNoRestore()
                     .EnableNoBuild()
+                    .SetProcessEnvironmentVariable("TracerHomeDirectory", TracerHomeDirectory)
                     .When(!string.IsNullOrEmpty(Filter), c => c.SetFilter(Filter))
                     .When(CodeCoverage, ConfigureCodeCoverage)
                     .CombineWith(ParallelIntegrationTests, (s, project) => s
@@ -897,6 +893,7 @@ partial class Build
                     .EnableNoRestore()
                     .EnableNoBuild()
                     .SetFilter(Filter ?? "RunOnWindows=True&LoadFromGAC!=True&IIS!=True")
+                    .SetProcessEnvironmentVariable("TracerHomeDirectory", TracerHomeDirectory)
                     .When(CodeCoverage, ConfigureCodeCoverage)
                     .CombineWith(ClrProfilerIntegrationTests, (s, project) => s
                         .EnableTrxLogOutput(GetResultsDirectory(project))
@@ -928,6 +925,7 @@ partial class Build
                     .EnableNoRestore()
                     .EnableNoBuild()
                     .SetFilter(Filter ?? "Category=Smoke&LoadFromGAC!=True")
+                    .SetProcessEnvironmentVariable("TracerHomeDirectory", TracerHomeDirectory)
                     .When(CodeCoverage, ConfigureCodeCoverage)
                     .CombineWith(ClrProfilerIntegrationTests, (s, project) => s
                         .EnableTrxLogOutput(GetResultsDirectory(project))
@@ -960,6 +958,7 @@ partial class Build
                     .EnableNoRestore()
                     .EnableNoBuild()
                     .SetFilter(Filter ?? "(RunOnWindows=True)&LoadFromGAC=True")
+                    .SetProcessEnvironmentVariable("TracerHomeDirectory", TracerHomeDirectory)
                     .When(CodeCoverage, ConfigureCodeCoverage)
                     .CombineWith(ClrProfilerIntegrationTests, (s, project) => s
                         .EnableTrxLogOutput(GetResultsDirectory(project))
@@ -1061,9 +1060,6 @@ partial class Build
                     .SetFramework(Framework)
                     // .SetTargetPlatform(Platform)
                     .SetNoWarnDotNetCore3()
-                    .SetProperty("ExcludeManagedProfiler", "true")
-                    .SetProperty("ExcludeNativeProfiler", "true")
-                    .SetProperty("ManagedProfilerOutputDirectory", TracerHomeDirectory)
                     .When(TestAllPackageVersions, o => o.SetProperty("TestAllPackageVersions", "true"))
                     .When(!string.IsNullOrEmpty(NugetPackageDirectory), o => o.SetPackageDirectory(NugetPackageDirectory))
                     .CombineWith(projectsToBuild, (c, project) => c
@@ -1078,7 +1074,6 @@ partial class Build
                     .SetFramework(Framework)
                     // .SetTargetPlatform(Platform)
                     .SetNoWarnDotNetCore3()
-                    .SetProperty("ManagedProfilerOutputDirectory", TracerHomeDirectory)
                     .When(TestAllPackageVersions, o => o.SetProperty("TestAllPackageVersions", "true"))
                     .When(!string.IsNullOrEmpty(NugetPackageDirectory), o => o.SetPackageDirectory(NugetPackageDirectory))
                     .CombineWith(projectsToBuild, (c, project) => c
@@ -1107,10 +1102,7 @@ partial class Build
                 .SetConfiguration(BuildConfiguration)
                 .EnableNoDependencies()
                 .SetProperty("TargetFramework", Framework.ToString())
-                .SetProperty("ManagedProfilerOutputDirectory", TracerHomeDirectory)
                 .SetProperty("BuildInParallel", "true")
-                .SetProperty("ExcludeManagedProfiler", "true")
-                .SetProperty("ExcludeNativeProfiler", "true")
                 .SetProcessArgumentConfigurator(arg => arg.Add("/nowarn:NU1701"))
                 .When(TestAllPackageVersions, o => o.SetProcessEnvironmentVariable("TestAllPackageVersions", "true"))
                 .CombineWith(targets, (c, target) => c.SetTargets(target))
@@ -1139,8 +1131,8 @@ partial class Build
                     // .SetTargetPlatform(Platform)
                     .SetNoWarnDotNetCore3()
                     .When(TestAllPackageVersions, o => o
-                        .SetProcessEnvironmentVariable("TestAllPackageVersions", "true"))
-                    .SetProcessEnvironmentVariable("ManagedProfilerOutputDirectory", TracerHomeDirectory)
+                        .SetProperty("TestAllPackageVersions", "true"))
+                    .AddProcessEnvironmentVariable("TestAllPackageVersions", "true")
                     .When(!string.IsNullOrEmpty(NugetPackageDirectory), o =>
                         o.SetPackageDirectory(NugetPackageDirectory))
                     .CombineWith(integrationTestProjects, (c, project) => c
@@ -1180,6 +1172,7 @@ partial class Build
                         .SetFramework(Framework)
                         .EnableMemoryDumps()
                         .SetFilter(filter)
+                        .SetProcessEnvironmentVariable("TracerHomeDirectory", TracerHomeDirectory)
                         .When(TestAllPackageVersions, o => o
                             .SetProcessEnvironmentVariable("TestAllPackageVersions", "true"))
                         .When(CodeCoverage, ConfigureCodeCoverage)
@@ -1197,6 +1190,7 @@ partial class Build
                     .SetFramework(Framework)
                     .EnableMemoryDumps()
                     .SetFilter(filter)
+                    .SetProcessEnvironmentVariable("TracerHomeDirectory", TracerHomeDirectory)
                     .When(TestAllPackageVersions, o => o
                         .SetProcessEnvironmentVariable("TestAllPackageVersions", "true"))
                     .When(CodeCoverage, ConfigureCodeCoverage)
@@ -1215,13 +1209,14 @@ partial class Build
 
     private void EnsureResultsDirectory(Project proj) => EnsureCleanDirectory(GetResultsDirectory(proj));
 
-    private (string, string) GetUnixArchitectureAndExtention()
+    private (string, string) GetUnixArchitectureAndExtension(bool includeMuslSuffixOnAlpine)
     {
-        var archExt = IsOsx
-            ? ("osx-x64", "dylib")
-            : ($"linux-{LinuxArchitectureIdentifier}", "so");
-
-        return archExt;
+        return (IsOsx, IsAlpine, includeMuslSuffixOnAlpine) switch
+        {
+            (true, _, _) => ("osx-x64", "dylib"),
+            (_, true, true) => ($"linux-musl-{LinuxArchitectureIdentifier}", "so"),
+            _ => ($"linux-{LinuxArchitectureIdentifier}", "so"),
+        };
     }
 
     // the integration tests need their own copy of the profiler, this achived through build.props on Windows, but doesn't seem to work under Linux
