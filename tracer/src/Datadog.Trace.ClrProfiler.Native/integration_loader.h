@@ -16,7 +16,7 @@ namespace trace
 using json = nlohmann::json;
 
 // LoadIntegrationsFromEnvironment loads integrations from any files specified
-// in the OTEL_INTEGRATIONS environment variable
+// in the SIGNALFX_INTEGRATIONS environment variable
 void LoadIntegrationsFromEnvironment(std::vector<IntegrationMethod>& integrationMethods, const bool isCallTargetEnabled,
                                      const bool isNetstandardEnabled,
                                      const std::vector<WSTRING>& disabledIntegrationNames);

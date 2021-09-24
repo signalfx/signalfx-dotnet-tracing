@@ -363,7 +363,7 @@ namespace Datadog.Trace.AppSec.Waf.NativeBindings
             }
 
             // treat any path that could contain integrations.json as home folder
-            var integrationsPaths = Environment.GetEnvironmentVariable("OTEL_INTEGRATIONS")
+            var integrationsPaths = Environment.GetEnvironmentVariable("SIGNALFX_INTEGRATIONS")
                     ?.Split(';')
                     ?.Where(x => !string.IsNullOrWhiteSpace(x))
                     ?.Select(Path.GetDirectoryName)
@@ -371,7 +371,7 @@ namespace Datadog.Trace.AppSec.Waf.NativeBindings
                         ?? new List<string>();
 
             // the real trace home
-            var tracerHome = Environment.GetEnvironmentVariable("OTEL_DOTNET_TRACER_HOME");
+            var tracerHome = Environment.GetEnvironmentVariable("SIGNALFX_DOTNET_TRACER_HOME");
             if (!string.IsNullOrWhiteSpace(tracerHome))
             {
                 integrationsPaths.Add(tracerHome);

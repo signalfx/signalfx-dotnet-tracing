@@ -57,8 +57,8 @@ variables:
   ddTracerHome: $(System.DefaultWorkingDirectory)/tracer/src/bin/dd-tracer-home
   tracerHome: $(System.DefaultWorkingDirectory)/tracer/src/bin/windows-tracer-home
   artifacts: $(System.DefaultWorkingDirectory)/tracer/src/bin/artifacts
-  ddApiKey: $(DD_API_KEY)
-  DD_DOTNET_TRACER_MSBUILD:
+  ddApiKey: $(SIGNALFX_API_KEY)
+  SIGNALFX_DOTNET_TRACER_MSBUILD:
   NugetPackageDirectory: $(System.DefaultWorkingDirectory)/packages
   relativeNugetPackageDirectory: packages
   # For scheduled builds, only run benchmarks and crank (and deps).
@@ -74,8 +74,8 @@ resources:
     ports:
     - 8126:8126
     env:
-      DD_API_KEY: $(ddApiKey)
-      DD_INSIDE_CI: true
+      SIGNALFX_API_KEY: $(ddApiKey)
+      SIGNALFX_INSIDE_CI: true
 
 # Stages
 stages:

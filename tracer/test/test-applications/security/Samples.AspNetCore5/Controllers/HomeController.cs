@@ -25,7 +25,7 @@ namespace Samples.AspNetCore5.Controllers
             ViewBag.ProfilerAttached = instrumentationType?.GetProperty("ProfilerAttached", BindingFlags.Public | BindingFlags.Static)?.GetValue(null) ?? false;
             ViewBag.TracerAssemblyLocation = instrumentationType?.Assembly.Location;
 
-            var prefixes = new[] { "COR_", "CORECLR_", "DD_", "DATADOG_", "PW" };
+            var prefixes = new[] { "COR_", "CORECLR_", "SIGNALFX_", "PW" };
 
             var envVars = from envVar in Environment.GetEnvironmentVariables().Cast<DictionaryEntry>()
                           from prefix in prefixes

@@ -19,8 +19,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         public HttpMessageHandlerTests(ITestOutputHelper output)
             : base("HttpMessageHandler", output)
         {
-            SetEnvironmentVariable("OTEL_PROPAGATORS", "datadog,b3");
-            SetEnvironmentVariable("OTEL_HTTP_CLIENT_ERROR_STATUSES", "400-499, 502,-343,11-53, 500-500-200");
+            SetEnvironmentVariable("SIGNALFX_PROPAGATORS", "datadog,b3");
+            SetEnvironmentVariable("SIGNALFX_HTTP_CLIENT_ERROR_STATUSES", "400-499, 502,-343,11-53, 500-500-200");
             SetServiceVersion("1.0.0");
         }
 
@@ -177,13 +177,13 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             // Enable specific integrations, or use defaults
             if (instrumentation.InstrumentSocketHandler.HasValue)
             {
-                SetEnvironmentVariable("OTEL_HttpSocketsHandler_ENABLED", instrumentation.InstrumentSocketHandler.Value ? "true" : "false");
+                SetEnvironmentVariable("SIGNALFX_HttpSocketsHandler_ENABLED", instrumentation.InstrumentSocketHandler.Value ? "true" : "false");
             }
 
             if (instrumentation.InstrumentWinHttpOrCurlHandler.HasValue)
             {
-                SetEnvironmentVariable("OTEL_WinHttpHandler_ENABLED", instrumentation.InstrumentWinHttpOrCurlHandler.Value ? "true" : "false");
-                SetEnvironmentVariable("OTEL_CurlHandler_ENABLED", instrumentation.InstrumentWinHttpOrCurlHandler.Value ? "true" : "false");
+                SetEnvironmentVariable("SIGNALFX_WinHttpHandler_ENABLED", instrumentation.InstrumentWinHttpOrCurlHandler.Value ? "true" : "false");
+                SetEnvironmentVariable("SIGNALFX_CurlHandler_ENABLED", instrumentation.InstrumentWinHttpOrCurlHandler.Value ? "true" : "false");
             }
         }
 

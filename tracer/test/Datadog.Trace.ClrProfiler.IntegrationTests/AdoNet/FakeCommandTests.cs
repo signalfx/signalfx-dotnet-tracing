@@ -37,7 +37,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             const string expectedServiceName = "Samples.FakeDbCommand-" + dbType;
 
             // NOTE: opt into the additional instrumentation of calls into netstandard.dll
-            SetEnvironmentVariable("OTEL_TRACE_NETSTANDARD_ENABLED", "true");
+            SetEnvironmentVariable("SIGNALFX_TRACE_NETSTANDARD_ENABLED", "true");
 
             int agentPort = TcpPortProvider.GetOpenPort();
 

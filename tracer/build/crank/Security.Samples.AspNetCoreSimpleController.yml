@@ -25,9 +25,9 @@ scenarios:
       environmentVariables:
         COR_ENABLE_PROFILING: 1
         CORECLR_ENABLE_PROFILING: 1
-        OTEL_TRACE_CALLTARGET_ENABLED: 1
-        OTEL_APPSEC_ENABLED: true
-        OTEL_APPSEC_BLOCKING_ENABLED: true
+        SIGNALFX_TRACE_CALLTARGET_ENABLED: 1
+        SIGNALFX_APPSEC_ENABLED: true
+        SIGNALFX_APPSEC_BLOCKING_ENABLED: true
     load:
       job: bombardier
       variables:
@@ -42,9 +42,9 @@ scenarios:
       environmentVariables:
         COR_ENABLE_PROFILING: 1
         CORECLR_ENABLE_PROFILING: 1
-        OTEL_TRACE_CALLTARGET_ENABLED: 1
-        OTEL_APPSEC_ENABLED: true
-        OTEL_APPSEC_BLOCKING_ENABLED: false
+        SIGNALFX_TRACE_CALLTARGET_ENABLED: 1
+        SIGNALFX_APPSEC_ENABLED: true
+        SIGNALFX_APPSEC_BLOCKING_ENABLED: false
     load:
       job: bombardier
       variables:
@@ -59,9 +59,9 @@ scenarios:
       environmentVariables:
         COR_ENABLE_PROFILING: 1
         CORECLR_ENABLE_PROFILING: 1
-        OTEL_APPSEC_ENABLED: true
-        OTEL_TRACE_CALLTARGET_ENABLED: 1
-        OTEL_APPSEC_BLOCKING_ENABLED: true
+        SIGNALFX_APPSEC_ENABLED: true
+        SIGNALFX_TRACE_CALLTARGET_ENABLED: 1
+        SIGNALFX_APPSEC_BLOCKING_ENABLED: true
     load:
       job: bombardier
       variables:

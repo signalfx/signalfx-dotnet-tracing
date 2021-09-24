@@ -21,7 +21,7 @@ namespace Samples.AspNetCoreMvc.Controllers
             ViewBag.TracerAssemblyLocation = instrumentationType?.Assembly.Location;
             ViewBag.StackTrace = StackTraceHelper.GetUsefulStack();
 
-            var prefixes = new[] { "COR_", "CORECLR_", "OTEL_", "DATADOG_" };
+            var prefixes = new[] { "COR_", "CORECLR_", "SIGNALFX_" };
 
             var envVars = from envVar in Environment.GetEnvironmentVariables().Cast<DictionaryEntry>()
                           from prefix in prefixes

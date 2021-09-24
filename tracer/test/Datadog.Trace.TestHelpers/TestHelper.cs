@@ -337,12 +337,12 @@ namespace Datadog.Trace.TestHelpers
 
         protected void SetServiceVersion(string serviceVersion)
         {
-            SetEnvironmentVariable("OTEL_VERSION", serviceVersion);
+            SetEnvironmentVariable("SIGNALFX_VERSION", serviceVersion);
         }
 
         protected void SetCallTargetSettings(bool enableCallTarget)
         {
-            SetEnvironmentVariable("OTEL_TRACE_CALLTARGET_ENABLED", enableCallTarget ? "true" : "false");
+            SetEnvironmentVariable("SIGNALFX_TRACE_CALLTARGET_ENABLED", enableCallTarget ? "true" : "false");
         }
 
         protected void SetSecurity(bool security)

@@ -248,17 +248,17 @@ namespace Datadog.Trace.Ci
             // **********
             // Custom environment variables.
             // **********
-            Branch = GetEnvironmentVariableIfIsNotEmpty("OTEL_GIT_BRANCH", Branch);
-            Tag = GetEnvironmentVariableIfIsNotEmpty("OTEL_GIT_TAG", Tag);
-            Repository = GetEnvironmentVariableIfIsNotEmpty("OTEL_GIT_REPOSITORY_URL", Repository);
-            Commit = GetEnvironmentVariableIfIsNotEmpty("OTEL_GIT_COMMIT_SHA", Commit);
-            Message = GetEnvironmentVariableIfIsNotEmpty("OTEL_GIT_COMMIT_MESSAGE", Message);
-            AuthorName = GetEnvironmentVariableIfIsNotEmpty("OTEL_GIT_COMMIT_AUTHOR_NAME", AuthorName);
-            AuthorEmail = GetEnvironmentVariableIfIsNotEmpty("OTEL_GIT_COMMIT_AUTHOR_EMAIL", AuthorEmail);
-            AuthorDate = GetDateTimeOffsetEnvironmentVariableIfIsNotEmpty("OTEL_GIT_COMMIT_AUTHOR_DATE", AuthorDate);
-            CommitterName = GetEnvironmentVariableIfIsNotEmpty("OTEL_GIT_COMMIT_COMMITTER_NAME", CommitterName);
-            CommitterEmail = GetEnvironmentVariableIfIsNotEmpty("OTEL_GIT_COMMIT_COMMITTER_EMAIL", CommitterEmail);
-            CommitterDate = GetDateTimeOffsetEnvironmentVariableIfIsNotEmpty("OTEL_GIT_COMMIT_COMMITTER_DATE", CommitterDate);
+            Branch = GetEnvironmentVariableIfIsNotEmpty("SIGNALFX_GIT_BRANCH", Branch);
+            Tag = GetEnvironmentVariableIfIsNotEmpty("SIGNALFX_GIT_TAG", Tag);
+            Repository = GetEnvironmentVariableIfIsNotEmpty("SIGNALFX_GIT_REPOSITORY_URL", Repository);
+            Commit = GetEnvironmentVariableIfIsNotEmpty("SIGNALFX_GIT_COMMIT_SHA", Commit);
+            Message = GetEnvironmentVariableIfIsNotEmpty("SIGNALFX_GIT_COMMIT_MESSAGE", Message);
+            AuthorName = GetEnvironmentVariableIfIsNotEmpty("SIGNALFX_GIT_COMMIT_AUTHOR_NAME", AuthorName);
+            AuthorEmail = GetEnvironmentVariableIfIsNotEmpty("SIGNALFX_GIT_COMMIT_AUTHOR_EMAIL", AuthorEmail);
+            AuthorDate = GetDateTimeOffsetEnvironmentVariableIfIsNotEmpty("SIGNALFX_GIT_COMMIT_AUTHOR_DATE", AuthorDate);
+            CommitterName = GetEnvironmentVariableIfIsNotEmpty("SIGNALFX_GIT_COMMIT_COMMITTER_NAME", CommitterName);
+            CommitterEmail = GetEnvironmentVariableIfIsNotEmpty("SIGNALFX_GIT_COMMIT_COMMITTER_EMAIL", CommitterEmail);
+            CommitterDate = GetDateTimeOffsetEnvironmentVariableIfIsNotEmpty("SIGNALFX_GIT_COMMIT_COMMITTER_DATE", CommitterDate);
         }
 
         private static string GetEnvironmentVariableIfIsNotEmpty(string key, string defaultValue)

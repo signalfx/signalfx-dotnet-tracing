@@ -15,8 +15,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         public ServiceMappingTests(ITestOutputHelper output)
             : base("WebRequest", output)
         {
-            SetEnvironmentVariable("OTEL_TRACE_SERVICE_MAPPING", "some-trace:not-used,http-client:my-custom-client");
-            SetEnvironmentVariable("OTEL_PROPAGATORS", "datadog,b3");
+            SetEnvironmentVariable("SIGNALFX_TRACE_SERVICE_MAPPING", "some-trace:not-used,http-client:my-custom-client");
+            SetEnvironmentVariable("SIGNALFX_PROPAGATORS", "datadog,b3");
             SetServiceVersion("1.0.0");
         }
 

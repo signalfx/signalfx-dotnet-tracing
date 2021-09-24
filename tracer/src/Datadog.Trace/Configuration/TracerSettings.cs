@@ -54,7 +54,7 @@ namespace Datadog.Trace.Configuration
 
             ServiceName = source?.GetString(ConfigurationKeys.ServiceName) ??
                           // backwards compatibility for names used in the past
-                          source?.GetString("OTEL_SERVICE_NAME");
+                          source?.GetString("SIGNALFX_SERVICE_NAME");
 
             ServiceVersion = source?.GetString(ConfigurationKeys.ServiceVersion);
 
@@ -75,13 +75,13 @@ namespace Datadog.Trace.Configuration
 
             var agentHost = source?.GetString(ConfigurationKeys.AgentHost) ??
                             // backwards compatibility for names used in the past
-                            source?.GetString("OTEL_TRACE_AGENT_HOSTNAME") ??
+                            source?.GetString("SIGNALFX_TRACE_AGENT_HOSTNAME") ??
                             // default value
                             DefaultAgentHost;
 
             var agentPort = source?.GetInt32(ConfigurationKeys.AgentPort) ??
                             // backwards compatibility for names used in the past
-                            source?.GetInt32("OTEL_TRACE_AGENT_PORT") ??
+                            source?.GetInt32("SIGNALFX_TRACE_AGENT_PORT") ??
                             // default value
                             DefaultAgentPort;
 
@@ -126,7 +126,7 @@ namespace Datadog.Trace.Configuration
 
             GlobalTags = source?.GetDictionary(ConfigurationKeys.GlobalTags) ??
                          // backwards compatibility for names used in the past
-                         source?.GetDictionary("OTEL_TRACE_GLOBAL_TAGS") ??
+                         source?.GetDictionary("SIGNALFX_TRACE_GLOBAL_TAGS") ??
                          // default value (empty)
                          new ConcurrentDictionary<string, string>();
 
@@ -403,7 +403,7 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <remark>
         /// This value cannot be set in code. Instead,
-        /// set it using the <c>OTEL_TRACE_DIAGNOSTIC_SOURCE_ENABLED</c>
+        /// set it using the <c>SIGNALFX_TRACE_DIAGNOSTIC_SOURCE_ENABLED</c>
         /// environment variable or in configuration files.
         /// </remark>
         public bool DiagnosticSourceEnabled
@@ -649,7 +649,7 @@ namespace Datadog.Trace.Configuration
                 // Checks that the value about to be used follows the `401-404` structure or single 3 digit number i.e. `401` else log the warning
                 if (!Regex.IsMatch(statusConfiguration, @"^\d{3}-\d{3}$|^\d{3}$"))
                 {
-                    Log.Warning("Wrong format '{0}' for OTEL_HTTP_SERVER/CLIENT_ERROR_STATUSES configuration.", statusConfiguration);
+                    Log.Warning("Wrong format '{0}' for SIGNALFX_HTTP_SERVER/CLIENT_ERROR_STATUSES configuration.", statusConfiguration);
                 }
 
                 // If statusConfiguration equals a single value i.e. `401` parse the value and save to the array

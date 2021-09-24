@@ -39,8 +39,8 @@ scenarios:
       environmentVariables:
         COR_ENABLE_PROFILING: 1
         CORECLR_ENABLE_PROFILING: 1
-        OTEL_TRACE_CALLTARGET_ENABLED: 1
-        OTEL_CLR_ENABLE_INLINING: 1
+        SIGNALFX_TRACE_CALLTARGET_ENABLED: 1
+        SIGNALFX_CLR_ENABLE_INLINING: 1
     load:
       job: bombardier
       variables:
@@ -55,9 +55,9 @@ scenarios:
       environmentVariables:
         COR_ENABLE_PROFILING: 1
         CORECLR_ENABLE_PROFILING: 1
-        OTEL_TRACE_CALLTARGET_ENABLED: 1
-        OTEL_CLR_ENABLE_INLINING: 1
-        OTEL_CLR_ENABLE_NGEN: 1
+        SIGNALFX_TRACE_CALLTARGET_ENABLED: 1
+        SIGNALFX_CLR_ENABLE_INLINING: 1
+        SIGNALFX_CLR_ENABLE_NGEN: 1
     load:
       job: bombardier
       variables:

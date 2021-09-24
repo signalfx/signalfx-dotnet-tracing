@@ -138,15 +138,15 @@ namespace Datadog.Trace.TestHelpers
                 "COR_PROFILER_PATH",
 
                 // Datadog
-                "OTEL_PROFILER_PROCESSES",
-                "OTEL_DOTNET_TRACER_HOME",
-                "OTEL_INTEGRATIONS",
-                "OTEL_DISABLED_INTEGRATIONS",
-                "OTEL_SERVICE",
-                "OTEL_VERSION",
-                "OTEL_TAGS",
-                "OTEL_APPSEC_ENABLED",
-                "OTEL_TRACE_CALLTARGET_ENABLED"
+                "SIGNALFX_PROFILER_PROCESSES",
+                "SIGNALFX_DOTNET_TRACER_HOME",
+                "SIGNALFX_INTEGRATIONS",
+                "SIGNALFX_DISABLED_INTEGRATIONS",
+                "SIGNALFX_SERVICE",
+                "SIGNALFX_VERSION",
+                "SIGNALFX_TAGS",
+                "SIGNALFX_APPSEC_ENABLED",
+                "SIGNALFX_TRACE_CALLTARGET_ENABLED"
             };
 
             foreach (string variable in environmentVariables)
@@ -175,7 +175,7 @@ namespace Datadog.Trace.TestHelpers
 
                 profilerPath = GetProfilerPath();
                 environmentVariables["CORECLR_PROFILER_PATH"] = profilerPath;
-                environmentVariables["OTEL_DOTNET_TRACER_HOME"] = Path.GetDirectoryName(profilerPath);
+                environmentVariables["SIGNALFX_DOTNET_TRACER_HOME"] = Path.GetDirectoryName(profilerPath);
             }
             else
             {
@@ -184,35 +184,35 @@ namespace Datadog.Trace.TestHelpers
 
                 profilerPath = GetProfilerPath();
                 environmentVariables["COR_PROFILER_PATH"] = profilerPath;
-                environmentVariables["OTEL_DOTNET_TRACER_HOME"] = Path.GetDirectoryName(profilerPath);
+                environmentVariables["SIGNALFX_DOTNET_TRACER_HOME"] = Path.GetDirectoryName(profilerPath);
             }
 
             if (DebugModeEnabled)
             {
-                environmentVariables["OTEL_TRACE_DEBUG"] = "1";
+                environmentVariables["SIGNALFX_TRACE_DEBUG"] = "1";
             }
 
             if (callTargetEnabled)
             {
-                environmentVariables["OTEL_TRACE_CALLTARGET_ENABLED"] = "1";
+                environmentVariables["SIGNALFX_TRACE_CALLTARGET_ENABLED"] = "1";
             }
 
             if (!string.IsNullOrEmpty(processToProfile))
             {
-                environmentVariables["OTEL_PROFILER_PROCESSES"] = Path.GetFileName(processToProfile);
+                environmentVariables["SIGNALFX_PROFILER_PROCESSES"] = Path.GetFileName(processToProfile);
             }
 
             string integrations = string.Join(";", GetIntegrationsFilePaths());
-            environmentVariables["OTEL_INTEGRATIONS"] = integrations;
-            environmentVariables["OTEL_TRACE_AGENT_HOSTNAME"] = "127.0.0.1";
-            environmentVariables["OTEL_TRACE_AGENT_PORT"] = agentPort.ToString();
+            environmentVariables["SIGNALFX_INTEGRATIONS"] = integrations;
+            environmentVariables["SIGNALFX_TRACE_AGENT_HOSTNAME"] = "127.0.0.1";
+            environmentVariables["SIGNALFX_TRACE_AGENT_PORT"] = agentPort.ToString();
 
             // for ASP.NET Core sample apps, set the server's port
             environmentVariables["ASPNETCORE_URLS"] = $"http://127.0.0.1:{aspNetCorePort}/";
 
             if (statsdPort != null)
             {
-                environmentVariables["OTEL_DOGSTATSD_PORT"] = statsdPort.Value.ToString();
+                environmentVariables["SIGNALFX_DOGSTATSD_PORT"] = statsdPort.Value.ToString();
             }
 
             if (enableSecurity)
@@ -235,10 +235,10 @@ namespace Datadog.Trace.TestHelpers
             }
 
             // set consistent env name (can be overwritten by custom environment variable)
-            environmentVariables["OTEL_ENV"] = "integration_tests";
+            environmentVariables["SIGNALFX_ENV"] = "integration_tests";
 
             // Don't attach the profiler to these processes
-            environmentVariables["OTEL_PROFILER_EXCLUDE_PROCESSES"] =
+            environmentVariables["SIGNALFX_PROFILER_EXCLUDE_PROCESSES"] =
                 "devenv.exe;Microsoft.ServiceHub.Controller.exe;ServiceHub.Host.CLR.exe;ServiceHub.TestWindowStoreHost.exe;" +
                 "ServiceHub.DataWarehouseHost.exe;sqlservr.exe;VBCSCompiler.exe;iisexpresstray.exe;msvsmon.exe;PerfWatson2.exe;" +
                 "ServiceHub.IdentityHost.exe;ServiceHub.VSDetouredHost.exe;ServiceHub.SettingsHost.exe;ServiceHub.Host.CLR.x86.exe;" +

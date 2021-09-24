@@ -96,9 +96,9 @@ namespace Datadog.Trace.Tools.Runner
 
             var envVars = new Dictionary<string, string>
             {
-                ["OTEL_DOTNET_TRACER_HOME"] = tracerHome,
-                ["OTEL_DOTNET_TRACER_MSBUILD"] = tracerMsBuild,
-                ["OTEL_INTEGRATIONS"] = tracerIntegrations,
+                ["SIGNALFX_DOTNET_TRACER_HOME"] = tracerHome,
+                ["SIGNALFX_DOTNET_TRACER_MSBUILD"] = tracerMsBuild,
+                ["SIGNALFX_INTEGRATIONS"] = tracerIntegrations,
                 ["CORECLR_ENABLE_PROFILING"] = "1",
                 ["CORECLR_PROFILER"] = PROFILERID,
                 ["CORECLR_PROFILER_PATH_32"] = tracerProfiler32,
@@ -111,22 +111,22 @@ namespace Datadog.Trace.Tools.Runner
 
             if (!string.IsNullOrWhiteSpace(options.Environment))
             {
-                envVars["OTEL_ENV"] = options.Environment;
+                envVars["SIGNALFX_ENV"] = options.Environment;
             }
 
             if (!string.IsNullOrWhiteSpace(options.Service))
             {
-                envVars["OTEL_SERVICE"] = options.Service;
+                envVars["SIGNALFX_SERVICE"] = options.Service;
             }
 
             if (!string.IsNullOrWhiteSpace(options.Version))
             {
-                envVars["OTEL_VERSION"] = options.Version;
+                envVars["SIGNALFX_VERSION"] = options.Version;
             }
 
             if (!string.IsNullOrWhiteSpace(options.AgentUrl))
             {
-                envVars["OTEL_TRACE_AGENT_URL"] = options.AgentUrl;
+                envVars["SIGNALFX_TRACE_AGENT_URL"] = options.AgentUrl;
             }
 
             if (!string.IsNullOrWhiteSpace(options.EnvironmentValues))

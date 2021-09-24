@@ -22,7 +22,7 @@ namespace Dotnet.WindowsContainer.Example.Pages
             IsProfilerAttached = (bool?)instrumentationType?.GetProperty("ProfilerAttached", BindingFlags.Public | BindingFlags.Static)?.GetValue(null) ?? false;
             TracerAssemblyLocation = instrumentationType?.Assembly.Location;
 
-            var prefixes = new[] { "COR_", "CORECLR_", "OTEL_", "DATADOG_" };
+            var prefixes = new[] { "COR_", "CORECLR_", "SIGNALFX_" };
 
             EnvVars = from envVar in Environment.GetEnvironmentVariables().Cast<DictionaryEntry>()
                       from prefix in prefixes

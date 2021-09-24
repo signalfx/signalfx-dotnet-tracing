@@ -35,7 +35,7 @@ jobs:
           --env NugetPackageDirectory=/project/packages \
           --env tracerHome=/project/tracer/bin/tracer-home \
           --env artifacts=/project/tracer/src/bin/artifacts \
-          --env OTEL_CLR_ENABLE_NGEN=${OTEL_CLR_ENABLE_NGEN} \
+          --env SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN} \
           dd-trace-dotnet/${baseImage}-builder \
           dotnet /build/bin/Debug/_build.dll Clean BuildTracerHome ZipTracerHome
     - uses: actions/upload-artifact@v2

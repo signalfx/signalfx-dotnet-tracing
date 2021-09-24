@@ -27,7 +27,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
             Output.WriteLine($"Assigning port {agentPort} for the agentPort.");
 
-            SetEnvironmentVariable("OTEL_RUNTIME_METRICS_ENABLED", "1");
+            SetEnvironmentVariable("SIGNALFX_RUNTIME_METRICS_ENABLED", "1");
 
             using var agent = new MockTracerAgent(agentPort, useStatsd: true);
             Output.WriteLine($"Assigning port {agent.StatsdPort} for the statsdPort.");
@@ -65,7 +65,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
             Output.WriteLine($"Assigning port {agentPort} for the agentPort.");
 
-            SetEnvironmentVariable("OTEL_RUNTIME_METRICS_ENABLED", "0");
+            SetEnvironmentVariable("SIGNALFX_RUNTIME_METRICS_ENABLED", "0");
 
             using var agent = new MockTracerAgent(agentPort, useStatsd: true);
             Output.WriteLine($"Assigning port {agent.StatsdPort} for the statsdPort.");

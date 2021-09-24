@@ -33,6 +33,6 @@ Add any other context about the problem here.
 NOTE: To contact our support team, see https://www.datadoghq.com/support/
 When contacting support, please include the information requested above.
 If possible, also include the tracer log files found (by default) in:
-Windows: %ProgramData%\Datadog .NET Tracer\logs\
-Linux: /var/log/datadog/dotnet/
+Windows: %ProgramData%\SignalFx .NET Tracing\logs\
+Linux: /var/log/signalfx/dotnet/
 --!>

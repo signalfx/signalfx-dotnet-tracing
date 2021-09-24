@@ -11,7 +11,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
 {
     internal static class StartupLogger
     {
-        private const string NixDefaultDirectory = "/var/log/opentelemetry/dotnet";
+        private const string NixDefaultDirectory = "/var/log/signalfx/dotnet";
 
         private static readonly bool DebugEnabled = IsDebugEnabled();
         private static readonly string LogDirectory = GetLogDirectory();
@@ -66,11 +66,11 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
 
             try
             {
-                logDirectory = Environment.GetEnvironmentVariable("OTEL_TRACE_LOG_DIRECTORY");
+                logDirectory = Environment.GetEnvironmentVariable("SIGNALFX_TRACE_LOG_DIRECTORY");
 
                 if (logDirectory == null)
                 {
-                    var nativeLogFile = Environment.GetEnvironmentVariable("OTEL_TRACE_LOG_PATH");
+                    var nativeLogFile = Environment.GetEnvironmentVariable("SIGNALFX_TRACE_LOG_PATH");
 
                     if (!string.IsNullOrEmpty(nativeLogFile))
                     {
@@ -82,7 +82,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
                 {
                     if (Environment.OSVersion.Platform == PlatformID.Win32NT)
                     {
-                        var windowsDefaultDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"OpenTelemetry .NET AutoInstrumentation", "logs");
+                        var windowsDefaultDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"SignalFx .NET Tracing", "logs");
                         logDirectory = windowsDefaultDirectory;
                     }
                     else
@@ -148,7 +148,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
         {
             try
             {
-                var ddTraceDebugValue = Environment.GetEnvironmentVariable("OTEL_TRACE_DEBUG");
+                var ddTraceDebugValue = Environment.GetEnvironmentVariable("SIGNALFX_TRACE_DEBUG");
 
                 if (ddTraceDebugValue == null)
                 {

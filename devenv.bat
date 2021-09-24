@@ -52,14 +52,14 @@ rem Enable .NET Core Profiling API
 SET CORECLR_ENABLE_PROFILING=1
 SET CORECLR_PROFILER={918728DD-259F-4A6A-AC2B-B85E1B658318}
 SET CORECLR_PROFILER_PATH=%~dp0\src\Datadog.Trace.ClrProfiler.Native\bin\%profiler_configuration%\%profiler_platform%\OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dll
-SET OTEL_APPSEC_ENABLED=false
+SET SIGNALFX_APPSEC_ENABLED=false
 
 rem Don't attach the profiler to these processes
-SET OTEL_PROFILER_EXCLUDE_PROCESSES=devenv.exe;JetBrains.DPA.Runner.exe;JetBrains.Debugger.Worker.exe;Rider.Backend64.exe;Microsoft.ServiceHub.Controller.exe;ServiceHub.Host.CLR.exe;ServiceHub.TestWindowStoreHost.exe;ServiceHub.DataWarehouseHost.exe;sqlservr.exe;VBCSCompiler.exe;iisexpresstray.exe;msvsmon.exe;PerfWatson2.exe;ServiceHub.IdentityHost.exe;ServiceHub.VSDetouredHost.exe;ServiceHub.SettingsHost.exe;ServiceHub.Host.CLR.x86.exe;vstest.console.exe;ServiceHub.RoslynCodeAnalysisService32.exe;testhost.x86.exe;MSBuild.exe;ServiceHub.ThreadedWaitDialog.exe
+SET SIGNALFX_PROFILER_EXCLUDE_PROCESSES=devenv.exe;JetBrains.DPA.Runner.exe;JetBrains.Debugger.Worker.exe;Rider.Backend64.exe;Microsoft.ServiceHub.Controller.exe;ServiceHub.Host.CLR.exe;ServiceHub.TestWindowStoreHost.exe;ServiceHub.DataWarehouseHost.exe;sqlservr.exe;VBCSCompiler.exe;iisexpresstray.exe;msvsmon.exe;PerfWatson2.exe;ServiceHub.IdentityHost.exe;ServiceHub.VSDetouredHost.exe;ServiceHub.SettingsHost.exe;ServiceHub.Host.CLR.x86.exe;vstest.console.exe;ServiceHub.RoslynCodeAnalysisService32.exe;testhost.x86.exe;MSBuild.exe;ServiceHub.ThreadedWaitDialog.exe
 
 rem Set dotnet tracer home path
-SET OTEL_DOTNET_TRACER_HOME=%~dp0
-SET OTEL_INTEGRATIONS=%OTEL_DOTNET_TRACER_HOME%\integrations.json
+SET SIGNALFX_DOTNET_TRACER_HOME=%~dp0
+SET SIGNALFX_INTEGRATIONS=%SIGNALFX_DOTNET_TRACER_HOME%\integrations.json
 
 if "%start_visual_studio%" == "true" (
     echo Starting Visual Studio...

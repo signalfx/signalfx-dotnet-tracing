@@ -60,9 +60,9 @@ variables:
   ddTracerHome: $(System.DefaultWorkingDirectory)/tracer/src/bin/dd-tracer-home
   tracerHome: $(System.DefaultWorkingDirectory)/tracer/src/bin/windows-tracer-home
   artifacts: $(System.DefaultWorkingDirectory)/tracer/src/bin/artifacts
-  ddApiKey: $(DD_API_KEY)
+  ddApiKey: $(SIGNALFX_API_KEY)
   isMainBranch: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
-  DD_DOTNET_TRACER_MSBUILD:
+  SIGNALFX_DOTNET_TRACER_MSBUILD:
   NugetPackageDirectory: $(System.DefaultWorkingDirectory)/packages
   relativeNugetPackageDirectory: packages
   # For scheduled builds, only run benchmarks and crank (and deps).
@@ -78,8 +78,8 @@ resources:
     ports:
     - 8126:8126
     env:
-      DD_API_KEY: $(ddApiKey)
-      DD_INSIDE_CI: true
+      SIGNALFX_API_KEY: $(ddApiKey)
+      SIGNALFX_INSIDE_CI: true
 
 # Stages
 stages:
@@ -1058,7 +1058,7 @@ stages:
         ./run.sh
       displayName: Crank
       env:
-        DD_SERVICE: dd-trace-dotnet
+        SIGNALFX_SERVICE: dd-trace-dotnet
 
 - stage: coverage
   condition: and(succeeded(), eq(variables['isScheduledBuild'], 'False'), ne(variables['isNgenTestBuild'], 'True'))
@@ -1145,13 +1145,13 @@ stages:
       workingDirectory: $(System.DefaultWorkingDirectory)/tracer/build/timeit/Samples.HttpMessageHandler
       displayName: Execute Samples.HttpMessageHandler benchmark
       env:
-        DD_SERVICE: dd-trace-dotnet
+        SIGNALFX_SERVICE: dd-trace-dotnet
 
     - script: run.cmd
       workingDirectory: $(System.DefaultWorkingDirectory)/tracer/build/timeit/Samples.FakeDbCommand
       displayName: Execute Samples.FakeDbCommand benchmark
       env:
-        DD_SERVICE: dd-trace-dotnet
+        SIGNALFX_SERVICE: dd-trace-dotnet
 
     - task: PowerShell@2
       displayName: Wait 20 seconds to agent flush before finishing pipeline
