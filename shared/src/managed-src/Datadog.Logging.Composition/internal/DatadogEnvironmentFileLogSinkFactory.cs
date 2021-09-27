@@ -75,8 +75,8 @@ namespace Datadog.Logging.Composition
         private const char FilenameInvalidCharFallback = '_';
         private const string FilenameSeparator = "-";
 
-        private const string WindowsDefaultLogDirectory = @"Datadog-APM\logs\";    // relative to Environment.SpecialFolder.CommonApplicationData
-        private const string NixDefaultLogDirectory = @"/var/log/datadog/";        // global path
+        private const string WindowsDefaultLogDirectory = @"SignalFx .NET Tracing\logs\";    // relative to Environment.SpecialFolder.CommonApplicationData
+        private const string NixDefaultLogDirectory = @"/var/log/signalfx/";        // global path
 
         private const string DdTraceLogDirectoryEnvVarName = "SIGNALFX_TRACE_LOG_DIRECTORY";
 

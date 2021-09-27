@@ -159,9 +159,9 @@ namespace shared {
             program_data = R"(C:\ProgramData)";
         }
         
-        return fs::path(program_data) / R"(Datadog-APM\logs\DotNet)";
+        return fs::path(program_data) / R"(SignalFx .NET Tracing\logs\dotnet)";
 #else
-        return fs::path("/var/log/datadog/dotnet");
+        return fs::path("/var/log/signalfx/dotnet");
 #endif
     }
 
