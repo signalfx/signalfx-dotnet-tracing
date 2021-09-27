@@ -54,8 +54,8 @@ partial class Build
     AbsolutePath TempDirectory => (AbsolutePath)(IsWin ? Path.GetTempPath() : "/tmp/");
     string TracerLogDirectory => IsWin
         ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-            "Datadog .NET Tracer", "logs")
-        : "/var/log/datadog/dotnet/";
+            "SignalFx .NET Tracing", "logs")
+        : "/var/log/signalfx/dotnet/";
 
     Project NativeProfilerProject => Solution.GetProject(Projects.ClrProfilerNative);
 
@@ -540,7 +540,7 @@ partial class Build
             {
                 var fpm = Fpm.Value;
                 var gzip = GZip.Value;
-                var packageName = "datadog-dotnet-apm";
+                var packageName = "signalfx-dotnet-tracing";
 
                 var workingDirectory = ArtifactsDirectory / $"linux-{LinuxArchitectureIdentifier}";
                 EnsureCleanDirectory(workingDirectory);
@@ -554,7 +554,7 @@ partial class Build
                         $"-t {packageType}",
                         $"-n {packageName}",
                         $"-v {Version}",
-                        packageType == "tar" ? "" : "--prefix /opt/datadog",
+                        packageType == "tar" ? "" : "--prefix /opt/signalfx",
                         $"--chdir {TracerHomeDirectory}",
                         "netstandard2.0/",
                         "netcoreapp3.1/",

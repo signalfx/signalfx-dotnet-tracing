@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 
 ROOT_DIR="$(pwd)"
 BUILD_DIR="$ROOT_DIR/build/_build"
-IMAGE_NAME="dd-trace-dotnet/debian-base"
+IMAGE_NAME="signalfx-dotnet-tracing/debian-base"
 
 docker build \
    --build-arg DOTNETSDK_VERSION=5.0.103 \
@@ -20,6 +20,6 @@ docker run -it --rm \
     --env tracerHome=/project/bin/tracer-home \
     --env artifacts=/project/bin/artifacts \
     -p 5003:5003 \
-    -v /ddlogs:/var/log/datadog/dotnet \
+    -v /ddlogs:/var/log/signalfx/dotnet \
     $IMAGE_NAME \
     dotnet /build/bin/Debug/_build.dll "$@"
