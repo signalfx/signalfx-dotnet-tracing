@@ -112,20 +112,20 @@ via your system's package manager.
 manager:
     ```bash
     # Use dpkg:
-    $ dpkg -i otel-dotnet-autoinstrumentation.deb
+    $ dpkg -i signalfx-dotnet-tracing.deb
 
     # Use rpm:
-    $ rpm -ivh otel-dotnet-autoinstrumentation.rpm
+    $ rpm -ivh signalfx-dotnet-tracing.rpm
 
     # Install directly from the release bundle:
-    $ tar -xf otel-dotnet-autoinstrumentation.tar.gz -C /
+    $ tar -xf signalfx-dotnet-tracing.tar.gz -C /
 
     # Install directly from the release bundle for musl-using systems (Alpine Linux):
-    $ tar -xf otel-dotnet-autoinstrumentation-musl.tar.gz -C /
+    $ tar -xf signalfx-dotnet-tracing-musl.tar.gz -C /
     ```
 1. Configure the required environment variables:
     ```bash
-    $ source /opt/otel-dotnet-autoinstrumentation/defaults.env
+    $ source /opt/signalfx/defaults.env
     ```
 2. Set the service name:
     ```bash
@@ -149,7 +149,7 @@ manager:
     ```
 7. Optionally, create the default logging directory:
     ```bash
-    $ source /opt/otel-dotnet-autoinstrumentation/createLogPath.sh
+    $ source /opt/signalfx/createLogPath.sh
     ```
 8. Run your application:
     ```bash
