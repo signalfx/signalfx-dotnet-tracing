@@ -13,6 +13,7 @@ using Datadog.Trace.Configuration;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Headers;
 using Datadog.Trace.Logging;
+using Datadog.Trace.Propagation;
 using Datadog.Trace.Tagging;
 using Datadog.Trace.Util;
 using Datadog.Trace.Util.Http;
@@ -46,7 +47,9 @@ namespace Datadog.Trace.PlatformHelpers
 
                 if (requestHeaders != null)
                 {
-                    return SpanContextPropagator.Instance.Extract(new HeadersCollectionAdapter(requestHeaders));
+                    var tracer = Tracer.Instance;
+                    var propagator = tracer.Propagator;
+                    return propagator.Extract(new HeadersCollectionAdapter(requestHeaders));
                 }
             }
             catch (Exception ex)
@@ -70,7 +73,7 @@ namespace Datadog.Trace.PlatformHelpers
 
                     if (requestHeaders != null)
                     {
-                        return SpanContextPropagator.Instance.ExtractHeaderTags(new HeadersCollectionAdapter(requestHeaders), settings.HeaderTags, defaultTagPrefix: SpanContextPropagator.HttpRequestHeadersTagPrefix);
+                        return new HeadersCollectionAdapter(requestHeaders).ExtractHeaderTags(settings.HeaderTags, PropagationExtensions.HttpRequestHeadersTagPrefix);
                     }
                 }
                 catch (Exception ex)
