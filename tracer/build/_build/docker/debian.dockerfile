@@ -20,6 +20,7 @@ RUN apt-get update \
         ruby \
         ruby-dev \
         rubygems \
+        xsel \
     && gem install --no-document fpm
 
 
