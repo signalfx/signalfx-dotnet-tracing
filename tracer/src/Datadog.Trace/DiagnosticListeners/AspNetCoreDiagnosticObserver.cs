@@ -17,7 +17,6 @@ using Datadog.Trace.DuckTyping;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Headers;
 using Datadog.Trace.Logging;
-using Datadog.Trace.Propagation;
 using Datadog.Trace.PlatformHelpers;
 using Datadog.Trace.Propagation;
 using Datadog.Trace.Tagging;
@@ -27,6 +26,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Template;
+using static Datadog.Trace.PlatformHelpers.AspNetCoreHttpRequestHandler;
 
 namespace Datadog.Trace.DiagnosticListeners
 {
