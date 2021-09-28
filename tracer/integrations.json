@@ -47,7 +47,7 @@
           "maximum_patch": 65535
         },
         "wrapper": {
-          "assembly": "Datadog.Trace, Version=1.28.6.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb",
+          "assembly": "OpenTelemetry.AutoInstrumentation, Version=0.0.1.0, Culture=neutral, PublicKeyToken=34b8972644a12429",
           "type": "Datadog.Trace.ClrProfiler.Integrations.AspNet.AspNetThreadContextIntegration",
           "method": "AssociateWithCurrentThread",
           "signature": "00 05 01 1C 02 08 08 0A",
@@ -73,7 +73,7 @@
           "maximum_patch": 65535
         },
         "wrapper": {
-          "assembly": "Datadog.Trace, Version=1.28.6.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb",
+          "assembly": "OpenTelemetry.AutoInstrumentation, Version=0.0.1.0, Culture=neutral, PublicKeyToken=34b8972644a12429",
           "type": "Datadog.Trace.ClrProfiler.Integrations.AspNet.AspNetThreadContextIntegration",
           "method": "DisassociateFromCurrentThread",
           "signature": "00 04 01 1C 08 08 0A",
