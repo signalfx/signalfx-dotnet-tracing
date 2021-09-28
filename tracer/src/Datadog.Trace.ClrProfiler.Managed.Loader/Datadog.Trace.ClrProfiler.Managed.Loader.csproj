@@ -7,7 +7,11 @@
     <AssemblyName>OpenTelemetry.AutoInstrumentation.ClrProfiler.Managed.Loader</AssemblyName>
 
     <!-- NuGet -->
+<<<<<<< HEAD
     <Version>0.0.1</Version>
+=======
+    <Version>1.28.8</Version>
+>>>>>>> ed0e465a7 ([Version Bump] 1.28.8 (#1827))
 
     <!-- Hide warnings for EOL .NET Core targets (e.g. netcoreapp2.0) -->
     <CheckEolTargetFramework>false</CheckEolTargetFramework>

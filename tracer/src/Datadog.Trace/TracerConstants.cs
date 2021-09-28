@@ -14,6 +14,10 @@ namespace Datadog.Trace
         /// </summary>
         public const ulong MaxTraceId = 9_223_372_036_854_775_807;
 
+<<<<<<< HEAD
         public static readonly string AssemblyVersion = "0.0.1.0";
+=======
+        public static readonly string AssemblyVersion = "1.28.8.0";
+>>>>>>> ed0e465a7 ([Version Bump] 1.28.8 (#1827))
     }
 }

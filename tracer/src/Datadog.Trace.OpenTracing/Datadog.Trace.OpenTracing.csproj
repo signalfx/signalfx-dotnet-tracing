@@ -2,10 +2,16 @@
 
   <PropertyGroup>
     <!-- NuGet -->
+<<<<<<< HEAD
     <Version>0.0.1</Version>
     <Title>OpenTelemetry Instrumentation - OpenTracing</Title>
     <Description>Provides OpenTracing support for OpenTelemetry AutoInstrumentation</Description>
 	  <AssemblyName>OpenTelemetry.AutoInstrumentation.OpenTracing</AssemblyName>
+=======
+    <Version>1.28.8</Version>
+    <Title>Datadog APM - OpenTracing</Title>
+    <Description>Provides OpenTracing support for Datadog APM</Description>
+>>>>>>> ed0e465a7 ([Version Bump] 1.28.8 (#1827))
     <PackageTags>$(PackageTags);OpenTracing</PackageTags>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>

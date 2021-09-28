@@ -51,7 +51,11 @@ partial class Build : NukeBuild
     readonly bool IsAlpine = false;
 
     [Parameter("The build version. Default is latest")]
+<<<<<<< HEAD
     readonly string Version = "0.0.1";
+=======
+    readonly string Version = "1.28.8";
+>>>>>>> ed0e465a7 ([Version Bump] 1.28.8 (#1827))
 
     [Parameter("Whether the build version is a prerelease(for packaging purposes). Default is latest")]
     readonly bool IsPrerelease = false;

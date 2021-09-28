@@ -86,7 +86,11 @@ const WSTRING microsoft_aspnetcore_hosting_assemblyName = WStr("Microsoft.AspNet
 const WSTRING dapper_assemblyName = WStr("Dapper");
 
 const WSTRING managed_profiler_full_assembly_version =
+<<<<<<< HEAD
     WStr("OpenTelemetry.AutoInstrumentation, Version=0.0.1.0, Culture=neutral, PublicKeyToken=34b8972644a12429");
+=======
+    WStr("Datadog.Trace, Version=1.28.8.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb");
+>>>>>>> ed0e465a7 ([Version Bump] 1.28.8 (#1827))
 
 const WSTRING managed_profiler_name = WStr("OpenTelemetry.AutoInstrumentation");
 
