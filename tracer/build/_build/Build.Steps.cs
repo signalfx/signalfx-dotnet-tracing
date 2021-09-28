@@ -1130,8 +1130,7 @@ partial class Build
                     // .SetTargetPlatform(Platform)
                     .SetNoWarnDotNetCore3()
                     .When(TestAllPackageVersions, o => o
-                        .SetProperty("TestAllPackageVersions", "true"))
-                    .AddProcessEnvironmentVariable("TestAllPackageVersions", "true")
+                        .SetProcessEnvironmentVariable("TestAllPackageVersions", "true"))
                     .When(!string.IsNullOrEmpty(NugetPackageDirectory), o =>
                         o.SetPackageDirectory(NugetPackageDirectory))
                     .CombineWith(integrationTestProjects, (c, project) => c
