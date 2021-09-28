@@ -109,8 +109,8 @@ stages:
       matrix:
         debian:
           baseImage: debian
-        alpine:
-          baseImage: alpine
+        # alpine:
+        #   baseImage: alpine
     pool:
       vmImage: ubuntu-18.04
 
@@ -215,8 +215,8 @@ stages:
       matrix:
         debian:
           baseImage: debian
-        alpine:
-          baseImage: alpine
+        # alpine:
+        #   baseImage: alpine
     pool:
       vmImage: ubuntu-18.04
 
@@ -385,12 +385,12 @@ stages:
         debian_net5_0:
           publishTargetFramework: net5.0
           baseImage: debian
-        alpine_netcoreapp3_1:
-          publishTargetFramework: netcoreapp3.1
-          baseImage: alpine
-        alpine_net5_0:
-          publishTargetFramework: net5.0
-          baseImage: alpine
+        # alpine_netcoreapp3_1:
+        #   publishTargetFramework: netcoreapp3.1
+        #   baseImage: alpine
+        # alpine_net5_0:
+        #   publishTargetFramework: net5.0
+        #   baseImage: alpine
 
     variables:
       TestAllPackageVersions: false
