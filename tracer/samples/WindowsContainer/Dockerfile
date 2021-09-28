@@ -7,7 +7,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:5.0-windowsservercore-ltsc2019 AS base
 WORKDIR /app
 
 ARG TRACER_VERSION=0.0.1
-ENV OTEL_TRACER_VERSION=$TRACER_VERSION
+ENV SIGNALFX_TRACER_VERSION=$TRACER_VERSION
 ENV ASPNETCORE_URLS=http://*.80
 
 ENV COR_ENABLE_PROFILING="1"
@@ -16,15 +16,15 @@ ENV COR_PROFILER="{918728DD-259F-4A6A-AC2B-B85E1B658318}"
 ENV CORECLR_ENABLE_PROFILING="1"
 ENV CORECLR_PROFILER=$COR_PROFILER
 
-# We recommend always using the latest release and regularly updating: https://github.com/DataDog/dd-trace-dotnet/releases/latest
+# We recommend always using the latest release and regularly updating: https://github.com/signalfx/signalfx-dotnet-tracing/releases/latest
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
-RUN Write-Host "Downloading Datadog .NET Tracer v$env:OTEL_TRACER_VERSION" ;\
-    (New-Object System.Net.WebClient).DownloadFile('https://github.com/DataDog/dd-trace-dotnet/releases/download/v' + $env:OTEL_TRACER_VERSION + '/datadog-dotnet-apm-' + $env:OTEL_TRACER_VERSION + '-x64.msi', 'datadog-apm.msi') ;\
-    Write-Host 'Installing Datadog .NET Tracer' ;\
-    Start-Process -Wait msiexec -ArgumentList '/i datadog-apm.msi /quiet /qn /norestart /log datadog-apm-msi-installer.log' ; \
-    Write-Host 'Datadog .NET Tracer installed, removing installer file' ; \
-	Remove-Item 'datadog-apm.msi' ;
+RUN Write-Host "Downloading SignalFx .NET Tracer v$env:SIGNALFX_TRACER_VERSION" ;\
+    (New-Object System.Net.WebClient).DownloadFile('https://github.com/signalfx/signalfx-dotnet-tracing/releases/download/v' + $env:SIGNALFX_TRACER_VERSION + '/signalfx-dotnet-tracing-' + $env:SIGNALFX_TRACER_VERSION + '-x64.msi', 'signalfx-dotnet-tracing.msi') ;\
+    Write-Host 'Installing SignalFX .NET Tracer' ;\
+    Start-Process -Wait msiexec -ArgumentList '/i signalfx-dotnet-tracing.msi /quiet /qn /norestart /log signalfx-dotnet-tracing-msi-installer.log' ; \
+    Write-Host 'SignalFx .NET Tracer installed, removing installer file' ; \
+	Remove-Item 'signalfx-dotnet-tracing.msi' ;
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0-windowsservercore-ltsc2019 AS build
 WORKDIR /src

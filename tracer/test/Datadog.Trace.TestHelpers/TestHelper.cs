@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -337,12 +339,12 @@ namespace Datadog.Trace.TestHelpers
 
         protected void SetServiceVersion(string serviceVersion)
         {
-            SetEnvironmentVariable("OTEL_VERSION", serviceVersion);
+            SetEnvironmentVariable("SIGNALFX_VERSION", serviceVersion);
         }
 
         protected void SetCallTargetSettings(bool enableCallTarget)
         {
-            SetEnvironmentVariable("OTEL_TRACE_CALLTARGET_ENABLED", enableCallTarget ? "true" : "false");
+            SetEnvironmentVariable("SIGNALFX_TRACE_CALLTARGET_ENABLED", enableCallTarget ? "true" : "false");
         }
 
         protected void SetSecurity(bool security)

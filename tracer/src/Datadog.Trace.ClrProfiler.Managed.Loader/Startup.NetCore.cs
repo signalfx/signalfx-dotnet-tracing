@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #if NETCOREAPP
 using System;
 using System.IO;
@@ -29,7 +31,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
                 tracerFrameworkDirectory = "netcoreapp3.1";
             }
 
-            var tracerHomeDirectory = ReadEnvironmentVariable("OTEL_DOTNET_TRACER_HOME") ?? string.Empty;
+            var tracerHomeDirectory = ReadEnvironmentVariable("SIGNALFX_DOTNET_TRACER_HOME") ?? string.Empty;
             return Path.Combine(tracerHomeDirectory, tracerFrameworkDirectory);
         }
 

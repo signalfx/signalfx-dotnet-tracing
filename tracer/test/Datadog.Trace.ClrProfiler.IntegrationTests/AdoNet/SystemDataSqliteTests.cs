@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #if !NET452
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +39,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             const string expectedServiceName = "Samples.SQLite.Core-" + dbType;
 
             // NOTE: opt into the additional instrumentation of calls into netstandard.dll
-            SetEnvironmentVariable("OTEL_TRACE_NETSTANDARD_ENABLED", "true");
+            SetEnvironmentVariable("SIGNALFX_TRACE_NETSTANDARD_ENABLED", "true");
 
             int agentPort = TcpPortProvider.GetOpenPort();
 

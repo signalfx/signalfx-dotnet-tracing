@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #if NET452
 using System.Linq;
 using Datadog.Trace.ClrProfiler.IntegrationTests.Helpers;
@@ -18,7 +20,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             : base("WebRequest.NetFramework20", output)
         {
             SetServiceVersion("1.0.0");
-            SetEnvironmentVariable("OTEL_PROPAGATORS", "datadog,b3");
+            SetEnvironmentVariable("SIGNALFX_PROPAGATORS", "datadog,b3");
         }
 
         [Theory]

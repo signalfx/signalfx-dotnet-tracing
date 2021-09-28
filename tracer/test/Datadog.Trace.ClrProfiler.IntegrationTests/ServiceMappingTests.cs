@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using Datadog.Trace.TestHelpers;
 using Xunit;
 using Xunit.Abstractions;
@@ -15,8 +17,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         public ServiceMappingTests(ITestOutputHelper output)
             : base("WebRequest", output)
         {
-            SetEnvironmentVariable("OTEL_TRACE_SERVICE_MAPPING", "some-trace:not-used,http-client:my-custom-client");
-            SetEnvironmentVariable("OTEL_PROPAGATORS", "datadog,b3");
+            SetEnvironmentVariable("SIGNALFX_TRACE_SERVICE_MAPPING", "some-trace:not-used,http-client:my-custom-client");
+            SetEnvironmentVariable("SIGNALFX_PROPAGATORS", "datadog,b3");
             SetServiceVersion("1.0.0");
         }
 

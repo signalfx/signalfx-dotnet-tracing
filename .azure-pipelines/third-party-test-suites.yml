@@ -13,8 +13,8 @@ schedules:
 variables:
   buildConfiguration: Release
   dotnetCoreSdk5Version: 5.0.103
-  ddApiKey: $(DD_API_KEY)
-  DD_DOTNET_TRACER_MSBUILD:
+  ddApiKey: $(SIGNALFX_API_KEY)
+  SIGNALFX_DOTNET_TRACER_MSBUILD:
   NugetPackageDirectory: $(System.DefaultWorkingDirectory)/packages
   relativeNugetPackageDirectory: packages
   dotnetToolTag: build-dotnet-tool
@@ -28,8 +28,8 @@ resources:
     ports:
     - 8126:8126
     env:
-      DD_API_KEY: $(ddApiKey)
-      DD_INSIDE_CI: true
+      SIGNALFX_API_KEY: $(ddApiKey)
+      SIGNALFX_INSIDE_CI: true
 
 stages:
 - stage: run_tests

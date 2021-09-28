@@ -57,9 +57,9 @@ namespace shared {
         }
 
         return ToWSTRING(program_data +
-            R"(\Datadog .NET Tracer\logs\dotnet-tracer-native.log)");
+            R"(\SignalFx .NET Tracing\logs\dotnet-tracer-native.log)");
 #else
-        return WStr("/var/log/datadog/dotnet/dotnet-tracer-native.log");
+        return WStr("/var/log/signalfx/dotnet/dotnet-tracer-native.log");
 #endif
     }
 

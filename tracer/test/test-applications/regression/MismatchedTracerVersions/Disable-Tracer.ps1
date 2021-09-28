@@ -1,9 +1,9 @@
 $ErrorActionPreference = 'SilentlyContinue'
 
-Remove-Item 'env:OTEL_DOTNET_TRACER_HOME'
-Remove-Item 'env:OTEL_INTEGRATIONS'
-Remove-Item 'env:OTEL_TRACE_LOG_DIRECTORY'
-Remove-Item 'env:OTEL_PROFILER_EXCLUDE_PROCESSES'
+Remove-Item 'env:SIGNALFX_DOTNET_TRACER_HOME'
+Remove-Item 'env:SIGNALFX_INTEGRATIONS'
+Remove-Item 'env:SIGNALFX_TRACE_LOG_DIRECTORY'
+Remove-Item 'env:SIGNALFX_PROFILER_EXCLUDE_PROCESSES'
 
 Remove-Item 'env:CORECLR_ENABLE_PROFILING'
 Remove-Item 'env:CORECLR_PROFILER'

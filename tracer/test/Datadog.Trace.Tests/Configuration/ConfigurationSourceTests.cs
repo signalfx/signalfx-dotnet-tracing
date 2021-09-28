@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -78,7 +80,7 @@ namespace Datadog.Trace.Tests.Configuration
             yield return new object[] { ConfigurationKeys.ServiceVersion, "1.0.0", CreateFunc(s => s.ServiceVersion), "1.0.0" };
 
             yield return new object[] { ConfigurationKeys.ServiceName, "web-service", CreateFunc(s => s.ServiceName), "web-service" };
-            yield return new object[] { "OTEL_SERVICE_NAME", "web-service", CreateFunc(s => s.ServiceName), "web-service" };
+            yield return new object[] { "SIGNALFX_SERVICE_NAME", "web-service", CreateFunc(s => s.ServiceName), "web-service" };
 
             yield return new object[] { ConfigurationKeys.DisabledIntegrations, "integration1,integration2,,INTEGRATION2", CreateFunc(s => s.DisabledIntegrationNames.Count), 2 };
 
@@ -86,7 +88,7 @@ namespace Datadog.Trace.Tests.Configuration
 
             yield return new object[] { ConfigurationKeys.GlobalTags, "k1:v1, k2:v2", CreateFunc(s => s.GlobalTags), TagsK1V1K2V2 };
             yield return new object[] { ConfigurationKeys.GlobalTags, "keyonly:,nocolon,:,:valueonly,k2:v2", CreateFunc(s => s.GlobalTags), TagsK2V2 };
-            yield return new object[] { "OTEL_TRACE_GLOBAL_TAGS", "k1:v1, k2:v2", CreateFunc(s => s.GlobalTags), TagsK1V1K2V2 };
+            yield return new object[] { "SIGNALFX_TRACE_GLOBAL_TAGS", "k1:v1, k2:v2", CreateFunc(s => s.GlobalTags), TagsK1V1K2V2 };
             yield return new object[] { ConfigurationKeys.GlobalTags, "k1:v1,k1:v2", CreateFunc(s => s.GlobalTags.Count), 1 };
 
             yield return new object[] { ConfigurationKeys.GlobalAnalyticsEnabled, "true", CreateFunc(s => s.AnalyticsEnabled), true };
@@ -112,25 +114,25 @@ namespace Datadog.Trace.Tests.Configuration
         // JsonConfigurationSource needs to be tested with JSON data, which cannot be used with the other IConfigurationSource implementations.
         public static IEnumerable<object[]> GetJsonTestData()
         {
-            yield return new object[] { @"{ ""OTEL_TRACE_GLOBAL_TAGS"": { ""k1"":""v1"", ""k2"": ""v2""} }", CreateFunc(s => s.GlobalTags), TagsK1V1K2V2 };
+            yield return new object[] { @"{ ""SIGNALFX_TRACE_GLOBAL_TAGS"": { ""k1"":""v1"", ""k2"": ""v2""} }", CreateFunc(s => s.GlobalTags), TagsK1V1K2V2 };
         }
 
         public static IEnumerable<object[]> GetBadJsonTestData1()
         {
             // Extra opening brace
-            yield return new object[] { @"{ ""OTEL_TRACE_GLOBAL_TAGS"": { { ""name1"":""value1"", ""name2"": ""value2""} }" };
+            yield return new object[] { @"{ ""SIGNALFX_TRACE_GLOBAL_TAGS"": { { ""name1"":""value1"", ""name2"": ""value2""} }" };
         }
 
         public static IEnumerable<object[]> GetBadJsonTestData2()
         {
             // Missing closing brace
-            yield return new object[] { @"{ ""OTEL_TRACE_GLOBAL_TAGS"": { ""name1"":""value1"", ""name2"": ""value2"" }" };
+            yield return new object[] { @"{ ""SIGNALFX_TRACE_GLOBAL_TAGS"": { ""name1"":""value1"", ""name2"": ""value2"" }" };
         }
 
         public static IEnumerable<object[]> GetBadJsonTestData3()
         {
             // Json doesn't represent dictionary of string to string
-            yield return new object[] { @"{ ""OTEL_TRACE_GLOBAL_TAGS"": { ""name1"": { ""name2"": [ ""vers"" ] } } }", CreateFunc(s => s.GlobalTags.Count), 0 };
+            yield return new object[] { @"{ ""SIGNALFX_TRACE_GLOBAL_TAGS"": { ""name1"": { ""name2"": [ ""vers"" ] } } }", CreateFunc(s => s.GlobalTags.Count), 0 };
         }
 
         public static Func<TracerSettings, object> CreateFunc(Func<TracerSettings, object> settingGetter)
@@ -180,9 +182,9 @@ namespace Datadog.Trace.Tests.Configuration
 
             TracerSettings settings;
 
-            if (key == "OTEL_SERVICE_NAME")
+            if (key == "SIGNALFX_SERVICE_NAME")
             {
-                // We need to ensure OTEL_SERVICE is empty.
+                // We need to ensure SIGNALFX_SERVICE is empty.
                 string originalServiceName = Environment.GetEnvironmentVariable(ConfigurationKeys.ServiceName);
                 Environment.SetEnvironmentVariable(ConfigurationKeys.ServiceName, null, EnvironmentVariableTarget.Process);
 
@@ -190,7 +192,7 @@ namespace Datadog.Trace.Tests.Configuration
                 IConfigurationSource source = new EnvironmentConfigurationSource();
                 settings = new TracerSettings(source);
 
-                // after load settings we can restore the original OTEL_SERVICE
+                // after load settings we can restore the original SIGNALFX_SERVICE
                 Environment.SetEnvironmentVariable(ConfigurationKeys.ServiceName, originalServiceName, EnvironmentVariableTarget.Process);
             }
             else

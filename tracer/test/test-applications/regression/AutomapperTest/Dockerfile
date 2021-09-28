@@ -1,15 +1,15 @@
 FROM mcr.microsoft.com/dotnet/core/runtime:2.1-stretch-slim AS base
 ARG TRACER_VERSION=0.0.1
-RUN mkdir -p /opt/datadog
-RUN mkdir -p /var/log/opentelemetry/dotnet
-RUN curl -L https://github.com/DataDog/dd-trace-dotnet/releases/download/v$TRACER_VERSION/datadog-dotnet-apm-$TRACER_VERSION.tar.gz | tar xzf - -C /opt/datadog
+RUN mkdir -p /opt/signalfx
+RUN mkdir -p /var/log/signalfx/dotnet
+RUN curl -L https://github.com/signalfx/signalfx-dotnet-tracing/releases/download/v$TRACER_VERSION/signalfx-dotnet-tracing-$TRACER_VERSION.tar.gz | tar xzf - -C /opt/signalfx
 
 ENV CORECLR_ENABLE_PROFILING=1
 ENV CORECLR_PROFILER={918728DD-259F-4A6A-AC2B-B85E1B658318}
-ENV CORECLR_PROFILER_PATH=/opt/otel-dotnet-autoinstrumentation/OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.so
-ENV OTEL_DOTNET_TRACER_HOME=/opt/otel-dotnet-autoinstrumentation
-ENV OTEL_INTEGRATIONS=/opt/otel-dotnet-autoinstrumentation/integrations.json
-ENV OTEL_TRACE_ENABLED=true
+ENV CORECLR_PROFILER_PATH=/opt/signalfx/OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.so
+ENV SIGNALFX_DOTNET_TRACER_HOME=/opt/signalfx
+ENV SIGNALFX_INTEGRATIONS=/opt/signalfx/integrations.json
+ENV SIGNALFX_TRACE_ENABLED=true
 
 FROM mcr.microsoft.com/dotnet/core/sdk:2.1-stretch AS build
 WORKDIR "/src"

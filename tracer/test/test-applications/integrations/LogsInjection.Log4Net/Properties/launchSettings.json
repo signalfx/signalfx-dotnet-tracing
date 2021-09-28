@@ -3,7 +3,7 @@
     "LogsInjection.Log4Net": {
       "commandName": "Project",
       "environmentVariables": {
-        "OTEL_LOGS_INJECTION": "true"
+        "SIGNALFX_LOGS_INJECTION": "true"
       }
     }
   }

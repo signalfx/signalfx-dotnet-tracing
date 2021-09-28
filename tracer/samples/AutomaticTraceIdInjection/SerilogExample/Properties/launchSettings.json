@@ -3,10 +3,10 @@
     "SerilogExample": {
       "commandName": "Project",
       "environmentVariables": {
-        "OTEL_LOGS_INJECTION": "true",
-        "OTEL_ENV": "dev",
-        "OTEL_SERVICE": "SerilogExample",
-        "OTEL_VERSION": "1.0.0"
+        "SIGNALFX_LOGS_INJECTION": "true",
+        "SIGNALFX_ENV": "dev",
+        "SIGNALFX_SERVICE": "SerilogExample",
+        "SIGNALFX_VERSION": "1.0.0"
       }
     }
   }

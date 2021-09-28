@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
@@ -107,7 +109,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         public void DoesNotCrashInBadConfiguration(string targetFramework)
         {
             // Set bad configuration
-            SetEnvironmentVariable("OTEL_DOTNET_TRACER_HOME", Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+            SetEnvironmentVariable("SIGNALFX_DOTNET_TRACER_HOME", Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
 
             int agentPort = TcpPortProvider.GetOpenPort();
             int httpPort = TcpPortProvider.GetOpenPort();

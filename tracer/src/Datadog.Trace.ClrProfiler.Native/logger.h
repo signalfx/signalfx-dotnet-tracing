@@ -16,13 +16,13 @@ struct TracerLoggerPolicy
 #ifdef _WIN32
     // this field will be removed once merged with the profiler in order to have
     // the same product folder name
-    inline static const WSTRING folder_path = WStr(R"(OpenTelemetry .NET AutoInstrumentation\logs)");
+    inline static const WSTRING folder_path = WStr(R"(SignalFx .NET Tracing\logs)");
 #endif
     inline static const std::string pattern = "%D %I:%M:%S.%e %p [%P|%t] [%l] %v";
     struct logging_environment
     {
         // cannot reuse environment::log_path variable. On alpine, test fails
-        inline static const WSTRING log_path = WStr("OTEL_TRACE_LOG_PATH");
+        inline static const WSTRING log_path = WStr("SIGNALFX_TRACE_LOG_PATH");
     };
 };
 

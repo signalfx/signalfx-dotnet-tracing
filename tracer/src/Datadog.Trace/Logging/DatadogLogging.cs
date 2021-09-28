@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -186,16 +188,16 @@ namespace Datadog.Trace.Logging
             if (logDirectory == null)
             {
 #if NETFRAMEWORK
-                logDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"OpenTelemetry .NET AutoInstrumentation", "logs");
+                logDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"SignalFx .NET Tracing", "logs");
 #else
                 if (RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
                 {
-                    logDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"OpenTelemetry .NET AutoInstrumentation", "logs");
+                    logDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"SignalFx .NET Tracing", "logs");
                 }
                 else
                 {
                     // Linux
-                    logDirectory = "/var/log/opentelemetry/dotnet";
+                    logDirectory = "/var/log/signalfx/dotnet";
                 }
 #endif
             }

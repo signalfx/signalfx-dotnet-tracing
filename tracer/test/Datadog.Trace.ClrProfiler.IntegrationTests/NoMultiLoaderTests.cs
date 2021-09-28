@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -26,7 +28,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         public void SingleLoaderTest()
         {
             string tmpFile = Path.GetTempFileName();
-            SetEnvironmentVariable("OTEL_TRACE_LOG_PATH", tmpFile);
+            SetEnvironmentVariable("SIGNALFX_TRACE_LOG_PATH", tmpFile);
             using ProcessResult processResult = RunSampleAndWaitForExit(9696);
             string[] logFileContent = File.ReadAllLines(tmpFile);
             int numOfLoadersLoad = logFileContent.Count(line => line.Contains("OpenTelemetry.AutoInstrumentation.ClrProfiler.Managed.Loader loaded"));

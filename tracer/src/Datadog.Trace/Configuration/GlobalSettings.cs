@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.IO;
 using Datadog.Trace.Logging;
@@ -147,7 +149,7 @@ namespace Datadog.Trace.Configuration
         {
             // if environment variable is not set, look for default file name in the current directory
             var configurationFileName = configurationSource.GetString(ConfigurationKeys.ConfigurationFileName) ??
-                                        configurationSource.GetString("OTEL_DOTNET_TRACER_CONFIG_FILE");
+                                        configurationSource.GetString("SIGNALFX_DOTNET_TRACER_CONFIG_FILE");
 
             return TryLoadJsonConfigurationFile(configurationFileName, out jsonConfigurationSource);
         }

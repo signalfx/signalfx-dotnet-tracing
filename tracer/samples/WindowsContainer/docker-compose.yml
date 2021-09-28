@@ -7,14 +7,14 @@ services:
     depends_on:
       - datadog-agent
     environment:
-      OTEL_ENV: "apm-docker-samples"
-      OTEL_AGENT_HOST: "datadog-agent"
-      OTEL_TRACE_DEBUG: "true"
+      SIGNALFX_ENV: "apm-docker-samples"
+      SIGNALFX_AGENT_HOST: "datadog-agent"
+      SIGNALFX_TRACE_DEBUG: "true"
       ASPNETCORE_ENVIRONMENT: Production
 
   datadog-agent:
     image: "gcr.io/datadoghq/agent:7"
     environment:
-      OTEL_API_KEY: ${OTEL_API_KEY}
-      OTEL_APM_ENABLED: "true"
-      OTEL_APM_NON_LOCAL_TRAFFIC: "true"
+      SIGNALFX_API_KEY: ${SIGNALFX_API_KEY}
+      SIGNALFX_APM_ENABLED: "true"
+      SIGNALFX_APM_NON_LOCAL_TRAFFIC: "true"

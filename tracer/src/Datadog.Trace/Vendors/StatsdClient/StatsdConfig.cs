@@ -22,37 +22,37 @@ namespace Datadog.Trace.Vendors.StatsdClient
         /// <summary>
         /// The name of the environment variable defining the global tags to be applied to every metric, event, and service check.
         /// </summary>
-        public const string EntityIdEnvVar = "OTEL_ENTITY_ID";
+        public const string EntityIdEnvVar = "SIGNALFX_ENTITY_ID";
 
         /// <summary>
         /// The name of the environment variable defining the port of the targeted StatsD server.
         /// </summary>
-        public const string DogStatsdPortEnvVar = "OTEL_DOGSTATSD_PORT";
+        public const string DogStatsdPortEnvVar = "SIGNALFX_DOGSTATSD_PORT";
 
         /// <summary>
         /// The name of the environment variable defining the host name of the targeted StatsD server.
         /// </summary>
-        public const string AgentHostEnvVar = "OTEL_AGENT_HOST";
+        public const string AgentHostEnvVar = "SIGNALFX_AGENT_HOST";
 
         /// <summary>
         /// The name of the environment variable defining the name of the pipe. INTERNAL USAGE ONLY.
         /// </summary>
-        public const string AgentPipeNameEnvVar = "OTEL_DOGSTATSD_PIPE_NAME";
+        public const string AgentPipeNameEnvVar = "SIGNALFX_DOGSTATSD_PIPE_NAME";
 
         /// <summary>
         /// The name of the environment variable defining the service name
         /// </summary>
-        public const string ServiceEnvVar = "OTEL_SERVICE";
+        public const string ServiceEnvVar = "SIGNALFX_SERVICE";
 
         /// <summary>
         /// The name of the environment variable defining the environment name
         /// </summary>
-        public const string EnvironmentEnvVar = "OTEL_ENV";
+        public const string EnvironmentEnvVar = "SIGNALFX_ENV";
 
         /// <summary>
         /// The name of the environment variable defining the version of the service
         /// </summary>
-        public const string VersionEnvVar = "OTEL_VERSION";
+        public const string VersionEnvVar = "SIGNALFX_VERSION";
 
         internal const string ServiceTagKey = "service";
 

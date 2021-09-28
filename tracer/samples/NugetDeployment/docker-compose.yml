@@ -8,10 +8,10 @@ services:
     ports:
       - "8126"
     environment:
-      DD_API_KEY: "${DD_API_KEY:?Set DD_API_KEY in your shell to send traces to Datadog}"
-      DD_APM_ENABLED: "true"
-      DD_APM_NON_LOCAL_TRAFFIC: "true"
-      DD_ENV: "${DD_ENV}"
+      SIGNALFX_API_KEY: "${SIGNALFX_API_KEY:?Set SIGNALFX_API_KEY in your shell to send traces to Datadog}"
+      SIGNALFX_APM_ENABLED: "true"
+      SIGNALFX_APM_NON_LOCAL_TRAFFIC: "true"
+      SIGNALFX_ENV: "${SIGNALFX_ENV}"
 
   #
   # Application containers
@@ -24,8 +24,8 @@ services:
     depends_on:
       - datadog-agent
     environment:
-      DD_AGENT_HOST: "datadog-agent"
-      DD_TRACE_AGENT_PORT: "8126"
+      SIGNALFX_AGENT_HOST: "datadog-agent"
+      SIGNALFX_TRACE_AGENT_PORT: "8126"
       ASPNETCORE_URLS: "80"
 
   linux:
@@ -37,8 +37,8 @@ services:
     depends_on:
       - datadog-agent
     environment:
-      DD_AGENT_HOST: "datadog-agent"
-      DD_TRACE_AGENT_PORT: "8126"
+      SIGNALFX_AGENT_HOST: "datadog-agent"
+      SIGNALFX_TRACE_AGENT_PORT: "8126"
       ASPNETCORE_URLS: "80"
 
   # This service will only enable automatic instrumentation on ARM64 hardware.
@@ -52,8 +52,8 @@ services:
     depends_on:
       - datadog-agent
     environment:
-      DD_AGENT_HOST: "datadog-agent"
-      DD_TRACE_AGENT_PORT: "8126"
+      SIGNALFX_AGENT_HOST: "datadog-agent"
+      SIGNALFX_TRACE_AGENT_PORT: "8126"
       ASPNETCORE_URLS: "80"
 
   windows-netcore-x64:
@@ -65,8 +65,8 @@ services:
     depends_on:
       - datadog-agent
     environment:
-      DD_AGENT_HOST: "datadog-agent"
-      DD_TRACE_AGENT_PORT: "8126"
+      SIGNALFX_AGENT_HOST: "datadog-agent"
+      SIGNALFX_TRACE_AGENT_PORT: "8126"
       ASPNETCORE_URLS: "80"
 
   windows-netcore-x86:
@@ -78,8 +78,8 @@ services:
     depends_on:
       - datadog-agent
     environment:
-      DD_AGENT_HOST: "datadog-agent"
-      DD_TRACE_AGENT_PORT: "8126"
+      SIGNALFX_AGENT_HOST: "datadog-agent"
+      SIGNALFX_TRACE_AGENT_PORT: "8126"
       ASPNETCORE_URLS: "80"
 
   windows-netframework-x64:
@@ -91,8 +91,8 @@ services:
     depends_on:
       - datadog-agent
     environment:
-      DD_AGENT_HOST: "datadog-agent"
-      DD_TRACE_AGENT_PORT: "8126"
+      SIGNALFX_AGENT_HOST: "datadog-agent"
+      SIGNALFX_TRACE_AGENT_PORT: "8126"
       ASPNETCORE_URLS: "80"
 
   windows-netframework-x86:
@@ -104,7 +104,7 @@ services:
     depends_on:
       - datadog-agent
     environment:
-      DD_AGENT_HOST: "datadog-agent"
-      DD_TRACE_AGENT_PORT: "8126"
+      SIGNALFX_AGENT_HOST: "datadog-agent"
+      SIGNALFX_TRACE_AGENT_PORT: "8126"
       ASPNETCORE_URLS: "80"
 

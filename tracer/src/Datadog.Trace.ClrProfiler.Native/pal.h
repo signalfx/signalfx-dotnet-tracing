@@ -62,7 +62,7 @@ inline WSTRING GetDatadogLogFilePath(const std::string& file_name_suffix)
     // on Windows WSTRING == wstring
     return (program_data_path / TLoggerPolicy::folder_path  / file_name).wstring();
 #else
-    return ToWSTRING("/var/log/opentelemetry/dotnet/" + file_name);
+    return ToWSTRING("/var/log/signalfx/dotnet/" + file_name);
 #endif
 }
 

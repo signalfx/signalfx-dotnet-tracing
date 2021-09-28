@@ -37,7 +37,7 @@ namespace Datadog.Logging.Composition
     /// </summary>
     internal static class LogComposer
     {
-        private const string IsDebugLoggingEnabledEnvVarName = "OTEL_TRACE_DEBUG";
+        private const string IsDebugLoggingEnabledEnvVarName = "SIGNALFX_TRACE_DEBUG";
 
         private static bool s_isDebugLoggingEnabled = true;
 

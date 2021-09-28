@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 
 namespace Datadog.Trace.Configuration
@@ -27,13 +29,13 @@ namespace Datadog.Trace.Configuration
             }
 
             Enabled = source.GetBool(string.Format(ConfigurationKeys.Integrations.Enabled, integrationName)) ??
-                      source.GetBool(string.Format("OTEL_{0}_ENABLED", integrationName));
+                      source.GetBool(string.Format("SIGNALFX_{0}_ENABLED", integrationName));
 
             AnalyticsEnabled = source.GetBool(string.Format(ConfigurationKeys.Integrations.AnalyticsEnabled, integrationName)) ??
-                               source.GetBool(string.Format("OTEL_{0}_ANALYTICS_ENABLED", integrationName));
+                               source.GetBool(string.Format("SIGNALFX_{0}_ANALYTICS_ENABLED", integrationName));
 
             AnalyticsSampleRate = source.GetDouble(string.Format(ConfigurationKeys.Integrations.AnalyticsSampleRate, integrationName)) ??
-                                  source.GetDouble(string.Format("OTEL_{0}_ANALYTICS_SAMPLE_RATE", integrationName)) ??
+                                  source.GetDouble(string.Format("SIGNALFX_{0}_ANALYTICS_SAMPLE_RATE", integrationName)) ??
                                   // default value
                                   1.0;
         }

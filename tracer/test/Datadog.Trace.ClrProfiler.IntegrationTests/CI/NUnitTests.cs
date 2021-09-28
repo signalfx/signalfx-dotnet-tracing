@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -61,8 +63,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.CI
             try
             {
                 SetCallTargetSettings(enableCallTarget);
-                SetEnvironmentVariable("OTEL_TRACE_DEBUG", "1");
-                SetEnvironmentVariable("OTEL_DUMP_ILREWRITE_ENABLED", "1");
+                SetEnvironmentVariable("SIGNALFX_TRACE_DEBUG", "1");
+                SetEnvironmentVariable("SIGNALFX_DUMP_ILREWRITE_ENABLED", "1");
 
                 int agentPort = TcpPortProvider.GetOpenPort();
 

@@ -3,10 +3,10 @@
     "Log4NetExample": {
       "commandName": "Project",
       "environmentVariables": {
-        "OTEL_LOGS_INJECTION": "true",
-        "OTEL_ENV": "dev",
-        "OTEL_SERVICE": "Log4NetExample",
-        "OTEL_VERSION": "1.0.0"
+        "SIGNALFX_LOGS_INJECTION": "true",
+        "SIGNALFX_ENV": "dev",
+        "SIGNALFX_SERVICE": "Log4NetExample",
+        "SIGNALFX_VERSION": "1.0.0"
       }
     }
   }

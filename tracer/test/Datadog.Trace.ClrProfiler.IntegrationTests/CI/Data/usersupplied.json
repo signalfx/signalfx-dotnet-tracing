@@ -1,16 +1,16 @@
 ﻿[
   [
     {
-      "OTEL_GIT_BRANCH": "feature",
-      "OTEL_GIT_REPOSITORY_URL": "usersupplied-repo",
-      "OTEL_GIT_COMMIT_SHA": "usersupplied-commit",
-      "OTEL_GIT_COMMIT_MESSAGE": "usersupplied-message",
-      "OTEL_GIT_COMMIT_AUTHOR_NAME": "usersupplied-authorname",
-      "OTEL_GIT_COMMIT_AUTHOR_EMAIL": "usersupplied-authoremail",
-      "OTEL_GIT_COMMIT_AUTHOR_DATE": "usersupplied-authordate",
-      "OTEL_GIT_COMMIT_COMMITTER_NAME": "usersupplied-comittername",
-      "OTEL_GIT_COMMIT_COMMITTER_EMAIL": "usersupplied-comitteremail",
-      "OTEL_GIT_COMMIT_COMMITTER_DATE": "usersupplied-comitterdate"
+      "SIGNALFX_GIT_BRANCH": "feature",
+      "SIGNALFX_GIT_REPOSITORY_URL": "usersupplied-repo",
+      "SIGNALFX_GIT_COMMIT_SHA": "usersupplied-commit",
+      "SIGNALFX_GIT_COMMIT_MESSAGE": "usersupplied-message",
+      "SIGNALFX_GIT_COMMIT_AUTHOR_NAME": "usersupplied-authorname",
+      "SIGNALFX_GIT_COMMIT_AUTHOR_EMAIL": "usersupplied-authoremail",
+      "SIGNALFX_GIT_COMMIT_AUTHOR_DATE": "usersupplied-authordate",
+      "SIGNALFX_GIT_COMMIT_COMMITTER_NAME": "usersupplied-comittername",
+      "SIGNALFX_GIT_COMMIT_COMMITTER_EMAIL": "usersupplied-comitteremail",
+      "SIGNALFX_GIT_COMMIT_COMMITTER_DATE": "usersupplied-comitterdate"
     },
     {
       "git.branch": "feature",
@@ -27,16 +27,16 @@
   ],
   [
     {
-      "OTEL_GIT_TAG": "0.1.0",
-      "OTEL_GIT_REPOSITORY_URL": "usersupplied-repo",
-      "OTEL_GIT_COMMIT_SHA": "usersupplied-commit",
-      "OTEL_GIT_COMMIT_MESSAGE": "usersupplied-message",
-      "OTEL_GIT_COMMIT_AUTHOR_NAME": "usersupplied-authorname",
-      "OTEL_GIT_COMMIT_AUTHOR_EMAIL": "usersupplied-authoremail",
-      "OTEL_GIT_COMMIT_AUTHOR_DATE": "usersupplied-authordate",
-      "OTEL_GIT_COMMIT_COMMITTER_NAME": "usersupplied-comittername",
-      "OTEL_GIT_COMMIT_COMMITTER_EMAIL": "usersupplied-comitteremail",
-      "OTEL_GIT_COMMIT_COMMITTER_DATE": "usersupplied-comitterdate"
+      "SIGNALFX_GIT_TAG": "0.1.0",
+      "SIGNALFX_GIT_REPOSITORY_URL": "usersupplied-repo",
+      "SIGNALFX_GIT_COMMIT_SHA": "usersupplied-commit",
+      "SIGNALFX_GIT_COMMIT_MESSAGE": "usersupplied-message",
+      "SIGNALFX_GIT_COMMIT_AUTHOR_NAME": "usersupplied-authorname",
+      "SIGNALFX_GIT_COMMIT_AUTHOR_EMAIL": "usersupplied-authoremail",
+      "SIGNALFX_GIT_COMMIT_AUTHOR_DATE": "usersupplied-authordate",
+      "SIGNALFX_GIT_COMMIT_COMMITTER_NAME": "usersupplied-comittername",
+      "SIGNALFX_GIT_COMMIT_COMMITTER_EMAIL": "usersupplied-comitteremail",
+      "SIGNALFX_GIT_COMMIT_COMMITTER_DATE": "usersupplied-comitterdate"
     },
     {
       "git.tag": "0.1.0",
@@ -60,15 +60,15 @@
       "GITHUB_RUN_NUMBER": "ghactions-pipeline-number",
       "GITHUB_REPOSITORY": "ghactions-repo",
       "GITHUB_SHA": "ghactions-commit",
-      "OTEL_GIT_REPOSITORY_URL": "usersupplied-repo",
-      "OTEL_GIT_COMMIT_SHA": "usersupplied-commit",
-      "OTEL_GIT_COMMIT_MESSAGE": "usersupplied-message",
-      "OTEL_GIT_COMMIT_AUTHOR_NAME": "usersupplied-authorname",
-      "OTEL_GIT_COMMIT_AUTHOR_EMAIL": "usersupplied-authoremail",
-      "OTEL_GIT_COMMIT_AUTHOR_DATE": "usersupplied-authordate",
-      "OTEL_GIT_COMMIT_COMMITTER_NAME": "usersupplied-comittername",
-      "OTEL_GIT_COMMIT_COMMITTER_EMAIL": "usersupplied-comitteremail",
-      "OTEL_GIT_COMMIT_COMMITTER_DATE": "usersupplied-comitterdate"
+      "SIGNALFX_GIT_REPOSITORY_URL": "usersupplied-repo",
+      "SIGNALFX_GIT_COMMIT_SHA": "usersupplied-commit",
+      "SIGNALFX_GIT_COMMIT_MESSAGE": "usersupplied-message",
+      "SIGNALFX_GIT_COMMIT_AUTHOR_NAME": "usersupplied-authorname",
+      "SIGNALFX_GIT_COMMIT_AUTHOR_EMAIL": "usersupplied-authoremail",
+      "SIGNALFX_GIT_COMMIT_AUTHOR_DATE": "usersupplied-authordate",
+      "SIGNALFX_GIT_COMMIT_COMMITTER_NAME": "usersupplied-comittername",
+      "SIGNALFX_GIT_COMMIT_COMMITTER_EMAIL": "usersupplied-comitteremail",
+      "SIGNALFX_GIT_COMMIT_COMMITTER_DATE": "usersupplied-comitterdate"
     },
     {
       "ci.workspace_path": "/foo/bar",

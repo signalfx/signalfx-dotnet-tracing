@@ -27,8 +27,8 @@ COPY --from=publish /app/publish .
 ENV CORECLR_ENABLE_PROFILING=1
 ENV CORECLR_PROFILER={918728DD-259F-4A6A-AC2B-B85E1B658318}
 ENV CORECLR_PROFILER_PATH=/app/datadog/linux-musl-x64/OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.so
-ENV OTEL_INTEGRATIONS=/app/datadog/integrations.json
-ENV OTEL_DOTNET_TRACER_HOME=/app/datadog
+ENV SIGNALFX_INTEGRATIONS=/app/datadog/integrations.json
+ENV SIGNALFX_DOTNET_TRACER_HOME=/app/datadog
 
 # Run the createLogPath script on Linux to ensure the automatic instrumentation logs are genereated without permission isues
 RUN sh /app/datadog/createLogPath.sh

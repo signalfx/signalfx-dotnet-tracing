@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.Configuration;
@@ -72,7 +74,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
 
             // NOTE: opt into the additional instrumentation of calls into netstandard.dll
             // see https://github.com/DataDog/dd-trace-dotnet/pull/753
-            SetEnvironmentVariable("OTEL_TRACE_NETSTANDARD_ENABLED", "true");
+            SetEnvironmentVariable("SIGNALFX_TRACE_NETSTANDARD_ENABLED", "true");
 
             int agentPort = TcpPortProvider.GetOpenPort();
 

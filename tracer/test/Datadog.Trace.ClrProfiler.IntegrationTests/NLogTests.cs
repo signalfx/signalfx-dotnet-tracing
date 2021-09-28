@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using Datadog.Trace.TestHelpers;
 using Xunit;
@@ -54,7 +56,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("Category", "LinuxUnsupported")]
         public void InjectsLogsWhenEnabled(string packageVersion)
         {
-            SetEnvironmentVariable("OTEL_LOGS_INJECTION", "true");
+            SetEnvironmentVariable("SIGNALFX_LOGS_INJECTION", "true");
 
             int agentPort = TcpPortProvider.GetOpenPort();
             using (var agent = new MockTracerAgent(agentPort))
@@ -83,7 +85,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("Category", "LinuxUnsupported")]
         public void DoesNotInjectLogsWhenDisabled(string packageVersion)
         {
-            SetEnvironmentVariable("OTEL_LOGS_INJECTION", "false");
+            SetEnvironmentVariable("SIGNALFX_LOGS_INJECTION", "false");
 
             int agentPort = TcpPortProvider.GetOpenPort();
             using (var agent = new MockTracerAgent(agentPort))

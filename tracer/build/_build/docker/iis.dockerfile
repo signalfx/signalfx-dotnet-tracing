@@ -18,8 +18,8 @@ RUN New-ItemProperty -Path "HKLM:\Software\WOW6432Node\Microsoft\.NETFramework" 
 
 # Install the .NET Tracer MSI
 ARG DOTNET_TRACER_MSI
-ADD $DOTNET_TRACER_MSI ./datadog-apm.msi
-RUN Start-Process -Wait msiexec -ArgumentList '/qn /i datadog-apm.msi'
+ADD $DOTNET_TRACER_MSI ./signalfx-dotnet-tracing.msi
+RUN Start-Process -Wait msiexec -ArgumentList '/qn /i signalfx-dotnet-tracing.msi'
 
 # Restart IIS
 RUN net stop /y was; \
