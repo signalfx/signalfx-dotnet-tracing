@@ -12,8 +12,8 @@ namespace Samples.AzureFunctions.AllTriggers
 		{
 			builder.Services.AddHttpClient();
 
-			var apiKey = Environment.GetEnvironmentVariable("DD_API_KEY");
-			var logsInjectionEnabled = Environment.GetEnvironmentVariable("DD_LOGS_INJECTION");
+			var apiKey = Environment.GetEnvironmentVariable("SIGNALFX_API_KEY");
+			var logsInjectionEnabled = Environment.GetEnvironmentVariable("SIGNALFX_LOGS_INJECTION");
 
 			if (!string.IsNullOrWhiteSpace(apiKey) && logsInjectionEnabled.Equals("1"))
 			{

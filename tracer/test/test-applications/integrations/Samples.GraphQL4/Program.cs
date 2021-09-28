@@ -30,7 +30,7 @@ namespace Samples.GraphQL4
 
             logger.LogInformation($"Instrumentation.ProfilerAttached = {IsProfilerAttached()}");
 
-            var prefixes = new[] { "COR_", "CORECLR_", "DD_", "DATADOG_" };
+            var prefixes = new[] { "COR_", "CORECLR_", "SIGNALFX_" };
             var envVars = from envVar in Environment.GetEnvironmentVariables().Cast<DictionaryEntry>()
                           from prefix in prefixes
                           let key = (envVar.Key as string)?.ToUpperInvariant()

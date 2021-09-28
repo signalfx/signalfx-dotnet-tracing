@@ -209,7 +209,7 @@ namespace Datadog.Trace.TestHelpers
             bool callTargetEnabled = false)
         {
             string profilerEnabled = _requiresProfiling ? "1" : "0";
-            environmentVariables["DD_DOTNET_TRACER_HOME"] = TracerHome;
+            environmentVariables["SIGNALFX_DOTNET_TRACER_HOME"] = TracerHome;
 
             if (IsCoreClr())
             {

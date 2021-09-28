@@ -67,7 +67,7 @@ namespace Datadog.Trace.Configuration
         /// Override the default rules file provided. Must be a path to a valid JSON rules file.
         /// Default is value is null (do not override).
         /// </summary>
-        public const string AppSecRules = "DD_APPSEC_RULES";
+        public const string AppSecRules = "SIGNALFX_APPSEC_RULES";
 
         /// <summary>
         /// Configuration key for enabling or disabling the Tracer's debug mode.

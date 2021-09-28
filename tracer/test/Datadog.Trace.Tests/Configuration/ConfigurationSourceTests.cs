@@ -195,13 +195,13 @@ namespace Datadog.Trace.Tests.Configuration
             }
             else if (key == ConfigurationKeys.AgentHost || key == ConfigurationKeys.AgentPort)
             {
-                // We need to ensure DD_TRACE_AGENT_URL is empty.
+                // We need to ensure SIGNALFX_TRACE_AGENT_URL is empty.
                 string originalAgentUri = Environment.GetEnvironmentVariable(ConfigurationKeys.AgentUri);
                 Environment.SetEnvironmentVariable(ConfigurationKeys.AgentUri, null, EnvironmentVariableTarget.Process);
 
                 settings = GetTracerSettings(key, value);
 
-                // after load settings we can restore the original DD_TRACE_AGENT_URL
+                // after load settings we can restore the original SIGNALFX_TRACE_AGENT_URL
                 Environment.SetEnvironmentVariable(ConfigurationKeys.AgentUri, originalAgentUri, EnvironmentVariableTarget.Process);
             }
             else

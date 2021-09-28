@@ -23,16 +23,16 @@ namespace shared {
 		//
 
 		// Enables or disables the module initializer rewriting
-		const WSTRING loader_rewrite_module_initializer_enabled = WStr("DD_LOADER_REWRITE_MODULE_INITIALIZER_ENABLED");
+		const WSTRING loader_rewrite_module_initializer_enabled = WStr("SIGNALFX_LOADER_REWRITE_MODULE_INITIALIZER_ENABLED");
 
 		// Enables or disables the module entrypoint rewriting
-		const WSTRING loader_rewrite_module_entrypoint_enabled = WStr("DD_LOADER_REWRITE_MODULE_ENTRYPOINT_ENABLED");
+		const WSTRING loader_rewrite_module_entrypoint_enabled = WStr("SIGNALFX_LOADER_REWRITE_MODULE_ENTRYPOINT_ENABLED");
 
 		// Enables or disables the mscorlib rewriting
-		const WSTRING loader_rewrite_mscorlib_enabled = WStr("DD_LOADER_REWRITE_MSCORLIB_ENABLED");
+		const WSTRING loader_rewrite_mscorlib_enabled = WStr("SIGNALFX_LOADER_REWRITE_MSCORLIB_ENABLED");
 
 		// Enables or disables NGEN images support
-		const WSTRING loader_ngen_enabled = WStr("DD_LOADER_NGEN_ENABLED");
+		const WSTRING loader_ngen_enabled = WStr("SIGNALFX_LOADER_NGEN_ENABLED");
 
 	}  // namespace environment
 }  // namespace shared
