@@ -16,6 +16,7 @@ RUN apk update \
         ruby \
         ruby-dev \
         ruby-etc \
+        xsel \
     && gem install --no-document fpm
 
 ENV IsAlpine=true
