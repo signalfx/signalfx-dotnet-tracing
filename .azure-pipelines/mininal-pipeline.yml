@@ -258,18 +258,18 @@ stages:
           platform: x64
           target: BuildAndRunWindowsIntegrationTests
           requiresCosmos: true
-        x86_interation:
-          platform: x86
-          target: BuildAndRunWindowsIntegrationTests
-          requiresCosmos: true
+        # x86_interation:
+        #   platform: x86
+        #   target: BuildAndRunWindowsIntegrationTests
+        #   requiresCosmos: true
         x64_regression:
           platform: x64
           target: BuildAndRunWindowsRegressionTests
           requiresCosmos: false
-        x86_regression:
-          platform: x86
-          target: BuildAndRunWindowsRegressionTests
-          requiresCosmos: false
+        # x86_regression:
+        #   platform: x86
+        #   target: BuildAndRunWindowsRegressionTests
+        #   requiresCosmos: false
 
     steps:
     - template: steps/install-dotnet-sdks.yml
@@ -312,9 +312,9 @@ stages:
         x64:
           platform: x64
           enable32bit: false
-        x86:
-          platform: x86
-          enable32bit: true
+        # x86:
+        #   platform: x86
+        #   enable32bit: true
     pool:
       vmImage: windows-2019
     variables:
