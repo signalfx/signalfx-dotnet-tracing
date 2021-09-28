@@ -117,7 +117,7 @@ namespace Datadog.Trace.Tests
         {
             const int partialFlushThreshold = 3;
 
-            Span CreateSpan() => new Span(new SpanContext(42, SpanIdGenerator.ThreadInstance.CreateNew()), DateTimeOffset.UtcNow);
+            Span CreateSpan() => new Span(new SpanContext(TraceId.CreateFromInt(42), SpanIdGenerator.ThreadInstance.CreateNew()), DateTimeOffset.UtcNow);
 
             var tracer = new Mock<IDatadogTracer>();
 
@@ -167,7 +167,7 @@ namespace Datadog.Trace.Tests
         {
             const int partialFlushThreshold = 2;
 
-            Span CreateSpan() => new Span(new SpanContext(42, SpanIdGenerator.ThreadInstance.CreateNew()), DateTimeOffset.UtcNow);
+            Span CreateSpan() => new Span(new SpanContext(TraceId.CreateFromInt(42), SpanIdGenerator.ThreadInstance.CreateNew()), DateTimeOffset.UtcNow);
 
             var tracer = new Mock<IDatadogTracer>();
 
