@@ -5,11 +5,7 @@ cmake_policy(SET CMP0015 NEW)
 # Project definition
 # ******************************************************
 
-<<<<<<< HEAD
 project("OpenTelemetry.AutoInstrumentation.ClrProfiler.Native" VERSION 0.0.1)
-=======
-project("Datadog.Trace.ClrProfiler.Native" VERSION 1.28.8)
->>>>>>> ed0e465a7 ([Version Bump] 1.28.8 (#1827))
 
 # ******************************************************
 # Environment detection

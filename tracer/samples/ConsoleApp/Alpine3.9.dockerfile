@@ -16,19 +16,11 @@ COPY --from=build /app/out .
 
 # Set up Datadog APM
 RUN apk --no-cache update && apk add curl
-<<<<<<< HEAD
 ARG TRACER_VERSION=0.0.1
 RUN mkdir -p /var/log/signalfx
 RUN mkdir -p /opt/signalfx
 RUN curl -L https://github.com/signalfx/signalfx-dotnet-tracing/releases/download/v${TRACER_VERSION}/signalfx-dotnet-tracing-${TRACER_VERSION}-musl.tar.gz \
   |  tar xzf - -C /opt/signalfx
-=======
-ARG TRACER_VERSION=1.28.8
-RUN mkdir -p /var/log/datadog
-RUN mkdir -p /opt/datadog
-RUN curl -L https://github.com/DataDog/dd-trace-dotnet/releases/download/v${TRACER_VERSION}/datadog-dotnet-apm-${TRACER_VERSION}-musl.tar.gz \
-  |  tar xzf - -C /opt/datadog
->>>>>>> ed0e465a7 ([Version Bump] 1.28.8 (#1827))
 
 ENV CORECLR_ENABLE_PROFILING=1
 ENV CORECLR_PROFILER={918728DD-259F-4A6A-AC2B-B85E1B658318}

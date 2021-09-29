@@ -6,13 +6,8 @@
 FROM mcr.microsoft.com/dotnet/aspnet:5.0-windowsservercore-ltsc2019 AS base
 WORKDIR /app
 
-<<<<<<< HEAD
 ARG TRACER_VERSION=0.0.1
 ENV SIGNALFX_TRACER_VERSION=$TRACER_VERSION
-=======
-ARG TRACER_VERSION=1.28.8
-ENV DD_TRACER_VERSION=$TRACER_VERSION
->>>>>>> ed0e465a7 ([Version Bump] 1.28.8 (#1827))
 ENV ASPNETCORE_URLS=http://*.80
 
 ENV COR_ENABLE_PROFILING="1"

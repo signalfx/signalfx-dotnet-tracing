@@ -32,9 +32,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.CI
         [Trait("Category", "TestIntegrations")]
         public void SubmitTraces(string packageVersion)
         {
+            var version = string.IsNullOrEmpty(packageVersion) ? new Version("2.0.0") : new Version(packageVersion);
             List<MockTracerAgent.Span> spans = null;
-            var actualPackageVersion = string.IsNullOrEmpty(packageVersion) ? "2.0.0" : packageVersion;
-            var expectedSpanCount = new Version(actualPackageVersion).CompareTo(new Version("2.2.5")) < 0 ? 13 : 15;
+            var expectedSpanCount = version.CompareTo(new Version("2.2.5")) < 0 ? 13 : 15;
 
             try
             {

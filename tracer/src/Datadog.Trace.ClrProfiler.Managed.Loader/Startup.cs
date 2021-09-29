@@ -39,11 +39,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
         {
             try
             {
-<<<<<<< HEAD
                 var assembly = Assembly.Load("OpenTelemetry.AutoInstrumentation, Version=0.0.1.0, Culture=neutral, PublicKeyToken=34b8972644a12429");
-=======
-                var assembly = Assembly.Load("Datadog.Trace, Version=1.28.8.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb");
->>>>>>> ed0e465a7 ([Version Bump] 1.28.8 (#1827))
 
                 if (assembly != null)
                 {

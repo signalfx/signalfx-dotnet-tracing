@@ -58,6 +58,8 @@ variables:
   tracerHome: $(System.DefaultWorkingDirectory)/tracer/src/bin/windows-tracer-home
   artifacts: $(System.DefaultWorkingDirectory)/tracer/src/bin/artifacts
   ddApiKey: $(SIGNALFX_API_KEY)
+  isMainBranch: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
+  isPullRequest: $[eq(variables['Build.Reason'], 'PullRequest')]
   SIGNALFX_DOTNET_TRACER_MSBUILD:
   NugetPackageDirectory: $(System.DefaultWorkingDirectory)/packages
   relativeNugetPackageDirectory: packages
@@ -395,7 +397,7 @@ stages:
         #   baseImage: alpine
 
     variables:
-      TestAllPackageVersions: false
+      TestAllPackageVersions: $(isMainBranch)
 
     pool:
       vmImage: ubuntu-18.04

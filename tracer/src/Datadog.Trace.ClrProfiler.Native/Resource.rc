@@ -49,13 +49,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
-<<<<<<< HEAD
  FILEVERSION 0,0,1,0
  PRODUCTVERSION 0,0,1,0
-=======
- FILEVERSION 1,28,8,0
- PRODUCTVERSION 1,28,8,0
->>>>>>> ed0e465a7 ([Version Bump] 1.28.8 (#1827))
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -70,7 +65,6 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-<<<<<<< HEAD
             VALUE "CompanyName", "The OpenTelemetry Authors"
             VALUE "FileDescription", "OpenTelemetry CLR Profiler"
             VALUE "FileVersion", "0.0.1.0"
@@ -79,16 +73,6 @@ BEGIN
             VALUE "OriginalFilename", "OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.DLL"
             VALUE "ProductName", "SignalFx .NET Tracing"
             VALUE "ProductVersion", "0.0.1"
-=======
-            VALUE "CompanyName", "Datadog, Inc."
-            VALUE "FileDescription", "Datadog CLR Profiler"
-            VALUE "FileVersion", "1.28.8.0"
-            VALUE "InternalName", "Datadog.Trace.ClrProfiler.Native.DLL"
-            VALUE "LegalCopyright", "Copyright 2017 Datadog, Inc."
-            VALUE "OriginalFilename", "Datadog.Trace.ClrProfiler.Native.DLL"
-            VALUE "ProductName", "Datadog .NET Tracer"
-            VALUE "ProductVersion", "1.28.8"
->>>>>>> ed0e465a7 ([Version Bump] 1.28.8 (#1827))
         END
     END
     BLOCK "VarFileInfo"
