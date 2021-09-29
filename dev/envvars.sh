@@ -26,7 +26,7 @@ SUFIX=$(native_sufix)
 # Enable .NET Framework Profiling API
 export COR_ENABLE_PROFILING="1"
 export COR_PROFILER="{918728DD-259F-4A6A-AC2B-B85E1B658318}"
-export COR_PROFILER_PATH="${PWD}/src/Datadog.Trace.ClrProfiler.Native/bin/Debug/x64/OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.${SUFIX}"
+export COR_PROFILER_PATH="${PWD}/tracer/bin/tracer-home/OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.${SUFIX}"
 
 # Enable .NET Core Profiling API
 export CORECLR_ENABLE_PROFILING="1"
