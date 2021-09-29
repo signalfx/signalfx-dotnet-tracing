@@ -31,11 +31,11 @@ export COR_PROFILER_PATH="${PWD}/src/Datadog.Trace.ClrProfiler.Native/bin/Debug/
 # Enable .NET Core Profiling API
 export CORECLR_ENABLE_PROFILING="1"
 export CORECLR_PROFILER="{918728DD-259F-4A6A-AC2B-B85E1B658318}"
-export CORECLR_PROFILER_PATH="${PWD}/src/Datadog.Trace.ClrProfiler.Native/bin/Debug/x64/OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.${SUFIX}"
+export CORECLR_PROFILER_PATH="${PWD}/tracer/bin/tracer-home/OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.${SUFIX}"
 
 # Configure OpenTelemetry Tracer 
-export SIGNALFX_DOTNET_TRACER_HOME="${PWD}/src/Datadog.Trace.ClrProfiler.Native/bin/Debug/x64"
-export SIGNALFX_INTEGRATIONS="${PWD}/integrations.json"
+export SIGNALFX_DOTNET_TRACER_HOME="${PWD}/tracer/bin/tracer-home"
+export SIGNALFX_INTEGRATIONS="${PWD}/tracer/integrations.json"
 export SIGNALFX_VERSION="1.0.0"
 export SIGNALFX_TRACE_AGENT_URL="http://localhost:9411/api/v2/spans"
 export SIGNALFX_TRACE_DEBUG="1"
