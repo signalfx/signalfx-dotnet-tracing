@@ -16,11 +16,7 @@
     * Run unit tests, commit any needed fixes, repeat until passing unit tests
     * Update version in [TracerVersion.cs](https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation/blob/main/tools/Datadog.Core.Tools/TracerVersion.cs) if the upstream bumped it.
     * Update versions and integrations json by running: `cd \build\tools\PrepareRelease && dotnet run -- versions integrations` (remember to revert wcf and other windows-only frameworks if you are using different platform)
-    * Run each of the following commands and commit any needed fixes, until it passes:
-       - `docker-compose run --rm build`
-       - `docker-compose run --rm Profiler`
-       - `docker-compose run --rm IntegrationTests`
-       - `docker-compose run --rm package`
+    * Run build via nuke and commit any needed fixes, until it passes:
 
 6. If squashing cherry-pick from upstream to pass CLA check:
     * `git rebase -i <squash_sha>^`

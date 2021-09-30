@@ -416,7 +416,7 @@ namespace Datadog.Trace.Configuration
         /// Configuration key for enabling or disabling CI Visibility.
         /// Default is value is false (disabled).
         /// </summary>
-        public const string CIVisibilityEnabled = "DD_CIVISIBILITY_ENABLED";
+        public const string CIVisibilityEnabled = "SIGNALFX_CIVISIBILITY_ENABLED";
 
         /// <summary>
         /// String format patterns used to match integration-specific configuration keys.
