@@ -28,17 +28,6 @@ namespace Datadog.Trace.Propagation
         private static readonly int VersionAndTraceIdLength = "00-0af7651916cd43dd8448eb211c80319c-".Length;
         private static readonly int SpanIdLength = "00f067aa0ba902b7".Length;
 
-        private readonly ITraceIdConvention _traceIdConvention;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="W3CSpanContextPropagator"/> class.
-        /// </summary>
-        /// <param name="traceIdConvention">Trace id convention</param>
-        public W3CSpanContextPropagator(ITraceIdConvention traceIdConvention)
-        {
-            _traceIdConvention = traceIdConvention;
-        }
-
         /// <inheritdoc cref="IPropagator"/>
         public virtual void Inject<T>(SpanContext context, T carrier, Action<T, string, string> setter)
         {
@@ -55,26 +44,29 @@ namespace Datadog.Trace.Propagation
         /// <inheritdoc cref="IPropagator"/>
         public virtual SpanContext Extract<T>(T carrier, Func<T, string, IEnumerable<string>> getter)
         {
-            var traceParentCollection = getter(carrier, W3CHeaderNames.TraceParent).ToList();
-            if (traceParentCollection.Count != 1)
+            var enumerableHeaderValues = getter(carrier, W3CHeaderNames.TraceParent);
+            if (enumerableHeaderValues == Enumerable.Empty<string>())
             {
-                Log.Warning("Header {HeaderName} needs exactly 1 value", W3CHeaderNames.TraceParent);
                 return null;
             }
 
-            var traceParentHeader = traceParentCollection.First();
+            var traceParentHeader = enumerableHeaderValues.First();
             var traceIdString = traceParentHeader.Substring(VersionPrefixIdLength, TraceIdLength);
-            var traceId = _traceIdConvention.CreateFromString(traceIdString);
+            if (!TraceId.TryParse(traceIdString, out var traceId))
+            {
+                Log.Debug("Could not parse correct TraceId from header {HeaderName}: {HeaderValues}", W3CHeaderNames.TraceParent, traceParentHeader);
+                return null;
+            }
+
             if (traceId == TraceId.Zero)
             {
-                Log.Warning("Could not parse {HeaderName} headers: {HeaderValues}", W3CHeaderNames.TraceParent, string.Join(",", traceParentCollection));
                 return null;
             }
 
             var spanIdString = traceParentHeader.Substring(VersionAndTraceIdLength, SpanIdLength);
             if (!ulong.TryParse(spanIdString, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var spanId))
             {
-                Log.Warning("Could not parse {HeaderName} headers: {HeaderValues}", W3CHeaderNames.TraceParent, string.Join(",", traceParentCollection));
+                Log.Debug("Could not retrieve SpanId from header {HeaderName}: {HeaderValues}", W3CHeaderNames.TraceParent, traceParentHeader);
                 return null;
             }
 

@@ -15,19 +15,7 @@ namespace Datadog.Trace.Propagation
         private const NumberStyles NumberStyle = NumberStyles.HexNumber;
 
         private static readonly CultureInfo InvariantCulture = CultureInfo.InvariantCulture;
-        private static readonly string UserKeep = ((int)SamplingPriority.UserKeep).ToString(InvariantCulture);
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<B3SpanContextPropagator>();
-
-        private readonly ITraceIdConvention _traceIdConvention;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="B3SpanContextPropagator"/> class.
-        /// </summary>
-        /// <param name="traceIdConvention">Trace id convention</param>
-        public B3SpanContextPropagator(ITraceIdConvention traceIdConvention)
-        {
-            _traceIdConvention = traceIdConvention;
-        }
 
         /// <inheritdoc cref="IPropagator"/>
         public virtual void Inject<T>(SpanContext context, T carrier, Action<T, string, string> setter)
@@ -63,7 +51,7 @@ namespace Datadog.Trace.Propagation
 
             if (getter == null) { throw new ArgumentNullException(nameof(getter)); }
 
-            var traceId = PropagationHelpers.ParseTraceId(carrier, getter, B3HttpHeaderNames.B3TraceId, _traceIdConvention, Log);
+            var traceId = PropagationHelpers.ParseTraceId(carrier, getter, B3HttpHeaderNames.B3TraceId, Log);
 
             if (traceId == TraceId.Zero)
             {

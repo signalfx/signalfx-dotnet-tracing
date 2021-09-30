@@ -21,12 +21,38 @@ namespace Datadog.Trace.Tests
         }
 
         [Fact]
-        public void CreateFromString_CreatesIdCorrectly()
+        public void Parse_CreatesIdCorrectly()
         {
             var traceId = TraceId.CreateRandom();
-            var recreatedId = TraceId.CreateFromString(traceId.ToString());
+            var recreatedId = TraceId.Parse(traceId.ToString());
 
             recreatedId.Should().Be(traceId);
+        }
+
+        [Fact]
+        public void TryParse_CreatesIdCorrectly()
+        {
+            var traceId = TraceId.CreateRandom();
+            var result = TraceId.TryParse(traceId.ToString(), out var recreatedId);
+
+            using (new AssertionScope())
+            {
+                result.Should().BeTrue();
+                recreatedId.Should().Be(traceId);
+            }
+        }
+
+        [Fact]
+        public void TryParse_ForInvalidTraceId_ReturnsFalse()
+        {
+            var traceId = "321521";
+            var result = TraceId.TryParse(traceId, out var recreatedId);
+
+            using (new AssertionScope())
+            {
+                result.Should().BeFalse();
+                recreatedId.Should().Be(TraceId.Zero);
+            }
         }
 
         [Fact]
@@ -34,7 +60,7 @@ namespace Datadog.Trace.Tests
         {
             var traceId = TraceId.CreateFromInt(123);
 
-            traceId.ToString().Should().Be("123");
+            traceId.ToString().Should().Be("0000000000000000000000000000007b");
         }
 
         [Fact]
@@ -42,18 +68,7 @@ namespace Datadog.Trace.Tests
         {
             var traceId = TraceId.CreateFromUlong(3212132132132132121);
 
-            traceId.ToString().Should().Be("3212132132132132121");
-        }
-
-        [Fact]
-        public void CreateRandom64Bit_CreatesValid64BitId()
-        {
-            var traceId = TraceId.CreateRandomDataDogCompatible();
-
-            using (new AssertionScope())
-            {
-                FluentActions.Invoking(() => Convert.ToUInt64(traceId.ToString(), fromBase: 10)).Should().NotThrow();
-            }
+            traceId.ToString().Should().Be("00000000000000002c93c927d35a9519");
         }
 
         [Fact]
@@ -65,61 +80,22 @@ namespace Datadog.Trace.Tests
         }
 
         [Fact]
-        public void Equals_WorksCorrectlyFor128BitId()
+        public void Equals_WorksCorrectly()
         {
             var traceId1 = TraceId.CreateRandom();
-            var traceId2 = TraceId.CreateRandom();
 
-            using (new AssertionScope())
-            {
-                traceId1.Should().Be(TraceId.CreateFromString(traceId1.ToString()));
-                traceId2.Should().Be(TraceId.CreateFromString(traceId2.ToString()));
-                traceId1.Should().NotBe(TraceId.CreateFromString(traceId2.ToString()));
-                traceId2.Should().NotBe(TraceId.CreateFromString(traceId1.ToString()));
-            }
+            traceId1.Should().Be(TraceId.Parse(traceId1.ToString()));
         }
 
         [Fact]
-        public void Equals_WorksCorrectlyFor64BitId()
-        {
-            var traceId1 = TraceId.CreateRandomDataDogCompatible();
-            var traceId2 = TraceId.CreateRandomDataDogCompatible();
-
-            using (new AssertionScope())
-            {
-                traceId1.Should().Be(TraceId.CreateDataDogCompatibleFromDecimalString(traceId1.ToString()));
-                traceId1.GetHashCode().Should().Be(TraceId.CreateDataDogCompatibleFromDecimalString(traceId1.ToString()).GetHashCode());
-                traceId2.Should().Be(TraceId.CreateDataDogCompatibleFromDecimalString(traceId2.ToString()));
-                traceId2.GetHashCode().Should().Be(TraceId.CreateDataDogCompatibleFromDecimalString(traceId2.ToString()).GetHashCode());
-                traceId1.Should().NotBe(TraceId.CreateDataDogCompatibleFromDecimalString(traceId2.ToString()));
-                traceId2.Should().NotBe(TraceId.CreateDataDogCompatibleFromDecimalString(traceId1.ToString()));
-            }
-        }
-
-        [Fact]
-        public void Equals_WorksCorrectlyBetween64And128BitIds()
-        {
-            var traceId1 = TraceId.CreateRandomDataDogCompatible();
-            var traceId2 = TraceId.CreateFromString(TraceId.Zero.Lower.ToString("x16") + traceId1.Lower.ToString("x16"));
-
-            using (new AssertionScope())
-            {
-                traceId1.Lower.Should().Be(traceId2.Lower);
-                traceId1.Should().NotBe(TraceId.CreateFromString(traceId2.ToString()));
-                traceId2.Should().NotBe(TraceId.CreateDataDogCompatibleFromDecimalString(traceId1.ToString()));
-                traceId1.GetHashCode().Should().NotBe(traceId2.GetHashCode());
-            }
-        }
-
-        [Fact]
-        public void Zero_ReturnsEmpty64BitId()
+        public void Zero_ReturnsEmptyId()
         {
             var traceId = TraceId.Zero;
 
             using (new AssertionScope())
             {
-                traceId.ToString().Should().HaveLength(1);
-                traceId.ToString().Should().Be("0");
+                traceId.ToString().Should().HaveLength(32);
+                traceId.ToString().Should().Be("00000000000000000000000000000000");
             }
         }
     }

@@ -1,5 +1,4 @@
 using System.Globalization;
-using Datadog.Trace.Conventions;
 using Datadog.Trace.Headers;
 using Datadog.Trace.Propagation;
 using Datadog.Trace.TestHelpers;
@@ -13,14 +12,14 @@ namespace Datadog.Trace.Tests.Propagators
 
         public B3SpanContextPropagatorTests()
         {
-            _propagator = new B3SpanContextPropagator(new OtelTraceIdConvention());
+            _propagator = new B3SpanContextPropagator();
         }
 
         [Theory]
         [MemberData(nameof(GetHeaderCollectionImplementations))]
         internal void HttpRequestMessage_InjectExtract_Identity(IHeadersCollection headers)
         {
-            var traceId = TraceId.CreateFromString("52686470458518446744073709551615");
+            var traceId = TraceId.Parse("52686470458518446744073709551615");
             const ulong spanId = 18446744073709551614;
             const SamplingPriority samplingPriority = SamplingPriority.AutoKeep;
 
@@ -46,7 +45,7 @@ namespace Datadog.Trace.Tests.Propagators
         [MemberData(nameof(GetHeaderCollectionImplementations))]
         internal void HttpRequestMessage_InjectExtract_Identity_WithParent(IHeadersCollection headers)
         {
-            var traceId = TraceId.CreateFromString("52686470458518446744073709551615");
+            var traceId = TraceId.Parse("52686470458518446744073709551615");
             const ulong spanId = 18446744073709551614;
             const SamplingPriority samplingPriority = SamplingPriority.UserKeep;
 
@@ -78,7 +77,7 @@ namespace Datadog.Trace.Tests.Propagators
         [MemberData(nameof(GetHeaderCollectionImplementations))]
         internal void WebRequest_InjectExtract_Identity(IHeadersCollection headers)
         {
-            var traceId = TraceId.CreateFromString("52686470458518446744073709551615");
+            var traceId = TraceId.Parse("52686470458518446744073709551615");
             const int spanId = 2147483646;
             const SamplingPriority samplingPriority = SamplingPriority.AutoReject;
 
@@ -118,7 +117,7 @@ namespace Datadog.Trace.Tests.Propagators
         [MemberData(nameof(GetHeadersInvalidIdsCartesianProduct))]
         internal void Extract_InvalidSpanId(IHeadersCollection headers, string spanId)
         {
-            var traceId = TraceId.CreateFromString("52686470458518446744073709551615");
+            var traceId = TraceId.Parse("52686470458518446744073709551615");
             const SamplingPriority samplingPriority = SamplingPriority.UserKeep;
 
             InjectContext(
@@ -138,7 +137,7 @@ namespace Datadog.Trace.Tests.Propagators
         [MemberData(nameof(GetHeadersInvalidSamplingPrioritiesCartesianProduct))]
         internal void Extract_InvalidSamplingPriority(IHeadersCollection headers, string samplingPriority)
         {
-            var traceId = TraceId.CreateFromString("52686470458518446744073709551615");
+            var traceId = TraceId.Parse("52686470458518446744073709551615");
             const ulong spanId = 23456789;
 
             InjectContext(

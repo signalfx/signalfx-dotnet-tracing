@@ -123,23 +123,10 @@ namespace Datadog.Trace
 
             _agentWriter = agentWriter ?? CreateTraceWriter(Settings, Statsd);
 
-            switch (Settings.Convention)
-            {
-                case ConventionType.OpenTelemetry:
-                    OutboundHttpConvention = new OtelOutboundHttpConvention(this);
-                    TraceIdConvention = new OtelTraceIdConvention();
-                    break;
-                case ConventionType.Datadog:
-                default:
-                    OutboundHttpConvention = new DatadogOutboundHttpConvention(this);
-                    TraceIdConvention = new DatadogTraceIdConvention();
-                    break;
-            }
-
             _scopeManager = scopeManager ?? new AsyncLocalScopeManager();
             Sampler = sampler ?? new RuleBasedSampler(new RateLimiter(Settings.MaxTracesSubmittedPerSecond));
 
-            _propagator = CreateCompositePropagator(Settings, TraceIdConvention, plugins ?? ArrayHelper.Empty<IOTelExtension>());
+            _propagator = CreateCompositePropagator(Settings, plugins ?? ArrayHelper.Empty<IOTelExtension>());
 
             if (!string.IsNullOrWhiteSpace(Settings.CustomSamplingRules))
             {
@@ -303,8 +290,6 @@ namespace Datadog.Trace
         internal IDogStatsd Statsd { get; private set; }
 
         internal IOutboundHttpConvention OutboundHttpConvention { get; }
-
-        internal ITraceIdConvention TraceIdConvention { get; }
 
         internal IPropagator Propagator => _propagator;
 
@@ -783,7 +768,7 @@ namespace Datadog.Trace
             }
         }
 
-        private static CompositeTextMapPropagator CreateCompositePropagator(TracerSettings settings, ITraceIdConvention traceIdConvention, IReadOnlyCollection<IOTelExtension> extensions)
+        private static CompositeTextMapPropagator CreateCompositePropagator(TracerSettings settings, IReadOnlyCollection<IOTelExtension> extensions)
         {
             var compositeProvider = new CompositePropagatorsProvider();
             compositeProvider.RegisterProvider(new OTelPropagatorsProvider());
@@ -797,7 +782,7 @@ namespace Datadog.Trace
             }
 
             var propagators = compositeProvider
-               .GetPropagators(settings.Propagators, traceIdConvention)
+               .GetPropagators(settings.Propagators)
                .ToList();
 
             return new CompositeTextMapPropagator(propagators);

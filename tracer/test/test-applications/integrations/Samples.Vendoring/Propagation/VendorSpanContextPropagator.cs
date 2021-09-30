@@ -12,13 +12,6 @@ namespace Samples.Vendoring.Propagation
         private const string TraceIdHeader = "vendor-trace-id";
         private const string SpanIdHeader = "vendor-span-id";
 
-        private readonly ITraceIdConvention _traceIdConvention;
-
-        public VendorSpanContextPropagator(ITraceIdConvention traceIdConvention)
-        {
-            _traceIdConvention = traceIdConvention;
-        }
-
         public SpanContext Extract<T>(T carrier, Func<T, string, IEnumerable<string>> getter)
         {
             var traceId = ParseTraceId(carrier, getter);
@@ -48,7 +41,7 @@ namespace Samples.Vendoring.Propagation
                 return TraceId.Zero;
             }
 
-            return _traceIdConvention.CreateFromString(headerValue);
+            return TraceId.Parse(headerValue);
         }
 
         private ulong ParseSpanId<T>(T carrier, Func<T, string, IEnumerable<string>> getter)

@@ -87,7 +87,7 @@ namespace Datadog.Trace
 
         private SpanContext(TraceId? traceId, string serviceName)
         {
-            TraceId = traceId ?? Tracer.Instance.TraceIdConvention.GenerateNewTraceId();
+            TraceId = traceId ?? TraceId.CreateRandom();
             ServiceName = serviceName;
         }
 

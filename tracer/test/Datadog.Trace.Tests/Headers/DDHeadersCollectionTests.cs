@@ -22,7 +22,7 @@ namespace Datadog.Trace.Tests.Headers
     public class DDHeadersCollectionTests : HeadersCollectionTestBase
     {
         private const string TestPrefix = "test.prefix";
-        private readonly DDSpanContextPropagator _propagator = new DDSpanContextPropagator(new DatadogTraceIdConvention());
+        private readonly DDSpanContextPropagator _propagator = new DDSpanContextPropagator();
 
         [Theory]
         [MemberData(nameof(GetHeaderCollectionImplementations))]

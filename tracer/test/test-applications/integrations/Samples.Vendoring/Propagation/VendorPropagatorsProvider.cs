@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Datadog.Trace.Conventions;
 using Datadog.Trace.Propagation;
 using Samples.Vendoring.Types;
 
@@ -8,22 +7,22 @@ namespace Samples.Vendoring.Propagation
 {
     public class VendorPropagatorsProvider : IPropagatorsProvider
     {
-        private static readonly IReadOnlyDictionary<string, Func<ITraceIdConvention, IPropagator>> PropagatorSelector =
-            new Dictionary<string, Func<ITraceIdConvention, IPropagator>>(StringComparer.InvariantCultureIgnoreCase)
+        private static readonly IReadOnlyDictionary<string, Func<IPropagator>> PropagatorSelector =
+            new Dictionary<string, Func<IPropagator>>(StringComparer.InvariantCultureIgnoreCase)
             {
-                { VendorPropagatorTypes.VendorPropagator, convention => new VendorSpanContextPropagator(convention) }
+                { VendorPropagatorTypes.VendorPropagator, () => new VendorSpanContextPropagator() }
             };
 
-        public bool CanProvide(string propagatorId, ITraceIdConvention traceIdConvention)
+        public bool CanProvide(string propagatorId)
         {
             return PropagatorSelector.ContainsKey(propagatorId);
         }
 
-        public IPropagator GetPropagator(string propagatorId, ITraceIdConvention traceIdConvention)
+        public IPropagator GetPropagator(string propagatorId)
         {
-            if (PropagatorSelector.TryGetValue(propagatorId, out Func<ITraceIdConvention, IPropagator> getter))
+            if (PropagatorSelector.TryGetValue(propagatorId, out Func<IPropagator> getter))
             {
-                return getter(traceIdConvention);
+                return getter();
             }
 
             throw new InvalidOperationException($"There is no propagator registered for type '{propagatorId}'.");

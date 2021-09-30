@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Datadog.Trace.Conventions;
 using Datadog.Trace.Headers;
 using Datadog.Trace.Logging;
 
@@ -22,16 +21,9 @@ namespace Datadog.Trace.Propagation
 
         private static readonly int[] SamplingPriorities;
 
-        private readonly ITraceIdConvention _traceIdConvention;
-
         static DDSpanContextPropagator()
         {
             SamplingPriorities = Enum.GetValues(typeof(SamplingPriority)).Cast<int>().ToArray();
-        }
-
-        public DDSpanContextPropagator(ITraceIdConvention traceIdConvention)
-        {
-            _traceIdConvention = traceIdConvention;
         }
 
         /// <summary>
@@ -80,7 +72,7 @@ namespace Datadog.Trace.Propagation
 
             if (getter == null) { throw new ArgumentNullException(nameof(getter)); }
 
-            var traceId = PropagationHelpers.ParseTraceId(carrier, getter, DDHttpHeaderNames.TraceId, _traceIdConvention, Log);
+            var traceId = PropagationHelpers.ParseTraceId(carrier, getter, DDHttpHeaderNames.TraceId, Log);
 
             if (traceId == TraceId.Zero)
             {

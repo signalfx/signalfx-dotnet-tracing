@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Datadog.Trace.Conventions;
 using Datadog.Trace.Propagation;
 using Xunit;
 
@@ -21,7 +20,7 @@ namespace Datadog.Trace.Tests.Propagators
             provider.RegisterProvider(new ProviderStub(Propagator3));
 
             var propagators = provider
-                .GetPropagators(new[] { Propagator1, Propagator3 }, null)
+                .GetPropagators(new[] { Propagator1, Propagator3 })
                 .Cast<PropagatorStub>()
                 .ToList();
 
@@ -37,7 +36,7 @@ namespace Datadog.Trace.Tests.Propagators
             provider.RegisterProvider(new ProviderStub(Propagator1));
 
             Assert.Throws<InvalidOperationException>(() => provider
-                .GetPropagators(new[] { Propagator2 }, null)
+                .GetPropagators(new[] { Propagator2 })
                 .Cast<PropagatorStub>()
                 .ToList());
         }
@@ -51,12 +50,12 @@ namespace Datadog.Trace.Tests.Propagators
                 _provides = provides;
             }
 
-            public bool CanProvide(string propagatorId, ITraceIdConvention traceIdConvention)
+            public bool CanProvide(string propagatorId)
             {
                 return _provides == propagatorId;
             }
 
-            public IPropagator GetPropagator(string propagatorId, ITraceIdConvention traceIdConvention)
+            public IPropagator GetPropagator(string propagatorId)
             {
                 return new PropagatorStub(propagatorId);
             }

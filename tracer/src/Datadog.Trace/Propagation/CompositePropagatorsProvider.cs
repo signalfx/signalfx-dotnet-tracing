@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Datadog.Trace.Conventions;
 using Datadog.Trace.Logging;
 
 namespace Datadog.Trace.Propagation
@@ -22,16 +21,16 @@ namespace Datadog.Trace.Propagation
             _providers.Add(provider);
         }
 
-        public IEnumerable<IPropagator> GetPropagators(IEnumerable<string> propagatorIds, ITraceIdConvention traceIdConvention)
+        public IEnumerable<IPropagator> GetPropagators(IEnumerable<string> propagatorIds)
         {
-            return propagatorIds.Select(type => GetPropagator(type, traceIdConvention)).ToList();
+            return propagatorIds.Select(GetPropagator).ToList();
         }
 
-        private IPropagator GetPropagator(string propagatorId, ITraceIdConvention traceIdConvention)
+        private IPropagator GetPropagator(string propagatorId)
         {
             var propagator = _providers
-                .Where(x => x.CanProvide(propagatorId, traceIdConvention))
-                .Select(x => x.GetPropagator(propagatorId, traceIdConvention))
+                .Where(x => x.CanProvide(propagatorId))
+                .Select(x => x.GetPropagator(propagatorId))
                 .FirstOrDefault();
 
             if (propagator == null)

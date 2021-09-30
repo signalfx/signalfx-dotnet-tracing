@@ -1,37 +1,34 @@
+// Modified by SignalFx
+
 using System;
-using System.Globalization;
 
 namespace Datadog.Trace
 {
     /// <summary>
-    /// Class representing 64 or 128 bit TraceID. 64 bit representation is compatible with DataDog conventions (parsed from and to decimal representation).
-    /// 128 bit representation is compatible with OpenTelemetry conventions (parsed from and to hexadecimal representation).
+    /// Class representing 128 bit TraceID (parsed from and to hexadecimal string representation)
     /// </summary>
     public readonly struct TraceId : IEquatable<TraceId>
     {
-        private readonly bool _isDataDogCompatible;
         private readonly string _string;
 
-        private TraceId(long higher, long lower)
+        private TraceId(ulong higher, ulong lower)
         {
-            _isDataDogCompatible = false;
-            Higher = (ulong)higher;
-            Lower = (ulong)lower;
+            Higher = higher;
+            Lower = lower;
             _string = $"{Higher:x16}{Lower:x16}";
         }
 
         private TraceId(ulong lower)
         {
-            _isDataDogCompatible = true;
             Higher = 0;
             Lower = lower;
-            _string = Lower.ToString(CultureInfo.InvariantCulture);
+            _string = $"{Higher:x16}{Lower:x16}";
         }
 
         /// <summary>
         /// Gets TraceId with zero id.
         /// </summary>
-        public static TraceId Zero => new(lower: 0);
+        public static TraceId Zero => new TraceId(lower: 0);
 
         /// <summary>
         /// Gets higher 64 bits of 128 bit traceID.
@@ -72,107 +69,90 @@ namespace Datadog.Trace
         public static TraceId CreateRandom()
         {
             var randomNumberGenerator = RandomNumberGenerator.Current;
-            var higher = randomNumberGenerator.Next() & 0x7FFFFFFFFFFFFFFF;
-            var lower = randomNumberGenerator.Next() & 0x7FFFFFFFFFFFFFFF;
+
+            var higher = randomNumberGenerator.Next();
+            var lower = randomNumberGenerator.Next();
 
             return new TraceId(higher, lower);
         }
 
         /// <summary>
-        /// Creates random DataDog compatible 64 bit traceId.
+        /// Creates traceId from given 16 or 32 character string representing traceId in hexadecimal format.
         /// </summary>
-        /// <returns>Instance of randomly generated <see cref="TraceId"/>.</returns>
-        public static TraceId CreateRandomDataDogCompatible()
-        {
-            var randomNumberGenerator = RandomNumberGenerator.Current;
-            var lower = (ulong)randomNumberGenerator.Next() & 0x7FFFFFFFFFFFFFFF;
-
-            return new TraceId(lower);
-        }
-
-        /// <summary>
-        /// Creates traceId from given 16 or 32 sign string representing traceId in hexadecimal format.
-        /// </summary>
-        /// <param name="id">16 or 32 sign string ID to be parsed.</param>
+        /// <param name="id">16 or 32 character string ID to be parsed.</param>
         /// <returns>Instance of <see cref="TraceId"/> representing the same traceId as the passed string.</returns>
-        public static TraceId CreateFromString(string id)
+        public static TraceId Parse(string id)
         {
-            try
+            switch (id.Length)
             {
-                switch (id.Length)
-                {
-                    case 16:
+                case 16:
                     {
-                        var lower = Convert.ToInt64(id, fromBase: 16);
+                        var lower = Convert.ToUInt64(id, fromBase: 16);
                         return new TraceId(higher: 0, lower);
                     }
 
-                    case 32:
+                case 32:
                     {
                         var higherAsString = id.Substring(startIndex: 0, length: 16);
                         var lowerAsString = id.Substring(startIndex: 16, length: 16);
 
-                        var higher = Convert.ToInt64(higherAsString, fromBase: 16);
-                        var lower = Convert.ToInt64(lowerAsString, fromBase: 16);
+                        var higher = Convert.ToUInt64(higherAsString, fromBase: 16);
+                        var lower = Convert.ToUInt64(lowerAsString, fromBase: 16);
 
                         return new TraceId(higher, lower);
                     }
 
-                    default:
+                default:
                     {
-                        return Zero;
+                        throw new FormatException("The passed string must have 16 or 32 character");
                     }
-                }
-            }
-            catch (Exception ex) when (ex is ArgumentOutOfRangeException || ex is InvalidOperationException || ex is OverflowException || ex is FormatException)
-            {
-                return Zero;
             }
         }
 
         /// <summary>
-        /// Creates DataDog compatible traceId from given string representing 64bit traceId in decimal format.
+        /// Tries to convert the specified string representation of a TraceId to its <see cref="TraceId" /> equivalent. A return value indicates whether the conversion succeeded or failed.
         /// </summary>
-        /// <param name="id">String ID to be parsed.</param>
-        /// <returns>Instance of 64bit <see cref="TraceId"/> representing the same traceId as the passed string.</returns>
-        public static TraceId CreateDataDogCompatibleFromDecimalString(string id)
+        /// <param name="id">16 or 32 character string ID to be parsed.</param>
+        /// <param name="traceId">Output <see cref="TraceId"/></param>
+        /// <returns>Value indicating whether the conversion succeeded or failed.</returns>
+        public static bool TryParse(string id, out TraceId traceId)
         {
             try
             {
-                var lower = ulong.Parse(id);
-                return new TraceId(lower);
+                traceId = Parse(id);
+                return true;
             }
             catch (Exception ex) when (ex is ArgumentOutOfRangeException || ex is InvalidOperationException || ex is OverflowException || ex is FormatException)
             {
-                return Zero;
+                traceId = Zero;
+                return false;
             }
         }
 
         /// <summary>
-        /// Creates 64 bit DataDog compatible traceId from given int.
+        /// Creates traceId from given int.
         /// </summary>
         /// <param name="id">Int32 ID to be parsed.</param>
         /// <returns>Instance of <see cref="TraceId"/> representing the same traceId as the passed int.</returns>
         public static TraceId CreateFromInt(int id)
         {
-            return new((ulong)id);
+            return new TraceId((ulong)id);
         }
 
         /// <summary>
-        /// Creates 64 bit DataDog compatible traceId from given ulong.
+        /// Creates traceId from given ulong.
         /// </summary>
         /// <param name="id">Ulong ID to be parsed.</param>
         /// <returns>Instance of <see cref="TraceId"/> representing the same traceId as the passed ulong.</returns>
         public static TraceId CreateFromUlong(ulong id)
         {
-            return new(id);
+            return new TraceId(id);
         }
 
         /// <summary>
-        /// For Datadog compatible traceId this returns decimal representation of the 64 bit id.
-        /// For OpenTelemetry compatible traceId this returns hexadecimal representation of the 128 bit id.
+        /// Returns hexadecimal representation of the 128 bit id.
         /// </summary>
-        /// <returns>Depending on the traceId compatibility - dec or hex representation of <see cref="TraceId"/> as a string.</returns>
+        /// <returns>Hex representation of <see cref="TraceId"/> as a string.</returns>
         public override string ToString() => _string;
 
         /// <inheritdoc/>
@@ -195,13 +175,18 @@ namespace Datadog.Trace
         /// <returns>True if TraceIds are equal, false otherwise.</returns>
         public bool Equals(TraceId other)
         {
-            return Lower == other.Lower && Higher == other.Higher && _isDataDogCompatible == other._isDataDogCompatible;
+            return Lower == other.Lower && Higher == other.Higher;
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public override int GetHashCode()
         {
-            return HashCode.Combine(Higher, Lower, _isDataDogCompatible);
+            unchecked
+            {
+                var hashCode = Higher.GetHashCode();
+                hashCode = (hashCode * 397) ^ Lower.GetHashCode();
+                return hashCode;
+            }
         }
     }
 }

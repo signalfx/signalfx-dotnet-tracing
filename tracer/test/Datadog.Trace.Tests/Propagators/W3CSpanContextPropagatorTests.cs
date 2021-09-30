@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using Datadog.Trace.Conventions;
 using Datadog.Trace.Headers;
 using Datadog.Trace.Propagation;
 using Datadog.Trace.TestHelpers;
@@ -16,10 +14,10 @@ namespace Datadog.Trace.Tests.Propagators
         [MemberData(nameof(GetHeaderCollectionImplementations))]
         internal void Inject_CratesCorrectTraceParentHeader(IHeadersCollection headers)
         {
-            var traceId = TraceId.CreateFromString("0af7651916cd43dd8448eb211c80319c");
+            var traceId = TraceId.Parse("0af7651916cd43dd8448eb211c80319c");
             const ulong spanId = 67667974448284343;
             var spanContext = new SpanContext(traceId, spanId);
-            var propagator = new W3CSpanContextPropagator(new OtelTraceIdConvention());
+            var propagator = new W3CSpanContextPropagator();
 
             propagator.Inject(spanContext, headers);
 
@@ -34,10 +32,10 @@ namespace Datadog.Trace.Tests.Propagators
         [MemberData(nameof(GetHeaderCollectionImplementations))]
         internal void Inject_CreateCorrectTraceStateHeaderIfPresent(IHeadersCollection headers)
         {
-            var traceId = TraceId.CreateFromString("0af7651916cd43dd8448eb211c80319c");
+            var traceId = TraceId.Parse("0af7651916cd43dd8448eb211c80319c");
             const ulong spanId = 67667974448284343;
             var spanContext = new SpanContext(traceId, spanId, "state");
-            var propagator = new W3CSpanContextPropagator(new OtelTraceIdConvention());
+            var propagator = new W3CSpanContextPropagator();
 
             propagator.Inject(spanContext, headers);
 
@@ -52,10 +50,10 @@ namespace Datadog.Trace.Tests.Propagators
         [MemberData(nameof(GetHeaderCollectionImplementations))]
         internal void Inject_DoNotCreateCorrectTraceStateHeaderIfNotPresent(IHeadersCollection headers)
         {
-            var traceId = TraceId.CreateFromString("0af7651916cd43dd8448eb211c80319c");
+            var traceId = TraceId.Parse("0af7651916cd43dd8448eb211c80319c");
             const ulong spanId = 67667974448284343;
             var spanContext = new SpanContext(traceId, spanId, traceState: null);
-            var propagator = new W3CSpanContextPropagator(new OtelTraceIdConvention());
+            var propagator = new W3CSpanContextPropagator();
 
             propagator.Inject(spanContext, headers);
 
@@ -66,7 +64,7 @@ namespace Datadog.Trace.Tests.Propagators
         [MemberData(nameof(GetHeaderCollectionImplementations))]
         internal void Extract_ReturnCorrectTraceAndSpanIdInContext(IHeadersCollection headers)
         {
-            var propagator = new W3CSpanContextPropagator(new OtelTraceIdConvention());
+            var propagator = new W3CSpanContextPropagator();
             headers.Set(W3CHeaderNames.TraceParent, "00-0af7651916cd43dd8448eb211c80319c-00f067aa0ba902b7-01");
 
             var spanContext = propagator.Extract(headers);
@@ -74,7 +72,7 @@ namespace Datadog.Trace.Tests.Propagators
             using (new AssertionScope())
             {
                 spanContext.SpanId.Should().Be(67667974448284343);
-                spanContext.TraceId.Should().Be(TraceId.CreateFromString("0af7651916cd43dd8448eb211c80319c"));
+                spanContext.TraceId.Should().Be(TraceId.Parse("0af7651916cd43dd8448eb211c80319c"));
             }
         }
 
@@ -82,7 +80,7 @@ namespace Datadog.Trace.Tests.Propagators
         [MemberData(nameof(GetHeaderCollectionImplementations))]
         internal void Extract_ReturnCorrectTraceStateInContextIfPresent(IHeadersCollection headers)
         {
-            var propagator = new W3CSpanContextPropagator(new OtelTraceIdConvention());
+            var propagator = new W3CSpanContextPropagator();
             headers.Set(W3CHeaderNames.TraceParent, "00-0af7651916cd43dd8448eb211c80319c-00f067aa0ba902b7-01");
             headers.Set(W3CHeaderNames.TraceState, "state=2,am=dsa");
 
@@ -95,7 +93,7 @@ namespace Datadog.Trace.Tests.Propagators
         [MemberData(nameof(GetHeaderCollectionImplementations))]
         internal void Extract_DoNotReturnTraceStateInContextIfNotPresent(IHeadersCollection headers)
         {
-            var propagator = new W3CSpanContextPropagator(new OtelTraceIdConvention());
+            var propagator = new W3CSpanContextPropagator();
             headers.Set(W3CHeaderNames.TraceParent, "00-0af7651916cd43dd8448eb211c80319c-00f067aa0ba902b7-01");
 
             var spanContext = propagator.Extract(headers);
@@ -107,7 +105,7 @@ namespace Datadog.Trace.Tests.Propagators
         [MemberData(nameof(GetHeaderCollectionImplementations))]
         internal void Extract_OmitsTraceStateWithIncorrectValue(IHeadersCollection headers)
         {
-            var propagator = new W3CSpanContextPropagator(new OtelTraceIdConvention());
+            var propagator = new W3CSpanContextPropagator();
             headers.Set(W3CHeaderNames.TraceParent, "00-0af7651916cd43dd8448eb211c80319c-00f067aa0ba902b7-01");
             headers.Set(W3CHeaderNames.TraceState, "state=,arn=2");
 
@@ -120,7 +118,7 @@ namespace Datadog.Trace.Tests.Propagators
         [MemberData(nameof(GetHeaderCollectionImplementations))]
         internal void Extract_OmitsTraceStateWithIncorrectKey(IHeadersCollection headers)
         {
-            var propagator = new W3CSpanContextPropagator(new OtelTraceIdConvention());
+            var propagator = new W3CSpanContextPropagator();
             headers.Set(W3CHeaderNames.TraceParent, "00-0af7651916cd43dd8448eb211c80319c-00f067aa0ba902b7-01");
             headers.Set(W3CHeaderNames.TraceState, "statDSAe=3,arn=2");
 
@@ -133,7 +131,7 @@ namespace Datadog.Trace.Tests.Propagators
         [MemberData(nameof(GetHeaderCollectionImplementations))]
         internal void Extract_OmitsEmptyTraceState(IHeadersCollection headers)
         {
-            var propagator = new W3CSpanContextPropagator(new OtelTraceIdConvention());
+            var propagator = new W3CSpanContextPropagator();
             headers.Set(W3CHeaderNames.TraceParent, "00-0af7651916cd43dd8448eb211c80319c-00f067aa0ba902b7-01");
             headers.Set(W3CHeaderNames.TraceState, string.Empty);
 

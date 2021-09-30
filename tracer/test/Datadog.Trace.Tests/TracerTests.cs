@@ -369,7 +369,7 @@ namespace Datadog.Trace.Tests
             const string origin = "synthetics";
 
             var propagatedContext = new SpanContext(traceId, spanId, samplingPriority, null, origin);
-            var propagator = new DDSpanContextPropagator(new DatadogTraceIdConvention());
+            var propagator = new DDSpanContextPropagator();
 
             using var firstSpan = _tracer.StartActive("First Span", propagatedContext);
             using var secondSpan = _tracer.StartActive("Child", firstSpan.Span.Context);

@@ -132,7 +132,7 @@ namespace Datadog.Trace.Tests.Logging
             Assert.Equal(env, logEvent.Properties[CorrelationIdentifier.EnvKey].ToString());
 
             Assert.Contains(CorrelationIdentifier.TraceIdKey, logEvent.Properties.GetKeys());
-            Assert.Equal(traceId, TraceId.CreateDataDogCompatibleFromDecimalString(logEvent.Properties[CorrelationIdentifier.TraceIdKey].ToString()));
+            Assert.Equal(traceId, TraceId.Parse(logEvent.Properties[CorrelationIdentifier.TraceIdKey].ToString()));
 
             Assert.Contains(CorrelationIdentifier.SpanIdKey, logEvent.Properties.GetKeys());
             Assert.Equal(spanId, ulong.Parse(logEvent.Properties[CorrelationIdentifier.SpanIdKey].ToString()));
