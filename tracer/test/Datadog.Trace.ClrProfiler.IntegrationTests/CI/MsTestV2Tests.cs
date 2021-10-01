@@ -34,7 +34,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.CI
         {
             if (string.IsNullOrEmpty(packageVersion))
             {
-                packageVersion = "2.0.0"
+                packageVersion = "2.0.0";
             }
 
             List<MockTracerAgent.Span> spans = null;
