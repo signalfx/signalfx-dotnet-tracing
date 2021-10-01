@@ -66,9 +66,6 @@ namespace Datadog.Trace.TestHelpers
                 throw new Exception($"application not found: {sampleAppPath}");
             }
 
-            // get full paths to integration definitions
-            IEnumerable<string> integrationPaths = Directory.EnumerateFiles(".", "*integrations.json").Select(Path.GetFullPath);
-
             Output.WriteLine($"Starting Application: {sampleAppPath}");
             string testCli = EnvironmentHelper.GetDotNetTest();
             string exec = testCli;
@@ -124,9 +121,6 @@ namespace Datadog.Trace.TestHelpers
                 throw new Exception($"application not found: {sampleAppPath}");
             }
 
-            // get full paths to integration definitions
-            IEnumerable<string> integrationPaths = Directory.EnumerateFiles(".", "*integrations.json").Select(Path.GetFullPath);
-
             Output.WriteLine($"Starting Application: {sampleAppPath}");
             var executable = EnvironmentHelper.IsCoreClr() ? EnvironmentHelper.GetSampleExecutionSource() : sampleAppPath;
             var args = EnvironmentHelper.IsCoreClr() ? $"{sampleAppPath} {arguments ?? string.Empty}" : arguments;
@@ -173,9 +167,6 @@ namespace Datadog.Trace.TestHelpers
 
         public (Process Process, string ConfigFile) StartIISExpress(int traceAgentPort, int iisPort, IisAppType appType)
         {
-            // get full paths to integration definitions
-            IEnumerable<string> integrationPaths = Directory.EnumerateFiles(".", "*integrations.json").Select(Path.GetFullPath);
-
             var iisExpress = EnvironmentHelper.GetIisExpressPath();
 
             var appPool = appType switch
@@ -363,7 +354,8 @@ namespace Datadog.Trace.TestHelpers
             MockTracerAgent agent,
             int httpPort,
             HttpStatusCode expectedHttpStatusCode,
-            int expectedSpanCount = 2)
+            int expectedSpanCount = 2,
+            bool filterServerSpans = true)
         {
             using var httpClient = new HttpClient();
 
@@ -375,7 +367,10 @@ namespace Datadog.Trace.TestHelpers
             Output.WriteLine($"[http] {response.StatusCode} {content}");
             Assert.Equal(expectedHttpStatusCode, response.StatusCode);
 
-            agent.SpanFilters.Add(IsServerSpan);
+            if (filterServerSpans)
+            {
+                agent.SpanFilters.Add(IsServerSpan);
+            }
 
             return agent.WaitForSpans(
                 count: expectedSpanCount,

@@ -1,0 +1,25 @@
+{
+  "profiles": {
+    "Samples.AzureFunctions.AllTriggers": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "CORECLR_ENABLE_PROFILING": "1",
+        "CORECLR_PROFILER": "{846F5F1C-F9AE-4B07-969E-05C26BC060D8}",
+        "CORECLR_PROFILER_PATH": "$(ProjectDir)$(OutputPath)profiler-lib\\OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dll",
+
+        "SIGNALFX_DOTNET_TRACER_HOME": "$(ProjectDir)$(OutputPath)profiler-lib",
+        "SIGNALFX_INTEGRATIONS": "$(ProjectDir)$(OutputPath)profiler-lib\\integrations.json",
+        "SIGNALFX_VERSION": "1.0.0",
+
+        // local.settings.json only applies to the function script, not the host, so this needs to exist here
+        "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+
+        "SIGNALFX_AZURE_APP_SERVICES": "1",
+        "SIGNALFX_TRACE_AZURE_FUNCTIONS_ENABLED": "1",
+        "SIGNALFX_LOGS_INJECTION": "1",
+        "SIGNALFX_TRACE_DEBUG": "0"
+      },
+      "nativeDebugging": true
+    }
+  }
+}

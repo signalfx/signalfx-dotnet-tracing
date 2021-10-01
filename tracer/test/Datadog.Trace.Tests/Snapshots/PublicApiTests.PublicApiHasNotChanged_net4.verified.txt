@@ -23,6 +23,7 @@ namespace Datadog.Trace.Configuration
         public const string ApiKey = "SIGNALFX_API_KEY";
         public const string AppSecBlockingEnabled = "SIGNALFX_APPSEC_BLOCKING_ENABLED";
         public const string AppSecEnabled = "SIGNALFX_APPSEC_ENABLED";
+        public const string AppSecRules = "SIGNALFX_APPSEC_RULES";
         public const string BufferSize = "SIGNALFX_TRACE_BUFFER_SIZE";
         public const string ConfigurationFileName = "SIGNALFX_TRACE_CONFIG_FILE";
         public const string CustomSamplingRules = "SIGNALFX_TRACE_SAMPLING_RULES";
@@ -253,6 +254,7 @@ namespace Datadog.Trace
         public const string MongoDb = "mongodb";
         public const string Queue = "queue";
         public const string Redis = "redis";
+        public const string Serverless = "serverless";
         public const string Sql = "sql";
         public const string Test = "test";
         public const string Web = "web";

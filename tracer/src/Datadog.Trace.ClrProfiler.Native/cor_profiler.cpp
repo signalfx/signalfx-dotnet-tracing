@@ -160,6 +160,15 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
                          " is recognized as Kudu, an Azure App Services reserved process.");
             return E_FAIL;
         }
+
+        const auto functions_worker_runtime_value =
+            GetEnvironmentValue(environment::azure_app_services_functions_worker_runtime);
+
+        if (!functions_worker_runtime_value.empty() && !IsAzureFunctionsEnabled())
+        {
+            Logger::Info("DATADOG TRACER DIAGNOSTICS - Profiler disabled: Azure Functions are not officially supported. Enable instrumentation with SIGNALFX_TRACE_AZURE_FUNCTIONS_ENABLED.");
+            return E_FAIL;
+        }
     }
 
     const bool is_calltarget_enabled = IsCallTargetEnabled(is_net46_or_greater);
@@ -695,8 +704,10 @@ HRESULT STDMETHODCALLTYPE CorProfiler::ModuleLoadFinished(ModuleID module_id, HR
         // subscribe to DiagnosticSource events.
         // don't skip Dapper: it makes ADO.NET calls even though it doesn't reference
         // System.Data or System.Data.Common
+        // don't skip Datadog.Trace: we need to ensure we do the PInvokesMap rewrites.
         if (module_info.assembly.name != microsoft_aspnetcore_hosting_assemblyName &&
-            module_info.assembly.name != dapper_assemblyName)
+            module_info.assembly.name != dapper_assemblyName &&
+            module_info.assembly.name != managed_profiler_name)
         {
             filtered_integrations = FilterIntegrationsByTarget(filtered_integrations, assembly_import);
 
@@ -811,6 +822,8 @@ HRESULT STDMETHODCALLTYPE CorProfiler::ModuleUnloadStarted(ModuleID module_id)
 
 HRESULT STDMETHODCALLTYPE CorProfiler::Shutdown()
 {
+    is_attached_.store(false);
+
     CorProfilerBase::Shutdown();
 
     // keep this lock until we are done using the module,
@@ -824,7 +837,6 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Shutdown()
         rejit_handler = nullptr;
     }
     Logger::Info("Exiting. Stats: ", Stats::Instance()->ToString());
-    is_attached_.store(false);
     Logger::Shutdown();
     return S_OK;
 }
@@ -1069,17 +1081,11 @@ HRESULT STDMETHODCALLTYPE CorProfiler::JITInlining(FunctionID callerId, Function
         return S_OK;
     }
 
-
-    RejitHandlerModule* handlerModule = nullptr;
-    if (rejit_handler->TryGetModule(calleeModuleId, &handlerModule))
+    if (is_attached_ && rejit_handler != nullptr && rejit_handler->HasModuleAndMethod(calleeModuleId, calleFunctionToken))
     {
-        if (handlerModule->ContainsMethod(calleFunctionToken))
-        {
-            Logger::Debug("*** JITInlining: Inlining disabled for [ModuleId=", calleeModuleId,
-                          ", MethodDef=", TokenStr(&calleFunctionToken), "]");
-            *pfShouldInline = false;
-            return S_OK;
-        }
+        Logger::Debug("*** JITInlining: Inlining disabled for [ModuleId=", calleeModuleId,
+                      ", MethodDef=", TokenStr(&calleFunctionToken), "]");
+        *pfShouldInline = false;
     }
 
     return S_OK;
@@ -1089,11 +1095,22 @@ HRESULT STDMETHODCALLTYPE CorProfiler::JITInlining(FunctionID callerId, Function
 //
 // InitializeProfiler method
 //
-void CorProfiler::InitializeProfiler(CallTargetDefinition* items, int size)
+void CorProfiler::InitializeProfiler(WCHAR* id, CallTargetDefinition* items, int size)
 {
     auto _ = trace::Stats::Instance()->InitializeProfilerMeasure();
 
-    Logger::Info("InitializeProfiler:: received from managed side: ", size, " integrations.");
+    WSTRING definitionsId = WSTRING(id);
+    Logger::Info("InitializeProfiler: received id: ", definitionsId, " from managed side with ", size,
+                 " integrations.");
+
+    std::scoped_lock<std::mutex> definitionsLock(definitions_ids_lock_);
+
+    if (definitions_ids_.find(definitionsId) != definitions_ids_.end())
+    {
+        Logger::Info("InitializeProfiler: Id already processed.");
+        return;
+    }
+
     if (items != nullptr && rejit_handler != nullptr)
     {
         std::vector<IntegrationMethod> integrationMethods;
@@ -1165,7 +1182,9 @@ void CorProfiler::InitializeProfiler(CallTargetDefinition* items, int size)
             integrationMethods.push_back(integration);
         }
 
-        std::lock_guard<std::mutex> guard(module_id_to_info_map_lock_);
+        std::scoped_lock<std::mutex> moduleLock(module_id_to_info_map_lock_);
+
+        definitions_ids_.emplace(definitionsId);
 
         for (const auto& moduleItem : module_id_to_info_map_)
         {
@@ -1178,7 +1197,7 @@ void CorProfiler::InitializeProfiler(CallTargetDefinition* items, int size)
             integration_methods_.push_back(integration);
         }
 
-        Logger::Info("InitializeProfiler:: Total integrations in profiler: ", integration_methods_.size());
+        Logger::Info("InitializeProfiler: Total integrations in profiler: ", integration_methods_.size());
     }
 }
 

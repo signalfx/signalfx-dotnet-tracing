@@ -118,22 +118,25 @@ namespace Datadog.Trace.PlatformHelpers
                         GetVariableIfExists(
                             FunctionsWorkerRuntimeKey,
                             environmentVariables,
-                            i => AzureContext = AzureContext.AzureFunction);
+                            i => AzureContext = AzureContext.AzureFunctions);
                     FunctionsExtensionVersion =
                         GetVariableIfExists(
                             FunctionsExtensionVersionKey,
                             environmentVariables,
-                            i => AzureContext = AzureContext.AzureFunction);
+                            i => AzureContext = AzureContext.AzureFunctions);
 
                     switch (AzureContext)
                     {
-                        case AzureContext.AzureFunction:
+                        case AzureContext.AzureFunctions:
                             SiteKind = "functionapp";
                             SiteType = "function";
+                            IsFunctionsApp = true;
+                            PlatformStrategy.ShouldSkipClientSpan = ShouldSkipClientSpanWithinFunctions;
                             break;
                         case AzureContext.AzureAppService:
                             SiteKind = "app";
                             SiteType = "app";
+                            IsFunctionsApp = false;
                             break;
                     }
 
@@ -173,6 +176,8 @@ namespace Datadog.Trace.PlatformHelpers
 
         public AzureContext AzureContext { get; private set; } = AzureContext.AzureAppService;
 
+        public bool IsFunctionsApp { get; private set; }
+
         public string FunctionsExtensionVersion { get; }
 
         public string FunctionsWorkerRuntime { get; }
@@ -185,7 +190,13 @@ namespace Datadog.Trace.PlatformHelpers
 
         public string Runtime { get; }
 
-        public string DefaultHttpClientExclusions { get; } = "logs.datadoghq, services.visualstudio, applicationinsights.azure, blob.core.windows.net/azure-webjobs, azurewebsites.net/admin".ToUpperInvariant();
+        public string DefaultHttpClientExclusions { get; } = "logs.datadoghq, services.visualstudio, applicationinsights.azure, blob.core.windows.net/azure-webjobs, azurewebsites.net/admin, /azure-webjobs-hosts/".ToUpperInvariant();
+
+        private static bool ShouldSkipClientSpanWithinFunctions(Scope scope)
+        {
+            // Ignore isolated client spans within azure functions
+            return scope == null;
+        }
 
         private string CompileResourceId()
         {
