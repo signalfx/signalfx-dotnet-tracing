@@ -1,0 +1,7 @@
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: cimg/base:2021.04
+    steps:
+      - run: echo "hello world"
