@@ -17,6 +17,7 @@ using Datadog.Trace.DuckTyping;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Headers;
 using Datadog.Trace.Logging;
+using Datadog.Trace.PlatformHelpers;
 using Datadog.Trace.Propagation;
 using Datadog.Trace.Tagging;
 using Datadog.Trace.Util;
@@ -25,6 +26,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Template;
+using static Datadog.Trace.PlatformHelpers.AspNetCoreHttpRequestHandler;
 
 namespace Datadog.Trace.DiagnosticListeners
 {
@@ -52,6 +54,8 @@ namespace Datadog.Trace.DiagnosticListeners
                    ?.GetType("Microsoft.AspNetCore.Http.Features.IEndpointFeature", throwOnError: false);
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<AspNetCoreDiagnosticObserver>();
+        private static readonly AspNetCoreHttpRequestHandler AspNetCoreRequestHandler = new AspNetCoreHttpRequestHandler(Log, HttpRequestInOperationName, IntegrationId);
+
         private readonly Tracer _tracer;
         private readonly Security _security;
 
@@ -488,7 +492,7 @@ namespace Datadog.Trace.DiagnosticListeners
             var span = mvcScope.Span;
             span.Type = SpanTypes.Web;
 
-            var trackingFeature = httpContext.Features.Get<RequestTrackingFeature>();
+            var trackingFeature = httpContext.Features.Get<AspNetCoreHttpRequestHandler.RequestTrackingFeature>();
             var isUsingEndpointRouting = trackingFeature.IsUsingEndpointRouting;
 
             var isFirstExecution = trackingFeature.IsFirstPipelineExecution;
@@ -645,7 +649,7 @@ namespace Datadog.Trace.DiagnosticListeners
                 Span span = null;
                 if (shouldTrace)
                 {
-                    span = StartCoreSpan(tracer, httpContext, request);
+                    span = AspNetCoreRequestHandler.StartAspNetCorePipelineScope(tracer, security, httpContext).Span;
                 }
 
                 if (shouldSecure)
@@ -690,7 +694,7 @@ namespace Datadog.Trace.DiagnosticListeners
                 }
 
                 HttpContext httpContext = typedArg.HttpContext;
-                var trackingFeature = httpContext.Features.Get<RequestTrackingFeature>();
+                var trackingFeature = httpContext.Features.Get<AspNetCoreHttpRequestHandler.RequestTrackingFeature>();
                 var isFirstExecution = trackingFeature.IsFirstPipelineExecution;
                 if (isFirstExecution)
                 {
@@ -948,7 +952,7 @@ namespace Datadog.Trace.DiagnosticListeners
         }
 
         /// <summary>
-        /// Proxy for ducktyping IEndpointFeature when the interface is not implemented explictly
+        /// Proxy for ducktyping IEndpointFeature when the interface is not implemented explicitly
         /// </summary>
         /// <seealso cref="IEndpointFeature"/>
         [DuckCopy]
@@ -1029,42 +1033,6 @@ namespace Datadog.Trace.DiagnosticListeners
             {
                 throw new NotImplementedException();
             }
-        }
-
-        /// <summary>
-        /// Holds state that we want to pass between diagnostic source events
-        /// </summary>
-        private class RequestTrackingFeature
-        {
-            /// <summary>
-            /// Gets or sets a value indicating whether the pipeline using endpoint routing
-            /// </summary>
-            public bool IsUsingEndpointRouting { get; set; }
-
-            /// <summary>
-            /// Gets or sets a value indicating whether this is the first pipeline execution
-            /// </summary>
-            public bool IsFirstPipelineExecution { get; set; } = true;
-
-            /// <summary>
-            /// Gets or sets a value indicating the route as calculated by endpoint routing (if available)
-            /// </summary>
-            public string Route { get; set; }
-
-            /// <summary>
-            /// Gets or sets a value indicating the resource name as calculated by the endpoint routing(if available)
-            /// </summary>
-            public string ResourceName { get; set; }
-
-            /// <summary>
-            /// Gets or sets the HTTP method, as it requires normalization, so avoids repeatedly calculations
-            /// </summary>
-            public string HttpMethod { get; set; }
-
-            /// <summary>
-            /// Gets or Sets the original URL received by the pipeline
-            /// </summary>
-            public string OriginalUrl { get; set; }
         }
     }
 }

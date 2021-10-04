@@ -1,5 +1,42 @@
 [assembly: System.Reflection.AssemblyMetadata("RepositoryUrl", "https://github.com/DataDog/dd-trace-dotnet.git")]
 
+namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Azure.Functions
+{
+    public enum AzureFunctionsExecutionReason
+    {
+        AutomaticTrigger = 0,
+        HostCall = 1,
+        Dashboard = 2,
+    }
+    public class AzureFunctionsExecutorTryExecuteAsyncIntegration
+    {
+        public AzureFunctionsExecutorTryExecuteAsyncIntegration() { }
+        public static TReturn OnAsyncMethodEnd<TTarget, TReturn>(TTarget instance, TReturn returnValue, System.Exception exception, Datadog.Trace.ClrProfiler.CallTarget.CallTargetState state) { }
+        public static Datadog.Trace.ClrProfiler.CallTarget.CallTargetState OnMethodBegin<TTarget, TFunction>(TTarget instance, TFunction functionInstance, System.Threading.CancellationToken cancellationToken)
+            where TFunction : Datadog.Trace.ClrProfiler.AutoInstrumentation.Azure.Functions.IFunctionInstance { }
+    }
+    public class FunctionInvocationMiddlewareInvokeIntegration
+    {
+        public FunctionInvocationMiddlewareInvokeIntegration() { }
+        public static TReturn OnAsyncMethodEnd<TTarget, TReturn>(TTarget instance, TReturn returnValue, System.Exception exception, Datadog.Trace.ClrProfiler.CallTarget.CallTargetState state) { }
+        public static Datadog.Trace.ClrProfiler.CallTarget.CallTargetState OnMethodBegin<TTarget>(TTarget instance, Microsoft.AspNetCore.Http.HttpContext httpContext) { }
+    }
+    public interface IFunctionDescriptor
+    {
+        string FullName { get; }
+        string Id { get; }
+        string LogName { get; }
+        string ShortName { get; }
+    }
+    public interface IFunctionInstance
+    {
+        object BindingSource { get; }
+        Datadog.Trace.ClrProfiler.AutoInstrumentation.Azure.Functions.IFunctionDescriptor FunctionDescriptor { get; }
+        System.Guid Id { get; }
+        Datadog.Trace.ClrProfiler.AutoInstrumentation.Azure.Functions.AzureFunctionsExecutionReason Reason { get; }
+        System.Collections.Generic.IDictionary<string, string> TriggerDetails { get; }
+    }
+}
 namespace Datadog.Trace.Configuration
 {
     public class CompositeConfigurationSource : Datadog.Trace.Configuration.IConfigurationSource, System.Collections.Generic.IEnumerable<Datadog.Trace.Configuration.IConfigurationSource>, System.Collections.IEnumerable
@@ -23,6 +60,7 @@ namespace Datadog.Trace.Configuration
         public const string ApiKey = "SIGNALFX_API_KEY";
         public const string AppSecBlockingEnabled = "SIGNALFX_APPSEC_BLOCKING_ENABLED";
         public const string AppSecEnabled = "SIGNALFX_APPSEC_ENABLED";
+        public const string AppSecRules = "SIGNALFX_APPSEC_RULES";
         public const string BufferSize = "SIGNALFX_TRACE_BUFFER_SIZE";
         public const string ConfigurationFileName = "SIGNALFX_TRACE_CONFIG_FILE";
         public const string CustomSamplingRules = "SIGNALFX_TRACE_SAMPLING_RULES";
@@ -253,6 +291,7 @@ namespace Datadog.Trace
         public const string MongoDb = "mongodb";
         public const string Queue = "queue";
         public const string Redis = "redis";
+        public const string Serverless = "serverless";
         public const string Sql = "sql";
         public const string Test = "test";
         public const string Web = "web";

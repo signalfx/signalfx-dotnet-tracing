@@ -17,7 +17,7 @@ jobs:
 
     env:
       baseImage: ${{ matrix.baseImage }}
-      dotnetCoreSdk5Version: 5.0.103
+      dotnetCoreSdk5Version: 5.0.401
     steps:
     - uses: actions/checkout@v2
     - name: Build Docker image
@@ -36,6 +36,8 @@ jobs:
           --env tracerHome=/project/tracer/bin/tracer-home \
           --env artifacts=/project/tracer/src/bin/artifacts \
           --env SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN} \
+          --env Verify_DisableClipboard=true \
+          --env DiffEngine_Disabled=true \
           dd-trace-dotnet/${baseImage}-builder \
           dotnet /build/bin/Debug/_build.dll Clean BuildTracerHome ZipTracerHome
     - uses: actions/upload-artifact@v2
