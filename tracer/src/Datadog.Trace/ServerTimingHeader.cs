@@ -1,7 +1,6 @@
 // Modified by Splunk Inc.
 
 using System;
-using System.Collections.Generic;
 using Datadog.Trace.Conventions;
 using Datadog.Trace.Propagation;
 
@@ -46,9 +45,7 @@ namespace Datadog.Trace
 
         private static string ToHeaderValue(SpanContext context)
         {
-            var traceContextHeaders = new Dictionary<string, string>(capacity: 1);
-            _propagator.Inject(context, traceContextHeaders, (dictionary, headerName, headerValue) => dictionary[headerName] = headerValue);
-            return string.Format(ServerTimingFormat, traceContextHeaders[W3CHeaderNames.TraceParent]);
+            return string.Format(ServerTimingFormat, W3CSpanContextPropagator.GetFormattedTraceParent(context));
         }
     }
 }
