@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
@@ -314,7 +316,21 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             try
             {
                 // call the original method, inspecting (but not catching) any unhandled exceptions
-                return instrumentedMethod(asyncControllerActionInvoker, controllerContext, actionName, callback, state);
+                var response = instrumentedMethod(asyncControllerActionInvoker, controllerContext, actionName, callback, state);
+
+                if (scope != null)
+                {
+                    // TracingHttpModule is expected to already have added it in the typical IIS setup
+                    // In principle we could remove adding the headers from this instrumentation, keeping
+                    // so user can disable "AspNet" instrumentation and still get the Server-Timing header added.
+                    var httpContextHeaders = HttpContext.Current?.Response?.Headers;
+                    if (httpContextHeaders != null && httpContextHeaders[ServerTimingHeader.Key] == null)
+                    {
+                        ServerTimingHeader.SetHeaders(scope.Span.Context, httpContextHeaders, (headers, name, value) => headers.Add(name, value));
+                    }
+                }
+
+                return response;
             }
             catch (Exception ex)
             {

@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System.Collections.Generic;
 
 namespace Datadog.Trace.Headers
@@ -10,7 +12,7 @@ namespace Datadog.Trace.Headers
     /// <summary>
     /// Specified a common interface that can be used to manipulate collections of headers.
     /// </summary>
-    internal interface IHeadersCollection
+    public interface IHeadersCollection
     {
         /// <summary>
         /// Returns all header values for a specified header stored in the collection.

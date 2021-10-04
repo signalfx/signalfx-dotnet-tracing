@@ -203,6 +203,8 @@ namespace Datadog.Trace.Configuration
             RouteTemplateResourceNamesEnabled = source?.GetBool(ConfigurationKeys.FeatureFlags.RouteTemplateResourceNamesEnabled)
                                                    ?? false;
 
+            TraceResponseHeaderEnabled = source?.GetBool(ConfigurationKeys.TraceResponseHeaderEnabled) ?? true;
+
             PartialFlushEnabled = source?.GetBool(ConfigurationKeys.PartialFlushEnabled)
                 // default value
                 ?? false;
@@ -447,6 +449,11 @@ namespace Datadog.Trace.Configuration
         /// Gets or sets a value indicating whether the diagnostic log at startup is enabled
         /// </summary>
         public bool StartupDiagnosticLogEnabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether context server timing header will be added.
+        /// </summary>
+        public bool TraceResponseHeaderEnabled { get; set; }
 
         /// <summary>
         /// Gets or sets the comma separated list of url patterns to skip tracing.

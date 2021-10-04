@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #if NETFRAMEWORK
 
 using System;
@@ -127,6 +129,8 @@ namespace Datadog.Trace.AspNet
                 scope = tracer.StartActiveWithTags(_requestOperationName, propagatedContext, tags: tags);
                 // Leave resourceName blank for now - we'll update it in OnEndRequest
                 scope.Span.DecorateWebServerSpan(resourceName: null, httpMethod, host, url, tags, tagsFromHeaders);
+
+                ServerTimingHeader.SetHeaders(scope.Span.Context, httpContext.Response.Headers, (headers, name, value) => headers.Add(name, value));
 
                 tags.SetAnalyticsSampleRate(IntegrationId, tracer.Settings, enabledWithGlobalSetting: true);
 

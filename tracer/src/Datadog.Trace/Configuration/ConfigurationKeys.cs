@@ -393,6 +393,11 @@ namespace Datadog.Trace.Configuration
         public const string KafkaCreateConsumerScopeEnabled = "SIGNALFX_TRACE_KAFKA_CREATE_CONSUMER_SCOPE_ENABLED";
 
         /// <summary>
+        /// Configuration key for enabling splunk context server timing header.
+        /// </summary>
+        public const string TraceResponseHeaderEnabled = "SIGNALFX_TRACE_RESPONSE_HEADER_ENABLED";
+
+        /// <summary>
         /// String format patterns used to match integration-specific configuration keys.
         /// </summary>
         public static class Integrations
