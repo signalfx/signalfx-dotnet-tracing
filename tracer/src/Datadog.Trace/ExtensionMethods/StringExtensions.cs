@@ -86,9 +86,7 @@ namespace Datadog.Trace.ExtensionMethods
         /// <returns>The truncated string or the original string if its length is less than or equal to <paramref name="maxLength"/>.</returns>
         public static string Truncate(this string value, int maxLength)
         {
-            if (value == null) { throw new ArgumentNullException(nameof(value)); }
-
-            return value.Length > maxLength ? value.Substring(0, maxLength) : value;
+            return value?.Length > maxLength ? value.Substring(0, maxLength) : value;
         }
 
         /// <summary>
