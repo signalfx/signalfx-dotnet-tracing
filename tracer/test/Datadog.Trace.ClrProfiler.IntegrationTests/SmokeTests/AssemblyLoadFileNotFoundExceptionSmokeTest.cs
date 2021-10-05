@@ -15,7 +15,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.SmokeTests
         {
         }
 
-        [Fact(Skip="https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation/issues/192")]
+        [SkippableFact]
         [Trait("Category", "Smoke")]
         public void NoExceptions()
         {
