@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Datadog.Trace.Configuration;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Vendors.Newtonsoft.Json;
 using Datadog.Trace.Vendors.Newtonsoft.Json.Serialization;
@@ -9,10 +10,17 @@ namespace Datadog.Trace.Agent
 {
     internal class ZipkinSerializer
     {
-        private readonly JsonSerializer serializer = new JsonSerializer();
-
         // Don't serialize with BOM
-        private readonly Encoding utf8 = new UTF8Encoding(false);
+        private static readonly Encoding UTF8Enconding = new UTF8Encoding(false);
+
+        private readonly JsonSerializer _serializer = new JsonSerializer();
+
+        private readonly TracerSettings _settings;
+
+        public ZipkinSerializer(TracerSettings settings)
+        {
+            _settings = settings;
+        }
 
         public void Serialize(Stream stream, Span[][] traces)
         {
@@ -22,14 +30,14 @@ namespace Datadog.Trace.Agent
             {
                 foreach (var span in trace)
                 {
-                    var zspan = new ZipkinSpan(span);
+                    var zspan = new ZipkinSpan(span, _settings);
                     zipkinTraces.Add(zspan);
                 }
             }
 
-            using (var sw = new StreamWriter(stream, utf8, 4096, true))
+            using (var sw = new StreamWriter(stream, UTF8Enconding, 4096, true))
             {
-                serializer.Serialize(sw, zipkinTraces);
+                _serializer.Serialize(sw, zipkinTraces);
             }
         }
 
@@ -39,10 +47,10 @@ namespace Datadog.Trace.Agent
             private readonly Span _span;
             private readonly IDictionary<string, string> _tags;
 
-            public ZipkinSpan(Span span)
+            public ZipkinSpan(Span span, TracerSettings settings)
             {
                 _span = span;
-                _tags = BuildTags(span);
+                _tags = BuildTags(span, settings);
             }
 
             public string Id
@@ -99,15 +107,17 @@ namespace Datadog.Trace.Agent
                 get => _tags;
             }
 
-            private static IDictionary<string, string> BuildTags(Span span)
+            private static IDictionary<string, string> BuildTags(Span span, TracerSettings settings)
             {
                 var spanTags = span?.Tags?.GetAllTags();
                 var tags = new Dictionary<string, string>(spanTags.Count);
+                var recordedValueMaxLength = settings.RecordedValueMaxLength;
                 foreach (var entry in spanTags)
                 {
                     if (!entry.Key.Equals(Trace.Tags.SpanKind))
                     {
-                        tags[entry.Key] = entry.Value;
+                        var truncatedValue = entry.Value.Truncate(recordedValueMaxLength);
+                        tags[entry.Key] = truncatedValue;
                     }
                 }
 

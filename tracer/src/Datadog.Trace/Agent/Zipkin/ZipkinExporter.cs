@@ -1,6 +1,7 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
+using Datadog.Trace.Configuration;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Propagation;
 
@@ -10,13 +11,15 @@ namespace Datadog.Trace.Agent.Zipkin
     {
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(ZipkinExporter));
 
-        private Uri _tracesEndpoint;
+        private readonly Uri _tracesEndpoint;
+        private readonly TracerSettings _settings;
 
-        public ZipkinExporter(Uri tracesEndpoint)
+        public ZipkinExporter(TracerSettings settings)
         {
             Log.Debug("Creating new Zipkin exporter");
 
-            _tracesEndpoint = tracesEndpoint ?? throw new ArgumentNullException(nameof(tracesEndpoint)); // User needs to include the proper path.
+            _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+            _tracesEndpoint = _settings.AgentUri;
         }
 
         public async Task<bool> SendTracesAsync(Span[][] traces)
@@ -44,7 +47,7 @@ namespace Datadog.Trace.Agent.Zipkin
 
                 using (var requestStream = await request.GetRequestStreamAsync().ConfigureAwait(false))
                 {
-                    var serializer = new ZipkinSerializer();
+                    var serializer = new ZipkinSerializer(_settings);
                     serializer.Serialize(requestStream, traces);
                 }
 

@@ -775,7 +775,7 @@ namespace Datadog.Trace
             switch (settings.Exporter)
             {
                 case ExporterType.Zipkin:
-                    return new ExporterWriter(new ZipkinExporter(settings.AgentUri), metrics);
+                    return new ExporterWriter(new ZipkinExporter(settings), metrics);
                 case ExporterType.Jaeger:
                     return new ExporterWriter(new JaegerExporter(JaegerOptions.FromTracerSettings(settings)), metrics);
                 default:

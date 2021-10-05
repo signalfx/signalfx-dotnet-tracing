@@ -1,9 +1,12 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Datadog.Trace.Agent;
+using Datadog.Trace.Configuration;
 using Datadog.Trace.TestHelpers.Factories;
 using Newtonsoft.Json;
 using Xunit;
+using static Datadog.Trace.Agent.ZipkinSerializer;
 
 namespace Datadog.Trace.Tests.Agent.Zipkin
 {
@@ -12,10 +15,11 @@ namespace Datadog.Trace.Tests.Agent.Zipkin
         [Fact]
         public void RoundTripRootSpanTest()
         {
+            var settings = new TracerSettings();
             var span = SpanFactory.CreateSpan();
-            var zipkinSpan = new ZipkinSerializer.ZipkinSpan(span);
+            var zipkinSpan = new ZipkinSpan(span, settings);
 
-            var serializer = new ZipkinSerializer();
+            var serializer = new ZipkinSerializer(settings);
             using var ms = new MemoryStream();
 
             serializer.Serialize(ms, new[] { new[] { span } });
@@ -28,6 +32,27 @@ namespace Datadog.Trace.Tests.Agent.Zipkin
 
             var actualSpan = actualTraces[0];
             actualSpan.AssertZipkinSerializerSpan(zipkinSpan);
+        }
+
+        [Theory]
+        [InlineData("log not to be truncated", "log not to be truncated")]
+        [InlineData("log to be truncated", "log to be")]
+        [InlineData("log set to empty", "")]
+        public void TagTruncation(string original, string expected)
+        {
+            var traceContext = new TraceContext(Tracer.Instance);
+            var spanContext = new SpanContext(null, traceContext, $"{nameof(TagTruncation)}");
+            var span = new Span(spanContext, start: null);
+            span.SetTag("test", original);
+
+            var settings = new TracerSettings
+            {
+                RecordedValueMaxLength = expected.Length,
+            };
+            var zipkinSpan = new ZipkinSpan(span, settings);
+            var tags = zipkinSpan.Tags;
+            Assert.Single(tags);
+            Assert.Equal(expected, tags.First().Value);
         }
 
         public class TestZipkinSpan
