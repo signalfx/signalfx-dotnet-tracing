@@ -65,6 +65,7 @@ namespace Datadog.Trace.Tests.Configuration
             yield return new object[] { CreateFunc(s => s.MaxTracesSubmittedPerSecond), 100 };
             yield return new object[] { CreateFunc(s => s.TracerMetricsEnabled), false };
             yield return new object[] { CreateFunc(s => s.DogStatsdPort), 8125 };
+            yield return new object[] { CreateFunc(s => s.RecordedValueMaxLength), 1200 };
         }
 
         public static IEnumerable<object[]> GetTestData()
@@ -109,6 +110,8 @@ namespace Datadog.Trace.Tests.Configuration
             yield return new object[] { ConfigurationKeys.Convention, "opentelemetry", CreateFunc(s => s.Convention), ConventionType.OpenTelemetry };
             yield return new object[] { ConfigurationKeys.Convention, "Datadog", CreateFunc(s => s.Convention), ConventionType.Datadog };
             yield return new object[] { ConfigurationKeys.Convention, "unknown", CreateFunc(s => s.Convention), ConventionType.Default };
+
+            yield return new object[] { ConfigurationKeys.RecordedValueMaxLength, "100", CreateFunc(s => s.RecordedValueMaxLength), 100 };
         }
 
         // JsonConfigurationSource needs to be tested with JSON data, which cannot be used with the other IConfigurationSource implementations.
