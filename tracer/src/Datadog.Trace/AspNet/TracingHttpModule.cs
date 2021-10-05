@@ -130,8 +130,6 @@ namespace Datadog.Trace.AspNet
                 // Leave resourceName blank for now - we'll update it in OnEndRequest
                 scope.Span.DecorateWebServerSpan(resourceName: null, httpMethod, host, url, tags, tagsFromHeaders);
 
-                ServerTimingHeader.SetHeaders(scope.Span.Context, httpContext.Response.Headers, (headers, name, value) => headers.Add(name, value));
-
                 tags.SetAnalyticsSampleRate(IntegrationId, tracer.Settings, enabledWithGlobalSetting: true);
 
                 // Decorate the incoming HTTP Request with distributed tracing headers
@@ -139,6 +137,8 @@ namespace Datadog.Trace.AspNet
                 // (e.g. WCF being hosted in IIS)
                 if (HttpRuntime.UsingIntegratedPipeline)
                 {
+                    ServerTimingHeader.SetHeaders(scope.Span.Context, httpContext.Response.Headers, (headers, name, value) => headers.Add(name, value));
+
                     propagator.Inject(scope.Span.Context, httpRequest.Headers.Wrap());
                 }
 
