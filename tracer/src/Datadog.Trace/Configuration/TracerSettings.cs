@@ -33,7 +33,7 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         public const int DefaultAgentPort = 8126;
 
-        private const int DefaultRecordedValueMaxLength = 1200;
+        private const int DefaultRecordedValueMaxLength = 12000;
 
         private int _partialFlushMinSpans;
 
@@ -459,7 +459,7 @@ namespace Datadog.Trace.Configuration
         /// <summary>
         /// Gets or sets a value with the maximum length a tag/log value can have.
         /// Values are completely truncated when set to 0, and ignored when set to negative
-        /// or non-integer string. The default value is 1200.
+        /// or non-integer string. The default value is 12000.
         /// </summary>
         /// <seealso cref="ConfigurationKeys.RecordedValueMaxLength"/>
         public int RecordedValueMaxLength { get; set; }

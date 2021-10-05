@@ -395,7 +395,7 @@ namespace Datadog.Trace.Configuration
         /// <summary>
         /// Configuration key to set maximum length a tag/log value can have.
         /// Values are completely truncated when set to 0, and ignored when set to negative
-        /// or non-integer string. The default value is 1200.
+        /// or non-integer string. The default value is 12000.
         /// </summary>
         /// <seealso cref="TracerSettings.RecordedValueMaxLength"/>
         public const string RecordedValueMaxLength = "SIGNALFX_RECORDED_VALUE_MAX_LENGTH";
