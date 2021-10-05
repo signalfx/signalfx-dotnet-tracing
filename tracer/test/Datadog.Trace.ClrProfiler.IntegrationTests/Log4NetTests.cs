@@ -6,6 +6,8 @@
 // Modified by Splunk Inc.
 
 using System;
+using System.Linq;
+using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.TestHelpers;
 using Xunit;
 using Xunit.Abstractions;
@@ -49,13 +51,23 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetServiceVersion("1.0.0");
         }
 
+        public static System.Collections.Generic.IEnumerable<object[]> GetTestData()
+        {
+            foreach (var item in PackageVersions.log4net)
+            {
+                yield return item.Concat(false);
+                yield return item.Concat(true);
+            }
+        }
+
         [SkippableTheory]
-        [MemberData(nameof(PackageVersions.log4net), MemberType = typeof(PackageVersions))]
+        [MemberData(nameof(GetTestData))]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         [Trait("Category", "LinuxUnsupported")]
-        public void InjectsLogsWhenEnabled(string packageVersion)
+        public void InjectsLogsWhenEnabled(string packageVersion, bool enableCallTarget)
         {
+            SetCallTargetSettings(enableCallTarget);
             SetEnvironmentVariable("SIGNALFX_LOGS_INJECTION", "true");
 
             int agentPort = TcpPortProvider.GetOpenPort();
@@ -82,13 +94,14 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         }
 
         [SkippableTheory]
-        [MemberData(nameof(PackageVersions.log4net), MemberType = typeof(PackageVersions))]
+        [MemberData(nameof(GetTestData))]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         [Trait("Category", "LinuxUnsupported")]
-        public void DoesNotInjectLogsWhenDisabled(string packageVersion)
+        public void DoesNotInjectLogsWhenDisabled(string packageVersion, bool enableCallTarget)
         {
-            SetEnvironmentVariable("SIGNALFX_LOGS_INJECTION", "false");
+            SetCallTargetSettings(enableCallTarget);
+            SetEnvironmentVariable("SIGNALFX_LOGS_INJECTION", "true");
 
             int agentPort = TcpPortProvider.GetOpenPort();
             using (var agent = new MockTracerAgent(agentPort))
