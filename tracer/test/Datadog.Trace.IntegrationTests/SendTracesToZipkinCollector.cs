@@ -15,8 +15,9 @@ namespace Datadog.Trace.IntegrationTests
         public SendTracesToZipkinCollector()
         {
             int collectorPort = 9411;
-            var agentUri = new Uri($"http://localhost:{collectorPort}/api/v2/spans");
-            var exporter = new ZipkinExporter(agentUri);
+            var settings = new TracerSettings();
+            settings.AgentUri = new Uri($"http://localhost:{collectorPort}/api/v2/spans");
+            var exporter = new ZipkinExporter(settings);
             var exporterWriter = new ExporterWriter(exporter, new NullMetrics());
             _tracer = new Tracer(new TracerSettings(), plugins: null, exporterWriter, sampler: null, scopeManager: null, statsd: null);
             _zipkinCollector = new MockZipkinCollector(collectorPort);

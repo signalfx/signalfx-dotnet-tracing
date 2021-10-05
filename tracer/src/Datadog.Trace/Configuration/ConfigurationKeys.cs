@@ -398,6 +398,14 @@ namespace Datadog.Trace.Configuration
         public const string TraceResponseHeaderEnabled = "SIGNALFX_TRACE_RESPONSE_HEADER_ENABLED";
 
         /// <summary>
+        /// Configuration key to set maximum length a tag/log value can have.
+        /// Values are completely truncated when set to 0, and ignored when set to negative
+        /// or non-integer string. The default value is 12000.
+        /// </summary>
+        /// <seealso cref="TracerSettings.RecordedValueMaxLength"/>
+        public const string RecordedValueMaxLength = "SIGNALFX_RECORDED_VALUE_MAX_LENGTH";
+
+        /// <summary>
         /// String format patterns used to match integration-specific configuration keys.
         /// </summary>
         public static class Integrations

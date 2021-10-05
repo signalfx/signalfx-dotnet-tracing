@@ -33,6 +33,8 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         public const int DefaultAgentPort = 8126;
 
+        private const int DefaultRecordedValueMaxLength = 12000;
+
         private int _partialFlushMinSpans;
 
         /// <summary>
@@ -199,6 +201,12 @@ namespace Datadog.Trace.Configuration
 
             TraceBatchInterval = source?.GetInt32(ConfigurationKeys.SerializationBatchInterval)
                         ?? 100;
+
+            RecordedValueMaxLength = source?.GetInt32(ConfigurationKeys.RecordedValueMaxLength) ?? DefaultRecordedValueMaxLength;
+            if (RecordedValueMaxLength < 0)
+            {
+                RecordedValueMaxLength = DefaultRecordedValueMaxLength;
+            }
 
             RouteTemplateResourceNamesEnabled = source?.GetBool(ConfigurationKeys.FeatureFlags.RouteTemplateResourceNamesEnabled)
                                                    ?? false;
@@ -454,6 +462,14 @@ namespace Datadog.Trace.Configuration
         /// Gets or sets a value indicating whether context server timing header will be added.
         /// </summary>
         public bool TraceResponseHeaderEnabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value with the maximum length a tag/log value can have.
+        /// Values are completely truncated when set to 0, and ignored when set to negative
+        /// or non-integer string. The default value is 12000.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.RecordedValueMaxLength"/>
+        public int RecordedValueMaxLength { get; set; }
 
         /// <summary>
         /// Gets or sets the comma separated list of url patterns to skip tracing.
