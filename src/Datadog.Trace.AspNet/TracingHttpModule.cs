@@ -139,17 +139,17 @@ namespace Datadog.Trace.AspNet
                 span.DecorateWebServerSpan(resourceName, httpMethod, host, url, remoteIp);
                 span.SetTag(Tags.InstrumentationName, IntegrationName);
 
-                ServerTimingHeader.SetHeaders(span.Context, httpContext.Response.Headers, (headers, name, value) => headers.Add(name, value));
-
-                httpContext.Items[_httpContextScopeKey] = scope;
-
                 // Decorate the incoming HTTP Request with distributed tracing headers
                 // in case the next processor cannot access the stored Scope
                 // (e.g. WCF being hosted in IIS)
                 if (HttpRuntime.UsingIntegratedPipeline)
                 {
+                    ServerTimingHeader.SetHeaders(span.Context, httpContext.Response.Headers, (headers, name, value) => headers.Add(name, value));
+
                     Tracer.Instance.Propagator.Inject(scope.Span.Context, httpRequest.Headers.Wrap());
                 }
+
+                httpContext.Items[_httpContextScopeKey] = scope;
             }
             catch (Exception ex)
             {
