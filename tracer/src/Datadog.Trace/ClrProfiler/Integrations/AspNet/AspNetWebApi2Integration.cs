@@ -214,7 +214,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             }
             finally
             {
-                if (scope != null)
+                if (scope != null && HttpRuntime.UsingIntegratedPipeline)
                 {
                     // TracingHttpModule is expected to already have added it in the typical IIS setup
                     // In principle we could remove adding the headers from this instrumentation, keeping

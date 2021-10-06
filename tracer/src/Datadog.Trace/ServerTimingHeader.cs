@@ -1,7 +1,6 @@
 // Modified by Splunk Inc.
 
 using System;
-using Datadog.Trace.Conventions;
 using Datadog.Trace.Propagation;
 
 namespace Datadog.Trace
@@ -19,13 +18,6 @@ namespace Datadog.Trace
 
         private const string ExposeHeadersHeaderName = "Access-Control-Expose-Headers";
         private const string ServerTimingFormat = "traceparent;desc=\"{0}\"";
-
-        private static W3CSpanContextPropagator _propagator;
-
-        static ServerTimingHeader()
-        {
-            _propagator = new W3CSpanContextPropagator(new OtelTraceIdConvention());
-        }
 
         /// <summary>
         /// Sets the Server-Timing (and Access-Control-Expose-Headers) headers.
