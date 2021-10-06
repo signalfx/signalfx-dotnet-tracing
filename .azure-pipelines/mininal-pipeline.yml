@@ -289,7 +289,7 @@ stages:
       condition: eq(variables.requiresCosmos, true)
       workingDirectory: $(Pipeline.Workspace)
 
-    - script: tracer\build.cmd $(target) --PrintDriveSpace
+    - script: tracer\build.cmd $(target) -Framework netcoreapp3.1 --PrintDriveSpace
       displayName: Run integration tests
 
     - task: PublishTestResults@2
@@ -338,7 +338,7 @@ stages:
         patterns: '**/*.msi'
         path: $(System.DefaultWorkingDirectory)/$(relativeMsiOutputDirectory)
 
-    - script: tracer\build.cmd BuildWindowsIntegrationTests
+    - script: tracer\build.cmd BuildWindowsIntegrationTests -Framework netcoreapp3.1 
       displayName: BuildWindowsIntegrationTests
 
     - task: DockerCompose@0
@@ -353,7 +353,7 @@ stages:
         containerregistrytype: Container Registry
         dockerComposeCommand: up -d IntegrationTests.IIS
 
-    - script: tracer\build.cmd RunWindowsIisIntegrationTests
+    - script: tracer\build.cmd RunWindowsIisIntegrationTests -Framework netcoreapp3.1  
       displayName: RunWindowsIisIntegrationTests
 
     - task: PublishTestResults@2
