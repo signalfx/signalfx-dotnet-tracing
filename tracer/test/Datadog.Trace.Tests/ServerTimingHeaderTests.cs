@@ -12,7 +12,7 @@ namespace Datadog.Trace.Tests
     {
         [Theory]
         [MemberData(nameof(GetHeaderCollectionImplementations))]
-        public void SetHeaders_InjectsTheHeadersCorrectly(IHeadersCollection headers)
+        internal void SetHeaders_InjectsTheHeadersCorrectly(IHeadersCollection headers)
         {
             var traceId = TraceId.CreateRandom();
             var spanContext = new SpanContext(traceId, 123, SamplingPriority.AutoKeep);
