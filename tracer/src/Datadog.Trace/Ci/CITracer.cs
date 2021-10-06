@@ -12,7 +12,7 @@ namespace Datadog.Trace.Ci
     internal class CITracer : Tracer, ILockedTracer
     {
         public CITracer(TracerSettings settings)
-            : base(settings, agentWriter: new CIAgentWriter(settings), sampler: new CISampler(), scopeManager: null, statsd: null)
+            : base(settings, agentWriter: new CIAgentWriter(settings), sampler: new CISampler(), scopeManager: null, statsd: null, plugins: null)
         {
         }
     }
