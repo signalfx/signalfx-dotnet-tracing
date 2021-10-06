@@ -1,3 +1,5 @@
+// Modified by Splunk Inc.
+
 using System;
 using System.Net;
 using System.Threading.Tasks;
@@ -44,6 +46,12 @@ namespace Datadog.Trace.Agent.Zipkin
 
                 // Disable automatic instrumentation for Zipkin exporter
                 request.Headers.Add(CommonHttpHeaderNames.TracingEnabled, "false");
+
+                // Add SignalFx Access Token if configured
+                if (!string.IsNullOrWhiteSpace(_settings.SignalFxAccessToken))
+                {
+                    request.Headers.Add("X-Sf-Token", _settings.SignalFxAccessToken);
+                }
 
                 using (var requestStream = await request.GetRequestStreamAsync().ConfigureAwait(false))
                 {

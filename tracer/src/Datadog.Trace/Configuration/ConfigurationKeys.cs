@@ -45,6 +45,13 @@ namespace Datadog.Trace.Configuration
         public const string ServiceVersion = "SIGNALFX_VERSION";
 
         /// <summary>
+        /// Configuration key to set the SignalFx access token. This is to be used when sending data
+        /// directly to ingestion URL, ie.: no agent or collector is being used.
+        /// </summary>
+        /// <seealso cref="TracerSettings.SignalFxAccessToken"/>
+        public const string SignalFxAccessToken = "SIGNALFX_ACCESS_TOKEN";
+
+        /// <summary>
         /// Configuration key for enabling or disabling the Tracer.
         /// Default is value is true (enabled).
         /// </summary>

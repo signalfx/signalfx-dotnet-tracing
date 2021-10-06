@@ -62,6 +62,8 @@ namespace Datadog.Trace.Configuration
 
             ServiceVersion = source?.GetString(ConfigurationKeys.ServiceVersion);
 
+            SignalFxAccessToken = source?.GetString(ConfigurationKeys.SignalFxAccessToken);
+
             TraceEnabled = source?.GetBool(ConfigurationKeys.TraceEnabled) ??
                            // default value
                            true;
@@ -250,6 +252,13 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="ConfigurationKeys.ServiceVersion"/>
         public string ServiceVersion { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value with the SignalFx access token. This is to be used when sending data
+        /// directly to ingestion URL, ie.: no agent or collector is being used.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.SignalFxAccessToken"/>
+        public string SignalFxAccessToken { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether tracing is enabled.
