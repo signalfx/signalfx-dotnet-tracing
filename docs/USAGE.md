@@ -26,6 +26,7 @@ Use these environment variables to configure the tracing library:
 | `SIGNALFX_TRACE_BUFFER_SIZE` | The size in bytes of the trace buffer. | `1024 * 1024 * 10 (10MB)` |
 | `SIGNALFX_TRACE_BATCH_INTERVAL` | The batch interval in milliseconds for the serialization queue. | `100` |
 | `SIGNALFX_MAX_TRACES_PER_SECOND` | The number of traces allowed to be submitted per second. | `100` |
+| `SIGNALFX_TRACE_RESPONSE_HEADER_ENABLED` | Enable to add server trace information to HTTP response headers. | `true` |
 | `SIGNALFX_TRACE_STARTUP_LOGS` | Enable to activate diagnostic log at stratup. | `true` |
 | `SIGNALFX_TRACE_SAMPLING_RULES` | Comma separated list of sampling rules taht enabled custom sampling rules based on regular expressions. The rule is matched in order of specification. The first match in a list is used. The item "sample_rate" is required in decimal format. The item "service" is optional in regular expression format, to match on service name. The item "name" is optional in regular expression format, to match on operation name. | `'[{"sample_rate":0.5, "service":"cart.*"}],[{"sample_rate":0.2, "name":"http.request"}]'` |
 | `SIGNALFX_TRACE_SAMPLE_RATE` | The global rate for the sampler. |  |

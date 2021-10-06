@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #if NETFRAMEWORK
 
 using System;
@@ -135,6 +137,8 @@ namespace Datadog.Trace.AspNet
                 // (e.g. WCF being hosted in IIS)
                 if (HttpRuntime.UsingIntegratedPipeline)
                 {
+                    ServerTimingHeader.SetHeaders(scope.Span.Context, httpContext.Response.Headers, (headers, name, value) => headers.Add(name, value));
+
                     propagator.Inject(scope.Span.Context, httpRequest.Headers.Wrap());
                 }
 

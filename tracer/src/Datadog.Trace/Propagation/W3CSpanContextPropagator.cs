@@ -39,13 +39,24 @@ namespace Datadog.Trace.Propagation
             _traceIdConvention = traceIdConvention;
         }
 
+        /// <summary>
+        /// Formats <see cref="SpanContext"/> to traceparent specific format.
+        /// </summary>
+        /// <param name="context">A <see cref="SpanContext"/> value that will be used to generate
+        /// traceparent header value.</param>
+        /// <returns>Fromatted traceparent header value</returns>
+        public static string GetFormattedTraceParent(SpanContext context)
+        {
+            return string.Format(TraceParentFormat, context.TraceId.ToString(), context.SpanId.ToString("x16"));
+        }
+
         /// <inheritdoc cref="IPropagator"/>
         public virtual void Inject<T>(SpanContext context, T carrier, Action<T, string, string> setter)
         {
             // lock sampling priority when span propagates.
             context.TraceContext?.LockSamplingPriority();
 
-            setter(carrier, W3CHeaderNames.TraceParent, string.Format(TraceParentFormat, context.TraceId.ToString(), context.SpanId.ToString("x16")));
+            setter(carrier, W3CHeaderNames.TraceParent, GetFormattedTraceParent(context));
             if (!string.IsNullOrEmpty(context.TraceState))
             {
                 setter(carrier, W3CHeaderNames.TraceState, context.TraceState);

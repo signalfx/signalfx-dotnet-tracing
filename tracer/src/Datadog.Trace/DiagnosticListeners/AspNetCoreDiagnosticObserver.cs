@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #if !NETFRAMEWORK
 using System;
 using System.Collections;
@@ -650,6 +652,12 @@ namespace Datadog.Trace.DiagnosticListeners
                 if (shouldTrace)
                 {
                     span = AspNetCoreRequestHandler.StartAspNetCorePipelineScope(tracer, security, httpContext).Span;
+
+                    var httpContextHeaders = httpContext.Response.Headers;
+                    if (httpContextHeaders != null && !httpContextHeaders.ContainsKey(ServerTimingHeader.Key))
+                    {
+                        ServerTimingHeader.SetHeaders(span.Context, httpContextHeaders, (headers, name, value) => headers.Add(name, value));
+                    }
                 }
 
                 if (shouldSecure)

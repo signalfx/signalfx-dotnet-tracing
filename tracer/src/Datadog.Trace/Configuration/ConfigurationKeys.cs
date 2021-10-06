@@ -400,6 +400,11 @@ namespace Datadog.Trace.Configuration
         public const string KafkaCreateConsumerScopeEnabled = "SIGNALFX_TRACE_KAFKA_CREATE_CONSUMER_SCOPE_ENABLED";
 
         /// <summary>
+        /// Configuration key for enabling splunk context server timing header.
+        /// </summary>
+        public const string TraceResponseHeaderEnabled = "SIGNALFX_TRACE_RESPONSE_HEADER_ENABLED";
+
+        /// <summary>
         /// Configuration key to set maximum length a tag/log value can have.
         /// Values are completely truncated when set to 0, and ignored when set to negative
         /// or non-integer string. The default value is 12000.
