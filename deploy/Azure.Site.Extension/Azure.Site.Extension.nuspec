@@ -3,14 +3,15 @@
   <metadata>
     <id>SignalFx.NET.Tracing.Azure.Site.Extension</id>
     <version>0.1.13.0</version>
-    <title>SignalFx .NET Tracing [PreRelease]</title>
+    <title>SignalFx .NET Tracing</title>
     <authors>SignalFx</authors>
     <icon>icon.png</icon>
     <license type="expression">Apache-2.0</license>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>
-      SignalFx .NET Tracing [PreRelease]
+      SignalFx .NET Tracing packaged as an Azure Site Extension.
     </description>
+    <projectUrl>https://github.com/signalfx/signalfx-dotnet-tracing</projectUrl>
     <tags>AzureSiteExtension SignalFx .NET Tracing</tags>
     <packageTypes>
       <packageType name="AzureSiteExtension" />

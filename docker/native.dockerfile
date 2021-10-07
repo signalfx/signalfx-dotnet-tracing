@@ -1,15 +1,16 @@
-FROM ubuntu:14.04
+FROM ubuntu:18.04
 
 RUN apt-get update && \
     apt-get install -y \
+        gnupg2 \
         git \
         wget
 
-RUN echo "deb https://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.9 main" | sudo tee /etc/apt/sources.list.d/llvm.list
-RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-RUN sudo apt-get update
+RUN echo "deb https://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.9 main" | tee /etc/apt/sources.list.d/llvm.list
+RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
+RUN apt-get update
 
-RUN sudo apt-get install -y \
+RUN apt-get install -y \
     cmake \
     llvm-3.9 \
     clang-3.9 \
@@ -25,10 +26,9 @@ RUN sudo apt-get install -y \
     libnuma-dev \
     libkrb5-dev
 
-RUN cd /usr/lib/llvm-3.9/lib && ln -s ../../x86_64-linux-gnu/liblldb-3.9.so.1 liblldb-3.9.so.1
+RUN ln -s ../../x86_64-linux-gnu/liblldb-3.9.so.1 liblldb-3.9.so.1
 
 RUN apt-get update && apt-get install -y \
-    python-software-properties \
     software-properties-common
 
 RUN add-apt-repository ppa:ubuntu-toolchain-r/test && \
