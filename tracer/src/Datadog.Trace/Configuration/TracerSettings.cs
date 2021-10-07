@@ -92,6 +92,7 @@ namespace Datadog.Trace.Configuration
                             DefaultAgentPort;
 
             var agentUri = source?.GetString(ConfigurationKeys.AgentUri) ??
+                           source?.GetString(ConfigurationKeys.EndpointUrl) ??
                            // default value
                            $"http://{agentHost}:{agentPort}";
 
