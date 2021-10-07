@@ -25,6 +25,7 @@ namespace Datadog.Trace.Configuration
         public const string AppSecEnabled = "SIGNALFX_APPSEC_ENABLED";
         public const string AppSecRules = "SIGNALFX_APPSEC_RULES";
         public const string BufferSize = "SIGNALFX_TRACE_BUFFER_SIZE";
+        public const string CIVisibilityEnabled = "SIGNALFX_CIVISIBILITY_ENABLED";
         public const string ConfigurationFileName = "SIGNALFX_TRACE_CONFIG_FILE";
         public const string CustomSamplingRules = "SIGNALFX_TRACE_SAMPLING_RULES";
         public const string DebugEnabled = "SIGNALFX_TRACE_DEBUG";

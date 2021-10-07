@@ -36,17 +36,15 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetCallTargetSettings(true);
         }
 
-        [Fact]
+        [SkippableFact]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         public void InjectsLogs()
         {
             int agentPort = TcpPortProvider.GetOpenPort();
             using (var agent = new MockTracerAgent(agentPort))
-            using (var processResult = RunSampleAndWaitForExit(agent.Port, aspNetCorePort: 0))
+            using (RunSampleAndWaitForExit(agent.Port, aspNetCorePort: 0))
             {
-                Assert.True(processResult.ExitCode >= 0, $"Process exited with code {processResult.ExitCode} and exception: {processResult.StandardError}");
-
                 var spans = agent.WaitForSpans(1, 2500);
                 spans.Should().HaveCountGreaterOrEqualTo(1);
 

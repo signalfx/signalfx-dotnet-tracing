@@ -82,7 +82,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
         {
             private readonly HttpClient _httpClient;
             private Process _process;
-            private bool _enableLogging = true;
+            private bool _enableLogging = false;
 
             public AspNetCoreTestFixture()
             {

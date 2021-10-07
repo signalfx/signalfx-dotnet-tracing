@@ -3,7 +3,7 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-namespace Datadog.Trace.Ci
+namespace Datadog.Trace.Ci.Tags
 {
     /// <summary>
     /// Span tags for test data model
@@ -43,6 +43,12 @@ namespace Datadog.Trace.Ci
         /// </summary>
         [FeatureTracking]
         public const string Framework = "test.framework";
+
+        /// <summary>
+        /// Test framework version
+        /// </summary>
+        [FeatureTracking]
+        public const string FrameworkVersion = "test.framework_version";
 
         /// <summary>
         /// Test parameters

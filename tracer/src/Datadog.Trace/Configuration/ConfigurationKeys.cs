@@ -413,6 +413,12 @@ namespace Datadog.Trace.Configuration
         public const string RecordedValueMaxLength = "SIGNALFX_RECORDED_VALUE_MAX_LENGTH";
 
         /// <summary>
+        /// Configuration key for enabling or disabling CI Visibility.
+        /// Default is value is false (disabled).
+        /// </summary>
+        public const string CIVisibilityEnabled = "SIGNALFX_CIVISIBILITY_ENABLED";
+
+        /// <summary>
         /// String format patterns used to match integration-specific configuration keys.
         /// </summary>
         public static class Integrations

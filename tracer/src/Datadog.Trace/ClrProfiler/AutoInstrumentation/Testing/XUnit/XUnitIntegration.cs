@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Datadog.Trace.Ci;
+using Datadog.Trace.Ci.Tags;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.ExtensionMethods;
 
@@ -17,18 +18,16 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Testing.XUnit
         internal const string IntegrationName = nameof(IntegrationIds.XUnit);
         internal static readonly IntegrationInfo IntegrationId = IntegrationRegistry.GetIntegrationInfo(IntegrationName);
 
-        internal static bool IsEnabled => Common.TestTracer.Settings.IsIntegrationEnabled(IntegrationId);
+        internal static bool IsEnabled => CIVisibility.IsRunning && Tracer.Instance.Settings.IsIntegrationEnabled(IntegrationId);
 
         internal static Scope CreateScope(ref TestRunnerStruct runnerInstance, Type targetType)
         {
             string testSuite = runnerInstance.TestClass.ToString();
             string testName = runnerInstance.TestMethod.Name;
 
-            AssemblyName testInvokerAssemblyName = targetType.Assembly.GetName();
-
             string testFramework = "xUnit";
 
-            Scope scope = Common.TestTracer.StartActive("xunit.test", serviceName: Common.TestTracer.DefaultServiceName);
+            Scope scope = Tracer.Instance.StartActive("xunit.test", serviceName: Tracer.Instance.DefaultServiceName);
             Span span = scope.Span;
 
             span.Type = SpanTypes.Test;
@@ -38,6 +37,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Testing.XUnit
             span.SetTag(TestTags.Suite, testSuite);
             span.SetTag(TestTags.Name, testName);
             span.SetTag(TestTags.Framework, testFramework);
+            span.SetTag(TestTags.FrameworkVersion, targetType.Assembly?.GetName().Version.ToString());
             span.SetTag(TestTags.Type, TestTags.TypeTest);
             CIEnvironmentValues.DecorateSpan(span);
 

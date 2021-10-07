@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Datadog.Trace.Ci;
+using Datadog.Trace.Ci.Tags;
 using Datadog.Trace.TestHelpers;
 using Xunit;
 using Xunit.Abstractions;
@@ -26,19 +27,20 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.CI
             SetServiceVersion("1.0.0");
         }
 
-        [Theory]
+        [SkippableTheory]
         [MemberData(nameof(PackageVersions.MSTest), MemberType = typeof(PackageVersions))]
         [Trait("Category", "EndToEnd")]
         [Trait("Category", "TestIntegrations")]
         public void SubmitTraces(string packageVersion)
         {
+            var version = string.IsNullOrEmpty(packageVersion) ? new Version("2.0.0") : new Version(packageVersion);
             List<MockTracerAgent.Span> spans = null;
-            var actualPackageVersion = string.IsNullOrEmpty(packageVersion) ? "2.0.0" : packageVersion;
-            var expectedSpanCount = new Version(actualPackageVersion).CompareTo(new Version("2.2.5")) < 0 ? 13 : 15;
+            var expectedSpanCount = version.CompareTo(new Version("2.2.5")) < 0 ? 13 : 15;
 
             try
             {
                 SetCallTargetSettings(true);
+                SetEnvironmentVariable("SIGNALFX_CIVISIBILITY_ENABLED", "1");
                 SetEnvironmentVariable("SIGNALFX_TRACE_DEBUG", "1");
                 SetEnvironmentVariable("SIGNALFX_DUMP_ILREWRITE_ENABLED", "1");
 
@@ -73,6 +75,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.CI
 
                         // check the test framework
                         AssertTargetSpanContains(targetSpan, TestTags.Framework, "MSTestV2");
+                        Assert.True(targetSpan.Tags.Remove(TestTags.FrameworkVersion));
 
                         // check the version
                         AssertTargetSpanEqual(targetSpan, "version", "1.0.0");

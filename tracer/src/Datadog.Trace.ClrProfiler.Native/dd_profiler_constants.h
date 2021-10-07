@@ -91,9 +91,20 @@ const WSTRING managed_profiler_full_assembly_version =
 const WSTRING managed_profiler_name = WStr("OpenTelemetry.AutoInstrumentation");
 
 const WSTRING nonwindows_nativemethods_type = WStr("Datadog.Trace.ClrProfiler.NativeMethods+NonWindows");
+const WSTRING windows_nativemethods_type = WStr("Datadog.Trace.ClrProfiler.NativeMethods+Windows");
+
 const WSTRING appsec_nonwindows_nativemethods_type = WStr("Datadog.Trace.AppSec.Waf.NativeBindings.NativeLibrary+NonWindows");
+const WSTRING appsec_windows_nativemethods_type = WStr("Datadog.Trace.AppSec.Waf.NativeBindings.NativeLibrary+Windows");
 
 const WSTRING calltarget_modification_action = WStr("CallTargetModification");
+
+#ifdef _WIN32
+const WSTRING native_dll_filename = WStr("OPENTELEMETRY.AUTOINSTRUMENTATION.CLRPROFILER.NATIVE.DLL");
+#elif MACOS
+const WSTRING native_dll_filename = WStr("OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dylib");
+#else
+const WSTRING native_dll_filename = WStr("OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.so");
+#endif
 
 } // namespace trace
 

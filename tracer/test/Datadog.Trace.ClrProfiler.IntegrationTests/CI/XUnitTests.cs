@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Datadog.Trace.Ci;
+using Datadog.Trace.Ci.Tags;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.TestHelpers;
 using Xunit;
@@ -37,7 +38,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.CI
             }
         }
 
-        [Theory]
+        [SkippableTheory]
         [MemberData(nameof(GetData))]
         [Trait("Category", "EndToEnd")]
         [Trait("Category", "TestIntegrations")]
@@ -47,6 +48,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.CI
             try
             {
                 SetCallTargetSettings(enableCallTarget);
+                SetEnvironmentVariable("SIGNALFX_CIVISIBILITY_ENABLED", "1");
                 SetEnvironmentVariable("SIGNALFX_TRACE_DEBUG", "1");
                 SetEnvironmentVariable("SIGNALFX_DUMP_ILREWRITE_ENABLED", "1");
 
@@ -83,6 +85,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.CI
 
                         // check the test framework
                         AssertTargetSpanContains(targetSpan, TestTags.Framework, "xUnit");
+                        Assert.True(targetSpan.Tags.Remove(TestTags.FrameworkVersion));
 
                         // check the version
                         AssertTargetSpanEqual(targetSpan, "version", "1.0.0");

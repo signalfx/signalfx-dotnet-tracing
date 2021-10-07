@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 using Datadog.Trace.Ci;
+using Datadog.Trace.Ci.Tags;
 using Datadog.Trace.ClrProfiler.Emit;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.ExtensionMethods;
@@ -119,7 +120,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Testing
             {
                 if (aggregator.TryCallMethod<Exception>("ToException", out Exception testException))
                 {
-                    Span span = Common.TestTracer.ActiveScope?.Span;
+                    Span span = Tracer.Instance.ActiveScope?.Span;
                     if (span != null && testException != null)
                     {
                         span.SetException(testException);
@@ -319,7 +320,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Testing
                         // So the last spans in buffer aren't send to the agent.
                         // Other times we reach the 500 items of the buffer in a sec and the tracer start to drop spans.
                         // In a test scenario we must keep all spans.
-                        await Common.TestTracer.FlushAsync().ConfigureAwait(false);
+                        await Tracer.Instance.FlushAsync().ConfigureAwait(false);
                         return r;
                     });
             }
@@ -329,7 +330,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Testing
 
         private static Scope CreateScope(object testSdk)
         {
-            if (!Common.TestTracer.Settings.IsIntegrationEnabled(IntegrationId))
+            if (!CIVisibility.Enabled || !Tracer.Instance.Settings.IsIntegrationEnabled(IntegrationId))
             {
                 // integration disabled, don't create a scope, skip this trace
                 return null;
@@ -404,9 +405,9 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Testing
                     }
                 }
 
-                string testFramework = "xUnit " + testInvokerAssemblyName.Version.ToString();
+                string testFramework = "xUnit";
 
-                scope = Common.TestTracer.StartActive("xunit.test", serviceName: Common.TestTracer.DefaultServiceName);
+                scope = Tracer.Instance.StartActive("xunit.test", serviceName: Tracer.Instance.DefaultServiceName);
                 Span span = scope.Span;
 
                 span.Type = SpanTypes.Test;
@@ -416,6 +417,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.Testing
                 span.SetTag(TestTags.Suite, testSuite);
                 span.SetTag(TestTags.Name, testName);
                 span.SetTag(TestTags.Framework, testFramework);
+                span.SetTag(TestTags.FrameworkVersion, testInvokerAssemblyName.Version.ToString());
                 span.SetTag(TestTags.Type, TestTags.TypeTest);
                 CIEnvironmentValues.DecorateSpan(span);
 

@@ -52,7 +52,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetServiceVersion("1.0.0");
         }
 
-        [Theory]
+        [SkippableTheory]
         [MemberData(nameof(PackageVersions.Serilog), MemberType = typeof(PackageVersions))]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
@@ -63,10 +63,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
             int agentPort = TcpPortProvider.GetOpenPort();
             using (var agent = new MockTracerAgent(agentPort))
-            using (var processResult = RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion))
+            using (RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion))
             {
-                Assert.True(processResult.ExitCode >= 0, $"Process exited with code {processResult.ExitCode} and exception: {processResult.StandardError}");
-
                 var spans = agent.WaitForSpans(1, 2500);
                 Assert.True(spans.Count >= 1, $"Expecting at least 1 span, only received {spans.Count}");
 
@@ -82,7 +80,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             }
         }
 
-        [Theory]
+        [SkippableTheory]
         [MemberData(nameof(PackageVersions.Serilog), MemberType = typeof(PackageVersions))]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
@@ -93,10 +91,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
             int agentPort = TcpPortProvider.GetOpenPort();
             using (var agent = new MockTracerAgent(agentPort))
-            using (var processResult = RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion))
+            using (RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion))
             {
-                Assert.True(processResult.ExitCode >= 0, $"Process exited with code {processResult.ExitCode} and exception: {processResult.StandardError}");
-
                 var spans = agent.WaitForSpans(1, 2500);
                 Assert.True(spans.Count >= 1, $"Expecting at least 1 span, only received {spans.Count}");
 

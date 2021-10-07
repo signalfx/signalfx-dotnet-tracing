@@ -5,7 +5,11 @@
 
 using System;
 using System.Reflection;
+using Datadog.Trace.Agent;
 using Datadog.Trace.Configuration;
+using Datadog.Trace.Sampling;
+using Datadog.Trace.TestHelpers;
+using Moq;
 using Xunit;
 using Xunit.Sdk;
 
@@ -55,7 +59,7 @@ namespace Datadog.Trace.Tests
                 Environment = env
             };
             var tracer = new Tracer(settings);
-            Tracer.Instance = tracer;
+            Tracer.UnsafeSetTracerInstance(tracer);
 
             using (var parentScope = Tracer.Instance.StartActive("parent"))
             using (var childScope = Tracer.Instance.StartActive("child"))
@@ -75,7 +79,7 @@ namespace Datadog.Trace.Tests
         {
             var settings = new TracerSettings();
             var tracer = new Tracer(settings);
-            Tracer.Instance = tracer;
+            Tracer.UnsafeSetTracerInstance(tracer);
 
             using (var parentScope = Tracer.Instance.StartActive("parent"))
             using (var childScope = Tracer.Instance.StartActive("child"))
@@ -93,7 +97,7 @@ namespace Datadog.Trace.Tests
         {
             var settings = new TracerSettings();
             var tracer = new Tracer(settings);
-            Tracer.Instance = tracer;
+            Tracer.UnsafeSetTracerInstance(tracer);
 
             using (var parentScope = Tracer.Instance.StartActive("parent"))
             using (var childScope = Tracer.Instance.StartActive("child"))
@@ -102,24 +106,6 @@ namespace Datadog.Trace.Tests
             }
 
             Assert.Equal(CorrelationIdentifier.Service, Tracer.Instance.DefaultServiceName);
-        }
-
-        [AttributeUsage(AttributeTargets.Class, Inherited = true)]
-        private class TracerRestorerAttribute : BeforeAfterTestAttribute
-        {
-            private Tracer _tracer;
-
-            public override void Before(MethodInfo methodUnderTest)
-            {
-                _tracer = Tracer.Instance;
-                base.Before(methodUnderTest);
-            }
-
-            public override void After(MethodInfo methodUnderTest)
-            {
-                Tracer.Instance = _tracer;
-                base.After(methodUnderTest);
-            }
         }
     }
 }

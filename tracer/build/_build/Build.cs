@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using Nuke.Common;
+using Nuke.Common.CI;
 using Nuke.Common.IO;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
@@ -17,6 +18,7 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
 // #pragma warning disable SA1400
 // #pragma warning disable SA1401
 
+[ShutdownDotNetAfterServerBuild]
 partial class Build : NukeBuild
 {
     /// Support plugins are available for:
@@ -29,7 +31,7 @@ partial class Build : NukeBuild
     readonly Configuration BuildConfiguration = Configuration.Release;
 
     [Parameter("Platform to build - x86 or x64. Default is x64")]
-    readonly MSBuildTargetPlatform Platform = MSBuildTargetPlatform.x64;
+    readonly MSBuildTargetPlatform TargetPlatform = MSBuildTargetPlatform.x64;
 
     [Parameter("The TargetFramework to execute when running or building a sample app, or linux integration tests")]
     readonly TargetFramework Framework;
@@ -71,7 +73,7 @@ partial class Build : NukeBuild
         .Executes(() =>
         {
             Logger.Info($"Configuration: {BuildConfiguration}");
-            Logger.Info($"Platform: {Platform}");
+            Logger.Info($"Platform: {TargetPlatform}");
             Logger.Info($"Framework: {Framework}");
             Logger.Info($"TestAllPackageVersions: {TestAllPackageVersions}");
             Logger.Info($"TracerHomeDirectory: {TracerHomeDirectory}");
@@ -169,7 +171,7 @@ partial class Build : NukeBuild
         .DependsOn(PublishIisSamples)
         .DependsOn(CompileIntegrationTests);
 
-    Target BuildWindowsRegressionIntegrationTests => _ => _
+    Target BuildWindowsRegressionTests => _ => _
         .Unlisted()
         .Requires(() => IsWin)
         .Description("Builds the integration tests for Windows")
@@ -189,7 +191,7 @@ partial class Build : NukeBuild
     Target BuildAndRunWindowsRegressionTests => _ => _
         .Requires(() => IsWin)
         .Description("Builds and runs the Windows regression tests")
-        .DependsOn(BuildWindowsRegressionIntegrationTests)
+        .DependsOn(BuildWindowsRegressionTests)
         .DependsOn(RunWindowsRegressionTests);
 
     Target BuildAndRunWindowsIisIntegrationTests => _ => _

@@ -25,7 +25,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetEnvironmentVariable("SIGNALFX_PROPAGATORS", "datadog,b3");
         }
 
-        [Theory]
+        [SkippableTheory]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         [InlineData(false)]
@@ -53,8 +53,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             using (var agent = new MockTracerAgent(agentPort))
             using (ProcessResult processResult = RunSampleAndWaitForExit(agent.Port, arguments: $"{extraArgs}Port={httpPort}"))
             {
-                Assert.True(processResult.ExitCode >= 0, $"Process exited with code {processResult.ExitCode}");
-
                 var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName).OrderBy(s => s.Start);
                 spans.Should().HaveCount(expectedSpanCount);
 
@@ -71,7 +69,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             }
         }
 
-        [Theory]
+        [SkippableTheory]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         [InlineData(false)]
@@ -88,8 +86,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             using (var agent = new MockTracerAgent(agentPort))
             using (ProcessResult processResult = RunSampleAndWaitForExit(agent.Port, arguments: $"TracingDisabled Port={httpPort}"))
             {
-                Assert.True(processResult.ExitCode >= 0, $"Process exited with code {processResult.ExitCode}");
-
                 var spans = agent.WaitForSpans(1, 3000, operationName: expectedOperationName);
                 Assert.Equal(0, spans.Count);
 

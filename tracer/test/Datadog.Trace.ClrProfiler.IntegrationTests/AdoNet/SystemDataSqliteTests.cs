@@ -23,7 +23,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             SetServiceVersion("1.0.0");
         }
 
-        [Theory(Skip="https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation/issues/192")]
+        [SkippableTheory]
         [InlineData(true)]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
@@ -44,10 +44,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             int agentPort = TcpPortProvider.GetOpenPort();
 
             using (var agent = new MockTracerAgent(agentPort))
-            using (ProcessResult processResult = RunSampleAndWaitForExit(agent.Port))
+            using (RunSampleAndWaitForExit(agent.Port))
             {
-                Assert.True(processResult.ExitCode >= 0, $"Process exited with code {processResult.ExitCode}");
-
                 var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
                 Assert.Equal(expectedSpanCount, spans.Count);
 
@@ -62,7 +60,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             }
         }
 
-        [Theory(Skip="https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation/issues/192")]
+        [SkippableTheory]
         [InlineData(false)]
         [InlineData(true)]
         [Trait("Category", "EndToEnd")]
@@ -82,10 +80,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             int agentPort = TcpPortProvider.GetOpenPort();
 
             using (var agent = new MockTracerAgent(agentPort))
-            using (ProcessResult processResult = RunSampleAndWaitForExit(agent.Port))
+            using (RunSampleAndWaitForExit(agent.Port))
             {
-                Assert.True(processResult.ExitCode >= 0, $"Process exited with code {processResult.ExitCode}");
-
                 var spans = agent.WaitForSpans(totalSpanCount, returnAllOperations: true);
                 Assert.NotEmpty(spans);
                 Assert.Empty(spans.Where(s => s.Name.Equals(expectedOperationName)));

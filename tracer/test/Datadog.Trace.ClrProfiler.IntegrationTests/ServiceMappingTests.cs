@@ -22,7 +22,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetServiceVersion("1.0.0");
         }
 
-        [Theory]
+        [SkippableTheory]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         [InlineData(false)]
@@ -48,10 +48,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             Output.WriteLine($"Assigning port {httpPort} for the httpPort.");
 
             using (var agent = new MockTracerAgent(agentPort))
-            using (ProcessResult processResult = RunSampleAndWaitForExit(agent.Port, arguments: $"{extraArgs}Port={httpPort}"))
+            using (RunSampleAndWaitForExit(agent.Port, arguments: $"{extraArgs}Port={httpPort}"))
             {
-                Assert.True(processResult.ExitCode >= 0, $"Process exited with code {processResult.ExitCode}");
-
                 var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
                 Assert.Equal(expectedSpanCount, spans.Count);
 

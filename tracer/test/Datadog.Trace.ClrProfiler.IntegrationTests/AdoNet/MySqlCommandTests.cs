@@ -27,8 +27,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
         {
             foreach (object[] item in PackageVersions.MySqlData)
             {
-                var version = (string)item[0];
-                if (version != string.Empty && !version.StartsWith("8"))
+                if (!((string)item[0]).StartsWith("8") && !string.IsNullOrEmpty((string)item[0]))
                 {
                     continue;
                 }
@@ -53,7 +52,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             }
         }
 
-        [Theory]
+        [SkippableTheory]
         [MemberData(nameof(GetMySql8Data))]
         [Trait("Category", "EndToEnd")]
         public void SubmitsTracesWithNetStandardInMySql8(string packageVersion, bool enableCallTarget)
@@ -61,7 +60,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             SubmitsTracesWithNetStandard(packageVersion, enableCallTarget);
         }
 
-        [Theory]
+        [SkippableTheory]
         [MemberData(nameof(GetOldMySqlData))]
         [Trait("Category", "EndToEnd")]
         [Trait("Category", "ArmUnsupported")]
@@ -70,7 +69,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             SubmitsTracesWithNetStandard(packageVersion, enableCallTarget);
         }
 
-        [Theory]
+        [SkippableTheory]
         [InlineData(false)]
         [InlineData(true)]
         [Trait("Category", "EndToEnd")]
@@ -88,10 +87,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             int agentPort = TcpPortProvider.GetOpenPort();
 
             using (var agent = new MockTracerAgent(agentPort))
-            using (ProcessResult processResult = RunSampleAndWaitForExit(agent.Port))
+            using (RunSampleAndWaitForExit(agent.Port))
             {
-                Assert.True(processResult.ExitCode >= 0, $"Process exited with code {processResult.ExitCode}");
-
                 var spans = agent.WaitForSpans(totalSpanCount, returnAllOperations: true);
                 Assert.NotEmpty(spans);
                 Assert.Empty(spans.Where(s => s.Name.Equals(expectedOperationName)));
@@ -147,10 +144,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             int agentPort = TcpPortProvider.GetOpenPort();
 
             using (var agent = new MockTracerAgent(agentPort))
-            using (ProcessResult processResult = RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion))
+            using (RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion))
             {
-                Assert.True(processResult.ExitCode >= 0, $"Process exited with code {processResult.ExitCode}");
-
                 var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
                 int actualSpanCount = spans.Where(s => s.ParentId.HasValue && !s.Resource.Equals("SHOW WARNINGS", System.StringComparison.OrdinalIgnoreCase)).Count(); // Remove unexpected DB spans from the calculation
                 Assert.Equal(expectedSpanCount, actualSpanCount);
