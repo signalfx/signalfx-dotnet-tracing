@@ -101,7 +101,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         public void DoesNotInjectLogsWhenDisabled(string packageVersion, bool enableCallTarget)
         {
             SetCallTargetSettings(enableCallTarget);
-            SetEnvironmentVariable("SIGNALFX_LOGS_INJECTION", "true");
+            SetEnvironmentVariable("SIGNALFX_LOGS_INJECTION", "false");
 
             int agentPort = TcpPortProvider.GetOpenPort();
             using (var agent = new MockTracerAgent(agentPort))
