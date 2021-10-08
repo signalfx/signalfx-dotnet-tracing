@@ -152,6 +152,13 @@ namespace Datadog.Trace.Configuration
         public const string AgentUri = "SIGNALFX_TRACE_AGENT_URL";
 
         /// <summary>
+        /// Configuration key for the trace endpoint. Same as <see creg="AgentUri"/> created
+        /// for compatibility of previous version of SignalFx .NET Tracing.
+        /// </summary>
+        /// <seealso cref="TracerSettings.AgentUri"/>
+        public const string EndpointUrl = "SIGNALFX_ENDPOINT_URL";
+
+        /// <summary>
         /// Configuration key for enabling or disabling default Analytics.
         /// </summary>
         /// <seealso cref="TracerSettings.AnalyticsEnabled"/>
