@@ -12,7 +12,7 @@
       aspnet_core.controller: home,
       aspnet_core.route: {controller=home}/{action=index}/{id?},
       component: aspnet_core,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       span.kind: server,
       version: 1.0.0
@@ -29,7 +29,7 @@
       aspnet_core.endpoint: Samples.AspNetCoreMvc.Controllers.HomeController.Index (Samples.AspNetCoreMvc31),
       aspnet_core.route: {controller=home}/{action=index}/{id?},
       component: aspnet_core,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,

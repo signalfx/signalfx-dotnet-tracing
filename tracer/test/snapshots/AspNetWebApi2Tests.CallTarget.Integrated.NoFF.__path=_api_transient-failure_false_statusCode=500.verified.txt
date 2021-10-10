@@ -7,7 +7,7 @@
     Service: sample,
     ParentId: Id_3,
     Tags: {
-      env: integration_tests,
+      deployment.environment: integration_tests,
       span.kind: server,
       version: 1.0.0
     }
@@ -21,7 +21,7 @@
     Type: web,
     Error: 1,
     Tags: {
-      env: integration_tests,
+      deployment.environment: integration_tests,
       error.msg: Passed in value was not 'true': false,
       error.stack: 
 System.ArgumentException: Passed in value was not 'true': false
@@ -53,7 +53,7 @@ at Samples.AspNetMvc5.Controllers.ApiController.TransientFailure(String value),
     Error: 1,
     Tags: {
       aspnet.route: api/transient-failure/{value},
-      env: integration_tests,
+      deployment.environment: integration_tests,
       error.msg: Passed in value was not 'true': false,
       error.stack: 
 System.ArgumentException: Passed in value was not 'true': false

@@ -8,7 +8,7 @@
     Type: web,
     Tags: {
       aspnet.route: api/absolute-route,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,

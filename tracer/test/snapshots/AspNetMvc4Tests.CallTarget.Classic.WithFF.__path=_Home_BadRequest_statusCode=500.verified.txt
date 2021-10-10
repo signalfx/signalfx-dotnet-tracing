@@ -8,7 +8,7 @@
     Type: web,
     Error: 1,
     Tags: {
-      env: integration_tests,
+      deployment.environment: integration_tests,
       error.msg: Oops, it broke.,
       error.stack: 
 System.Exception: Oops, it broke.
@@ -42,7 +42,7 @@ at Samples.AspNetMvc4.Controllers.HomeController.BadRequest(),
       aspnet.action: badrequest,
       aspnet.controller: home,
       aspnet.route: {controller}/{action}/{id},
-      env: integration_tests,
+      deployment.environment: integration_tests,
       error.msg: Oops, it broke.,
       error.stack: 
 System.Exception: Oops, it broke.

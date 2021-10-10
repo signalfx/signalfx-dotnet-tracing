@@ -9,7 +9,7 @@
     Error: 1,
     Tags: {
       component: aspnet_core,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       error.msg: This was a bad request.,
       error.stack: 
 System.Exception: This was a bad request.

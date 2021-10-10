@@ -7,7 +7,7 @@
     Service: sample,
     ParentId: Id_3,
     Tags: {
-      env: integration_tests,
+      deployment.environment: integration_tests,
       span.kind: server,
       version: 1.0.0
     }
@@ -21,7 +21,7 @@
     Type: web,
     Error: 1,
     Tags: {
-      env: integration_tests,
+      deployment.environment: integration_tests,
       error.msg: Source: TerminatingQuerySuccessMessageHandler. Error: Query param ts was set to a non-true value,
       error.stack: 
 System.ArgumentException: Source: TerminatingQuerySuccessMessageHandler. Error: Query param ts was set to a non-true value
