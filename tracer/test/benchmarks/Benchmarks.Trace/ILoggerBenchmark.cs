@@ -22,7 +22,7 @@ namespace Benchmarks.Trace
             {
                 StartupDiagnosticLogEnabled = false,
                 LogsInjectionEnabled = true,
-                Environment = "env",
+                Environment = "deployment.environment",
                 ServiceVersion = "version"
             };
 

@@ -300,7 +300,7 @@ namespace Datadog.Trace
         public const string DbName = "db.name";
         public const string DbType = "db.type";
         public const string DbUser = "db.user";
-        public const string Env = "env";
+        public const string Env = "deployment.environment";
         public const string ErrorMsg = "error.msg";
         public const string ErrorStack = "error.stack";
         public const string ErrorType = "error.type";

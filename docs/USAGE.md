@@ -48,7 +48,7 @@ Use these environment variables to configure the tracing library:
 | `SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED` | Enable to activate sending partial traces to the agent. | `false` |
 | `SIGNALFX_TRACE_PARTIAL_FLUSH_MIN_SPANS` | The minimum number of closed spans in a trace before it's partially flushed. `SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED` has to be enabled for this to take effect. | `500` |
 | `SIGNALFX_SERVICE` | Application's default service name. |  |
-| `SIGNALFX_ENV` | The value for the `environment` tag added to every span. |  |
+| `SIGNALFX_ENV` | The value for the `deployment.environment` tag added to every span. |  |
 | `SIGNALFX_TRACE_ENABLED` | Enable to activate the tracer. | `true` | 
 | `SIGNALFX_TRACE_DEBUG` | Enable to activate debugging mode for the tracer. | `false` | 
 | `SIGNALFX_TRACE_AGENT_URL`, `SIGNALFX_ENDPOINT_URL` | The URL to where trace exporters (see: `SIGNALFX_EXPORTER`) send traces. | `http://localhost:8126` | 
