@@ -13,6 +13,7 @@ using Datadog.Trace.Conventions;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Tagging;
+using Datadog.Trace.Util;
 
 namespace Datadog.Trace.ClrProfiler
 {
@@ -110,6 +111,8 @@ namespace Datadog.Trace.ClrProfiler
                 return null;
             }
 
+            Scope scope = null;
+
             try
             {
                 if (GetActiveHttpScope(tracer) != null)
@@ -120,15 +123,33 @@ namespace Datadog.Trace.ClrProfiler
                     return null;
                 }
 
-                var args = new OutboundHttpArgs(spanId, httpMethod, requestUri, integrationId);
-                var scope = tracer.OutboundHttpConvention.CreateScope(args, out tags);
-                return scope;
+                string resourceUrl = requestUri != null ? UriHelpers.CleanUri(requestUri, removeScheme: true, tryRemoveIds: true) : null;
+                string httpUrl = requestUri != null ? UriHelpers.CleanUri(requestUri, removeScheme: false, tryRemoveIds: false) : null;
+
+                tags = new HttpTags();
+
+                httpMethod = httpMethod?.ToUpperInvariant();
+                string serviceName = tracer.Settings.GetServiceName(tracer, ServiceName);
+                scope = tracer.StartActiveWithTags(OperationName, tags: tags, serviceName: serviceName, spanId: spanId, startTime: startTime);
+
+                var span = scope.Span;
+
+                span.Type = SpanTypes.Http;
+
+                tags.HttpMethod = httpMethod?.ToUpperInvariant();
+                tags.HttpUrl = httpUrl;
+                tags.InstrumentationName = IntegrationRegistry.GetName(integrationId);
+
+                tags.SetAnalyticsSampleRate(integrationId, tracer.Settings, enabledWithGlobalSetting: false);
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "Error creating or populating scope.");
-                return null;
             }
+
+            // always returns the scope, even if it's null because we couldn't create it,
+            // or we couldn't populate it completely (some tags is better than no tags)
+            return scope;
         }
 
         public static Scope CreateDbCommandScope(Tracer tracer, IDbCommand command)
