@@ -11,7 +11,7 @@
       aspnet.action: transientfailure,
       aspnet.controller: conventions,
       aspnet.route: api2/{action}/{value},
-      env: integration_tests,
+      deployment.environment: integration_tests,
       error.msg: Passed in value was not 'true': false,
       error.stack: 
 System.ArgumentException: Passed in value was not 'true': false
@@ -38,7 +38,7 @@ at Samples.AspNetMvc5.Controllers.ConventionsController.TransientFailure(String 
     Resource: CustomTracingExceptionHandler.handle-async,
     Service: Samples.Owin.WebApi2,
     Tags: {
-      env: integration_tests,
+      deployment.environment: integration_tests,
       runtime-id: Guid_1,
       span.kind: server,
       version: 1.0.0

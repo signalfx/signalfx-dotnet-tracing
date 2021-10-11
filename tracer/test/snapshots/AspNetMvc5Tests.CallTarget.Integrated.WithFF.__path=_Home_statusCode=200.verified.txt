@@ -11,7 +11,7 @@
       aspnet.action: index,
       aspnet.controller: home,
       aspnet.route: {controller}/{action}/{id},
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
@@ -29,7 +29,7 @@
     Service: sample,
     Type: web,
     Tags: {
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,

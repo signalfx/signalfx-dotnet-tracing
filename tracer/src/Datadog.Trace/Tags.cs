@@ -13,9 +13,14 @@ namespace Datadog.Trace
     public static class Tags
     {
         /// <summary>
-        /// The environment of the profiled service.
+        /// The deployment environment of the profiled service.
         /// </summary>
-        public const string Env = "env";
+        /// <remarks>
+        /// This tag matches with the OpenTelemetry specification v0.1.7, see
+        /// https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/resource/semantic_conventions/deployment_environment.md.
+        /// Legacy used the name "environment" until version 0.1.13 and upstream uses "env".
+        /// </remarks>
+        public const string Env = "deployment.environment";
 
         /// <summary>
         /// The version of the profiled service.

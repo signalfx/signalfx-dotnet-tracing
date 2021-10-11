@@ -12,7 +12,7 @@
       aspnet_core.controller: home,
       aspnet_core.route: status-code/{statuscode},
       component: aspnet_core,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       span.kind: server,
       version: 1.0.0
@@ -31,7 +31,7 @@
       aspnet_core.route: status-code/{statuscode},
       component: aspnet_core,
       datadog-header-tag: asp-net-core,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       error.msg: The HTTP response has status code 500.,
       http.method: GET,
       http.request.headers.host: localhost:00000,

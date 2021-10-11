@@ -40,7 +40,7 @@ namespace environment {
     // Sets the Agent's port. Default is 8126.
     const WSTRING agent_port = WStr("SIGNALFX_TRACE_AGENT_PORT");
 
-    // Sets the "env" tag for every span.
+    // Sets the "deployment.environment" tag for every span.
     const WSTRING env = WStr("SIGNALFX_ENV");
 
     // Sets the default service name for every span.

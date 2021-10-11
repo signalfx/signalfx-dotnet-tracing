@@ -25,7 +25,7 @@ namespace Datadog.Trace.Configuration
         public const string PluginConfigurationFileName = "SIGNALFX_DOTNET_TRACER_PLUGINS_FILE";
 
         /// <summary>
-        /// Configuration key for the application's environment. Sets the "env" tag on every <see cref="Span"/>.
+        /// Configuration key for the application's environment. Sets the "deployment.environment" tag on every <see cref="Span"/>.
         /// </summary>
         /// <seealso cref="TracerSettings.Environment"/>
         public const string Environment = "SIGNALFX_ENV";

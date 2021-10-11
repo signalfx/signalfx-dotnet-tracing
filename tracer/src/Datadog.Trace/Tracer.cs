@@ -476,7 +476,7 @@ namespace Datadog.Trace
                 }
             }
 
-            // automatically add the "env" tag if defined, taking precedence over an "env" tag set from a global tag
+            // automatically add the "deployment.environment" tag if defined, taking precedence over an "deployment.environment" tag set from a global tag
             var env = Settings.Environment;
             if (!string.IsNullOrWhiteSpace(env))
             {
@@ -551,7 +551,7 @@ namespace Datadog.Trace
                     writer.WritePropertyName("lang_version");
                     writer.WriteValue(FrameworkDescription.Instance.ProductVersion);
 
-                    writer.WritePropertyName("env");
+                    writer.WritePropertyName("deployment.environment");
                     writer.WriteValue(Settings.Environment);
 
                     writer.WritePropertyName("enabled");

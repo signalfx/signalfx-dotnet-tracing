@@ -6,7 +6,7 @@
     Resource: CustomTracingExceptionHandler.handle-async,
     Service: Samples.Owin.WebApi2,
     Tags: {
-      env: integration_tests,
+      deployment.environment: integration_tests,
       runtime-id: Guid_1,
       span.kind: server,
       version: 1.0.0
