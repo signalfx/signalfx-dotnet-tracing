@@ -22,7 +22,6 @@ namespace Datadog.Trace.ClrProfiler
     /// </summary>
     internal static class ScopeFactory
     {
-        public const string OperationName = "http.request";
         public const string ServiceName = "http-client";
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(ScopeFactory));
@@ -128,15 +127,19 @@ namespace Datadog.Trace.ClrProfiler
 
                 tags = new HttpTags();
 
-                httpMethod = httpMethod?.ToUpperInvariant();
+                // Upstream uses "http.request" for the span name but following legacy version and the
+                // OpenTelemetry specification we use the capitalized method as the span name.
+                string uppercaseHttpMethod = httpMethod?.ToUpperInvariant();
+
                 string serviceName = tracer.Settings.GetServiceName(tracer, ServiceName);
-                scope = tracer.StartActiveWithTags(OperationName, tags: tags, serviceName: serviceName, spanId: spanId, startTime: startTime);
+                scope = tracer.StartActiveWithTags(uppercaseHttpMethod, tags: tags, serviceName: serviceName, spanId: spanId, startTime: startTime);
 
                 var span = scope.Span;
 
                 span.Type = SpanTypes.Http;
+                span.ResourceName = $"{httpMethod} {resourceUrl}";
 
-                tags.HttpMethod = httpMethod?.ToUpperInvariant();
+                tags.HttpMethod = uppercaseHttpMethod;
                 tags.HttpUrl = httpUrl;
                 tags.InstrumentationName = IntegrationRegistry.GetName(integrationId);
 
