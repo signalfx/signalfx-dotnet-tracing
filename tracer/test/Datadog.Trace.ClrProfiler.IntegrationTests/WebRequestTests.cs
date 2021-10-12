@@ -58,7 +58,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 foreach (var span in spans)
                 {
-                    Assert.Equal(expectedOperationName, span.Name);
+                    // Unlike upstream the span name is expected to match the "http.method" tag.
+                    Assert.Equal(span.Tags["http.method"], span.Name);
+                    Assert.Equal(expectedOperationName, span.LogicScope);
                     Assert.Equal(expectedServiceName, span.Service);
                     Assert.Equal(SpanTypes.Http, span.Type);
                     Assert.True(string.Equals(span.Tags[Tags.InstrumentationName], "WebRequest") || string.Equals(span.Tags[Tags.InstrumentationName], "HttpMessageHandler"));

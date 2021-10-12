@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -123,7 +125,6 @@ namespace Datadog.Trace
 
             _agentWriter = agentWriter ?? CreateTraceWriter(Settings, Statsd);
 
-            OutboundHttpConvention = new OtelOutboundHttpConvention(this);
             TraceIdConvention = new OtelTraceIdConvention();
 
             _scopeManager = scopeManager ?? new AsyncLocalScopeManager();
@@ -274,8 +275,6 @@ namespace Datadog.Trace
         internal ISampler Sampler { get; }
 
         internal IDogStatsd Statsd { get; private set; }
-
-        internal IOutboundHttpConvention OutboundHttpConvention { get; }
 
         internal ITraceIdConvention TraceIdConvention { get; }
 

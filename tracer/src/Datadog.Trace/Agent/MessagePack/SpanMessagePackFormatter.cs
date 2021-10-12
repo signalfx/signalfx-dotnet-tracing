@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Vendors.MessagePack;
@@ -14,6 +16,7 @@ namespace Datadog.Trace.Agent.MessagePack
     {
         private static byte[] _traceIdBytes = StringEncoding.UTF8.GetBytes("trace_id");
         private static byte[] _spanIdBytes = StringEncoding.UTF8.GetBytes("span_id");
+        private static byte[] _logicScopeBytes = StringEncoding.UTF8.GetBytes("logic_scope");
         private static byte[] _nameBytes = StringEncoding.UTF8.GetBytes("name");
         private static byte[] _resourceBytes = StringEncoding.UTF8.GetBytes("resource");
         private static byte[] _serviceBytes = StringEncoding.UTF8.GetBytes("service");
@@ -41,6 +44,8 @@ namespace Datadog.Trace.Agent.MessagePack
 
             len += 2; // Tags and metrics
 
+            len++; // The LogicScope
+
             int originalOffset = offset;
 
             offset += MessagePackBinary.WriteMapHeader(ref bytes, offset, len);
@@ -50,6 +55,9 @@ namespace Datadog.Trace.Agent.MessagePack
 
             offset += MessagePackBinary.WriteStringBytes(ref bytes, offset, _spanIdBytes);
             offset += MessagePackBinary.WriteUInt64(ref bytes, offset, value.Context.SpanId);
+
+            offset += MessagePackBinary.WriteStringBytes(ref bytes, offset, _logicScopeBytes);
+            offset += MessagePackBinary.WriteString(ref bytes, offset, value.LogicScope);
 
             offset += MessagePackBinary.WriteStringBytes(ref bytes, offset, _nameBytes);
             offset += MessagePackBinary.WriteString(ref bytes, offset, value.OperationName);
