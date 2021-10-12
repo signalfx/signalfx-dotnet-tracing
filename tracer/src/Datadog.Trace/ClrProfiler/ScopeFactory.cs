@@ -21,6 +21,7 @@ namespace Datadog.Trace.ClrProfiler
     /// </summary>
     internal static class ScopeFactory
     {
+        public const string OperationName = "http.request";
         public const string ServiceName = "http-client";
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(ScopeFactory));
@@ -137,7 +138,7 @@ namespace Datadog.Trace.ClrProfiler
 
                 span.Type = SpanTypes.Http;
                 span.ResourceName = $"{httpMethod} {resourceUrl}";
-                span.LogicScope = "http.request";
+                span.LogicScope = OperationName;
 
                 tags.HttpMethod = uppercaseHttpMethod;
                 tags.HttpUrl = httpUrl;
