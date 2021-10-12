@@ -123,18 +123,8 @@ namespace Datadog.Trace
 
             _agentWriter = agentWriter ?? CreateTraceWriter(Settings, Statsd);
 
-            switch (Settings.Convention)
-            {
-                case ConventionType.OpenTelemetry:
-                    OutboundHttpConvention = new OtelOutboundHttpConvention(this);
-                    TraceIdConvention = new OtelTraceIdConvention();
-                    break;
-                case ConventionType.Datadog:
-                default:
-                    OutboundHttpConvention = new DatadogOutboundHttpConvention(this);
-                    TraceIdConvention = new DatadogTraceIdConvention();
-                    break;
-            }
+            OutboundHttpConvention = new OtelOutboundHttpConvention(this);
+            TraceIdConvention = new OtelTraceIdConvention();
 
             _scopeManager = scopeManager ?? new AsyncLocalScopeManager();
             Sampler = sampler ?? new RuleBasedSampler(new RateLimiter(Settings.MaxTracesSubmittedPerSecond));
