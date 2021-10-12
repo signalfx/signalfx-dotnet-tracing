@@ -184,9 +184,11 @@ namespace Datadog.Trace.TestHelpers
 
             if (!returnAllOperations)
             {
+                // Upstream uses operation name to identify the "scope", ie. source code used to populate the span
+                // as a shortcut to select spans in tests.
                 relevantSpans =
                     relevantSpans
-                       .Where(s => operationName == null || s.Name == operationName)
+                       .Where(s => operationName == null || s.Name == operationName || s.LogicScope == operationName)
                        .ToImmutableList();
             }
 
