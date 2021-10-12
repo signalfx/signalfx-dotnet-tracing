@@ -155,7 +155,9 @@ namespace Datadog.Trace.TestHelpers
                        .Where(s => s.Start > minimumOffset)
                        .ToImmutableList();
 
-                if (relevantSpans.Count(s => operationName == null || s.Name == operationName) >= count)
+                // Upstream uses operation name to identify the "scope", ie. source code used to populate the span
+                // as a shortcut to select spans in tests.
+                if (relevantSpans.Count(s => operationName == null || s.Name == operationName || s.LogicScope == operationName) >= count)
                 {
                     break;
                 }
@@ -312,6 +314,9 @@ namespace Datadog.Trace.TestHelpers
 
             [Key("name")]
             public string Name { get; set; }
+
+            [Key("logic_scope")]
+            public string LogicScope { get; set; }
 
             [Key("resource")]
             public string Resource { get; set; }

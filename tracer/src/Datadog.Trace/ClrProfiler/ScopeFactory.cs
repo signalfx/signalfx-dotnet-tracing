@@ -9,7 +9,6 @@ using System.Linq;
 using Datadog.Trace.ClrProfiler.Helpers;
 using Datadog.Trace.ClrProfiler.Integrations.AdoNet;
 using Datadog.Trace.Configuration;
-using Datadog.Trace.Conventions;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Tagging;
@@ -138,6 +137,7 @@ namespace Datadog.Trace.ClrProfiler
 
                 span.Type = SpanTypes.Http;
                 span.ResourceName = $"{httpMethod} {resourceUrl}";
+                span.LogicScope = "http.request";
 
                 tags.HttpMethod = uppercaseHttpMethod;
                 tags.HttpUrl = httpUrl;
