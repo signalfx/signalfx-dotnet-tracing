@@ -58,7 +58,6 @@ Use these environment variables to configure the tracing library:
 | `SIGNALFX_TRACE_LOG_PATH` | The path of the profiler log file. | Linux: `/var/log/signalfx/dotnet/dotnet-profiler.log`<br>Windows: `%ProgramData%"\SignalFx .NET Tracing\logs\dotnet-profiler.log` |
 | `SIGNALFX_DIAGNOSTIC_SOURCE_ENABLED` | Enable to generate troubleshooting logs with the `System.Diagnostics.DiagnosticSource` class. | `true` |
 | `SIGNALFX_DISABLED_INTEGRATIONS` | The integrations you want to disable, if any, separated by a comma. These are the supported integrations: AspNetMvc, AspNetWebApi2, DbCommand, ElasticsearchNet5, ElasticsearchNet6, GraphQL, HttpMessageHandler, IDbCommand, MongoDb, NpgsqlCommand, OpenTracing, ServiceStackRedis, SqlCommand, StackExchangeRedis, Wcf, WebRequest |  |
-| `SIGNALFX_CONVENTION` | Sets the semantic and trace id conventions for the tracer. Available values are: `Datadog` (64bit trace id), `OpenTelemetry` (128 bit trace id). |  `Datadog` |
 | `SIGNALFX_PROPAGATORS` | Comma separated list of the propagators for the tracer. Available propagators are: `Datadog`, `B3`, `W3C`. The Tracer will try to execute extraction in the given order. | `Datadog` |
 | `SIGNALFX_TRACE_DOMAIN_NEUTRAL_INSTRUMENTATION` |  Sets whether to intercept method calls when the caller method is inside a domain-neutral assembly. This is recommended when instrumenting IIS applications. | `false` |
 | `SIGNALFX_PROFILER_PROCESSES` | Sets the filename of executables the profiler can attach to. If not defined (default), the profiler will attach to any process. Supports multiple values separated with comma, for example: `MyApp.exe,dotnet.exe` |  |
@@ -138,23 +137,19 @@ manager:
     ```bash
     $ export SIGNALFX_EXPORTER='Zipkin'
     ```
-4. Set OpenTelemetry conventions:
-    ```bash
-    $ export SIGNALFX_CONVENTION='OpenTelemetry'
-    ```
-5. Set the endpoint, e.g. OpenTelemetry Collector:
+4. Set the endpoint, e.g. OpenTelemetry Collector:
     ```bash
     $ export SIGNALFX_TRACE_AGENT_URL='http://<YourCollector>:9080/v1/trace'
     ```
-6. Optionally, enable trace injection in logs:
+5. Optionally, enable trace injection in logs:
     ```bash
     $ export SIGNALFX_LOGS_INJECTION=true
     ```
-7. Optionally, create the default logging directory:
+6. Optionally, create the default logging directory:
     ```bash
     $ source /opt/signalfx/createLogPath.sh
     ```
-8. Run your application:
+7. Run your application:
     ```bash
     $ dotnet run
     ```
