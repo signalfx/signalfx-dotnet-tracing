@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -126,12 +128,10 @@ namespace Datadog.Trace
             switch (Settings.Convention)
             {
                 case ConventionType.OpenTelemetry:
-                    OutboundHttpConvention = new OtelOutboundHttpConvention(this);
                     TraceIdConvention = new OtelTraceIdConvention();
                     break;
                 case ConventionType.Datadog:
                 default:
-                    OutboundHttpConvention = new DatadogOutboundHttpConvention(this);
                     TraceIdConvention = new DatadogTraceIdConvention();
                     break;
             }
@@ -284,8 +284,6 @@ namespace Datadog.Trace
         internal ISampler Sampler { get; }
 
         internal IDogStatsd Statsd { get; private set; }
-
-        internal IOutboundHttpConvention OutboundHttpConvention { get; }
 
         internal ITraceIdConvention TraceIdConvention { get; }
 

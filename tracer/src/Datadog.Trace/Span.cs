@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Diagnostics;
 using System.Globalization;
@@ -44,6 +46,16 @@ namespace Datadog.Trace
                 Context.ParentId,
                 TraceId);
         }
+
+        /// <summary>
+        /// Gets or sets the span's logic scope, ie. the source code, used to
+        /// populate the span.
+        /// </summary>
+        /// <remarks>
+        /// Not used in upstream, added to be used in tests to select the specific
+        /// logic being tested.
+        /// </remarks>
+        public string LogicScope { get; set; }
 
         /// <summary>
         /// Gets or sets operation name
@@ -132,6 +144,7 @@ namespace Datadog.Trace
             sb.AppendLine($"SpanId: {Context.SpanId}");
             sb.AppendLine($"Origin: {Context.Origin}");
             sb.AppendLine($"ServiceName: {ServiceName}");
+            sb.AppendLine($"LogicScope: {LogicScope}");
             sb.AppendLine($"OperationName: {OperationName}");
             sb.AppendLine($"Resource: {ResourceName}");
             sb.AppendLine($"Type: {Type}");
