@@ -42,6 +42,8 @@ namespace Datadog.Trace.Agent.MessagePack
 
             len += 2; // Tags and metrics
 
+            len++; // The LogicScope
+
             int originalOffset = offset;
 
             offset += MessagePackBinary.WriteMapHeader(ref bytes, offset, len);
