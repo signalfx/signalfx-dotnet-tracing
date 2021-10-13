@@ -194,6 +194,16 @@ namespace Datadog.Trace.TestHelpers
                        .ToImmutableList();
             }
 
+            foreach (var span in relevantSpans)
+            {
+                // Upstream uses "http.request.headers.host" tag.
+                if (span.Tags.TryGetValue(Tags.HttpRequestHeadersHost, out var value))
+                {
+                    span.Tags["http.request.headers.host"] = value;
+                    span.Tags.Remove(Tags.HttpRequestHeadersHost);
+                }
+            }
+
             return relevantSpans;
         }
 
