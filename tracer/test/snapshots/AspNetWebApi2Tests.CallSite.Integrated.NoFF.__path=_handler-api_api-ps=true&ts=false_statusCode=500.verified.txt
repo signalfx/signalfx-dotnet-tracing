@@ -28,7 +28,7 @@ System.ArgumentException: Source: TerminatingQuerySuccessMessageHandler. Error: 
 at Samples.AspNetMvc5.Handlers.TerminatingQuerySuccessMessageHandler.SendAsync(HttpRequestMessage request, CancellationToken cancellationToken),
       error.type: System.ArgumentException,
       http.method: GET,
-      http.host: localhost:00000,
+      http.request.headers.host: localhost:00000,
       http.status_code: 500,
       http.url: /handler-api/api?ps=true&ts=false,
       language: dotnet,

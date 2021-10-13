@@ -13,7 +13,7 @@
       aspnet.route: api2/{action}/{value},
       deployment.environment: integration_tests,
       http.method: GET,
-      http.host: localhost:00000,
+      http.request.headers.host: localhost:00000,
       http.status_code: 201,
       http.url: http://localhost:00000/api2/statuscode/201?ps=true&ts=false,
       language: dotnet,
@@ -31,7 +31,7 @@
     Tags: {
       deployment.environment: integration_tests,
       http.method: GET,
-      http.host: localhost:00000,
+      http.request.headers.host: localhost:00000,
       http.status_code: 201,
       http.url: /api2/statuscode/201?ps=true&ts=false,
       language: dotnet,

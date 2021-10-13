@@ -351,7 +351,7 @@ namespace Datadog.Trace
         public const string GraphQLOperationType = "graphql.operation.type";
         public const string GraphQLSource = "graphql.source";
         public const string HttpMethod = "http.method";
-        public const string HttpRequestHeadersHost = "http.host";
+        public const string HttpRequestHeadersHost = "http.request.headers.host";
         public const string HttpStatusCode = "http.status_code";
         public const string HttpUrl = "http.url";
         public const string InstrumentationName = "component";

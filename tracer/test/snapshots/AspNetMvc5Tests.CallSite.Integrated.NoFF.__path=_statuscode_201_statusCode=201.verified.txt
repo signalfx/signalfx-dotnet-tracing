@@ -13,7 +13,7 @@
       aspnet.route: statuscode/{value},
       deployment.environment: integration_tests,
       http.method: GET,
-      http.host: localhost:00000,
+      http.request.headers.host: localhost:00000,
       http.status_code: 201,
       http.url: /statuscode/201,
       language: dotnet,
@@ -31,7 +31,7 @@
     Tags: {
       deployment.environment: integration_tests,
       http.method: GET,
-      http.host: localhost:00000,
+      http.request.headers.host: localhost:00000,
       http.status_code: 201,
       http.url: /statuscode/201,
       language: dotnet,

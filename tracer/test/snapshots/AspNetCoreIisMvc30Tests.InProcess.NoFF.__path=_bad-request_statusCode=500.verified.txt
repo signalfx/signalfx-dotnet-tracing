@@ -16,7 +16,7 @@ System.Exception: This was a bad request.
 at Samples.AspNetCoreMvc.Controllers.HomeController.ThrowException(),
       error.type: System.Exception,
       http.method: GET,
-      http.host: localhost:00000,
+      http.request.headers.host: localhost:00000,
       http.status_code: 500,
       http.url: http://localhost:00000/bad-request,
       language: dotnet,

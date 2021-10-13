@@ -11,7 +11,7 @@
       datadog-header-tag: asp-net-core,
       deployment.environment: integration_tests,
       http.method: GET,
-      http.host: localhost:00000,
+      http.request.headers.host: localhost:00000,
       http.request.headers.sample_correlation_identifier: 0000-0000-0000,
       http.response.headers.sample_correlation_identifier: 0000-0000-0000,
       http.response.headers.server: Kestrel,

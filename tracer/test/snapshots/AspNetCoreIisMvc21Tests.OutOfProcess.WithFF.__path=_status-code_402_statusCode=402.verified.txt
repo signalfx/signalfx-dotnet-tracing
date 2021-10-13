@@ -32,7 +32,7 @@
       deployment.environment: integration_tests,
       error.msg: The HTTP response has status code 402.,
       http.method: GET,
-      http.host: localhost:00000,
+      http.request.headers.host: localhost:00000,
       http.status_code: 402,
       http.url: http://localhost:00000/status-code/402,
       language: dotnet,

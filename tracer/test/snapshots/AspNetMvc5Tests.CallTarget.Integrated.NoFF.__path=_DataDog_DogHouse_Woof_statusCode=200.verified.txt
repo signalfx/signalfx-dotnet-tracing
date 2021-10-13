@@ -14,7 +14,7 @@
       aspnet.route: Datadog/{controller}/{action}/{id},
       deployment.environment: integration_tests,
       http.method: GET,
-      http.host: localhost:00000,
+      http.request.headers.host: localhost:00000,
       http.status_code: 200,
       http.url: /datadog/doghouse/woof,
       language: dotnet,
@@ -32,7 +32,7 @@
     Tags: {
       deployment.environment: integration_tests,
       http.method: GET,
-      http.host: localhost:00000,
+      http.request.headers.host: localhost:00000,
       http.status_code: 200,
       http.url: /datadog/doghouse/woof,
       language: dotnet,
