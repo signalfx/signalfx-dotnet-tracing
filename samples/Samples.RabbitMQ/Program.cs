@@ -74,7 +74,7 @@ namespace Samples.RabbitMQ
 
                     channel.BasicPublish(exchange: exchangeName,
                                             routingKey: routingKey,
-                                            basicProperties: null,
+                                            basicProperties: CreateBasicProperties(channel),
                                             body: body);
                     Console.WriteLine($"[Program.PublishAndGet] BasicPublish - Sent message: {string.Empty}");
                 }
@@ -114,9 +114,10 @@ namespace Samples.RabbitMQ
                     // Send message to the default exchange and use new queue as the routingKey
                     string message = "PublishAndGetDefault - Message";
                     var body = Encoding.UTF8.GetBytes(message);
+
                     channel.BasicPublish(exchange: "",
                                             routingKey: defaultQueueName,
-                                            basicProperties: null,
+                                            basicProperties: CreateBasicProperties(channel),
                                             body: body);
                     Console.WriteLine($"[Program.PublishAndGetDefault] BasicPublish - Sent message: {message}");
                 }
@@ -158,7 +159,7 @@ namespace Samples.RabbitMQ
 
                         channel.BasicPublish(exchange: "",
                                                 routingKey: "hello",
-                                                basicProperties: null,
+                                                basicProperties: CreateBasicProperties(channel),
                                                 body: body);
                         Console.WriteLine("[Send] - [x] Sent \"{0}\"", message);
 
@@ -216,6 +217,14 @@ namespace Samples.RabbitMQ
 
                 Console.WriteLine("[Receive] Exiting Thread.");
             }
+        }
+
+        private static IBasicProperties CreateBasicProperties(IModel channel)
+        {
+            var props = channel.CreateBasicProperties();
+            props.DeliveryMode = 1;
+
+            return props;
         }
     }
 }

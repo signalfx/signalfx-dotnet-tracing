@@ -444,7 +444,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     {
                         if (basicPropertiesValue.IsDeliveryModePresent())
                         {
-                            tags.Add(Tags.RabbitMQ.RoutingKey, DeliveryModeStrings[0x3 & basicPropertiesValue.DeliveryMode]);
+                            tags.Add(Tags.RabbitMQ.DeliveryMode, DeliveryModeStrings[0x3 & basicPropertiesValue.DeliveryMode]);
                         }
 
                         // add distributed tracing headers to the message
@@ -542,7 +542,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     {
                         if (basicPropertiesValue.IsDeliveryModePresent())
                         {
-                            tags.Add(Tags.RabbitMQ.RoutingKey, DeliveryModeStrings[0x3 & basicPropertiesValue.DeliveryMode]);
+                            tags.Add(Tags.RabbitMQ.DeliveryMode, DeliveryModeStrings[0x3 & basicPropertiesValue.DeliveryMode]);
                         }
 
                         // add distributed tracing headers to the message

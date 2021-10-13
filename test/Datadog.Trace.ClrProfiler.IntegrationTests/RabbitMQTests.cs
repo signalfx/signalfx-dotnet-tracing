@@ -63,6 +63,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                         {
                             basicPublishCount++;
                             Assert.Equal(SpanKinds.Producer, span.Tags[Tags.SpanKind]);
+                            Assert.True(span.Tags.TryGetValue(Tags.RabbitMQ.DeliveryMode, out string mode));
                         }
                         else if (string.Equals(command, "basic.get", StringComparison.OrdinalIgnoreCase))
                         {
