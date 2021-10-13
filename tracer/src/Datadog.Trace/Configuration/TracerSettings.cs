@@ -175,6 +175,8 @@ namespace Datadog.Trace.Configuration
 
             Exporter = source.GetTypedValue<ExporterType>(ConfigurationKeys.Exporter);
 
+            Convention = source.GetTypedValue<ConventionType>(ConfigurationKeys.Convention);
+
             Propagators = GetPropagators(source);
 
             var urlSubstringSkips = source?.GetString(ConfigurationKeys.HttpClientExcludedUrlSubstrings) ??
@@ -394,6 +396,14 @@ namespace Datadog.Trace.Configuration
         /// <seealso cref="ConfigurationKeys.Exporter"/>
         /// </summary>
         public ExporterType Exporter { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the semantic convention to be used.
+        /// The Tracer uses it to define operation names, span tags, statuses etc.
+        /// Default is <c>"Default"</c>.
+        /// <seealso cref="ConfigurationKeys.Convention"/>
+        /// </summary>
+        public ConventionType Convention { get; set; }
 
         /// <summary>
         /// Gets or sets the propagators be used.

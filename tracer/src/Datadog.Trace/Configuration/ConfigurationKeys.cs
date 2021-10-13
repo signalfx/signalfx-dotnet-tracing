@@ -330,6 +330,14 @@ namespace Datadog.Trace.Configuration
         public const string Exporter = "SIGNALFX_EXPORTER";
 
         /// <summary>
+        /// Configuration key for the semantic convention to be used.
+        /// The Tracer uses it to define operation names, span tags, statuses etc.
+        /// Default is <c>"Default"</c>.
+        /// <seealso cref="TracerSettings.Convention"/>
+        /// </summary>
+        public const string Convention = "SIGNALFX_CONVENTION";
+
+        /// <summary>
         /// Configuration key for the propagators to be used.
         /// Default is <c>Datadog</c>.
         /// Supports multiple values separated with comma.
