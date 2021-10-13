@@ -59,7 +59,9 @@ namespace Datadog.Trace.Configuration
         public const string AgentUri = "SIGNALFX_TRACE_AGENT_URL";
         public const string ApiKey = "SIGNALFX_API_KEY";
         public const string AppSecBlockingEnabled = "SIGNALFX_APPSEC_BLOCKING_ENABLED";
+        public const string AppSecCustomIpHeader = "SIGNALFX_APPSEC_IPHEADER";
         public const string AppSecEnabled = "SIGNALFX_APPSEC_ENABLED";
+        public const string AppSecExtraHeaders = "SIGNALFX_APPSEC_EXTRA_HEADERS";
         public const string AppSecRules = "SIGNALFX_APPSEC_RULES";
         public const string BufferSize = "SIGNALFX_TRACE_BUFFER_SIZE";
         public const string CIVisibilityEnabled = "SIGNALFX_CIVISIBILITY_ENABLED";
