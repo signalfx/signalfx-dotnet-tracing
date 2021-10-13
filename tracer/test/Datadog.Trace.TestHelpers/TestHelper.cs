@@ -382,10 +382,23 @@ namespace Datadog.Trace.TestHelpers
                 agent.SpanFilters.Add(IsServerSpan);
             }
 
-            return agent.WaitForSpans(
+            var spans = agent.WaitForSpans(
                 count: expectedSpanCount,
                 minDateTime: testStart,
                 returnAllOperations: true);
+
+            foreach (var span in spans)
+            {
+                // Upstream uses "http.request.headers.host" tag.
+                // Changing in tests to reduce the number of possible conflicts
+                // when pulling from upsteam.
+                if (span.Tags.TryGetValue("http.request.headers.host", out var value))
+                {
+                    span.Tags[Tags.HttpRequestHeadersHost] = value;
+                }
+            }
+
+            return spans;
         }
 #endif
 
