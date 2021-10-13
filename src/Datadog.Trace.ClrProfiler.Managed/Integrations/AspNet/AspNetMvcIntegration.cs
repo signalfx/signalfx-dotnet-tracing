@@ -287,7 +287,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 // call the original method, inspecting (but not catching) any unhandled exceptions
                 var response = instrumentedMethod(asyncControllerActionInvoker, controllerContext, actionName, callback, state);
 
-                if (scope != null)
+                if (HttpRuntime.UsingIntegratedPipeline && scope != null)
                 {
                     // TracingHttpModule is expected to already have added it in the typical IIS setup
                     // In principle we could remove adding the headers from this instrumentation, keeping
