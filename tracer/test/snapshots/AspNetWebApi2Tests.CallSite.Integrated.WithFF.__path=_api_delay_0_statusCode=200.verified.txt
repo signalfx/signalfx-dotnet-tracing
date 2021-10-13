@@ -11,7 +11,7 @@
       aspnet.route: api/delay/{seconds},
       deployment.environment: integration_tests,
       http.method: GET,
-      http.request.headers.host: localhost:00000,
+      http.host: localhost:00000,
       http.status_code: 200,
       http.url: http://localhost:00000/api/delay/0,
       language: dotnet,
@@ -29,7 +29,7 @@
     Tags: {
       deployment.environment: integration_tests,
       http.method: GET,
-      http.request.headers.host: localhost:00000,
+      http.host: localhost:00000,
       http.status_code: 200,
       http.url: /api/delay/0,
       language: dotnet,

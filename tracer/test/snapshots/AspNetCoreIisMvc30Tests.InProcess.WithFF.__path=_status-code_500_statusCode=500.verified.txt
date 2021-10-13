@@ -33,7 +33,7 @@
       deployment.environment: integration_tests,
       error.msg: The HTTP response has status code 500.,
       http.method: GET,
-      http.request.headers.host: localhost:00000,
+      http.host: localhost:00000,
       http.status_code: 500,
       http.url: http://localhost:00000/status-code/500,
       language: dotnet,

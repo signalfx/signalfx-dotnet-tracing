@@ -10,7 +10,7 @@
       component: aspnet_core,
       deployment.environment: integration_tests,
       http.method: GET,
-      http.request.headers.host: localhost:00000,
+      http.host: localhost:00000,
       http.status_code: 404,
       http.url: http://localhost:00000/branch/not-found,
       language: dotnet,
