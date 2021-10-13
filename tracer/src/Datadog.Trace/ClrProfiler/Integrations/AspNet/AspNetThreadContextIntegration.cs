@@ -29,7 +29,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.AspNet
 
         private const string SystemWebAssembly = "System.Web";
         private const string ThreadContextTypeName = "System.Web.ThreadContext";
-        private const string HttpContextScopeKey = "__Datadog.Trace.AspNet.TracingHttpModule-aspnet.request";
+        private const string HttpContextScopeKey = "__SignalFx.Tracing.AspNet.TracingHttpModule-aspnet.request";
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(AspNetThreadContextIntegration));
 

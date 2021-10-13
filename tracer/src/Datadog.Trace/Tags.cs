@@ -59,7 +59,11 @@ namespace Datadog.Trace
         /// <summary>
         /// The host of an HTTP request
         /// </summary>
-        public const string HttpRequestHeadersHost = "http.request.headers.host";
+        /// <remarks>
+        /// Upstream uses "http.request.headers.host", however, to better align with OpenTelemetry we use
+        /// "http.host" instead.
+        /// </remarks>
+        public const string HttpRequestHeadersHost = "http.host";
 
         /// <summary>
         /// The status code of an HTTP response
