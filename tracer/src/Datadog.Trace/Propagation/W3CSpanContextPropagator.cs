@@ -66,26 +66,25 @@ namespace Datadog.Trace.Propagation
         /// <inheritdoc cref="IPropagator"/>
         public virtual SpanContext Extract<T>(T carrier, Func<T, string, IEnumerable<string>> getter)
         {
-            var traceParentCollection = getter(carrier, W3CHeaderNames.TraceParent).ToList();
-            if (traceParentCollection.Count != 1)
+            var enumerableHeaderValues = getter(carrier, W3CHeaderNames.TraceParent);
+            if (enumerableHeaderValues == Enumerable.Empty<string>())
             {
-                Log.Warning("Header {HeaderName} needs exactly 1 value", W3CHeaderNames.TraceParent);
                 return null;
             }
 
-            var traceParentHeader = traceParentCollection.First();
+            var traceParentHeader = enumerableHeaderValues.First();
             var traceIdString = traceParentHeader.Substring(VersionPrefixIdLength, TraceIdLength);
             var traceId = _traceIdConvention.CreateFromString(traceIdString);
             if (traceId == TraceId.Zero)
             {
-                Log.Warning("Could not parse {HeaderName} headers: {HeaderValues}", W3CHeaderNames.TraceParent, string.Join(",", traceParentCollection));
+                Log.Debug("Could not parse correct TraceId from header {HeaderName}: {HeaderValues}, or the value is 0", W3CHeaderNames.TraceParent, traceParentHeader);
                 return null;
             }
 
             var spanIdString = traceParentHeader.Substring(VersionAndTraceIdLength, SpanIdLength);
             if (!ulong.TryParse(spanIdString, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var spanId))
             {
-                Log.Warning("Could not parse {HeaderName} headers: {HeaderValues}", W3CHeaderNames.TraceParent, string.Join(",", traceParentCollection));
+                Log.Debug("Could not retrieve SpanId from header {HeaderName}: {HeaderValues}", W3CHeaderNames.TraceParent, traceParentHeader);
                 return null;
             }
 
