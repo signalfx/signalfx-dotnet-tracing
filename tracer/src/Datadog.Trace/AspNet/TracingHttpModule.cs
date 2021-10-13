@@ -57,7 +57,7 @@ namespace Datadog.Trace.AspNet
         {
             _requestOperationName = operationName ?? throw new ArgumentNullException(nameof(operationName));
 
-            _httpContextScopeKey = string.Concat("__Datadog.Trace.AspNet.TracingHttpModule-", _requestOperationName);
+            _httpContextScopeKey = string.Concat("__SignalFx.Tracing.AspNet.TracingHttpModule-", _requestOperationName);
         }
 
         /// <inheritdoc />
@@ -123,12 +123,13 @@ namespace Datadog.Trace.AspNet
 
                 string host = httpRequest.Headers.Get("Host");
                 string httpMethod = httpRequest.HttpMethod.ToUpperInvariant();
-                string url = httpRequest.RawUrl.ToLowerInvariant();
+                string url = httpRequest.Url.ToString(); // Upstream uses RawUrl, ie. the part of the URL following the domain information.
 
                 var tags = new WebTags();
-                scope = tracer.StartActiveWithTags(_requestOperationName, propagatedContext, tags: tags);
+                scope = tracer.StartActiveWithTags(httpMethod, propagatedContext, tags: tags);
                 // Leave resourceName blank for now - we'll update it in OnEndRequest
                 scope.Span.DecorateWebServerSpan(resourceName: null, httpMethod, host, url, tags, tagsFromHeaders);
+                scope.Span.LogicScope = _requestOperationName;
 
                 tags.SetAnalyticsSampleRate(IntegrationId, tracer.Settings, enabledWithGlobalSetting: true);
 
