@@ -41,7 +41,7 @@ env:
   DiffEngine_Disabled: true
 jobs:
   build_windows_Stage_build:
-    name: build windows
+    name: Windows - Build
     runs-on: windows-2019
     steps:
     - uses: actions/checkout@v2
@@ -54,37 +54,38 @@ jobs:
       with:
         path: ${{ env.binDir }}
         name: build-windows-working-directory
-  build_linux_Stage_build:
-    runs-on: ubuntu-18.04
-    strategy:
-      matrix:
-        baseImage:
-        - debian
-    steps:
-    - uses: actions/checkout@v2
-    - # There is no conversion path for templates in GitHub Actions
-      run: |
-        #steps/run-in-docker.yml
-        build: true
-        target: builder
-        baseImage: ${{ env.baseImage }}
-        command: Clean BuildTracerHome ZipTracerHome
-    - name: Uploading linux tracer home artifact
-      uses: actions/upload-artifact@v2
-      with:
-        path: ${{ env.tracerHome }}
-        name: linux-tracer-home-${{ env.baseImage }}
-    - name: Upload linux-x64 packages
-      uses: actions/upload-artifact@v2
-      with:
-        path: ${{ env.artifacts }}/linux-x64
-        name: linux-packages-${{ env.baseImage }}
-    - name: Upload working directory after the build
-      uses: actions/upload-artifact@v2
-      with:
-        path: ${{ env.binDir }}
-        name: build-linux-${{ env.baseImage }}-working-directory
+  # build_linux_Stage_build:
+  #   runs-on: ubuntu-18.04
+  #   strategy:
+  #     matrix:
+  #       baseImage:
+  #       - debian
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - # There is no conversion path for templates in GitHub Actions
+  #     run: |
+  #       #steps/run-in-docker.yml
+  #       build: true
+  #       target: builder
+  #       baseImage: ${{ env.baseImage }}
+  #       command: Clean BuildTracerHome ZipTracerHome
+  #   - name: Uploading linux tracer home artifact
+  #     uses: actions/upload-artifact@v2
+  #     with:
+  #       path: ${{ env.tracerHome }}
+  #       name: linux-tracer-home-${{ env.baseImage }}
+  #   - name: Upload linux-x64 packages
+  #     uses: actions/upload-artifact@v2
+  #     with:
+  #       path: ${{ env.artifacts }}/linux-x64
+  #       name: linux-packages-${{ env.baseImage }}
+  #   - name: Upload working directory after the build
+  #     uses: actions/upload-artifact@v2
+  #     with:
+  #       path: ${{ env.binDir }}
+  #       name: build-linux-${{ env.baseImage }}-working-directory
   package_windows_Stage_msi_and_pack:
+    name: Windows - msi and nuget
     runs-on: windows-2019
     needs:
     - build_windows_Stage_build
@@ -117,7 +118,7 @@ jobs:
         path: ${{ env.artifacts }}/nuget
         name: nuget-packages
   unit_tests_windows_Stage_managed:
-    name: managed unit tests windows
+    name: Windows - managed unit tests
     runs-on: windows-2019
     steps:
     - uses: actions/checkout@v2
@@ -132,7 +133,7 @@ jobs:
       if: (${{ job.status }} != 'cancelled')
       continue-on-error: true
   unit_tests_windows_Stage_native:
-    name: native unit tests windows
+    name: Windows - native unit tests 
     runs-on: windows-2019
     steps:
     - uses: actions/checkout@v2
@@ -142,29 +143,31 @@ jobs:
       run: tracer\build.cmd BuildTracerHome
     - name: Build and Test
       run: tracer\build.cmd BuildAndRunNativeUnitTests
-  unit_tests_linux_Stage_test:
-    runs-on: ubuntu-18.04
-    strategy:
-      matrix:
-        baseImage:
-        - debian
-    steps:
-    - uses: actions/checkout@v2
-    - # There is no conversion path for templates in GitHub Actions
-      run: |
-        #steps/run-in-docker.yml
-        build: true
-        baseImage: ${{ env.baseImage }}
-        command: BuildTracerHome BuildAndRunManagedUnitTests
-    - uses: actions/upload-artifact@v2
-      with:
-        path: tracer/build_data
-        name: profiler-logs_unit_tests_linux_${{ env.Agent.JobName }}_${{ env.System.JobAttempt }}
-      if: (${{ job.status }} != 'cancelled')
-      continue-on-error: true
+  # unit_tests_linux_Stage_test:
+  #   runs-on: ubuntu-18.04
+  #   strategy:
+  #     matrix:
+  #       baseImage:
+  #       - debian
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - # There is no conversion path for templates in GitHub Actions
+  #     run: |
+  #       #steps/run-in-docker.yml
+  #       build: true
+  #       baseImage: ${{ env.baseImage }}
+  #       command: BuildTracerHome BuildAndRunManagedUnitTests
+  #   - uses: actions/upload-artifact@v2
+  #     with:
+  #       path: tracer/build_data
+  #       name: profiler-logs_unit_tests_linux_${{ env.Agent.JobName }}_${{ env.System.JobAttempt }}
+  #     if: (${{ job.status }} != 'cancelled')
+  #     continue-on-error: true
   integration_tests_windows_Stage_Windows:
+    name: Windows - integration tests 
     runs-on: windows-2019
     strategy:
+      fail-fast: false
       matrix:
         include:
         - platform: x64
@@ -199,6 +202,7 @@ jobs:
       if: (${{ job.status }} != 'cancelled')
       continue-on-error: true
   integration_tests_windows_iis_Stage_Windows_IIS:
+    name: Windows - IIS integration tests 
     runs-on: windows-2019
     strategy:
       matrix:
@@ -241,47 +245,47 @@ jobs:
         name: integration_tests_windows_iis_tracer_logs_${{ env.platform }}
       if: (${{ job.status }} != 'cancelled')
       continue-on-error: true
-  integration_tests_linux_Stage_Test:
-    runs-on: ubuntu-18.04
-    strategy:
-      matrix:
-        publishTargetFramework:
-        - netcoreapp3.1
-        - net5.0
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set environmental variables
-      run: |
-        echo "TestAllPackageVersions=$isMainBranch" >> $GITHUB_ENV
-    - # There is no conversion path for templates in GitHub Actions
-      run: |
-        #steps/run-in-docker.yml
-        build: true
-        baseImage: ${{ env.baseImage }}
-        command: CleanObjFiles
-    - uses: actions/download-artifact@v2
-      with:
-        path: ${{ env.binDir }}
-        name: build-linux-${{ env.baseImage }}-working-directory
-    - # There is no conversion path for templates in GitHub Actions
-      run: |
-        #steps/run-in-docker.yml
-        build: true
-        baseImage: ${{ env.baseImage }}
-        command: BuildTracerHome BuildLinuxIntegrationTests --framework ${{ env.publishTargetFramework }}
-    - name: docker-compose build IntegrationTests
-      run: docker-compose build --build-arg baseImage=${{ env.baseImage }} --build-arg framework=${{ env.publishTargetFramework }} IntegrationTests
-    - name: docker-compose start dependencies
-      run: docker-compose run --rm StartDependencies
-    - name: docker-compose run IntegrationTests
-      run: docker-compose run --rm -e baseImage=${{ env.baseImage }} -e framework=${{ env.publishTargetFramework }} IntegrationTests
-    - name: docker-compose stop services
-      run: docker-compose down
-      if: (${{ job.status }} != 'cancelled')
-    - uses: actions/upload-artifact@v2
-      with:
-        path: tracer/build_data
-        name: profiler-logs_integration_tests_linux_${{ env.baseImage }}_${{ env.publishTargetFramework }}_${{ env.System.JobAttempt }}
-      if: (${{ job.status }} != 'cancelled')
-      continue-on-error: true
+  # integration_tests_linux_Stage_Test:
+  #   runs-on: ubuntu-18.04
+  #   strategy:
+  #     matrix:
+  #       publishTargetFramework:
+  #       - netcoreapp3.1
+  #       - net5.0
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - name: Set environmental variables
+  #     run: |
+  #       echo "TestAllPackageVersions=$isMainBranch" >> $GITHUB_ENV
+  #   - # There is no conversion path for templates in GitHub Actions
+  #     run: |
+  #       #steps/run-in-docker.yml
+  #       build: true
+  #       baseImage: ${{ env.baseImage }}
+  #       command: CleanObjFiles
+  #   - uses: actions/download-artifact@v2
+  #     with:
+  #       path: ${{ env.binDir }}
+  #       name: build-linux-${{ env.baseImage }}-working-directory
+  #   - # There is no conversion path for templates in GitHub Actions
+  #     run: |
+  #       #steps/run-in-docker.yml
+  #       build: true
+  #       baseImage: ${{ env.baseImage }}
+  #       command: BuildTracerHome BuildLinuxIntegrationTests --framework ${{ env.publishTargetFramework }}
+  #   - name: docker-compose build IntegrationTests
+  #     run: docker-compose build --build-arg baseImage=${{ env.baseImage }} --build-arg framework=${{ env.publishTargetFramework }} IntegrationTests
+  #   - name: docker-compose start dependencies
+  #     run: docker-compose run --rm StartDependencies
+  #   - name: docker-compose run IntegrationTests
+  #     run: docker-compose run --rm -e baseImage=${{ env.baseImage }} -e framework=${{ env.publishTargetFramework }} IntegrationTests
+  #   - name: docker-compose stop services
+  #     run: docker-compose down
+  #     if: (${{ job.status }} != 'cancelled')
+  #   - uses: actions/upload-artifact@v2
+  #     with:
+  #       path: tracer/build_data
+  #       name: profiler-logs_integration_tests_linux_${{ env.baseImage }}_${{ env.publishTargetFramework }}_${{ env.System.JobAttempt }}
+  #     if: (${{ job.status }} != 'cancelled')
+  #     continue-on-error: true
                     
