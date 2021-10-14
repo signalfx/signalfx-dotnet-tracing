@@ -213,7 +213,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Set environmental variables
       run: |
-        echo "relativeMsiOutputDirectory=$relativeArtifacts/$platform/en-us" >> $GITHUB_ENV
+        echo "relativeMsiOutputDirectory=$relativeArtifacts/{{ matrix.platform }}/en-us" >> $GITHUB_ENV
   #  - # There is no conversion path for templates in GitHub Actions
   #    run: |
   #      #steps/install-dotnet-sdks.yml
@@ -223,7 +223,7 @@ jobs:
     - name: Download MSI
       uses: actions/download-artifact@v2
       with:
-        name: windows-msi-${{ env.platform }}
+        name: windows-msi-${{ matrix.platform }}
         path: ${{ github.workspace }}/${{ env.relativeMsiOutputDirectory }}
     - name: BuildWindowsIntegrationTests
       run: tracer\build.cmd BuildWindowsIntegrationTests -Framework netcoreapp3.1
