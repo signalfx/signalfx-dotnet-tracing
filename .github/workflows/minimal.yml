@@ -32,7 +32,6 @@ env:
   ddTracerHome: ${{ github.workspace }}/tracer/src/bin/dd-tracer-home
   tracerHome: ${{ github.workspace }}/tracer/src/bin/windows-tracer-home
   artifacts: ${{ github.workspace }}/tracer/src/bin/artifacts
-  ddApiKey: ${{ env.SIGNALFX_API_KEY }}
   isMainBranch: $[eq(github.ref, 'refs/heads/next-ver')]
   isPullRequest: $[eq(variables['Build.Reason'], 'PullRequest')]
   NugetPackageDirectory: ${{ github.workspace }}/packages
