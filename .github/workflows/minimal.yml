@@ -226,10 +226,11 @@ jobs:
     needs:
     - build_windows_Stage_build
     - package_windows_Stage_msi_and_pack
-    env:
-      relativeMsiOutputDirectory: ${{ env.relativeArtifacts }}/${{ env.platform }}/en-us
     steps:
     - uses: actions/checkout@v2
+    - name: "Set environmental variables"
+        run: |
+          echo "relativeMsiOutputDirectory=$relativeArtifacts/$platform/en-us" >> $GITHUB_ENV
   #  - # There is no conversion path for templates in GitHub Actions
   #    run: |
   #      #steps/install-dotnet-sdks.yml
@@ -269,10 +270,11 @@ jobs:
         - net5.0
     needs:
     - build_linux_Stage_build
-    env:
-      TestAllPackageVersions: ${{ env.isMainBranch }}
     steps:
     - uses: actions/checkout@v2
+    - name: "Set environmental variables"
+        run: |
+          echo "TestAllPackageVersions=$isMainBranch" >> $GITHUB_ENV
     - # There is no conversion path for templates in GitHub Actions
       run: |
         #steps/run-in-docker.yml
