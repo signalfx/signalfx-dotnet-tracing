@@ -21,7 +21,7 @@
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: aspnet_core.request,
+    Name: GET /status-code/{statuscode},
     Resource: GET /status-code/{statuscode},
     Service: Samples.AspNetCoreMvc21,
     Type: web,
