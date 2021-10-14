@@ -228,9 +228,9 @@ jobs:
     - package_windows_Stage_msi_and_pack
     steps:
     - uses: actions/checkout@v2
-    - name: "Set environmental variables"
-        run: |
-          echo "relativeMsiOutputDirectory=$relativeArtifacts/$platform/en-us" >> $GITHUB_ENV
+    - name: Set environmental variables
+      run: |
+        echo "relativeMsiOutputDirectory=$relativeArtifacts/$platform/en-us" >> $GITHUB_ENV
   #  - # There is no conversion path for templates in GitHub Actions
   #    run: |
   #      #steps/install-dotnet-sdks.yml
@@ -272,9 +272,9 @@ jobs:
     - build_linux_Stage_build
     steps:
     - uses: actions/checkout@v2
-    - name: "Set environmental variables"
-        run: |
-          echo "TestAllPackageVersions=$isMainBranch" >> $GITHUB_ENV
+    - name: Set environmental variables
+      run: |
+        echo "TestAllPackageVersions=$isMainBranch" >> $GITHUB_ENV
     - # There is no conversion path for templates in GitHub Actions
       run: |
         #steps/run-in-docker.yml
