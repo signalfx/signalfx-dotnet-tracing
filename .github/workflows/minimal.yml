@@ -98,8 +98,9 @@ jobs:
     - uses: actions/checkout@v2
    # - # There is no conversion path for templates in GitHub Actions
    #   run: '#steps/install-dotnet-5-sdk.yml'
-    - # There is no conversion path for templates in GitHub Actions
-      run: '#steps/restore-working-directory.yml'
+    - uses: actions/download-artifact@v2
+      with:
+        name: build-windows-working-directory
     - name: Build MSI and Tracer home
       run: tracer\build.cmd PackageTracerHome
     - name: Publish tracer-home.zip
@@ -131,8 +132,9 @@ jobs:
     - uses: actions/checkout@v2
    # - # There is no conversion path for templates in GitHub Actions
    #   run: '#steps/install-dotnet.yml'
-    - # There is no conversion path for templates in GitHub Actions
-      run: '#steps/restore-working-directory.yml'
+    - uses: actions/download-artifact@v2
+      with:
+        name: build-windows-working-directory
     - name: Build and Test
       run: tracer\build.cmd BuildAndRunManagedUnitTests
     - uses: actions/upload-artifact@v2
@@ -150,8 +152,9 @@ jobs:
     - uses: actions/checkout@v2
    # - # There is no conversion path for templates in GitHub Actions
    #   run: '#steps/install-dotnet.yml'
-    - # There is no conversion path for templates in GitHub Actions
-      run: '#steps/restore-working-directory.yml'
+    - uses: actions/download-artifact@v2
+      with:
+        name: build-windows-working-directory
     - name: Build and Test
       run: tracer\build.cmd BuildAndRunNativeUnitTests
   unit_tests_linux_Stage_test:
@@ -164,10 +167,9 @@ jobs:
     - build_linux_Stage_build
     steps:
     - uses: actions/checkout@v2
-    - # There is no conversion path for templates in GitHub Actions
-      run: |
-        #steps/restore-working-directory.yml
-        artifact: build-linux-${{ env.baseImage }}-working-directory
+    - uses: actions/download-artifact@v2
+      with:
+        name: build-linux-${{ env.baseImage }}-working-directory
     - # There is no conversion path for templates in GitHub Actions
       run: |
         #steps/run-in-docker.yml
@@ -196,8 +198,9 @@ jobs:
   #    run: |
   #      #steps/install-dotnet-sdks.yml
   #      includeX86: true
-    - # There is no conversion path for templates in GitHub Actions
-      run: '#steps/restore-working-directory.yml'
+    - uses: actions/download-artifact@v2
+      with:
+        name: build-windows-working-directory
     - name: Start CosmosDB Emulator
       run: |
         Write-Host "Starting CosmosDB Emulator"
@@ -232,8 +235,9 @@ jobs:
   #    run: |
   #      #steps/install-dotnet-sdks.yml
   #      includeX86: true
-    - # There is no conversion path for templates in GitHub Actions
-      run: '#steps/restore-working-directory.yml'
+    - uses: actions/download-artifact@v2
+      with:
+        name: build-windows-working-directory
     - name: Download MSI
       uses: actions/download-artifact@v2
       with:
@@ -276,10 +280,9 @@ jobs:
         build: true
         baseImage: ${{ env.baseImage }}
         command: CleanObjFiles
-    - # There is no conversion path for templates in GitHub Actions
-      run: |
-        #steps/restore-working-directory.yml
-        artifact: build-linux-${{ env.baseImage }}-working-directory
+    - uses: actions/download-artifact@v2
+      with:
+        name: build-linux-${{ env.baseImage }}-working-directory
     - # There is no conversion path for templates in GitHub Actions
       run: |
         #steps/run-in-docker.yml
