@@ -78,7 +78,8 @@ namespace Datadog.Trace.Tests.DiagnosticListeners
 
             Assert.NotNull(span);
 
-            Assert.Equal("aspnet_core.request", span.OperationName);
+            Assert.Equal("HTTP GET", span.LogicScope);
+            Assert.Equal("aspnet_core.request", span.LogicScope);
             Assert.Equal("aspnet_core", span.GetTag(Tags.InstrumentationName));
             Assert.Equal(SpanTypes.Web, span.Type);
             Assert.Equal("GET /home/?/action", span.ResourceName);

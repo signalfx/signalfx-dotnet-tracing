@@ -123,7 +123,8 @@ namespace Datadog.Trace.PlatformHelpers
                 tags = new AspNetCoreTags();
             }
 
-            var scope = tracer.StartActiveWithTags(_requestInOperationName, propagatedContext, tags: tags);
+            var scope = tracer.StartActiveWithTags($"HTTP {httpMethod}", propagatedContext, tags: tags);
+            scope.Span.LogicScope = _requestInOperationName;
 
             scope.Span.DecorateWebServerSpan(resourceName, httpMethod, host, url, tags, tagsFromHeaders);
 
