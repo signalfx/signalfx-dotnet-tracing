@@ -84,37 +84,6 @@ jobs:
   #     with:
   #       path: ${{ env.binDir }}
   #       name: build-linux-${{ env.baseImage }}-working-directory
-  package_windows_Stage_msi_and_pack:
-    name: Windows - msi and nuget
-    runs-on: windows-2019
-    steps:
-    - uses: actions/checkout@v2
-   # - # There is no conversion path for templates in GitHub Actions
-   #   run: '#steps/install-dotnet-5-sdk.yml'
-    - name: Build tracer home
-      run: tracer\build.cmd BuildTracerHome
-    - name: Build MSI and Tracer home
-      run: tracer\build.cmd PackageTracerHome
-    - name: Publish tracer-home.zip
-      uses: actions/upload-artifact@v2
-      with:
-        path: ${{ env.artifacts }}/windows-tracer-home.zip
-        name: windows-tracer-home.zip
-    - name: Publish Windows x86 MSI
-      uses: actions/upload-artifact@v2
-      with:
-        path: ${{ env.artifacts }}/x86/en-us
-        name: windows-msi-x86
-    - name: Publish Windows x64 MSI
-      uses: actions/upload-artifact@v2
-      with:
-        path: ${{ env.artifacts }}/x64/en-us
-        name: windows-msi-x64
-    - name: Publish NuGet packages
-      uses: actions/upload-artifact@v2
-      with:
-        path: ${{ env.artifacts }}/nuget
-        name: nuget-packages
   unit_tests_windows_Stage_managed:
     name: Windows - managed unit tests
     runs-on: windows-2019
@@ -207,28 +176,20 @@ jobs:
         platform:
         - x64
     timeout-minutes: 100
-    needs:
-    - package_windows_Stage_msi_and_pack
     steps:
     - uses: actions/checkout@v2
-    - name: Set environmental variables
-      run: |
-        echo "relativeMsiOutputDirectory=$relativeArtifacts/{{ matrix.platform }}/en-us" >> $GITHUB_ENV
   #  - # There is no conversion path for templates in GitHub Actions
   #    run: |
   #      #steps/install-dotnet-sdks.yml
   #      includeX86: true
     - name: Build tracer home
       run: tracer\build.cmd BuildTracerHome
-    - name: Download MSI
-      uses: actions/download-artifact@v2
-      with:
-        name: windows-msi-${{ matrix.platform }}
-        path: ${{ github.workspace }}/${{ env.relativeMsiOutputDirectory }}
+    - name: Build MSI
+      run: tracer\build.cmd PackageTracerHome
     - name: BuildWindowsIntegrationTests
       run: tracer\build.cmd BuildWindowsIntegrationTests -Framework netcoreapp3.1
     - name: docker-compose build IIS containers
-      run: docker-compose build --build-arg dotnet_tracer_msi=.${{ env.relativeMsiOutputDirectory }}/*.msi --build-arg ENABLE_32_BIT=${{ env.enable32bit }} IntegrationTests.IIS
+      run: docker-compose build --build-arg dotnet_tracer_msi=.$relativeArtifacts/{{ matrix.platform }}/en-us/*.msi --build-arg ENABLE_32_BIT=${{ env.enable32bit }} IntegrationTests.IIS
     - name: docker-compose start IIS containers
       run: docker-compose up -d IntegrationTests.IIS
     - name: RunWindowsIisIntegrationTests
