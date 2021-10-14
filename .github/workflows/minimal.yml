@@ -29,6 +29,7 @@ env:
   dotnetCoreSdk5Version: 5.0.401
   relativeTracerHome: /tracer/src/bin/windows-tracer-home
   relativeArtifacts: /tracer/src/bin/artifacts
+  binDir: ${{ github.workspace }}/tracer/src/bin
   ddTracerHome: ${{ github.workspace }}/tracer/src/bin/dd-tracer-home
   tracerHome: ${{ github.workspace }}/tracer/src/bin/windows-tracer-home
   artifacts: ${{ github.workspace }}/tracer/src/bin/artifacts
@@ -48,15 +49,10 @@ jobs:
    #   run: '#steps/install-dotnet-5-sdk.yml'
     - name: Build tracer home
       run: tracer\build.cmd BuildTracerHome
-    - name: Upload Windows tracer home directory
-      uses: actions/upload-artifact@v2
-      with:
-        path: ${{ env.tracerHome }}
-        name: windows-tracer-home
     - name: Upload working directory after the managed build
       uses: actions/upload-artifact@v2
       with:
-        path: ${{ github.workspace }}
+        path: ${{ env.binDir }}
         name: build-windows-working-directory
   build_linux_Stage_build:
     runs-on: ubuntu-18.04
@@ -86,7 +82,7 @@ jobs:
     - name: Upload working directory after the build
       uses: actions/upload-artifact@v2
       with:
-        path: ${{ github.workspace }}
+        path: ${{ env.binDir }}
         name: build-linux-${{ env.baseImage }}-working-directory
   package_windows_Stage_msi_and_pack:
     runs-on: windows-2019
@@ -98,6 +94,7 @@ jobs:
    #   run: '#steps/install-dotnet-5-sdk.yml'
     - uses: actions/download-artifact@v2
       with:
+        path: ${{ env.binDir }}
         name: build-windows-working-directory
     - name: Build MSI and Tracer home
       run: tracer\build.cmd PackageTracerHome
@@ -132,6 +129,7 @@ jobs:
    #   run: '#steps/install-dotnet.yml'
     - uses: actions/download-artifact@v2
       with:
+        path: ${{ env.binDir }}
         name: build-windows-working-directory
     - name: Build and Test
       run: tracer\build.cmd BuildAndRunManagedUnitTests
@@ -152,6 +150,7 @@ jobs:
    #   run: '#steps/install-dotnet.yml'
     - uses: actions/download-artifact@v2
       with:
+        path: ${{ env.binDir }}
         name: build-windows-working-directory
     - name: Build and Test
       run: tracer\build.cmd BuildAndRunNativeUnitTests
@@ -167,6 +166,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/download-artifact@v2
       with:
+        path: ${{ env.binDir }}
         name: build-linux-${{ env.baseImage }}-working-directory
     - # There is no conversion path for templates in GitHub Actions
       run: |
@@ -202,6 +202,7 @@ jobs:
   #      includeX86: true
     - uses: actions/download-artifact@v2
       with:
+        path: ${{ env.binDir }}
         name: build-windows-working-directory
     - name: Start CosmosDB Emulator
       run: |
@@ -240,6 +241,7 @@ jobs:
   #      includeX86: true
     - uses: actions/download-artifact@v2
       with:
+        path: ${{ env.binDir }}
         name: build-windows-working-directory
     - name: Download MSI
       uses: actions/download-artifact@v2
@@ -286,6 +288,7 @@ jobs:
         command: CleanObjFiles
     - uses: actions/download-artifact@v2
       with:
+        path: ${{ env.binDir }}
         name: build-linux-${{ env.baseImage }}-working-directory
     - # There is no conversion path for templates in GitHub Actions
       run: |
