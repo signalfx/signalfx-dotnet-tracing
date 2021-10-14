@@ -87,8 +87,6 @@ jobs:
   package_windows_Stage_msi_and_pack:
     name: Windows - msi and nuget
     runs-on: windows-2019
-    needs:
-    - build_windows_Stage_build
     steps:
     - uses: actions/checkout@v2
    # - # There is no conversion path for templates in GitHub Actions
