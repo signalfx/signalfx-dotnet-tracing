@@ -2,7 +2,7 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: GET /ping,
+    Name: aspnet_core.request,
     Resource: GET /ping,
     Service: Samples.AspNetCoreMvc31,
     Type: web,

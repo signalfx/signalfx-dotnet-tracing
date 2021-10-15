@@ -21,7 +21,7 @@
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: GET /bad-request,
+    Name: aspnet_core.request,
     Resource: GET /bad-request,
     Service: Samples.AspNetCoreMvc21,
     Type: web,

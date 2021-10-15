@@ -21,7 +21,7 @@
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: GET /api/delay/{seconds},
+    Name: aspnet_core.request,
     Resource: GET /api/delay/{seconds},
     Service: Samples.AspNetCoreMvc21,
     Type: web,
