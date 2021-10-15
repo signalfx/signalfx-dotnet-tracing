@@ -23,7 +23,7 @@ namespace Datadog.Trace.IntegrationTests
             _output = output;
         }
 
-        [Fact]
+        [Fact(Skip = "Upstream requires the DD Agent to be installed. For us it is not important")]
         public async Task DatadogHttpClient_CanSendTracesToAgent()
         {
             var agentPort = TcpPortProvider.GetOpenPort();
