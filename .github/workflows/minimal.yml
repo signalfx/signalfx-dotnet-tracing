@@ -126,33 +126,29 @@ jobs:
           platform: x64
           framework: netcoreapp3.1
           target: BuildAndRunWindowsIntegrationTests
-          requiresCosmos: true
         - machine: windows-2019
           platform: x64
           framework: netcoreapp3.1
           target: BuildAndRunWindowsRegressionTests
-          requiresCosmos: false
         - machine: ubuntu-20.04
           platform: x64
           framework: netcoreapp3.1
           target: BuildAndRunLinuxIntegrationTests
-          requiresCosmos: false
         - machine: ubuntu-20.04
           platform: x64
           framework: net5.0
           target: BuildAndRunLinuxIntegrationTests
-          requiresCosmos: false
     runs-on: ${{ matrix.machine }}
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v2
     - name: Start CosmosDB Emulator
+      if: ${{ matrix.target == 'BuildAndRunWindowsIntegrationTests' }}
+      shell: powershell
       run: |
         Write-Host "Starting CosmosDB Emulator"
         Import-Module "C:/Program Files/Azure Cosmos DB Emulator/PSModules/Microsoft.Azure.CosmosDB.Emulator"
         Start-CosmosDbEmulator -Timeout 300
-      shell: powershell
-      if: ${{ matrix.requiresCosmos }}
     - run: ./tracer/build.cmd BuildTracerHome ${{ matrix.target }} -Framework ${{ matrix.framework }} -TargetPlatform ${{ matrix.platform }} --PrintDriveSpace
     - uses: actions/upload-artifact@v2
       with:
