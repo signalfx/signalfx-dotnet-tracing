@@ -1,0 +1,245 @@
+name: minimal
+on:
+  push:
+    branches:
+    - main
+    - next-ver
+    tags:
+    - 'v*'
+    paths-ignore:
+    - docs/*
+# The following is a list of shared asset locations.
+# This is the config for the Tracer CI pipeline,
+# so we are excluding shared assets that are not currently used by the Tracer.
+# We make this list granular, rather than catch-all, on purpose.
+# It makes it easier to selectively remove items from the list, once the Tracer starts using them.
+#   - The Managed Loader:
+    - shared/samples/Datadog.AutoInstrumentation.ManagedLoader.Demo/*
+    - shared/src/managed-lib/ManagedLoader/*
+#   - Dynamic Bindings for DiagnosticSource:
+    - shared/samples/Datadog.DynamicDiagnosticSourceBindings.Demo/*
+    - shared/src/managed-lib/DynamicDiagnosticSourceBindings/*
+#   - Logging demo samples:
+    - shared/samples/Datadog.Logging.Demo/*
+#   - Managed utility APIs (may be used transitively):
+    - shared/src/managed-src/Datadog.Collections/*
+    - shared/src/managed-src/Datadog.Util/*
+#   - Managed Logging APIs (may be used transitively):    
+    - shared/src/managed-src/Datadog.Logging.Emission/*
+    - shared/src/managed-src/Datadog.Logging.Composition/*
+    - shared/src/managed-src/Datadog.Logging/*
+#   - Fmt lib:
+    - shared/src/native-lib/fmt_x64-windows-static/*
+    - shared/src/native-lib/fmt_x86-windows-static/*
+#   - Spdlob lib:
+    - shared/src/native-lib/spdlog/*
+#   - Mics common native sources:
+    - shared/src/native-src/*
+  pull_request:
+  workflow_dispatch:
+env:
+  buildConfiguration: Release
+  dotnetCoreSdk5Version: 5.0.401
+  relativeTracerHome: /tracer/src/bin/windows-tracer-home
+  relativeArtifacts: /tracer/src/bin/artifacts
+  binDir: ${{ github.workspace }}/tracer/src/bin
+  ddTracerHome: ${{ github.workspace }}/tracer/src/bin/dd-tracer-home
+  tracerHome: ${{ github.workspace }}/tracer/src/bin/windows-tracer-home
+  artifacts: ${{ github.workspace }}/tracer/src/bin/artifacts
+  isMainBranch: $[eq(github.ref, 'refs/heads/next-ver')]
+  NugetPackageDirectory: ${{ github.workspace }}/packages
+  relativeNugetPackageDirectory: packages
+  dotnetToolTag: build-dotnet-tool
+  Verify_DisableClipboard: true
+  DiffEngine_Disabled: true
+jobs:
+  windows-build:
+    name: Windows - Build
+    runs-on: windows-2019
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build tracer home
+      run: tracer\build.cmd BuildTracerHome PackageTracerHome
+    - name: Publish tracer-home.zip
+      uses: actions/upload-artifact@v2
+      with:
+        path: ${{ env.tracerHome }}
+        name: windows-tracer-home
+    - name: Publish Windows x86 MSI
+      uses: actions/upload-artifact@v2
+      with:
+        path: ${{ env.artifacts }}/x86/en-us
+        name: windows-msi-x86
+    - name: Publish Windows x64 MSI
+      uses: actions/upload-artifact@v2
+      with:
+        path: ${{ env.artifacts }}/x64/en-us
+        name: windows-msi-x64
+  # build_linux_Stage_build:
+  #   runs-on: ubuntu-18.04
+  #   strategy:
+  #     matrix:
+  #       baseImage:
+  #       - debian
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - # There is no conversion path for templates in GitHub Actions
+  #     run: |
+  #       #steps/run-in-docker.yml
+  #       build: true
+  #       target: builder
+  #       baseImage: ${{ env.baseImage }}
+  #       command: Clean BuildTracerHome ZipTracerHome
+  #   - name: Uploading linux tracer home artifact
+  #     uses: actions/upload-artifact@v2
+  #     with:
+  #       path: ${{ env.tracerHome }}
+  #       name: linux-tracer-home-${{ env.baseImage }}
+  #   - name: Upload linux-x64 packages
+  #     uses: actions/upload-artifact@v2
+  #     with:
+  #       path: ${{ env.artifacts }}/linux-x64
+  #       name: linux-packages-${{ env.baseImage }}
+  #   - name: Upload working directory after the build
+  #     uses: actions/upload-artifact@v2
+  #     with:
+  #       path: ${{ env.binDir }}
+  #       name: build-linux-${{ env.baseImage }}-working-directory
+  windows-managed-unit-tests:
+    name: Windows - managed unit tests
+    runs-on: windows-2019
+    steps:
+    - uses: actions/checkout@v2
+    - run: tracer\build.cmd BuildTracerHome BuildAndRunManagedUnitTests
+    - uses: actions/upload-artifact@v2
+      with:
+        name: windows-managed-unit-tests-build_data
+        path: tracer/build_data
+      if: (${{ job.status }} != 'cancelled')
+      continue-on-error: true
+  unit_tests_windows_Stage_native:
+    name: Windows - native unit tests 
+    runs-on: windows-2019
+    steps:
+    - uses: actions/checkout@v2
+    - run: tracer\build.cmd BuildTracerHome BuildAndRunNativeUnitTests
+  # unit_tests_linux_Stage_test:
+  #   runs-on: ubuntu-18.04
+  #   strategy:
+  #     matrix:
+  #       baseImage:
+  #       - debian
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - # There is no conversion path for templates in GitHub Actions
+  #     run: |
+  #       #steps/run-in-docker.yml
+  #       build: true
+  #       baseImage: ${{ env.baseImage }}
+  #       command: BuildTracerHome BuildAndRunManagedUnitTests
+  #   - uses: actions/upload-artifact@v2
+  #     with:
+  #       path: tracer/build_data
+  #       name: profiler-logs_unit_tests_linux_${{ env.Agent.JobName }}_${{ env.System.JobAttempt }}
+  #     if: (${{ job.status }} != 'cancelled')
+  #     continue-on-error: true
+  windows-integration-tests:
+    name: Windows - integration tests 
+    runs-on: windows-2019
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - platform: x64
+          target: BuildAndRunWindowsIntegrationTests
+          requiresCosmos: true
+        - platform: x64
+          target: BuildAndRunWindowsRegressionTests
+          requiresCosmos: false
+    timeout-minutes: 60
+    steps:
+    - uses: actions/checkout@v2
+    - name: Start CosmosDB Emulator
+      run: |
+        Write-Host "Starting CosmosDB Emulator"
+        Import-Module "C:/Program Files/Azure Cosmos DB Emulator/PSModules/Microsoft.Azure.CosmosDB.Emulator"
+        Start-CosmosDbEmulator -Timeout 300
+      shell: powershell
+      if: ${{ matrix.requiresCosmos }}
+    - run: tracer\build.cmd BuildTracerHome ${{ matrix.target }} -Framework netcoreapp3.1 -TargetPlatform ${{ matrix.platform }} --PrintDriveSpace
+    - uses: actions/upload-artifact@v2
+      with:
+        name: windows-integration-tests-${{ matrix.platform }}-${{ matrix.target }}-build_data
+        path: tracer/build_data
+      if: (${{ job.status }} != 'cancelled')
+      continue-on-error: true
+  windows-iis-integration-tests:
+    name: Windows - IIS integration tests 
+    runs-on: windows-2019
+    strategy:
+      matrix:
+        platform:
+        - x64
+    timeout-minutes: 60
+    steps:
+    - uses: actions/checkout@v2
+    - run: tracer\build.cmd BuildTracerHome PackageTracerHome BuildWindowsIntegrationTests -Framework netcoreapp3.1
+    - name: docker-compose build IIS containers
+      run: docker-compose build --build-arg dotnet_tracer_msi=.$relativeArtifacts/{{ matrix.platform }}/en-us/*.msi --build-arg ENABLE_32_BIT=${{ env.enable32bit }} IntegrationTests.IIS
+    - name: docker-compose start IIS containers
+      run: docker-compose up -d IntegrationTests.IIS
+    - name: RunWindowsIisIntegrationTests
+      run: tracer\build.cmd RunWindowsIisIntegrationTests -Framework netcoreapp3.1
+    - name: docker-compose stop services
+      run: docker-compose down
+      if: (${{ job.status }} != 'cancelled')
+    - uses: actions/upload-artifact@v2
+      with:
+        name: windows-iis-integration-tests-${{ matrix.platform }}-build_data
+        path: tracer/build_data
+      if: (${{ job.status }} != 'cancelled')
+      continue-on-error: true
+  # integration_tests_linux_Stage_Test:
+  #   runs-on: ubuntu-18.04
+  #   strategy:
+  #     matrix:
+  #       publishTargetFramework:
+  #       - netcoreapp3.1
+  #       - net5.0
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - name: Set environmental variables
+  #     run: |
+  #       echo "TestAllPackageVersions=$isMainBranch" >> $GITHUB_ENV
+  #   - # There is no conversion path for templates in GitHub Actions
+  #     run: |
+  #       #steps/run-in-docker.yml
+  #       build: true
+  #       baseImage: ${{ env.baseImage }}
+  #       command: CleanObjFiles
+  #   - uses: actions/download-artifact@v2
+  #     with:
+  #       path: ${{ env.binDir }}
+  #       name: build-linux-${{ env.baseImage }}-working-directory
+  #   - # There is no conversion path for templates in GitHub Actions
+  #     run: |
+  #       #steps/run-in-docker.yml
+  #       build: true
+  #       baseImage: ${{ env.baseImage }}
+  #       command: BuildTracerHome BuildLinuxIntegrationTests --framework ${{ env.publishTargetFramework }}
+  #   - name: docker-compose build IntegrationTests
+  #     run: docker-compose build --build-arg baseImage=${{ env.baseImage }} --build-arg framework=${{ env.publishTargetFramework }} IntegrationTests
+  #   - name: docker-compose start dependencies
+  #     run: docker-compose run --rm StartDependencies
+  #   - name: docker-compose run IntegrationTests
+  #     run: docker-compose run --rm -e baseImage=${{ env.baseImage }} -e framework=${{ env.publishTargetFramework }} IntegrationTests
+  #   - name: docker-compose stop services
+  #     run: docker-compose down
+  #     if: (${{ job.status }} != 'cancelled')
+  #   - uses: actions/upload-artifact@v2
+  #     with:
+  #       path: tracer/build_data
+  #       name: profiler-logs_integration_tests_linux_${{ env.baseImage }}_${{ env.publishTargetFramework }}_${{ env.System.JobAttempt }}
+  #     if: (${{ job.status }} != 'cancelled')
+  #     continue-on-error: true
+                    
