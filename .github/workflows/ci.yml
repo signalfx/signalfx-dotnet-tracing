@@ -62,6 +62,9 @@ jobs:
     runs-on: ${{ matrix.machine }}
     steps:
     - uses: actions/checkout@v2
+    - name: Install CMake 3.19.8
+      if: ${{ runner.os == 'Linux' }}
+      run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh -o cmakeinstall.sh && chmod +x cmakeinstall.sh && sudo ./cmakeinstall.sh --prefix=/usr/local --exclude-subdir
     - name: Install fpm
       if: ${{ runner.os == 'Linux' }}
       run: sudo gem install --no-document fpm
@@ -117,6 +120,9 @@ jobs:
     runs-on: ${{ matrix.machine }}
     steps:
     - uses: actions/checkout@v2
+    - name: Install CMake 3.19.8
+      if: ${{ runner.os == 'Linux' }}
+      run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh -o cmakeinstall.sh && chmod +x cmakeinstall.sh && sudo ./cmakeinstall.sh --prefix=/usr/local --exclude-subdir
     - run: ./tracer/build.cmd BuildTracerHome BuildAndRunNativeUnitTests
 
   integration-tests:
@@ -141,6 +147,9 @@ jobs:
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v2
+    - name: Install CMake 3.19.8
+      if: ${{ runner.os == 'Linux' }}
+      run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh -o cmakeinstall.sh && chmod +x cmakeinstall.sh && sudo ./cmakeinstall.sh --prefix=/usr/local --exclude-subdir
     - name: Start CosmosDB Emulator
       if: ${{ matrix.target == 'BuildAndRunWindowsIntegrationTests' }}
       shell: powershell
