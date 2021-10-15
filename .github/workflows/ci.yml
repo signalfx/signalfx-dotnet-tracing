@@ -157,6 +157,8 @@ jobs:
         Write-Host "Starting CosmosDB Emulator"
         Import-Module "C:/Program Files/Azure Cosmos DB Emulator/PSModules/Microsoft.Azure.CosmosDB.Emulator"
         Start-CosmosDbEmulator -Timeout 300
+    - run: docker-compose run --rm StartDependencies
+      if: ${{ runner.os == 'Linux' }}
     - run: ./tracer/build.cmd BuildTracerHome ${{ matrix.target }} -Framework ${{ matrix.framework }} -TargetPlatform ${{ matrix.platform }} --PrintDriveSpace
     - uses: actions/upload-artifact@v2
       with:
