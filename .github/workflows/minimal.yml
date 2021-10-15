@@ -53,20 +53,20 @@ env:
   Verify_DisableClipboard: true
   DiffEngine_Disabled: true
 jobs:
-  build_windows_Stage_build:
+  windows-build:
     name: Windows - Build
     runs-on: windows-2019
     steps:
     - uses: actions/checkout@v2
-   # - # There is no conversion path for templates in GitHub Actions
-   #   run: '#steps/install-dotnet-5-sdk.yml'
     - name: Build tracer home
-      run: tracer\build.cmd BuildTracerHome
+      run: tracer\build.cmd BuildTracerHome PackageTracerHome
     - name: Upload working directory after the managed build
       uses: actions/upload-artifact@v2
       with:
         path: ${{ env.binDir }}
-        name: build-windows-working-directory
+    - uses: actions/upload-artifact@v2
+      with:
+        path: tracer/bin/artifacts/*/en-us
   # build_linux_Stage_build:
   #   runs-on: ubuntu-18.04
   #   strategy:
@@ -97,19 +97,16 @@ jobs:
   #     with:
   #       path: ${{ env.binDir }}
   #       name: build-linux-${{ env.baseImage }}-working-directory
-  unit_tests_windows_Stage_managed:
+  windows-managed-unit-tests:
     name: Windows - managed unit tests
     runs-on: windows-2019
     steps:
     - uses: actions/checkout@v2
-   # - # There is no conversion path for templates in GitHub Actions
-   #   run: '#steps/install-dotnet.yml'
-    - name: Build and Test
-      run: tracer\build.cmd BuildTracerHome BuildAndRunManagedUnitTests
+    - run: tracer\build.cmd BuildTracerHome BuildAndRunManagedUnitTests
     - uses: actions/upload-artifact@v2
       with:
+        name: windows-managed-unit-tests-build_data
         path: tracer/build_data
-        name: profiler-logs_unit_tests_windows_${{ env.System.JobAttempt }}
       if: (${{ job.status }} != 'cancelled')
       continue-on-error: true
   unit_tests_windows_Stage_native:
@@ -117,12 +114,7 @@ jobs:
     runs-on: windows-2019
     steps:
     - uses: actions/checkout@v2
-   # - # There is no conversion path for templates in GitHub Actions
-   #   run: '#steps/install-dotnet.yml'
-    - name: Build tracer home
-      run: tracer\build.cmd BuildTracerHome
-    - name: Build and Test
-      run: tracer\build.cmd BuildAndRunNativeUnitTests
+    - run: tracer\build.cmd BuildTracerHome BuildAndRunNativeUnitTests
   # unit_tests_linux_Stage_test:
   #   runs-on: ubuntu-18.04
   #   strategy:
@@ -143,7 +135,7 @@ jobs:
   #       name: profiler-logs_unit_tests_linux_${{ env.Agent.JobName }}_${{ env.System.JobAttempt }}
   #     if: (${{ job.status }} != 'cancelled')
   #     continue-on-error: true
-  integration_tests_windows_Stage_Windows:
+  windows-integration-tests:
     name: Windows - integration tests 
     runs-on: windows-2019
     strategy:
@@ -156,15 +148,9 @@ jobs:
         - platform: x64
           target: BuildAndRunWindowsRegressionTests
           requiresCosmos: false
-    timeout-minutes: 100
+    timeout-minutes: 60
     steps:
     - uses: actions/checkout@v2
-  #  - # There is no conversion path for templates in GitHub Actions
-  #    run: |
-  #      #steps/install-dotnet-sdks.yml
-  #      includeX86: true
-    - name: Build tracer home
-      run: tracer\build.cmd BuildTracerHome
     - name: Start CosmosDB Emulator
       run: |
         Write-Host "Starting CosmosDB Emulator"
@@ -172,35 +158,24 @@ jobs:
         Start-CosmosDbEmulator -Timeout 300
       shell: powershell
       if: ${{ matrix.requiresCosmos }}
-    - name: Run integration tests
-      run: tracer\build.cmd ${{ matrix.target }} -Framework netcoreapp3.1 --PrintDriveSpace
-    - name: Uploading integration_tests_windows tracer logs
-      uses: actions/upload-artifact@v2
+    - run: tracer\build.cmd BuildTracerHome ${{ matrix.target }} -Framework netcoreapp3.1 -TargetPlatform ${{ matrix.platform }} --PrintDriveSpace
+    - uses: actions/upload-artifact@v2
       with:
+        name: windows-integration-tests-{{ matrix.platform }}-${{ matrix.target }}-build_data
         path: tracer/build_data
-        name: integration_tests_windows_tracer_logs_${{ matrix.platform }}_${{ matrix.target }}
       if: (${{ job.status }} != 'cancelled')
       continue-on-error: true
-  integration_tests_windows_iis_Stage_Windows_IIS:
+  windows-iis-integration-tests:
     name: Windows - IIS integration tests 
     runs-on: windows-2019
     strategy:
       matrix:
         platform:
         - x64
-    timeout-minutes: 100
+    timeout-minutes: 60
     steps:
     - uses: actions/checkout@v2
-  #  - # There is no conversion path for templates in GitHub Actions
-  #    run: |
-  #      #steps/install-dotnet-sdks.yml
-  #      includeX86: true
-    - name: Build tracer home
-      run: tracer\build.cmd BuildTracerHome
-    - name: Build MSI
-      run: tracer\build.cmd PackageTracerHome
-    - name: BuildWindowsIntegrationTests
-      run: tracer\build.cmd BuildWindowsIntegrationTests -Framework netcoreapp3.1
+    - run: tracer\build.cmd BuildTracerHome PackageTracerHome BuildWindowsIntegrationTests -Framework netcoreapp3.1
     - name: docker-compose build IIS containers
       run: docker-compose build --build-arg dotnet_tracer_msi=.$relativeArtifacts/{{ matrix.platform }}/en-us/*.msi --build-arg ENABLE_32_BIT=${{ env.enable32bit }} IntegrationTests.IIS
     - name: docker-compose start IIS containers
@@ -210,11 +185,10 @@ jobs:
     - name: docker-compose stop services
       run: docker-compose down
       if: (${{ job.status }} != 'cancelled')
-    - name: Uploading integration_tests_windows_iis tracer logs
-      uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v2
       with:
+        name: windows-iis-integration-tests-{{ matrix.platform }}-build_data
         path: tracer/build_data
-        name: integration_tests_windows_iis_tracer_logs_${{ env.platform }}
       if: (${{ job.status }} != 'cancelled')
       continue-on-error: true
   # integration_tests_linux_Stage_Test:
