@@ -169,7 +169,7 @@ jobs:
     - run: tracer\build.cmd BuildTracerHome ${{ matrix.target }} -Framework netcoreapp3.1 -TargetPlatform ${{ matrix.platform }} --PrintDriveSpace
     - uses: actions/upload-artifact@v2
       with:
-        name: windows-integration-tests-{{ matrix.platform }}-${{ matrix.target }}-build_data
+        name: windows-integration-tests-${{ matrix.platform }}-${{ matrix.target }}-build_data
         path: tracer/build_data
       if: (${{ job.status }} != 'cancelled')
       continue-on-error: true
@@ -195,7 +195,7 @@ jobs:
       if: (${{ job.status }} != 'cancelled')
     - uses: actions/upload-artifact@v2
       with:
-        name: windows-iis-integration-tests-{{ matrix.platform }}-build_data
+        name: windows-iis-integration-tests-${{ matrix.platform }}-build_data
         path: tracer/build_data
       if: (${{ job.status }} != 'cancelled')
       continue-on-error: true
