@@ -67,7 +67,7 @@ jobs:
       run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh -o cmakeinstall.sh && chmod +x cmakeinstall.sh && sudo ./cmakeinstall.sh --prefix=/usr/local --exclude-subdir
     - name: Install fpm
       if: ${{ matrix.machine == 'ubuntu-20.04' }}
-      run: gem install --no-document fpm
+      run: sudo gem install --no-document fpm
     - name: Build tracer home
       run: ./tracer/build.cmd BuildTracerHome PackageTracerHome
     - name: Publish tracer-home
