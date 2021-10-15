@@ -63,7 +63,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build tracer home
-      run: tracer\build.cmd BuildTracerHome PackageTracerHome
+      run: ./tracer/build.cmd BuildTracerHome PackageTracerHome
     - name: Publish tracer-home
       uses: actions/upload-artifact@v2
       with:
@@ -97,7 +97,7 @@ jobs:
     runs-on: ${{ matrix.machine }}
     steps:
     - uses: actions/checkout@v2
-    - run: tracer\build.cmd BuildTracerHome BuildAndRunManagedUnitTests
+    - run: ./tracer/build.cmd BuildTracerHome BuildAndRunManagedUnitTests
     - uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.machine }}-managed-unit-tests-build_data
@@ -114,7 +114,7 @@ jobs:
     runs-on: ${{ matrix.machine }}
     steps:
     - uses: actions/checkout@v2
-    - run: tracer\build.cmd BuildTracerHome BuildAndRunNativeUnitTests
+    - run: ./tracer/build.cmd BuildTracerHome BuildAndRunNativeUnitTests
 
   integration-tests:
     name: Integration tests 
@@ -153,7 +153,7 @@ jobs:
         Start-CosmosDbEmulator -Timeout 300
       shell: powershell
       if: ${{ matrix.requiresCosmos }}
-    - run: tracer\build.cmd BuildTracerHome ${{ matrix.target }} -Framework ${{ matrix.framework }} -TargetPlatform ${{ matrix.platform }} --PrintDriveSpace
+    - run: ./tracer/build.cmd BuildTracerHome ${{ matrix.target }} -Framework ${{ matrix.framework }} -TargetPlatform ${{ matrix.platform }} --PrintDriveSpace
     - uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.machine }}-integration-tests-${{ matrix.platform }}-${{ matrix.framework }}-${{ matrix.target }}-build_data
@@ -171,13 +171,13 @@ jobs:
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v2
-    - run: tracer\build.cmd BuildTracerHome PackageTracerHome BuildWindowsIntegrationTests -Framework netcoreapp3.1
+    - run: ./tracer/build.cmd BuildTracerHome PackageTracerHome BuildWindowsIntegrationTests -Framework netcoreapp3.1
     - name: docker-compose build IIS containers
       run: docker-compose build --build-arg dotnet_tracer_msi=.$relativeArtifacts/{{ matrix.platform }}/en-us/*.msi --build-arg ENABLE_32_BIT=${{ env.enable32bit }} IntegrationTests.IIS
     - name: docker-compose start IIS containers
       run: docker-compose up -d IntegrationTests.IIS
     - name: RunWindowsIisIntegrationTests
-      run: tracer\build.cmd RunWindowsIisIntegrationTests -Framework netcoreapp3.1
+      run: ./tracer/build.cmd RunWindowsIisIntegrationTests -Framework netcoreapp3.1
     - name: docker-compose stop services
       run: docker-compose down
       if: (${{ job.status }} != 'cancelled')
