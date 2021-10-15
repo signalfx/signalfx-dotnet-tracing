@@ -53,109 +53,96 @@ env:
   Verify_DisableClipboard: true
   DiffEngine_Disabled: true
 jobs:
-  windows-build:
-    name: Windows - Build
-    runs-on: windows-2019
+  build:
+    name: Build
+    strategy:
+      fail-fast: false
+      matrix:
+        machine: [ windows-2019, ubuntu-20.04 ]
+    runs-on: ${{ matrix.machine }}
     steps:
     - uses: actions/checkout@v2
     - name: Build tracer home
       run: tracer\build.cmd BuildTracerHome PackageTracerHome
-    - name: Publish tracer-home.zip
+    - name: Publish tracer-home
       uses: actions/upload-artifact@v2
       with:
         path: ${{ env.tracerHome }}
-        name: windows-tracer-home
+        name: ${{ matrix.machine }}-tracer-home
     - name: Publish Windows x86 MSI
+      if: ${{ matrix.machine == 'windows-2019' }}
       uses: actions/upload-artifact@v2
       with:
         path: ${{ env.artifacts }}/x86/en-us
         name: windows-msi-x86
     - name: Publish Windows x64 MSI
+      if: ${{ matrix.machine == 'windows-2019' }}
       uses: actions/upload-artifact@v2
       with:
         path: ${{ env.artifacts }}/x64/en-us
         name: windows-msi-x64
-  # build_linux_Stage_build:
-  #   runs-on: ubuntu-18.04
-  #   strategy:
-  #     matrix:
-  #       baseImage:
-  #       - debian
-  #   steps:
-  #   - uses: actions/checkout@v2
-  #   - # There is no conversion path for templates in GitHub Actions
-  #     run: |
-  #       #steps/run-in-docker.yml
-  #       build: true
-  #       target: builder
-  #       baseImage: ${{ env.baseImage }}
-  #       command: Clean BuildTracerHome ZipTracerHome
-  #   - name: Uploading linux tracer home artifact
-  #     uses: actions/upload-artifact@v2
-  #     with:
-  #       path: ${{ env.tracerHome }}
-  #       name: linux-tracer-home-${{ env.baseImage }}
-  #   - name: Upload linux-x64 packages
-  #     uses: actions/upload-artifact@v2
-  #     with:
-  #       path: ${{ env.artifacts }}/linux-x64
-  #       name: linux-packages-${{ env.baseImage }}
-  #   - name: Upload working directory after the build
-  #     uses: actions/upload-artifact@v2
-  #     with:
-  #       path: ${{ env.binDir }}
-  #       name: build-linux-${{ env.baseImage }}-working-directory
-  windows-managed-unit-tests:
-    name: Windows - managed unit tests
-    runs-on: windows-2019
+    - name: Publish Linux x64 packages
+      if: ${{ matrix.machine == 'ubuntu-20.04' }}
+      uses: actions/upload-artifact@v2
+      with:
+        path: ${{ env.artifacts }}/linux-x64
+        name: linux-x64-packages
+
+  managed-unit-tests:
+    name: Managed unit tests
+    strategy:
+      fail-fast: false
+      matrix:
+        machine: [ windows-2019, ubuntu-20.04 ]
+    runs-on: ${{ matrix.machine }}
     steps:
     - uses: actions/checkout@v2
     - run: tracer\build.cmd BuildTracerHome BuildAndRunManagedUnitTests
     - uses: actions/upload-artifact@v2
       with:
-        name: windows-managed-unit-tests-build_data
+        name: ${{ matrix.machine }}-managed-unit-tests-build_data
         path: tracer/build_data
       if: (${{ job.status }} != 'cancelled')
       continue-on-error: true
-  unit_tests_windows_Stage_native:
-    name: Windows - native unit tests 
-    runs-on: windows-2019
+
+  native-unit-tests:
+    name: Native unit tests
+    strategy:
+      fail-fast: false
+      matrix:
+        machine: [ windows-2019, ubuntu-20.04 ]
+    runs-on: ${{ matrix.machine }}
     steps:
     - uses: actions/checkout@v2
     - run: tracer\build.cmd BuildTracerHome BuildAndRunNativeUnitTests
-  # unit_tests_linux_Stage_test:
-  #   runs-on: ubuntu-18.04
-  #   strategy:
-  #     matrix:
-  #       baseImage:
-  #       - debian
-  #   steps:
-  #   - uses: actions/checkout@v2
-  #   - # There is no conversion path for templates in GitHub Actions
-  #     run: |
-  #       #steps/run-in-docker.yml
-  #       build: true
-  #       baseImage: ${{ env.baseImage }}
-  #       command: BuildTracerHome BuildAndRunManagedUnitTests
-  #   - uses: actions/upload-artifact@v2
-  #     with:
-  #       path: tracer/build_data
-  #       name: profiler-logs_unit_tests_linux_${{ env.Agent.JobName }}_${{ env.System.JobAttempt }}
-  #     if: (${{ job.status }} != 'cancelled')
-  #     continue-on-error: true
-  windows-integration-tests:
-    name: Windows - integration tests 
-    runs-on: windows-2019
+
+  integration-tests:
+    name: Integration tests 
     strategy:
       fail-fast: false
       matrix:
         include:
-        - platform: x64
+        - machine: windows-2019
+          platform: x64
+          framework: netcoreapp3.1
           target: BuildAndRunWindowsIntegrationTests
           requiresCosmos: true
-        - platform: x64
+        - machine: windows-2019
+          platform: x64
+          framework: netcoreapp3.1
           target: BuildAndRunWindowsRegressionTests
           requiresCosmos: false
+        - machine: ubuntu-20.04
+          platform: x64
+          framework: netcoreapp3.1
+          target: BuildAndRunLinuxIntegrationTests
+          requiresCosmos: false
+        - machine: ubuntu-20.04
+          platform: x64
+          framework: net5.0
+          target: BuildAndRunLinuxIntegrationTests
+          requiresCosmos: false
+    runs-on: ${{ matrix.machine }}
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v2
@@ -166,13 +153,14 @@ jobs:
         Start-CosmosDbEmulator -Timeout 300
       shell: powershell
       if: ${{ matrix.requiresCosmos }}
-    - run: tracer\build.cmd BuildTracerHome ${{ matrix.target }} -Framework netcoreapp3.1 -TargetPlatform ${{ matrix.platform }} --PrintDriveSpace
+    - run: tracer\build.cmd BuildTracerHome ${{ matrix.target }} -Framework ${{ matrix.framework }} -TargetPlatform ${{ matrix.platform }} --PrintDriveSpace
     - uses: actions/upload-artifact@v2
       with:
-        name: windows-integration-tests-${{ matrix.platform }}-${{ matrix.target }}-build_data
+        name: ${{ matrix.machine }}-integration-tests-${{ matrix.platform }}-${{ matrix.framework }}-${{ matrix.target }}-build_data
         path: tracer/build_data
       if: (${{ job.status }} != 'cancelled')
       continue-on-error: true
+
   windows-iis-integration-tests:
     name: Windows - IIS integration tests 
     runs-on: windows-2019
@@ -199,47 +187,3 @@ jobs:
         path: tracer/build_data
       if: (${{ job.status }} != 'cancelled')
       continue-on-error: true
-  # integration_tests_linux_Stage_Test:
-  #   runs-on: ubuntu-18.04
-  #   strategy:
-  #     matrix:
-  #       publishTargetFramework:
-  #       - netcoreapp3.1
-  #       - net5.0
-  #   steps:
-  #   - uses: actions/checkout@v2
-  #   - name: Set environmental variables
-  #     run: |
-  #       echo "TestAllPackageVersions=$isMainBranch" >> $GITHUB_ENV
-  #   - # There is no conversion path for templates in GitHub Actions
-  #     run: |
-  #       #steps/run-in-docker.yml
-  #       build: true
-  #       baseImage: ${{ env.baseImage }}
-  #       command: CleanObjFiles
-  #   - uses: actions/download-artifact@v2
-  #     with:
-  #       path: ${{ env.binDir }}
-  #       name: build-linux-${{ env.baseImage }}-working-directory
-  #   - # There is no conversion path for templates in GitHub Actions
-  #     run: |
-  #       #steps/run-in-docker.yml
-  #       build: true
-  #       baseImage: ${{ env.baseImage }}
-  #       command: BuildTracerHome BuildLinuxIntegrationTests --framework ${{ env.publishTargetFramework }}
-  #   - name: docker-compose build IntegrationTests
-  #     run: docker-compose build --build-arg baseImage=${{ env.baseImage }} --build-arg framework=${{ env.publishTargetFramework }} IntegrationTests
-  #   - name: docker-compose start dependencies
-  #     run: docker-compose run --rm StartDependencies
-  #   - name: docker-compose run IntegrationTests
-  #     run: docker-compose run --rm -e baseImage=${{ env.baseImage }} -e framework=${{ env.publishTargetFramework }} IntegrationTests
-  #   - name: docker-compose stop services
-  #     run: docker-compose down
-  #     if: (${{ job.status }} != 'cancelled')
-  #   - uses: actions/upload-artifact@v2
-  #     with:
-  #       path: tracer/build_data
-  #       name: profiler-logs_integration_tests_linux_${{ env.baseImage }}_${{ env.publishTargetFramework }}_${{ env.System.JobAttempt }}
-  #     if: (${{ job.status }} != 'cancelled')
-  #     continue-on-error: true
-                    
