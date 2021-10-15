@@ -62,11 +62,8 @@ jobs:
     runs-on: ${{ matrix.machine }}
     steps:
     - uses: actions/checkout@v2
-    - name: Install CMake 3.19.8
-      if: ${{ matrix.machine == 'ubuntu-20.04' }}
-      run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh -o cmakeinstall.sh && chmod +x cmakeinstall.sh && sudo ./cmakeinstall.sh --prefix=/usr/local --exclude-subdir
     - name: Install fpm
-      if: ${{ matrix.machine == 'ubuntu-20.04' }}
+      if: ${{ runner.os == 'Linux' }}
       run: sudo gem install --no-document fpm
     - name: Build tracer home
       run: ./tracer/build.cmd BuildTracerHome PackageTracerHome
@@ -76,19 +73,19 @@ jobs:
         path: ${{ env.tracerHome }}
         name: ${{ matrix.machine }}-tracer-home
     - name: Publish Windows x86 MSI
-      if: ${{ matrix.machine == 'windows-2019' }}
+      if: ${{ runner.os == 'Windows' }}
       uses: actions/upload-artifact@v2
       with:
         path: ${{ env.artifacts }}/x86/en-us
         name: windows-msi-x86
     - name: Publish Windows x64 MSI
-      if: ${{ matrix.machine == 'windows-2019' }}
+      if: ${{ runner.os == 'Windows' }}
       uses: actions/upload-artifact@v2
       with:
         path: ${{ env.artifacts }}/x64/en-us
         name: windows-msi-x64
     - name: Publish Linux x64 packages
-      if: ${{ matrix.machine == 'ubuntu-20.04' }}
+      if: ${{ runner.os == 'Linux' }}
       uses: actions/upload-artifact@v2
       with:
         path: ${{ env.artifacts }}/linux-x64
@@ -120,9 +117,6 @@ jobs:
     runs-on: ${{ matrix.machine }}
     steps:
     - uses: actions/checkout@v2
-    - name: Install CMake 3.19.8
-      if: ${{ matrix.machine == 'ubuntu-20.04' }}
-      run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh -o cmakeinstall.sh && chmod +x cmakeinstall.sh && sudo ./cmakeinstall.sh --prefix=/usr/local --exclude-subdir
     - run: ./tracer/build.cmd BuildTracerHome BuildAndRunNativeUnitTests
 
   integration-tests:
@@ -147,9 +141,6 @@ jobs:
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v2
-    - name: Install CMake 3.19.8
-      if: ${{ matrix.machine == 'ubuntu-20.04' }}
-      run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh -o cmakeinstall.sh && chmod +x cmakeinstall.sh && sudo ./cmakeinstall.sh --prefix=/usr/local --exclude-subdir
     - name: Start CosmosDB Emulator
       if: ${{ matrix.target == 'BuildAndRunWindowsIntegrationTests' }}
       shell: powershell
