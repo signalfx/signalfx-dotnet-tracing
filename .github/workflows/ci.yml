@@ -1,4 +1,4 @@
-name: minimal
+name: ci
 on:
   push:
     branches:
