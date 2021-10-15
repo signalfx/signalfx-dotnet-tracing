@@ -5,6 +5,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Net;
 using Datadog.Trace.ClrProfiler.CallTarget;
 using Datadog.Trace.ExtensionMethods;
@@ -47,7 +48,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Http.WebRequest
 
                 // We may have already set headers
                 var propagator = tracer.Propagator;
-                var requestContext = propagator.Extract(request.Headers, (headers, key) => headers.GetValues(key));
+                var requestContext = propagator.Extract(request.Headers, (headers, key) => headers.GetValues(key) ?? Enumerable.Empty<string>());
                 if (requestContext is null || requestContext.TraceId == TraceId.Zero)
                 {
                     var spanContext = ScopeFactory.CreateHttpSpanContext(tracer, WebRequestCommon.IntegrationId);
