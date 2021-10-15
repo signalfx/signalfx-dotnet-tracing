@@ -60,13 +60,21 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build tracer home
       run: tracer\build.cmd BuildTracerHome PackageTracerHome
-    - name: Upload working directory after the managed build
+    - name: Publish tracer-home.zip
       uses: actions/upload-artifact@v2
       with:
-        path: ${{ env.binDir }}
-    - uses: actions/upload-artifact@v2
+        path: ${{ env.artifacts }}/windows-tracer-home.zip
+        name: windows-tracer-home.zip
+    - name: Publish Windows x86 MSI
+      uses: actions/upload-artifact@v2
       with:
-        path: tracer/bin/artifacts/*/en-us
+        path: ${{ env.artifacts }}/x86/en-us
+        name: windows-msi-x86
+    - name: Publish Windows x64 MSI
+      uses: actions/upload-artifact@v2
+      with:
+        path: ${{ env.artifacts }}/x64/en-us
+        name: windows-msi-x64
   # build_linux_Stage_build:
   #   runs-on: ubuntu-18.04
   #   strategy:
