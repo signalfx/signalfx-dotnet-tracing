@@ -64,7 +64,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install CMake 3.19.8
       if: ${{ matrix.machine == 'ubuntu-20.04' }}
-      run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh | bash -s -- --prefix=/usr/local --exclude-subdir
+      run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh | sh -s -- --prefix=/usr/local --exclude-subdir
     - name: Install fpm
       if: ${{ matrix.machine == 'ubuntu-20.04' }}
       run: gem install --no-document fpm
@@ -122,7 +122,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install CMake 3.19.8
       if: ${{ matrix.machine == 'ubuntu-20.04' }}
-      run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh | bash -s -- --prefix=/usr/local --exclude-subdir
+      run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh | sh -s -- --prefix=/usr/local --exclude-subdir
     - run: ./tracer/build.cmd BuildTracerHome BuildAndRunNativeUnitTests
 
   integration-tests:
@@ -149,7 +149,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install CMake 3.19.8
       if: ${{ matrix.machine == 'ubuntu-20.04' }}
-      run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh | bash -s -- --prefix=/usr/local --exclude-subdir
+      run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh | sh -s -- --prefix=/usr/local --exclude-subdir
     - name: Start CosmosDB Emulator
       if: ${{ matrix.target == 'BuildAndRunWindowsIntegrationTests' }}
       shell: powershell
