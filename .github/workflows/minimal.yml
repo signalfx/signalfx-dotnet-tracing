@@ -63,8 +63,8 @@ jobs:
     - name: Publish tracer-home.zip
       uses: actions/upload-artifact@v2
       with:
-        path: ${{ env.artifacts }}/windows-tracer-home.zip
-        name: windows-tracer-home.zip
+        path: ${{ env.tracerHome }}
+        name: windows-tracer-home
     - name: Publish Windows x86 MSI
       uses: actions/upload-artifact@v2
       with:
