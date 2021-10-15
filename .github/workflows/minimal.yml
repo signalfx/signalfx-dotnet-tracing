@@ -121,15 +121,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        machine: [ windows-2019 ]
+        platform: [ x64 ]
+        framework: [ net452, net461, netcoreapp3.1, net5.0 ]
+        target: [ BuildAndRunWindowsIntegrationTests, BuildAndRunWindowsRegressionTests ]
         include:
-        - machine: windows-2019
-          platform: x64
-          framework: netcoreapp3.1
-          target: BuildAndRunWindowsIntegrationTests
-        - machine: windows-2019
-          platform: x64
-          framework: netcoreapp3.1
-          target: BuildAndRunWindowsRegressionTests
         - machine: ubuntu-20.04
           platform: x64
           framework: netcoreapp3.1
