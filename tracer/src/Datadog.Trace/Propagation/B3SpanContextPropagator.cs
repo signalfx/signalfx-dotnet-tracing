@@ -99,14 +99,14 @@ namespace Datadog.Trace.Propagation
 
         private static SamplingPriority? ParseB3Sampling<T>(T carrier, Func<T, string, IEnumerable<string>> getter)
         {
-            var debugged = getter(carrier, B3HttpHeaderNames.B3Flags).ToList();
-            var sampled = getter(carrier, B3HttpHeaderNames.B3Sampled).ToList();
+            var debugged = getter(carrier, B3HttpHeaderNames.B3Flags)?.ToList();
+            var sampled = getter(carrier, B3HttpHeaderNames.B3Sampled)?.ToList();
 
-            if (debugged.Count != 0 && (debugged[0] == "0" || debugged[0] == "1"))
+            if (debugged != null && debugged.Count != 0 && (debugged[0] == "0" || debugged[0] == "1"))
             {
                 return debugged[0] == "1" ? SamplingPriority.UserKeep : null;
             }
-            else if (sampled.Count != 0 && (sampled[0] == "0" || sampled[0] == "1"))
+            else if (sampled != null && sampled.Count != 0 && (sampled[0] == "0" || sampled[0] == "1"))
             {
                 return sampled[0] == "1" ? SamplingPriority.AutoKeep : SamplingPriority.AutoReject;
             }
