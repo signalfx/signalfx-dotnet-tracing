@@ -196,7 +196,7 @@ jobs:
     - name: Start dependencies
       run: docker-compose run --rm StartDependencies
     - name: Run integration tests in container
-      run: docker-compose run --rm -e baseImage={{ env.base-image }} -e framework=${{ matrix.framework }} IntegrationTests
+      run: docker-compose run --rm -e baseImage={{ matrix.base-image }} -e framework=${{ matrix.framework }} IntegrationTests
     - uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.machine }}-integration-tests-${{ matrix.platform }}-${{ matrix.framework }}-${{ matrix.target }}-build_data
