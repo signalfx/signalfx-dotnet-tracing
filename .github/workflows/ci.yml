@@ -196,7 +196,7 @@ jobs:
           IntegrationTests
     - uses: actions/upload-artifact@v2
       with:
-        name: ${{ matrix.machine }}-integration-tests-${{ matrix.platform }}-${{ matrix.framework }}-${{ matrix.target }}-build_data
+        name: ${{ matrix.base-image }}-integration-tests-${{ matrix.framework }}-build_data
         path: tracer/build_data
       if: (${{ job.status }} != 'cancelled')
       continue-on-error: true
