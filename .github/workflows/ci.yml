@@ -176,9 +176,9 @@ jobs:
       run: |
         docker run --rm \
           --mount type=bind,source="${GITHUB_WORKSPACE}",target=/project \
-          --env NugetPackageDirectory=/project/packages \
-          --env tracerHome=/project/tracer/bin/tracer-home \
-          --env artifacts=/project/tracer/src/bin/artifacts \
+          --env NugetPackageDirectory=/project/$(relativeNugetPackageDirectory) \
+          --env tracerHome=/project/${relativeTracerHome} \
+          --env artifacts=/project/${relativeArtifacts} \
           --env SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN} \
           dd-trace-dotnet/${{ matrix.base-image }}-builder \
           dotnet /build/bin/Debug/_build.dll BuildTracerHome BuildLinuxIntegrationTests -Framework ${{ matrix.framework }}
