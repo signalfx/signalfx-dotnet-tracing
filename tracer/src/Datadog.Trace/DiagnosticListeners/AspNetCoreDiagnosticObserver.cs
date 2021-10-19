@@ -596,6 +596,9 @@ namespace Datadog.Trace.DiagnosticListeners
                 }
 
                 parentSpan.ResourceName = span.ResourceName;
+
+                // Upstream updated the resource name, update the operation name too.
+                parentSpan.OperationName = span.ResourceName;
             }
 
             return span;
@@ -807,6 +810,10 @@ namespace Datadog.Trace.DiagnosticListeners
                 {
                     span.ResourceName = resourceName;
                     tags.AspNetCoreRoute = normalizedRoute;
+
+                    // Upstream only needs to update the resource name, we also need to update
+                    // the span name.
+                    span.OperationName = resourceName;
                 }
             }
         }
