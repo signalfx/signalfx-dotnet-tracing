@@ -2,7 +2,7 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: GET /branch/ping,
+    Name: HTTP GET,
     LogicScope: aspnet_core.request,
     Resource: GET /branch/ping,
     Service: Samples.AspNetCoreMvc31,
