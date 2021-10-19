@@ -147,9 +147,6 @@ jobs:
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v2
-    - name: Install CMake 3.19.8
-      if: ${{ runner.os == 'Linux' }}
-      run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh -o cmakeinstall.sh && chmod +x cmakeinstall.sh && sudo ./cmakeinstall.sh --prefix=/usr/local --exclude-subdir
     - name: Start CosmosDB Emulator
       if: ${{ matrix.target == 'BuildAndRunWindowsIntegrationTests' }}
       shell: powershell
@@ -157,9 +154,49 @@ jobs:
         Write-Host "Starting CosmosDB Emulator"
         Import-Module "C:/Program Files/Azure Cosmos DB Emulator/PSModules/Microsoft.Azure.CosmosDB.Emulator"
         Start-CosmosDbEmulator -Timeout 300
-    - run: docker-compose run --rm StartDependencies
-      if: ${{ runner.os == 'Linux' }}
     - run: ./tracer/build.cmd BuildTracerHome ${{ matrix.target }} -Framework ${{ matrix.framework }} -TargetPlatform ${{ matrix.platform }} --PrintDriveSpace
+    - uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.machine }}-integration-tests-${{ matrix.platform }}-${{ matrix.framework }}-${{ matrix.target }}-build_data
+        path: tracer/build_data
+      if: (${{ job.status }} != 'cancelled')
+      continue-on-error: true
+
+  container-integration-tests:
+    name: Container Integration tests 
+    strategy:
+      fail-fast: false
+      matrix:
+        base-image: [ debian, alpine ]
+        framework: [ netcoreapp3.1, net5.0 ]
+    runs-on: ubuntu-20.04
+    timeout-minutes: 60
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build Docker image
+      run: |
+        docker build \
+          --build-arg DOTNETSDK_VERSION=${dotnetCoreSdk5Version} \
+          --tag dd-trace-dotnet/${{ matrix.base-image }}/-builder \
+          --target builder \
+          --file "./tracer/build/_build/docker/${{ matrix.base-image }}.dockerfile" \
+          "./tracer/build/_build"
+    - name: Build integration tests in Docker container
+      run: |
+        docker run --rm \
+          --mount type=bind,source="${GITHUB_WORKSPACE}",target=/project \
+          --env NugetPackageDirectory=/project/packages \
+          --env tracerHome=/project/tracer/bin/tracer-home \
+          --env artifacts=/project/tracer/src/bin/artifacts \
+          --env SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN} \
+          dd-trace-dotnet/${{ matrix.base-image }}-builder \
+          dotnet /build/bin/Debug/_build.dll BuildTracerHome BuildLinuxIntegrationTests -Framework ${{ matrix.framework }}
+    - name: Build IntegrationTests container
+      run: docker-compose build --build-arg baseImage=${{ env.base-image }} --build-arg framework=${{ matrix.framework }} IntegrationTests
+    - name: Start dependencies
+      run: docker-compose run --rm StartDependencies
+    - name: Run integration tests in container
+      run: docker-compose run --rm -e baseImage={{ env.base-image }} -e framework=${{ matrix.framework }} IntegrationTests
     - uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.machine }}-integration-tests-${{ matrix.platform }}-${{ matrix.framework }}-${{ matrix.target }}-build_data
