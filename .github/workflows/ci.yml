@@ -177,7 +177,7 @@ jobs:
       run: |
         docker build \
           --build-arg DOTNETSDK_VERSION=${dotnetCoreSdk5Version} \
-          --tag dd-trace-dotnet/${{ matrix.base-image }}/-builder \
+          --tag dd-trace-dotnet/${{ matrix.base-image }}-builder \
           --target builder \
           --file "./tracer/build/_build/docker/${{ matrix.base-image }}.dockerfile" \
           "./tracer/build/_build"
