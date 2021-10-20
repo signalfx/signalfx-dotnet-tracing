@@ -1,11 +1,5 @@
 name: Build artifacts
-on: 
-  push: 
-    branches: [ next-ver ]
-    tags:
-      - 'v*.*.*'
-  pull_request:
-    branches: [ next-ver ]
+on:
   workflow_dispatch:
 
 jobs:
