@@ -2,7 +2,8 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: aspnet_core.request,
+    Name: GET /not-found,
+    LogicScope: aspnet_core.request,
     Resource: GET /not-found,
     Service: Samples.AspNetCoreMvc21,
     Type: web,

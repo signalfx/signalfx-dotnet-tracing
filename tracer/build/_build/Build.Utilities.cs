@@ -42,8 +42,8 @@ partial class Build
 
     readonly IEnumerable<string> GacProjects = new []
     {
-        Projects.DatadogTrace,
-        Projects.DatadogTraceAspNet
+        "OpenTelemetry.AutoInstrumentation",
+        "OpenTelemetry.AutoInstrumentation.AspNet"
     };
 
     Target GacAdd => _ => _

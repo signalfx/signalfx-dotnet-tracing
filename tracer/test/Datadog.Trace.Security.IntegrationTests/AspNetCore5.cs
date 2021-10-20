@@ -37,7 +37,7 @@ namespace Datadog.Trace.Security.IntegrationTests
             using var agent = await RunOnSelfHosted(enableSecurity, enableBlocking);
             await TestBlockedRequestAsync(agent, enableSecurity, expectedStatusCode, 5, new Action<TestHelpers.MockTracerAgent.Span>[]
             {
-             s => Assert.Equal("aspnet_core.request", s.Name),
+             s => Assert.Equal("aspnet_core.request", s.LogicScope),
              s  => Assert.Equal("Samples.AspNetCore5", s.Service),
              s  =>  Assert.Equal("web", s.Type)
             });

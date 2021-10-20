@@ -106,7 +106,7 @@ namespace Datadog.Trace.Security.IntegrationTests
             // NOTE: by integrating the latest version of the WAF, blocking was disabled, as it does not support blocking yet
             return TestBlockedRequestAsync(_iisFixture.Agent, _enableSecurity, _enableSecurity && _blockingEnabled ? HttpStatusCode.OK : HttpStatusCode.OK, _enableSecurity && _blockingEnabled ? 10 : 10, new Action<TestHelpers.MockTracerAgent.Span>[]
              {
-             s => Assert.Matches("aspnet(-mvc)?.request", s.Name),
+             s => Assert.Matches("aspnet(-mvc)?.request", s.LogicScope ?? s.Name),
              s => Assert.Equal("sample", s.Service),
              s => Assert.Equal("web", s.Type)
              });

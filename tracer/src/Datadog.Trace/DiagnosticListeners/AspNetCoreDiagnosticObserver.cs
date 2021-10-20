@@ -484,15 +484,22 @@ namespace Datadog.Trace.DiagnosticListeners
 
             // override the parent's resource name with the MVC route template
             span.ResourceName = resourceName;
+
+            // Upstream provided a less descriptive span name, let's use the resource name instead.
+            span.OperationName = resourceName;
         }
 
         private static Span StartMvcCoreSpan(Tracer tracer, Span parentSpan, BeforeActionStruct typedArg, HttpContext httpContext, HttpRequest request)
         {
             // Create a child span for the MVC action
             var mvcSpanTags = new AspNetCoreEndpointTags();
+
+            // Upstream sets a good value for span name later when filling up the resource name, the name
+            // will be updated at that time.
             var mvcScope = tracer.StartActiveWithTags(MvcOperationName, parentSpan.Context, tags: mvcSpanTags);
             var span = mvcScope.Span;
             span.Type = SpanTypes.Web;
+            span.LogicScope = MvcOperationName;
 
             var trackingFeature = httpContext.Features.Get<AspNetCoreHttpRequestHandler.RequestTrackingFeature>();
             var isUsingEndpointRouting = trackingFeature.IsUsingEndpointRouting;
@@ -570,6 +577,9 @@ namespace Datadog.Trace.DiagnosticListeners
             // mirror the parent if we couldn't extract a route
             span.ResourceName = resourceName ?? parentSpan.ResourceName;
 
+            // Upstream default name can be improved if we use the resource name instead.
+            span.OperationName = span.ResourceName;
+
             mvcSpanTags.AspNetCoreAction = actionName;
             mvcSpanTags.AspNetCoreController = controllerName;
             mvcSpanTags.AspNetCoreArea = areaName;
@@ -586,6 +596,9 @@ namespace Datadog.Trace.DiagnosticListeners
                 }
 
                 parentSpan.ResourceName = span.ResourceName;
+
+                // Upstream updated the resource name, update the operation name too.
+                parentSpan.OperationName = span.ResourceName;
             }
 
             return span;
@@ -622,7 +635,8 @@ namespace Datadog.Trace.DiagnosticListeners
             var tagsFromHeaders = ExtractHeaderTags(request, tracer);
 
             var tags = tracer.Settings.RouteTemplateResourceNamesEnabled ? new AspNetCoreEndpointTags() : new AspNetCoreTags();
-            var scope = tracer.StartActiveWithTags(HttpRequestInOperationName, propagatedContext, tags: tags);
+            var scope = tracer.StartActiveWithTags($"HTTP {httpMethod}", propagatedContext, tags: tags);
+            scope.Span.LogicScope = HttpRequestInOperationName;
 
             scope.Span.DecorateWebServerSpan(resourceName, httpMethod, host, url, tags, tagsFromHeaders);
 
@@ -796,6 +810,10 @@ namespace Datadog.Trace.DiagnosticListeners
                 {
                     span.ResourceName = resourceName;
                     tags.AspNetCoreRoute = normalizedRoute;
+
+                    // Upstream only needs to update the resource name, we also need to update
+                    // the span name.
+                    span.OperationName = resourceName;
                 }
             }
         }
@@ -854,7 +872,7 @@ namespace Datadog.Trace.DiagnosticListeners
 
             var scope = tracer.ActiveScope;
 
-            if (scope is not null && ReferenceEquals(scope.Span.OperationName, MvcOperationName))
+            if (scope is not null && ReferenceEquals(scope.Span.LogicScope, MvcOperationName))
             {
                 scope.Dispose();
             }
