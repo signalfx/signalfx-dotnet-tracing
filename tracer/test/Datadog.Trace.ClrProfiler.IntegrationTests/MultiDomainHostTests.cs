@@ -141,7 +141,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 foreach (var span in spans)
                 {
-                    Assert.Equal(expectedOperationName, span.Name);
+                    Assert.Equal(expectedOperationName, span.LogicScope);
                     Assert.Equal(SpanTypes.Http, span.Type);
                     Assert.False(span.Tags?.ContainsKey(Tags.Version), "External service span should not have service version tag.");
 
