@@ -88,7 +88,11 @@ namespace Datadog.Trace
         /// <summary>
         /// The type of database (e.g. mssql, mysql)
         /// </summary>
-        public const string DbType = "db.type";
+        /// /// <remarks>
+        /// Upstream uses "db.type", however, to better align with OpenTelemetry we use
+        /// "db.system" instead.
+        /// </remarks>
+        public const string DbType = "db.system";
 
         /// <summary>
         /// The user used to sign into a database

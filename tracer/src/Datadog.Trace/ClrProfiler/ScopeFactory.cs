@@ -225,8 +225,8 @@ namespace Datadog.Trace.ClrProfiler
             var result =
                 commandTypeName switch
                 {
-                    "SqlCommand" => "sql-server",
-                    "NpgsqlCommand" => "postgres",
+                    "SqlCommand" => "mssql",
+                    "NpgsqlCommand" => "postgresql",
                     "MySqlCommand" => "mysql",
                     "SqliteCommand" => "sqlite",
                     "SQLiteCommand" => "sqlite",

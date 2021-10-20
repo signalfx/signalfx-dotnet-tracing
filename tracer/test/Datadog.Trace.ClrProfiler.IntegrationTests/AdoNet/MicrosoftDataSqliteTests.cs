@@ -73,7 +73,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
 
             var totalSpanCount = 21;
 
-            const string dbType = "sql-server";
+            const string dbType = "mssql";
             const string expectedOperationName = dbType + ".query";
 
             SetEnvironmentVariable(ConfigurationKeys.AdoNetExcludedTypes, "System.Data.SQLite.SQLiteCommand,Microsoft.Data.Sqlite.SqliteCommand");
