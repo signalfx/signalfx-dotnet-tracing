@@ -88,7 +88,7 @@ namespace Datadog.Trace
         /// <summary>
         /// The type of database (e.g. mssql, mysql)
         /// </summary>
-        /// /// <remarks>
+        /// <remarks>
         /// Upstream uses "db.type", however, to better align with OpenTelemetry we use
         /// "db.system" instead.
         /// </remarks>
