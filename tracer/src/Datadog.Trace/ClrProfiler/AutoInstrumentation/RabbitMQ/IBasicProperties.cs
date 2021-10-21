@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System.Collections.Generic;
 using System.ComponentModel;
 
@@ -22,14 +24,18 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
         IDictionary<string, object> Headers { get; set; }
 
         /// <summary>
-        /// Gets the delivery mode of the message
+        /// Gets or sets the application id
         /// </summary>
-        byte DeliveryMode { get; }
+        public string AppId { get; set; }
 
         /// <summary>
-        /// Returns true if the DeliveryMode property is present
+        /// Gets or sets the correlation id
         /// </summary>
-        /// <returns>true if the DeliveryMode property is present</returns>
-        bool IsDeliveryModePresent();
+        public string CorrelationId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the message id
+        /// </summary>
+        public string MessageId { get; set; }
     }
 }

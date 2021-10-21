@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.ComponentModel;
 using Datadog.Trace.ClrProfiler.CallTarget;
@@ -29,7 +31,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class BasicGetIntegration
     {
-        private const string Command = "basic.get";
+        private const string Command = RabbitMQIntegration.AmqpBasicGetCommand;
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(BasicGetIntegration));
 
@@ -94,7 +96,9 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
 
                     if (tags != null && messageSize != null)
                     {
-                        tags.MessageSize = messageSize;
+                        tags.MessagePayloadSize = messageSize;
+
+                        RabbitMQIntegration.SetTagsFromBasicProperties(tags, basicGetResult.BasicProperties);
                     }
 
                     if (exception != null)
