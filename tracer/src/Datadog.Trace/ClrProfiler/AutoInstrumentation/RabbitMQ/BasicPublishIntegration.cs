@@ -31,7 +31,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class BasicPublishIntegration
     {
-        private const string Operation = RabbitMQIntegration.OperationSend;
+        private const string Command = RabbitMQIntegration.AmqpBasicPublishCommand;
 
         private static readonly string[] DeliveryModeStrings = { null, "1", "2" };
 
@@ -53,13 +53,13 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
             where TBody : IBody, IDuckType // Versions < 6.0.0: TBody is byte[] // Versions >= 6.0.0: TBody is ReadOnlyMemory<byte>
         {
             var tracer = Tracer.Instance;
-            var scope = RabbitMQIntegration.CreateScope(tracer, out RabbitMQTags tags, Operation, spanKind: SpanKinds.Producer, exchange: exchange, routingKey: routingKey);
+            var scope = RabbitMQIntegration.CreateScope(tracer, out RabbitMQTags tags, Command, spanKind: SpanKinds.Producer, exchange: exchange, routingKey: routingKey);
 
             if (scope != null)
             {
                 string exchangeDisplayName = string.IsNullOrEmpty(exchange) ? "<default>" : exchange;
                 string routingKeyDisplayName = string.IsNullOrEmpty(routingKey) ? "<all>" : routingKey.StartsWith("amq.gen-") ? "<generated>" : routingKey;
-                scope.Span.ResourceName = $"{Operation} {exchangeDisplayName} -> {routingKeyDisplayName}";
+                scope.Span.ResourceName = $"{Command} {exchangeDisplayName} -> {routingKeyDisplayName}";
 
                 if (tags != null)
                 {

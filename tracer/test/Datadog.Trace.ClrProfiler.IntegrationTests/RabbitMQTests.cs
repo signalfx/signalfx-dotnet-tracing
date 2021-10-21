@@ -196,7 +196,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
         private void AssertSpanName(MockTracerAgent.Span span, string operation)
         {
-            string destination = span.Tags[Tags.Messaging.Destination];
+            span.Tags.TryGetValue(Tags.Messaging.Destination, out string destination);
 
             if (string.IsNullOrWhiteSpace(destination))
             {
