@@ -67,7 +67,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.ILogger
                 CultureInfo.InvariantCulture,
                 "{0}, dd_trace_id:\"{1}\", dd_span_id:\"{2}\"",
                 _cachedFormat,
-                span.TraceId,
+                span.TraceId.ToString(),
                 span.SpanId);
         }
 
