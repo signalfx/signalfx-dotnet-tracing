@@ -68,7 +68,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
 #endif
             }
 
-            const string dbType = "postgres";
+            const string dbType = "postgresql";
             const string expectedOperationName = dbType + ".query";
             const string expectedServiceName = "Samples.Npgsql-" + dbType;
 
@@ -115,7 +115,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
 
             var totalSpanCount = 21;
 
-            const string dbType = "postgres";
+            const string dbType = "postgresql";
             const string expectedOperationName = dbType + ".query";
 
             SetEnvironmentVariable(ConfigurationKeys.AdoNetExcludedTypes, "System.Data.SqlClient.SqlCommand,Microsoft.Data.SqlClient.SqlCommand,MySql.Data.MySqlClient.MySqlCommand,Npgsql.NpgsqlCommand");

@@ -25,7 +25,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
         public void SubmitsTraces()
         {
             const int expectedSpanCount = 17;
-            const string dbType = "postgres";
+            const string dbType = "postgresql";
             const string expectedOperationName = dbType + ".query";
             const string expectedServiceName = "Samples.Dapper-" + dbType;
 
@@ -53,7 +53,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
         public void SubmitsTracesWithNetStandard()
         {
             const int expectedSpanCount = 17;
-            const string dbType = "postgres";
+            const string dbType = "postgresql";
             const string expectedOperationName = dbType + ".query";
             const string expectedServiceName = "Samples.Dapper-" + dbType;
 
