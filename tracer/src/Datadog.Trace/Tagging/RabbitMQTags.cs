@@ -20,6 +20,14 @@ namespace Datadog.Trace.Tagging
 
         private string _spanKind;
 
+        // For the sake of unit tests, define a default constructor with the default behavior,
+        // though the RabbitMQ integration should use the constructor that takes a spanKind
+        // so the setter is only invoked once
+        public RabbitMQTags()
+        {
+            _spanKind = SpanKinds.Client;
+        }
+
         public RabbitMQTags(string spanKind)
         {
             _spanKind = spanKind;
