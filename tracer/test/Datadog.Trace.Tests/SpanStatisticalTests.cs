@@ -38,6 +38,7 @@ namespace Datadog.Trace.Tests
             BlastOff();
         }
 
+        [Fact]
         public void GeneratedIds_Contain_High_Numbers()
         {
             var rangeBound = _maxId - _bucketSize;
@@ -55,7 +56,7 @@ namespace Datadog.Trace.Tests
             Assert.True(keysWithinRange.Count() > 0);
         }
 
-        [Fact(Skip = "Flaky test, still to investigate, it could be changes to changes to IDs")]
+        [Fact]
         public void GeneratedIds_Contain_Nothing_Above_Expected_Max()
         {
             var keysOutOfRange = _generatedIds.Keys.Any(i => i > _maxId);
