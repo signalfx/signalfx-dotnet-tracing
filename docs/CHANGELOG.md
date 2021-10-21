@@ -3,9 +3,19 @@
 ## [Unreleased]
 
 
-[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/v0.1.13...HEAD)
+[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.14...HEAD)
 
-[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/v0.1.13..HEAD)
+[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.14..HEAD)
+
+## [Release 0.1.14](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.1.14)
+
+- Remove "PreRelease" from AZ site extension
+- Do not add Sever-Timing header on IIS apps using classic pool (fixes crash for this case)
+- Fix RabbitMq delivery mode tags
+
+[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.13...HEAD)
+
+[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.13..HEAD)
 
 ## [Release 0.1.13](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.1.13)
 
@@ -15,9 +25,9 @@
 - Added Server-Timing header to ASP.NET on IIS
 - Added RabbitMQ instrumentation
 
-[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/v0.1.13...HEAD)
+[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.13...v0.1.14)
 
-[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/v0.1.13..HEAD)
+[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.13..v0.1.14)
 
 ## [Release 0.1.12](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.1.12)
 
@@ -25,9 +35,9 @@
 - Added Confluent.Kafka instrumentation for IConsumer.Consume, IProducer.Produce, and IProducer.ProduceAsync
 - New instrumentations for SqlCommand: ExecuteXmlReader and ExecuteXmlReaderAsync methods
 
-[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/v0.1.11...v0.1.12)
+[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.11...v0.1.12)
 
-[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/v0.1.11..v0.1.12)
+[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.11..v0.1.12)
 
 ## [Release 0.1.11](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.1.11)
 
@@ -35,9 +45,9 @@
 - Optimized B3 context propagation
 - Other optimizations: default sampler and span Id allocation
 
-[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/v0.1.10...v0.1.11)
+[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.10...v0.1.11)
 
-[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/v0.1.10..v0.1.11)
+[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.10..v0.1.11)
 
 ---
 

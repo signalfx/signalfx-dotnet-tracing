@@ -42,5 +42,5 @@ If you want to use a specific version of the tracing library in your application
 environment variable before application deployment, either using `cf set-env` or the `manifest.yml` file:
 
 ```sh
-$ cf set-env SIGNALFX_DOTNET_TRACING_VERSION "0.1.13"
+$ cf set-env SIGNALFX_DOTNET_TRACING_VERSION "0.1.14"
 ```

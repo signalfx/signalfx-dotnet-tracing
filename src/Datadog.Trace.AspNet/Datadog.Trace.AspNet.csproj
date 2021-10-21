@@ -5,7 +5,7 @@
     <TargetFrameworks>net45</TargetFrameworks>
 
     <!-- NuGet -->
-    <Version>0.1.13</Version>
+    <Version>0.1.14</Version>
     <Title>SignalFx Tracing for ASP.NET</Title>
     <AssemblyName>SignalFx.Tracing.AspNet</AssemblyName>
     <PackageDescription>
