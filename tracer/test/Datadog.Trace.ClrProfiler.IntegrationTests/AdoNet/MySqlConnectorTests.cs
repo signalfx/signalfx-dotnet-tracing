@@ -72,7 +72,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             const string expectedServiceName = "Samples.MySqlConnector-" + dbType;
 
             // NOTE: opt into the additional instrumentation of calls into netstandard.dll
-            SetEnvironmentVariable("DD_TRACE_NETSTANDARD_ENABLED", "true");
+            SetEnvironmentVariable("SIGNALFX_TRACE_NETSTANDARD_ENABLED", "true");
 
             int agentPort = TcpPortProvider.GetOpenPort();
 

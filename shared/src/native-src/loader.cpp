@@ -348,17 +348,17 @@ namespace shared
                     }
 
                     //
-                    // Define a new TypeDef DD_LoaderMethodsType that extends System.Object
+                    // Define a new TypeDef SIGNALFX_LoaderMethodsType that extends System.Object
                     //
                     mdTypeDef newTypeDef;
-                    hr = metadataEmit->DefineTypeDef(WStr("DD_LoaderMethodsType"), tdAbstract | tdSealed, systemObjectTypeRef, NULL, &newTypeDef);
+                    hr = metadataEmit->DefineTypeDef(WStr("SIGNALFX_LoaderMethodsType"), tdAbstract | tdSealed, systemObjectTypeRef, NULL, &newTypeDef);
                     if (FAILED(hr)) {
-                        Error("Loader::InjectLoaderToModuleInitializer: failed to define typedef: DD_LoaderMethodsType");
+                        Error("Loader::InjectLoaderToModuleInitializer: failed to define typedef: SIGNALFX_LoaderMethodsType");
                         return hr;
                     }
 
                     //
-                    // Emit the DD_LoaderMethodsType.DD_LoadInitializationAssemblies() mdMethodDef
+                    // Emit the SIGNALFX_LoaderMethodsType.SIGNALFX_LoadInitializationAssemblies() mdMethodDef
                     //
                     mdMethodDef loaderMethodDef;
                     mdMemberRef securitySafeCriticalCtorMemberRef;
@@ -462,22 +462,22 @@ namespace shared
                 }
 
                 //
-                // Define a new TypeDef DD_LoaderMethodsType that extends System.Object
+                // Define a new TypeDef SIGNALFX_LoaderMethodsType that extends System.Object
                 //
                 mdTypeDef newTypeDef;
-                hr = metadataEmit->DefineTypeDef(WStr("DD_LoaderMethodsType"),
+                hr = metadataEmit->DefineTypeDef(WStr("SIGNALFX_LoaderMethodsType"),
                                                  tdAbstract | tdSealed,
                                                  systemObjectTypeRef,
                                                  NULL,
                                                  &newTypeDef);
                 if (FAILED(hr))
                 {
-                    Error("Loader::InjectLoaderToModuleInitializer: failed to define typedef: DD_LoaderMethodsType");
+                    Error("Loader::InjectLoaderToModuleInitializer: failed to define typedef: SIGNALFX_LoaderMethodsType");
                     return hr;
                 }
 
                 //
-                // Emit the DD_LoaderMethodsType.DD_LoadInitializationAssemblies() mdMethodDef
+                // Emit the SIGNALFX_LoaderMethodsType.SIGNALFX_LoadInitializationAssemblies() mdMethodDef
                 //
                 mdMethodDef loaderMethodDef;
                 mdMemberRef securitySafeCriticalCtorMemberRef;
@@ -530,10 +530,10 @@ namespace shared
             //      IntPtr symbolsPtr, out int symbolsSize, string moduleName);
             //
             //      static <Module>() {
-            //          DD_LoadInitializationAssemblies();
+            //          SIGNALFX_LoadInitializationAssemblies();
             //      }
             //
-            //      static void DD_LoadInitializationAssemblies()
+            //      static void SIGNALFX_LoadInitializationAssemblies()
             //      {
             //          if (GetAssemblyAndSymbolsBytes(out var assemblyPtr, out var assemblySize, out var symbolsPtr,
             //          out var symbolsSize, "[ModuleName]"))
@@ -765,7 +765,7 @@ namespace shared
 
 
         //
-        // Emit the <Module>.DD_LoadInitializationAssemblies() mdMethodDef
+        // Emit the <Module>.SIGNALFX_LoadInitializationAssemblies() mdMethodDef
         //
         mdMethodDef loaderMethodDef;
         mdMemberRef securitySafeCriticalCtorMemberRef;
@@ -840,9 +840,9 @@ namespace shared
         WSTRING typeNameString = WSTRING(typeName);
 
         //
-        // Check if the static void [Type].DD_LoadInitializationAssemblies() mdMethodDef has been already injected.
+        // Check if the static void [Type].SIGNALFX_LoadInitializationAssemblies() mdMethodDef has been already injected.
         //
-        WSTRING loaderMethodName = WSTRING(WStr("DD_LoadInitializationAssemblies_")) + ReplaceString(assemblyName, (WSTRING)WStr("."), (WSTRING)WStr(""));
+        WSTRING loaderMethodName = WSTRING(WStr("SIGNALFX_LoadInitializationAssemblies_")) + ReplaceString(assemblyName, (WSTRING)WStr("."), (WSTRING)WStr(""));
         COR_SIGNATURE loaderMethodSignature[] =
         {
                 IMAGE_CEE_CS_CALLCONV_DEFAULT,  // Calling convention
@@ -1190,7 +1190,7 @@ namespace shared
         }
 
         //
-        // If the loader method cannot be found we create [Type].DD_LoadInitializationAssemblies() mdMethodDef
+        // If the loader method cannot be found we create [Type].SIGNALFX_LoadInitializationAssemblies() mdMethodDef
         //
         hr = metadataEmit->DefineMethod(typeDef, loaderMethodName.c_str(), mdStatic | mdPublic, loaderMethodSignature, sizeof(loaderMethodSignature), 0, 0, pLoaderMethodDef);
         if (FAILED(hr))

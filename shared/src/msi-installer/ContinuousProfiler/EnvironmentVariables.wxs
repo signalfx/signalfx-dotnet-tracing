@@ -7,7 +7,7 @@
     <ComponentGroup Id="ContinuousProfiler.EnvironmentVariables.Machine" Directory="ContinuousProfiler">
         <Component Id="ContinuousProfiler.EnvironmentVariablesShared" Guid="{9973ACAE-A4D4-495C-BD4E-FCC384C45C70}" Win64="$(var.Win64)">
           <CreateFolder/>
-          <Environment Id="DD_DOTNET_PROFILER_HOME" Name="DD_DOTNET_PROFILER_HOME" Action="set" Permanent="no" System="yes" Value="[ContinuousProfiler]" Part="all" />
+          <Environment Id="SIGNALFX_DOTNET_PROFILER_HOME" Name="SIGNALFX_DOTNET_PROFILER_HOME" Action="set" Permanent="no" System="yes" Value="[ContinuousProfiler]" Part="all" />
         </Component>
       </ComponentGroup>
   </Fragment>

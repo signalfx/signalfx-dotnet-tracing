@@ -63,11 +63,11 @@ namespace Datadog.AutoInstrumentation.ManagedLoader
             public const int SleepDurationMs = 100;
 
             // Set this env var to FALSE to disable delayed execution:
-            public const string IsEnabled_EnvVarName = "DD_INTERNAL_LOADER_DELAY_ENABLED";
+            public const string IsEnabled_EnvVarName = "SIGNALFX_INTERNAL_LOADER_DELAY_ENABLED";
             public const bool IsEnabled_DefaultVal = true;
 
             // Set this env var to a POSITIVE NUMBER to force delayed execution in default IIS app domain:
-            public const string IisDelayMs_EnvVarName = "DD_INTERNAL_LOADER_DELAY_IIS_MILLISEC";
+            public const string IisDelayMs_EnvVarName = "SIGNALFX_INTERNAL_LOADER_DELAY_IIS_MILLISEC";
             public const int IisDelayMs_DefaultVal = 0;
         }
 
@@ -173,13 +173,13 @@ namespace Datadog.AutoInstrumentation.ManagedLoader
         ///   So, we apply the above strategy: wait on a separate thread until `GetEntryAssembly` is not null and then execute the loader.
         ///   As mentioned, it is required because some APIs need `GetEntryAssembly` to populate bin compat flags in the Fx.
         ///    * The user does not need to specify a parameter for this, since we wait _until `GetEntryAssembly` is not null_.
-        ///    * This behavior is on by default, but all delaying may be disabled using `DD_INTERNAL_LOADER_DELAY_ENABLED=false`.
+        ///    * This behavior is on by default, but all delaying may be disabled using `SIGNALFX_INTERNAL_LOADER_DELAY_ENABLED=false`.
         /// <br />
         /// * On default AD, app IS hosted in IIS:
         ///   `GetEntryAssembly` always returns null. It will always stay null, and there is no point delaying anything in that case.
         ///   Even if we did delay, we would not have an end-condition for the wait as `GetEntryAssembly` always remains null forever.
         ///    * So by default we do not wait on IIS.
-        ///    * As a precaution we support an _optional_ wait that use user can opt into by setting DD_INTERNAL_LOADER_DELAY_IIS_MILLISEC to
+        ///    * As a precaution we support an _optional_ wait that use user can opt into by setting SIGNALFX_INTERNAL_LOADER_DELAY_IIS_MILLISEC to
         ///      a potitive number of milliseconds. (Since on IIS there is no exit condition to that delay, the option cannot be Boolean.)        
         /// </remarks>       
         private static void ExecuteDelayed(object assemblyLoaderObj)
@@ -560,7 +560,7 @@ namespace Datadog.AutoInstrumentation.ManagedLoader
             //  - c:\Program Files\Datadog\.NET Tracer\ContinuousProfiler\netcoreapp3.1\
             //  - ...
 
-            string profilerHomeDirectory = ReadEnvironmentVariable("DD_DOTNET_PROFILER_HOME");
+            string profilerHomeDirectory = ReadEnvironmentVariable("SIGNALFX_DOTNET_PROFILER_HOME");
 
             // Be defensive against env var not being set.
             if (String.IsNullOrWhiteSpace(profilerHomeDirectory))

@@ -22,7 +22,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         public void RunChecksProject()
         {
             SetCallTargetSettings(enableCallTarget: true);
-            SetEnvironmentVariable("DD_TRACE_DEBUG", "1");
+            SetEnvironmentVariable("SIGNALFX_TRACE_DEBUG", "1");
             int agentPort = TcpPortProvider.GetOpenPort();
 
             using (var agent = new MockTracerAgent(agentPort))

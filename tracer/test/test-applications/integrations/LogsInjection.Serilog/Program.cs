@@ -18,7 +18,7 @@ namespace LogsInjection.Serilog
             // When that happens, there is a risk that the startup log thread gets aborted during appdomain unload,
             // adding error logs which in turn cause a failure in CI.
             // Disabling the startup log at the process level should prevent this.
-            Environment.SetEnvironmentVariable("DD_TRACE_STARTUP_LOGS", "0");
+            Environment.SetEnvironmentVariable("SIGNALFX_TRACE_STARTUP_LOGS", "0");
 
             LoggingMethods.DeleteExistingLogs();
 
