@@ -75,6 +75,11 @@ jobs:
       with:
         path: ${{ env.tracerHome }}
         name: ${{ runner.os }}-tracer-home
+    - name: Publish Restored Packages
+      uses: actions/upload-artifact@v2
+      with:
+        path: ${{ env.NugetPackageDirectory }}
+        name: ${{ runner.os }}-nuget-packages
     - name: Publish Windows x86 MSI
       if: ${{ runner.os == 'Windows' }}
       uses: actions/upload-artifact@v2
@@ -143,6 +148,10 @@ jobs:
       with:
         path: ${{ env.tracerHome }}
         name: ${{ runner.os }}-tracer-home
+    - uses: actions/download-artifact@v2
+      with:
+        path: ${{ env.NugetPackageDirectory }}
+        name: ${{ runner.os }}-nuget-packages
     - name: Start CosmosDB Emulator
       if: ${{ matrix.target == 'BuildAndRunWindowsIntegrationTests' }}
       shell: powershell
@@ -155,7 +164,7 @@ jobs:
       run: |
         subst y: .
         y:
-        ./tracer/build.cmd Restore ${{ matrix.target }} -Framework ${{ matrix.framework }} -TargetPlatform ${{ matrix.platform }} --PrintDriveSpace
+        ./tracer/build.cmd Restore CompileManagedSrc ${{ matrix.target }} -Framework ${{ matrix.framework }} -TargetPlatform ${{ matrix.platform }} --PrintDriveSpace
     - uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.machine }}-integration-tests-${{ matrix.platform }}-${{ matrix.framework }}-${{ matrix.target }}-build_data
@@ -225,7 +234,11 @@ jobs:
       with:
         path: ${{ env.tracerHome }}
         name: ${{ runner.os }}-tracer-home
-    - run: ./tracer/build.cmd Restore PackageTracerHome BuildWindowsIntegrationTests -Framework netcoreapp3.1
+    - uses: actions/download-artifact@v2
+      with:
+        path: ${{ env.NugetPackageDirectory }}
+        name: ${{ runner.os }}-nuget-packages
+    - run: ./tracer/build.cmd Restore CompileManagedSrc PackageTracerHome BuildWindowsIntegrationTests -Framework netcoreapp3.1
     - name: docker-compose build IIS containers
       run: docker-compose build --build-arg dotnet_tracer_msi=.$relativeArtifacts/{{ matrix.platform }}/en-us/*.msi --build-arg ENABLE_32_BIT=${{ env.enable32bit }} IntegrationTests.IIS
     - name: docker-compose start IIS containers
