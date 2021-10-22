@@ -44,7 +44,7 @@ env:
   relativeArtifacts: /tracer/src/bin/artifacts
   binDir: ${{ github.workspace }}/tracer/src/bin
   ddTracerHome: ${{ github.workspace }}/tracer/src/bin/dd-tracer-home
-  tracerHome: ${{ github.workspace }}/tracer/src/bin/windows-tracer-home
+  tracerHome: ${{ github.workspace }}/tracer/bin/tracer-home
   artifacts: ${{ github.workspace }}/tracer/src/bin/artifacts
   isMainBranch: $[eq(github.ref, 'refs/heads/next-ver')]
   NugetPackageDirectory: ${{ github.workspace }}/packages
@@ -74,7 +74,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         path: ${{ env.tracerHome }}
-        name: ${{ matrix.machine }}-tracer-home
+        name: ${{ runner.os }}-tracer-home
     - name: Publish Windows x86 MSI
       if: ${{ runner.os == 'Windows' }}
       uses: actions/upload-artifact@v2
@@ -126,7 +126,8 @@ jobs:
     - run: ./tracer/build.cmd BuildTracerHome BuildAndRunNativeUnitTests
 
   integration-tests:
-    name: Integration tests 
+    name: Integration tests
+    needs: build
     strategy:
       fail-fast: false
       matrix:
@@ -138,6 +139,10 @@ jobs:
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/download-artifact@v2
+      with:
+        path: ${{ env.tracerHome }}
+        name: ${{ runner.os }}-tracer-home
     - name: Start CosmosDB Emulator
       if: ${{ matrix.target == 'BuildAndRunWindowsIntegrationTests' }}
       shell: powershell
@@ -206,7 +211,8 @@ jobs:
       continue-on-error: true
 
   windows-iis-integration-tests:
-    name: Windows - IIS integration tests 
+    name: Windows - IIS integration tests
+    needs: build
     runs-on: windows-2019
     strategy:
       matrix:
@@ -215,7 +221,11 @@ jobs:
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v2
-    - run: ./tracer/build.cmd BuildTracerHome PackageTracerHome BuildWindowsIntegrationTests -Framework netcoreapp3.1
+    - uses: actions/download-artifact@v2
+      with:
+        path: ${{ env.tracerHome }}
+        name: ${{ runner.os }}-tracer-home
+    - run: ./tracer/build.cmd PackageTracerHome BuildWindowsIntegrationTests -Framework netcoreapp3.1
     - name: docker-compose build IIS containers
       run: docker-compose build --build-arg dotnet_tracer_msi=.$relativeArtifacts/{{ matrix.platform }}/en-us/*.msi --build-arg ENABLE_32_BIT=${{ env.enable32bit }} IntegrationTests.IIS
     - name: docker-compose start IIS containers
