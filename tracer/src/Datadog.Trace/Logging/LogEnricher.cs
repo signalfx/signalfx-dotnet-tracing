@@ -30,7 +30,7 @@ namespace Datadog.Trace.Logging
             _versionProperty = tracer.Settings.ServiceVersion;
             _environmentProperty = tracer.Settings.Environment;
             _serviceProperty = tracer.DefaultServiceName;
-            _traceIdProperty = CreateTracerProperty(tracer, t => t.ActiveScope?.Span.TraceId.ToString());
+            _traceIdProperty = CreateTracerProperty(tracer, t => (t.ActiveScope?.Span.TraceId ?? TraceId.Zero).ToString());
             _spanIdProperty = CreateTracerProperty(tracer, t => t.ActiveScope?.Span.SpanId.ToString());
         }
 

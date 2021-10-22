@@ -48,7 +48,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Log4Net
                 var span = tracer.ActiveScope?.Span;
                 if (span is not null)
                 {
-                    loggingEvent.Properties[CorrelationIdentifier.TraceIdKey] = span.TraceId;
+                    loggingEvent.Properties[CorrelationIdentifier.TraceIdKey] = span.TraceId.ToString();
                     loggingEvent.Properties[CorrelationIdentifier.SpanIdKey] = span.SpanId;
                 }
             }

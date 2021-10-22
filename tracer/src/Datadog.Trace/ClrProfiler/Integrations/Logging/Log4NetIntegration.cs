@@ -92,7 +92,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations.AdoNet
                 var span = tracer.ActiveScope?.Span;
                 if (span is not null)
                 {
-                    loggingEventStruct.Properties[CorrelationIdentifier.TraceIdKey] = span.TraceId;
+                    loggingEventStruct.Properties[CorrelationIdentifier.TraceIdKey] = span.TraceId.ToString();
                     loggingEventStruct.Properties[CorrelationIdentifier.SpanIdKey] = span.SpanId;
                 }
             }
