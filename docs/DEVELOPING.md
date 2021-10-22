@@ -19,7 +19,7 @@ If for whatever reason you need to use `Datadog.Trace.sln` you can run `for i in
 ## Testing environment
 
 The [`dev/docker-compose.yaml`](../dev/docker-compose.yaml) contains configuration for running OTel Collector and Jaeger.
-It also configured to sends the traces to Splunk Observability Cloud.
+It also configured to send the traces to Splunk Observability Cloud.
 
 Before running `docker-compose` make sure to set `SPLUNK_AUTH_TOKEN` env var.
 You can do this by executing following command in Bash,
