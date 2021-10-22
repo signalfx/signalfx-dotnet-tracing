@@ -7,6 +7,7 @@ on:
     tags:
     - 'v*'
     paths-ignore:
+    - dev/*
     - docs/*
 # The following is a list of shared asset locations.
 # This is the config for the Tracer CI pipeline,
