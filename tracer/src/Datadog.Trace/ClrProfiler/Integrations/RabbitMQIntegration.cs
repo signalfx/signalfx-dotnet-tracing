@@ -895,7 +895,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 if (ReferenceEquals(operation, OperationReceive) ||
                     ReferenceEquals(operation, OperationProcess))
                 {
-                    tags.Operation = command;
+                    tags.Operation = operation;
 
                     // tags.ConsumerId = "TODO";
                 }
