@@ -103,7 +103,7 @@ jobs:
     runs-on: ${{ matrix.machine }}
     steps:
     - uses: actions/checkout@v2
-    - run: ./tracer/build.cmd BuildTracerHome BuildAndRunManagedUnitTests
+    - run: ./tracer/build.cmd Restore CompileManagedSrc BuildAndRunManagedUnitTests
     - uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.machine }}-managed-unit-tests-build_data
