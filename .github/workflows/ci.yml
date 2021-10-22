@@ -145,7 +145,12 @@ jobs:
         Write-Host "Starting CosmosDB Emulator"
         Import-Module "C:/Program Files/Azure Cosmos DB Emulator/PSModules/Microsoft.Azure.CosmosDB.Emulator"
         Start-CosmosDbEmulator -Timeout 300
-    - run: ./tracer/build.cmd BuildTracerHome ${{ matrix.target }} -Framework ${{ matrix.framework }} -TargetPlatform ${{ matrix.platform }} --PrintDriveSpace
+    # Workaround around long name being hit in MultiDomainHostTests.WorksOutsideTheGAC tests
+    - name: Subst for shorter path and Run Tests
+      run: |
+        subst y: .
+        y:
+        ./tracer/build.cmd BuildTracerHome ${{ matrix.target }} -Framework ${{ matrix.framework }} -TargetPlatform ${{ matrix.platform }} --PrintDriveSpace
     - uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.machine }}-integration-tests-${{ matrix.platform }}-${{ matrix.framework }}-${{ matrix.target }}-build_data
