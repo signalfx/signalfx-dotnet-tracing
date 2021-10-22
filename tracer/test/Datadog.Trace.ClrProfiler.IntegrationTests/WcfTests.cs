@@ -70,7 +70,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     // Test HTTP tags
                     Assert.Equal("POST", span.Tags[Tags.HttpMethod]);
                     Assert.Equal("http://localhost:8585/WcfSample/CalculatorService", span.Tags[Tags.HttpUrl]);
-                    Assert.Equal($"localhost:{wcfPort}", span.Tags[Tags.HttpRequestHeadersHost]);
+
+                    // Upstream can use Tags.HttpRequestHeadersHost to retrieve the value, but, the mock agent
+                    // transforms the tag key to its original value "http.request.headers.host" in order to
+                    // avoid changes to the verification files.
+                    Assert.Equal($"localhost:{wcfPort}", span.Tags["http.request.headers.host"]);
                 }
             }
         }
