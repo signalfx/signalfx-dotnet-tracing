@@ -155,7 +155,7 @@ jobs:
       run: |
         subst y: .
         y:
-        ./tracer/build.cmd ${{ matrix.target }} -Framework ${{ matrix.framework }} -TargetPlatform ${{ matrix.platform }} --PrintDriveSpace
+        ./tracer/build.cmd Restore ${{ matrix.target }} -Framework ${{ matrix.framework }} -TargetPlatform ${{ matrix.platform }} --PrintDriveSpace
     - uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.machine }}-integration-tests-${{ matrix.platform }}-${{ matrix.framework }}-${{ matrix.target }}-build_data
@@ -225,7 +225,7 @@ jobs:
       with:
         path: ${{ env.tracerHome }}
         name: ${{ runner.os }}-tracer-home
-    - run: ./tracer/build.cmd PackageTracerHome BuildWindowsIntegrationTests -Framework netcoreapp3.1
+    - run: ./tracer/build.cmd Restore PackageTracerHome BuildWindowsIntegrationTests -Framework netcoreapp3.1
     - name: docker-compose build IIS containers
       run: docker-compose build --build-arg dotnet_tracer_msi=.$relativeArtifacts/{{ matrix.platform }}/en-us/*.msi --build-arg ENABLE_32_BIT=${{ env.enable32bit }} IntegrationTests.IIS
     - name: docker-compose start IIS containers
