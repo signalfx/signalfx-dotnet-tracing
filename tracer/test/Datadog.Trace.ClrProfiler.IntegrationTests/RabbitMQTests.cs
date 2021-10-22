@@ -66,22 +66,26 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 foreach (var span in rabbitmqSpans)
                 {
+                    span.Tags.TryGetValue(Tags.AmqpCommand, out string command);
+
                     Assert.Equal(SpanTypes.Queue, span.Type);
                     Assert.Equal("rabbitmq", span.Tags[Tags.Messaging.System]);
                     Assert.Equal("RabbitMQ", span.Tags[Tags.InstrumentationName]);
                     Assert.False(span.Tags?.ContainsKey(Tags.Version), "External service span should not have service version tag.");
-                    Assert.NotNull(span.Tags[Tags.AmqpCommand]);
-
-                    var command = span.Tags[Tags.AmqpCommand];
+                    Assert.NotNull(command);
 
                     if (command.StartsWith("basic.", StringComparison.OrdinalIgnoreCase))
                     {
+                        span.Tags.TryGetValue(Tags.Messaging.Operation, out string operation);
+
                         if (string.Equals(command, "basic.publish", StringComparison.OrdinalIgnoreCase))
                         {
                             basicPublishCount++;
+
                             Assert.Equal(SpanKinds.Producer, span.Tags[Tags.SpanKind]);
                             Assert.NotNull(span.Tags[Tags.RabbitMq.RoutingKey]);
                             Assert.NotNull(span.Tags[Tags.Messaging.DestinationKind]);
+                            Assert.Null(operation); // We dont specify send operation
 
                             AssertSpanName(span, "send");
 
@@ -91,6 +95,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                         else if (string.Equals(command, "basic.get", StringComparison.OrdinalIgnoreCase))
                         {
                             basicGetCount++;
+
+                            Assert.NotNull(span.Tags[Tags.Messaging.DestinationKind]);
+                            Assert.NotNull(operation);
 
                             // Successful responses will have the "message.size" tag
                             // Empty responses will not
@@ -120,7 +127,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                         else if (string.Equals(command, "basic.deliver", StringComparison.OrdinalIgnoreCase))
                         {
                             basicDeliverCount++;
+
                             Assert.NotNull(span.ParentId);
+                            Assert.NotNull(operation);
 
                             // Add the parent span ID to a dictionary so we can later assert 1:1 mappings
                             if (distributedParentSpans.TryGetValue(span.ParentId.Value, out int count))
@@ -133,7 +142,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                             }
 
                             Assert.Equal(SpanKinds.Consumer, span.Tags[Tags.SpanKind]);
-                            // Assert.NotNull(span.Tags[Tags.AmqpQueue]); // Java does this but we're having difficulty doing this. Push to v2?
                             Assert.NotNull(span.Tags[Tags.RabbitMq.RoutingKey]);
                             Assert.NotNull(span.Tags[Tags.Messaging.DestinationKind]);
 
@@ -149,6 +157,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     }
                     else
                     {
+                        /* Setup commands, not supported by OTel */
+
                         Assert.Equal(SpanKinds.Client, span.Tags[Tags.SpanKind]);
 
                         if (string.Equals(command, "exchange.declare", StringComparison.OrdinalIgnoreCase))
@@ -162,6 +172,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                         else if (string.Equals(command, "queue.bind", StringComparison.OrdinalIgnoreCase))
                         {
                             queueBindCount++;
+
                             Assert.NotNull(span.Tags[Tags.RabbitMq.RoutingKey]);
                         }
                         else
