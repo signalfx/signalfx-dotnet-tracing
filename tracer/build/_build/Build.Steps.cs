@@ -927,6 +927,7 @@ partial class Build
                     .SetConfiguration(BuildConfiguration)
                     .SetTargetPlatform(TargetPlatform)
                     .SetFramework(Framework)
+                    //.WithMemoryDumpAfter(timeoutInMinutes: 30)
                     .EnableNoRestore()
                     .EnableNoBuild()
                     .SetProcessEnvironmentVariable("TracerHomeDirectory", TracerHomeDirectory)
@@ -944,6 +945,7 @@ partial class Build
                     .SetConfiguration(BuildConfiguration)
                     .SetTargetPlatform(TargetPlatform)
                     .SetFramework(Framework)
+                    //.WithMemoryDumpAfter(timeoutInMinutes: 30)
                     .EnableNoRestore()
                     .EnableNoBuild()
                     .SetFilter(Filter ?? "RunOnWindows=True&LoadFromGAC!=True&IIS!=True")
@@ -956,6 +958,7 @@ partial class Build
             finally
             {
                 MoveLogsToBuildData();
+                CopyMemoryDumps();
             }
         });
 
@@ -1226,6 +1229,7 @@ partial class Build
                         .EnableNoRestore()
                         .EnableNoBuild()
                         .SetFramework(Framework)
+                        //.WithMemoryDumpAfter(timeoutInMinutes: 30)
                         .SetFilter(filter)
                         .SetProcessEnvironmentVariable("TracerHomeDirectory", TracerHomeDirectory)
                         .When(TestAllPackageVersions, o => o.SetProcessEnvironmentVariable("TestAllPackageVersions", "true"))
@@ -1242,6 +1246,7 @@ partial class Build
                     .EnableNoRestore()
                     .EnableNoBuild()
                     .SetFramework(Framework)
+                    //.WithMemoryDumpAfter(timeoutInMinutes: 30)
                     .SetFilter(filter)
                     .SetProcessEnvironmentVariable("TracerHomeDirectory", TracerHomeDirectory)
                     .When(TestAllPackageVersions, o => o.SetProcessEnvironmentVariable("TestAllPackageVersions", "true"))
@@ -1254,6 +1259,7 @@ partial class Build
             finally
             {
                 MoveLogsToBuildData();
+                CopyMemoryDumps();
             }
         });
 
@@ -1483,6 +1489,14 @@ partial class Build
             {
                 MoveFileToDirectory(dump, BuildDataDirectory / "dumps", FileExistsPolicy.Overwrite);
             }
+        }
+    }
+
+    private void CopyMemoryDumps()
+    {
+        foreach (var file in Directory.EnumerateFiles(TracerDirectory, "*.dmp", SearchOption.AllDirectories))
+        {
+            CopyFileToDirectory(file, BuildDataDirectory, FileExistsPolicy.OverwriteIfNewer);
         }
     }
 
