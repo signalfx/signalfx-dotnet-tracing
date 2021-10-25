@@ -71,10 +71,10 @@ variables:
   profilerHome: $(System.DefaultWorkingDirectory)/profiler/bin/profiler-home # Important, put the profiler assets into the working directory so it can be saved across build stages more easily
   monitoringHome: $(System.DefaultWorkingDirectory)/shared/bin/monitoring-home
   artifacts: $(System.DefaultWorkingDirectory)/tracer/src/bin/artifacts
-  ddApiKey: $(SIGNALFX_API_KEY)
+  ddApiKey: $(DD_API_KEY)
   isMainBranch: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   isPullRequest: $[eq(variables['Build.Reason'], 'PullRequest')]
-  SIGNALFX_DOTNET_TRACER_MSBUILD:
+  DD_DOTNET_TRACER_MSBUILD:
   NugetPackageDirectory: $(System.DefaultWorkingDirectory)/packages
   relativeNugetPackageDirectory: packages
   # For scheduled builds, only run benchmarks and crank (and deps).
@@ -92,8 +92,8 @@ resources:
     ports:
     - 8126:8126
     env:
-      SIGNALFX_API_KEY: $(ddApiKey)
-      SIGNALFX_INSIDE_CI: true
+      DD_API_KEY: $(ddApiKey)
+      DD_INSIDE_CI: true
   repositories:
   - repository: dd-continuous-profiler-dotnet
     type: github
@@ -1220,7 +1220,7 @@ stages:
         ./run.sh "linux"
       displayName: Crank
       env:
-        SIGNALFX_SERVICE: dd-trace-dotnet
+        DD_SERVICE: dd-trace-dotnet
 
   - job: Windows64
     timeoutInMinutes: 60
@@ -1241,7 +1241,7 @@ stages:
         ./run.sh "windows"
       displayName: Crank
       env:
-        SIGNALFX_SERVICE: dd-trace-dotnet
+        DD_SERVICE: dd-trace-dotnet
 
   - job: LinuxArm64
     timeoutInMinutes: 60
@@ -1261,8 +1261,8 @@ stages:
         ./run.sh "linux_arm64"
       displayName: Crank
       env:
-        SIGNALFX_SERVICE: dd-trace-dotnet
-        SIGNALFX_ENV: CI
+        DD_SERVICE: dd-trace-dotnet
+        DD_ENV: CI
 
 - stage: coverage
   condition: and(succeeded(), eq(variables['isScheduledBuild'], 'False'), ne(variables['isNgenTestBuild'], 'True'))
@@ -1360,13 +1360,13 @@ stages:
       workingDirectory: $(System.DefaultWorkingDirectory)/tracer/build/timeit/Samples.HttpMessageHandler
       displayName: Execute Samples.HttpMessageHandler benchmark
       env:
-        SIGNALFX_SERVICE: dd-trace-dotnet
+        DD_SERVICE: dd-trace-dotnet
 
     - script: run.cmd
       workingDirectory: $(System.DefaultWorkingDirectory)/tracer/build/timeit/Samples.FakeDbCommand
       displayName: Execute Samples.FakeDbCommand benchmark
       env:
-        SIGNALFX_SERVICE: dd-trace-dotnet
+        DD_SERVICE: dd-trace-dotnet
 
     - task: PowerShell@2
       displayName: Wait 20 seconds to agent flush before finishing pipeline
