@@ -542,12 +542,12 @@ namespace Datadog.Trace
             /// The (uncompressed) size of the message payload in bytes.
             /// Also use this attribute if it is unknown whether the compressed or uncompressed payload size is reported.
             /// </summary>
-            public const string MessagePayloadSize = "messaging.message_payload_size_bytes";
+            public const string MessageSize = "messaging.message_payload_size_bytes";
 
             /// <summary>
             /// The compressed size of the message payload in bytes.
             /// </summary>
-            public const string MessagePayloadCompressedSize = "messaging.message_payload_compressed_size_bytes";
+            public const string MessageSizeCompressed = "messaging.message_payload_compressed_size_bytes";
         }
 
         /// <summary>

@@ -45,9 +45,9 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         internal const string OperationReceive = "receive";
         internal const string OperationSend = "send";
 
-        internal const string AmqpBasicDeliverCommand = "basic.deliver";
-        internal const string AmqpBasicGetCommand = "basic.get";
-        internal const string AmqpBasicPublishCommand = "basic.publish";
+        internal const string DeliverCommand = "basic.deliver";
+        internal const string GetCommand = "basic.get";
+        internal const string PublishCommand = "basic.publish";
 
         internal static readonly IntegrationInfo IntegrationId = IntegrationRegistry.GetIntegrationInfo(IntegrationName);
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(RabbitMQIntegration));
@@ -107,7 +107,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             if (model == null) { throw new ArgumentNullException(nameof(model)); }
 
             const string methodName = "HandleBasicDeliver";
-            const string command = AmqpBasicDeliverCommand;
+            const string command = DeliverCommand;
             Action<object, string, ulong, bool, string, string, object, byte[]> instrumentedMethod;
             var modelType = model.GetType();
 
@@ -156,7 +156,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 {
                     if (tags != null)
                     {
-                        tags.MessagePayloadSize = body?.Length.ToString() ?? "0";
+                        tags.MessageSize = body?.Length.ToString() ?? "0";
 
                         SetTagsFromBasicProperties(tags, basicPropertiesValue);
                     }
@@ -215,7 +215,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             if (model == null) { throw new ArgumentNullException(nameof(model)); }
 
             const string methodName = "HandleBasicDeliver";
-            const string command = AmqpBasicDeliverCommand;
+            const string command = DeliverCommand;
             Action<object, string, ulong, bool, string, string, object, object> instrumentedMethod;
             var modelType = model.GetType();
 
@@ -262,11 +262,14 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
                 using (var scope = CreateScope(tracer, out RabbitMQTags tags, command, parentContext: propagatedContext, spanKind: SpanKinds.Consumer, exchange: exchange, routingKey: routingKey))
                 {
-                    if (tags != null && body != null && body.TryDuckCast<BodyStruct>(out var bodyStruct))
+                    if (tags != null)
                     {
-                        tags.MessagePayloadSize = bodyStruct.Length.ToString() ?? "0";
-
                         SetTagsFromBasicProperties(tags, basicPropertiesValue);
+
+                        if (body != null && body.TryDuckCast<BodyStruct>(out var bodyStruct))
+                        {
+                            tags.MessageSize = bodyStruct.Length.ToString() ?? "0";
+                        }
                     }
 
                     try
@@ -314,7 +317,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             if (model == null) { throw new ArgumentNullException(nameof(model)); }
 
             const string methodName = "BasicGet";
-            const string command = AmqpBasicGetCommand;
+            const string command = GetCommand;
             Func<object, string, bool, object> instrumentedMethod;
             var modelType = model.GetType();
 
@@ -391,7 +394,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
                         if (tags != null && messageSize != null)
                         {
-                            tags.MessagePayloadSize = messageSize;
+                            tags.MessageSize = messageSize;
                         }
 
                         if (exception != null)
@@ -438,7 +441,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             if (model == null) { throw new ArgumentNullException(nameof(model)); }
 
             const string methodName = "_Private_BasicPublish";
-            const string command = AmqpBasicPublishCommand;
+            const string command = PublishCommand;
             Action<object, string, string, bool, object, byte[]> instrumentedMethod;
             var modelType = model.GetType();
 
@@ -477,7 +480,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
                     if (tags != null)
                     {
-                        tags.MessagePayloadSize = body?.Length.ToString() ?? "0";
+                        tags.MessageSize = body?.Length.ToString() ?? "0";
                     }
 
                     if (basicProperties != null && basicProperties.TryDuckCast<IBasicProperties>(out var basicPropertiesValue))
@@ -542,7 +545,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             if (model == null) { throw new ArgumentNullException(nameof(model)); }
 
             const string methodName = "_Private_BasicPublish";
-            const string command = AmqpBasicPublishCommand;
+            const string command = PublishCommand;
             Action<object, string, string, bool, object, object> instrumentedMethod;
             var modelType = model.GetType();
 
@@ -583,11 +586,11 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     {
                         if (body != null && body.TryDuckCast<BodyStruct>(out var bodyStruct))
                         {
-                            tags.MessagePayloadSize = bodyStruct.Length.ToString();
+                            tags.MessageSize = bodyStruct.Length.ToString();
                         }
                         else
                         {
-                            tags.MessagePayloadSize = "0";
+                            tags.MessageSize = "0";
                         }
                     }
 
@@ -871,7 +874,10 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 tags = new RabbitMQTags(spanKind);
                 string serviceName = tracer.Settings.GetServiceName(tracer, SystemName);
                 string operation = CommandToOperation(command);
-                string operationName = $"{exchange} {operation}".TrimStart();
+                string operationName = string.IsNullOrWhiteSpace(exchange)
+                    ? operation
+                    : $"{exchange} {operation}";
+
                 scope = tracer.StartActiveWithTags(operationName, parent: parentContext, tags: tags, serviceName: serviceName, startTime: startTime);
                 var span = scope.Span;
 
@@ -919,12 +925,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
         private static string CommandToOperation(string command)
         {
-            if (ReferenceEquals(command, AmqpBasicDeliverCommand) ||
-                ReferenceEquals(command, AmqpBasicGetCommand))
+            if (ReferenceEquals(command, DeliverCommand) ||
+                ReferenceEquals(command, GetCommand))
             {
                 return OperationReceive;
             }
-            else if (ReferenceEquals(command, AmqpBasicPublishCommand))
+            else if (ReferenceEquals(command, PublishCommand))
             {
                 return OperationSend;
             }
@@ -936,6 +942,11 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         {
             tags.ConversationId = basicProperties.CorrelationId;
             tags.MessageId = basicProperties.MessageId;
+
+            if (basicProperties.IsDeliveryModePresent())
+            {
+                tags.DeliveryMode = DeliveryModeStrings[0x3 & basicProperties.DeliveryMode];
+            }
         }
 
         /********************

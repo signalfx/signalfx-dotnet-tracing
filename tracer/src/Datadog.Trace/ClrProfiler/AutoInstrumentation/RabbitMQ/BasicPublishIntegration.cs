@@ -31,7 +31,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class BasicPublishIntegration
     {
-        private const string Command = RabbitMQIntegration.AmqpBasicPublishCommand;
+        private const string Command = RabbitMQIntegration.PublishCommand;
 
         private static readonly string[] DeliveryModeStrings = { null, "1", "2" };
 
@@ -63,7 +63,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
 
                 if (tags != null)
                 {
-                    tags.MessagePayloadSize = body.Instance != null ? body.Length.ToString() : "0";
+                    tags.MessageSize = body.Instance != null ? body.Length.ToString() : "0";
 
                     RabbitMQIntegration.SetTagsFromBasicProperties(tags, basicProperties);
                 }

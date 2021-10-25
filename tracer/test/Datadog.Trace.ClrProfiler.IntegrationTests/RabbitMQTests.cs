@@ -66,13 +66,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 foreach (var span in rabbitmqSpans)
                 {
-                    span.Tags.TryGetValue(Tags.AmqpCommand, out string command);
-
                     Assert.Equal(SpanTypes.Queue, span.Type);
                     Assert.Equal("rabbitmq", span.Tags[Tags.Messaging.System]);
                     Assert.Equal("RabbitMQ", span.Tags[Tags.InstrumentationName]);
                     Assert.False(span.Tags?.ContainsKey(Tags.Version), "External service span should not have service version tag.");
-                    Assert.NotNull(command);
+                    Assert.True(span.Tags.TryGetValue(Tags.AmqpCommand, out string command));
 
                     if (command.StartsWith("basic.", StringComparison.OrdinalIgnoreCase))
                     {
@@ -85,12 +83,12 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                             Assert.Equal(SpanKinds.Producer, span.Tags[Tags.SpanKind]);
                             Assert.NotNull(span.Tags[Tags.RabbitMq.RoutingKey]);
                             Assert.NotNull(span.Tags[Tags.Messaging.DestinationKind]);
-                            Assert.Null(operation); // We dont specify send operation
+                            Assert.Null(operation); // We must not set 'send' as operation name
 
                             AssertSpanName(span, "send");
 
-                            Assert.NotNull(span.Tags[Tags.Messaging.MessagePayloadSize]);
-                            Assert.True(int.TryParse(span.Tags[Tags.Messaging.MessagePayloadSize], out _));
+                            Assert.NotNull(span.Tags[Tags.Messaging.MessageSize]);
+                            Assert.True(int.TryParse(span.Tags[Tags.Messaging.MessageSize], out _));
                         }
                         else if (string.Equals(command, "basic.get", StringComparison.OrdinalIgnoreCase))
                         {
@@ -101,7 +99,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                             // Successful responses will have the "message.size" tag
                             // Empty responses will not
-                            if (span.Tags.TryGetValue(Tags.Messaging.MessagePayloadSize, out string messageSize))
+                            if (span.Tags.TryGetValue(Tags.Messaging.MessageSize, out string messageSize))
                             {
                                 Assert.NotNull(span.ParentId);
                                 Assert.True(int.TryParse(messageSize, out _));
@@ -145,8 +143,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                             Assert.NotNull(span.Tags[Tags.RabbitMq.RoutingKey]);
                             Assert.NotNull(span.Tags[Tags.Messaging.DestinationKind]);
 
-                            Assert.NotNull(span.Tags[Tags.Messaging.MessagePayloadSize]);
-                            Assert.True(int.TryParse(span.Tags[Tags.Messaging.MessagePayloadSize], out _));
+                            Assert.NotNull(span.Tags[Tags.Messaging.MessageSize]);
+                            Assert.True(int.TryParse(span.Tags[Tags.Messaging.MessageSize], out _));
 
                             AssertSpanName(span, "receive");
                         }

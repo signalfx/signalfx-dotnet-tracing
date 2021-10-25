@@ -20,8 +20,8 @@ namespace Datadog.Trace.Tagging
                 new Property<MessagingTags, string>(Tags.Messaging.MessageId, t => t.MessageId, (t, v) => t.MessageId = v),
                 new Property<MessagingTags, string>(Tags.Messaging.ConversationId, t => t.ConversationId, (t, v) => t.ConversationId = v),
                 new Property<MessagingTags, string>(Tags.Messaging.ConsumerId, t => t.ConsumerId, (t, v) => t.ConsumerId = v),
-                new Property<MessagingTags, string>(Tags.Messaging.MessagePayloadSize, t => t.MessagePayloadSize, (t, v) => t.MessagePayloadSize = v),
-                new Property<MessagingTags, string>(Tags.Messaging.MessagePayloadCompressedSize, t => t.MessagePayloadCompressedSize, (t, v) => t.MessagePayloadCompressedSize = v));
+                new Property<MessagingTags, string>(Tags.Messaging.MessageSize, t => t.MessageSize, (t, v) => t.MessageSize = v),
+                new Property<MessagingTags, string>(Tags.Messaging.MessageSizeCompressed, t => t.MessageSizeCompressed, (t, v) => t.MessageSizeCompressed = v));
 
         public string System { get; set; }
 
@@ -45,9 +45,9 @@ namespace Datadog.Trace.Tagging
 
         public string ConsumerId { get; set; }
 
-        public string MessagePayloadSize { get; set; }
+        public string MessageSize { get; set; }
 
-        public string MessagePayloadCompressedSize { get; set; }
+        public string MessageSizeCompressed { get; set; }
 
         protected override IProperty<string>[] GetAdditionalTags() => MessagingTagsProperties;
     }

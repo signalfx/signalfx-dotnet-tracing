@@ -30,7 +30,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class BasicDeliverIntegration
     {
-        private const string Command = RabbitMQIntegration.AmqpBasicDeliverCommand;
+        private const string Command = RabbitMQIntegration.DeliverCommand;
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(BasicDeliverIntegration));
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
             var scope = RabbitMQIntegration.CreateScope(Tracer.Instance, out RabbitMQTags tags, Command, parentContext: propagatedContext, spanKind: SpanKinds.Consumer, exchange: exchange, routingKey: routingKey);
             if (tags != null)
             {
-                tags.MessagePayloadSize = body?.Length.ToString() ?? "0";
+                tags.MessageSize = body?.Length.ToString() ?? "0";
 
                 RabbitMQIntegration.SetTagsFromBasicProperties(tags, basicProperties);
             }

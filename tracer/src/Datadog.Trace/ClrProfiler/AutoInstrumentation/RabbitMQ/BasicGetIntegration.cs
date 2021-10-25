@@ -31,7 +31,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class BasicGetIntegration
     {
-        private const string Command = RabbitMQIntegration.AmqpBasicGetCommand;
+        private const string Command = RabbitMQIntegration.GetCommand;
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(BasicGetIntegration));
 
@@ -94,11 +94,14 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
                     string queueDisplayName = string.IsNullOrEmpty(queue) || !queue.StartsWith("amq.gen-") ? queue : "<generated>";
                     scope.Span.ResourceName = $"{Command} {queueDisplayName}";
 
-                    if (tags != null && messageSize != null)
+                    if (tags != null)
                     {
-                        tags.MessagePayloadSize = messageSize;
-
                         RabbitMQIntegration.SetTagsFromBasicProperties(tags, basicGetResult.BasicProperties);
+
+                        if (messageSize != null)
+                        {
+                            tags.MessageSize = messageSize;
+                        }
                     }
 
                     if (exception != null)

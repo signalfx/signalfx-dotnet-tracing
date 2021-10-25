@@ -24,18 +24,29 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
         IDictionary<string, object> Headers { get; set; }
 
         /// <summary>
+        /// Gets or sets the message delivery mode
+        /// </summary>
+        byte DeliveryMode { get; set; }
+
+        /// <summary>
         /// Gets or sets the application id
         /// </summary>
-        public string AppId { get; set; }
+        string AppId { get; set; }
 
         /// <summary>
         /// Gets or sets the correlation id
         /// </summary>
-        public string CorrelationId { get; set; }
+        string CorrelationId { get; set; }
 
         /// <summary>
         /// Gets or sets the message id
         /// </summary>
-        public string MessageId { get; set; }
+        string MessageId { get; set; }
+
+        /// <summary>
+        /// Returns true if the DeliveryMode property is present
+        /// </summary>
+        /// <returns>true if the DeliveryMode property is present</returns>
+        bool IsDeliveryModePresent();
     }
 }
