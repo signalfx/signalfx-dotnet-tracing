@@ -37,8 +37,8 @@ namespace shared
         WStr("Datadog.AutoInstrumentation.Profiler.Managed"),
     };
 
-    constexpr const WCHAR* SpecificTypeToInjectName = WStr("System.AppDomain");
-    constexpr const WCHAR* SpecificMethodToInjectName = WStr("IsCompatibilitySwitchSet");
+    const WSTRING SpecificTypeToInjectName = WStr("System.AppDomain");
+    const WSTRING SpecificMethodToInjectName = WStr("IsCompatibilitySwitchSet");
 
 
     static Enumerator<mdMethodDef> EnumMethodsWithName(
@@ -324,14 +324,14 @@ namespace shared
             if (_loaderOptions.RewriteMSCorLibMethods && _loaderOptions.IsNet46OrGreater)
             {
                 mdTypeDef appDomainTypeDef;
-                hr = metadataImport->FindTypeDefByName(SpecificTypeToInjectName, mdTokenNil, &appDomainTypeDef);
+                hr = metadataImport->FindTypeDefByName(SpecificTypeToInjectName.c_str(), mdTokenNil, &appDomainTypeDef);
                 if (FAILED(hr))
                 {
                     Debug("Loader::InjectLoaderToModuleInitializer: " + ToString(SpecificTypeToInjectName) + " not found.");
                     return S_FALSE;
                 }
 
-                auto enumMethods = EnumMethodsWithName(metadataImport, appDomainTypeDef, SpecificMethodToInjectName);
+                auto enumMethods = EnumMethodsWithName(metadataImport, appDomainTypeDef, SpecificMethodToInjectName.c_str());
                 auto enumIterator = enumMethods.begin();
                 if (enumIterator != enumMethods.end()) {
                     auto methodDef = *enumIterator;
@@ -348,17 +348,17 @@ namespace shared
                     }
 
                     //
-                    // Define a new TypeDef DD_LoaderMethodsType that extends System.Object
+                    // Define a new TypeDef SIGNALFX_LoaderMethodsType that extends System.Object
                     //
                     mdTypeDef newTypeDef;
-                    hr = metadataEmit->DefineTypeDef(WStr("DD_LoaderMethodsType"), tdAbstract | tdSealed, systemObjectTypeRef, NULL, &newTypeDef);
+                    hr = metadataEmit->DefineTypeDef(WStr("SIGNALFX_LoaderMethodsType"), tdAbstract | tdSealed, systemObjectTypeRef, NULL, &newTypeDef);
                     if (FAILED(hr)) {
-                        Error("Loader::InjectLoaderToModuleInitializer: failed to define typedef: DD_LoaderMethodsType");
+                        Error("Loader::InjectLoaderToModuleInitializer: failed to define typedef: SIGNALFX_LoaderMethodsType");
                         return hr;
                     }
 
                     //
-                    // Emit the DD_LoaderMethodsType.DD_LoadInitializationAssemblies() mdMethodDef
+                    // Emit the SIGNALFX_LoaderMethodsType.SIGNALFX_LoadInitializationAssemblies() mdMethodDef
                     //
                     mdMethodDef loaderMethodDef;
                     mdMemberRef securitySafeCriticalCtorMemberRef;
@@ -462,22 +462,22 @@ namespace shared
                 }
 
                 //
-                // Define a new TypeDef DD_LoaderMethodsType that extends System.Object
+                // Define a new TypeDef SIGNALFX_LoaderMethodsType that extends System.Object
                 //
                 mdTypeDef newTypeDef;
-                hr = metadataEmit->DefineTypeDef(WStr("DD_LoaderMethodsType"),
+                hr = metadataEmit->DefineTypeDef(WStr("SIGNALFX_LoaderMethodsType"),
                                                  tdAbstract | tdSealed,
                                                  systemObjectTypeRef,
                                                  NULL,
                                                  &newTypeDef);
                 if (FAILED(hr))
                 {
-                    Error("Loader::InjectLoaderToModuleInitializer: failed to define typedef: DD_LoaderMethodsType");
+                    Error("Loader::InjectLoaderToModuleInitializer: failed to define typedef: SIGNALFX_LoaderMethodsType");
                     return hr;
                 }
 
                 //
-                // Emit the DD_LoaderMethodsType.DD_LoadInitializationAssemblies() mdMethodDef
+                // Emit the SIGNALFX_LoaderMethodsType.SIGNALFX_LoadInitializationAssemblies() mdMethodDef
                 //
                 mdMethodDef loaderMethodDef;
                 mdMemberRef securitySafeCriticalCtorMemberRef;
@@ -530,10 +530,10 @@ namespace shared
             //      IntPtr symbolsPtr, out int symbolsSize, string moduleName);
             //
             //      static <Module>() {
-            //          DD_LoadInitializationAssemblies();
+            //          SIGNALFX_LoadInitializationAssemblies();
             //      }
             //
-            //      static void DD_LoadInitializationAssemblies()
+            //      static void SIGNALFX_LoadInitializationAssemblies()
             //      {
             //          if (GetAssemblyAndSymbolsBytes(out var assemblyPtr, out var assemblySize, out var symbolsPtr,
             //          out var symbolsSize, "[ModuleName]"))
@@ -644,12 +644,12 @@ namespace shared
         const ComPtr<IMetaDataImport2> metadataImport = metadataInterfaces.As<IMetaDataImport2>(IID_IMetaDataImport);
         const ComPtr<IMetaDataAssemblyImport> assemblyImport = metadataInterfaces.As<IMetaDataAssemblyImport>(IID_IMetaDataAssemblyImport);
 
-        constexpr DWORD NameBuffSize = 1024;
+        const size_t NameBuffSize = 1024;
 
         mdToken functionParentToken;
         WCHAR functionName[NameBuffSize]{};
-        DWORD functionNameLength = 0;
-        hr = metadataImport->GetMemberProps(functionToken, &functionParentToken, functionName, NameBuffSize, &functionNameLength,
+        DWORD functionNameSize = 0;
+        hr = metadataImport->GetMemberProps(functionToken, &functionParentToken, functionName, NameBuffSize, &functionNameSize,
                 nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
         if (FAILED(hr))
         {
@@ -657,33 +657,56 @@ namespace shared
             return S_FALSE;
         }
 
+        if (SpecificMethodToInjectName != functionName)
+        {
+            if (ExtraVerboseLogging && _loaderOptions.LogDebugIsEnabled)
+            {
+                Debug("Loader::HandleJitCachedFunctionSearchStarted:"
+                      " (functionId=" +
+                      ToString(functionId) +
+                      ") "
+                      " resulted in disableNGenForFunction=False.");
+            }
+            return S_OK;
+        }
+
         WCHAR typeName[NameBuffSize]{};
-        DWORD typeNameLength = 0;
+        DWORD typeNameSize = 0;
         DWORD typeFlags;
-        hr = metadataImport->GetTypeDefProps(functionParentToken, typeName, NameBuffSize, &typeNameLength, &typeFlags, NULL);
+        hr = metadataImport->GetTypeDefProps(functionParentToken, typeName, NameBuffSize, &typeNameSize, &typeFlags, NULL);
         if (FAILED(hr))
         {
             Error("Loader::HandleJitCachedFunctionSearchStarted: Call to GetTypeDefProps(..) returned a FAILED HResult: " + ToString(hr) + ".");
             return S_FALSE;
         }
 
-        bool disableNGenForFunction = (0 == memcmp(functionName, SpecificMethodToInjectName, sizeof(WCHAR) * (std::min)(NameBuffSize, functionNameLength)))
-                                        && (0 == memcmp(typeName, SpecificTypeToInjectName, sizeof(WCHAR) * (std::min)(NameBuffSize, typeNameLength)));
-
-        if (disableNGenForFunction)
+        if (SpecificTypeToInjectName != typeName)
         {
-            _specificMethodToInjectFunctionId = functionId;
+            if (ExtraVerboseLogging && _loaderOptions.LogDebugIsEnabled)
+            {
+                Debug("Loader::HandleJitCachedFunctionSearchStarted:"
+                      " (functionId=" +
+                      ToString(functionId) +
+                      ","
+                      " functionMoniker=\"" +
+                      ToString(typeName) + "." + ToString(functionName) +
+                      "\")"
+                      " resulted in disableNGenForFunction=False.");
+            }
+            return S_OK;
         }
 
-        if ((ExtraVerboseLogging || disableNGenForFunction) && _loaderOptions.LogDebugIsEnabled)
+        _specificMethodToInjectFunctionId = functionId;
+
+        if (_loaderOptions.LogDebugIsEnabled)
         {
             Debug("Loader::HandleJitCachedFunctionSearchStarted:"
                   " (functionId=" + ToString(functionId) + ","
                   " functionMoniker=\"" + ToString(typeName) + "." + ToString(functionName) + "\")"
-                  " resulted in disableNGenForFunction=" + (disableNGenForFunction ? "True" : "False") + ".");
+                  " resulted in disableNGenForFunction=True.");
         }
 
-        *pbUseCachedFunction = *pbUseCachedFunction && !disableNGenForFunction;
+        *pbUseCachedFunction = false;
         return S_OK;
     }
 
@@ -742,7 +765,7 @@ namespace shared
 
 
         //
-        // Emit the <Module>.DD_LoadInitializationAssemblies() mdMethodDef
+        // Emit the <Module>.SIGNALFX_LoadInitializationAssemblies() mdMethodDef
         //
         mdMethodDef loaderMethodDef;
         mdMemberRef securitySafeCriticalCtorMemberRef;
@@ -817,9 +840,9 @@ namespace shared
         WSTRING typeNameString = WSTRING(typeName);
 
         //
-        // Check if the static void [Type].DD_LoadInitializationAssemblies() mdMethodDef has been already injected.
+        // Check if the static void [Type].SIGNALFX_LoadInitializationAssemblies() mdMethodDef has been already injected.
         //
-        WSTRING loaderMethodName = WSTRING(WStr("DD_LoadInitializationAssemblies_")) + ReplaceString(assemblyName, (WSTRING)WStr("."), (WSTRING)WStr(""));
+        WSTRING loaderMethodName = WSTRING(WStr("SIGNALFX_LoadInitializationAssemblies_")) + ReplaceString(assemblyName, (WSTRING)WStr("."), (WSTRING)WStr(""));
         COR_SIGNATURE loaderMethodSignature[] =
         {
                 IMAGE_CEE_CS_CALLCONV_DEFAULT,  // Calling convention
@@ -1167,7 +1190,7 @@ namespace shared
         }
 
         //
-        // If the loader method cannot be found we create [Type].DD_LoadInitializationAssemblies() mdMethodDef
+        // If the loader method cannot be found we create [Type].SIGNALFX_LoadInitializationAssemblies() mdMethodDef
         //
         hr = metadataEmit->DefineMethod(typeDef, loaderMethodName.c_str(), mdStatic | mdPublic, loaderMethodSignature, sizeof(loaderMethodSignature), 0, 0, pLoaderMethodDef);
         if (FAILED(hr))

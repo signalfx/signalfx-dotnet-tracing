@@ -35,16 +35,16 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             };
 
         private readonly LogFileTest[] _logPre200FileTests =
+        {
+            new LogFileTest()
             {
-                new LogFileTest()
-                {
-                    FileName = "log-textFile.log",
-                    RegexFormat = @"{0}: {1}",
-                    TracedLogTypes = TracedLogTypes.NotCorrelated,
-                    UnTracedLogTypes = UnTracedLogTypes.EmptyProperties,
-                    PropertiesUseSerilogNaming = true
-                }
-            };
+                FileName = "log-textFile.log",
+                RegexFormat = @"{0}: {1}",
+                TracedLogTypes = TracedLogTypes.NotCorrelated,
+                UnTracedLogTypes = UnTracedLogTypes.EmptyProperties,
+                PropertiesUseSerilogNaming = true
+            }
+        };
 
         public SerilogTests(ITestOutputHelper output)
             : base(output, "LogsInjection.Serilog")
@@ -56,7 +56,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [MemberData(nameof(PackageVersions.Serilog), MemberType = typeof(PackageVersions))]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
-        [Trait("Category", "LinuxUnsupported")]
         public void InjectsLogsWhenEnabled(string packageVersion)
         {
             SetEnvironmentVariable("SIGNALFX_LOGS_INJECTION", "true");
@@ -68,14 +67,14 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 var spans = agent.WaitForSpans(1, 2500);
                 Assert.True(spans.Count >= 1, $"Expecting at least 1 span, only received {spans.Count}");
 
-                if (string.IsNullOrWhiteSpace(packageVersion) || new Version(packageVersion) >= new Version("2.0.0"))
+                if (PackageSupportsLogsInjection(packageVersion))
                 {
-                    ValidateLogCorrelation(spans, _log200FileTests);
+                    ValidateLogCorrelation(spans, _log200FileTests, packageVersion);
                 }
                 else
                 {
                     // We do not expect logs injection for Serilog versions < 2.0.0 so filter out all logs
-                    ValidateLogCorrelation(spans, _logPre200FileTests);
+                    ValidateLogCorrelation(spans, _logPre200FileTests, packageVersion);
                 }
             }
         }
@@ -84,7 +83,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [MemberData(nameof(PackageVersions.Serilog), MemberType = typeof(PackageVersions))]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
-        [Trait("Category", "LinuxUnsupported")]
         public void DoesNotInjectLogsWhenDisabled(string packageVersion)
         {
             SetEnvironmentVariable("SIGNALFX_LOGS_INJECTION", "false");
@@ -96,16 +94,25 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 var spans = agent.WaitForSpans(1, 2500);
                 Assert.True(spans.Count >= 1, $"Expecting at least 1 span, only received {spans.Count}");
 
-                if (string.IsNullOrWhiteSpace(packageVersion) || new Version(packageVersion) >= new Version("2.0.0"))
+                if (PackageSupportsLogsInjection(packageVersion))
                 {
-                    ValidateLogCorrelation(spans, _log200FileTests, disableLogCorrelation: true);
+                    ValidateLogCorrelation(spans, _log200FileTests, packageVersion, disableLogCorrelation: true);
                 }
                 else
                 {
                     // We do not expect logs injection for Serilog versions < 2.0.0 so filter out all logs
-                    ValidateLogCorrelation(spans, _logPre200FileTests, disableLogCorrelation: true);
+                    ValidateLogCorrelation(spans, _logPre200FileTests, packageVersion, disableLogCorrelation: true);
                 }
             }
         }
+
+        private static bool PackageSupportsLogsInjection(string packageVersion)
+#if NETCOREAPP
+            // enabled in default version for .NET Core
+            => string.IsNullOrWhiteSpace(packageVersion) || new Version(packageVersion) >= new Version("2.0.0");
+#else
+            // disabled dor default version in .NET Framework
+            => !string.IsNullOrWhiteSpace(packageVersion) && new Version(packageVersion) >= new Version("2.0.0");
+#endif
     }
 }
