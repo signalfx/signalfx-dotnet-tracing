@@ -1,44 +1,48 @@
-# OpenTelemetry .NET Auto-Instrumentation
+# SignalFx Tracing Library for .NET
 
-[![Slack](https://img.shields.io/badge/slack-@cncf/otel--dotnet--auto--instr-brightgreen.svg?logo=slack)](https://cloud-native.slack.com/archives/C01NR1YLSE7)
+The SignalFx Tracing Library for .NET provides an
+OpenTracing-compatible tracer and automatically configured instrumentations
+for popular .NET libraries and frameworks.  It supports .NET Core 2.0+ on
+Linux and Windows and .NET Framework 4.5+ on Windows.
 
-This project provides a .NET tracer that leverages the .NET profiling APIs to support .NET instrumentation and auto-instrumentation without requiring code changes to an application.
+Where applicable, context propagation uses
+[B3 headers](https://github.com/openzipkin/b3-propagation).
+
+The SignalFx-Tracing Library for .NET implements the
+[Profiling API](https://docs.microsoft.com/en-us/dotnet/framework/unmanaged-api/profiling/)
+and should only require basic configuration of your application environment.
+
+You can link individual log entries with trace IDs and span IDs associated with
+corresponding events. If your application uses a supported logger, enable trace
+injection to automatically include trace context in your application's logs.
+For more information, see [Inject traces in logs](/customer-samples/AutomaticTraceIdInjection/README.md).
+
+## Supported libraries and frameworks
+
+There are [known .NET Core runtime issues](https://github.com/dotnet/coreclr/issues/18448)
+for version 2.1.0 and 2.1.2.
+
+| Library | Versions Supported | Notes |
+| ---     | ---                | ---   |
+| ADO.NET | Supported .NET versions | Disable sanitization of `db.statement` with `SIGNALFX_SANITIZE_SQL_STATEMENTS=false` (`true` by default) |
+| ASP.NET Core MVC | 2.0+ | `Microsoft.AspNet.Mvc.Core` NuGet and built-in packages.  Include additional applicable Diagnostic Listeners with `SIGNALFX_INSTRUMENTATION_ASPNETCORE_DIAGNOSTIC_LISTENERS='Listener.One,Listener.Two'` |
+| ASP.NET MVC on .NET Framework | `System.Web.Mvc` 4.x and 5.x | |
+| ASP.NET Web API 2 on .NET Framework | `System.Web.Http` 5.1+ | |
+| Confluent.Kafka | `Confluent.Kafka` NuGet [1.4.0, 2) | |
+| Elasticsearch.Net | `Elasticsearch.Net` NuGet 5.3 - 7.x | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES=false` (`true` by default, which may introduce overhead for direct streaming users). |
+| GraphQL | `GraphQL` NuGet [2.3, 3) | Currently only instruments validation and execution functionality. |
+| HttpClient | Supported .NET versions | by way of `System.Net.Http.HttpClientHandler` and `HttpMessageHandler` instrumentations |
+| MongoDB | `MongoDB.Driver.Core` NuGet 2.1.0+ | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS=false` (`true` by default). |
+| Npgsql | `Npqsql` NuGet 4.0+ | Provided via enhanced ADO.NET instrumentation |
+| RabbitMQ | `RabbitMQ.Client` NuGet [3.6.9, 7) | |
+| ServiceStack.Redis | `ServiceStack.Redis` NuGet 4.0+ | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS=false` (`true` by default). |
+| StackExchange.Redis | `StackExchange.Redis` NuGet 1.0+ | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS=false` (`true` by default). |
+| WCF (Server) | `System.ServiceModel` 4.x | Client requests using `WSHttpBinding` or `BasicHttpBinding` are instrumented via the `WebClient` instrumentation. There is no client-side span for `NetTcpBinding`. |
+| WebClient | Supported .NET versions | by way of `System.Net.WebRequest` instrumentation |
 
 ## Usage
 
 See [USAGE.md](USAGE.md) for installation, usage and configuration instructions.
-
-## Status
-
-This project is in the early stages of development starting with an initial seeding of code from the [.NET Tracer for Datadog APM](https://github.com/DataDog/dd-trace-dotnet). Our current goal is to take the seeded tracer and update it to both listen to and generate OpenTelemetry tracing data.
-
-For more details about the design and roadmap see [DESIGN.md](DESIGN.md).
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## Community Roles
-
-Maintainers ([@open-telemetry/dotnet-instrumentation-maintainers](https://github.com/orgs/open-telemetry/teams/dotnet-instrumentation-maintainers)):
-
-- [Chris Ventura](https://github.com/nrcventura), New Relic
-- [Greg Paperin](https://github.com/macrogreg), Datadog
-- [Paulo Janotti](https://github.com/pjanotti), Splunk
-- [Zach Montoya](https://github.com/zacharycmontoya), Datadog
-
-Approvers ([@open-telemetry/dotnet-instrumentation-approvers](https://github.com/orgs/open-telemetry/teams/dotnet-instrumentation-approvers)):
-
-- [Colin Higgins](https://github.com/colin-higgins), Datadog
-- [Kevin Gosse](https://github.com/kevingosse), Datadog
-- [Lucas Pimentel-Ordyna](https://github.com/lucaspimentel), Datadog
-- [Mike Goldsmith](https://github.com/MikeGoldsmith), HoneyComb
-- [Robert Pajak](https://github.com/pellared), Splunk
-- [Tony Redondo](https://github.com/tonyredondo), Datadog
-
-Learn more about roles in the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md).
-
-# Development
 
 ## Windows
 
@@ -102,10 +106,8 @@ The recommended approach for Linux is to build using Docker. You can use this ap
 
 ## Further Reading
 
-Datadog APM
-- [Datadog APM](https://docs.datadoghq.com/tracing/)
-- [Datadog APM - Tracing .NET Core and .NET 5 Applications](https://docs.datadoghq.com/tracing/setup_overview/setup/dotnet-core)
-- [Datadog APM - Tracing .NET Framework Applications](https://docs.datadoghq.com/tracing/setup_overview/setup/dotnet-framework)
+OpenTelemetry AutoInstrumentation
+- [OpenTelemetry AutoInstrumentation](https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation)
 
 Microsoft .NET Profiling APIs
 - [Profiling API](https://docs.microsoft.com/en-us/dotnet/framework/unmanaged-api/profiling/)

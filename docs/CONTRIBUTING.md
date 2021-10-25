@@ -1,47 +1,25 @@
 # Contributing
 
-[![Slack](https://img.shields.io/badge/slack-@cncf/otel--dotnet--auto--instr-brightgreen.svg?logo=slack)](https://cloud-native.slack.com/archives/C01NR1YLSE7)
+> Modified by SignalFx
 
-We'd love your help!
+## Development Container
 
-Please join our weekly [SIG meeting](https://github.com/open-telemetry/community#special-interest-groups) or get in touch on [Slack](https://cloud-native.slack.com/archives/C01NR1YLSE7).
+The repository contains configuration for [developing inside a Container](https://code.visualstudio.com/docs/remote/containers) using [Visual Studio Code Remote - Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers).
 
-Meeting notes are available as a public [Google
-doc](https://docs.google.com/document/d/1XedN2D8_PH4YLej-maT8sp4RKogfuhFpccRi3QpUcoI/edit?usp=sharing).
+- [Installation](https://code.visualstudio.com/docs/remote/containers#_installation) 
 
-## Report a bug
+The Development Container configuration mixes [Docker in Docker](https://github.com/microsoft/vscode-dev-containers/tree/master/containers/docker-in-docker) and [C# (.NET)](https://github.com/microsoft/vscode-dev-containers/tree/master/containers/dotnet) definitions. Use the [Official Development Container Definitions](https://github.com/microsoft/vscode-dev-containers) if more is needed.
 
-Reporting bugs is an important contribution. Please make sure to include:
+There may be a lot of errors, because some projects target .NET Framework. Switch to `Datadog.Trace.Minimal.sln` or `Datadog.Trace.Native.sln` using `F1 -> OmniSharp: Select Project` in Visual Studio Code to load a subset of projects which work without any issues. You can also try building the projects which have errors as it sometimes helps.
 
-* Expected and actual behavior
-* OpenTelemetry, OS, and .NET versions you are using
-* If possible, steps to reproduce
+If for whatever reason you need to use `Datadog.Trace.sln` you can run `for i in **/*.csproj; do dotnet build $i; done` to decrease the number of errors.
 
-## Request a feature
+## Releasing
 
-If you would like to work on something that is not listed as an issue
-(e.g. a new feature or enhancement) please first read our [DESIGN.md](DESIGN.md)
-to make sure your proposal aligns with the goals of the
-project, then create an issue and describe your proposal. 
-
-## How to contribute
-
-Please read the [contribution guide](https://github.com/open-telemetry/community/blob/main/CONTRIBUTING.md)
-and the [code of conduct](https://github.com/open-telemetry/community/blob/main/code-of-conduct.md).
-for general practices of the OpenTelemetry project.
-
-Select a good issue from the links below (ordered by difficulty/complexity):
-
-* [Good First Issue](https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
-* [Help Wanted](https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22)
-
-Comment on the issue that you want to work on so we can assign it to you and
-clarify anything related to it.
-
-If you would like to work on something that is not listed as an issue,
-please [request a feature](#request-a-feature) first.
-It is best to do this in advance so that maintainers can decide if the proposal is a good fit for
-this repository. This will help avoid situations when you spend significant time
-on something that maintainers may decide this repo is not the right place for.
-
-See [DEVELOPING.md](DEVELOPING.md) to get familiar with the development environment setup and usage.
+1. Update the desired version in [`Datadog.Core.Tools.TracerVersion`](../tools/Datadog.Core.Tools/TracerVersion.cs).
+2. In build container (`docker-compose run build bash`):
+    * `cd /project/tools/PrepareRelease`
+    * `dotnet run --project . versions`
+3. Submit a PR updating the version with the changes above.
+4. Approve and merge PR above.
+5. Publish a new GitHub Release and describe what has changed. CircleCI will automatically add artifacts and publish a new NuGet package.
