@@ -20,17 +20,25 @@ native_sufix() {
     esac
 }
 
+optional_dir() {
+    if [[ $(uname_os) = "windows" ]]; then
+        echo "win-x64/"
+    fi
+}
+
 SUFIX=$(native_sufix)
+
+OPT_DIR=$(optional_dir)
 
 # Enable .NET Framework Profiling API
 export COR_ENABLE_PROFILING="1"
 export COR_PROFILER="{918728DD-259F-4A6A-AC2B-B85E1B658318}"
-export COR_PROFILER_PATH="${PWD}/tracer/bin/tracer-home/OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.${SUFIX}"
+export COR_PROFILER_PATH="${PWD}/tracer/bin/tracer-home/${OPT_DIR}OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.${SUFIX}"
 
 # Enable .NET Core Profiling API
 export CORECLR_ENABLE_PROFILING="1"
 export CORECLR_PROFILER="{918728DD-259F-4A6A-AC2B-B85E1B658318}"
-export CORECLR_PROFILER_PATH="${PWD}/tracer/bin/tracer-home/OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.${SUFIX}"
+export CORECLR_PROFILER_PATH="${PWD}/tracer/bin/tracer-home/${OPT_DIR}OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.${SUFIX}"
 
 # Configure OpenTelemetry Tracer 
 export SIGNALFX_DOTNET_TRACER_HOME="${PWD}/tracer/bin/tracer-home"
