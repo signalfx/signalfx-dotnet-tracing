@@ -1,5 +1,7 @@
 # Releasing
 
+<!-- TODO update this section when working on generating the deliverables story -->
+
 1. Update the desired version in [`Datadog.Core.Tools.TracerVersion`](../tools/Datadog.Core.Tools/TracerVersion.cs).
 2. In build container (`docker-compose run build bash`):
     * `cd /project/tools/PrepareRelease`
