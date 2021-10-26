@@ -25,9 +25,16 @@ processors:
 exporters:
   logging:
     logLevel: debug
+
+  zipkin:
+    endpoint: https://ingest.us0.signalfx.com/v2/trace
+    headers:
+      # Splunk Observability Cloud accepts Basic auth where user=auth and password=access-token
+      Authorization: Basic ${SPLUNK_AUTH_TOKEN}
   jaeger:
     endpoint: jaeger:14250
-    insecure: true
+    tls:
+      insecure: true
   prometheus:
     endpoint: "0.0.0.0:8889"
     namespace: promexample
@@ -39,7 +46,7 @@ service:
     traces:
       receivers: [otlp, opencensus, jaeger, zipkin]
       processors: [batch]
-      exporters: [logging, jaeger]
+      exporters: [logging, jaeger, zipkin]
     metrics:
       receivers: [otlp, opencensus]
       processors: [batch]
