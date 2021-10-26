@@ -14,7 +14,7 @@ Because of [Mono missing features](https://github.com/OmniSharp/omnisharp-vscode
 
 There may be a lot of errors, because some projects target .NET Framework. Switch to `Datadog.Trace.Minimal.sln` using `F1` -> `OmniSharp: Select Project` in Visual Studio Code to load a subset of projects which work without any issues. You can also try building the projects which have errors as it sometimes helps.
 
-If for whatever reason you need to use `Datadog.Trace.sln` you can run `for i in **/*.csproj; do dotnet build $i; done` to decrease the number of errors.
+If for whatever reason you need to use `Datadog.Trace.sln` you can run `nuke BuildTracerHome` to decrease the number of errors.
 
 ## Testing environment
 
