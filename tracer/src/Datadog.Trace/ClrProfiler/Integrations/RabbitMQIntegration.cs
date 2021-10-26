@@ -883,7 +883,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
                 span.Type = SpanTypes.Queue;
                 span.LogicScope = "amqp.command";
-                span.ResourceName = operationName;
+                span.ResourceName = command;
 
                 // Network tags
                 // TODO: tags.PeerName = "";
@@ -908,6 +908,8 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
                 // RabbitMq Tags
                 tags.InstrumentationName = IntegrationName;
+                tags.Queue = queue;
+                tags.Exchange = exchange;
                 tags.Command = command;
                 tags.RoutingKey = routingKey;
 

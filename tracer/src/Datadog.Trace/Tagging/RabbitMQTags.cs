@@ -17,6 +17,8 @@ namespace Datadog.Trace.Tagging
                 new Property<RabbitMQTags, string>(Tags.InstrumentationName, t => t.InstrumentationName, (t, v) => t.InstrumentationName = v), // Non OTel compliant tag
                 new Property<RabbitMQTags, string>(Tags.AmqpCommand, t => t.Command, (t, v) => t.Command = v), // Non OTel compliant tag
                 new Property<RabbitMQTags, string>(Tags.AmqpDeliveryMode, t => t.DeliveryMode, (t, v) => t.DeliveryMode = v), // Non OTel compliant tag
+                new Property<RabbitMQTags, string>(Tags.AmqpExchange, t => t.Exchange, (t, v) => t.Exchange = v), // Non OTel compliant tag
+                new Property<RabbitMQTags, string>(Tags.AmqpQueue, t => t.Queue, (t, v) => t.Queue = v), // Non OTel compliant tag
                 new Property<RabbitMQTags, string>(Tags.RabbitMq.RoutingKey, t => t.RoutingKey, (t, v) => t.RoutingKey = v));
 
         private string _spanKind;
@@ -39,6 +41,10 @@ namespace Datadog.Trace.Tagging
         public string Command { get; set; }
 
         public string DeliveryMode { get; set; }
+
+        public string Exchange { get; set; }
+
+        public string Queue { get; set; }
 
         public string RoutingKey { get; set; }
 
