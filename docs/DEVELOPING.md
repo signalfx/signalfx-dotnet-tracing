@@ -26,7 +26,7 @@ You can do this by executing following command in Bash,
 where a value for `$SPLUNK_ACCESS_TOKEN` can be found [here](https://app.signalfx.com/o11y/#/organization/current?selectedKeyValue=sf_section:accesstokens).
 
 ```sh
-export SPLUNK_ACCESS_TOKEN=$(echo -n "auth:$SPLUNK_ACCESS_TOKEN" | base64)
+export SPLUNK_AUTH_TOKEN=$(echo -n "auth:$SPLUNK_ACCESS_TOKEN" | base64)
 ```
 
 You can run the services using:
