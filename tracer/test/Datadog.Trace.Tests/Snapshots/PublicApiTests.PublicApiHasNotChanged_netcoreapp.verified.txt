@@ -360,9 +360,9 @@ namespace Datadog.Trace
         public const string HttpUrl = "http.url";
         public const string InstrumentationName = "component";
         public const string InstrumentedMethod = "instrumented.method";
-        public const string KafkaOffset = "kafka.offset";
-        public const string KafkaPartition = "kafka.partition";
-        public const string KafkaTombstone = "kafka.tombstone";
+        public const string KafkaOffset = "messaging.kafka.offset";
+        public const string KafkaPartition = "messaging.kafka.partition";
+        public const string KafkaTombstone = "messaging.kafka.tombstone";
         public const string Language = "language";
         public const string ManualDrop = "manual.drop";
         public const string ManualKeep = "manual.keep";
