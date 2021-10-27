@@ -1,15 +1,14 @@
-#####################################################
-#
-# List of approvers for OpenTelemetry .NET Instrumentation
-#
-#####################################################
-#
-# Learn about membership in OpenTelemetry community:
-#  https://github.com/open-telemetry/community/blob/main/community-membership.md
-# 
-#
-# Learn about CODEOWNERS file format: 
-#  https://help.github.com/en/articles/about-code-owners
-#
+* @signalfx/gdi-dotnet-approvers
 
-* @open-telemetry/dotnet-instrumentation-approvers
+CODEOWNERS @signalfx/gdi-dotnet-maintainers
+
+#####################################################
+#
+# Docs reviewers
+#
+#####################################################
+
+*.md @signalfx/gdi-docs @signalfx/gdi-dotnet-approvers
+*.rst @signalfx/gdi-docs @signalfx/gdi-dotnet-approvers
+docs/ @signalfx/gdi-docs @signalfx/gdi-dotnet-approvers
+README* @signalfx/gdi-docs @signalfx/gdi-dotnet-approvers
