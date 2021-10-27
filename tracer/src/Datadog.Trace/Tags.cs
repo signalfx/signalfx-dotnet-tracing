@@ -71,19 +71,39 @@ namespace Datadog.Trace
         public const string HttpStatusCode = "http.status_code";
 
         /// <summary>
+        /// Whether a span denotes an error.
+        /// </summary>
+        /// <remarks>
+        /// Upstream does not have this tag, this is needed to better align with SFx.
+        /// </remarks>
+        public const string Error = "error";
+
+        /// <summary>
         /// The error message of an exception
         /// </summary>
-        public const string ErrorMsg = "error.msg";
+        /// <remarks>
+        /// Upstream uses "error.msg", however, to better align with SFx we use
+        /// "sfx.error.message" instead.
+        /// </remarks>
+        public const string ErrorMsg = "sfx.error.message";
 
         /// <summary>
         /// The type of an exception
         /// </summary>
-        public const string ErrorType = "error.type";
+        /// <remarks>
+        /// Upstream uses "error.type", however, to better align with SFx we use
+        /// "sfx.error.kind" instead.
+        /// </remarks>
+        public const string ErrorType = "sfx.error.kind";
 
         /// <summary>
         /// The stack trace of an exception
         /// </summary>
-        public const string ErrorStack = "error.stack";
+        /// <remarks>
+        /// Upstream uses "error.stack", however, to better align with SFx we use
+        /// "sfx.error.stack" instead.
+        /// </remarks>
+        public const string ErrorStack = "sfx.error.stack";
 
         /// <summary>
         /// The type of database (e.g. mssql, mysql)
@@ -224,7 +244,7 @@ namespace Datadog.Trace
         /// </summary>
         public const string AmqpQueue = "amqp.queue";
 
-        /// <summary>
+        /// <summary>"error
         /// The delivery mode of the AMQP message.
         /// </summary>
         public const string AmqpDeliveryMode = "amqp.delivery_mode";
