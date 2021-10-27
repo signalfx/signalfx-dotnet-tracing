@@ -9,6 +9,6 @@ CODEOWNERS @signalfx/gdi-dotnet-maintainers
 #####################################################
 
 *.md @signalfx/gdi-docs @signalfx/gdi-dotnet-approvers
-*.rst @signalfx/gdi-docs@signalfx/gdi-dotnet-approvers
+*.rst @signalfx/gdi-docs @signalfx/gdi-dotnet-approvers
 docs/ @signalfx/gdi-docs @signalfx/gdi-dotnet-approvers
 README* @signalfx/gdi-docs @signalfx/gdi-dotnet-approvers
