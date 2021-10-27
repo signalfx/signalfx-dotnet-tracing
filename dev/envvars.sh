@@ -40,13 +40,14 @@ export CORECLR_ENABLE_PROFILING="1"
 export CORECLR_PROFILER="{918728DD-259F-4A6A-AC2B-B85E1B658318}"
 export CORECLR_PROFILER_PATH="${PWD}/tracer/bin/tracer-home/${OPT_DIR}OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.${SUFIX}"
 
-# Configure OpenTelemetry Tracer 
+# Configure SFx .NET Tracer 
 export SIGNALFX_DOTNET_TRACER_HOME="${PWD}/tracer/bin/tracer-home"
 export SIGNALFX_INTEGRATIONS="${PWD}/tracer/integrations.json"
 export SIGNALFX_VERSION="1.0.0"
-export SIGNALFX_TRACE_AGENT_URL="http://localhost:9411/api/v2/spans"
+export SIGNALFX_TRACE_AGENT_URL=${SIGNALFX_TRACE_AGENT_URL:-"http://localhost:9411/api/v2/spans"}
 export SIGNALFX_TRACE_DEBUG="1"
 export SIGNALFX_EXPORTER="Zipkin"
 export SIGNALFX_DUMP_ILREWRITE_ENABLED="0"
 export SIGNALFX_CLR_ENABLE_INLINING="1"
 export SIGNALFX_CONVENTION="OpenTelemetry"
+export SIGNALFX_ENV=${SIGNALFX_ENV:-$(whoami)}
