@@ -244,7 +244,7 @@ namespace Datadog.Trace
         /// </summary>
         public const string AmqpQueue = "amqp.queue";
 
-        /// <summary>"error
+        /// <summary>
         /// The delivery mode of the AMQP message.
         /// </summary>
         public const string AmqpDeliveryMode = "amqp.delivery_mode";
