@@ -66,8 +66,6 @@ namespace Datadog.Trace.Agent.Jaeger
                 case StatusCode.Error:
                     PooledList<JaegerTag>.Add(ref list, new JaegerTag("error", JaegerTagType.BOOL, vBool: true));
                     PooledList<JaegerTag>.Add(ref list, new JaegerTag("otel.status_code", JaegerTagType.STRING, vStr: "ERROR"));
-                    // var description = span.Status.Description ?? string.Empty;
-                    // PooledList<JaegerTag>.Add(ref list, new JaegerTag("otel.status_description", JaegerTagType.STRING, vStr: description));
                     break;
             }
 
