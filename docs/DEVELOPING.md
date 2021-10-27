@@ -51,7 +51,7 @@ The following Web UI endpoints are exposed:
 Example usage:
 
 ```sh
-./dev/instrument.sh dotnet run -f netcoreapp3.1 -p ./samples/ConsoleApp/ConsoleApp.csproj
+./dev/instrument.sh dotnet run -f netcoreapp3.1 -p ./tracer/samples/ConsoleApp/ConsoleApp.csproj
 ```
 
  [`dev/envvars.sh`](../dev/envvars.sh) can be used to export profiler
@@ -61,7 +61,7 @@ Example usage:
 
  ```sh
  source ./dev/envvars.sh
- ./samples/ConsoleApp/bin/Debug/netcoreapp3.1/ConsoleApp
+ ./tracer/samples/ConsoleApp/bin/Debug/netcoreapp3.1/ConsoleApp
  ```
 
 Confiugration to send data directly to Splunk Observability Cloud:
