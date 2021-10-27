@@ -45,17 +45,28 @@ The following Web UI endpoints are exposed:
 
 > *Caution:* Make sure that before usage you have build the tracer.
 
-[`dev/instrument.sh`](../dev/instrument.sh) helps to run a command with .NET instrumentation in your shell (e.g. bash, zsh, git bash) .
+[`dev/instrument.sh`](../dev/instrument.sh) helps to run a command with
+.NET instrumentation in your shell (e.g. bash, zsh, git bash) .
 
 Example usage:
 
 ```sh
-./dev/instrument.sh dotnet run -f netcoreapp3.1 -p ./samples/ConsoleApp/ConsoleApp.csproj
+./dev/instrument.sh dotnet run -f netcoreapp3.1 -p ./tracer/samples/ConsoleApp/ConsoleApp.csproj
 ```
 
- [`dev/envvars.sh`](../dev/envvars.sh) can be used to export profiler environmental variables to your current shell session. **It has to be executed from the root of this repository**. Example usage:
+ [`dev/envvars.sh`](../dev/envvars.sh) can be used to export profiler
+ environmental variables to your current shell session.
+ **It has to be executed from the root of this repository**.
+ Example usage:
 
  ```sh
  source ./dev/envvars.sh
- ./samples/ConsoleApp/bin/Debug/netcoreapp3.1/ConsoleApp
+ ./tracer/samples/ConsoleApp/bin/Debug/netcoreapp3.1/ConsoleApp
  ```
+
+Confiugration to send data directly to Splunk Observability Cloud:
+
+ ```sh
+export SIGNALFX_ACCESS_TOKEN=secret
+export SIGNALFX_TRACE_AGENT_URL=https://ingest.us0.signalfx.com/v2/trace
+```
