@@ -232,17 +232,29 @@ namespace Datadog.Trace
         /// <summary>
         /// The partition associated with a record
         /// </summary>
-        public const string KafkaPartition = "kafka.partition";
+        /// <remarks>
+        /// Upstream uses "kafka.partition", however, to better align with OpenTelemetry we use
+        /// "messaging.kafka.partition" instead.
+        /// </remarks>
+        public const string KafkaPartition = "messaging.kafka.partition";
 
         /// <summary>
         /// The offset inside a partition associated with a record
         /// </summary>
-        public const string KafkaOffset = "kafka.offset";
+        /// <remarks>
+        /// Upstream uses "kafka.offset", however, to better align with OpenTelemetry we use
+        /// "messaging.kafka.offset" instead.
+        /// </remarks>
+        public const string KafkaOffset = "messaging.kafka.offset";
 
         /// <summary>
         /// Whether the record was a "tombstone" record
         /// </summary>
-        public const string KafkaTombstone = "kafka.tombstone";
+        /// <remarks>
+        /// Upstream uses "kafka.tombstone", however, to better align with OpenTelemetry we use
+        /// "messaging.kafka.tombstone" instead.
+        /// </remarks>
+        public const string KafkaTombstone = "messaging.kafka.tombstone";
 
         /// <summary>
         /// The size of the message.
@@ -320,6 +332,12 @@ namespace Datadog.Trace
         /// Language tag, applied to root spans that are .NET runtime (e.g., ASP.NET)
         /// </summary>
         public const string Language = "language";
+
+        /// <summary>
+        /// The runtime family tag, it will be placed on the service entry span, the first span opened for a
+        /// service. For this library it will always have the value "dotnet".
+        /// </summary>
+        public const string RuntimeFamily = "_dd.runtime_family";
 
         /// <summary>
         /// The resource ID of the site instance in Azure App Services where the traced application is running.
@@ -433,6 +451,11 @@ namespace Datadog.Trace
         /// </summary>
         public const string CosmosDbContainer = "cosmosdb.container";
 
+        /// <summary>
+        /// If a span was involved with an application security event
+        /// </summary>
+        public const string AppSecEvent = "appsec.event";
+
         internal const string ElasticsearchAction = "elasticsearch.action";
 
         internal const string ElasticsearchMethod = "elasticsearch.method";
@@ -446,5 +469,7 @@ namespace Datadog.Trace
         internal const string AerospikeNamespace = "aerospike.namespace";
 
         internal const string AerospikeSetName = "aerospike.setname";
+
+        internal const string AerospikeUserKey = "aerospike.userkey";
     }
 }

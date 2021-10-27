@@ -22,7 +22,9 @@ namespace Datadog.Trace.Configuration
         public const string AgentUri = "SIGNALFX_TRACE_AGENT_URL";
         public const string ApiKey = "SIGNALFX_API_KEY";
         public const string AppSecBlockingEnabled = "SIGNALFX_APPSEC_BLOCKING_ENABLED";
+        public const string AppSecCustomIpHeader = "SIGNALFX_APPSEC_IPHEADER";
         public const string AppSecEnabled = "SIGNALFX_APPSEC_ENABLED";
+        public const string AppSecExtraHeaders = "SIGNALFX_APPSEC_EXTRA_HEADERS";
         public const string AppSecRules = "SIGNALFX_APPSEC_RULES";
         public const string BufferSize = "SIGNALFX_TRACE_BUFFER_SIZE";
         public const string CIVisibilityEnabled = "SIGNALFX_CIVISIBILITY_ENABLED";
@@ -204,6 +206,7 @@ namespace Datadog.Trace
         AutoReject = 0,
         AutoKeep = 1,
         UserKeep = 2,
+        AppSecKeep = 4,
     }
     public class Scope : System.IDisposable
     {
@@ -268,6 +271,7 @@ namespace Datadog.Trace
         public const string AmqpQueue = "amqp.queue";
         public const string AmqpRoutingKey = "amqp.routing_key";
         public const string Analytics = "_dd1.sr.eausr";
+        public const string AppSecEvent = "appsec.event";
         public const string AspNetAction = "aspnet.action";
         public const string AspNetArea = "aspnet.area";
         public const string AspNetController = "aspnet.controller";
@@ -319,9 +323,9 @@ namespace Datadog.Trace
         public const string HttpUrl = "http.url";
         public const string InstrumentationName = "component";
         public const string InstrumentedMethod = "instrumented.method";
-        public const string KafkaOffset = "kafka.offset";
-        public const string KafkaPartition = "kafka.partition";
-        public const string KafkaTombstone = "kafka.tombstone";
+        public const string KafkaOffset = "messaging.kafka.offset";
+        public const string KafkaPartition = "messaging.kafka.partition";
+        public const string KafkaTombstone = "messaging.kafka.tombstone";
         public const string Language = "language";
         public const string ManualDrop = "manual.drop";
         public const string ManualKeep = "manual.keep";
@@ -337,6 +341,7 @@ namespace Datadog.Trace
         public const string OutHost = "out.host";
         public const string OutPort = "out.port";
         public const string RedisRawCommand = "redis.raw_command";
+        public const string RuntimeFamily = "_dd.runtime_family";
         public const string SamplingPriority = "sampling.priority";
         public const string SpanKind = "span.kind";
         public const string SqlQuery = "sql.query";

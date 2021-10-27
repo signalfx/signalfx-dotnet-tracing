@@ -5,9 +5,10 @@
     * Look at previous catchup PR comment and record the sha of the last commit on upstream, let's call it <fst_sha>
     * Look at the last commit on upstream, eg.: git log --oneline upstream/master, let's call it <last_sha>
 3. If needed to squash to pass CLA check:
-    * Add an empty commit and save its sha (squash_sha): `git commit --allow-empty -m "Catchup to upstream"`
+    * Add an empty commit and save its sha (squash_sha): `git commit --allow-empty -m "Upstream sync <fst_sha>..<last_sha>"`
 4. `git cherry-pick fst_sha..last_sha`
-    * Resolve each conflict and `git cherry-pick --continue` every time that one is resolved
+    * Resolve each conflict, suggestion: run `dotnet build` for the affected projects to confirm that the resolution is good.
+    * Run `git cherry-pick --continue` every time that a conflict is resolved
 5. Build and fix any integration issues:
     * New usages of env vars, reg ex: ^[^#].*[^A-Z]DD_
     * Old profiler ID: `846F5F1C-F9AE-4B07-969E-05C26BC060D8` (happens in launch.settings for new apps) use `918728DD-259F-4A6A-AC2B-B85E1B658318` instead.
