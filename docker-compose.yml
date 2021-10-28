@@ -298,6 +298,7 @@ services:
       - baseImage=${baseImage:-default}
       - SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN:-0}
       - TestAllPackageVersions=${TestAllPackageVersions:-false}
+      - IncludeMinorPackageVersions=${IncludeMinorPackageVersions:-false}
       - MONGO_HOST=mongo
       - SERVICESTACK_REDIS_HOST=servicestackredis:6379
       - STACKEXCHANGE_REDIS_HOST=stackexchangeredis:6379
@@ -370,6 +371,7 @@ services:
       - framework=${framework:-netcoreapp3.1}
       - baseImage=${baseImage:-debian}
       - TestAllPackageVersions=${TestAllPackageVersions:-false}
+      - IncludeMinorPackageVersions=${IncludeMinorPackageVersions:-false}
       - SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN:-0}
       - MONGO_HOST=mongo_arm64
       - SERVICESTACK_REDIS_HOST=servicestackredis_arm64:6379
