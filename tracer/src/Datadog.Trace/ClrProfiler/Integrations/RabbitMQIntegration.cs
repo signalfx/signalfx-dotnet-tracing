@@ -872,13 +872,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 Span parent = tracer.ActiveScope?.Span;
 
                 tags = new RabbitMQTags(spanKind);
-                string serviceName = tracer.Settings.GetServiceName(tracer, SystemName);
                 string operation = CommandToOperation(command);
                 string operationName = string.IsNullOrWhiteSpace(exchange)
                     ? operation
                     : $"{exchange} {operation}";
 
-                scope = tracer.StartActiveWithTags(operationName, parent: parentContext, tags: tags, serviceName: serviceName, startTime: startTime);
+                scope = tracer.StartActiveWithTags(operationName, parent: parentContext, tags: tags, startTime: startTime);
                 var span = scope.Span;
 
                 span.Type = SpanTypes.Queue;

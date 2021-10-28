@@ -36,6 +36,8 @@ namespace Datadog.Trace.Tagging
             _spanKind = spanKind;
         }
 
+        public override string SpanKind => _spanKind;
+
         public string InstrumentationName { get; set; }
 
         public string Command { get; set; }
@@ -44,11 +46,9 @@ namespace Datadog.Trace.Tagging
 
         public string Exchange { get; set; }
 
-        public string Queue { get; set; }
-
         public string RoutingKey { get; set; }
 
-        public override string SpanKind => _spanKind;
+        public string Queue { get; set; }
 
         protected override IProperty<string>[] GetAdditionalTags() => RabbitMQTagsProperties;
     }
