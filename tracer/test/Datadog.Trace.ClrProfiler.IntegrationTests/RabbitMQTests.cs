@@ -19,7 +19,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 {
     public class RabbitMQTests : TestHelper
     {
-        private const string ExpectedServiceName = "Samples.RabbitMQ-rabbitmq";
+        private const string ExpectedServiceName = "Samples.RabbitMQ";
 
         public RabbitMQTests(ITestOutputHelper output)
             : base("RabbitMQ", output)
