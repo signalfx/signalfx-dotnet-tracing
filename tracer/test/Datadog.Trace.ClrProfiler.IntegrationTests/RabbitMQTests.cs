@@ -62,15 +62,15 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 var spans = agent.WaitForSpans(expectedSpanCount); // Do not filter on operation name because they will vary depending on instrumented method
                 Assert.True(spans.Count >= expectedSpanCount, $"Expecting at least {expectedSpanCount} spans, only received {spans.Count}");
 
-                var rabbitmqSpans = spans.Where(span => string.Equals(span.Service, ExpectedServiceName, StringComparison.OrdinalIgnoreCase));
-                var manualSpans = spans.Where(span => !string.Equals(span.Service, ExpectedServiceName, StringComparison.OrdinalIgnoreCase));
+                var rabbitmqSpans = spans.Where(span => span.Tags.ContainsKey(Tags.InstrumentationName));
+                var manualSpans = spans.Where(span => !span.Tags.ContainsKey(Tags.InstrumentationName));
 
                 foreach (var span in rabbitmqSpans)
                 {
                     Assert.Equal(SpanTypes.Queue, span.Type);
                     Assert.Equal("rabbitmq", span.Tags[Tags.Messaging.System]);
                     Assert.Equal("RabbitMQ", span.Tags[Tags.InstrumentationName]);
-                    Assert.False(span.Tags?.ContainsKey(Tags.Version), "External service span should not have service version tag.");
+                    Assert.Equal(ExpectedServiceName, span.Service);
 
                     span.Tags.TryGetValue(Tags.AmqpCommand, out string command);
                     Assert.NotNull(command);
@@ -224,7 +224,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 foreach (var span in manualSpans)
                 {
-                    Assert.Equal("Samples.RabbitMQ", span.Service);
+                    Assert.Equal(ExpectedServiceName, span.Service);
                     Assert.Equal("1.0.0", span.Tags[Tags.Version]);
                 }
             }
