@@ -61,7 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="banner.bmp" />
-    <Content Include="datadog-icon.ico" />
+    <Content Include="sfx-icon.ico" />
     <Content Include="dialog.bmp" />
     <Content Include="Config.wxi" />
     <Content Include="license.rtf" />

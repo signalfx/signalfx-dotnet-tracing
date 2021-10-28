@@ -288,7 +288,7 @@ namespace PrepareRelease
 
         private string AssemblyString(string versionText)
         {
-            return $"OpenTelemetry.AutoInstrumentation, Version={versionText}.0, Culture=neutral, PublicKeyToken=34b8972644a12429";
+            return $"SignalFx.Instrumentation, Version={versionText}.0, Culture=neutral, PublicKeyToken=e43a27c2023d388a";
         }
     }
 }

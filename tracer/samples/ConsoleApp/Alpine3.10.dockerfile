@@ -24,7 +24,7 @@ RUN curl -L https://github.com/signalfx/signalfx-dotnet-tracing/releases/downloa
 
 ENV CORECLR_ENABLE_PROFILING=1
 ENV CORECLR_PROFILER={918728DD-259F-4A6A-AC2B-B85E1B658318}
-ENV CORECLR_PROFILER_PATH=/opt/signalfx/OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.so
+ENV CORECLR_PROFILER_PATH=/opt/signalfx/SignalFx.Instrumentation.ClrProfiler.Native.so
 ENV SIGNALFX_INTEGRATIONS=/opt/signalfx/integrations.json
 ENV SIGNALFX_DOTNET_TRACER_HOME=/opt/signalfx
 

@@ -42,8 +42,8 @@ partial class Build
 
     readonly IEnumerable<string> GacProjects = new []
     {
-        "OpenTelemetry.AutoInstrumentation",
-        "OpenTelemetry.AutoInstrumentation.AspNet"
+        "SignalFx.Instrumentation",
+        "SignalFx.Instrumentation.AspNet"
     };
 
     Target GacAdd => _ => _
@@ -95,8 +95,8 @@ partial class Build
             // Override environment variables
             envVars["COR_ENABLE_PROFILING"] = "1";
             envVars["COR_PROFILER"] = "{918728DD-259F-4A6A-AC2B-B85E1B658318}";
-            envVars["COR_PROFILER_PATH_64"] = TracerHomeDirectory / "win-x64" / "OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dll";
-            envVars["COR_PROFILER_PATH_32"] = TracerHomeDirectory / "win-x86" / "OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dll";
+            envVars["COR_PROFILER_PATH_64"] = TracerHomeDirectory / "win-x64" / "SignalFx.Instrumentation.ClrProfiler.Native.dll";
+            envVars["COR_PROFILER_PATH_32"] = TracerHomeDirectory / "win-x86" / "SignalFx.Instrumentation.ClrProfiler.Native.dll";
             envVars["SIGNALFX_INTEGRATIONS"] = TracerHomeDirectory / "integrations.json";
             envVars["SIGNALFX_DOTNET_TRACER_HOME"] = TracerHomeDirectory;
 
@@ -125,8 +125,8 @@ partial class Build
             {
                 {"COR_ENABLE_PROFILING", "1"},
                 {"COR_PROFILER", "{918728DD-259F-4A6A-AC2B-B85E1B658318}"},
-                {"COR_PROFILER_PATH_32", TracerHomeDirectory / "win-x86" / "OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dll"},
-                {"COR_PROFILER_PATH_64", TracerHomeDirectory / "win-x64" / "OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dll"},
+                {"COR_PROFILER_PATH_32", TracerHomeDirectory / "win-x86" / "SignalFx.Instrumentation.ClrProfiler.Native.dll"},
+                {"COR_PROFILER_PATH_64", TracerHomeDirectory / "win-x64" / "SignalFx.Instrumentation.ClrProfiler.Native.dll"},
                 {"CORECLR_ENABLE_PROFILING", "1"},
                 {"CORECLR_PROFILER", "{918728DD-259F-4A6A-AC2B-B85E1B658318}"},
                 {"SIGNALFX_INTEGRATIONS", TracerHomeDirectory / "integrations.json" },
@@ -136,12 +136,12 @@ partial class Build
 
             if (IsWin)
             {
-                envVars.Add("CORECLR_PROFILER_PATH_32", TracerHomeDirectory / "win-x86" / "OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dll");
-                envVars.Add("CORECLR_PROFILER_PATH_64", TracerHomeDirectory / "win-x64" / "OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dll");
+                envVars.Add("CORECLR_PROFILER_PATH_32", TracerHomeDirectory / "win-x86" / "SignalFx.Instrumentation.ClrProfiler.Native.dll");
+                envVars.Add("CORECLR_PROFILER_PATH_64", TracerHomeDirectory / "win-x64" / "SignalFx.Instrumentation.ClrProfiler.Native.dll");
             }
             else
             {
-                envVars.Add("CORECLR_PROFILER_PATH", TracerHomeDirectory / "OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.so");
+                envVars.Add("CORECLR_PROFILER_PATH", TracerHomeDirectory / "SignalFx.Instrumentation.ClrProfiler.Native.so");
             }
 
             if (ExtraEnvVars?.Length > 0)

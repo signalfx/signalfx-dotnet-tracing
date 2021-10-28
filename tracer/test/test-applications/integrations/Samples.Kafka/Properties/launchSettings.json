@@ -6,11 +6,11 @@
         "SIGNALFX_DOTNET_TRACER_HOME": "$(SolutionDir)tracer\\bin\\tracer-home",
         "COR_ENABLE_PROFILING": "1",
         "CORECLR_ENABLE_PROFILING": "1",
-        "COR_PROFILER_PATH": "$(SolutionDir)tracer\\bin\\tracer-home\\win-$(Platform)\\OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dll",
+        "COR_PROFILER_PATH": "$(SolutionDir)tracer\\bin\\tracer-home\\win-$(Platform)\\SignalFx.Instrumentation.ClrProfiler.Native.dll",
         "CORECLR_PROFILER": "{918728DD-259F-4A6A-AC2B-B85E1B658318}",
         "SIGNALFX_TRACE_CALLTARGET_ENABLED": "1",
         "SIGNALFX_INTEGRATIONS": "$(SolutionDir)tracer\\bin\\tracer-home\\integrations.json",
-        "CORECLR_PROFILER_PATH": "$(SolutionDir)tracer\\bin\\tracer-home\\win-$(Platform)\\OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dll",
+        "CORECLR_PROFILER_PATH": "$(SolutionDir)tracer\\bin\\tracer-home\\win-$(Platform)\\SignalFx.Instrumentation.ClrProfiler.Native.dll",
         "COR_PROFILER": "{918728DD-259F-4A6A-AC2B-B85E1B658318}"
       },
       "nativeDebugging": true

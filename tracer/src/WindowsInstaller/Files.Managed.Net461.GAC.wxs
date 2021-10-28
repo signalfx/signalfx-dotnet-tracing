@@ -7,20 +7,20 @@
     <ComponentGroup Id="Files.Managed.Net461.GAC" Directory="net461.GAC">
       <Component Win64="$(var.Win64)">
         <Condition>WIX_IS_NETFRAMEWORK_461_OR_LATER_INSTALLED</Condition>
-        <File Id="net461_GAC_OpenTelemetry.AutoInstrumentation.AspNet.dll"
-              Source="$(var.TracerHomeDirectory)\net461\OpenTelemetry.AutoInstrumentation.AspNet.dll"
+        <File Id="net461_GAC_SignalFx.Instrumentation.AspNet.dll"
+              Source="$(var.TracerHomeDirectory)\net461\SignalFx.Instrumentation.AspNet.dll"
               KeyPath="yes" Checksum="yes" Assembly=".net"/>
       </Component>
       <Component Win64="$(var.Win64)">
         <Condition>WIX_IS_NETFRAMEWORK_461_OR_LATER_INSTALLED</Condition>
-        <File Id="net461_GAC_OpenTelemetry.AutoInstrumentation.dll"
-              Source="$(var.TracerHomeDirectory)\net461\OpenTelemetry.AutoInstrumentation.dll"
+        <File Id="net461_GAC_SignalFx.Instrumentation.dll"
+              Source="$(var.TracerHomeDirectory)\net461\SignalFx.Instrumentation.dll"
               KeyPath="yes" Checksum="yes" Assembly=".net"/>
       </Component>
       <Component Win64="$(var.Win64)">
         <Condition>WIX_IS_NETFRAMEWORK_461_OR_LATER_INSTALLED</Condition>
-        <File Id="net461_GAC_OpenTelemetry.AutoInstrumentation.MSBuild.dll"
-              Source="$(var.TracerHomeDirectory)\net461\OpenTelemetry.AutoInstrumentation.MSBuild.dll"
+        <File Id="net461_GAC_SignalFx.Instrumentation.MSBuild.dll"
+              Source="$(var.TracerHomeDirectory)\net461\SignalFx.Instrumentation.MSBuild.dll"
               KeyPath="yes" Checksum="yes" Assembly=".net"/>
       </Component>
     </ComponentGroup>
