@@ -29,10 +29,10 @@ if ($env:os -eq "Windows_NT")
         $signalfx_tracer_home = "$signalfx_tracer_workingfolder\release"
     }
 
-    $signalfx_tracer_msbuild = "$signalfx_tracer_home\netstandard2.0\OpenTelemetry.AutoInstrumentation.MSBuild.dll"
+    $signalfx_tracer_msbuild = "$signalfx_tracer_home\netstandard2.0\SignalFx.Instrumentation.MSBuild.dll"
     $signalfx_tracer_integrations = "$signalfx_tracer_home\integrations.json"
-    $signalfx_tracer_profiler_32 = "$signalfx_tracer_home\win-x86\OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dll"
-    $signalfx_tracer_profiler_64 = "$signalfx_tracer_home\win-x64\OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dll"
+    $signalfx_tracer_profiler_32 = "$signalfx_tracer_home\win-x86\SignalFx.Instrumentation.ClrProfiler.Native.dll"
+    $signalfx_tracer_profiler_64 = "$signalfx_tracer_home\win-x64\SignalFx.Instrumentation.ClrProfiler.Native.dll"
 } 
 else 
 {
@@ -56,9 +56,9 @@ else
         $signalfx_tracer_home = "$signalfx_tracer_workingfolder/release"
     }
 
-    $signalfx_tracer_msbuild = "$signalfx_tracer_home/netstandard2.0/OpenTelemetry.AutoInstrumentation.MSBuild.dll"
+    $signalfx_tracer_msbuild = "$signalfx_tracer_home/netstandard2.0/SignalFx.Instrumentation.MSBuild.dll"
     $signalfx_tracer_integrations = "$signalfx_tracer_home/integrations.json"
-    $signalfx_tracer_profiler_64 = "$signalfx_tracer_home/OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.so"
+    $signalfx_tracer_profiler_64 = "$signalfx_tracer_home/SignalFx.Instrumentation.ClrProfiler.Native.so"
 }
 
 # Set all environment variables to attach the profiler to the following pipeline steps

@@ -6,23 +6,23 @@
   <Fragment>
     <ComponentGroup Id="Files.Managed.Netcoreapp31" Directory="netcoreapp3.1">
       <Component Win64="$(var.Win64)">
-        <File Id="netcoreapp31_OpenTelemetry.AutoInstrumentation.dll"
-              Source="$(var.TracerHomeDirectory)\netcoreapp3.1\OpenTelemetry.AutoInstrumentation.dll"
+        <File Id="netcoreapp31_SignalFx.Instrumentation.dll"
+              Source="$(var.TracerHomeDirectory)\netcoreapp3.1\SignalFx.Instrumentation.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="netcoreapp31_OpenTelemetry.AutoInstrumentation.MSBuild.dll"
-              Source="$(var.TracerHomeDirectory)\netcoreapp3.1\OpenTelemetry.AutoInstrumentation.MSBuild.dll"
+        <File Id="netcoreapp31_SignalFx.Instrumentation.MSBuild.dll"
+              Source="$(var.TracerHomeDirectory)\netcoreapp3.1\SignalFx.Instrumentation.MSBuild.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="netcoreapp31_OpenTelemetry.AutoInstrumentation.MSBuild.pdb"
-              Source="$(var.TracerHomeDirectory)\netcoreapp3.1\OpenTelemetry.AutoInstrumentation.MSBuild.pdb"
+        <File Id="netcoreapp31_SignalFx.Instrumentation.MSBuild.pdb"
+              Source="$(var.TracerHomeDirectory)\netcoreapp3.1\SignalFx.Instrumentation.MSBuild.pdb"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="netcoreapp31_OpenTelemetry.AutoInstrumentation.pdb"
-              Source="$(var.TracerHomeDirectory)\netcoreapp3.1\OpenTelemetry.AutoInstrumentation.pdb"
+        <File Id="netcoreapp31_SignalFx.Instrumentation.pdb"
+              Source="$(var.TracerHomeDirectory)\netcoreapp3.1\SignalFx.Instrumentation.pdb"
               KeyPath="yes" Checksum="yes"/>
       </Component>
     </ComponentGroup>

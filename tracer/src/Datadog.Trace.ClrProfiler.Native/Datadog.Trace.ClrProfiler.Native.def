@@ -1,4 +1,4 @@
-LIBRARY "OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dll"
+LIBRARY "SignalFx.Instrumentation.ClrProfiler.Native.dll"
 
 EXPORTS
     DllCanUnloadNow PRIVATE

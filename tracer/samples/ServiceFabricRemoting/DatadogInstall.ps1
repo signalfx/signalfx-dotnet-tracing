@@ -41,10 +41,10 @@ Set-MachineEnvironmentVariable 'SIGNALFX_TRACE_LOG_DIRECTORY' "$LOGS_PATH"
 
 # Set-MachineEnvironmentVariable'COR_ENABLE_PROFILING' '0' # Enable per app
 Set-MachineEnvironmentVariable 'COR_PROFILER' '{918728DD-259F-4A6A-AC2B-B85E1B658318}'
-Set-MachineEnvironmentVariable 'COR_PROFILER_PATH_32' "$SIGNALFX_DOTNET_TRACER_HOME\win-x86\OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dll"
-Set-MachineEnvironmentVariable 'COR_PROFILER_PATH_64' "$SIGNALFX_DOTNET_TRACER_HOME\win-x64\OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dll"
+Set-MachineEnvironmentVariable 'COR_PROFILER_PATH_32' "$SIGNALFX_DOTNET_TRACER_HOME\win-x86\SignalFx.Instrumentation.ClrProfiler.Native.dll"
+Set-MachineEnvironmentVariable 'COR_PROFILER_PATH_64' "$SIGNALFX_DOTNET_TRACER_HOME\win-x64\SignalFx.Instrumentation.ClrProfiler.Native.dll"
 
 # Set-MachineEnvironmentVariable 'CORECLR_ENABLE_PROFILING' '0' # Enable per app
 Set-MachineEnvironmentVariable 'CORECLR_PROFILER' '{918728DD-259F-4A6A-AC2B-B85E1B658318}'
-Set-MachineEnvironmentVariable 'CORECLR_PROFILER_PATH_32' "$SIGNALFX_DOTNET_TRACER_HOME\win-x86\OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dll"
-Set-MachineEnvironmentVariable 'CORECLR_PROFILER_PATH_64' "$SIGNALFX_DOTNET_TRACER_HOME\win-x64\OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dll"
+Set-MachineEnvironmentVariable 'CORECLR_PROFILER_PATH_32' "$SIGNALFX_DOTNET_TRACER_HOME\win-x86\SignalFx.Instrumentation.ClrProfiler.Native.dll"
+Set-MachineEnvironmentVariable 'CORECLR_PROFILER_PATH_64' "$SIGNALFX_DOTNET_TRACER_HOME\win-x64\SignalFx.Instrumentation.ClrProfiler.Native.dll"

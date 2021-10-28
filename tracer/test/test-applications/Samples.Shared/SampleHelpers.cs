@@ -10,7 +10,7 @@ namespace Samples
 {
     public class SampleHelpers
     {
-        private static readonly Type NativeMethodsType = Type.GetType("Datadog.Trace.ClrProfiler.NativeMethods, OpenTelemetry.AutoInstrumentation");
+        private static readonly Type NativeMethodsType = Type.GetType("Datadog.Trace.ClrProfiler.NativeMethods, SignalFx.Instrumentation");
 
         public static bool IsProfilerAttached()
         {
