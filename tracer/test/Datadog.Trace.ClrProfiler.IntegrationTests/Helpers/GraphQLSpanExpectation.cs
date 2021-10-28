@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System.Collections.Generic;
 using Datadog.Trace.TestHelpers;
 
@@ -11,7 +13,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
     public class GraphQLSpanExpectation : WebServerSpanExpectation
     {
         public GraphQLSpanExpectation(string serviceName, string operationName, string resourceName)
-            : base(serviceName, serviceVersion: null, operationName, resourceName, SpanTypes.GraphQL)
+            : base(serviceName, serviceVersion: "1.0.0", operationName, resourceName, SpanTypes.GraphQL)
         {
             RegisterDelegateExpectation(ExpectErrorMatch);
             RegisterTagExpectation(nameof(Tags.GraphQLSource), expected: GraphQLSource);
