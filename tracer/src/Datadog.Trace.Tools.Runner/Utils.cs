@@ -40,7 +40,6 @@ namespace Datadog.Trace.Tools.Runner
 
             tracerHome ??= DirectoryExists("Home", Path.Combine(runnerFolder, "..", "..", "..", "home"), Path.Combine(runnerFolder, "home"));
             string tracerMsBuild = FileExists(Path.Combine(tracerHome, "netstandard2.0", "SignalFx.Tracing.MSBuild.dll"));
-            string tracerIntegrations = FileExists(Path.Combine(tracerHome, "integrations.json"));
             string tracerProfiler32 = string.Empty;
             string tracerProfiler64 = string.Empty;
 
@@ -100,7 +99,6 @@ namespace Datadog.Trace.Tools.Runner
             {
                 ["SIGNALFX_DOTNET_TRACER_HOME"] = tracerHome,
                 ["SIGNALFX_DOTNET_TRACER_MSBUILD"] = tracerMsBuild,
-                ["SIGNALFX_INTEGRATIONS"] = tracerIntegrations,
                 ["CORECLR_ENABLE_PROFILING"] = "1",
                 ["CORECLR_PROFILER"] = PROFILERID,
                 ["CORECLR_PROFILER_PATH_32"] = tracerProfiler32,

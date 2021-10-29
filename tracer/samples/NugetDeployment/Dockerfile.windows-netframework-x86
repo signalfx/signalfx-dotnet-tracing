@@ -27,7 +27,6 @@ COPY --from=publish /app/publish .
 ENV COR_ENABLE_PROFILING=1
 ENV COR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}
 ENV COR_PROFILER_PATH=/app/datadog/win-x86/SignalFx.Tracing.ClrProfiler.Native.dll
-ENV SIGNALFX_INTEGRATIONS=/app/datadog/integrations.json
 ENV SIGNALFX_DOTNET_TRACER_HOME=/app/datadog
 
 ENTRYPOINT ["HttpListenerExample.exe"]

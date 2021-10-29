@@ -23,13 +23,10 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             : base("Elasticsearch.V7", output)
         {
             SetServiceVersion("1.0.0");
-            SetCallTargetSettings(true);
         }
 
-        public static IEnumerable<object[]> GetElasticsearch() => PackageVersions.ElasticSearch7;
-
         [SkippableTheory]
-        [MemberData(nameof(GetElasticsearch))]
+        [MemberData(nameof(PackageVersions.ElasticSearch7), MemberType = typeof(PackageVersions))]
         [Trait("Category", "EndToEnd")]
         public void SubmitsTraces(string packageVersion)
         {

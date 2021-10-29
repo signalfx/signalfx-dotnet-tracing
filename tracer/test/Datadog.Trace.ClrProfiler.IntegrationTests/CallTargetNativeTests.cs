@@ -28,7 +28,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             {
                 bool fastPath = i < 9;
                 yield return new object[] { i, fastPath };
-                yield return new object[] { i, fastPath };
             }
         }
 
@@ -36,8 +35,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [MemberData(nameof(MethodArgumentsData))]
         public void MethodArgumentsInstrumentation(int numberOfArguments, bool fastPath)
         {
-            SetCallTargetSettings(enableCallTarget: true);
-            SetEnvironmentVariable("SIGNALFX_INTEGRATIONS", Path.Combine(EnvironmentHelper.GetSampleProjectDirectory(), "integrations.json"));
             int agentPort = TcpPortProvider.GetOpenPort();
 
             using (new MockTracerAgent(agentPort))

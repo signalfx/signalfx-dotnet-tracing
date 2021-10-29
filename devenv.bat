@@ -59,7 +59,6 @@ SET SIGNALFX_PROFILER_EXCLUDE_PROCESSES=devenv.exe;JetBrains.DPA.Runner.exe;JetB
 
 rem Set dotnet tracer home path
 SET SIGNALFX_DOTNET_TRACER_HOME=%~dp0
-SET SIGNALFX_INTEGRATIONS=%SIGNALFX_DOTNET_TRACER_HOME%\integrations.json
 
 if "%start_visual_studio%" == "true" (
     echo Starting Visual Studio...

@@ -97,7 +97,6 @@ partial class Build
             envVars["COR_PROFILER"] = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}";
             envVars["COR_PROFILER_PATH_64"] = TracerHomeDirectory / "win-x64" / "SignalFx.Tracing.ClrProfiler.Native.dll";
             envVars["COR_PROFILER_PATH_32"] = TracerHomeDirectory / "win-x86" / "SignalFx.Tracing.ClrProfiler.Native.dll";
-            envVars["SIGNALFX_INTEGRATIONS"] = TracerHomeDirectory / "integrations.json";
             envVars["SIGNALFX_DOTNET_TRACER_HOME"] = TracerHomeDirectory;
 
             if (ExtraEnvVars?.Length > 0)
@@ -129,7 +128,6 @@ partial class Build
                 {"COR_PROFILER_PATH_64", TracerHomeDirectory / "win-x64" / "SignalFx.Tracing.ClrProfiler.Native.dll"},
                 {"CORECLR_ENABLE_PROFILING", "1"},
                 {"CORECLR_PROFILER", "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"},
-                {"SIGNALFX_INTEGRATIONS", TracerHomeDirectory / "integrations.json" },
                 {"SIGNALFX_DOTNET_TRACER_HOME", TracerHomeDirectory },
                 {"ASPNETCORE_URLS", "https://*:5003" },
             };
@@ -215,7 +213,6 @@ partial class Build
     Target UpdateIntegrationsJson => _ => _
        .Description("Update the integrations.json file")
        .DependsOn(Clean, Restore, CreateRequiredDirectories, CompileManagedSrc, PublishManagedProfiler) // We load the dlls from the output, so need to do a clean build
-       .Before(CopyIntegrationsJson)
        .Executes(async () =>
         {
             var assemblies = TracerHomeDirectory

@@ -343,11 +343,6 @@ namespace Datadog.Trace.TestHelpers
             SetEnvironmentVariable("SIGNALFX_VERSION", serviceVersion);
         }
 
-        protected void SetCallTargetSettings(bool enableCallTarget)
-        {
-            SetEnvironmentVariable("SIGNALFX_TRACE_CALLTARGET_ENABLED", enableCallTarget ? "true" : "false");
-        }
-
         protected void SetSecurity(bool security)
         {
             SetEnvironmentVariable(Configuration.ConfigurationKeys.AppSecEnabled, security ? "true" : "false");

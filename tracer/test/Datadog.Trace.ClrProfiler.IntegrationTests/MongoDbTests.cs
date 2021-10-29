@@ -31,20 +31,17 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         {
             foreach (var item in PackageVersions.MongoDB)
             {
-                yield return item.Concat(false, false);
-                yield return item.Concat(false, true);
-                yield return item.Concat(true, false);
-                yield return item.Concat(true, true);
+                yield return item.Concat(false);
+                yield return item.Concat(true);
             }
         }
 
         [SkippableTheory]
         [MemberData(nameof(GetMongoDb))]
         [Trait("Category", "EndToEnd")]
-        public void SubmitsTraces(string packageVersion, bool enableCallTarget, bool tagCommands)
+        public void SubmitsTraces(string packageVersion, bool tagCommands)
         {
             SetEnvironmentVariable("SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS", tagCommands.ToString().ToLowerInvariant());
-            SetCallTargetSettings(enableCallTarget);
 
             int agentPort = TcpPortProvider.GetOpenPort();
             using (var agent = new MockTracerAgent(agentPort))

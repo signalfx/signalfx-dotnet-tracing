@@ -34,7 +34,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         {
             SetServiceVersion("1.0.0");
             SetEnvironmentVariable("SIGNALFX_LOGS_INJECTION", "true");
-            SetCallTargetSettings(true);
         }
 
         [SkippableFact]

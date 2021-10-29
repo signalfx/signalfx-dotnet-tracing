@@ -7,10 +7,17 @@
 
 #if NETFRAMEWORK
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
+using System.Net;
 using Datadog.Trace.ClrProfiler.CallTarget;
-using Datadog.Trace.ClrProfiler.Integrations;
+using Datadog.Trace.ClrProfiler.Emit;
 using Datadog.Trace.Configuration;
+using Datadog.Trace.ExtensionMethods;
+using Datadog.Trace.Logging;
+using Datadog.Trace.Propagation;
+using Datadog.Trace.Tagging;
 
 namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
 {
@@ -30,7 +37,13 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class ChannelHandlerIntegration
     {
+        private const string DefaultOperationName = "wcf.request";
         private const string IntegrationName = nameof(IntegrationIds.Wcf);
+        private const string ChannelHandlerTypeName = "System.ServiceModel.Dispatcher.ChannelHandler";
+        private const string HttpRequestMessagePropertyTypeName = "System.ServiceModel.Channels.HttpRequestMessageProperty";
+
+        private static readonly IntegrationInfo IntegrationId = IntegrationRegistry.GetIntegrationInfo(IntegrationName);
+        private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(ChannelHandlerIntegration));
 
         /// <summary>
         /// OnMethodBegin callback
@@ -44,7 +57,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
         /// <returns>Calltarget state value</returns>
         public static CallTargetState OnMethodBegin<TTarget, TRequestContext, TOperationContext>(TTarget instance, TRequestContext request, TOperationContext currentOperationContext)
         {
-            return new CallTargetState(WcfIntegration.CreateScope(request));
+            return new CallTargetState(CreateScope(request));
         }
 
         /// <summary>
@@ -61,6 +74,91 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
         {
             state.Scope.DisposeWithException(exception);
             return new CallTargetReturn<TReturn>(returnValue);
+        }
+
+        private static Scope CreateScope(object requestContext)
+        {
+            var requestMessage = requestContext.GetProperty<object>("RequestMessage").GetValueOrDefault();
+
+            if (requestMessage == null)
+            {
+                return null;
+            }
+
+            var tracer = Tracer.Instance;
+
+            if (!tracer.Settings.IsIntegrationEnabled(IntegrationId))
+            {
+                // integration disabled, don't create a scope, skip this trace
+                return null;
+            }
+
+            Scope scope = null;
+
+            try
+            {
+                SpanContext propagatedContext = null;
+                var tagsFromHeaders = Enumerable.Empty<KeyValuePair<string, string>>();
+                string host = null;
+                string httpMethod = null;
+
+                IDictionary<string, object> requestProperties = requestMessage.GetProperty<IDictionary<string, object>>("Properties").GetValueOrDefault();
+                if (requestProperties.TryGetValue("httpRequest", out object httpRequestProperty) &&
+                    httpRequestProperty.GetType().FullName.Equals(HttpRequestMessagePropertyTypeName, StringComparison.OrdinalIgnoreCase))
+                {
+                    var webHeaderCollection = httpRequestProperty.GetProperty<WebHeaderCollection>("Headers").GetValueOrDefault();
+
+                    // we're using an http transport
+                    host = webHeaderCollection[HttpRequestHeader.Host];
+                    httpMethod = httpRequestProperty.GetProperty<string>("Method").GetValueOrDefault()?.ToUpperInvariant();
+
+                    // try to extract propagated context values from http headers
+                    if (tracer.ActiveScope == null)
+                    {
+                        try
+                        {
+                            var headers = webHeaderCollection.Wrap();
+                            propagatedContext = tracer.Propagator.Extract(headers);
+                            tagsFromHeaders = headers.ExtractHeaderTags(tracer.Settings.HeaderTags, PropagationExtensions.HttpRequestHeadersTagPrefix);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Error(ex, "Error extracting propagated HTTP headers.");
+                        }
+                    }
+                }
+
+                object requestHeaders = requestMessage.GetProperty<object>("Headers").GetValueOrDefault();
+                string action = requestHeaders.GetProperty<string>("Action").GetValueOrDefault();
+                Uri requestHeadersTo = requestHeaders.GetProperty<Uri>("To").GetValueOrDefault();
+
+                var operationNameSuffix = action ?? requestHeadersTo?.LocalPath;
+                var operationName = !string.IsNullOrEmpty(operationNameSuffix)
+                    ? $"{DefaultOperationName} {operationNameSuffix}"
+                    : DefaultOperationName;
+
+                var tags = new WcfTags();
+                scope = tracer.StartActiveWithTags(operationName, propagatedContext, tags: tags);
+                var span = scope.Span;
+                span.LogicScope = DefaultOperationName;
+
+                span.DecorateWebServerSpan(
+                    resourceName: action ?? requestHeadersTo?.LocalPath,
+                    httpMethod,
+                    host,
+                    httpUrl: requestHeadersTo?.AbsoluteUri,
+                    tags,
+                    tagsFromHeaders);
+
+                tags.SetAnalyticsSampleRate(IntegrationId, tracer.Settings, enabledWithGlobalSetting: true);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error creating or populating scope.");
+            }
+
+            // always returns the scope, even if it's null
+            return scope;
         }
     }
 }

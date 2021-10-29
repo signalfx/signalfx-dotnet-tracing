@@ -50,7 +50,6 @@ namespace Datadog.Trace.TestHelpers
             _requiresProfiling = requiresProfiling;
             TracerHome = GetTracerHomePath();
             ProfilerPath = GetProfilerPath();
-            IntegrationsJsonPath = GetIntegrationsJsonFilePath();
 
             var parts = _targetFramework.FrameworkName.Split(',');
             _runtime = parts[0];
@@ -79,8 +78,6 @@ namespace Datadog.Trace.TestHelpers
         public string ProfilerPath { get; }
 
         public string TracerHome { get; }
-
-        public string IntegrationsJsonPath { get; }
 
         public string FullSampleName => $"{_appNamePrepend}{SampleName}";
 
@@ -147,18 +144,6 @@ namespace Datadog.Trace.TestHelpers
             if (!File.Exists(path))
             {
                 throw new Exception($"Unable to find profiler at {path}");
-            }
-
-            return path;
-        }
-
-        public static string GetIntegrationsJsonFilePath()
-        {
-            string fileName = "integrations.json";
-            var path = Path.Combine(GetTracerHomePath(), fileName);
-            if (!File.Exists(path))
-            {
-                throw new Exception($"Attempt 3: Unable to find integrations at {path}");
             }
 
             return path;
@@ -242,7 +227,6 @@ namespace Datadog.Trace.TestHelpers
                 environmentVariables["SIGNALFX_PROFILER_PROCESSES"] = Path.GetFileName(processToProfile);
             }
 
-            environmentVariables["SIGNALFX_INTEGRATIONS"] = IntegrationsJsonPath;
             environmentVariables["SIGNALFX_TRACE_AGENT_HOSTNAME"] = "127.0.0.1";
             environmentVariables["SIGNALFX_TRACE_AGENT_PORT"] = agentPort.ToString();
 

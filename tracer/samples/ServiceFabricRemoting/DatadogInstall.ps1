@@ -36,7 +36,6 @@ function Set-MachineEnvironmentVariable {
 }
 
 Set-MachineEnvironmentVariable 'SIGNALFX_DOTNET_TRACER_HOME' $SIGNALFX_DOTNET_TRACER_HOME
-Set-MachineEnvironmentVariable 'SIGNALFX_INTEGRATIONS' "$SIGNALFX_DOTNET_TRACER_HOME\integrations.json"
 Set-MachineEnvironmentVariable 'SIGNALFX_TRACE_LOG_DIRECTORY' "$LOGS_PATH"
 
 # Set-MachineEnvironmentVariable'COR_ENABLE_PROFILING' '0' # Enable per app

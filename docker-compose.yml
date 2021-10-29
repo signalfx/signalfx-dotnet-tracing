@@ -278,7 +278,7 @@ services:
     ports:
     - "8080:80"
     environment:
-      - SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN:-0}
+      - SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN:-1}
 
   IntegrationTests:
     build:
@@ -296,8 +296,8 @@ services:
       - artifacts=/project/${relativeArtifacts:-tracer/src/bin/artifacts}
       - framework=${framework:-netcoreapp3.1}
       - baseImage=${baseImage:-default}
-      - SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN:-0}
-      - TestAllPackageVersions=${TestAllPackageVersions:-false}
+      - SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN:-1}
+      - TestAllPackageVersions=${TestAllPackageVersions:-true}
       - IncludeMinorPackageVersions=${IncludeMinorPackageVersions:-false}
       - MONGO_HOST=mongo
       - SERVICESTACK_REDIS_HOST=servicestackredis:6379
@@ -372,7 +372,7 @@ services:
       - baseImage=${baseImage:-debian}
       - TestAllPackageVersions=${TestAllPackageVersions:-false}
       - IncludeMinorPackageVersions=${IncludeMinorPackageVersions:-false}
-      - SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN:-0}
+      - SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN:-1}
       - MONGO_HOST=mongo_arm64
       - SERVICESTACK_REDIS_HOST=servicestackredis_arm64:6379
       - STACKEXCHANGE_REDIS_HOST=stackexchangeredis_arm64:6379

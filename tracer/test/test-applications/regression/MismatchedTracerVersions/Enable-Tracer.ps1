@@ -16,7 +16,6 @@ $TracerGuid = '{B4C89B0F-9908-4F73-9F59-0D77C5A06874}'
 $TracerPath32 = ''
 $TracerPath64 = ''
 $TracerHome = Resolve-Path $TracerHome
-$JsonPath = Join-Path $TracerHome 'integrations.json' -Resolve
 
 if ($LogPath -eq "") {
     $LogPath = Join-Path $TracerHome 'logs'
@@ -55,7 +54,6 @@ if ($IsWindows) {
 }
 
 Set-EnvironmentVariable 'SIGNALFX_DOTNET_TRACER_HOME' $TracerHome
-Set-EnvironmentVariable 'SIGNALFX_INTEGRATIONS' $JsonPath
 Set-EnvironmentVariable 'SIGNALFX_TRACE_LOG_DIRECTORY' $LogPath
 
 Set-EnvironmentVariable 'CORECLR_ENABLE_PROFILING' '1'
