@@ -99,7 +99,7 @@ const WSTRING appsec_windows_nativemethods_type = WStr("Datadog.Trace.AppSec.Waf
 const WSTRING calltarget_modification_action = WStr("CallTargetModification");
 
 #ifdef _WIN32
-const WSTRING native_dll_filename = WStr("OPENTELEMETRY.AUTOINSTRUMENTATION.CLRPROFILER.NATIVE.DLL");
+const WSTRING native_dll_filename = WStr("SIGNALFX.INSTRUMENTATION.CLRPROFILER.NATIVE.DLL");
 #elif MACOS
 const WSTRING native_dll_filename = WStr("SignalFx.Instrumentation.ClrProfiler.Native.dylib");
 #else
