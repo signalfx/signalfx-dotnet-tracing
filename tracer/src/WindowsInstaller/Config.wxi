@@ -2,17 +2,17 @@
 
 <Include>
   <?define BaseProductName = ".NET Instrumentation" ?>
-  <?define ArpManufacturer = "Splunk" ?>
+  <?define ArpManufacturer = "SignalFx" ?>
   <?define Company = "Splunk" ?>
-  <?define ProductNamePlatformAgnostic = "Splunk $(var.BaseProductName)" ?>
+  <?define ProductNamePlatformAgnostic = "SignalFx $(var.BaseProductName)" ?>
   <?define ProfilerCLSID = "{918728DD-259F-4A6A-AC2B-B85E1B658318}" ?>
 
   <?if $(var.Platform) = x64 ?>
-  <?define ProductName = "Splunk $(var.BaseProductName) 64-bit" ?>
+  <?define ProductName = "SignalFx $(var.BaseProductName) 64-bit" ?>
   <?define Win64 = "yes" ?>
   <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
   <?else ?>
-  <?define ProductName = "Splunk $(var.BaseProductName) 32-bit" ?>
+  <?define ProductName = "SignalFx $(var.BaseProductName) 32-bit" ?>
   <?define Win64 = "no" ?>
   <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
   <?endif ?>
