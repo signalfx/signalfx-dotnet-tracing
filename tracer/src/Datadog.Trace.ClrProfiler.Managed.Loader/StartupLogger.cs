@@ -84,7 +84,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
                 {
                     if (Environment.OSVersion.Platform == PlatformID.Win32NT)
                     {
-                        var windowsDefaultDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"SignalFx .NET Tracing", "logs");
+                        var windowsDefaultDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"SignalFx .NET Instrumentation", "logs");
                         logDirectory = windowsDefaultDirectory;
                     }
                     else

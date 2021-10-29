@@ -165,7 +165,7 @@ namespace Datadog.Trace.Configuration
 
         /// <summary>
         /// Configuration key for the trace endpoint. Same as <see creg="AgentUri"/> created
-        /// for compatibility of previous version of SignalFx .NET Tracing.
+        /// for compatibility of previous version of SignalFx .NET Instrumentation.
         /// </summary>
         /// <seealso cref="TracerSettings.AgentUri"/>
         public const string EndpointUrl = "SIGNALFX_ENDPOINT_URL";
@@ -302,7 +302,7 @@ namespace Datadog.Trace.Configuration
         /// <summary>
         /// Configuration key for setting the directory of the .NET Tracer logs.
         /// Overrides the value in <see cref="ProfilerLogPath"/> if present.
-        /// Default value is "%ProgramData%"\SignalFx .NET Tracing\logs\" on Windows
+        /// Default value is "%ProgramData%"\SignalFx .NET Instrumentation\logs\" on Windows
         /// or "/var/log/signalfx/dotnet/" on Linux.
         /// </summary>
         public const string LogDirectory = "SIGNALFX_TRACE_LOG_DIRECTORY";

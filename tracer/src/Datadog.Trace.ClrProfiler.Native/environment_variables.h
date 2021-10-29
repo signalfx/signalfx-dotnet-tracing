@@ -15,11 +15,11 @@ namespace environment {
 
     // Sets the paths to integration definition JSON files.
     // Supports multiple values separated with comma, for example:
-    // "C:\Program Files\SignalFx .NET Tracing\integrations.json,D:\temp\test_integrations.json"
+    // "C:\Program Files\SignalFx .NET Instrumentation\integrations.json,D:\temp\test_integrations.json"
     const WSTRING integrations_path = WStr("SIGNALFX_INTEGRATIONS");
 
     // Sets the path to the profiler's home directory, for example:
-    // "C:\Program Files\SignalFx .NET Tracing\" or "/opt/signalfx/"
+    // "C:\Program Files\SignalFx .NET Instrumentation\" or "/opt/signalfx/"
     const WSTRING profiler_home_path = WStr("SIGNALFX_DOTNET_TRACER_HOME");
 
     // Sets the filename of executables the profiler can attach to.
@@ -64,7 +64,7 @@ namespace environment {
     // Sets the directory for the profiler's log file.
     // If set, this setting takes precedence over environment variable SIGNALFX_TRACE_LOG_PATH.
     // If not set, default is
-    // "%ProgramData%"\SignalFx .NET Tracing\logs\" on Windows or
+    // "%ProgramData%"\SignalFx .NET Instrumentation\logs\" on Windows or
     // "/var/log/signalfx/dotnet/" on Linux.
     const WSTRING log_directory = WStr("SIGNALFX_TRACE_LOG_DIRECTORY");
 

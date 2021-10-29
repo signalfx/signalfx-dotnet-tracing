@@ -13,7 +13,7 @@ namespace shared {
 		// Sets the directory for the profiler's log file.
 		// If set, this setting takes precedence over environment variable SIGNALFX_TRACE_LOG_PATH.
 		// If not set, default is
-		// "%ProgramData%"\SignalFx .NET Tracing\logs\" on Windows or
+		// "%ProgramData%"\SignalFx .NET Instrumentation\logs\" on Windows or
 		// "/var/log/signalfx/dotnet/" on Linux.
 		const WSTRING log_directory = WStr("SIGNALFX_TRACE_LOG_DIRECTORY");
 

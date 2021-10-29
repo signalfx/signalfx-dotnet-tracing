@@ -57,7 +57,7 @@ namespace shared {
         }
 
         return ToWSTRING(program_data +
-            R"(\SignalFx .NET Tracing\logs\dotnet-tracer-native.log)");
+            R"(\SignalFx .NET Instrumentation\logs\dotnet-tracer-native.log)");
 #else
         return WStr("/var/log/signalfx/dotnet/dotnet-tracer-native.log");
 #endif
