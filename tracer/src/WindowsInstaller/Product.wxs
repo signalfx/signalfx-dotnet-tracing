@@ -100,7 +100,7 @@
 
       <Directory Id="CommonAppDataFolder">
         <!-- "C:\ProgramData" -->
-        <Directory Id="CommonAppDataFolder.DatadogDotNetTracer" Name="SignalFx .NET Instrumentation">
+        <Directory Id="CommonAppDataFolder.DatadogDotNetTracer" Name="SignalFx .NET Tracing">
           <!-- ".\OpenTelemetry .NET AutoInstrumentation" -->
           <Directory Id="CommonAppDataFolder.DatadogDotNetTracer.logs" Name="logs">
             <!-- ".\logs" -->

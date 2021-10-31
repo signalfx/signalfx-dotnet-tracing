@@ -71,7 +71,7 @@ BEGIN
             VALUE "InternalName", "SignalFx.Instrumentation.ClrProfiler.Native.DLL"
             VALUE "LegalCopyright", "Copyright 2021 The OpenTelemetry Authors"
             VALUE "OriginalFilename", "SignalFx.Instrumentation.ClrProfiler.Native.DLL"
-            VALUE "ProductName", "SignalFx .NET Instrumentation"
+            VALUE "ProductName", "SignalFx .NET Tracing"
             VALUE "ProductVersion", "0.0.1"
         END
     END

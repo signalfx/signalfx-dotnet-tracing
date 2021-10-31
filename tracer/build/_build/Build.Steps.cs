@@ -61,7 +61,7 @@ partial class Build
     AbsolutePath TempDirectory => (AbsolutePath)(IsWin ? Path.GetTempPath() : "/tmp/");
     string TracerLogDirectory => IsWin
         ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-            "SignalFx .NET Instrumentation", "logs")
+            "SignalFx .NET Tracing", "logs")
         : "/var/log/signalfx/dotnet/";
 
     Project NativeProfilerProject => Solution.GetProject(Projects.ClrProfilerNative);

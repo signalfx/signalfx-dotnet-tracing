@@ -159,7 +159,7 @@ namespace shared {
             program_data = R"(C:\ProgramData)";
         }
         
-        return fs::path(program_data) / R"(SignalFx .NET Instrumentation\logs\dotnet)";
+        return fs::path(program_data) / R"(SignalFx .NET Tracing\logs\dotnet)";
 #else
         return fs::path("/var/log/signalfx/dotnet");
 #endif
