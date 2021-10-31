@@ -17,7 +17,7 @@
     <IntermediateOutputPath>obj\$(Configuration)\$(Platform)\</IntermediateOutputPath>
     <SuppressPdbOutput>True</SuppressPdbOutput>
     <DefineSolutionProperties>false</DefineSolutionProperties>
-    <OutputName>signalfx-dotnet-instrumentation-0.0.1-$(Platform)</OutputName>
+    <OutputName>signalfx-dotnet-tracing-0.0.1-$(Platform)</OutputName>
     <TracerHomeDirectory Condition="'$(TracerHomeDirectory)' == ''">$(MSBuildThisFileDirectory)..\bin\windows-tracer-home</TracerHomeDirectory>
     <DefineConstants>InstallerVersion=0.0.1;TracerHomeDirectory=$(TracerHomeDirectory);LibDdwafDirectory=$(LibDdwafDirectory)</DefineConstants>
     <LibDdwafDirectory Condition="'$(LibDdwafDirectory)' == ''">$(LibDdwafDirectory)..\..\packages\libddwaf.1.0.7</LibDdwafDirectory>

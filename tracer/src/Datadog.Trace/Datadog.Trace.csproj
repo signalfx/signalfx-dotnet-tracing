@@ -3,8 +3,8 @@
   <PropertyGroup>
     <!-- NuGet -->
     <Version>0.0.1</Version>
-    <Title>SignalFx .NET Instrumentation</Title>
-    <Description>SignalFx .NET Instrumentation library</Description>
+    <Title>SignalFx .NET Tracing</Title>
+    <Description>SignalFx .NET Tracing library</Description>
     <AssemblyName>SignalFx.Instrumentation</AssemblyName>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
