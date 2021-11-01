@@ -10,23 +10,23 @@
 
     <!-- NuGet packages -->
     <IsPackable>true</IsPackable>
-    <PackageIconUrl>https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation/raw/main/opentelemetry-logo-64x64.png</PackageIconUrl>
+    <PackageIconUrl>https://github.com/signalfx/signalfx-dotnet-tracing/raw/master/signalfx-logo-64x64.png</PackageIconUrl>
     <PackageIcon>packageIcon.png</PackageIcon>
-    <PackageProjectUrl>https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation/</PackageProjectUrl>
+    <PackageProjectUrl>https://docs.signalfx.com/en/latest/apm/apm-instrument/apm-dotnet.html</PackageProjectUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>See release notes at https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation/releases</PackageReleaseNotes>
-    <PackageTags>OpenTelemetry;OTEL;APM;tracing;profiling;instrumentation</PackageTags>
+    <PackageReleaseNotes>See release notes at https://github.com/signalfx/signalfx-dotnet-tracing/releases</PackageReleaseNotes>
+    <PackageTags>SignalFx;APM;tracing;profiling;instrumentation</PackageTags>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation.git</RepositoryUrl>
-    <Copyright>Copyright 2021 OpenTelemetry, originated from Datadog, Inc.</Copyright>
-    <Company>OpenTelemetry</Company>
-    <Authors>OpenTelemetry</Authors>
+    <RepositoryUrl>https://github.com/signalfx/signalfx-dotnet-tracing.git</RepositoryUrl>
+    <Copyright>Copyright 2021 Splunk, originated form Datadog, Inc.</Copyright>
+    <Company>Splunk</Company>
+    <Authors>pjanotti;pellared;rassk;dszmigielski;lachmatt</Authors>
   </PropertyGroup>
 
   <ItemGroup>
     <!-- NuGet -->
-    <None Include="$(MSBuildThisFileDirectory)\..\..\opentelemetry-logo-256x256.png" Pack="true" Visible="false" PackagePath="packageIcon.png" />
+    <None Include="$(MSBuildThisFileDirectory)\..\..\signalfx-logo-256x256.png" Pack="true" Visible="false" PackagePath="packageIcon.png" />
 
     <!-- StyleCop -->
     <Compile Include="$(MSBuildThisFileDirectory)GlobalSuppressions.cs" Link="GlobalSuppressions.src.cs" />
