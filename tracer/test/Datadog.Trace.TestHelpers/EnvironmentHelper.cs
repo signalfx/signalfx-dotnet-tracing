@@ -174,7 +174,6 @@ namespace Datadog.Trace.TestHelpers
                 "SIGNALFX_VERSION",
                 "SIGNALFX_TAGS",
                 "SIGNALFX_APPSEC_ENABLED",
-                "SIGNALFX_TRACE_CALLTARGET_ENABLED",
                 "SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS",
                 "SIGNALFX_CONVENTION",
                 "SIGNALFX_PROPAGATORS"
@@ -193,8 +192,7 @@ namespace Datadog.Trace.TestHelpers
             StringDictionary environmentVariables,
             string processToProfile = null,
             bool enableSecurity = false,
-            bool enableBlocking = false,
-            bool callTargetEnabled = false)
+            bool enableBlocking = false)
         {
             string profilerEnabled = _requiresProfiling ? "1" : "0";
             environmentVariables["SIGNALFX_DOTNET_TRACER_HOME"] = TracerHome;
@@ -215,11 +213,6 @@ namespace Datadog.Trace.TestHelpers
             if (DebugModeEnabled)
             {
                 environmentVariables["SIGNALFX_TRACE_DEBUG"] = "1";
-            }
-
-            if (callTargetEnabled)
-            {
-                environmentVariables["SIGNALFX_TRACE_CALLTARGET_ENABLED"] = "1";
             }
 
             if (!string.IsNullOrEmpty(processToProfile))

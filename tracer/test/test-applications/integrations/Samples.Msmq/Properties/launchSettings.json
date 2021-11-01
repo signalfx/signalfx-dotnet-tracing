@@ -9,7 +9,6 @@
         "CORECLR_ENABLE_PROFILING": "1",
         "COR_PROFILER_PATH": "$(SolutionDir)tracer\\bin\\tracer-home\\win-$(Platform)\\SignalFx.Tracing.ClrProfiler.Native.dll",
         "CORECLR_PROFILER": "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}",
-        "SIGNALFX_TRACE_CALLTARGET_ENABLED": "1",
         "CORECLR_PROFILER_PATH": "$(SolutionDir)tracer\\bin\\tracer-home\\win-$(Platform)\\SignalFx.Tracing.ClrProfiler.Native.dll",
         "COR_PROFILER": "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"
       },

@@ -58,7 +58,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             _fixture = fixture;
             _output = output;
             _testName = nameof(OwinWebApi2Tests)
-                      + ".CallTarget"
                       + (enableRouteTemplateResourceNames ? ".NoFF" : ".WithFF");
         }
 
