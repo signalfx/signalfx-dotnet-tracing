@@ -6,23 +6,23 @@
   <Fragment>
     <ComponentGroup Id="Files.Managed.NetStandard20" Directory="netstandard2.0">
       <Component Win64="$(var.Win64)">
-        <File Id="netstandard20_SignalFx.Instrumentation.dll"
-              Source="$(var.TracerHomeDirectory)\netstandard2.0\SignalFx.Instrumentation.dll"
+        <File Id="netstandard20_SignalFx.Tracing.dll"
+              Source="$(var.TracerHomeDirectory)\netstandard2.0\SignalFx.Tracing.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="netstandard20_SignalFx.Instrumentation.MSBuild.dll"
-              Source="$(var.TracerHomeDirectory)\netstandard2.0\SignalFx.Instrumentation.MSBuild.dll"
+        <File Id="netstandard20_SignalFx.Tracing.MSBuild.dll"
+              Source="$(var.TracerHomeDirectory)\netstandard2.0\SignalFx.Tracing.MSBuild.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="netstandard20_SignalFx.Instrumentation.MSBuild.pdb"
-              Source="$(var.TracerHomeDirectory)\netstandard2.0\SignalFx.Instrumentation.MSBuild.pdb"
+        <File Id="netstandard20_SignalFx.Tracing.MSBuild.pdb"
+              Source="$(var.TracerHomeDirectory)\netstandard2.0\SignalFx.Tracing.MSBuild.pdb"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="netstandard20_SignalFx.Instrumentation.pdb"
-              Source="$(var.TracerHomeDirectory)\netstandard2.0\SignalFx.Instrumentation.pdb"
+        <File Id="netstandard20_SignalFx.Tracing.pdb"
+              Source="$(var.TracerHomeDirectory)\netstandard2.0\SignalFx.Tracing.pdb"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">

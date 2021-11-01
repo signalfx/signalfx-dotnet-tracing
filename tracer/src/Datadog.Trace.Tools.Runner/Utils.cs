@@ -39,27 +39,27 @@ namespace Datadog.Trace.Tools.Runner
             }
 
             tracerHome ??= DirectoryExists("Home", Path.Combine(runnerFolder, "..", "..", "..", "home"), Path.Combine(runnerFolder, "home"));
-            string tracerMsBuild = FileExists(Path.Combine(tracerHome, "netstandard2.0", "SignalFx.Instrumentation.MSBuild.dll"));
+            string tracerMsBuild = FileExists(Path.Combine(tracerHome, "netstandard2.0", "SignalFx.Tracing.MSBuild.dll"));
             string tracerIntegrations = FileExists(Path.Combine(tracerHome, "integrations.json"));
             string tracerProfiler32 = string.Empty;
             string tracerProfiler64 = string.Empty;
 
             if (platform == Platform.Windows)
             {
-                tracerProfiler32 = FileExists(Path.Combine(tracerHome, "win-x86", "SignalFx.Instrumentation.ClrProfiler.Native.dll"));
-                tracerProfiler64 = FileExists(Path.Combine(tracerHome, "win-x64", "SignalFx.Instrumentation.ClrProfiler.Native.dll"));
+                tracerProfiler32 = FileExists(Path.Combine(tracerHome, "win-x86", "SignalFx.Tracing.ClrProfiler.Native.dll"));
+                tracerProfiler64 = FileExists(Path.Combine(tracerHome, "win-x64", "SignalFx.Tracing.ClrProfiler.Native.dll"));
             }
             else if (platform == Platform.Linux)
             {
-                tracerProfiler64 = FileExists(Path.Combine(tracerHome, "linux-x64", "SignalFx.Instrumentation.ClrProfiler.Native.so"));
+                tracerProfiler64 = FileExists(Path.Combine(tracerHome, "linux-x64", "SignalFx.Tracing.ClrProfiler.Native.so"));
             }
             else if (platform == Platform.MacOS)
             {
-                tracerProfiler64 = FileExists(Path.Combine(tracerHome, "osx-x64", "SignalFx.Instrumentation.ClrProfiler.Native.dylib"));
+                tracerProfiler64 = FileExists(Path.Combine(tracerHome, "osx-x64", "SignalFx.Tracing.ClrProfiler.Native.dylib"));
                 if (RuntimeInformation.OSArchitecture == Architecture.X64 || RuntimeInformation.OSArchitecture == Architecture.X86)
                 {
-                    tracerProfiler32 = FileExists(Path.Combine(tracerHome, "win-x86", "SignalFx.Instrumentation.Native.dll"));
-                    tracerProfiler64 = FileExists(Path.Combine(tracerHome, "win-x64", "SignalFx.Instrumentation.Native.dll"));
+                    tracerProfiler32 = FileExists(Path.Combine(tracerHome, "win-x86", "SignalFx.Tracing.Native.dll"));
+                    tracerProfiler64 = FileExists(Path.Combine(tracerHome, "win-x64", "SignalFx.Tracing.Native.dll"));
                 }
                 else
                 {
@@ -71,11 +71,11 @@ namespace Datadog.Trace.Tools.Runner
             {
                 if (RuntimeInformation.OSArchitecture == Architecture.X64)
                 {
-                    tracerProfiler64 = FileExists(Path.Combine(tracerHome, "linux-x64", "SignalFx.Instrumentation.Native.so"));
+                    tracerProfiler64 = FileExists(Path.Combine(tracerHome, "linux-x64", "SignalFx.Tracing.Native.so"));
                 }
                 else if (RuntimeInformation.OSArchitecture == Architecture.Arm64)
                 {
-                    tracerProfiler64 = FileExists(Path.Combine(tracerHome, "linux-arm64", "SignalFx.Instrumentation.Native.so"));
+                    tracerProfiler64 = FileExists(Path.Combine(tracerHome, "linux-arm64", "SignalFx.Tracing.Native.so"));
                 }
                 else
                 {
@@ -87,7 +87,7 @@ namespace Datadog.Trace.Tools.Runner
             {
                 if (RuntimeInformation.OSArchitecture == Architecture.X64)
                 {
-                    tracerProfiler64 = FileExists(Path.Combine(tracerHome, "osx-x64", "SignalFx.Instrumentation.Native.dylib"));
+                    tracerProfiler64 = FileExists(Path.Combine(tracerHome, "osx-x64", "SignalFx.Tracing.Native.dylib"));
                 }
                 else
                 {

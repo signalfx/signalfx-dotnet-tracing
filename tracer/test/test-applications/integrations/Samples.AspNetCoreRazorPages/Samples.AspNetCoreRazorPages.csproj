@@ -9,7 +9,7 @@
   <PropertyGroup>
     <!-- Strong name signature -->
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>$(ProjectDir)../../../../../SignalFx.Instrumentation.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>$(ProjectDir)../../../../../SignalFx.Tracing.snk</AssemblyOriginatorKeyFile>
     <DelaySign>false</DelaySign>
   </PropertyGroup>
 

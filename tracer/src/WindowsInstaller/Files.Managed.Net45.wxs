@@ -6,33 +6,33 @@
   <Fragment>
     <ComponentGroup Id="Files.Managed.Net45" Directory="net45">
       <Component Win64="$(var.Win64)">
-        <File Id="net45_SignalFx.Instrumentation.AspNet.dll"
-              Source="$(var.TracerHomeDirectory)\net45\SignalFx.Instrumentation.AspNet.dll"
+        <File Id="net45_SignalFx.Tracing.AspNet.dll"
+              Source="$(var.TracerHomeDirectory)\net45\SignalFx.Tracing.AspNet.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="net45_SignalFx.Instrumentation.AspNet.pdb"
-              Source="$(var.TracerHomeDirectory)\net45\SignalFx.Instrumentation.AspNet.pdb"
+        <File Id="net45_SignalFx.Tracing.AspNet.pdb"
+              Source="$(var.TracerHomeDirectory)\net45\SignalFx.Tracing.AspNet.pdb"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="net45_SignalFx.Instrumentation.dll"
-              Source="$(var.TracerHomeDirectory)\net45\SignalFx.Instrumentation.dll"
+        <File Id="net45_SignalFx.Tracing.dll"
+              Source="$(var.TracerHomeDirectory)\net45\SignalFx.Tracing.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="net45_SignalFx.Instrumentation.MSBuild.dll"
-              Source="$(var.TracerHomeDirectory)\net45\SignalFx.Instrumentation.MSBuild.dll"
+        <File Id="net45_SignalFx.Tracing.MSBuild.dll"
+              Source="$(var.TracerHomeDirectory)\net45\SignalFx.Tracing.MSBuild.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="net45_SignalFx.Instrumentation.MSBuild.pdb"
-              Source="$(var.TracerHomeDirectory)\net45\SignalFx.Instrumentation.MSBuild.pdb"
+        <File Id="net45_SignalFx.Tracing.MSBuild.pdb"
+              Source="$(var.TracerHomeDirectory)\net45\SignalFx.Tracing.MSBuild.pdb"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="net45_SignalFx.Instrumentation.pdb"
-              Source="$(var.TracerHomeDirectory)\net45\SignalFx.Instrumentation.pdb"
+        <File Id="net45_SignalFx.Tracing.pdb"
+              Source="$(var.TracerHomeDirectory)\net45\SignalFx.Tracing.pdb"
               KeyPath="yes" Checksum="yes"/>
       </Component>
     </ComponentGroup>

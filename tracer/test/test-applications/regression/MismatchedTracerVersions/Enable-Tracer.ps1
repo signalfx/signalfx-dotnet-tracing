@@ -27,18 +27,18 @@ $LogPath = Resolve-Path $LogPath
 
 if ($IsWindows) {
     Write-Host 'Setting environment variables for Windows'
-    $TracerPath32 = Join-Path $TracerHome 'win-x86\SignalFx.Instrumentation.ClrProfiler.Native.dll' -Resolve
-    $TracerPath64 = Join-Path $TracerHome 'win-x64\SignalFx.Instrumentation.ClrProfiler.Native.dll' -Resolve
+    $TracerPath32 = Join-Path $TracerHome 'win-x86\SignalFx.Tracing.ClrProfiler.Native.dll' -Resolve
+    $TracerPath64 = Join-Path $TracerHome 'win-x64\SignalFx.Tracing.ClrProfiler.Native.dll' -Resolve
 }
 
 if ($IsLinux) {
     Write-Host 'Setting environment variables for Linux'
-    $TracerPath64 = Join-Path $TracerHome 'SignalFx.Instrumentation.ClrProfiler.Native.so' -Resolve
+    $TracerPath64 = Join-Path $TracerHome 'SignalFx.Tracing.ClrProfiler.Native.so' -Resolve
 }
 
 if ($IsMacOS) {
     Write-Host 'Setting environment variables for macOS'
-    $TracerPath64 = Join-Path $TracerHome 'SignalFx.Instrumentation.ClrProfiler.Native.dylib' -Resolve
+    $TracerPath64 = Join-Path $TracerHome 'SignalFx.Tracing.ClrProfiler.Native.dylib' -Resolve
 }
 
 function Set-EnvironmentVariable {

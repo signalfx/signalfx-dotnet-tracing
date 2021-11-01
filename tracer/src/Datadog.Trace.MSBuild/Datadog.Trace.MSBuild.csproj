@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <Version>0.0.1</Version>
-    <AssemblyName>SignalFx.Instrumentation.MSBuild</AssemblyName>
+    <AssemblyName>SignalFx.Tracing.MSBuild</AssemblyName>
   </PropertyGroup>
 
   <!-- For VS testing purposes only, copy all implementation assemblies to the

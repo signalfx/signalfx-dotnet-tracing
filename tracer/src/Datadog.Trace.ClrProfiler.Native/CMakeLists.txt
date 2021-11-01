@@ -5,7 +5,7 @@ cmake_policy(SET CMP0015 NEW)
 # Project definition
 # ******************************************************
 
-project("SignalFx.Instrumentation.ClrProfiler.Native" VERSION 0.0.1)
+project("SignalFx.Tracing.ClrProfiler.Native" VERSION 0.0.1)
 
 # ******************************************************
 # Environment detection
@@ -73,9 +73,9 @@ else()
 endif()
 
 if (NOT EXISTS ${CMAKE_SOURCE_DIR}/../bin/ProfilerResources/netcoreapp2.0)
-    message(FATAL_ERROR "SignalFx.Instrumentation.ClrProfiler.Managed.Loader must be built first.")
+    message(FATAL_ERROR "SignalFx.Tracing.ClrProfiler.Managed.Loader must be built first.")
 else()
-    message(STATUS "SignalFx.Instrumentation.ClrProfiler.Managed.Loader was found")
+    message(STATUS "SignalFx.Tracing.ClrProfiler.Managed.Loader was found")
 endif()
 
 # ******************************************************
@@ -129,34 +129,34 @@ SET(MANAGED_LOADER_DIRECTORY ${CMAKE_SOURCE_DIR}/../bin/ProfilerResources/netcor
 # Set specific custom commands to embed the loader
 if (ISMACOS)
     add_custom_command(
-            OUTPUT ${OUTPUT_TMP_DIR}/SignalFx.Instrumentation.ClrProfiler.Managed.Loader.dll.o
-            COMMAND touch stub.c && gcc -o stub.o -c stub.c && cp ${MANAGED_LOADER_DIRECTORY}/SignalFx.Instrumentation.ClrProfiler.Managed.Loader.dll SignalFx.Instrumentation.ClrProfiler.Managed.Loader.dll && ld -r -o SignalFx.Instrumentation.ClrProfiler.Managed.Loader.dll.o -sectcreate binary dll SignalFx.Instrumentation.ClrProfiler.Managed.Loader.dll stub.o
-            DEPENDS ${MANAGED_LOADER_DIRECTORY}/SignalFx.Instrumentation.ClrProfiler.Managed.Loader.dll ${OUTPUT_DEPS_DIR}/json ${OUTPUT_DEPS_DIR}/re2 ${OUTPUT_DEPS_DIR}/fmt
+            OUTPUT ${OUTPUT_TMP_DIR}/SignalFx.Tracing.ClrProfiler.Managed.Loader.dll.o
+            COMMAND touch stub.c && gcc -o stub.o -c stub.c && cp ${MANAGED_LOADER_DIRECTORY}/SignalFx.Tracing.ClrProfiler.Managed.Loader.dll SignalFx.Tracing.ClrProfiler.Managed.Loader.dll && ld -r -o SignalFx.Tracing.ClrProfiler.Managed.Loader.dll.o -sectcreate binary dll SignalFx.Tracing.ClrProfiler.Managed.Loader.dll stub.o
+            DEPENDS ${MANAGED_LOADER_DIRECTORY}/SignalFx.Tracing.ClrProfiler.Managed.Loader.dll ${OUTPUT_DEPS_DIR}/json ${OUTPUT_DEPS_DIR}/re2 ${OUTPUT_DEPS_DIR}/fmt
             WORKING_DIRECTORY ${OUTPUT_TMP_DIR}
     )
     add_custom_command(
-            OUTPUT ${OUTPUT_TMP_DIR}/SignalFx.Instrumentation.ClrProfiler.Managed.Loader.pdb.o
-            COMMAND touch stub.c && gcc -o stub.o -c stub.c && cp "${MANAGED_LOADER_DIRECTORY}/SignalFx.Instrumentation.ClrProfiler.Managed.Loader.pdb" SignalFx.Instrumentation.ClrProfiler.Managed.Loader.pdb && ld -r -o SignalFx.Instrumentation.ClrProfiler.Managed.Loader.pdb.o -sectcreate binary pdb SignalFx.Instrumentation.ClrProfiler.Managed.Loader.pdb stub.o
-            DEPENDS ${MANAGED_LOADER_DIRECTORY}/SignalFx.Instrumentation.ClrProfiler.Managed.Loader.pdb ${OUTPUT_DEPS_DIR}/json ${OUTPUT_DEPS_DIR}/re2 ${OUTPUT_DEPS_DIR}/fmt
+            OUTPUT ${OUTPUT_TMP_DIR}/SignalFx.Tracing.ClrProfiler.Managed.Loader.pdb.o
+            COMMAND touch stub.c && gcc -o stub.o -c stub.c && cp "${MANAGED_LOADER_DIRECTORY}/SignalFx.Tracing.ClrProfiler.Managed.Loader.pdb" SignalFx.Tracing.ClrProfiler.Managed.Loader.pdb && ld -r -o SignalFx.Tracing.ClrProfiler.Managed.Loader.pdb.o -sectcreate binary pdb SignalFx.Tracing.ClrProfiler.Managed.Loader.pdb stub.o
+            DEPENDS ${MANAGED_LOADER_DIRECTORY}/SignalFx.Tracing.ClrProfiler.Managed.Loader.pdb ${OUTPUT_DEPS_DIR}/json ${OUTPUT_DEPS_DIR}/re2 ${OUTPUT_DEPS_DIR}/fmt
             WORKING_DIRECTORY ${OUTPUT_TMP_DIR}
     )
 elseif(ISLINUX)
     add_custom_command(
-            OUTPUT ${OUTPUT_TMP_DIR}/SignalFx.Instrumentation.ClrProfiler.Managed.Loader.dll.o
-            COMMAND cp "${MANAGED_LOADER_DIRECTORY}/SignalFx.Instrumentation.ClrProfiler.Managed.Loader.dll" SignalFx.Instrumentation.ClrProfiler.Managed.Loader.dll && ld -r -b binary -o SignalFx.Instrumentation.ClrProfiler.Managed.Loader.dll.o SignalFx.Instrumentation.ClrProfiler.Managed.Loader.dll
-            DEPENDS ${MANAGED_LOADER_DIRECTORY}/SignalFx.Instrumentation.ClrProfiler.Managed.Loader.dll ${OUTPUT_DEPS_DIR}/json ${OUTPUT_DEPS_DIR}/re2 ${OUTPUT_DEPS_DIR}/fmt
+            OUTPUT ${OUTPUT_TMP_DIR}/SignalFx.Tracing.ClrProfiler.Managed.Loader.dll.o
+            COMMAND cp "${MANAGED_LOADER_DIRECTORY}/SignalFx.Tracing.ClrProfiler.Managed.Loader.dll" SignalFx.Tracing.ClrProfiler.Managed.Loader.dll && ld -r -b binary -o SignalFx.Tracing.ClrProfiler.Managed.Loader.dll.o SignalFx.Tracing.ClrProfiler.Managed.Loader.dll
+            DEPENDS ${MANAGED_LOADER_DIRECTORY}/SignalFx.Tracing.ClrProfiler.Managed.Loader.dll ${OUTPUT_DEPS_DIR}/json ${OUTPUT_DEPS_DIR}/re2 ${OUTPUT_DEPS_DIR}/fmt
             WORKING_DIRECTORY ${OUTPUT_TMP_DIR}
     )
     add_custom_command(
-            OUTPUT ${OUTPUT_TMP_DIR}/SignalFx.Instrumentation.ClrProfiler.Managed.Loader.pdb.o
-            COMMAND cp "${MANAGED_LOADER_DIRECTORY}/SignalFx.Instrumentation.ClrProfiler.Managed.Loader.pdb" SignalFx.Instrumentation.ClrProfiler.Managed.Loader.pdb && ld -r -b binary -o SignalFx.Instrumentation.ClrProfiler.Managed.Loader.pdb.o SignalFx.Instrumentation.ClrProfiler.Managed.Loader.pdb
-            DEPENDS ${MANAGED_LOADER_DIRECTORY}/SignalFx.Instrumentation.ClrProfiler.Managed.Loader.pdb ${OUTPUT_DEPS_DIR}/json ${OUTPUT_DEPS_DIR}/re2 ${OUTPUT_DEPS_DIR}/fmt
+            OUTPUT ${OUTPUT_TMP_DIR}/SignalFx.Tracing.ClrProfiler.Managed.Loader.pdb.o
+            COMMAND cp "${MANAGED_LOADER_DIRECTORY}/SignalFx.Tracing.ClrProfiler.Managed.Loader.pdb" SignalFx.Tracing.ClrProfiler.Managed.Loader.pdb && ld -r -b binary -o SignalFx.Tracing.ClrProfiler.Managed.Loader.pdb.o SignalFx.Tracing.ClrProfiler.Managed.Loader.pdb
+            DEPENDS ${MANAGED_LOADER_DIRECTORY}/SignalFx.Tracing.ClrProfiler.Managed.Loader.pdb ${OUTPUT_DEPS_DIR}/json ${OUTPUT_DEPS_DIR}/re2 ${OUTPUT_DEPS_DIR}/fmt
             WORKING_DIRECTORY ${OUTPUT_TMP_DIR}
     )
 endif()
 SET(GENERATED_OBJ_FILES
-        ${OUTPUT_TMP_DIR}/SignalFx.Instrumentation.ClrProfiler.Managed.Loader.dll.o
-        ${OUTPUT_TMP_DIR}/SignalFx.Instrumentation.ClrProfiler.Managed.Loader.pdb.o
+        ${OUTPUT_TMP_DIR}/SignalFx.Tracing.ClrProfiler.Managed.Loader.dll.o
+        ${OUTPUT_TMP_DIR}/SignalFx.Tracing.ClrProfiler.Managed.Loader.pdb.o
 )
 SET_SOURCE_FILES_PROPERTIES(
         ${GENERATED_OBJ_FILES}
@@ -214,7 +214,7 @@ endif()
 # ******************************************************
 # Define static target
 # ******************************************************
-add_library("SignalFx.Instrumentation.ClrProfiler.Native.static" STATIC
+add_library("SignalFx.Tracing.ClrProfiler.Native.static" STATIC
         class_factory.cpp
         clr_helpers.cpp
         cor_profiler_base.cpp
@@ -234,10 +234,10 @@ add_library("SignalFx.Instrumentation.ClrProfiler.Native.static" STATIC
         ${GENERATED_OBJ_FILES}
 )
 
-set_target_properties("SignalFx.Instrumentation.ClrProfiler.Native.static" PROPERTIES PREFIX "")
+set_target_properties("SignalFx.Tracing.ClrProfiler.Native.static" PROPERTIES PREFIX "")
 
 # Define directories includes
-target_include_directories("SignalFx.Instrumentation.ClrProfiler.Native.static"
+target_include_directories("SignalFx.Tracing.ClrProfiler.Native.static"
         PUBLIC lib/coreclr/src/pal/inc/rt
         PUBLIC lib/coreclr/src/pal/prebuilt/inc
         PUBLIC lib/coreclr/src/pal/inc
@@ -250,13 +250,13 @@ target_include_directories("SignalFx.Instrumentation.ClrProfiler.Native.static"
 
 # Define linker libraries
 if (ISMACOS)
-    target_link_libraries("SignalFx.Instrumentation.ClrProfiler.Native.static"
+    target_link_libraries("SignalFx.Tracing.ClrProfiler.Native.static"
         ${OUTPUT_DEPS_DIR}/re2/obj/libre2.a
         ${OUTPUT_DEPS_DIR}/fmt/libfmt.a
         ${CMAKE_DL_LIBS}
     )
 elseif(ISLINUX)
-    target_link_libraries("SignalFx.Instrumentation.ClrProfiler.Native.static"
+    target_link_libraries("SignalFx.Tracing.ClrProfiler.Native.static"
         ${OUTPUT_DEPS_DIR}/re2/obj/libre2.a
         ${OUTPUT_DEPS_DIR}/fmt/libfmt.a
         ${CMAKE_DL_LIBS}
@@ -268,7 +268,7 @@ endif()
 # ******************************************************
 # Define shared target
 # ******************************************************
-SET(TARGET_NAME "SignalFx.Instrumentation.ClrProfiler.Native")
+SET(TARGET_NAME "SignalFx.Tracing.ClrProfiler.Native")
 
 if (ISMACOS)
     add_library(${TARGET_NAME} SHARED
@@ -286,4 +286,4 @@ endif()
 set_target_properties(${TARGET_NAME} PROPERTIES PREFIX "")
 
 # Define linker libraries
-target_link_libraries(${TARGET_NAME} "SignalFx.Instrumentation.ClrProfiler.Native.static")
+target_link_libraries(${TARGET_NAME} "SignalFx.Tracing.ClrProfiler.Native.static")

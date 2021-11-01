@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------------------
-// Exports that managed code from SignalFx.Instrumentation.dll will
+// Exports that managed code from SignalFx.Tracing.dll will
 // P/Invoke into
 //
 // NOTE: Must keep these signatures in sync with the DllImports in

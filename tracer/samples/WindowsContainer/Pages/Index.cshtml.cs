@@ -18,7 +18,7 @@ namespace Dotnet.WindowsContainer.Example.Pages
 
         public void OnGet()
         {
-            var instrumentationType = Type.GetType("Datadog.Trace.ClrProfiler.Instrumentation, SignalFx.Instrumentation");
+            var instrumentationType = Type.GetType("Datadog.Trace.ClrProfiler.Instrumentation, SignalFx.Tracing");
             IsProfilerAttached = (bool?)instrumentationType?.GetProperty("ProfilerAttached", BindingFlags.Public | BindingFlags.Static)?.GetValue(null) ?? false;
             TracerAssemblyLocation = instrumentationType?.Assembly.Location;
 

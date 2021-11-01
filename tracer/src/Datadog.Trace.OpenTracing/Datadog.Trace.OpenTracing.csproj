@@ -5,7 +5,7 @@
     <Version>0.0.1</Version>
     <Title>OpenTelemetry Instrumentation - OpenTracing</Title>
     <Description>Provides OpenTracing support for OpenTelemetry AutoInstrumentation</Description>
-	  <AssemblyName>SignalFx.Instrumentation.OpenTracing</AssemblyName>
+	  <AssemblyName>SignalFx.Tracing.OpenTracing</AssemblyName>
     <PackageTags>$(PackageTags);OpenTracing</PackageTags>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>

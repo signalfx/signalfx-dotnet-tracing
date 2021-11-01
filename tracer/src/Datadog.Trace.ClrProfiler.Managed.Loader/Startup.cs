@@ -9,13 +9,13 @@ using System.Reflection;
 namespace Datadog.Trace.ClrProfiler.Managed.Loader
 {
     /// <summary>
-    /// A class that attempts to load the SignalFx.Instrumentation .NET assembly.
+    /// A class that attempts to load the SignalFx.Tracing .NET assembly.
     /// </summary>
     public partial class Startup
     {
         /// <summary>
         /// Initializes static members of the <see cref="Startup"/> class.
-        /// This method also attempts to load the SignalFx.InstrumentationTrace .NET assembly.
+        /// This method also attempts to load the SignalFx.TracingTrace .NET assembly.
         /// </summary>
         static Startup()
         {
@@ -39,7 +39,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
         {
             try
             {
-                var assembly = Assembly.Load("SignalFx.Instrumentation, Version=0.0.1.0, Culture=neutral, PublicKeyToken=e43a27c2023d388a");
+                var assembly = Assembly.Load("SignalFx.Tracing, Version=0.0.1.0, Culture=neutral, PublicKeyToken=e43a27c2023d388a");
 
                 if (assembly != null)
                 {

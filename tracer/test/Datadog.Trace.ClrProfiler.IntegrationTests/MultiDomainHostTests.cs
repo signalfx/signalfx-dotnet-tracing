@@ -56,7 +56,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("LoadFromGAC", "False")]
         public void WorksOutsideTheGAC(string targetFramework)
         {
-            Assert.False(typeof(Instrumentation).Assembly.GlobalAssemblyCache, "SignalFx.Instrumentation was loaded from the GAC. Ensure that the assembly and its dependencies are not installed in the GAC when running this test.");
+            Assert.False(typeof(Instrumentation).Assembly.GlobalAssemblyCache, "SignalFx.Tracing was loaded from the GAC. Ensure that the assembly and its dependencies are not installed in the GAC when running this test.");
 
             var expectedMap = new Dictionary<string, int>()
             {

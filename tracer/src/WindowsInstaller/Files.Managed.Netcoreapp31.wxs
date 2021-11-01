@@ -6,23 +6,23 @@
   <Fragment>
     <ComponentGroup Id="Files.Managed.Netcoreapp31" Directory="netcoreapp3.1">
       <Component Win64="$(var.Win64)">
-        <File Id="netcoreapp31_SignalFx.Instrumentation.dll"
-              Source="$(var.TracerHomeDirectory)\netcoreapp3.1\SignalFx.Instrumentation.dll"
+        <File Id="netcoreapp31_SignalFx.Tracing.dll"
+              Source="$(var.TracerHomeDirectory)\netcoreapp3.1\SignalFx.Tracing.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="netcoreapp31_SignalFx.Instrumentation.MSBuild.dll"
-              Source="$(var.TracerHomeDirectory)\netcoreapp3.1\SignalFx.Instrumentation.MSBuild.dll"
+        <File Id="netcoreapp31_SignalFx.Tracing.MSBuild.dll"
+              Source="$(var.TracerHomeDirectory)\netcoreapp3.1\SignalFx.Tracing.MSBuild.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="netcoreapp31_SignalFx.Instrumentation.MSBuild.pdb"
-              Source="$(var.TracerHomeDirectory)\netcoreapp3.1\SignalFx.Instrumentation.MSBuild.pdb"
+        <File Id="netcoreapp31_SignalFx.Tracing.MSBuild.pdb"
+              Source="$(var.TracerHomeDirectory)\netcoreapp3.1\SignalFx.Tracing.MSBuild.pdb"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="netcoreapp31_SignalFx.Instrumentation.pdb"
-              Source="$(var.TracerHomeDirectory)\netcoreapp3.1\SignalFx.Instrumentation.pdb"
+        <File Id="netcoreapp31_SignalFx.Tracing.pdb"
+              Source="$(var.TracerHomeDirectory)\netcoreapp3.1\SignalFx.Tracing.pdb"
               KeyPath="yes" Checksum="yes"/>
       </Component>
     </ComponentGroup>

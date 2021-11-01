@@ -26,7 +26,7 @@ COPY --from=publish /app/publish .
 # App is being copied to /app, so Datadog assets are at /app/datadog
 ENV CORECLR_ENABLE_PROFILING=1
 ENV CORECLR_PROFILER={918728DD-259F-4A6A-AC2B-B85E1B658318}
-ENV CORECLR_PROFILER_PATH=/app/datadog/linux-musl-x64/SignalFx.Instrumentation.ClrProfiler.Native.so
+ENV CORECLR_PROFILER_PATH=/app/datadog/linux-musl-x64/SignalFx.Tracing.ClrProfiler.Native.so
 ENV SIGNALFX_INTEGRATIONS=/app/datadog/integrations.json
 ENV SIGNALFX_DOTNET_TRACER_HOME=/app/datadog
 

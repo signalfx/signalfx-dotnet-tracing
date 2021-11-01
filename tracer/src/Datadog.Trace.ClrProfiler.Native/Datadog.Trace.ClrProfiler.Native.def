@@ -1,4 +1,4 @@
-LIBRARY "SignalFx.Instrumentation.ClrProfiler.Native.dll"
+LIBRARY "SignalFx.Tracing.ClrProfiler.Native.dll"
 
 EXPORTS
     DllCanUnloadNow PRIVATE

@@ -4,7 +4,7 @@
     <RootNamespace>Datadog.Trace.ClrProfiler.Managed.Loader</RootNamespace>
     <TargetFrameworks>net45;netcoreapp2.0</TargetFrameworks>
     <OutputPath>..\bin\ProfilerResources\</OutputPath>
-    <AssemblyName>SignalFx.Instrumentation.ClrProfiler.Managed.Loader</AssemblyName>
+    <AssemblyName>SignalFx.Tracing.ClrProfiler.Managed.Loader</AssemblyName>
 
     <!-- NuGet -->
     <Version>0.0.1</Version>

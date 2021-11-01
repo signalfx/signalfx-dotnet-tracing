@@ -22,7 +22,7 @@ namespace StackExchange.Redis.AssemblyConflict.SdkProject
 
                 Console.WriteLine();
                 Console.WriteLine($"Profile attached: {profilerAttached}");
-                Console.WriteLine($"SignalFx.Instrumentation.dll path: {tracerAssemblyLocation}");
+                Console.WriteLine($"SignalFx.Tracing.dll path: {tracerAssemblyLocation}");
                 Console.WriteLine();
             }
 
