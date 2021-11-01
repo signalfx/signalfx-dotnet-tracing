@@ -70,12 +70,12 @@ echo "##vso[task.setvariable variable=SIGNALFX_DOTNET_TRACER_MSBUILD]$signalfx_t
 echo "##vso[task.setvariable variable=SIGNALFX_INTEGRATIONS]$signalfx_tracer_integrations"
 
 echo "##vso[task.setvariable variable=CORECLR_ENABLE_PROFILING]1"
-echo "##vso[task.setvariable variable=CORECLR_PROFILER]{918728DD-259F-4A6A-AC2B-B85E1B658318}"
+echo "##vso[task.setvariable variable=CORECLR_PROFILER]{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"
 echo "##vso[task.setvariable variable=CORECLR_PROFILER_PATH_32]$signalfx_tracer_profiler_32"
 echo "##vso[task.setvariable variable=CORECLR_PROFILER_PATH_64]$signalfx_tracer_profiler_64"
 
 echo "##vso[task.setvariable variable=COR_ENABLE_PROFILING]1"
-echo "##vso[task.setvariable variable=COR_PROFILER]{918728DD-259F-4A6A-AC2B-B85E1B658318}"
+echo "##vso[task.setvariable variable=COR_PROFILER]{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"
 echo "##vso[task.setvariable variable=COR_PROFILER_PATH_32]$signalfx_tracer_profiler_32"
 echo "##vso[task.setvariable variable=COR_PROFILER_PATH_64]$signalfx_tracer_profiler_64"
 

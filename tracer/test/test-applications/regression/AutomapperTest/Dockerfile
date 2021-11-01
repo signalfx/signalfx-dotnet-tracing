@@ -5,7 +5,7 @@ RUN mkdir -p /var/log/signalfx/dotnet
 RUN curl -L https://github.com/signalfx/signalfx-dotnet-tracing/releases/download/v$TRACER_VERSION/signalfx-dotnet-tracing-$TRACER_VERSION.tar.gz | tar xzf - -C /opt/signalfx
 
 ENV CORECLR_ENABLE_PROFILING=1
-ENV CORECLR_PROFILER={918728DD-259F-4A6A-AC2B-B85E1B658318}
+ENV CORECLR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}
 ENV CORECLR_PROFILER_PATH=/opt/signalfx/SignalFx.Tracing.ClrProfiler.Native.so
 ENV SIGNALFX_DOTNET_TRACER_HOME=/opt/signalfx
 ENV SIGNALFX_INTEGRATIONS=/opt/signalfx/integrations.json

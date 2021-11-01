@@ -11,9 +11,9 @@ profiles:
         endpoints:
           - "{{ windowsEndpoint }}"
         environmentVariables:
-          COR_PROFILER: "{918728DD-259F-4A6A-AC2B-B85E1B658318}"
+          COR_PROFILER: "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"
           COR_PROFILER_PATH: "{{ windowsProfilerPath }}\\{{ commit_hash }}\\tracer-home-win\\win-x64\\SignalFx.Tracing.ClrProfiler.Native.dll"
-          CORECLR_PROFILER: "{918728DD-259F-4A6A-AC2B-B85E1B658318}"
+          CORECLR_PROFILER: "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"
           CORECLR_PROFILER_PATH: "{{ windowsProfilerPath }}\\{{ commit_hash }}\\tracer-home-win\\win-x64\\SignalFx.Tracing.ClrProfiler.Native.dll"
           SIGNALFX_DOTNET_TRACER_HOME: "{{ windowsProfilerPath }}\\{{ commit_hash }}\\tracer-home-win"
           SIGNALFX_INTEGRATIONS: "{{ windowsProfilerPath }}\\{{ commit_hash }}\\tracer-home-win\\integrations.json"
@@ -37,9 +37,9 @@ profiles:
         endpoints:
           - "{{ linuxEndpoint }}"
         environmentVariables:
-          COR_PROFILER: "{918728DD-259F-4A6A-AC2B-B85E1B658318}"
+          COR_PROFILER: "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"
           COR_PROFILER_PATH: "{{ linuxProfilerPath }}/{{ commit_hash }}/tracer-home-linux/SignalFx.Tracing.ClrProfiler.Native.so"
-          CORECLR_PROFILER: "{918728DD-259F-4A6A-AC2B-B85E1B658318}"
+          CORECLR_PROFILER: "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"
           CORECLR_PROFILER_PATH: "{{ linuxProfilerPath }}/{{ commit_hash }}/tracer-home-linux/SignalFx.Tracing.ClrProfiler.Native.so"
           SIGNALFX_DOTNET_TRACER_HOME: "{{ linuxProfilerPath }}/{{ commit_hash }}/tracer-home-linux"
           SIGNALFX_INTEGRATIONS: "{{ linuxProfilerPath }}/{{ commit_hash }}/tracer-home-linux/integrations.json"
@@ -63,9 +63,9 @@ profiles:
         endpoints:
           - "{{ linuxArm64Endpoint }}"
         environmentVariables:
-          COR_PROFILER: "{918728DD-259F-4A6A-AC2B-B85E1B658318}"
+          COR_PROFILER: "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"
           COR_PROFILER_PATH: "{{ linuxArm64ProfilerPath }}/{{ commit_hash }}/tracer-home-linux-arm64/SignalFx.Tracing.ClrProfiler.Native.so"
-          CORECLR_PROFILER: "{918728DD-259F-4A6A-AC2B-B85E1B658318}"
+          CORECLR_PROFILER: "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"
           CORECLR_PROFILER_PATH: "{{ linuxArm64ProfilerPath }}/{{ commit_hash }}/tracer-home-linux-arm64/SignalFx.Tracing.ClrProfiler.Native.so"
           SIGNALFX_DOTNET_TRACER_HOME: "{{ linuxArm64ProfilerPath }}/{{ commit_hash }}/tracer-home-linux-arm64"
           SIGNALFX_INTEGRATIONS: "{{ linuxArm64ProfilerPath }}/{{ commit_hash }}/tracer-home-linux-arm64/integrations.json"

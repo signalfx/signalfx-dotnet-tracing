@@ -32,12 +32,12 @@ OPT_DIR=$(optional_dir)
 
 # Enable .NET Framework Profiling API
 export COR_ENABLE_PROFILING="1"
-export COR_PROFILER="{918728DD-259F-4A6A-AC2B-B85E1B658318}"
+export COR_PROFILER="{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"
 export COR_PROFILER_PATH="${PWD}/tracer/bin/tracer-home/${OPT_DIR}SignalFx.Tracing.ClrProfiler.Native.${SUFIX}"
 
 # Enable .NET Core Profiling API
 export CORECLR_ENABLE_PROFILING="1"
-export CORECLR_PROFILER="{918728DD-259F-4A6A-AC2B-B85E1B658318}"
+export CORECLR_PROFILER="{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"
 export CORECLR_PROFILER_PATH="${PWD}/tracer/bin/tracer-home/${OPT_DIR}SignalFx.Tracing.ClrProfiler.Native.${SUFIX}"
 
 # Configure SFx .NET Tracer 

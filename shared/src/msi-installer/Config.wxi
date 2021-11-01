@@ -5,7 +5,7 @@
   <?define ArpManufacturer = "Datadog, Inc." ?>
   <?define Company = "Datadog" ?>
   <?define ProductNamePlatformAgnostic = "Datadog $(var.BaseProductName)" ?>
-  <?define ProfilerCLSID = "{918728DD-259F-4A6A-AC2B-B85E1B658318}" ?>
+  <?define ProfilerCLSID = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}" ?>
   <?define ProfilerCLSIDBeta = "{50DA5EED-F1ED-B00B-1055-5AFE55A1ADE5}" ?>
 
   <?if $(var.Platform) = x64 ?>

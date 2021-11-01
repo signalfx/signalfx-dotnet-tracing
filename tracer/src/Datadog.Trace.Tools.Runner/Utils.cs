@@ -18,7 +18,7 @@ namespace Datadog.Trace.Tools.Runner
 {
     internal class Utils
     {
-        public const string PROFILERID = "{918728DD-259F-4A6A-AC2B-B85E1B658318}";
+        public const string PROFILERID = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}";
 
         public static Dictionary<string, string> GetProfilerEnvironmentVariables(string runnerFolder, Platform platform, Options options)
         {
