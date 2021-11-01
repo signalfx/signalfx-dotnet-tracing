@@ -3082,11 +3082,11 @@ HRESULT CorProfiler::AddIISPreStartInitFlags(const ModuleID module_id, const mdT
 }
 
 #ifdef LINUX
-extern uint8_t dll_start[] asm("_binary_SignalFx.Tracing_ClrProfiler_Managed_Loader_dll_start");
-extern uint8_t dll_end[] asm("_binary_SignalFx.Tracing_ClrProfiler_Managed_Loader_dll_end");
+extern uint8_t dll_start[] asm("_binary_SignalFx_Tracing_ClrProfiler_Managed_Loader_dll_start");
+extern uint8_t dll_end[] asm("_binary_SignalFx_Tracing_ClrProfiler_Managed_Loader_dll_end");
 
-extern uint8_t pdb_start[] asm("_binary_SignalFx.Tracing_ClrProfiler_Managed_Loader_pdb_start");
-extern uint8_t pdb_end[] asm("_binary_SignalFx.Tracing_ClrProfiler_Managed_Loader_pdb_end");
+extern uint8_t pdb_start[] asm("_binary_SignalFx_Tracing_ClrProfiler_Managed_Loader_pdb_start");
+extern uint8_t pdb_end[] asm("_binary_SignalFx_Tracing_ClrProfiler_Managed_Loader_pdb_end");
 #endif
 
 void CorProfiler::GetAssemblyAndSymbolsBytes(BYTE** pAssemblyArray, int* assemblySize, BYTE** pSymbolsArray,
