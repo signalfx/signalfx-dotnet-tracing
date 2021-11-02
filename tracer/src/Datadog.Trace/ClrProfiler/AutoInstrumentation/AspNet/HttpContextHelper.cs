@@ -7,7 +7,6 @@
 using System;
 using System.Web;
 using Datadog.Trace.ExtensionMethods;
-using Datadog.Trace.Headers;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Propagation;
 
@@ -24,7 +23,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
             {
                 try
                 {
-                    scope.Span.SetHeaderTags<IHeadersCollection>(httpContext.Response.Headers.Wrap(), Tracer.Instance.Settings.HeaderTags, defaultTagPrefix: PropagationExtensions.HttpResponseHeadersTagPrefix);
+                    scope.Span.SetHeaderTags(httpContext.Response.Headers.Wrap(), Tracer.Instance.Settings.HeaderTags, defaultTagPrefix: PropagationExtensions.HttpResponseHeadersTagPrefix);
                 }
                 catch (PlatformNotSupportedException ex)
                 {

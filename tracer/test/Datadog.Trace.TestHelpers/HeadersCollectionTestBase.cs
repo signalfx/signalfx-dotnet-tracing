@@ -41,7 +41,6 @@ namespace Datadog.Trace.TestHelpers
         {
             yield return () => WebRequest.CreateHttp("http://localhost").Headers.Wrap();
             yield return () => new NameValueCollection().Wrap();
-            yield return () => new DictionaryHeadersCollection();
         }
 
         internal static void AssertExpected(IHeadersCollection headers, string key, string expected)
