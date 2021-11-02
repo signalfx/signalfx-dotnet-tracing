@@ -72,11 +72,11 @@ public:
 
 #if _WINDOWS
 const std::string TestDynamicInstanceFilePath = "..\\..\\src\\Datadog.Trace.ClrProfiler.Native\\bin\\Debug\\" +
-                                                CurrentArch + "\\OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dll";
+                                                CurrentArch + "\\SignalFx.Tracing.ClrProfiler.Native.dll";
 #else
 const std::string TestDynamicInstanceFilePath = "Test";
 #endif
-const std::string TestDynamicInstanceIid = "{918728DD-259F-4A6A-AC2B-B85E1B658318}";
+const std::string TestDynamicInstanceIid = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}";
 
 inline TestDynamicInstanceImpl* CreateTestDynamicInstance(bool useTracerFilePath)
 {

@@ -39,20 +39,20 @@ namespace Datadog.Trace.ClrProfiler
         // and optional on .NET Core
         private static class Windows
         {
-            [DllImport("OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dll")]
+            [DllImport("SignalFx.Tracing.ClrProfiler.Native.dll")]
             public static extern bool IsProfilerAttached();
 
-            [DllImport("OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dll")]
+            [DllImport("SignalFx.Tracing.ClrProfiler.Native.dll")]
             public static extern void InitializeProfiler([MarshalAs(UnmanagedType.LPWStr)] string id, [In] NativeCallTargetDefinition[] methodArrays, int size);
         }
 
         // assume .NET Core if not running on Windows
         private static class NonWindows
         {
-            [DllImport("OpenTelemetry.AutoInstrumentation.ClrProfiler.Native")]
+            [DllImport("SignalFx.Tracing.ClrProfiler.Native")]
             public static extern bool IsProfilerAttached();
 
-            [DllImport("OpenTelemetry.AutoInstrumentation.ClrProfiler.Native")]
+            [DllImport("SignalFx.Tracing.ClrProfiler.Native")]
             public static extern void InitializeProfiler([MarshalAs(UnmanagedType.LPWStr)] string id, [In] NativeCallTargetDefinition[] methodArrays, int size);
         }
     }

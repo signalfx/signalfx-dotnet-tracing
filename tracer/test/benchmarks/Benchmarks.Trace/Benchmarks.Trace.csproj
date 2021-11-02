@@ -11,7 +11,7 @@
 
     <!-- Strong name signature -->
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\..\..\OpenTelemetry.AutoInstrumentation.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\..\..\SignalFx.Tracing.snk</AssemblyOriginatorKeyFile>
     <DelaySign>false</DelaySign>
     <NoWarn>1591</NoWarn>
 

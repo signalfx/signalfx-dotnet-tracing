@@ -22,7 +22,7 @@ namespace StackExchange.Redis.AssemblyConflict.LegacyProject
 
                 Console.WriteLine();
                 Console.WriteLine($"Profile attached: {profilerAttached}");
-                Console.WriteLine($"OpenTelemetry.AutoInstrumentation.dll path: {tracerAssemblyLocation}");
+                Console.WriteLine($"SignalFx.Tracing.dll path: {tracerAssemblyLocation}");
                 Console.WriteLine();
             }
 

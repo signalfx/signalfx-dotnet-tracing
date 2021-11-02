@@ -80,15 +80,15 @@ const WSTRING skip_assemblies[]{WStr("mscorlib"),
 
 const WSTRING mscorlib_assemblyName = WStr("mscorlib");
 const WSTRING system_private_corelib_assemblyName = WStr("System.Private.CoreLib");
-const WSTRING datadog_trace_clrprofiler_managed_loader_assemblyName = WStr("OpenTelemetry.AutoInstrumentation.ClrProfiler.Managed.Loader");
+const WSTRING datadog_trace_clrprofiler_managed_loader_assemblyName = WStr("SignalFx.Tracing.ClrProfiler.Managed.Loader");
 
 const WSTRING microsoft_aspnetcore_hosting_assemblyName = WStr("Microsoft.AspNetCore.Hosting");
 const WSTRING dapper_assemblyName = WStr("Dapper");
 
 const WSTRING managed_profiler_full_assembly_version =
-    WStr("OpenTelemetry.AutoInstrumentation, Version=0.0.1.0, Culture=neutral, PublicKeyToken=34b8972644a12429");
+    WStr("SignalFx.Tracing, Version=0.0.1.0, Culture=neutral, PublicKeyToken=e43a27c2023d388a");
 
-const WSTRING managed_profiler_name = WStr("OpenTelemetry.AutoInstrumentation");
+const WSTRING managed_profiler_name = WStr("SignalFx.Tracing");
 
 const WSTRING nonwindows_nativemethods_type = WStr("Datadog.Trace.ClrProfiler.NativeMethods+NonWindows");
 const WSTRING windows_nativemethods_type = WStr("Datadog.Trace.ClrProfiler.NativeMethods+Windows");
@@ -99,11 +99,11 @@ const WSTRING appsec_windows_nativemethods_type = WStr("Datadog.Trace.AppSec.Waf
 const WSTRING calltarget_modification_action = WStr("CallTargetModification");
 
 #ifdef _WIN32
-const WSTRING native_dll_filename = WStr("OPENTELEMETRY.AUTOINSTRUMENTATION.CLRPROFILER.NATIVE.DLL");
+const WSTRING native_dll_filename = WStr("SIGNALFX.TRACING.CLRPROFILER.NATIVE.DLL");
 #elif MACOS
-const WSTRING native_dll_filename = WStr("OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dylib");
+const WSTRING native_dll_filename = WStr("SignalFx.Tracing.ClrProfiler.Native.dylib");
 #else
-const WSTRING native_dll_filename = WStr("OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.so");
+const WSTRING native_dll_filename = WStr("SignalFx.Tracing.ClrProfiler.Native.so");
 #endif
 
 } // namespace trace

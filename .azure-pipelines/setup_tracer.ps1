@@ -29,10 +29,10 @@ if ($env:os -eq "Windows_NT")
         $signalfx_tracer_home = "$signalfx_tracer_workingfolder\release"
     }
 
-    $signalfx_tracer_msbuild = "$signalfx_tracer_home\netstandard2.0\OpenTelemetry.AutoInstrumentation.MSBuild.dll"
+    $signalfx_tracer_msbuild = "$signalfx_tracer_home\netstandard2.0\SignalFx.Tracing.MSBuild.dll"
     $signalfx_tracer_integrations = "$signalfx_tracer_home\integrations.json"
-    $signalfx_tracer_profiler_32 = "$signalfx_tracer_home\win-x86\OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dll"
-    $signalfx_tracer_profiler_64 = "$signalfx_tracer_home\win-x64\OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dll"
+    $signalfx_tracer_profiler_32 = "$signalfx_tracer_home\win-x86\SignalFx.Tracing.ClrProfiler.Native.dll"
+    $signalfx_tracer_profiler_64 = "$signalfx_tracer_home\win-x64\SignalFx.Tracing.ClrProfiler.Native.dll"
 } 
 else 
 {
@@ -56,9 +56,9 @@ else
         $signalfx_tracer_home = "$signalfx_tracer_workingfolder/release"
     }
 
-    $signalfx_tracer_msbuild = "$signalfx_tracer_home/netstandard2.0/OpenTelemetry.AutoInstrumentation.MSBuild.dll"
+    $signalfx_tracer_msbuild = "$signalfx_tracer_home/netstandard2.0/SignalFx.Tracing.MSBuild.dll"
     $signalfx_tracer_integrations = "$signalfx_tracer_home/integrations.json"
-    $signalfx_tracer_profiler_64 = "$signalfx_tracer_home/OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.so"
+    $signalfx_tracer_profiler_64 = "$signalfx_tracer_home/SignalFx.Tracing.ClrProfiler.Native.so"
 }
 
 # Set all environment variables to attach the profiler to the following pipeline steps
@@ -70,12 +70,12 @@ echo "##vso[task.setvariable variable=SIGNALFX_DOTNET_TRACER_MSBUILD]$signalfx_t
 echo "##vso[task.setvariable variable=SIGNALFX_INTEGRATIONS]$signalfx_tracer_integrations"
 
 echo "##vso[task.setvariable variable=CORECLR_ENABLE_PROFILING]1"
-echo "##vso[task.setvariable variable=CORECLR_PROFILER]{918728DD-259F-4A6A-AC2B-B85E1B658318}"
+echo "##vso[task.setvariable variable=CORECLR_PROFILER]{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"
 echo "##vso[task.setvariable variable=CORECLR_PROFILER_PATH_32]$signalfx_tracer_profiler_32"
 echo "##vso[task.setvariable variable=CORECLR_PROFILER_PATH_64]$signalfx_tracer_profiler_64"
 
 echo "##vso[task.setvariable variable=COR_ENABLE_PROFILING]1"
-echo "##vso[task.setvariable variable=COR_PROFILER]{918728DD-259F-4A6A-AC2B-B85E1B658318}"
+echo "##vso[task.setvariable variable=COR_PROFILER]{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"
 echo "##vso[task.setvariable variable=COR_PROFILER_PATH_32]$signalfx_tracer_profiler_32"
 echo "##vso[task.setvariable variable=COR_PROFILER_PATH_64]$signalfx_tracer_profiler_64"
 

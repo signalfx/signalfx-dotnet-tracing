@@ -4,7 +4,7 @@
   <PropertyGroup>
     <!-- Strong name signature -->
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>../../../OpenTelemetry.AutoInstrumentation.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>../../../SignalFx.Tracing.snk</AssemblyOriginatorKeyFile>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <DelaySign>false</DelaySign>
   </PropertyGroup>
