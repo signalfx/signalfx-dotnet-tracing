@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>net45</TargetFrameworks>
     <Version>0.0.1</Version>
-    <AssemblyName>OpenTelemetry.AutoInstrumentation.AspNet</AssemblyName>
+    <AssemblyName>SignalFx.Tracing.AspNet</AssemblyName>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
   </PropertyGroup>
 

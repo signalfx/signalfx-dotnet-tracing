@@ -6,33 +6,33 @@
   <Fragment>
     <ComponentGroup Id="Files.Managed.Net45" Directory="net45">
       <Component Win64="$(var.Win64)">
-        <File Id="net45_OpenTelemetry.AutoInstrumentation.AspNet.dll"
-              Source="$(var.TracerHomeDirectory)\net45\OpenTelemetry.AutoInstrumentation.AspNet.dll"
+        <File Id="net45_SignalFx.Tracing.AspNet.dll"
+              Source="$(var.TracerHomeDirectory)\net45\SignalFx.Tracing.AspNet.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="net45_OpenTelemetry.AutoInstrumentation.AspNet.pdb"
-              Source="$(var.TracerHomeDirectory)\net45\OpenTelemetry.AutoInstrumentation.AspNet.pdb"
+        <File Id="net45_SignalFx.Tracing.AspNet.pdb"
+              Source="$(var.TracerHomeDirectory)\net45\SignalFx.Tracing.AspNet.pdb"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="net45_OpenTelemetry.AutoInstrumentation.dll"
-              Source="$(var.TracerHomeDirectory)\net45\OpenTelemetry.AutoInstrumentation.dll"
+        <File Id="net45_SignalFx.Tracing.dll"
+              Source="$(var.TracerHomeDirectory)\net45\SignalFx.Tracing.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="net45_OpenTelemetry.AutoInstrumentation.MSBuild.dll"
-              Source="$(var.TracerHomeDirectory)\net45\OpenTelemetry.AutoInstrumentation.MSBuild.dll"
+        <File Id="net45_SignalFx.Tracing.MSBuild.dll"
+              Source="$(var.TracerHomeDirectory)\net45\SignalFx.Tracing.MSBuild.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="net45_OpenTelemetry.AutoInstrumentation.MSBuild.pdb"
-              Source="$(var.TracerHomeDirectory)\net45\OpenTelemetry.AutoInstrumentation.MSBuild.pdb"
+        <File Id="net45_SignalFx.Tracing.MSBuild.pdb"
+              Source="$(var.TracerHomeDirectory)\net45\SignalFx.Tracing.MSBuild.pdb"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="net45_OpenTelemetry.AutoInstrumentation.pdb"
-              Source="$(var.TracerHomeDirectory)\net45\OpenTelemetry.AutoInstrumentation.pdb"
+        <File Id="net45_SignalFx.Tracing.pdb"
+              Source="$(var.TracerHomeDirectory)\net45\SignalFx.Tracing.pdb"
               KeyPath="yes" Checksum="yes"/>
       </Component>
     </ComponentGroup>

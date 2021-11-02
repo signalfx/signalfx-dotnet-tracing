@@ -14,7 +14,7 @@ using System.Reflection;
 namespace Datadog.Trace.ClrProfiler.Managed.Loader
 {
     /// <summary>
-    /// A class that attempts to load the OpenTelemetry.AutoInstrumentation .NET assembly.
+    /// A class that attempts to load the SignalFx.Tracing .NET assembly.
     /// </summary>
     public partial class Startup
     {

@@ -138,7 +138,7 @@ namespace Datadog.Trace.TestHelpers
                 _ => throw new PlatformNotSupportedException()
             };
 
-            var fileName = $"OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.{extension}";
+            var fileName = $"SignalFx.Tracing.ClrProfiler.Native.{extension}";
 
             var path = dir is null
                            ? Path.Combine(tracerHome, fileName)

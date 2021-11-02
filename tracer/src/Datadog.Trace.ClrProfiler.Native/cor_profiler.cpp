@@ -354,7 +354,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::AssemblyLoadFinished(AssemblyID assembly_
         return S_OK;
     }
 
-    const auto is_instrumentation_assembly = assembly_info.name == WStr("OpenTelemetry.AutoInstrumentation");
+    const auto is_instrumentation_assembly = assembly_info.name == WStr("SignalFx.Tracing");
 
     if (is_instrumentation_assembly || Logger::IsDebugEnabled())
     {
@@ -628,7 +628,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::ModuleLoadFinished(ModuleID module_id, HR
     // In this case, do not insert another startup hook into that non-shared AppDomain
     if (module_info.assembly.name == datadog_trace_clrprofiler_managed_loader_assemblyName)
     {
-        Logger::Info("ModuleLoadFinished: OpenTelemetry.AutoInstrumentation.ClrProfiler.Managed.Loader loaded into AppDomain ", app_domain_id, " ",
+        Logger::Info("ModuleLoadFinished: SignalFx.Tracing.ClrProfiler.Managed.Loader loaded into AppDomain ", app_domain_id, " ",
                      module_info.assembly.app_domain_name);
         first_jit_compilation_app_domains.insert(app_domain_id);
         return S_OK;
@@ -3082,11 +3082,11 @@ HRESULT CorProfiler::AddIISPreStartInitFlags(const ModuleID module_id, const mdT
 }
 
 #ifdef LINUX
-extern uint8_t dll_start[] asm("_binary_OpenTelemetry_AutoInstrumentation_ClrProfiler_Managed_Loader_dll_start");
-extern uint8_t dll_end[] asm("_binary_OpenTelemetry_AutoInstrumentation_ClrProfiler_Managed_Loader_dll_end");
+extern uint8_t dll_start[] asm("_binary_SignalFx_Tracing_ClrProfiler_Managed_Loader_dll_start");
+extern uint8_t dll_end[] asm("_binary_SignalFx_Tracing_ClrProfiler_Managed_Loader_dll_end");
 
-extern uint8_t pdb_start[] asm("_binary_OpenTelemetry_AutoInstrumentation_ClrProfiler_Managed_Loader_pdb_start");
-extern uint8_t pdb_end[] asm("_binary_OpenTelemetry_AutoInstrumentation_ClrProfiler_Managed_Loader_pdb_end");
+extern uint8_t pdb_start[] asm("_binary_SignalFx_Tracing_ClrProfiler_Managed_Loader_pdb_start");
+extern uint8_t pdb_end[] asm("_binary_SignalFx_Tracing_ClrProfiler_Managed_Loader_pdb_end");
 #endif
 
 void CorProfiler::GetAssemblyAndSymbolsBytes(BYTE** pAssemblyArray, int* assemblySize, BYTE** pSymbolsArray,
@@ -3130,7 +3130,7 @@ void CorProfiler::GetAssemblyAndSymbolsBytes(BYTE** pAssemblyArray, int* assembl
     {
         const std::string name = std::string(_dyld_get_image_name(i));
 
-        if (name.rfind("OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dylib") != std::string::npos)
+        if (name.rfind("SignalFx.Tracing.ClrProfiler.Native.dylib") != std::string::npos)
         {
             const mach_header_64* header = (const struct mach_header_64*) _dyld_get_image_header(i);
 

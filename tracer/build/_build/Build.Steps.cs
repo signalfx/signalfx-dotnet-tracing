@@ -67,7 +67,7 @@ partial class Build
     Project NativeProfilerProject => Solution.GetProject(Projects.ClrProfilerNative);
     Project NativeLoaderProject => Solution.GetProject(Projects.NativeLoader);
 
-    string NativeProfilerModule => "OpenTelemetry.AutoInstrumentation.ClrProfiler.Native";
+    string NativeProfilerModule => "SignalFx.Tracing.ClrProfiler.Native";
 
     [LazyPathExecutable(name: "cmake")] readonly Lazy<Tool> CMake;
     [LazyPathExecutable(name: "make")] readonly Lazy<Tool> Make;
@@ -1488,7 +1488,7 @@ partial class Build
 
     private DotNetTestSettings ConfigureCodeCoverage(DotNetTestSettings settings)
     {
-        var strongNameKeyPath = Solution.Directory / "OpenTelemetry.AutoInstrumentation.snk";
+        var strongNameKeyPath = Solution.Directory / "SignalFx.Tracing.snk";
 
         return settings.SetDataCollector("XPlat Code Coverage")
                 .SetProcessArgumentConfigurator(

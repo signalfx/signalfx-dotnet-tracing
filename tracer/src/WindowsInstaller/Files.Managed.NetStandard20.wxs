@@ -6,23 +6,23 @@
   <Fragment>
     <ComponentGroup Id="Files.Managed.NetStandard20" Directory="netstandard2.0">
       <Component Win64="$(var.Win64)">
-        <File Id="netstandard20_OpenTelemetry.AutoInstrumentation.dll"
-              Source="$(var.TracerHomeDirectory)\netstandard2.0\OpenTelemetry.AutoInstrumentation.dll"
+        <File Id="netstandard20_SignalFx.Tracing.dll"
+              Source="$(var.TracerHomeDirectory)\netstandard2.0\SignalFx.Tracing.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="netstandard20_OpenTelemetry.AutoInstrumentation.MSBuild.dll"
-              Source="$(var.TracerHomeDirectory)\netstandard2.0\OpenTelemetry.AutoInstrumentation.MSBuild.dll"
+        <File Id="netstandard20_SignalFx.Tracing.MSBuild.dll"
+              Source="$(var.TracerHomeDirectory)\netstandard2.0\SignalFx.Tracing.MSBuild.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="netstandard20_OpenTelemetry.AutoInstrumentation.MSBuild.pdb"
-              Source="$(var.TracerHomeDirectory)\netstandard2.0\OpenTelemetry.AutoInstrumentation.MSBuild.pdb"
+        <File Id="netstandard20_SignalFx.Tracing.MSBuild.pdb"
+              Source="$(var.TracerHomeDirectory)\netstandard2.0\SignalFx.Tracing.MSBuild.pdb"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="netstandard20_OpenTelemetry.AutoInstrumentation.pdb"
-              Source="$(var.TracerHomeDirectory)\netstandard2.0\OpenTelemetry.AutoInstrumentation.pdb"
+        <File Id="netstandard20_SignalFx.Tracing.pdb"
+              Source="$(var.TracerHomeDirectory)\netstandard2.0\SignalFx.Tracing.pdb"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
