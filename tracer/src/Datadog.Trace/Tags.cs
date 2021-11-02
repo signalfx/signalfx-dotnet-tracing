@@ -471,5 +471,111 @@ namespace Datadog.Trace
         internal const string AerospikeSetName = "aerospike.setname";
 
         internal const string AerospikeUserKey = "aerospike.userkey";
+
+        /// <summary>
+        /// Messaging tags
+        /// </summary>
+        public static class Messaging
+        {
+            /// <summary>
+            /// A string identifying the messaging system
+            /// </summary>
+            /// <example>kafka; rabbitmq; rocketmq; activemq; AmazonSQS.</example>
+            public const string System = "messaging.system";
+
+            /// <summary>
+            /// The message destination name.
+            /// This might be equal to the span name but is required nevertheless.
+            /// </summary>
+            public const string Destination = "messaging.destination";
+
+            /// <summary>
+            /// The kind of message destination.
+            /// </summary>
+            /// <example>queue.</example>
+            public const string DestinationKind = "messaging.destination_kind";
+
+            /// <summary>
+            /// A boolean that is true if the message destination is temporary.
+            /// </summary>
+            public const string TempDestination = "messaging.temp_destination";
+
+            /// <summary>
+            /// The name of the transport protocol.
+            /// </summary>
+            /// <example>AMQP; MQTT.</example>
+            public const string Protocol = "messaging.protocol";
+
+            /// <summary>
+            /// The version of the transport protocol.
+            /// </summary>
+            public const string ProtocolVersion = "messaging.protocol_version";
+
+            /// <summary>
+            /// Connection string.
+            /// </summary>
+            public const string Url = "messaging.url";
+
+            /// <summary>
+            /// A string identifying the kind of message consumption.
+            /// </summary>
+            /// <example>send; receive; process.</example>
+            public const string Operation = "messaging.operation";
+
+            /// <summary>
+            /// A value used by the messaging system as an identifier for the message, represented as a string.
+            /// </summary>
+            public const string MessageId = "messaging.message_id";
+
+            /// <summary>
+            /// The conversation ID identifying the conversation to which the message belongs,
+            /// represented as a string. Sometimes called "Correlation ID".
+            /// </summary>
+            public const string ConversationId = "messaging.conversation_id";
+
+            /// <summary>
+            /// The identifier for the consumer receiving a message.
+            /// </summary>
+            public const string ConsumerId = "messaging.consumer_id	";
+
+            /// <summary>
+            /// The (uncompressed) size of the message payload in bytes.
+            /// Also use this attribute if it is unknown whether the compressed or uncompressed payload size is reported.
+            /// </summary>
+            public const string MessageSize = "messaging.message_payload_size_bytes";
+
+            /// <summary>
+            /// The compressed size of the message payload in bytes.
+            /// </summary>
+            public const string MessageSizeCompressed = "messaging.message_payload_compressed_size_bytes";
+        }
+
+        /// <summary>
+        /// RabbitMQ tags
+        /// </summary>
+        public static class RabbitMq
+        {
+            /// <summary>
+            /// RabbitMQ message routing key.
+            /// </summary>
+            public const string RoutingKey = "messaging.rabbitmq.routing_key";
+        }
+
+        /// <summary>
+        /// Network tags
+        /// </summary>
+        public static class Net
+        {
+            /// <summary>
+            /// Remote address of the peer (dotted decimal for IPv4 or RFC5952 for IPv6)
+            /// </summary>
+            public const string PeerIP = "net.peer.ip";
+
+            /// <summary>
+            /// Remote hostname or similar.
+            /// This should be the IP/hostname of the broker (or other network-level peer) this specific message is sent to/received from.
+            /// </summary>
+            public const string PeerName = "net.peer.name";
+        }
     }
 }

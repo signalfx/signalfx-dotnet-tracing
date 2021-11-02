@@ -3,13 +3,14 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using Datadog.Trace.ClrProfiler.CallTarget;
 using Datadog.Trace.ClrProfiler.Integrations;
 using Datadog.Trace.DuckTyping;
-using Datadog.Trace.Logging;
 using Datadog.Trace.Tagging;
 
 namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
@@ -30,7 +31,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class BasicPublishIntegration
     {
-        private const string Command = "basic.publish";
+        private const string Command = RabbitMQIntegration.PublishCommand;
 
         private static readonly string[] DeliveryModeStrings = { null, "1", "2" };
 
@@ -63,15 +64,12 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
                 if (tags != null)
                 {
                     tags.MessageSize = body.Instance != null ? body.Length.ToString() : "0";
+
+                    RabbitMQIntegration.SetTagsFromBasicProperties(tags, basicProperties);
                 }
 
                 if (basicProperties.Instance != null)
                 {
-                    if (tags != null && basicProperties.IsDeliveryModePresent())
-                    {
-                        tags.DeliveryMode = DeliveryModeStrings[0x3 & basicProperties.DeliveryMode];
-                    }
-
                     // add distributed tracing headers to the message
                     if (basicProperties.Headers == null)
                     {

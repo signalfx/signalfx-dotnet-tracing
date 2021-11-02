@@ -3,26 +3,23 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
+// Modified by Splunk Inc.
+
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Datadog.Trace.ExtensionMethods;
 
 namespace Datadog.Trace.Tagging
 {
-    internal class RabbitMQTags : InstrumentationTags
+    internal class RabbitMQTags : MessagingTags
     {
         protected static readonly IProperty<string>[] RabbitMQTagsProperties =
-            InstrumentationTagsProperties.Concat(
-                new Property<RabbitMQTags, string>(Trace.Tags.InstrumentationName, t => t.InstrumentationName, (t, v) => t.InstrumentationName = v),
-                new Property<RabbitMQTags, string>(Trace.Tags.AmqpCommand, t => t.Command, (t, v) => t.Command = v),
-                new Property<RabbitMQTags, string>(Trace.Tags.AmqpDeliveryMode, t => t.DeliveryMode, (t, v) => t.DeliveryMode = v),
-                new Property<RabbitMQTags, string>(Trace.Tags.AmqpExchange, t => t.Exchange, (t, v) => t.Exchange = v),
-                new Property<RabbitMQTags, string>(Trace.Tags.AmqpQueue, t => t.Queue, (t, v) => t.Queue = v),
-                new Property<RabbitMQTags, string>(Trace.Tags.AmqpRoutingKey, t => t.RoutingKey, (t, v) => t.RoutingKey = v),
-                new Property<RabbitMQTags, string>(Trace.Tags.MessageSize, t => t.MessageSize, (t, v) => t.MessageSize = v));
+            MessagingTagsProperties.Concat(
+                new Property<RabbitMQTags, string>(Tags.InstrumentationName, t => t.InstrumentationName, (t, v) => t.InstrumentationName = v), // Non OTel compliant tag
+                new Property<RabbitMQTags, string>(Tags.AmqpCommand, t => t.Command, (t, v) => t.Command = v), // Non OTel compliant tag
+                new Property<RabbitMQTags, string>(Tags.AmqpDeliveryMode, t => t.DeliveryMode, (t, v) => t.DeliveryMode = v), // Non OTel compliant tag
+                new Property<RabbitMQTags, string>(Tags.AmqpExchange, t => t.Exchange, (t, v) => t.Exchange = v), // Non OTel compliant tag
+                new Property<RabbitMQTags, string>(Tags.AmqpQueue, t => t.Queue, (t, v) => t.Queue = v), // Non OTel compliant tag
+                new Property<RabbitMQTags, string>(Tags.RabbitMq.RoutingKey, t => t.RoutingKey, (t, v) => t.RoutingKey = v));
 
         private string _spanKind;
 
@@ -50,8 +47,6 @@ namespace Datadog.Trace.Tagging
         public string Exchange { get; set; }
 
         public string RoutingKey { get; set; }
-
-        public string MessageSize { get; set; }
 
         public string Queue { get; set; }
 
