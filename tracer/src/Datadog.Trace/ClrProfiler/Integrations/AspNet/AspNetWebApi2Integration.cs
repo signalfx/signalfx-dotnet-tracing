@@ -483,6 +483,9 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     tags,
                     headerTags);
 
+                span.LogicScope = span.OperationName;
+                span.OperationName = resourceName;
+
                 tags.AspNetAction = action;
                 tags.AspNetController = controller;
                 tags.AspNetArea = area;
