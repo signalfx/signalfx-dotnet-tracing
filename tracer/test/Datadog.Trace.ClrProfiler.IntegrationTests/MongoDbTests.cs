@@ -3,11 +3,19 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
+using System.Collections.Generic;
 using System.Linq;
-using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.TestHelpers;
 using Xunit;
 using Xunit.Abstractions;
+
+using static Datadog.Trace.ExtensionMethods.ArrayExtensions;
+
+#if NETFRAMEWORK
+using static Datadog.Trace.ExtensionMethods.DictionaryExtensions;
+#endif
 
 namespace Datadog.Trace.ClrProfiler.IntegrationTests
 {
@@ -19,28 +27,37 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetServiceVersion("1.0.0");
         }
 
-        public static System.Collections.Generic.IEnumerable<object[]> GetMongoDb()
+        public static IEnumerable<object[]> GetMongoDb()
         {
             foreach (var item in PackageVersions.MongoDB)
             {
-                yield return item.Concat(false);
-                yield return item.Concat(true);
+                yield return item.Concat(false, false);
+                yield return item.Concat(false, true);
+                yield return item.Concat(true, false);
+                yield return item.Concat(true, true);
             }
         }
 
         [SkippableTheory]
         [MemberData(nameof(GetMongoDb))]
         [Trait("Category", "EndToEnd")]
-        public void SubmitsTraces(string packageVersion, bool enableCallTarget)
+        public void SubmitsTraces(string packageVersion, bool enableCallTarget, bool tagCommands)
         {
+            SetEnvironmentVariable("SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS", tagCommands.ToString().ToLowerInvariant());
             SetCallTargetSettings(enableCallTarget);
 
             int agentPort = TcpPortProvider.GetOpenPort();
             using (var agent = new MockTracerAgent(agentPort))
             using (RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion))
             {
-                var spans = agent.WaitForSpans(3, 500);
-                Assert.True(spans.Count >= 3, $"Expecting at least 3 spans, only received {spans.Count}");
+                var manualNames = new HashSet<string>() { "sync-calls", "sync-calls-execute", "async-calls", "async-calls-execute" };
+                var mongoNames = new HashSet<string>() { "aggregate", "buildInfo", "delete", "find", "getLastError", "insert", "isMaster", "mongodb.query" };
+                var expectedNames = new HashSet<string>();
+                expectedNames.UnionWith(manualNames);
+                expectedNames.UnionWith(mongoNames);
+
+                var spans = agent.WaitForSpans(expectedNames.Count, 500);
+                Assert.True(spans.Count >= expectedNames.Count, $"Expecting at least {expectedNames.Count} spans, only received {spans.Count}");
 
                 var rootSpan = spans.Single(s => s.ParentId == null);
 
@@ -49,7 +66,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 Assert.Equal("Samples.MongoDB", rootSpan.Service);
                 Assert.Null(rootSpan.Type);
 
-                int spansWithResourceName = 0;
+                var foundNames = new HashSet<string>();
 
                 foreach (var span in spans)
                 {
@@ -58,16 +75,30 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                         continue;
                     }
 
-                    if (span.Service == "Samples.MongoDB-mongodb")
-                    {
-                        Assert.Equal("mongodb.query", span.Name);
-                        Assert.Equal(SpanTypes.MongoDb, span.Type);
-                        Assert.False(span.Tags?.ContainsKey(Tags.Version), "External service span should not have service version tag.");
+                    var name = span.Name;
+                    foundNames.Add(name);
 
-                        if (span.Resource != null && span.Resource != "mongodb.query")
+                    if (span.Service == "Samples.MongoDB" &&
+                        span.LogicScope == "mongodb.query")
+                    {
+                        Assert.Equal(SpanTypes.MongoDb, span.Type);
+                        Assert.Equal(SpanTypes.MongoDb, span.Tags.GetValueOrDefault(Tags.DbType));
+                        Assert.Equal("MongoDb", span.Tags.GetValueOrDefault("component"));
+
+                        span.Tags.TryGetValue(Tags.DbStatement, out string statement);
+
+                        if (tagCommands && !name.Equals("mongodb.query"))
                         {
-                            spansWithResourceName++;
-                            Assert.True(span.Tags?.ContainsKey(Tags.MongoDbQuery), $"No query found on span {span}");
+                            Assert.NotNull(statement);
+                        }
+                        else
+                        {
+                            Assert.Null(statement);
+                        }
+
+                        if (!name.Equals("mongodb.query"))
+                        {
+                            Assert.NotNull(span.Tags.GetValueOrDefault(Tags.DbName));
                         }
                     }
                     else
@@ -78,7 +109,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     }
                 }
 
-                Assert.False(spansWithResourceName == 0, "Extraction of the command failed on all spans");
+                Assert.True(expectedNames.SetEquals(foundNames));
             }
         }
     }

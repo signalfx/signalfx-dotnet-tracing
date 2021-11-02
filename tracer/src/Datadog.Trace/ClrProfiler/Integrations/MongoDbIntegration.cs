@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.ComponentModel;
 using System.Net;
@@ -29,7 +31,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         internal const string Major2Minor2 = "2.2"; // Synchronous methods added in 2.2
         internal const string MongoDbClientAssembly = "MongoDB.Driver.Core";
 
-        private const string OperationName = "mongodb.query";
+        private const string DefaultOperationName = "mongodb.query";
         private const string ServiceName = "mongodb";
 
         private const string IWireProtocol = "MongoDB.Driver.Core.WireProtocol.IWireProtocol";
@@ -357,6 +359,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 Log.Warning(ex, "Unable to access EndPoint properties.");
             }
 
+            string statement = null;
             string operationName = null;
             string collectionName = null;
             string query = null;
@@ -366,6 +369,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             {
                 if (wireProtocol.TryGetFieldValue("_command", out object command) && command != null)
                 {
+                    if (tracer.Settings.TagMongoCommands)
+                    {
+                        string document = command.ToString();
+                        statement = document.Length > 1024 ? document.Substring(0, 1024) : document;
+                    }
+
                     // the name of the first element in the command BsonDocument will be the operation type (insert, delete, find, etc)
                     // and its value is the collection name
                     if (command.TryCallMethod("GetElement", 0, out object firstElement) && firstElement != null)
@@ -388,18 +397,19 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 Log.Warning(ex, "Unable to access IWireProtocol.Command properties.");
             }
 
-            string serviceName = tracer.Settings.GetServiceName(tracer, ServiceName);
-
             Scope scope = null;
 
             try
             {
                 var tags = new MongoDbTags();
-                scope = tracer.StartActiveWithTags(OperationName, serviceName: serviceName, tags: tags);
+                scope = tracer.StartActiveWithTags(operationName ?? DefaultOperationName, tags: tags);
                 var span = scope.Span;
+                span.LogicScope = DefaultOperationName;
                 span.Type = SpanTypes.MongoDb;
                 span.ResourceName = resourceName;
+                tags.DbType = SpanTypes.MongoDb;
                 tags.DbName = databaseName;
+                tags.DbStatement = statement;
                 tags.Query = query;
                 tags.Collection = collectionName;
                 tags.Host = host;
