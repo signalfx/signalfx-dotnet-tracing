@@ -12,9 +12,9 @@ cp -r .vscode.example .vscode
 
 Because of [Mono missing features](https://github.com/OmniSharp/omnisharp-vscode#note-about-using-net-5-sdks), `omnisharp.useGlobalMono` has to be set to `never`. Go to `File` -> `Preferences` -> `Settings` -> `Extensions` -> `C# Configuration` -> Change `Omnisharp: Use Global Mono` (you can search for it if the menu is too long) to `never`. Afterwards, you have restart OmniSharp: `F1` -> `OmniSharp: Restart OmniSharp`.
 
-There may be a lot of errors, because some projects target .NET Framework. Switch to `Datadog.Trace.Minimal.sln` using `F1` -> `OmniSharp: Select Project` in Visual Studio Code to load a subset of projects which work without any issues. You can also try building the projects which have errors as it sometimes helps.
+There may be a lot of errors, because some projects target .NET Framework. Switch to `Datadog.Trace.Minimal.slnf` using `F1` -> `OmniSharp: Select Project` in Visual Studio Code to load a subset of projects which work without any issues. You can also try building the projects which have errors as it sometimes helps.
 
-If for whatever reason you need to use `Datadog.Trace.sln` you can run `for i in **/*.csproj; do dotnet build $i; done` to decrease the number of errors.
+If for whatever reason you need to use `Datadog.Trace.sln` you can run `./tracer/build.cmd Clean BuildTracerHome` to decrease the number of errors.
 
 ## Testing environment
 
