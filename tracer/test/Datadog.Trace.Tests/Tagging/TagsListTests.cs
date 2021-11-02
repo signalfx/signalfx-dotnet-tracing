@@ -68,7 +68,7 @@ namespace Datadog.Trace.Tests.Tagging
         public void GetAll_When_MissingTags()
         {
             var tags = new EmptyTags();
-            var values = ArrayHelper.Empty<string>();
+            var values = Array.Empty<string>();
 
             ValidateTags(tags.GetAllTags(), values);
         }

@@ -58,7 +58,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     // Validate server fields
                     Assert.Equal(expectedServiceName, span.Service);
                     Assert.Equal(ServiceVersion, span.Tags[Tags.Version]);
-                    Assert.Equal(expectedOperationName, span.Name);
+                    Assert.Equal(expectedLogicScope, span.LogicScope);
                     Assert.Equal(SpanTypes.Web, span.Type);
                     Assert.Equal(SpanKinds.Server, span.Tags[Tags.SpanKind]);
 

@@ -5,7 +5,6 @@
 
 // Modified by Splunk Inc.
 
-#if !NET452
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -249,4 +248,3 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         }
     }
 }
-#endif

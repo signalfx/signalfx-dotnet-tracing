@@ -12,8 +12,6 @@ using Datadog.Trace.TestHelpers;
 using Xunit;
 using Xunit.Abstractions;
 
-#if !NET452
-
 namespace Datadog.Trace.ClrProfiler.IntegrationTests
 {
     public class Elasticsearch5Tests : TestHelper
@@ -148,5 +146,3 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         }
     }
 }
-
-#endif

@@ -18,7 +18,7 @@ namespace Datadog.Trace.Plugins
         {
             if (pluginsConfig == null)
             {
-                return ArrayHelper.Empty<IOTelExtension>();
+                return Array.Empty<IOTelExtension>();
             }
 
             var targetFramework = FrameworkDescription.Instance.TargetFramework;
@@ -38,14 +38,14 @@ namespace Datadog.Trace.Plugins
             {
                 Log.Warning(ex, "Could not parse list of plugin paths. Invalid plugin configuration provided.");
 
-                return ArrayHelper.Empty<IOTelExtension>();
+                return Array.Empty<IOTelExtension>();
             }
 
             if (pluginFiles == null || !pluginFiles.Any())
             {
                 Log.Information("Skipping plugins load. Could not find any plugins with target framework '{0}'.", targetFramework);
 
-                return ArrayHelper.Empty<IOTelExtension>();
+                return Array.Empty<IOTelExtension>();
             }
 
             var loadedPlugins = TryLoadPlugins(pluginFiles);

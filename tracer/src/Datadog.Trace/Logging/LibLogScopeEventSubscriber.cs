@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Threading;
 using Datadog.Trace.Logging.LogProviders;
 using Datadog.Trace.Util;
 
@@ -37,7 +38,7 @@ namespace Datadog.Trace.Logging
         private readonly ILogProvider _logProvider;
         private readonly ILogEnricher _logEnricher;
 
-        private readonly AsyncLocalCompat<IDisposable> _currentEnricher = new AsyncLocalCompat<IDisposable>();
+        private readonly AsyncLocal<IDisposable> _currentEnricher = new();
 
         // Each mapped context sets a key-value pair into the logging context
         // Disposing the returned context unsets the key-value pair
@@ -210,11 +211,11 @@ namespace Datadog.Trace.Logging
             {
                 try
                 {
-                    var currentEnricher = _currentEnricher.Get();
+                    var currentEnricher = _currentEnricher.Value;
 
                     if (currentEnricher == null)
                     {
-                        _currentEnricher.Set(_logEnricher.Register());
+                        _currentEnricher.Value = _logEnricher.Register();
                     }
                 }
                 catch (Exception)
@@ -231,8 +232,8 @@ namespace Datadog.Trace.Logging
                 if (_tracer.ActiveScope == null)
                 {
                     // We closed the last span
-                    _currentEnricher.Get()?.Dispose();
-                    _currentEnricher.Set(null);
+                    _currentEnricher.Value?.Dispose();
+                    _currentEnricher.Value = null;
                 }
             }
         }
@@ -314,8 +315,8 @@ namespace Datadog.Trace.Logging
                 if (_tracer.ActiveScope == null)
                 {
                     // We closed the last span
-                    _currentEnricher.Get()?.Dispose();
-                    _currentEnricher.Set(null);
+                    _currentEnricher.Value?.Dispose();
+                    _currentEnricher.Value = null;
                 }
 
                 return;
@@ -346,8 +347,8 @@ namespace Datadog.Trace.Logging
                 ctxDisposable.Dispose();
             }
 
-            _currentEnricher.Get()?.Dispose();
-            _currentEnricher.Set(null);
+            _currentEnricher.Value?.Dispose();
+            _currentEnricher.Value = null;
         }
 
         private void SetLogContext(TraceId traceId, ulong spanId)

@@ -6,13 +6,10 @@
 // Modified by Splunk Inc.
 
 #if NETFRAMEWORK
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Datadog.Trace.TestHelpers;
 using Xunit;
 using Xunit.Abstractions;
@@ -35,18 +32,12 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         public static IEnumerable<object[]> TargetFrameworks =>
             new List<object[]>
             {
-                new object[] { "net45" },
-                new object[] { "net451" },
-                new object[] { "net452" },
-                new object[] { "net46" },
-#if !NET45 && !NET451 && !NET452 && !NET46
                 new object[] { "net461" },
                 new object[] { "net462" },
                 new object[] { "net47" },
                 new object[] { "net471" },
                 new object[] { "net472" },
                 new object[] { "net48" },
-#endif
             };
 
         [SkippableTheory]
@@ -63,11 +54,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 { "Samples.MultiDomainHost.App.FrameworkHttpNoRedirects", 2 },
                 { "Samples.MultiDomainHost.App.NuGetHttpNoRedirects", 2 },
                 { "Samples.MultiDomainHost.App.NuGetJsonWithRedirects", 2 },
+                { "Samples.MultiDomainHost.App.NuGetHttpWithRedirects", 2 },
             };
-            if (!targetFramework.StartsWith("net45"))
-            {
-                expectedMap.Add("Samples.MultiDomainHost.App.NuGetHttpWithRedirects", 2);
-            }
 
             RunSampleAndAssertAgainstExpectations(targetFramework, expectedMap);
         }
@@ -88,11 +76,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     { "Samples.MultiDomainHost.App.FrameworkHttpNoRedirects", 2 },
                     { "Samples.MultiDomainHost.App.NuGetHttpNoRedirects", 2 },
                     { "Samples.MultiDomainHost.App.NuGetJsonWithRedirects", 2 },
+                    { "Samples.MultiDomainHost.App.NuGetHttpWithRedirects", 2 },
                 };
-                if (!targetFramework.StartsWith("net45"))
-                {
-                    expectedMap.Add("Samples.MultiDomainHost.App.NuGetHttpWithRedirects", 2);
-                }
 
                 RunSampleAndAssertAgainstExpectations(targetFramework, expectedMap);
             }

@@ -5,7 +5,7 @@
 
 // Modified by Splunk Inc.
 
-#if NET452
+#if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
 using System.Linq;

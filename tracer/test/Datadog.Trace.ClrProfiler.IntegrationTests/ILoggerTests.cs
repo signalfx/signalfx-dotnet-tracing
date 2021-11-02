@@ -4,8 +4,6 @@
 // </copyright>
 
 // Modified by Splunk Inc.
-
-#if !NET452
 using System;
 using Datadog.Trace.TestHelpers;
 using FluentAssertions;
@@ -53,4 +51,3 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         }
     }
 }
-#endif
