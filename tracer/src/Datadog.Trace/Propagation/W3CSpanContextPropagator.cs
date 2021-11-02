@@ -72,7 +72,12 @@ namespace Datadog.Trace.Propagation
                 return null;
             }
 
-            var traceParentHeader = enumerableHeaderValues.First();
+            var traceParentHeader = enumerableHeaderValues.FirstOrDefault();
+            if (traceParentHeader == null)
+            {
+                return null;
+            }
+
             var traceIdString = traceParentHeader.Substring(VersionPrefixIdLength, TraceIdLength);
             var traceId = _traceIdConvention.CreateFromString(traceIdString);
             if (traceId == TraceId.Zero)

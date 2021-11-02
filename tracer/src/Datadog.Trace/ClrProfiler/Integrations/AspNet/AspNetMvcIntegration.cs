@@ -74,7 +74,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     var newResourceNamesEnabled = Tracer.Instance.Settings.RouteTemplateResourceNamesEnabled;
                     string host = httpContext.Request.Headers.Get("Host");
                     string httpMethod = httpContext.Request.HttpMethod.ToUpperInvariant();
-                    string url = httpContext.Request.RawUrl.ToLowerInvariant();
+                    string url = httpContext.Request.Url?.ToString(); // Upstream uses RawUrl, ie. the part of the URL following the domain information.
                     string resourceName = null;
 
                     RouteData routeData = controllerContext.RouteData;
@@ -174,7 +174,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     }
 
                     var tags = new AspNetTags();
-                    scope = Tracer.Instance.StartActiveWithTags(OperationName, propagatedContext, tags: tags);
+                    scope = Tracer.Instance.StartActiveWithTags(resourceName, propagatedContext, tags: tags);
                     span = scope.Span;
 
                     span.DecorateWebServerSpan(
@@ -184,6 +184,8 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                         httpUrl: url,
                         tags,
                         tagsFromHeaders);
+
+                    span.LogicScope = OperationName;
 
                     tags.AspNetRoute = routeUrl;
                     tags.AspNetArea = areaName;
