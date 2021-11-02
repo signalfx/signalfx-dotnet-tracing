@@ -302,7 +302,7 @@ namespace Datadog.Trace
         public const string AzureAppServicesSubscriptionId = "aas.subscription.id";
         public const string CosmosDbContainer = "cosmosdb.container";
         public const string DbName = "db.name";
-        public const string DbType = "db.type";
+        public const string DbType = "db.system";
         public const string DbUser = "db.user";
         public const string Env = "deployment.environment";
         public const string ErrorMsg = "error.msg";
