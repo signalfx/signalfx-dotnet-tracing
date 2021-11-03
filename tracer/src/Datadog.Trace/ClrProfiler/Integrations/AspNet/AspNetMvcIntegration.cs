@@ -117,12 +117,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                         resourceName = $"{httpMethod} /{routeUrl.ToLowerInvariant()}";
                     }
 
-                    if (string.IsNullOrEmpty(resourceName) && httpContext.Request.Url != null)
-                    {
-                        var cleanUri = UriHelpers.GetCleanUriPath(httpContext.Request.Url);
-                        resourceName = $"{httpMethod} {cleanUri.ToLowerInvariant()}";
-                    }
-
                     if (string.IsNullOrEmpty(resourceName))
                     {
                         // Keep the legacy resource name, just to have something

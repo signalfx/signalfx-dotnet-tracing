@@ -441,14 +441,9 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 {
                     resourceName = $"{method} {(newResourceNamesEnabled ? "/" : string.Empty)}{route.ToLowerInvariant()}";
                 }
-                else if (requestUri != null)
-                {
-                    var cleanUri = UriHelpers.GetCleanUriPath(requestUri);
-                    resourceName = $"{method} {cleanUri.ToLowerInvariant()}";
-                }
                 else
                 {
-                    resourceName = $"{method}";
+                    resourceName = method;
                 }
 
                 string controller = string.Empty;
