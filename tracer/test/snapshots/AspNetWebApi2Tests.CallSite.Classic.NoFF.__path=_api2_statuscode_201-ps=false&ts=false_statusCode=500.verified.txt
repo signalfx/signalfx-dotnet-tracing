@@ -15,7 +15,8 @@
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: aspnet.request,
+    Name: GET,
+    LogicScope: aspnet.request,
     Resource: GET /api2/statuscode/?,
     Service: sample,
     Type: web,
@@ -30,7 +31,7 @@ at Samples.AspNetMvc5.Handlers.PassThroughQuerySuccessMessageHandler.<SendAsync>
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 500,
-      http.url: /api2/statuscode/201?ps=false&ts=false,
+      http.url: http://localhost:00000/api2/statuscode/201?ps=false&ts=false,
       language: dotnet,
       runtime-id: Guid_1,
       span.kind: server,
