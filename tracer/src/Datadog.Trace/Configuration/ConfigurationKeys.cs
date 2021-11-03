@@ -5,6 +5,8 @@
 
 // Modified by Splunk Inc.
 
+using System;
+
 namespace Datadog.Trace.Configuration
 {
     /// <summary>
@@ -202,6 +204,7 @@ namespace Datadog.Trace.Configuration
         /// Configuration key for enabling or disabling default Analytics.
         /// </summary>
         /// <seealso cref="TracerSettings.AnalyticsEnabled"/>
+        [Obsolete(DeprecationMessages.AppAnalytics)]
         public const string GlobalAnalyticsEnabled = "SIGNALFX_TRACE_ANALYTICS_ENABLED";
 
         /// <summary>
@@ -332,6 +335,7 @@ namespace Datadog.Trace.Configuration
         /// This also determines the output folder of the .NET Tracer managed log files.
         /// Overridden by <see cref="LogDirectory"/> if present.
         /// </summary>
+        [Obsolete(DeprecationMessages.LogPath)]
         public const string ProfilerLogPath = "SIGNALFX_TRACE_LOG_PATH";
 
         /// <summary>
@@ -483,11 +487,13 @@ namespace Datadog.Trace.Configuration
             /// <summary>
             /// Configuration key pattern for enabling or disabling Analytics in an integration.
             /// </summary>
+            [Obsolete(DeprecationMessages.AppAnalytics)]
             public const string AnalyticsEnabled = "SIGNALFX_TRACE_{0}_ANALYTICS_ENABLED";
 
             /// <summary>
             /// Configuration key pattern for setting Analytics sampling rate in an integration.
             /// </summary>
+            [Obsolete(DeprecationMessages.AppAnalytics)]
             public const string AnalyticsSampleRate = "SIGNALFX_TRACE_{0}_ANALYTICS_SAMPLE_RATE";
         }
 
