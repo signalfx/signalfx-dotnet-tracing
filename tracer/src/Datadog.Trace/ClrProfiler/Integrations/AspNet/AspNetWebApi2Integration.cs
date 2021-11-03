@@ -424,7 +424,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 Uri requestUri = request.RequestUri;
 
                 string host = request.Headers.Host ?? string.Empty;
-                string rawUrl = requestUri?.ToString().ToLowerInvariant() ?? string.Empty;
+                string rawUrl = requestUri?.ToString() ?? string.Empty;
                 string method = request.Method.Method?.ToUpperInvariant() ?? "GET";
                 string route = null;
                 try
