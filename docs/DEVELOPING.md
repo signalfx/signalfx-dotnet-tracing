@@ -27,7 +27,7 @@ You can run the services using:
 SPLUNK_ACCESS_TOKEN=secret docker-compose -f dev/docker-compose.yaml up
 ```
 
-The value for `SPLUNK_ACCESS_TOKEN` env var can be found
+The value for `SPLUNK_ACCESS_TOKEN` can be found
 [here](https://app.signalfx.com/o11y/#/organization/current?selectedKeyValue=sf_section:accesstokens).
 
 The following Web UI endpoints are exposed:
