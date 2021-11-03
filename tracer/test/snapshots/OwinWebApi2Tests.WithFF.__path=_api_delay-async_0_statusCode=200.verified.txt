@@ -2,9 +2,8 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: GET api/delay-async/{seconds},
-    LogicScope: aspnet-webapi.request,
-    Resource: GET api/delay-async/{seconds},
+    Name: aspnet-webapi.request,
+    Resource: GET /api/delay-async/{seconds},
     Service: Samples.Owin.WebApi2,
     Type: web,
     Tags: {

@@ -2,9 +2,8 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: GET,
-    LogicScope: aspnet.request,
-    Resource: GET /home/identifier/badvalue,
+    Name: aspnet.request,
+    Resource: GET /home/identifier/{id},
     Service: sample,
     Type: web,
     Error: 1,
@@ -37,9 +36,8 @@ at System.Web.Mvc.ActionDescriptor.ExtractParameterFromDictionary(ParameterInfo 
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: GET home.identifier,
-    LogicScope: aspnet-mvc.request,
-    Resource: GET home.identifier,
+    Name: aspnet-mvc.request,
+    Resource: GET /home/identifier/{id},
     Service: sample,
     Type: web,
     ParentId: Id_2,

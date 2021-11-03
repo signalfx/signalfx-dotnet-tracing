@@ -2,9 +2,8 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: GET api2/statuscode/{value},
-    LogicScope: aspnet-webapi.request,
-    Resource: GET api2/statuscode/{value},
+    Name: aspnet-webapi.request,
+    Resource: GET /api2/statuscode/{value},
     Service: Samples.Owin.WebApi2,
     Type: web,
     Tags: {

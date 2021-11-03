@@ -2,9 +2,8 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: GET home.optionalidentifier,
-    LogicScope: aspnet-mvc.request,
-    Resource: GET home.optionalidentifier,
+    Name: aspnet-mvc.request,
+    Resource: GET /home/optionalidentifier/{id},
     Service: sample,
     Type: web,
     ParentId: Id_3,
@@ -26,9 +25,8 @@
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: GET,
-    LogicScope: aspnet.request,
-    Resource: GET /home/optionalidentifier/badvalue,
+    Name: aspnet.request,
+    Resource: GET /home/optionalidentifier/{id},
     Service: sample,
     Type: web,
     Tags: {

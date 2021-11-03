@@ -26,9 +26,8 @@
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: GET,
-    LogicScope: aspnet.request,
-    Resource: GET /delay-optional/?,
+    Name: aspnet.request,
+    Resource: GET /delay-optional/{seconds},
     Service: sample,
     Type: web,
     Tags: {

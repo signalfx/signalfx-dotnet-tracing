@@ -2,9 +2,8 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: GET api/absolute-route,
-    LogicScope: aspnet-webapi.request,
-    Resource: GET api/absolute-route,
+    Name: aspnet-webapi.request,
+    Resource: GET /api/absolute-route,
     Service: sample,
     Type: web,
     ParentId: Id_3,

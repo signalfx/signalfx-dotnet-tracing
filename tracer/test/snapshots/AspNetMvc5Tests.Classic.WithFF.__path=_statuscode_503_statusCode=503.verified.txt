@@ -28,9 +28,8 @@
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: GET,
-    LogicScope: aspnet.request,
-    Resource: GET /statuscode/?,
+    Name: aspnet.request,
+    Resource: GET /statuscode/{value},
     Service: sample,
     Type: web,
     Error: 1,
