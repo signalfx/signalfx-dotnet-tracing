@@ -94,7 +94,6 @@ namespace Datadog.Trace.Configuration
         /// Configuration key for enabling or disabling the Tracer's debug mode.
         /// Default is value is false (disabled).
         /// </summary>
-        /// <seealso cref="TracerSettings.DebugEnabled"/>
         public const string DebugEnabled = "SIGNALFX_TRACE_DEBUG";
 
         /// <summary>

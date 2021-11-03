@@ -8,6 +8,7 @@
 using System;
 using System.ComponentModel;
 using System.Net;
+using Datadog.Trace.ClrProfiler.Emit;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Logging;
 
