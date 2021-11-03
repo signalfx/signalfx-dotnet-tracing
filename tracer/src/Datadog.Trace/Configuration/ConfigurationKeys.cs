@@ -440,6 +440,7 @@ namespace Datadog.Trace.Configuration
         /// <summary>
         /// Configuration key for enabling or disabling the tagging of
         /// a Mongo command BsonDocument as db.statement.
+        /// Default value is true (enabled).
         /// </summary>
         /// <seealso cref="TracerSettings.TagMongoCommands"/>
         public const string TagMongoCommands = "SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS";

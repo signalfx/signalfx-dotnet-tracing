@@ -34,6 +34,17 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         private const string DefaultOperationName = "mongodb.query";
         private const string ServiceName = "mongodb";
 
+        /// <summary>
+        /// Operation to get the role of the "mongod" instance, see
+        /// https://www.docs4dev.com/docs/en/mongodb/v3.6/reference/reference-command-isMaster.html
+        /// </summary>
+        private const string IsMasterOperation = "isMaster";
+
+        /// <summary>
+        /// The MongoDB database that stores system and authorization information.
+        /// </summary>
+        private const string AdminDatabaseName = "admin";
+
         private const string IWireProtocol = "MongoDB.Driver.Core.WireProtocol.IWireProtocol";
         private const string IWireProtocolGeneric = "MongoDB.Driver.Core.WireProtocol.IWireProtocol`1";
 
@@ -371,15 +382,19 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 {
                     if (tracer.Settings.TagMongoCommands)
                     {
-                        string document = command.ToString();
-                        statement = document.Length > 1024 ? document.Substring(0, 1024) : document;
+                        statement = command.ToString();
                     }
 
                     // the name of the first element in the command BsonDocument will be the operation type (insert, delete, find, etc)
                     // and its value is the collection name
                     if (command.TryCallMethod("GetElement", 0, out object firstElement) && firstElement != null)
                     {
-                        firstElement.TryGetPropertyValue("Name", out operationName);
+                        if (firstElement.TryGetPropertyValue("Name", out operationName) &&
+                            operationName == IsMasterOperation && databaseName == AdminDatabaseName)
+                        {
+                            // Assume that this is the driver doing "Heartbeat" or "RoundTripTimeMonitor", don't create an activity for it.
+                            return null;
+                        }
 
                         if (firstElement.TryGetPropertyValue("Value", out object collectionNameObj) && collectionNameObj != null)
                         {
