@@ -402,7 +402,17 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                         }
                     }
 
-                    query = command.ToString();
+                    // get the "query" element from the command BsonDocument, if it exists
+                    if (command.TryCallMethod("Contains", "query", out bool found) && found)
+                    {
+                        if (command.TryCallMethod("GetElement", "query", out object queryElement) && queryElement != null)
+                        {
+                            if (queryElement.TryGetPropertyValue("Value", out object queryValue) && queryValue != null)
+                            {
+                                query = queryValue.ToString();
+                            }
+                        }
+                    }
 
                     resourceName = $"{operationName ?? "operation"} {databaseName ?? "database"}";
                 }
