@@ -3,9 +3,16 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
 using System.Globalization;
+//<<<<<<< HEAD:tracer/test/Datadog.Trace.Tests/Headers/DDHeadersCollectionTests.cs
 using Datadog.Trace.Conventions;
+=======
+using System.Linq;
+using System.Net;
+using Datadog.Trace.ExtensionMethods;
+>>>>>>> 86c0bc554 (Use UserKeep(2)/UserReject(-1) in the rules-based sampler (#1937)):tracer/test/Datadog.Trace.Tests/HeadersCollectionTests.cs
 using Datadog.Trace.Headers;
 using Datadog.Trace.Propagation;
 using Datadog.Trace.TestHelpers;
@@ -24,6 +31,7 @@ namespace Datadog.Trace.Tests.Headers
         private const string TestPrefix = "test.prefix";
         private readonly DDSpanContextPropagator _propagator = new DDSpanContextPropagator(new DatadogTraceIdConvention());
 
+//<<<<<<< HEAD:tracer/test/Datadog.Trace.Tests/Headers/DDHeadersCollectionTests.cs
         [Theory]
         [MemberData(nameof(GetHeaderCollectionImplementations))]
         internal void ExtractHeaderTags_EmptyHeadersReturnsEmptyTagsList(IHeadersCollection headers)
@@ -32,6 +40,39 @@ namespace Datadog.Trace.Tests.Headers
 
             Assert.NotNull(tagsFromHeader);
             Assert.Empty(tagsFromHeader);
+=======
+        public static IEnumerable<object[]> GetHeaderCollectionImplementations()
+        {
+            return GetHeaderCollectionFactories().Select(factory => new object[] { factory() });
+        }
+
+        public static IEnumerable<object[]> GetHeadersInvalidIdsCartesianProduct()
+        {
+            return from headersFactory in GetHeaderCollectionFactories()
+                   from invalidId in HeadersCollectionTestHelpers.GetInvalidIds().SelectMany(i => i)
+                   select new[] { headersFactory(), invalidId };
+        }
+
+        public static IEnumerable<object[]> GetHeadersInvalidIntegerSamplingPrioritiesCartesianProduct()
+        {
+            return from headersFactory in GetHeaderCollectionFactories()
+                   from invalidSamplingPriority in HeadersCollectionTestHelpers.GetInvalidIntegerSamplingPriorities().SelectMany(i => i)
+                   select new[] { headersFactory(), invalidSamplingPriority };
+        }
+
+        public static IEnumerable<object[]> GetHeadersInvalidNonIntegerSamplingPrioritiesCartesianProduct()
+        {
+            return from headersFactory in GetHeaderCollectionFactories()
+                   from invalidSamplingPriority in HeadersCollectionTestHelpers.GetInvalidNonIntegerSamplingPriorities().SelectMany(i => i)
+                   select new[] { headersFactory(), invalidSamplingPriority };
+        }
+
+        internal static IEnumerable<Func<IHeadersCollection>> GetHeaderCollectionFactories()
+        {
+            yield return () => WebRequest.CreateHttp("http://localhost").Headers.Wrap();
+            yield return () => new NameValueCollection().Wrap();
+            yield return () => new DictionaryHeadersCollection();
+>>>>>>> 86c0bc554 (Use UserKeep(2)/UserReject(-1) in the rules-based sampler (#1937)):tracer/test/Datadog.Trace.Tests/HeadersCollectionTests.cs
         }
 
         [Theory]
@@ -202,16 +243,48 @@ namespace Datadog.Trace.Tests.Headers
 
             Assert.NotNull(resultContext);
             Assert.Equal(traceId, resultContext.TraceId);
-            Assert.Equal(default(ulong), resultContext.SpanId);
+            Assert.Equal(default, resultContext.SpanId);
             Assert.Equal(samplingPriority, resultContext.SamplingPriority);
             Assert.Equal(origin, resultContext.Origin);
         }
 
         [Theory]
-        [MemberData(nameof(GetHeadersInvalidSamplingPrioritiesCartesianProduct))]
-        internal void Extract_InvalidSamplingPriority(IHeadersCollection headers, string samplingPriority)
+        [MemberData(nameof(GetHeadersInvalidIntegerSamplingPrioritiesCartesianProduct))]
+        internal void Extract_InvalidIntegerSamplingPriority(IHeadersCollection headers, string samplingPriority)
         {
+            // if the extracted sampling priority is a valid integer, pass it along as is,
+            // even if we don't recognize its value to allow forward compatibility with newly added values.
+            const ulong traceId = 9;
+            const ulong spanId = 7;
+            const string origin = "synthetics";
+
+            InjectContext(
+                headers,
+                traceId.ToString(CultureInfo.InvariantCulture),
+                spanId.ToString(CultureInfo.InvariantCulture),
+                samplingPriority,
+                origin);
+
+            var resultContext = SpanContextPropagator.Instance.Extract(headers);
+
+            Assert.NotNull(resultContext);
+            Assert.Equal(traceId, resultContext.TraceId);
+            Assert.Equal(spanId, resultContext.SpanId);
+            Assert.NotNull(resultContext.SamplingPriority);
+            Assert.Equal(samplingPriority, ((int)resultContext.SamplingPriority).ToString());
+            Assert.Equal(origin, resultContext.Origin);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetHeadersInvalidNonIntegerSamplingPrioritiesCartesianProduct))]
+        internal void Extract_InvalidNonIntegerSamplingPriority(IHeadersCollection headers, string samplingPriority)
+        {
+//<<<<<<< HEAD:tracer/test/Datadog.Trace.Tests/Headers/DDHeadersCollectionTests.cs
             var traceId = TraceId.CreateFromInt(9);
+=======
+            // ignore the extracted sampling priority if it is not a valid integer
+            const ulong traceId = 9;
+>>>>>>> 86c0bc554 (Use UserKeep(2)/UserReject(-1) in the rules-based sampler (#1937)):tracer/test/Datadog.Trace.Tests/HeadersCollectionTests.cs
             const ulong spanId = 7;
             const string origin = "synthetics";
 
