@@ -141,7 +141,14 @@ namespace SignalFx.Tracing
 
             if (!Settings.DisableCancelKeyPressEvent)
             {
-                Console.CancelKeyPress += Console_CancelKeyPress;
+                try
+                {
+                    Console.CancelKeyPress += Console_CancelKeyPress;
+                }
+                catch (Exception ex)
+                {
+                    Log.Warning(ex, "Unable to register a callback to the Console.CancelKeyPress event.");
+                }
             }
 
             // start the heartbeat loop
