@@ -143,6 +143,7 @@ namespace SignalFx.Tracing
             {
                 try
                 {
+                    // Registering for the cancel key press event requires the System.Security.Permissions.UIPermission
                     Console.CancelKeyPress += Console_CancelKeyPress;
                 }
                 catch (Exception ex)
