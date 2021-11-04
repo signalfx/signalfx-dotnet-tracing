@@ -389,16 +389,6 @@ namespace Datadog.Trace.Configuration
         public const string HttpClientErrorStatusCodes = "SIGNALFX_HTTP_CLIENT_ERROR_STATUSES";
 
         /// <summary>
-        /// Configuration key for hostname for the Jaeger agent.
-        /// </summary>
-        public const string JaegerExporterAgentHost = "SIGNALFX_EXPORTER_JAEGER_AGENT_HOST";
-
-        /// <summary>
-        /// Configuration key for port for the Jaeger agent.
-        /// </summary>
-        public const string JaegerExporterAgentPort = "SIGNALFX_EXPORTER_JAEGER_AGENT_PORT";
-
-        /// <summary>
         /// Configuration key to enable sending partial traces to the agent
         /// </summary>
         /// <seealso cref="TracerSettings.PartialFlushEnabled"/>
