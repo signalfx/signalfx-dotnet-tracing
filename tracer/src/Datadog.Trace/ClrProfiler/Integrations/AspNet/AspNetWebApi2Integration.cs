@@ -424,7 +424,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 Uri requestUri = request.RequestUri;
 
                 string host = request.Headers.Host ?? string.Empty;
-                string rawUrl = requestUri?.ToString().ToLowerInvariant() ?? string.Empty;
+                string rawUrl = requestUri?.ToString() ?? string.Empty;
                 string method = request.Method.Method?.ToUpperInvariant() ?? "GET";
                 string route = null;
                 try
@@ -441,14 +441,9 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 {
                     resourceName = $"{method} {(newResourceNamesEnabled ? "/" : string.Empty)}{route.ToLowerInvariant()}";
                 }
-                else if (requestUri != null)
-                {
-                    var cleanUri = UriHelpers.GetCleanUriPath(requestUri);
-                    resourceName = $"{method} {cleanUri.ToLowerInvariant()}";
-                }
                 else
                 {
-                    resourceName = $"{method}";
+                    resourceName = method;
                 }
 
                 string controller = string.Empty;
@@ -482,6 +477,9 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     httpUrl: rawUrl,
                     tags,
                     headerTags);
+
+                span.LogicScope = OperationName;
+                span.OperationName = resourceName;
 
                 tags.AspNetAction = action;
                 tags.AspNetController = controller;

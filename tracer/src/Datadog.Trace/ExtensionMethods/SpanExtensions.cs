@@ -124,7 +124,7 @@ namespace Datadog.Trace.ExtensionMethods
                 if (string.IsNullOrEmpty(span.GetTag(Tags.ErrorMsg)))
                 {
                     var message = $"The HTTP response has status code {statusCodeString}.";
-                    span.Status = SpanStatus.Error.WithDescription(message);
+                    span.Status = SpanStatus.Error;
                     span.SetTag(Tags.ErrorMsg, message);
                 }
                 else

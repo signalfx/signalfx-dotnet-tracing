@@ -2,7 +2,8 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: aspnet-mvc.request,
+    Name: GET /home/index,
+    LogicScope: aspnet-mvc.request,
     Resource: GET /home/index,
     Service: sample,
     Type: web,
@@ -15,7 +16,7 @@
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
-      http.url: /home/index,
+      http.url: http://localhost:00000/Home/Index,
       language: dotnet,
       span.kind: server,
       version: 1.0.0
@@ -24,7 +25,8 @@
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: aspnet.request,
+    Name: GET,
+    LogicScope: aspnet.request,
     Resource: GET /home/index,
     Service: sample,
     Type: web,
@@ -33,7 +35,7 @@
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
-      http.url: /home/index,
+      http.url: http://localhost:00000/Home/Index,
       language: dotnet,
       runtime-id: Guid_1,
       span.kind: server,
