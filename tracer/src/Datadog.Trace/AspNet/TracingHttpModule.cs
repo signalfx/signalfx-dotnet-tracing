@@ -155,7 +155,7 @@ namespace Datadog.Trace.AspNet
             {
                 // Dispose here, as the scope won't be in context items and won't get disposed on request end in that case...
                 scope?.Dispose();
-                Log.Error(ex, "Datadog ASP.NET HttpModule instrumentation error");
+                Log.Error(ex, "SignalFx ASP.NET HttpModule instrumentation error");
             }
         }
 
@@ -200,7 +200,7 @@ namespace Datadog.Trace.AspNet
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Datadog ASP.NET HttpModule instrumentation error");
+                Log.Error(ex, "SignalFx ASP.NET HttpModule instrumentation error");
             }
         }
 
@@ -227,7 +227,7 @@ namespace Datadog.Trace.AspNet
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Datadog ASP.NET HttpModule instrumentation error");
+                Log.Error(ex, "SignalFx ASP.NET HttpModule instrumentation error");
             }
         }
 
