@@ -2,7 +2,8 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: aspnet.request,
+    Name: GET,
+    LogicScope: aspnet.request,
     Resource: GET /home/identifier/{id},
     Service: sample,
     Type: web,
@@ -20,7 +21,7 @@ at System.Web.Mvc.ActionDescriptor.ExtractParameterFromDictionary(ParameterInfo 
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 500,
-      http.url: /home/identifier/badvalue,
+      http.url: http://localhost:00000/Home/identifier/BadValue,
       language: dotnet,
       runtime-id: Guid_1,
       span.kind: server,
@@ -35,7 +36,8 @@ at System.Web.Mvc.ActionDescriptor.ExtractParameterFromDictionary(ParameterInfo 
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: aspnet-mvc.request,
+    Name: GET /home/identifier/{id},
+    LogicScope: aspnet-mvc.request,
     Resource: GET /home/identifier/{id},
     Service: sample,
     Type: web,
@@ -57,7 +59,7 @@ at System.Web.Mvc.ActionDescriptor.ExtractParameterFromDictionary(ParameterInfo 
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 500,
-      http.url: /home/identifier/badvalue,
+      http.url: http://localhost:00000/Home/identifier/BadValue,
       language: dotnet,
       span.kind: server,
       version: 1.0.0

@@ -2,7 +2,8 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: aspnet-webapi.request,
+    Name: GET /api2/delayasync/{value},
+    LogicScope: aspnet-webapi.request,
     Resource: GET /api2/delayasync/{value},
     Service: Samples.Owin.WebApi2,
     Type: web,
@@ -14,7 +15,7 @@
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
-      http.url: http://localhost:00000/api2/delayasync/0,
+      http.url: http://localhost:00000/api2/delayAsync/0,
       language: dotnet,
       runtime-id: Guid_1,
       span.kind: server,
