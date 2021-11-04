@@ -249,7 +249,7 @@ namespace Datadog.Trace.MSBuild
                     string stack = null;
                     string subCategory = e.Subcategory;
 
-                    projectSpan.Status = SpanStatus.Error.WithDescription(message);
+                    projectSpan.Status = SpanStatus.Error;
                     projectSpan.SetTag(BuildTags.ErrorMessage, message);
                     projectSpan.SetTag(BuildTags.ErrorType, type);
                     projectSpan.SetTag(BuildTags.ErrorCode, code);

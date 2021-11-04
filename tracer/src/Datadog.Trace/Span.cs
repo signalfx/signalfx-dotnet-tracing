@@ -320,7 +320,7 @@ namespace Datadog.Trace
                     exception = aggregateException.InnerExceptions[0];
                 }
 
-                Status = SpanStatus.Error.WithDescription(exception.Message);
+                Status = SpanStatus.Error;
                 SetTag(Trace.Tags.ErrorMsg, exception.Message);
                 SetTag(Trace.Tags.ErrorStack, exception.ToString());
                 SetTag(Trace.Tags.ErrorType, exception.GetType().ToString());
