@@ -11,13 +11,13 @@
     Tags: {
       aspnet.route: api/statuscode/{value},
       deployment.environment: integration_tests,
-      error.msg: The HTTP response has status code 503.,
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 503,
       http.url: http://localhost:00000/api/statuscode/503,
       language: dotnet,
       runtime-id: Guid_1,
+      sfx.error.message: The HTTP response has status code 503.,
       span.kind: server,
       version: 1.0.0
     },

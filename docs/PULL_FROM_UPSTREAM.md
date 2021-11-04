@@ -22,3 +22,27 @@
 6. If squashing cherry-pick from upstream to pass CLA check:
     * `git rebase -i <squash_sha>^`
     * Select top one as "pick" all coming from upstream as "squash" and let the ones that you made to fix build and test as "pick" so it is easier to review them separately.
+
+## Regenerating snapshot files
+
+Windows in Git Bash:
+
+```sh
+git clean -fXd ; ./tracer/build.cmd ; \
+Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.cmd BuildAndRunWindowsIntegrationTests --framework net5.0 ; \
+Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.cmd BuildAndRunWindowsIntegrationTests --framework netcoreapp3.1 ; \
+Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.cmd BuildAndRunWindowsIntegrationTests --framework net461 ; \
+Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.cmd BuildAndRunWindowsIntegrationTests --framework net452 ; \
+./tracer/build.cmd OverwriteSnaphotFiles
+```
+
+Windows in Ubuntu WSL:
+
+```sh
+git clean -fXd ; ./tracer/build.sh ; \
+docker-compose run --rm StartDependencies ; \
+Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.sh BuildAndRunLinuxIntegrationTests --framework net5.0 ; \
+Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.sh BuildAndRunLinuxIntegrationTests --framework netcoreapp3.1 ; \
+docker-compose down ; \
+./tracer/build.sh OverwriteSnaphotFiles
+```
