@@ -14,7 +14,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Datadog.Trace.Abstractions;
 using Datadog.Trace.Agent;
-using Datadog.Trace.Agent.Jaeger;
 using Datadog.Trace.Agent.Zipkin;
 using Datadog.Trace.AppSec;
 using Datadog.Trace.Configuration;
@@ -777,8 +776,6 @@ namespace Datadog.Trace
             {
                 case ExporterType.Zipkin:
                     return new ExporterWriter(new ZipkinExporter(settings), metrics);
-                case ExporterType.Jaeger:
-                    return new ExporterWriter(new JaegerExporter(JaegerOptions.FromTracerSettings(settings)), metrics);
                 default:
                     return new AgentWriter(new Api(settings.AgentUri, TransportStrategy.Get(settings), statsd), metrics, maxBufferSize: settings.TraceBufferSize);
             }
