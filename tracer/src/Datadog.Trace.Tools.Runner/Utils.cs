@@ -18,7 +18,7 @@ namespace Datadog.Trace.Tools.Runner
 {
     internal class Utils
     {
-        public const string PROFILERID = "{918728DD-259F-4A6A-AC2B-B85E1B658318}";
+        public const string PROFILERID = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}";
 
         public static Dictionary<string, string> GetProfilerEnvironmentVariables(string runnerFolder, Platform platform, Options options)
         {
@@ -39,27 +39,27 @@ namespace Datadog.Trace.Tools.Runner
             }
 
             tracerHome ??= DirectoryExists("Home", Path.Combine(runnerFolder, "..", "..", "..", "home"), Path.Combine(runnerFolder, "home"));
-            string tracerMsBuild = FileExists(Path.Combine(tracerHome, "netstandard2.0", "OpenTelemetry.AutoInstrumentation.MSBuild.dll"));
+            string tracerMsBuild = FileExists(Path.Combine(tracerHome, "netstandard2.0", "SignalFx.Tracing.MSBuild.dll"));
             string tracerIntegrations = FileExists(Path.Combine(tracerHome, "integrations.json"));
             string tracerProfiler32 = string.Empty;
             string tracerProfiler64 = string.Empty;
 
             if (platform == Platform.Windows)
             {
-                tracerProfiler32 = FileExists(Path.Combine(tracerHome, "win-x86", "OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dll"));
-                tracerProfiler64 = FileExists(Path.Combine(tracerHome, "win-x64", "OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dll"));
+                tracerProfiler32 = FileExists(Path.Combine(tracerHome, "win-x86", "SignalFx.Tracing.ClrProfiler.Native.dll"));
+                tracerProfiler64 = FileExists(Path.Combine(tracerHome, "win-x64", "SignalFx.Tracing.ClrProfiler.Native.dll"));
             }
             else if (platform == Platform.Linux)
             {
-                tracerProfiler64 = FileExists(Path.Combine(tracerHome, "linux-x64", "OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.so"));
+                tracerProfiler64 = FileExists(Path.Combine(tracerHome, "linux-x64", "SignalFx.Tracing.ClrProfiler.Native.so"));
             }
             else if (platform == Platform.MacOS)
             {
-                tracerProfiler64 = FileExists(Path.Combine(tracerHome, "osx-x64", "OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.dylib"));
+                tracerProfiler64 = FileExists(Path.Combine(tracerHome, "osx-x64", "SignalFx.Tracing.ClrProfiler.Native.dylib"));
                 if (RuntimeInformation.OSArchitecture == Architecture.X64 || RuntimeInformation.OSArchitecture == Architecture.X86)
                 {
-                    tracerProfiler32 = FileExists(Path.Combine(tracerHome, "win-x86", "OpenTelemetry.AutoInstrumentation.Native.dll"));
-                    tracerProfiler64 = FileExists(Path.Combine(tracerHome, "win-x64", "OpenTelemetry.AutoInstrumentation.Native.dll"));
+                    tracerProfiler32 = FileExists(Path.Combine(tracerHome, "win-x86", "SignalFx.Tracing.Native.dll"));
+                    tracerProfiler64 = FileExists(Path.Combine(tracerHome, "win-x64", "SignalFx.Tracing.Native.dll"));
                 }
                 else
                 {
@@ -71,11 +71,11 @@ namespace Datadog.Trace.Tools.Runner
             {
                 if (RuntimeInformation.OSArchitecture == Architecture.X64)
                 {
-                    tracerProfiler64 = FileExists(Path.Combine(tracerHome, "linux-x64", "OpenTelemetry.AutoInstrumentation.Native.so"));
+                    tracerProfiler64 = FileExists(Path.Combine(tracerHome, "linux-x64", "SignalFx.Tracing.Native.so"));
                 }
                 else if (RuntimeInformation.OSArchitecture == Architecture.Arm64)
                 {
-                    tracerProfiler64 = FileExists(Path.Combine(tracerHome, "linux-arm64", "OpenTelemetry.AutoInstrumentation.Native.so"));
+                    tracerProfiler64 = FileExists(Path.Combine(tracerHome, "linux-arm64", "SignalFx.Tracing.Native.so"));
                 }
                 else
                 {
@@ -87,7 +87,7 @@ namespace Datadog.Trace.Tools.Runner
             {
                 if (RuntimeInformation.OSArchitecture == Architecture.X64)
                 {
-                    tracerProfiler64 = FileExists(Path.Combine(tracerHome, "osx-x64", "OpenTelemetry.AutoInstrumentation.Native.dylib"));
+                    tracerProfiler64 = FileExists(Path.Combine(tracerHome, "osx-x64", "SignalFx.Tracing.Native.dylib"));
                 }
                 else
                 {

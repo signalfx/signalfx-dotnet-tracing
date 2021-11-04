@@ -32,7 +32,7 @@ namespace Datadog.Trace.ClrProfiler
         /// <summary>
         /// Gets the CLSID for the Datadog .NET profiler
         /// </summary>
-        public static readonly string ProfilerClsid = "{918728DD-259F-4A6A-AC2B-B85E1B658318}";
+        public static readonly string ProfilerClsid = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}";
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(Instrumentation));
 

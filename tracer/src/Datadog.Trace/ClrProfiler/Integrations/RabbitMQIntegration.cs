@@ -3,11 +3,14 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ;
 using Datadog.Trace.ClrProfiler.Emit;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.DuckTyping;
@@ -25,8 +28,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
     {
         internal const string IntegrationName = nameof(IntegrationIds.RabbitMQ);
 
-        private const string OperationName = "amqp.command";
-        private const string ServiceName = "rabbitmq";
+        private const string SystemName = "rabbitmq";
 
         private const string Major3Minor6Patch9 = "3.6.9";
         private const string Major5 = "5";
@@ -37,6 +39,15 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         private const string RabbitMQDefaultBasicConsumer = "RabbitMQ.Client.DefaultBasicConsumer";
         private const string IBasicPropertiesTypeName = "RabbitMQ.Client.IBasicProperties";
         private const string IDictionaryArgumentsTypeName = "System.Collections.Generic.IDictionary`2[System.String,System.Object]";
+
+        internal const string OperationSetup = "setup";
+        internal const string OperationProcess = "process";
+        internal const string OperationReceive = "receive";
+        internal const string OperationSend = "send";
+
+        internal const string DeliverCommand = "basic.deliver";
+        internal const string GetCommand = "basic.get";
+        internal const string PublishCommand = "basic.publish";
 
         internal static readonly IntegrationInfo IntegrationId = IntegrationRegistry.GetIntegrationInfo(IntegrationName);
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(RabbitMQIntegration));
@@ -96,7 +107,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             if (model == null) { throw new ArgumentNullException(nameof(model)); }
 
             const string methodName = "HandleBasicDeliver";
-            const string command = "basic.deliver";
+            const string command = DeliverCommand;
             Action<object, string, ulong, bool, string, string, object, byte[]> instrumentedMethod;
             var modelType = model.GetType();
 
@@ -146,6 +157,8 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     if (tags != null)
                     {
                         tags.MessageSize = body?.Length.ToString() ?? "0";
+
+                        SetTagsFromBasicProperties(tags, basicPropertiesValue);
                     }
 
                     try
@@ -202,7 +215,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             if (model == null) { throw new ArgumentNullException(nameof(model)); }
 
             const string methodName = "HandleBasicDeliver";
-            const string command = "basic.deliver";
+            const string command = DeliverCommand;
             Action<object, string, ulong, bool, string, string, object, object> instrumentedMethod;
             var modelType = model.GetType();
 
@@ -249,9 +262,14 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
                 using (var scope = CreateScope(tracer, out RabbitMQTags tags, command, parentContext: propagatedContext, spanKind: SpanKinds.Consumer, exchange: exchange, routingKey: routingKey))
                 {
-                    if (tags != null && body != null && body.TryDuckCast<BodyStruct>(out var bodyStruct))
+                    if (tags != null)
                     {
-                        tags.MessageSize = bodyStruct.Length.ToString() ?? "0";
+                        SetTagsFromBasicProperties(tags, basicPropertiesValue);
+
+                        if (body != null && body.TryDuckCast<BodyStruct>(out var bodyStruct))
+                        {
+                            tags.MessageSize = bodyStruct.Length.ToString() ?? "0";
+                        }
                     }
 
                     try
@@ -299,7 +317,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             if (model == null) { throw new ArgumentNullException(nameof(model)); }
 
             const string methodName = "BasicGet";
-            const string command = "basic.get";
+            const string command = GetCommand;
             Func<object, string, bool, object> instrumentedMethod;
             var modelType = model.GetType();
 
@@ -423,7 +441,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             if (model == null) { throw new ArgumentNullException(nameof(model)); }
 
             const string methodName = "_Private_BasicPublish";
-            const string command = "basic.publish";
+            const string command = PublishCommand;
             Action<object, string, string, bool, object, byte[]> instrumentedMethod;
             var modelType = model.GetType();
 
@@ -467,9 +485,9 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
                     if (basicProperties != null && basicProperties.TryDuckCast<IBasicProperties>(out var basicPropertiesValue))
                     {
-                        if (tags != null && basicPropertiesValue.IsDeliveryModePresent())
+                        if (tags != null)
                         {
-                            tags.DeliveryMode = DeliveryModeStrings[0x3 & basicPropertiesValue.DeliveryMode];
+                            SetTagsFromBasicProperties(tags, basicPropertiesValue);
                         }
 
                         // add distributed tracing headers to the message
@@ -527,7 +545,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             if (model == null) { throw new ArgumentNullException(nameof(model)); }
 
             const string methodName = "_Private_BasicPublish";
-            const string command = "basic.publish";
+            const string command = PublishCommand;
             Action<object, string, string, bool, object, object> instrumentedMethod;
             var modelType = model.GetType();
 
@@ -578,9 +596,9 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
                     if (basicProperties != null && basicProperties.TryDuckCast<IBasicProperties>(out var basicPropertiesValue))
                     {
-                        if (tags != null && basicPropertiesValue.IsDeliveryModePresent())
+                        if (tags != null)
                         {
-                            tags.DeliveryMode = DeliveryModeStrings[0x3 & basicPropertiesValue.DeliveryMode];
+                            SetTagsFromBasicProperties(tags, basicPropertiesValue);
                         }
 
                         // add distributed tracing headers to the message
@@ -854,19 +872,46 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 Span parent = tracer.ActiveScope?.Span;
 
                 tags = new RabbitMQTags(spanKind);
-                string serviceName = tracer.Settings.GetServiceName(tracer, ServiceName);
-                scope = tracer.StartActiveWithTags(OperationName, parent: parentContext, tags: tags, serviceName: serviceName, startTime: startTime);
+                string operation = CommandToOperation(command);
+                string operationName = string.IsNullOrWhiteSpace(exchange)
+                    ? operation
+                    : $"{exchange} {operation}";
+
+                scope = tracer.StartActiveWithTags(operationName, parent: parentContext, tags: tags, startTime: startTime);
                 var span = scope.Span;
 
                 span.Type = SpanTypes.Queue;
+                span.LogicScope = "amqp.command";
                 span.ResourceName = command;
-                tags.Command = command;
 
+                // Network tags
+                // TODO: tags.PeerName = "";
+                // TODO: tags.PeerIP = "";
+
+                // Messaging Tags
+                tags.System = SystemName;
+                tags.Destination = exchange;
+                tags.DestinationKind = SpanTypes.Queue;
+                // TODO: tags.TempDestination = "TODO";
+                // TODO: tags.Protocol = "TODO";
+                // TODO: tags.ProtocolVersion = "TODO";
+                // TODO: tags.Url = "TODO";
+
+                if (ReferenceEquals(operation, OperationReceive) ||
+                    ReferenceEquals(operation, OperationProcess))
+                {
+                    tags.Operation = operation;
+
+                    // tags.ConsumerId = "TODO";
+                }
+
+                // RabbitMq Tags
+                tags.InstrumentationName = IntegrationName;
                 tags.Queue = queue;
                 tags.Exchange = exchange;
+                tags.Command = command;
                 tags.RoutingKey = routingKey;
 
-                tags.InstrumentationName = IntegrationName;
                 tags.SetAnalyticsSampleRate(IntegrationId, tracer.Settings, enabledWithGlobalSetting: false);
             }
             catch (Exception ex)
@@ -877,6 +922,32 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             // always returns the scope, even if it's null because we couldn't create it,
             // or we couldn't populate it completely (some tags is better than no tags)
             return scope;
+        }
+
+        private static string CommandToOperation(string command)
+        {
+            if (ReferenceEquals(command, DeliverCommand) ||
+                ReferenceEquals(command, GetCommand))
+            {
+                return OperationReceive;
+            }
+            else if (ReferenceEquals(command, PublishCommand))
+            {
+                return OperationSend;
+            }
+
+            return OperationSetup;
+        }
+
+        internal static void SetTagsFromBasicProperties(RabbitMQTags tags, IBasicProperties basicProperties)
+        {
+            tags.ConversationId = basicProperties.CorrelationId;
+            tags.MessageId = basicProperties.MessageId;
+
+            if (basicProperties.IsDeliveryModePresent())
+            {
+                tags.DeliveryMode = DeliveryModeStrings[0x3 & basicProperties.DeliveryMode];
+            }
         }
 
         /********************
@@ -897,26 +968,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             /// Gets the message properties
             /// </summary>
             public IBasicProperties BasicProperties;
-        }
-
-        public interface IBasicProperties
-        {
-            /// <summary>
-            /// Gets or sets the headers of the message
-            /// </summary>
-            /// <returns>Message headers</returns>
-            IDictionary<string, object> Headers { get; set; }
-
-            /// <summary>
-            /// Gets the delivery mode of the message
-            /// </summary>
-            byte DeliveryMode { get; }
-
-            /// <summary>
-            /// Returns true if the DeliveryMode property is present
-            /// </summary>
-            /// <returns>true if the DeliveryMode property is present</returns>
-            bool IsDeliveryModePresent();
         }
 
         [DuckCopy]

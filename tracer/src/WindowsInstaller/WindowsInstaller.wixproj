@@ -17,9 +17,9 @@
     <IntermediateOutputPath>obj\$(Configuration)\$(Platform)\</IntermediateOutputPath>
     <SuppressPdbOutput>True</SuppressPdbOutput>
     <DefineSolutionProperties>false</DefineSolutionProperties>
-    <OutputName>opentelemetry-dotnet-autoinstrumentation-0.0.1-$(Platform)</OutputName>
+    <OutputName>signalfx-dotnet-tracing-0.0.1-$(Platform)</OutputName>
     <TracerHomeDirectory Condition="'$(TracerHomeDirectory)' == ''">$(MSBuildThisFileDirectory)..\bin\windows-tracer-home</TracerHomeDirectory>
-    <DefineConstants>InstallerVersion=1.29.0;TracerHomeDirectory=$(TracerHomeDirectory);LibDdwafDirectory=$(LibDdwafDirectory)</DefineConstants>
+    <DefineConstants>InstallerVersion=0.0.1;TracerHomeDirectory=$(TracerHomeDirectory);LibDdwafDirectory=$(LibDdwafDirectory)</DefineConstants>
     <LibDdwafDirectory Condition="'$(LibDdwafDirectory)' == ''">$(LibDdwafDirectory)..\..\packages\libddwaf.1.0.7</LibDdwafDirectory>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">

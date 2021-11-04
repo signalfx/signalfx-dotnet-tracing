@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #pragma warning disable SA1402 // File may only contain a single type
 #pragma warning disable SA1649 // File name should match first type name
 
@@ -227,30 +229,32 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             });
 
             // Expect a 'validate' span
-            _expectations.Add(new GraphQLSpanExpectation($"Samples.{sampleName}-graphql", _graphQLValidateOperationName, _graphQLValidateOperationName)
+            _expectations.Add(new GraphQLSpanExpectation($"Samples.{sampleName}", _graphQLValidateOperationName, _graphQLValidateOperationName)
             {
                 OriginalUri = url,
                 GraphQLRequestBody = graphQLRequestBody,
                 GraphQLOperationType = null,
                 GraphQLOperationName = graphQLOperationName,
                 GraphQLSource = graphQLSource,
-                IsGraphQLError = failsValidation,
-                ServiceVersion = null
+                IsGraphQLError = failsValidation
             });
             _expectedGraphQLValidateSpanCount++;
 
             if (failsValidation) { return; }
 
+            string operationName = string.IsNullOrEmpty(graphQLOperationName)
+                ? graphQLOperationType
+                : $"{graphQLOperationType} {graphQLOperationName}";
+
             // Expect an 'execute' span
-            _expectations.Add(new GraphQLSpanExpectation($"Samples.{sampleName}-graphql", _graphQLExecuteOperationName, resourceName)
+            _expectations.Add(new GraphQLSpanExpectation($"Samples.{sampleName}", operationName, resourceName)
             {
                 OriginalUri = url,
                 GraphQLRequestBody = graphQLRequestBody,
                 GraphQLOperationType = graphQLOperationType,
                 GraphQLOperationName = graphQLOperationName,
                 GraphQLSource = graphQLSource,
-                IsGraphQLError = failsExecution,
-                ServiceVersion = null
+                IsGraphQLError = failsExecution
             });
             _expectedGraphQLExecuteSpanCount++;
 

@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Text;
 using Datadog.Trace.ClrProfiler.Integrations;
@@ -24,7 +26,6 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.GraphQL
         internal const string IntegrationName = nameof(IntegrationIds.GraphQL);
         internal static readonly IntegrationInfo IntegrationId = IntegrationRegistry.GetIntegrationInfo(IntegrationName);
 
-        private const string ServiceName = "graphql";
         private const string ParseOperationName = "graphql.parse"; // Instrumentation not yet implemented
         private const string ValidateOperationName = "graphql.validate";
         private const string ExecuteOperationName = "graphql.execute";
@@ -45,10 +46,10 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.GraphQL
             try
             {
                 var tags = new GraphQLTags();
-                string serviceName = tracer.Settings.GetServiceName(tracer, ServiceName);
-                scope = tracer.StartActiveWithTags(ValidateOperationName, serviceName: serviceName, tags: tags);
+                scope = tracer.StartActiveWithTags(ValidateOperationName, tags: tags);
 
                 var span = scope.Span;
+                span.LogicScope = ValidateOperationName;
                 span.Type = SpanTypes.GraphQL;
                 tags.Source = document.OriginalQuery;
 
@@ -77,14 +78,17 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.GraphQL
                 string source = executionContext.Document.OriginalQuery;
                 string operationName = executionContext.Operation.Name;
                 string operationType = executionContext.Operation.OperationType.ToString();
+                var operation = string.IsNullOrEmpty(operationName)
+                    ? operationType
+                    : $"{operationType} {operationName}";
 
                 var tags = new GraphQLTags();
-                string serviceName = tracer.Settings.GetServiceName(tracer, ServiceName);
-                scope = tracer.StartActiveWithTags(ExecuteOperationName, serviceName: serviceName, tags: tags);
+                scope = tracer.StartActiveWithTags(operation, tags: tags);
 
                 var span = scope.Span;
                 span.Type = SpanTypes.GraphQL;
                 span.ResourceName = $"{operationType} {operationName ?? "operation"}";
+                span.LogicScope = ExecuteOperationName;
 
                 tags.Source = source;
                 tags.OperationName = operationName;

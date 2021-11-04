@@ -12,28 +12,23 @@ cp -r .vscode.example .vscode
 
 Because of [Mono missing features](https://github.com/OmniSharp/omnisharp-vscode#note-about-using-net-5-sdks), `omnisharp.useGlobalMono` has to be set to `never`. Go to `File` -> `Preferences` -> `Settings` -> `Extensions` -> `C# Configuration` -> Change `Omnisharp: Use Global Mono` (you can search for it if the menu is too long) to `never`. Afterwards, you have restart OmniSharp: `F1` -> `OmniSharp: Restart OmniSharp`.
 
-There may be a lot of errors, because some projects target .NET Framework. Switch to `Datadog.Trace.Minimal.sln` using `F1` -> `OmniSharp: Select Project` in Visual Studio Code to load a subset of projects which work without any issues. You can also try building the projects which have errors as it sometimes helps.
+There may be a lot of errors, because some projects target .NET Framework. Switch to `Datadog.Trace.Minimal.slnf` using `F1` -> `OmniSharp: Select Project` in Visual Studio Code to load a subset of projects which work without any issues. You can also try building the projects which have errors as it sometimes helps.
 
-If for whatever reason you need to use `Datadog.Trace.sln` you can run `for i in **/*.csproj; do dotnet build $i; done` to decrease the number of errors.
+If for whatever reason you need to use `Datadog.Trace.sln` you can run `./tracer/build.cmd Clean BuildTracerHome` to decrease the number of errors.
 
 ## Testing environment
 
 The [`dev/docker-compose.yaml`](../dev/docker-compose.yaml) contains configuration for running OTel Collector and Jaeger.
 It also configured to send the traces to Splunk Observability Cloud.
 
-Before running `docker-compose` make sure to set `SPLUNK_AUTH_TOKEN` env var.
-You can do this by executing following command in Bash,
-where a value for `$SPLUNK_ACCESS_TOKEN` can be found [here](https://app.signalfx.com/o11y/#/organization/current?selectedKeyValue=sf_section:accesstokens).
-
-```sh
-export SPLUNK_AUTH_TOKEN=$(echo -n "auth:$SPLUNK_ACCESS_TOKEN" | base64)
-```
-
 You can run the services using:
 
 ```sh
-docker-compose -f dev/docker-compose.yaml up
+SPLUNK_ACCESS_TOKEN=secret docker-compose -f dev/docker-compose.yaml up
 ```
+
+The value for `SPLUNK_ACCESS_TOKEN` can be found
+[here](https://app.signalfx.com/o11y/#/organization/current?selectedKeyValue=sf_section:accesstokens).
 
 The following Web UI endpoints are exposed:
 
