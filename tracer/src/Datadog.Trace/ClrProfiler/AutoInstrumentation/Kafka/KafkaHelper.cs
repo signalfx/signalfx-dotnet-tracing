@@ -126,7 +126,6 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
 
                 var span = scope.Span;
                 span.LogicScope = KafkaConstants.ConsumeOperationName;
-                span.LogicScope = KafkaConstants.ProduceOperationName;
                 tags.Destination = topic;
                 tags.System = SystemName;
                 span.Type = SpanTypes.Queue;
