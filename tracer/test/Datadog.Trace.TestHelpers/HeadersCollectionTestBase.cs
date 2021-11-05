@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -12,36 +13,34 @@ namespace Datadog.Trace.TestHelpers
     {
         public static IEnumerable<object[]> GetHeaderCollectionImplementations()
         {
-            yield return new object[] { WebRequest.CreateHttp("http://localhost").Headers.Wrap() };
-            yield return new object[] { new NameValueCollection().Wrap() };
-            yield return new object[] { new DictionaryHeadersCollection() };
+            return GetHeaderCollectionFactories().Select(factory => new object[] { factory() });
         }
 
         public static IEnumerable<object[]> GetHeadersInvalidIdsCartesianProduct()
         {
-            return from header in GetHeaderCollectionImplementations().SelectMany(i => i)
+            return from headersFactory in GetHeaderCollectionFactories()
                    from invalidId in HeadersCollectionTestHelpers.GetInvalidIds().SelectMany(i => i)
-                   select new[] { header, invalidId };
+                   select new[] { headersFactory(), invalidId };
         }
 
-        public static IEnumerable<object[]> GetHeadersInvalidSamplingPrioritiesCartesianProduct()
+        public static IEnumerable<object[]> GetHeadersInvalidIntegerSamplingPrioritiesCartesianProduct()
         {
-            return from header in GetHeaderCollectionImplementations().SelectMany(i => i)
-                   from invalidSamplingPriority in HeadersCollectionTestHelpers.GetInvalidSamplingPriorities().SelectMany(i => i)
-                   select new[] { header, invalidSamplingPriority };
+            return from headersFactory in GetHeaderCollectionFactories()
+                   from invalidSamplingPriority in HeadersCollectionTestHelpers.GetInvalidIntegerSamplingPriorities().SelectMany(i => i)
+                   select new[] { headersFactory(), invalidSamplingPriority };
         }
 
-        internal static void AssertExpected(IHeadersCollection headers, string key, string expected)
+        public static IEnumerable<object[]> GetHeadersInvalidNonIntegerSamplingPrioritiesCartesianProduct()
         {
-            var matches = headers.GetValues(key);
-            Assert.Single(matches);
-            matches.ToList().ForEach(x => Assert.Equal(expected, x));
+            return from headersFactory in GetHeaderCollectionFactories()
+                   from invalidSamplingPriority in HeadersCollectionTestHelpers.GetInvalidNonIntegerSamplingPriorities().SelectMany(i => i)
+                   select new[] { headersFactory(), invalidSamplingPriority };
         }
 
-        internal static void AssertMissing(IHeadersCollection headers, string key)
+        internal static IEnumerable<Func<IHeadersCollection>> GetHeaderCollectionFactories()
         {
-            var matches = headers.GetValues(key);
-            Assert.Empty(matches);
-        }
+            yield return () => WebRequest.CreateHttp("http://localhost").Headers.Wrap();
+            yield return () => new NameValueCollection().Wrap();
+            yield return () => new DictionaryHeadersCollection();
     }
 }
