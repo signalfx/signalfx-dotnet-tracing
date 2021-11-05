@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Propagation;
@@ -12,6 +14,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
 {
     internal static class KafkaHelper
     {
+        private const string SystemName = "rabbitmq";
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(KafkaHelper));
         private static bool _headersInjectionEnabled = true;
 
@@ -36,18 +39,19 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
                     return null;
                 }
 
-                string serviceName = settings.GetServiceName(tracer, KafkaConstants.ServiceName);
                 var tags = new KafkaTags(SpanKinds.Producer);
 
                 scope = tracer.StartActiveWithTags(
                     KafkaConstants.ProduceOperationName,
                     tags: tags,
-                    serviceName: serviceName,
                     finishOnClose: finishOnClose);
 
                 string resourceName = $"Produce Topic {(string.IsNullOrEmpty(topicPartition?.Topic) ? "kafka" : topicPartition?.Topic)}";
 
                 var span = scope.Span;
+                span.LogicScope = KafkaConstants.ProduceOperationName;
+                tags.Destination = topicPartition?.Topic;
+                tags.System = SystemName;
                 span.Type = SpanTypes.Queue;
                 span.ResourceName = resourceName;
                 if (topicPartition?.Partition is not null && !topicPartition.Partition.IsSpecial)
@@ -114,15 +118,17 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
                     }
                 }
 
-                string serviceName = tracer.Settings.GetServiceName(tracer, KafkaConstants.ServiceName);
-
                 var tags = new KafkaTags(SpanKinds.Consumer);
 
-                scope = tracer.StartActiveWithTags(KafkaConstants.ConsumeOperationName, parent: propagatedContext, tags: tags, serviceName: serviceName);
+                scope = tracer.StartActiveWithTags(KafkaConstants.ConsumeOperationName, parent: propagatedContext, tags: tags);
 
                 string resourceName = $"Consume Topic {(string.IsNullOrEmpty(topic) ? "kafka" : topic)}";
 
                 var span = scope.Span;
+                span.LogicScope = KafkaConstants.ConsumeOperationName;
+                span.LogicScope = KafkaConstants.ProduceOperationName;
+                tags.Destination = topic;
+                tags.System = SystemName;
                 span.Type = SpanTypes.Queue;
                 span.ResourceName = resourceName;
 

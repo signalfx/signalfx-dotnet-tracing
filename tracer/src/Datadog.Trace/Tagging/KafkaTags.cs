@@ -3,12 +3,14 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using Datadog.Trace.ExtensionMethods;
 
 namespace Datadog.Trace.Tagging
 {
-    internal class KafkaTags : InstrumentationTags
+    internal class KafkaTags : MessagingTags
     {
         private const string ComponentName = "kafka";
 
