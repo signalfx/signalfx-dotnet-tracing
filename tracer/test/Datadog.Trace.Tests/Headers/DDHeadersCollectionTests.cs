@@ -6,7 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-//<<<<<<< HEAD:tracer/test/Datadog.Trace.Tests/Headers/DDHeadersCollectionTests.cs
+<<<<<<< HEAD:tracer/test/Datadog.Trace.Tests/Headers/DDHeadersCollectionTests.cs
 using Datadog.Trace.Conventions;
 =======
 using System.Linq;
@@ -31,7 +31,7 @@ namespace Datadog.Trace.Tests.Headers
         private const string TestPrefix = "test.prefix";
         private readonly DDSpanContextPropagator _propagator = new DDSpanContextPropagator(new DatadogTraceIdConvention());
 
-//<<<<<<< HEAD:tracer/test/Datadog.Trace.Tests/Headers/DDHeadersCollectionTests.cs
+<<<<<<< HEAD:tracer/test/Datadog.Trace.Tests/Headers/DDHeadersCollectionTests.cs
         [Theory]
         [MemberData(nameof(GetHeaderCollectionImplementations))]
         internal void ExtractHeaderTags_EmptyHeadersReturnsEmptyTagsList(IHeadersCollection headers)
@@ -279,7 +279,7 @@ namespace Datadog.Trace.Tests.Headers
         [MemberData(nameof(GetHeadersInvalidNonIntegerSamplingPrioritiesCartesianProduct))]
         internal void Extract_InvalidNonIntegerSamplingPriority(IHeadersCollection headers, string samplingPriority)
         {
-//<<<<<<< HEAD:tracer/test/Datadog.Trace.Tests/Headers/DDHeadersCollectionTests.cs
+<<<<<<< HEAD:tracer/test/Datadog.Trace.Tests/Headers/DDHeadersCollectionTests.cs
             var traceId = TraceId.CreateFromInt(9);
 =======
             // ignore the extracted sampling priority if it is not a valid integer
