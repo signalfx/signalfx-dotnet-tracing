@@ -229,6 +229,8 @@ namespace Datadog.Trace.Configuration
 
             KafkaCreateConsumerScopeEnabled = source?.GetBool(ConfigurationKeys.KafkaCreateConsumerScopeEnabled)
                                            ?? true; // default
+
+            TagMongoCommands = source?.GetBool(ConfigurationKeys.TagMongoCommands) ?? true;
         }
 
         /// <summary>
@@ -472,6 +474,14 @@ namespace Datadog.Trace.Configuration
         /// Gets or sets a value indicating whether context server timing header will be added.
         /// </summary>
         public bool TraceResponseHeaderEnabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether MongoDb integration
+        /// should tag the command BsonDocument as db.statement.
+        /// Default is <c>true</c>.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.TagMongoCommands"/>
+        public bool TagMongoCommands { get; set; }
 
         /// <summary>
         /// Gets or sets a value with the maximum length a tag/log value can have.

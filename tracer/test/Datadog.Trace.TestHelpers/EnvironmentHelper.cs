@@ -180,7 +180,7 @@ namespace Datadog.Trace.TestHelpers
                 "COR_PROFILER",
                 "COR_PROFILER_PATH",
 
-                // Datadog
+                // SignalFx
                 "SIGNALFX_PROFILER_PROCESSES",
                 "SIGNALFX_DOTNET_TRACER_HOME",
                 "SIGNALFX_INTEGRATIONS",
@@ -189,7 +189,8 @@ namespace Datadog.Trace.TestHelpers
                 "SIGNALFX_VERSION",
                 "SIGNALFX_TAGS",
                 "SIGNALFX_APPSEC_ENABLED",
-                "SIGNALFX_TRACE_CALLTARGET_ENABLED"
+                "SIGNALFX_TRACE_CALLTARGET_ENABLED",
+                "SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS"
             };
 
             foreach (string variable in environmentVariables)

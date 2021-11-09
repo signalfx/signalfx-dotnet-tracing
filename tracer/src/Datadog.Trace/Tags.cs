@@ -125,6 +125,11 @@ namespace Datadog.Trace
         public const string DbName = "db.name";
 
         /// <summary>
+        /// The command/query text
+        /// </summary>
+        public const string DbStatement = "db.statement";
+
+        /// <summary>
         /// The query text
         /// </summary>
         public const string SqlQuery = "sql.query";

@@ -428,6 +428,14 @@ namespace Datadog.Trace.Configuration
         public const string CIVisibilityEnabled = "SIGNALFX_CIVISIBILITY_ENABLED";
 
         /// <summary>
+        /// Configuration key for enabling or disabling the tagging of
+        /// a Mongo command BsonDocument as db.statement.
+        /// Default value is true (enabled).
+        /// </summary>
+        /// <seealso cref="TracerSettings.TagMongoCommands"/>
+        public const string TagMongoCommands = "SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS";
+
+        /// <summary>
         /// String format patterns used to match integration-specific configuration keys.
         /// </summary>
         public static class Integrations
