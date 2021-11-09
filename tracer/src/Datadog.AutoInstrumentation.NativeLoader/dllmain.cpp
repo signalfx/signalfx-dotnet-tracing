@@ -55,8 +55,8 @@ extern "C"
     {
         Debug("DllGetClassObject");
 
-        // {846F5F1C-F9AE-4B07-969E-05C26BC060D8}
-        const GUID CLSID_CorProfiler = {0x846f5f1c, 0xf9ae, 0x4b07, {0x96, 0x9e, 0x5, 0xc2, 0x6b, 0xc0, 0x60, 0xd8}};
+        // {B4C89B0F-9908-4F73-9F59-0D77C5A06874}
+        const GUID CLSID_CorProfiler = {0xb4c89b0f, 0x9908, 0x4f73, {0x9f, 0x59, 0xd, 0x77, 0xc5, 0xa0, 0x68, 0x74}};
 
         if (ppv == NULL || rclsid != CLSID_CorProfiler)
         {

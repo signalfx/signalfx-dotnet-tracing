@@ -2843,7 +2843,7 @@
           "maximum_patch": 65535
         },
         "wrapper": {
-          "assembly": "Datadog.Trace, Version=1.29.0.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb",
+          "assembly": "SignalFx.Tracing, Version=0.0.1.0, Culture=neutral, PublicKeyToken=e43a27c2023d388a",
           "type": "Datadog.Trace.ClrProfiler.Integrations.WebRequestIntegration",
           "method": "BeginGetRequestStream",
           "signature": "00 06 1C 1C 1C 1C 08 08 0A",
@@ -2869,7 +2869,7 @@
           "maximum_patch": 65535
         },
         "wrapper": {
-          "assembly": "Datadog.Trace, Version=1.29.0.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb",
+          "assembly": "SignalFx.Tracing, Version=0.0.1.0, Culture=neutral, PublicKeyToken=e43a27c2023d388a",
           "type": "Datadog.Trace.ClrProfiler.Integrations.WebRequestIntegration",
           "method": "BeginGetRequestStream",
           "signature": "00 06 1C 1C 1C 1C 08 08 0A",
