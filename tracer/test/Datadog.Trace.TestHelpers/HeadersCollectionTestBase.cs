@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Headers;
-using Xunit;
 
 namespace Datadog.Trace.TestHelpers
 {
@@ -42,5 +41,6 @@ namespace Datadog.Trace.TestHelpers
             yield return () => WebRequest.CreateHttp("http://localhost").Headers.Wrap();
             yield return () => new NameValueCollection().Wrap();
             yield return () => new DictionaryHeadersCollection();
+        }
     }
 }
