@@ -73,7 +73,7 @@ namespace Datadog.Trace.Tests.Headers
         }
 
         [Theory]
-        [MemberData(nameof(GetHeadersInvalidSamplingPrioritiesCartesianProduct))]
+        [MemberData(nameof(GetHeadersInvalidNonIntegerSamplingPrioritiesCartesianProduct))]
         internal void Extract_InvalidSamplingPriority(IHeadersCollection headers, string samplingPriority)
         {
             var traceId = TraceId.CreateFromString("52686470458518446744073709551615");

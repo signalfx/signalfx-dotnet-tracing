@@ -13,7 +13,7 @@ namespace Datadog.Trace.Tests
         [Fact]
         public void OverrideTraceIdWithoutParent()
         {
-            const ulong expectedTraceId = 41;
+            var expectedTraceId = TraceId.CreateFromInt(41);
             const ulong expectedSpanId = 42;
 
             var spanContext = new SpanContext(parent: null, traceContext: null, serviceName: "service", traceId: expectedTraceId, spanId: expectedSpanId);
@@ -25,10 +25,10 @@ namespace Datadog.Trace.Tests
         [Fact]
         public void OverrideTraceIdWithParent()
         {
-            const ulong parentTraceId = 41;
+            var parentTraceId = TraceId.CreateFromInt(41);
             const ulong parentSpanId = 42;
 
-            const ulong childTraceId = 43;
+            var childTraceId = TraceId.CreateFromInt(43);
             const ulong childSpanId = 44;
 
             var parent = new SpanContext(parentTraceId, parentSpanId);

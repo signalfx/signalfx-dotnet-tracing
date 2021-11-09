@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Headers;
+using Xunit;
 
 namespace Datadog.Trace.TestHelpers
 {
@@ -41,6 +42,19 @@ namespace Datadog.Trace.TestHelpers
             yield return () => WebRequest.CreateHttp("http://localhost").Headers.Wrap();
             yield return () => new NameValueCollection().Wrap();
             yield return () => new DictionaryHeadersCollection();
+        }
+
+        internal static void AssertExpected(IHeadersCollection headers, string key, string expected)
+        {
+            var matches = headers.GetValues(key);
+            Assert.Single(matches);
+            matches.ToList().ForEach(x => Assert.Equal(expected, x));
+        }
+
+        internal static void AssertMissing(IHeadersCollection headers, string key)
+        {
+            var matches = headers.GetValues(key);
+            Assert.Empty(matches);
         }
     }
 }
