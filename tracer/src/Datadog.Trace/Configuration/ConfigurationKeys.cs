@@ -279,6 +279,13 @@ namespace Datadog.Trace.Configuration
         public const string RuntimeMetricsEnabled = "SIGNALFX_RUNTIME_METRICS_ENABLED";
 
         /// <summary>
+        /// Configuration key for enabling or disabling tagging Redis
+        /// commands as db.statement.
+        /// </summary>
+        /// <seealso cref="TracerSettings.TagRedisCommands"/>
+        public const string TagRedisCommands = "SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS";
+
+        /// <summary>
         /// Configuration key for setting the approximate maximum size,
         /// in bytes, for Tracer log files.
         /// Default value is 10 MB.

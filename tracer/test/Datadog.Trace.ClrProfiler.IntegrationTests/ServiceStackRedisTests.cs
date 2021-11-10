@@ -56,7 +56,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 foreach (var span in spans)
                 {
-                    Assert.Equal("redis.command", span.Name);
+                    Assert.Equal("redis.command", span.LogicScope);
                     Assert.Equal("Samples.ServiceStack.Redis", span.Service);
                     Assert.Equal(SpanTypes.Redis, span.Type);
                     Assert.Equal(host, DictionaryExtensions.GetValueOrDefault(span.Tags, "out.host"));
@@ -95,7 +95,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                                  ? spans[i].Resource
                                  : string.Empty;
                     var a2 = i < spans.Count
-                                 ? DictionaryExtensions.GetValueOrDefault(spans[i].Tags, "redis.raw_command")
+                                 ? DictionaryExtensions.GetValueOrDefault(spans[i].Tags, "db.statement")
                                  : string.Empty;
 
                     Assert.True(e1 == a1, $@"invalid resource name for span #{i}, expected ""{e1}"", actual ""{a1}""");

@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using Datadog.Trace.ClrProfiler.Integrations.StackExchange.Redis;
 using Datadog.Trace.Configuration;
@@ -40,7 +42,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             {
                 var tags = new RedisTags();
 
-                scope = tracer.StartActiveWithTags(OperationName, serviceName: serviceName, tags: tags);
                 int separatorIndex = rawCommand.IndexOf(' ');
                 string command;
 
@@ -53,10 +54,18 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     command = rawCommand;
                 }
 
+                scope = tracer.StartActiveWithTags(command ?? OperationName, serviceName: tracer.DefaultServiceName, tags: tags);
+
                 var span = scope.Span;
                 span.Type = SpanTypes.Redis;
                 span.ResourceName = command;
-                tags.RawCommand = rawCommand;
+                span.LogicScope = OperationName;
+
+                if (tracer.Settings.TagRedisCommands)
+                {
+                    tags.RawCommand = rawCommand;
+                }
+
                 tags.Host = host;
                 tags.Port = port;
 
