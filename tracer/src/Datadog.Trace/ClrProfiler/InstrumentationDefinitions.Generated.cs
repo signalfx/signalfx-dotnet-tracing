@@ -266,7 +266,7 @@ namespace Datadog.Trace.ClrProfiler
                 new("StackExchange.Redis.StrongName", "StackExchange.Redis.RedisTransaction", "ExecuteAsync",  new[] { "System.Threading.Tasks.Task`1<T>", "StackExchange.Redis.Message", "StackExchange.Redis.ResultProcessor`1[!!0]", "StackExchange.Redis.ServerEndPoint" }, 1, 0, 0, 2, 65535, 65535, assemblyFullName, "Datadog.Trace.ClrProfiler.AutoInstrumentation.Redis.StackExchange.RedisExecuteAsyncIntegration"),
 
                 // Wcf
-                new("System.ServiceModel", "System.ServiceModel.Dispatcher.ChannelHandler", "HandleRequest",  new[] { "System.Boolean", "System.ServiceModel.Channels.RequestContext", "System.ServiceModel.OperationContext" }, 4, 0, 0, 4, 65535, 65535, assemblyFullName, "Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf.ChannelHandlerIntegration"),
+                new("System.ServiceModel", "System.ServiceModel.Dispatcher.ChannelHandler", "HandleRequest",  new[] { "System.Boolean", "System.ServiceModel.Channels.RequestContext", "System.ServiceModel.OperationContext" }, 4, 0, 0, 5, 65535, 65535, assemblyFullName, "Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf.ChannelHandlerIntegration"),
 
                 // WebRequest
                 new("System", "System.Net.HttpWebRequest", "BeginGetRequestStream",  new[] { "System.IAsyncResult", "System.AsyncCallback", "System.Object" }, 4, 0, 0, 4, 65535, 65535, assemblyFullName, "Datadog.Trace.ClrProfiler.AutoInstrumentation.Http.WebRequest.HttpWebRequest_BeginGetRequestStream_Integration"),

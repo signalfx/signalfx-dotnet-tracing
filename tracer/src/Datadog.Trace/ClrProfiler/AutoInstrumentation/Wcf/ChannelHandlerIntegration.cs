@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #if NETFRAMEWORK
 using System;
 using System.ComponentModel;
@@ -22,7 +24,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
         ReturnTypeName = ClrNames.Bool,
         ParameterTypeNames = new[] { "System.ServiceModel.Channels.RequestContext", "System.ServiceModel.OperationContext" },
         MinimumVersion = "4.0.0",
-        MaximumVersion = "4.*.*",
+        MaximumVersion = "5.*.*",
         IntegrationName = IntegrationName)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
