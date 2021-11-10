@@ -43,7 +43,7 @@ namespace Datadog.Trace.IntegrationTests
                     AgentUri = new Uri($"http://localhost:{agent.Port}"),
                     Exporter = ExporterType.DatadogAgent
                 };
-                var tracer = new Tracer(settings);
+                var tracer = new Tracer(settings, plugins: null, agentWriter: null, sampler: null, scopeManager: null, statsd: null);
 
                 using (var scope = tracer.StartActive("operationName"))
                 {

@@ -22,7 +22,7 @@ namespace Benchmarks.Trace
                 StartupDiagnosticLogEnabled = false
             };
 
-            Tracer.Instance = new Tracer(settings, null, new DummyAgentWriter(), null, null, null);
+            Tracer.UnsafeSetTracerInstance(new Tracer(settings, null, new DummyAgentWriter(), null, null, null));
 
             new GraphQLBenchmark().ExecuteAsync();
         }

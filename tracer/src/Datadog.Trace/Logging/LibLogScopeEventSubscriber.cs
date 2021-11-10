@@ -9,6 +9,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Threading;
+using Datadog.Trace.Configuration;
 using Datadog.Trace.Logging.LogProviders;
 using Datadog.Trace.Util;
 
@@ -30,7 +31,6 @@ namespace Datadog.Trace.Logging
 
         private static bool _executingIISPreStartInit = false;
 
-        private readonly Tracer _tracer;
         private readonly IScopeManager _scopeManager;
         private readonly string _defaultServiceName;
         private readonly string _version;
@@ -107,9 +107,8 @@ namespace Datadog.Trace.Logging
         //            but the target AppDomain is unable to de-serialize the object --
         //            this can easily happen if the target AppDomain cannot find/load the
         //            logging framework assemblies.
-        public LibLogScopeEventSubscriber(Tracer tracer, IScopeManager scopeManager, string defaultServiceName, string version, string env)
+        public LibLogScopeEventSubscriber(IScopeManager scopeManager, string defaultServiceName, string version, string env)
         {
-            _tracer = tracer;
             _scopeManager = scopeManager;
             _defaultServiceName = defaultServiceName;
             _version = version;
@@ -129,7 +128,7 @@ namespace Datadog.Trace.Logging
                 if (_logProvider is ILogProviderWithEnricher logProvider)
                 {
                     var enricher = logProvider.CreateEnricher();
-                    enricher.Initialize(_tracer);
+                    enricher.Initialize(scopeManager, defaultServiceName, version, env);
                     _logEnricher = enricher;
 
                     _scopeManager.TraceStarted += RegisterLogEnricher;
@@ -229,7 +228,7 @@ namespace Datadog.Trace.Logging
         {
             if (!_executingIISPreStartInit)
             {
-                if (_tracer.ActiveScope == null)
+                if (_scopeManager.Active == null)
                 {
                     // We closed the last span
                     _currentEnricher.Value?.Dispose();
@@ -312,7 +311,7 @@ namespace Datadog.Trace.Logging
         {
             if (_logProvider is CustomSerilogLogProvider)
             {
-                if (_tracer.ActiveScope == null)
+                if (_scopeManager.Active == null)
                 {
                     // We closed the last span
                     _currentEnricher.Value?.Dispose();
