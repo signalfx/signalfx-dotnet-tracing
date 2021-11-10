@@ -64,7 +64,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             : base("AspNetMvc5", @"test\test-applications\aspnet", output)
         {
             SetServiceVersion("1.0.0");
-
             SetEnvironmentVariable(ConfigurationKeys.FeatureFlags.RouteTemplateResourceNamesEnabled, enableRouteTemplateResourceNames.ToString());
 
             _iisFixture = iisFixture;
