@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Data;
 using Datadog.Trace.ClrProfiler.Integrations.AdoNet;
@@ -62,10 +64,7 @@ namespace Datadog.Trace.ClrProfiler
             {
                 Span parent = tracer.ActiveScope?.Span;
 
-                if (parent != null &&
-                    parent.Type == SpanTypes.Sql &&
-                    parent.GetTag(Tags.DbType) == _dbTypeName &&
-                    parent.ResourceName == command.CommandText)
+                if (ScopeFactory.IsAlreadyInstrumented(parent, _dbTypeName, command.CommandText))
                 {
                     // we are already instrumenting this,
                     // don't instrument nested methods that belong to the same stacktrace

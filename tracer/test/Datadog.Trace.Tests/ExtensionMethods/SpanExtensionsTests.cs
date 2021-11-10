@@ -57,6 +57,20 @@ namespace Datadog.Trace.Tests.ExtensionMethods
         }
 
         [Fact]
+        public void SetDbStatementToCommandText()
+        {
+            const string connectionString = "Server=myServerName;Database=myDataBase;User Id=myUsername;Password=myPassword;";
+            const string commandText = "SELECT * FROM Table ORDER BY id";
+
+            var spanContext = new SpanContext(Mock.Of<ISpanContext>(), Mock.Of<ITraceContext>(), "test");
+            var span = new Span(spanContext, null);
+
+            span.AddTagsFromDbCommand(CreateDbCommand(connectionString, commandText));
+
+            Assert.Equal(commandText, span.GetTag(Tags.DbStatement));
+        }
+
+        [Fact]
         public void ShouldDisableCacheIfTooManyConnectionStrings()
         {
             const string connectionStringTemplate = "Server=myServerName{0};Database=myDataBase;User Id=myUsername;Password=myPassword;";
