@@ -389,16 +389,6 @@ namespace Datadog.Trace.Configuration
         public const string HttpClientErrorStatusCodes = "SIGNALFX_HTTP_CLIENT_ERROR_STATUSES";
 
         /// <summary>
-        /// Configuration key for hostname for the Jaeger agent.
-        /// </summary>
-        public const string JaegerExporterAgentHost = "SIGNALFX_EXPORTER_JAEGER_AGENT_HOST";
-
-        /// <summary>
-        /// Configuration key for port for the Jaeger agent.
-        /// </summary>
-        public const string JaegerExporterAgentPort = "SIGNALFX_EXPORTER_JAEGER_AGENT_PORT";
-
-        /// <summary>
         /// Configuration key to enable sending partial traces to the agent
         /// </summary>
         /// <seealso cref="TracerSettings.PartialFlushEnabled"/>
@@ -436,6 +426,14 @@ namespace Datadog.Trace.Configuration
         /// Default is value is false (disabled).
         /// </summary>
         public const string CIVisibilityEnabled = "SIGNALFX_CIVISIBILITY_ENABLED";
+
+        /// <summary>
+        /// Configuration key for enabling or disabling the tagging of
+        /// a Mongo command BsonDocument as db.statement.
+        /// Default value is true (enabled).
+        /// </summary>
+        /// <seealso cref="TracerSettings.TagMongoCommands"/>
+        public const string TagMongoCommands = "SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS";
 
         /// <summary>
         /// String format patterns used to match integration-specific configuration keys.

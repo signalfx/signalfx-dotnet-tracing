@@ -121,16 +121,10 @@ namespace Datadog.Trace.Agent
                     }
                 }
 
-                // report span status according to https://github.com/open-telemetry/opentelemetry-specification/blob/59bbfb781bb403902e7be79966a6576c47eb704b/specification/trace/sdk_exporters/zipkin.md#status
-                switch (span?.Status.StatusCode)
+                // report error status according to SFx convention
+                if (span?.Status.StatusCode == StatusCode.Error)
                 {
-                    case StatusCode.Ok:
-                        tags["otel.status_code"] = "OK";
-                        break;
-                    case StatusCode.Error:
-                        tags["otel.status_code"] = "ERROR";
-                        tags["error"] = span.Status.Description ?? string.Empty;
-                        break;
+                    tags[Trace.Tags.Error] = "true";
                 }
 
                 return tags;

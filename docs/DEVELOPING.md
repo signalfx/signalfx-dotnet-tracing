@@ -21,19 +21,14 @@ If for whatever reason you need to use `Datadog.Trace.sln` you can run `./tracer
 The [`dev/docker-compose.yaml`](../dev/docker-compose.yaml) contains configuration for running OTel Collector and Jaeger.
 It also configured to send the traces to Splunk Observability Cloud.
 
-Before running `docker-compose` make sure to set `SPLUNK_AUTH_TOKEN` env var.
-You can do this by executing following command in Bash,
-where a value for `$SPLUNK_ACCESS_TOKEN` can be found [here](https://app.signalfx.com/o11y/#/organization/current?selectedKeyValue=sf_section:accesstokens).
-
-```sh
-export SPLUNK_AUTH_TOKEN=$(echo -n "auth:$SPLUNK_ACCESS_TOKEN" | base64)
-```
-
 You can run the services using:
 
 ```sh
-docker-compose -f dev/docker-compose.yaml up
+SPLUNK_ACCESS_TOKEN=secret docker-compose -f dev/docker-compose.yaml up
 ```
+
+The value for `SPLUNK_ACCESS_TOKEN` can be found
+[here](https://app.signalfx.com/o11y/#/organization/current?selectedKeyValue=sf_section:accesstokens).
 
 The following Web UI endpoints are exposed:
 
