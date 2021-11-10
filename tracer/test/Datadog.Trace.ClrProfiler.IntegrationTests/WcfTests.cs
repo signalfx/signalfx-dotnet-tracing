@@ -3,9 +3,12 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #if NET461
 
 using System.Collections.Generic;
+using System.Linq;
 using Datadog.Trace.TestHelpers;
 using Xunit;
 using Xunit.Abstractions;
@@ -36,8 +39,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
             var expectedSpanCount = 4;
 
-            const string expectedOperationName = "wcf.request";
+            const string expectedLogicScope = "wcf.request";
             const string expectedServiceName = "Samples.Wcf";
+
             HashSet<string> expectedResourceNames = new HashSet<string>()
             {
                 "http://schemas.xmlsoap.org/ws/2005/02/trust/RSTR/Issue",
@@ -52,17 +56,25 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             using (var agent = new MockTracerAgent(agentPort))
             using (RunSampleAndWaitForExit(agent.Port, arguments: $"WSHttpBinding Port={wcfPort}"))
             {
-                var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
+                var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedLogicScope);
                 Assert.True(spans.Count >= expectedSpanCount, $"Expecting at least {expectedSpanCount} spans, only received {spans.Count}");
+
+                HashSet<string> expectedOperationNames = new HashSet<string>(
+                    expectedResourceNames
+                        .Select(resourceName => $"{expectedLogicScope} {resourceName}"));
+
+                HashSet<string> actualOperationNames = new HashSet<string>();
 
                 foreach (var span in spans)
                 {
+                    actualOperationNames.Add(span.Name);
+
                     // Validate server fields
                     Assert.Equal(expectedServiceName, span.Service);
                     Assert.Equal(ServiceVersion, span.Tags[Tags.Version]);
-                    Assert.Equal(expectedOperationName, span.Name);
                     Assert.Equal(SpanTypes.Web, span.Type);
                     Assert.Equal(SpanKinds.Server, span.Tags[Tags.SpanKind]);
+                    Assert.Equal("Wcf", span.Tags[Tags.InstrumentationName]);
 
                     // Validate resource name
                     Assert.Contains(span.Resource, expectedResourceNames);
@@ -76,6 +88,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     // avoid changes to the verification files.
                     Assert.Equal($"localhost:{wcfPort}", span.Tags["http.request.headers.host"]);
                 }
+
+                Assert.True(expectedOperationNames.SetEquals(actualOperationNames));
             }
         }
     }

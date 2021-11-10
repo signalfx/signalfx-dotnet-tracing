@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
@@ -25,7 +27,9 @@ namespace Datadog.Trace.ClrProfiler.Integrations
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class WcfIntegration
     {
+        private const string DefaultOperationName = "wcf.request";
         private const string Major4 = "4";
+        private const string Major5 = "5";
 
         private const string ChannelHandlerTypeName = "System.ServiceModel.Dispatcher.ChannelHandler";
         private const string HttpRequestMessagePropertyTypeName = "System.ServiceModel.Channels.HttpRequestMessageProperty";
@@ -48,7 +52,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             TargetType = ChannelHandlerTypeName,
             TargetSignatureTypes = new[] { ClrNames.Bool, "System.ServiceModel.Channels.RequestContext", "System.ServiceModel.OperationContext" },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major4)]
+            TargetMaximumVersion = Major5)]
         public static bool HandleRequest(
             object channelHandler,
             object requestContext,
@@ -156,13 +160,19 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     }
                 }
 
-                var tags = new WebTags();
-                scope = tracer.StartActiveWithTags("wcf.request", propagatedContext, tags: tags);
-                var span = scope.Span;
-
                 object requestHeaders = requestMessage.GetProperty<object>("Headers").GetValueOrDefault();
                 string action = requestHeaders.GetProperty<string>("Action").GetValueOrDefault();
                 Uri requestHeadersTo = requestHeaders.GetProperty<Uri>("To").GetValueOrDefault();
+
+                var operationNameSuffix = action ?? requestHeadersTo?.LocalPath;
+                var operationName = !string.IsNullOrEmpty(operationNameSuffix)
+                    ? $"{DefaultOperationName} {operationNameSuffix}"
+                    : DefaultOperationName;
+
+                var tags = new WcfTags();
+                scope = tracer.StartActiveWithTags(operationName, propagatedContext, tags: tags);
+                var span = scope.Span;
+                span.LogicScope = DefaultOperationName;
 
                 span.DecorateWebServerSpan(
                     resourceName: action ?? requestHeadersTo?.LocalPath,
