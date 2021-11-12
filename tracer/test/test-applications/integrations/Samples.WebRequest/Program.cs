@@ -20,7 +20,7 @@ namespace Samples.WebRequest
                 DDHttpHeaderNames.TraceId, DDHttpHeaderNames.ParentId, DDHttpHeaderNames.SamplingPriority,
 
                 // B3 headers
-                B3HttpHeaderNames.B3TraceId, B3HttpHeaderNames.B3SpanId, B3HttpHeaderNames.B3ParentId, B3HttpHeaderNames.B3Sampled
+                B3HttpHeaderNames.B3TraceId, B3HttpHeaderNames.B3SpanId, B3HttpHeaderNames.B3Sampled
             };
 
         private static bool _tracingDisabled;

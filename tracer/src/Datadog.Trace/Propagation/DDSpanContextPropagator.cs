@@ -14,20 +14,11 @@ namespace Datadog.Trace.Propagation
     internal class DDSpanContextPropagator : IPropagator
     {
         private const NumberStyles NumberStyles = System.Globalization.NumberStyles.Integer;
-        private const int MinimumSamplingPriority = (int)SamplingPriority.UserReject;
-        private const int MaximumSamplingPriority = (int)SamplingPriority.UserKeep;
 
         private static readonly CultureInfo InvariantCulture = CultureInfo.InvariantCulture;
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<DDSpanContextPropagator>();
 
-        private static readonly int[] SamplingPriorities;
-
         private readonly ITraceIdConvention _traceIdConvention;
-
-        static DDSpanContextPropagator()
-        {
-            SamplingPriorities = Enum.GetValues(typeof(SamplingPriority)).Cast<int>().ToArray();
-        }
 
         public DDSpanContextPropagator(ITraceIdConvention traceIdConvention)
         {
@@ -128,10 +119,10 @@ namespace Datadog.Trace.Propagation
             {
                 if (int.TryParse(headerValue, out var result))
                 {
-                    if (MinimumSamplingPriority <= result && result <= MaximumSamplingPriority)
-                    {
-                        return (SamplingPriority)result;
-                    }
+                    // note this int value may not be defined in the enum,
+                    // but we should pass it along without validation
+                    // for forward compatibility
+                    return (SamplingPriority)result;
                 }
 
                 hasValue = true;
