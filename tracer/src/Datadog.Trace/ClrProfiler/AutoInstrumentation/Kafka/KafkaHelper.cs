@@ -16,7 +16,6 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
     {
         private const string SystemName = "kafka";
         private const string OperationReceive = "receive";
-        private const string OperationSend = "send";
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(KafkaHelper));
         private static bool _headersInjectionEnabled = true;
 
@@ -54,7 +53,6 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
                 span.LogicScope = KafkaConstants.ProduceOperationName;
                 tags.Destination = topicPartition?.Topic;
                 tags.DestinationKind = SpanTypes.Queue;
-                tags.Operation = OperationSend;
                 tags.System = SystemName;
                 span.Type = SpanTypes.Queue;
                 span.ResourceName = resourceName;
