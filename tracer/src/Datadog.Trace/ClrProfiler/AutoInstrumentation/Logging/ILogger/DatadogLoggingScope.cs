@@ -48,8 +48,8 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.ILogger
                     0 => new KeyValuePair<string, object>("dd_service", _service),
                     1 => new KeyValuePair<string, object>("dd_env", _env),
                     2 => new KeyValuePair<string, object>("dd_version", _version),
-                    3 => new KeyValuePair<string, object>("dd_trace_id", (_tracer.ActiveScope?.Span.TraceId ?? TraceId.Zero).ToString()),
-                    4 => new KeyValuePair<string, object>("dd_span_id", (_tracer.ActiveScope?.Span.SpanId ?? 0).ToString()),
+                    3 => new KeyValuePair<string, object>(CorrelationIdentifier.TraceIdKey, (_tracer.ActiveScope?.Span.TraceId ?? TraceId.Zero).ToString()),
+                    4 => new KeyValuePair<string, object>(CorrelationIdentifier.SpanIdKey, (_tracer.ActiveScope?.Span.SpanId ?? 0).ToString()),
                     _ => throw new ArgumentOutOfRangeException(nameof(index))
                 };
             }
@@ -65,7 +65,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.ILogger
 
             return string.Format(
                 CultureInfo.InvariantCulture,
-                "{0}, dd_trace_id:\"{1}\", dd_span_id:\"{2}\"",
+                "{0}, trace_id:\"{1}\", span_id:\"{2}\"",
                 _cachedFormat,
                 span.TraceId.ToString(),
                 span.SpanId);
@@ -80,8 +80,8 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.ILogger
 
             if (span is not null)
             {
-                yield return new KeyValuePair<string, object>("dd_trace_id", span.TraceId.ToString());
-                yield return new KeyValuePair<string, object>("dd_span_id", span.SpanId.ToString());
+                yield return new KeyValuePair<string, object>(CorrelationIdentifier.TraceIdKey, span.TraceId.ToString());
+                yield return new KeyValuePair<string, object>(CorrelationIdentifier.SpanIdKey, span.SpanId.ToString());
             }
         }
 

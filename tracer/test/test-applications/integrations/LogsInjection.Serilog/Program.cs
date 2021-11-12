@@ -32,7 +32,7 @@ namespace LogsInjection.Serilog
                                         .MinimumLevel.Is(LogEventLevel.Information)
                                         .WriteTo.File(
                                             textFilePath,
-                                            outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level}] {{ dd_service: \"{dd_service}\", dd_version: \"{dd_version}\", dd_env: \"{dd_env}\", dd_trace_id: \"{dd_trace_id}\", dd_span_id: \"{dd_span_id}\" }} {Message:lj} {NewLine}{Exception}")
+                                            outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level}] {{ dd_service: \"{dd_service}\", dd_version: \"{dd_version}\", dd_env: \"{dd_env}\", trace_id: \"{trace_id}\", span_id: \"{span_id}\" }} {Message:lj} {NewLine}{Exception}")
 #if SERILOG_2_0
                                         .WriteTo.File(
                                             new JsonFormatter(),

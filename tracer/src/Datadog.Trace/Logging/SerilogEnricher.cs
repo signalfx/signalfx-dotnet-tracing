@@ -90,8 +90,8 @@ namespace Datadog.Trace.Logging
                 return;
             }
 
-            var traceIdProperty = _propertyFactory(CorrelationIdentifier.SerilogTraceIdKey, _valueFactory(activeScope.Span.TraceId.ToString()));
-            var spanIdProperty = _propertyFactory(CorrelationIdentifier.SerilogSpanIdKey, _valueFactory(activeScope.Span.SpanId.ToString()));
+            var traceIdProperty = _propertyFactory(CorrelationIdentifier.TraceIdKey, _valueFactory(activeScope.Span.TraceId.ToString()));
+            var spanIdProperty = _propertyFactory(CorrelationIdentifier.SpanIdKey, _valueFactory(activeScope.Span.SpanId.ToString()));
 
             logEvent.AddPropertyIfAbsent(_serviceProperty);
             logEvent.AddPropertyIfAbsent(_versionProperty);

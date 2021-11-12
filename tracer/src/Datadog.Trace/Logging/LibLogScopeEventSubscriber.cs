@@ -402,10 +402,10 @@ namespace Datadog.Trace.Logging
                         CorrelationIdentifier.SerilogEnvKey, _env, destructure: false));
                 _contextDisposalStack.Push(
                     LogProvider.OpenMappedContext(
-                        CorrelationIdentifier.SerilogTraceIdKey, traceId.ToString(), destructure: false));
+                        CorrelationIdentifier.TraceIdKey, traceId.ToString(), destructure: false));
                 _contextDisposalStack.Push(
                     LogProvider.OpenMappedContext(
-                        CorrelationIdentifier.SerilogSpanIdKey, spanId.ToString(), destructure: false));
+                        CorrelationIdentifier.SpanIdKey, spanId.ToString(), destructure: false));
             }
             catch (Exception)
             {
