@@ -93,7 +93,7 @@ namespace Datadog.Trace.Logging
         }
 
         // IMPORTANT: For all logging frameworks, do not set any default values for
-        //            "dd.trace_id" and "dd.span_id" when initializing the subscriber
+        //            "trace_id" and "span_id" when initializing the subscriber
         //            because the Tracer may be initialized at a time when it is not safe
         //            to add properties logging context of the underlying logging framework.
         //

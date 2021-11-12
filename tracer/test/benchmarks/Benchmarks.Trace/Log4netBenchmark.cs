@@ -32,7 +32,7 @@ namespace Benchmarks.Trace
             Tracer.Instance = LogInjectionTracer;
 
             var repository = (Hierarchy)log4net.LogManager.GetRepository();
-            var patternLayout = new PatternLayout { ConversionPattern = "%date [%thread] %-5level %logger {dd.env=%property{dd.env}, dd.service=%property{dd.service}, dd.version=%property{dd.version}, dd.trace_id=%property{dd.trace_id}, dd.span_id=%property{dd.span_id}} - %message%newline" };
+            var patternLayout = new PatternLayout { ConversionPattern = "%date [%thread] %-5level %logger {deployment.environment=%property{deployment.environment}, service.name=%property{service.name}, service.version=%property{service.version}, trace_id=%property{trace_id}, span_id=%property{span_id}} - %message%newline" };
             patternLayout.ActivateOptions();
 
 #if DEBUG

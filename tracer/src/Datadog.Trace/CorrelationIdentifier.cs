@@ -14,11 +14,11 @@ namespace Datadog.Trace
     /// </summary>
     public static class CorrelationIdentifier
     {
-        internal static readonly string ServiceKey = "dd.service";
-        internal static readonly string VersionKey = "dd.version";
-        internal static readonly string EnvKey = "dd.env";
-        internal static readonly string TraceIdKey = "dd.trace_id";
-        internal static readonly string SpanIdKey = "dd.span_id";
+        internal static readonly string ServiceKey = "service.name";
+        internal static readonly string VersionKey = "service.version";
+        internal static readonly string EnvKey = "deployment.environment";
+        internal static readonly string TraceIdKey = "trace_id";
+        internal static readonly string SpanIdKey = "span_id";
 
         // Serilog property names require valid C# identifiers
         internal static readonly string SerilogServiceKey = "dd_service";
