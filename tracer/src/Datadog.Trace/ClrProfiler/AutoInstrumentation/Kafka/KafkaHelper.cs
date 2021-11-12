@@ -1,4 +1,4 @@
-// <copyright file="KafkaHelper.cs" company="Datadog">
+﻿// <copyright file="KafkaHelper.cs" company="Datadog">
 // Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
@@ -15,6 +15,8 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
     internal static class KafkaHelper
     {
         private const string SystemName = "kafka";
+        private const string OperationReceive = "receive";
+        private const string OperationSend = "send";
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(KafkaHelper));
         private static bool _headersInjectionEnabled = true;
 
@@ -51,6 +53,8 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
                 var span = scope.Span;
                 span.LogicScope = KafkaConstants.ProduceOperationName;
                 tags.Destination = topicPartition?.Topic;
+                tags.DestinationKind = SpanTypes.Queue;
+                tags.Operation = OperationSend;
                 tags.System = SystemName;
                 span.Type = SpanTypes.Queue;
                 span.ResourceName = resourceName;
@@ -127,6 +131,8 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
                 var span = scope.Span;
                 span.LogicScope = KafkaConstants.ConsumeOperationName;
                 tags.Destination = topic;
+                tags.DestinationKind = SpanTypes.Queue;
+                tags.Operation = OperationReceive;
                 tags.System = SystemName;
                 span.Type = SpanTypes.Queue;
                 span.ResourceName = resourceName;
