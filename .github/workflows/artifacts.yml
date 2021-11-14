@@ -73,7 +73,7 @@ jobs:
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\/v}
       # TODO: Extract release notes
       - name: Create Release
-        run: gh release create v${{ steps.get_version.outputs.VERSION }} --draft artifacts/signalfx* artifacts/x64/en-us/*.msi  artifacts/x86/en-us/*.msi
+        run: gh release create v${{ steps.get_version.outputs.VERSION }} --draft --prerelease artifacts/signalfx* artifacts/x64/en-us/*.msi  artifacts/x86/en-us/*.msi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
