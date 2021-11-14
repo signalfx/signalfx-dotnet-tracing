@@ -3,7 +3,7 @@ name: Publish Release Artifacts
 on:
   push:
     branches:
-    - next-ver-automate-releases
+    - next-ver
     tags:
     - 'v*'
 
