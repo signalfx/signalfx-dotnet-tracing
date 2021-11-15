@@ -927,6 +927,7 @@ partial class Build
                     .SetConfiguration(BuildConfiguration)
                     .SetTargetPlatform(TargetPlatform)
                     .SetFramework(Framework)
+                    //.WithMemoryDumpAfter(timeoutInMinutes: 30)
                     .EnableNoRestore()
                     .EnableNoBuild()
                     .SetProcessEnvironmentVariable("TracerHomeDirectory", TracerHomeDirectory)
@@ -944,6 +945,7 @@ partial class Build
                     .SetConfiguration(BuildConfiguration)
                     .SetTargetPlatform(TargetPlatform)
                     .SetFramework(Framework)
+                    //.WithMemoryDumpAfter(timeoutInMinutes: 30)
                     .EnableNoRestore()
                     .EnableNoBuild()
                     .SetFilter(Filter ?? "RunOnWindows=True&LoadFromGAC!=True&IIS!=True")
@@ -956,6 +958,7 @@ partial class Build
             finally
             {
                 MoveLogsToBuildData();
+                CopyMemoryDumps();
             }
         });
 
@@ -1103,6 +1106,7 @@ partial class Build
                         "Samples.GraphQL4" => Framework == TargetFramework.NETCOREAPP3_1 || Framework == TargetFramework.NET5_0,
                         var name when projectsToSkip.Contains(name) => false,
                         var name when TestAllPackageVersions && multiPackageProjects.Contains(name) => false,
+                        "Samples.AspNetCoreRazorPages" => true,
                         _ when !string.IsNullOrWhiteSpace(SampleName) => project?.Name?.Contains(SampleName) ?? false,
                         _ => true,
                     };
@@ -1119,6 +1123,7 @@ partial class Build
                     // .SetTargetPlatform(Platform)
                     .SetNoWarnDotNetCore3()
                     .When(TestAllPackageVersions, o => o.SetProperty("TestAllPackageVersions", "true"))
+                    .When(IncludeMinorPackageVersions, o => o.SetProperty("IncludeMinorPackageVersions", "true"))
                     .When(!string.IsNullOrEmpty(NugetPackageDirectory), o => o.SetPackageDirectory(NugetPackageDirectory))
                     .CombineWith(projectsToBuild, (c, project) => c
                         .SetProjectFile(project)));
@@ -1133,6 +1138,7 @@ partial class Build
                     // .SetTargetPlatform(Platform)
                     .SetNoWarnDotNetCore3()
                     .When(TestAllPackageVersions, o => o.SetProperty("TestAllPackageVersions", "true"))
+                    .When(IncludeMinorPackageVersions, o => o.SetProperty("IncludeMinorPackageVersions", "true"))
                     .When(!string.IsNullOrEmpty(NugetPackageDirectory), o => o.SetPackageDirectory(NugetPackageDirectory))
                     .CombineWith(projectsToBuild, (c, project) => c
                         .SetProject(project)));
@@ -1163,6 +1169,7 @@ partial class Build
                 .SetProperty("BuildInParallel", "true")
                 .SetProcessArgumentConfigurator(arg => arg.Add("/nowarn:NU1701"))
                 .When(TestAllPackageVersions, o => o.SetProperty("TestAllPackageVersions", "true"))
+                .When(IncludeMinorPackageVersions, o => o.SetProperty("IncludeMinorPackageVersions", "true"))
                 .CombineWith(targets, (c, target) => c.SetTargets(target))
             );
         });
@@ -1189,6 +1196,7 @@ partial class Build
                     // .SetTargetPlatform(Platform)
                     .SetNoWarnDotNetCore3()
                     .When(TestAllPackageVersions, o => o.SetProperty("TestAllPackageVersions", "true"))
+                    .When(IncludeMinorPackageVersions, o => o.SetProperty("IncludeMinorPackageVersions", "true"))
                     .When(!string.IsNullOrEmpty(NugetPackageDirectory), o =>
                         o.SetPackageDirectory(NugetPackageDirectory))
                     .CombineWith(integrationTestProjects, (c, project) => c
@@ -1226,9 +1234,11 @@ partial class Build
                         .EnableNoRestore()
                         .EnableNoBuild()
                         .SetFramework(Framework)
+                        //.WithMemoryDumpAfter(timeoutInMinutes: 30)
                         .SetFilter(filter)
                         .SetProcessEnvironmentVariable("TracerHomeDirectory", TracerHomeDirectory)
                         .When(TestAllPackageVersions, o => o.SetProcessEnvironmentVariable("TestAllPackageVersions", "true"))
+                        .When(IncludeMinorPackageVersions, o => o.SetProperty("IncludeMinorPackageVersions", "true"))
                         .When(CodeCoverage, ConfigureCodeCoverage)
                         .CombineWith(ParallelIntegrationTests, (s, project) => s
                             .EnableTrxLogOutput(GetResultsDirectory(project))
@@ -1242,9 +1252,11 @@ partial class Build
                     .EnableNoRestore()
                     .EnableNoBuild()
                     .SetFramework(Framework)
+                    //.WithMemoryDumpAfter(timeoutInMinutes: 30)
                     .SetFilter(filter)
                     .SetProcessEnvironmentVariable("TracerHomeDirectory", TracerHomeDirectory)
                     .When(TestAllPackageVersions, o => o.SetProcessEnvironmentVariable("TestAllPackageVersions", "true"))
+                    .When(IncludeMinorPackageVersions, o => o.SetProperty("IncludeMinorPackageVersions", "true"))
                     .When(CodeCoverage, ConfigureCodeCoverage)
                     .CombineWith(ClrProfilerIntegrationTests, (s, project) => s
                         .EnableTrxLogOutput(GetResultsDirectory(project))
@@ -1254,6 +1266,7 @@ partial class Build
             finally
             {
                 MoveLogsToBuildData();
+                CopyMemoryDumps();
             }
         });
 
@@ -1483,6 +1496,14 @@ partial class Build
             {
                 MoveFileToDirectory(dump, BuildDataDirectory / "dumps", FileExistsPolicy.Overwrite);
             }
+        }
+    }
+
+    private void CopyMemoryDumps()
+    {
+        foreach (var file in Directory.EnumerateFiles(TracerDirectory, "*.dmp", SearchOption.AllDirectories))
+        {
+            CopyFileToDirectory(file, BuildDataDirectory, FileExistsPolicy.OverwriteIfNewer);
         }
     }
 

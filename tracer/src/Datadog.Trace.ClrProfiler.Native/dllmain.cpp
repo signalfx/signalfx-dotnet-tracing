@@ -23,7 +23,10 @@ extern "C"
         // {B4C89B0F-9908-4F73-9F59-0D77C5A06874}
         const GUID CLSID_CorProfiler = {0xb4c89b0f, 0x9908, 0x4f73, {0x9f, 0x59, 0xd, 0x77, 0xc5, 0xa0, 0x68, 0x74}};
 
-        if (ppv == NULL || rclsid != CLSID_CorProfiler)
+        // {50DA5EED-F1ED-B00B-1055-5AFE55A1ADE5}
+        const GUID CLSID_New_CorProfiler = {0x50da5eed, 0xf1ed, 0xb00b, {0x10, 0x55, 0x5a, 0xfe, 0x55, 0xa1, 0xad, 0xe5}};
+
+        if (ppv == NULL || (rclsid != CLSID_CorProfiler && rclsid != CLSID_New_CorProfiler))
         {
             return E_FAIL;
         }

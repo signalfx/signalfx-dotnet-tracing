@@ -50,14 +50,14 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Http.WebRequest
                 var requestContext = propagator.Extract(request.Headers, (headers, key) => headers.GetValues(key));
                 if (requestContext is null || requestContext.TraceId == TraceId.Zero)
                 {
-                    var spanContext = ScopeFactory.CreateHttpSpanContext(tracer, WebRequestCommon.IntegrationId);
+                    var span = ScopeFactory.CreateInactiveOutboundHttpSpan(tracer, request.Method, request.RequestUri, WebRequestCommon.IntegrationId, out _, traceId: null, spanId: null, startTime: null, addToTraceContext: false);
 
-                    if (spanContext != null)
+                    if (span?.Context != null)
                     {
                         // Add distributed tracing headers to the HTTP request.
                         // We don't want to set an active scope now, because it's possible that EndGetResponse will never be called.
                         // Instead, we generate a spancontext and inject it in the headers. EndGetResponse will fetch them and create an active scope with the right id.
-                        propagator.Inject(spanContext, request.Headers, (headers, key, value) => headers.Set(key, value));
+                        propagator.Inject(span.Context, request.Headers, (headers, key, value) => headers.Set(key, value));
                     }
                 }
             }
