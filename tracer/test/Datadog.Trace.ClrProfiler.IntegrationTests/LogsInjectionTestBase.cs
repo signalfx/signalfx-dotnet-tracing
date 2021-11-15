@@ -59,7 +59,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             EmptyProperties,
 
             /// <summary>
-            /// UnTraced logs include dd_service, dd_env, and dd_version with their correct values
+            /// UnTraced logs include service_name, deployment_environment, and service_version with their correct values
             /// but no trace_id
             /// </summary>
             EnvServiceTracingPropertiesOnly,
@@ -137,9 +137,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     }
                 }
 
-                var versionProperty = test.PropertiesUseSerilogNaming ? "dd_version" : @"service\.version";
-                var envProperty = test.PropertiesUseSerilogNaming ? "dd_env" : @"deployment\.environment";
-                var serviceProperty = test.PropertiesUseSerilogNaming ? "dd_service" : @"service\.name";
+                var versionProperty = test.PropertiesUseSerilogNaming ? "service_version" : @"service\.version";
+                var envProperty = test.PropertiesUseSerilogNaming ? "deployment_environment" : @"deployment\.environment";
+                var serviceProperty = test.PropertiesUseSerilogNaming ? "service_name" : @"service\.name";
                 var traceIdProperty = "trace_id";
                 var spanIdProperty = "span_id";
 
