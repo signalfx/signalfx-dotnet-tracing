@@ -187,7 +187,7 @@ namespace Datadog.Trace.ClrProfiler
 
                 Span parent = tracer.ActiveScope?.Span;
 
-                if (IsAlreadyInstrumented(parent, dbType, command.CommandText))
+                if (IsDbAlreadyInstrumented(parent, dbType, command.CommandText))
                 {
                     // we are already instrumenting this,
                     // don't instrument nested methods that belong to the same stacktrace
@@ -216,7 +216,7 @@ namespace Datadog.Trace.ClrProfiler
             return scope;
         }
 
-        internal static bool IsAlreadyInstrumented(Span parent, string dbType, string commandText)
+        internal static bool IsDbAlreadyInstrumented(Span parent, string dbType, string commandText)
         {
             return parent != null &&
                    parent.Type == SpanTypes.Sql &&

@@ -64,7 +64,7 @@ namespace Datadog.Trace.ClrProfiler
             {
                 Span parent = tracer.ActiveScope?.Span;
 
-                if (ScopeFactory.IsAlreadyInstrumented(parent, _dbTypeName, command.CommandText))
+                if (ScopeFactory.IsDbAlreadyInstrumented(parent, _dbTypeName, command.CommandText))
                 {
                     // we are already instrumenting this,
                     // don't instrument nested methods that belong to the same stacktrace

@@ -50,10 +50,7 @@ namespace Datadog.Trace.ExtensionMethods
             span.ResourceName = commandText;
             span.Type = SpanTypes.Sql;
 
-            if (!string.IsNullOrEmpty(commandText))
-            {
-                span.SetTag(Tags.DbStatement, commandText);
-            }
+            span.SetTag(Tags.DbStatement, commandText);
 
             var tags = DbCommandCache.GetTagsFromDbCommand(command);
 
