@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #if !NET452
 using System;
 using System.Collections.Generic;
@@ -19,7 +21,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
     public class CosmosTests : TestHelper
     {
         private const string ExpectedOperationName = "cosmosdb.query";
-        private const string ExpectedServiceName = "Samples.CosmosDb-cosmosdb";
+        private const string ExpectedServiceName = "Samples.CosmosDb";
 
         public CosmosTests(ITestOutputHelper output)
             : base("CosmosDb", output)

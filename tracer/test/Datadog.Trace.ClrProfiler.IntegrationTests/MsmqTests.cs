@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #if NETFRAMEWORK
 using System;
 using System.Linq;
@@ -15,7 +17,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 {
     public class MsmqTests : TestHelper
     {
-        private const string ExpectedServiceName = "Samples.Msmq-msmq";
+        private const string ExpectedServiceName = "Samples.Msmq";
 
         public MsmqTests(ITestOutputHelper output)
             : base("Msmq", output)

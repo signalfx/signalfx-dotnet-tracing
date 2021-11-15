@@ -37,7 +37,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
 
             const string dbType = "sqlite";
             const string expectedOperationName = dbType + ".query";
-            const string expectedServiceName = "Samples.Microsoft.Data.Sqlite-" + dbType;
+            const string expectedServiceName = "Samples.Microsoft.Data.Sqlite";
 
             // NOTE: opt into the additional instrumentation of calls into netstandard.dll
             SetEnvironmentVariable("SIGNALFX_TRACE_NETSTANDARD_ENABLED", "true");

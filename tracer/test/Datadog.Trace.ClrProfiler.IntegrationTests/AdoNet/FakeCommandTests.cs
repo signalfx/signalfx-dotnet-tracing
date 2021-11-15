@@ -37,7 +37,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
 
             const string dbType = "fake";
             const string expectedOperationName = dbType + ".query";
-            const string expectedServiceName = "Samples.FakeDbCommand-" + dbType;
+            const string expectedServiceName = "Samples.FakeDbCommand";
 
             // NOTE: opt into the additional instrumentation of calls into netstandard.dll
             SetEnvironmentVariable("SIGNALFX_TRACE_NETSTANDARD_ENABLED", "true");

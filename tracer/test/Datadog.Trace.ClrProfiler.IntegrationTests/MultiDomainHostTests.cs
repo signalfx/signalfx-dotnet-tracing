@@ -60,13 +60,13 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
             var expectedMap = new Dictionary<string, int>()
             {
-                { "Samples.MultiDomainHost.App.FrameworkHttpNoRedirects-http-client", 2 },
-                { "Samples.MultiDomainHost.App.NuGetHttpNoRedirects-http-client", 2 },
-                { "Samples.MultiDomainHost.App.NuGetJsonWithRedirects-http-client", 2 },
+                { "Samples.MultiDomainHost.App.FrameworkHttpNoRedirects", 2 },
+                { "Samples.MultiDomainHost.App.NuGetHttpNoRedirects", 2 },
+                { "Samples.MultiDomainHost.App.NuGetJsonWithRedirects", 2 },
             };
             if (!targetFramework.StartsWith("net45"))
             {
-                expectedMap.Add("Samples.MultiDomainHost.App.NuGetHttpWithRedirects-http-client", 2);
+                expectedMap.Add("Samples.MultiDomainHost.App.NuGetHttpWithRedirects", 2);
             }
 
             RunSampleAndAssertAgainstExpectations(targetFramework, expectedMap);
@@ -85,13 +85,13 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             {
                 var expectedMap = new Dictionary<string, int>()
                 {
-                    { "Samples.MultiDomainHost.App.FrameworkHttpNoRedirects-http-client", 2 },
-                    { "Samples.MultiDomainHost.App.NuGetHttpNoRedirects-http-client", 2 },
-                    { "Samples.MultiDomainHost.App.NuGetJsonWithRedirects-http-client", 2 },
+                    { "Samples.MultiDomainHost.App.FrameworkHttpNoRedirects", 2 },
+                    { "Samples.MultiDomainHost.App.NuGetHttpNoRedirects", 2 },
+                    { "Samples.MultiDomainHost.App.NuGetJsonWithRedirects", 2 },
                 };
                 if (!targetFramework.StartsWith("net45"))
                 {
-                    expectedMap.Add("Samples.MultiDomainHost.App.NuGetHttpWithRedirects-http-client", 2);
+                    expectedMap.Add("Samples.MultiDomainHost.App.NuGetHttpWithRedirects", 2);
                 }
 
                 RunSampleAndAssertAgainstExpectations(targetFramework, expectedMap);

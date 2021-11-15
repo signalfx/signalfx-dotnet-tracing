@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -145,7 +147,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 foreach (var span in spans)
                 {
                     Assert.Equal("elasticsearch.query", span.Name);
-                    Assert.Equal("Samples.Elasticsearch.V7-elasticsearch", span.Service);
+                    Assert.Equal("Samples.Elasticsearch.V7", span.Service);
                     Assert.Equal("elasticsearch", span.Type);
                     Assert.False(span.Tags?.ContainsKey(Tags.Version), "External service span should not have service version tag.");
                 }

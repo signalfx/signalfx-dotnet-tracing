@@ -55,7 +55,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             var expectedSpanCount = expectedAsyncCount + expectedSyncCount;
 
             const string expectedOperationName = "http.request";
-            const string expectedServiceName = "Samples.HttpMessageHandler-http-client";
+            const string expectedServiceName = "Samples.HttpMessageHandler";
 
             int agentPort = TcpPortProvider.GetOpenPort();
             int httpPort = TcpPortProvider.GetOpenPort();

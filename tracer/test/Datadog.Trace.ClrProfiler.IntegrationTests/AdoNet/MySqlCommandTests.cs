@@ -136,7 +136,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
 
             const string dbType = "mysql";
             const string expectedOperationName = dbType + ".query";
-            const string expectedServiceName = "Samples.MySql-" + dbType;
+            const string expectedServiceName = "Samples.MySql";
 
             // NOTE: opt into the additional instrumentation of calls into netstandard.dll
             SetEnvironmentVariable("SIGNALFX_TRACE_NETSTANDARD_ENABLED", "true");

@@ -41,7 +41,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             };
 
             const string expectedOperationName = "http.request";
-            const string expectedServiceName = "Samples.WebRequest-http-client";
+            const string expectedServiceName = "Samples.WebRequest";
 
             int agentPort = TcpPortProvider.GetOpenPort();
             int httpPort = TcpPortProvider.GetOpenPort();

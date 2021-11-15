@@ -28,7 +28,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             const int expectedSpanCount = 17;
             const string dbType = "postgresql";
             const string expectedOperationName = dbType + ".query";
-            const string expectedServiceName = "Samples.Dapper-" + dbType;
+            const string expectedServiceName = "Samples.Dapper";
 
             int agentPort = TcpPortProvider.GetOpenPort();
 
@@ -57,7 +57,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             const int expectedSpanCount = 17;
             const string dbType = "postgresql";
             const string expectedOperationName = dbType + ".query";
-            const string expectedServiceName = "Samples.Dapper-" + dbType;
+            const string expectedServiceName = "Samples.Dapper";
 
             // NOTE: opt into the additional instrumentation of calls into netstandard.dll
             SetEnvironmentVariable("SIGNALFX_TRACE_NETSTANDARD_ENABLED", "true");

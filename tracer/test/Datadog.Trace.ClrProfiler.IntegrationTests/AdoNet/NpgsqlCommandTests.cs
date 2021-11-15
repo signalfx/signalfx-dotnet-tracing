@@ -70,7 +70,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
 
             const string dbType = "postgresql";
             const string expectedOperationName = dbType + ".query";
-            const string expectedServiceName = "Samples.Npgsql-" + dbType;
+            const string expectedServiceName = "Samples.Npgsql";
 
             // NOTE: opt into the additional instrumentation of calls into netstandard.dll
             // see https://github.com/DataDog/dd-trace-dotnet/pull/753

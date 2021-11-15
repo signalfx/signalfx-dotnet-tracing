@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -274,7 +276,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 foreach (var span in spans)
                 {
                     Assert.Equal("redis.command", span.Name);
-                    Assert.Equal("Samples.StackExchange.Redis-redis", span.Service);
+                    Assert.Equal("Samples.StackExchange.Redis", span.Service);
                     Assert.Equal(SpanTypes.Redis, span.Type);
                     Assert.Equal(host, DictionaryExtensions.GetValueOrDefault(span.Tags, "out.host"));
                     Assert.Equal(port, DictionaryExtensions.GetValueOrDefault(span.Tags, "out.port"));
