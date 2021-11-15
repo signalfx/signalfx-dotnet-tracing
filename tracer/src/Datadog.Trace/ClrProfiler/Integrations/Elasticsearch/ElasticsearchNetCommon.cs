@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Threading;
 using Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch;
@@ -51,7 +53,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             }
 
             string requestName = requestParameters?.GetType().Name.Replace("RequestParameters", string.Empty);
-
             string serviceName = tracer.Settings.GetServiceName(tracer, ServiceName);
 
             Scope scope = null;
@@ -60,8 +61,10 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
             try
             {
-                scope = tracer.StartActiveWithTags(OperationName, serviceName: serviceName, tags: tags);
+                var operationName = requestName ?? OperationName;
+                scope = tracer.StartActiveWithTags(operationName, serviceName: serviceName, tags: tags);
                 var span = scope.Span;
+                span.LogicScope = OperationName;
                 span.ResourceName = requestName ?? path ?? string.Empty;
                 span.Type = SpanType;
                 tags.Action = requestName;
