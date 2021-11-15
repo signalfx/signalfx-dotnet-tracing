@@ -48,6 +48,11 @@ namespace Datadog.Trace
         public const string Queue = "queue";
 
         /// <summary>
+        /// The span type for a message queue integration.
+        /// </summary>
+        public const string Topic = "topic";
+
+        /// <summary>
         /// The span type for a custom integration.
         /// </summary>
         public const string Custom = "custom";

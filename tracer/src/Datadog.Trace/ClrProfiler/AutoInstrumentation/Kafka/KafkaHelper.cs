@@ -1,4 +1,4 @@
-﻿// <copyright file="KafkaHelper.cs" company="Datadog">
+// <copyright file="KafkaHelper.cs" company="Datadog">
 // Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
@@ -52,9 +52,9 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
                 var span = scope.Span;
                 span.LogicScope = KafkaConstants.ProduceOperationName;
                 tags.Destination = topicPartition?.Topic;
-                tags.DestinationKind = SpanTypes.Queue;
+                tags.DestinationKind = SpanTypes.Topic;
                 tags.System = SystemName;
-                span.Type = SpanTypes.Queue;
+                span.Type = SpanTypes.Topic;
                 span.ResourceName = resourceName;
                 if (topicPartition?.Partition is not null && !topicPartition.Partition.IsSpecial)
                 {
@@ -129,10 +129,10 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
                 var span = scope.Span;
                 span.LogicScope = KafkaConstants.ConsumeOperationName;
                 tags.Destination = topic;
-                tags.DestinationKind = SpanTypes.Queue;
+                tags.DestinationKind = SpanTypes.Topic;
                 tags.Operation = OperationReceive;
                 tags.System = SystemName;
-                span.Type = SpanTypes.Queue;
+                span.Type = SpanTypes.Topic;
                 span.ResourceName = resourceName;
 
                 if (partition is not null)
