@@ -80,7 +80,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     span.Service.Should().Be(ExpectedServiceName);
                     span.Type.Should().Be(SpanTypes.Sql);
                     span.Resource.Should().StartWith("SELECT * FROM");
-                    span.Tags.Should().NotContain(Tags.Version, "External service span should not have service version tag.");
+                    span.Tags.Should().Contain(new KeyValuePair<string, string>(Tags.Version, "1.0.0"));
                     span.Tags.Should().Contain(new KeyValuePair<string, string>(Tags.DbType, "cosmosdb"));
                     span.Tags.Should().Contain(new KeyValuePair<string, string>(Tags.OutHost, "https://localhost:8081/"));
 

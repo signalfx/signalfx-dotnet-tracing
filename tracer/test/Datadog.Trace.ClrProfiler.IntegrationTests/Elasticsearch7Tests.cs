@@ -149,7 +149,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     Assert.Equal("elasticsearch.query", span.Name);
                     Assert.Equal("Samples.Elasticsearch.V7", span.Service);
                     Assert.Equal("elasticsearch", span.Type);
-                    Assert.False(span.Tags?.ContainsKey(Tags.Version), "External service span should not have service version tag.");
+                    Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
                 }
 
                 ValidateSpans(spans, (span) => span.Resource, expected);

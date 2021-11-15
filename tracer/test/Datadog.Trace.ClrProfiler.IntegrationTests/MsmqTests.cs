@@ -71,7 +71,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 }
 
                 span.Name.Should().Be("msmq.command");
-                span.Tags?.ContainsKey(Tags.Version).Should().BeFalse("External service span should not have service version tag.");
+                span.Tags.Should().ContainKey(Tags.Version);
 
                 var command = span.Tags[Tags.MsmqCommand];
 

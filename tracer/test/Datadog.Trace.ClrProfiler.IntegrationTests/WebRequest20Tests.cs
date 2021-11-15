@@ -6,6 +6,7 @@
 // Modified by Splunk Inc.
 
 #if NET452
+using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.ClrProfiler.IntegrationTests.Helpers;
 using Datadog.Trace.TestHelpers;
@@ -54,7 +55,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     Assert.Equal(expectedServiceName, span.Service);
                     Assert.Equal(SpanTypes.Http, span.Type);
                     Assert.Equal("WebRequest", span.Tags[Tags.InstrumentationName]);
-                    Assert.False(span.Tags?.ContainsKey(Tags.Version), "External service span should not have service version tag.");
+                    Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
                 }
 
                 PropagationTestHelpers.AssertPropagationEnabled(spans.First(), processResult);

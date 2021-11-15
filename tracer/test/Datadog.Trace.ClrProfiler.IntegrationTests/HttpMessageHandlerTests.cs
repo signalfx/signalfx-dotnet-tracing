@@ -77,7 +77,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     Assert.Equal(expectedServiceName, span.Service);
                     Assert.Equal(SpanTypes.Http, span.Type);
                     Assert.Equal("HttpMessageHandler", span.Tags[Tags.InstrumentationName]);
-                    Assert.False(span.Tags?.ContainsKey(Tags.Version), "External service span should not have service version tag.");
+                    Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
 
                     if (span.Tags[Tags.HttpStatusCode] == "502")
                     {
