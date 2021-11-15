@@ -24,7 +24,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 FileName = "simple.log",
                 RegexFormat = @"""{0}"":{1}",
                 UnTracedLogTypes = UnTracedLogTypes.EnvServiceTracingPropertiesOnly,
-                PropertiesUseSerilogNaming = true
+                PropertiesUseSerilogNaming = false
             },
         };
 
