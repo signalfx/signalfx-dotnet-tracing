@@ -154,7 +154,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             int agentPort = TcpPortProvider.GetOpenPort();
             string packageVersion = PackageVersions.ElasticSearch5.First()[0] as string;
 
-            SetEnvironmentVariable($"DD_TRACE_{nameof(IntegrationIds.ElasticsearchNet)}_ENABLED", "false");
+            SetEnvironmentVariable($"SIGNALFX_TRACE_{nameof(IntegrationIds.ElasticsearchNet)}_ENABLED", "false");
 
             using var agent = new MockTracerAgent(agentPort);
             using var process = RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion);
