@@ -42,7 +42,7 @@ Available layouts:
 
 ### Serilog
 
-- Versions ≥ 1.0.3 (.NET Framework)
+- Versions ≥ 2.0.0 (.NET Framework)
 - Versions ≥ 2.0.0 (.NET Core)
 
 Available layouts:
@@ -60,6 +60,6 @@ Available layouts:
 
 - `trace_id`
 - `span_id`
-- `service.name` - [`SIGNALFX_SERVICE_NAME`](/README.md#configuration-values) configuration option
-- `service.version` - [`SIGNALFX_VERSION`](/README.md#configuration-values) configuration option
-- `deployment.environment` - [`SIGNALFX_ENV`](/README.md#configuration-values) configuration option
+- `service.name` - [`SIGNALFX_SERVICE_NAME`](/USAGE.md#configuration-values) configuration option
+- `service.version` - [`SIGNALFX_VERSION`](/USAGE.md#configuration-values) configuration option
+- `deployment.environment` - [`SIGNALFX_ENV`](/USAGE.md#configuration-values) configuration option
