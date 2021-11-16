@@ -98,9 +98,6 @@ namespace environment {
     // Sets whether to enable JIT inlining
     const WSTRING clr_enable_inlining = WStr("SIGNALFX_CLR_ENABLE_INLINING");
 
-    // Custom internal tracer profiler path
-    const WSTRING internal_trace_profiler_path = WStr("SIGNALFX_INTERNAL_TRACE_NATIVE_ENGINE_PATH");
-
     // Sets whether to enable NGEN images.
     const WSTRING clr_enable_ngen = WStr("SIGNALFX_CLR_ENABLE_NGEN");
 
