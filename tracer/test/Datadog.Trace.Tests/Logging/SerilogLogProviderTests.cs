@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -151,7 +153,7 @@ namespace Datadog.Trace.Tests.Logging
             Assert.Equal(5, spanLog.Properties.Count);
 
             var expectedSpanId = spanLog.MessageTemplate.Text.Split('-')[1];
-            var spanProperty = spanLog.Properties[CorrelationIdentifier.SerilogSpanIdKey];
+            var spanProperty = spanLog.Properties[CorrelationIdentifier.SpanIdKey];
             Assert.Equal(expectedSpanId, spanProperty.ToString().Trim('\"'));
 
             var noSpanLog = _logEvents[1];
@@ -175,19 +177,19 @@ namespace Datadog.Trace.Tests.Logging
             Assert.True(logEvent.Properties.ContainsKey(CorrelationIdentifier.SerilogEnvKey));
             Assert.Equal(env, logEvent.Properties[CorrelationIdentifier.SerilogEnvKey].ToString().Trim(new[] { '\"' }), ignoreCase: true);
 
-            Assert.True(logEvent.Properties.ContainsKey(CorrelationIdentifier.SerilogTraceIdKey));
-            Assert.Equal(traceId, TraceId.CreateDataDogCompatibleFromDecimalString(logEvent.Properties[CorrelationIdentifier.SerilogTraceIdKey].ToString().Trim(new[] { '\"' })));
+            Assert.True(logEvent.Properties.ContainsKey(CorrelationIdentifier.TraceIdKey));
+            Assert.Equal(traceId, TraceId.CreateDataDogCompatibleFromDecimalString(logEvent.Properties[CorrelationIdentifier.TraceIdKey].ToString().Trim(new[] { '\"' })));
 
-            Assert.True(logEvent.Properties.ContainsKey(CorrelationIdentifier.SerilogSpanIdKey));
-            Assert.Equal(spanId, ulong.Parse(logEvent.Properties[CorrelationIdentifier.SerilogSpanIdKey].ToString().Trim(new[] { '\"' })));
+            Assert.True(logEvent.Properties.ContainsKey(CorrelationIdentifier.SpanIdKey));
+            Assert.Equal(spanId, ulong.Parse(logEvent.Properties[CorrelationIdentifier.SpanIdKey].ToString().Trim(new[] { '\"' })));
         }
 
         internal static void LogEventDoesNotContainCorrelationIdentifiers(Serilog.Events.LogEvent logEvent)
         {
             // Do not assert on the version property
             // Do not assert on the service property
-            Assert.False(logEvent.Properties.ContainsKey(CorrelationIdentifier.SerilogSpanIdKey));
-            Assert.False(logEvent.Properties.ContainsKey(CorrelationIdentifier.SerilogTraceIdKey));
+            Assert.False(logEvent.Properties.ContainsKey(CorrelationIdentifier.SpanIdKey));
+            Assert.False(logEvent.Properties.ContainsKey(CorrelationIdentifier.TraceIdKey));
         }
 
         private static void Thread1(Barrier barrier, Tracer tracer)

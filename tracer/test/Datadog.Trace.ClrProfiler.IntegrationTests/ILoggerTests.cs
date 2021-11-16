@@ -24,7 +24,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 FileName = "simple.log",
                 RegexFormat = @"""{0}"":{1}",
                 UnTracedLogTypes = UnTracedLogTypes.EnvServiceTracingPropertiesOnly,
-                PropertiesUseSerilogNaming = true
+                // Upstream uses Serilog format. Splunk's backend prefers keys with '.' in the name.
+                PropertiesUseSerilogNaming = false
             },
         };
 

@@ -40,7 +40,7 @@ namespace Benchmarks.Trace
 
             var target = new TextWriterTarget(writer)
             {
-                Layout = "${longdate}|${uppercase:${level}}|${logger}|{dd.env=${mdlc:item=dd.env},dd.service=${mdlc:item=dd.service},dd.version=${mdlc:item=dd.version},dd.trace_id=${mdlc:item=dd.trace_id},dd.span_id=${mdlc:item=dd.span_id}}|${message}"
+                Layout = "${longdate}|${uppercase:${level}}|${logger}|{deployment.environment=${mdlc:item=deployment.environment},service.name=${mdlc:item=service.name},service.version=${mdlc:item=service.version},trace_id=${mdlc:item=trace_id},span_id=${mdlc:item=span_id}}|${message}"
             };
 
             config.AddRuleForAllLevels(target);

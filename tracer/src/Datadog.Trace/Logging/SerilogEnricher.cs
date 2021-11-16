@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #pragma warning disable SA1201 // Elements should appear in the correct order
 
 using System;
@@ -90,8 +92,8 @@ namespace Datadog.Trace.Logging
                 return;
             }
 
-            var traceIdProperty = _propertyFactory(CorrelationIdentifier.SerilogTraceIdKey, _valueFactory(activeScope.Span.TraceId.ToString()));
-            var spanIdProperty = _propertyFactory(CorrelationIdentifier.SerilogSpanIdKey, _valueFactory(activeScope.Span.SpanId.ToString()));
+            var traceIdProperty = _propertyFactory(CorrelationIdentifier.TraceIdKey, _valueFactory(activeScope.Span.TraceId.ToString()));
+            var spanIdProperty = _propertyFactory(CorrelationIdentifier.SpanIdKey, _valueFactory(activeScope.Span.SpanId.ToString()));
 
             logEvent.AddPropertyIfAbsent(_serviceProperty);
             logEvent.AddPropertyIfAbsent(_versionProperty);

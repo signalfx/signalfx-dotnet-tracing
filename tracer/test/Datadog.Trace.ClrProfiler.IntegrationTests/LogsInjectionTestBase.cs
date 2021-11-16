@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -59,8 +61,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             EmptyProperties,
 
             /// <summary>
-            /// UnTraced logs include dd_service, dd_env, and dd_version with their correct values
-            /// but no dd_trace_id
+            /// UnTraced logs include service_name, deployment_environment, and service_version with their correct values
+            /// but no trace_id
             /// </summary>
             EnvServiceTracingPropertiesOnly,
         }
@@ -137,11 +139,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     }
                 }
 
-                var versionProperty = test.PropertiesUseSerilogNaming ? "dd_version" : @"dd\.version";
-                var envProperty = test.PropertiesUseSerilogNaming ? "dd_env" : @"dd\.env";
-                var serviceProperty = test.PropertiesUseSerilogNaming ? "dd_service" : @"dd\.service";
-                var traceIdProperty = test.PropertiesUseSerilogNaming ? "dd_trace_id" : @"dd\.trace_id";
-                var spanIdProperty = test.PropertiesUseSerilogNaming ? "dd_span_id" : @"dd\.span_id";
+                var versionProperty = test.PropertiesUseSerilogNaming ? "service_version" : @"service\.version";
+                var envProperty = test.PropertiesUseSerilogNaming ? "deployment_environment" : @"deployment\.environment";
+                var serviceProperty = test.PropertiesUseSerilogNaming ? "service_name" : @"service\.name";
+                var traceIdProperty = "trace_id";
+                var spanIdProperty = "span_id";
 
                 var versionRegex = string.Format(test.RegexFormat, versionProperty, @"""1.0.0""");
                 var envRegex = string.Format(test.RegexFormat, envProperty, @"""integration_tests""");

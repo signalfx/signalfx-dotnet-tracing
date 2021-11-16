@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -93,7 +95,7 @@ namespace Datadog.Trace.Logging
         }
 
         // IMPORTANT: For all logging frameworks, do not set any default values for
-        //            "dd.trace_id" and "dd.span_id" when initializing the subscriber
+        //            "trace_id" and "span_id" when initializing the subscriber
         //            because the Tracer may be initialized at a time when it is not safe
         //            to add properties logging context of the underlying logging framework.
         //
@@ -402,10 +404,10 @@ namespace Datadog.Trace.Logging
                         CorrelationIdentifier.SerilogEnvKey, _env, destructure: false));
                 _contextDisposalStack.Push(
                     LogProvider.OpenMappedContext(
-                        CorrelationIdentifier.SerilogTraceIdKey, traceId.ToString(), destructure: false));
+                        CorrelationIdentifier.TraceIdKey, traceId.ToString(), destructure: false));
                 _contextDisposalStack.Push(
                     LogProvider.OpenMappedContext(
-                        CorrelationIdentifier.SerilogSpanIdKey, spanId.ToString(), destructure: false));
+                        CorrelationIdentifier.SpanIdKey, spanId.ToString(), destructure: false));
             }
             catch (Exception)
             {

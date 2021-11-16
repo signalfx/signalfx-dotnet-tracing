@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using Datadog.Trace.Agent;
 using Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.ILogger;
 using Datadog.Trace.Configuration;
@@ -31,7 +33,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Tests.AutoInstrumentation.Logging.IL
 
             var actual = scope.ToString();
 
-            actual.Should().Be(@"dd_service:""TestService"", dd_env:""test"", dd_version:""1.2.3""");
+            actual.Should().Be(@"service.name:""TestService"", deployment.environment:""test"", service.version:""1.2.3""");
         }
 
         [Fact]
@@ -50,7 +52,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Tests.AutoInstrumentation.Logging.IL
 
             var actual = scope.ToString();
 
-            var expected = @$"dd_service:""TestService"", dd_env:""test"", dd_version:""1.2.3"", dd_trace_id:""{spanScope.Span.TraceId}"", dd_span_id:""{spanScope.Span.SpanId}""";
+            var expected = @$"service.name:""TestService"", deployment.environment:""test"", service.version:""1.2.3"", trace_id:""{spanScope.Span.TraceId}"", span_id:""{spanScope.Span.SpanId}""";
             actual.Should().Be(expected);
         }
     }
