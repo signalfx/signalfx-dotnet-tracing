@@ -65,7 +65,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 spans.Should()
                      .OnlyContain(span => span.Name == "aerospike.command")
-                     .And.OnlyContain(span => span.Service == "Samples.Aerospike-aerospike")
+                     .And.OnlyContain(span => span.Service == "Samples.Aerospike")
                      .And.OnlyContain(span => span.Tags[Tags.SpanKind] == SpanKinds.Client)
                      .And.OnlyContain(span => ValidateSpanKey(span));
 

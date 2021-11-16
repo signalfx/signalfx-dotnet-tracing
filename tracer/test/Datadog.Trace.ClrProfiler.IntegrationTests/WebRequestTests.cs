@@ -5,6 +5,7 @@
 
 // Modified by Splunk Inc.
 
+using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.ClrProfiler.IntegrationTests.Helpers;
 using Datadog.Trace.TestHelpers;
@@ -41,7 +42,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             };
 
             const string expectedOperationName = "http.request";
-            const string expectedServiceName = "Samples.WebRequest-http-client";
+            const string expectedServiceName = "Samples.WebRequest";
 
             int agentPort = TcpPortProvider.GetOpenPort();
             int httpPort = TcpPortProvider.GetOpenPort();
@@ -64,7 +65,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     Assert.Equal(expectedServiceName, span.Service);
                     Assert.Equal(SpanTypes.Http, span.Type);
                     Assert.True(string.Equals(span.Tags[Tags.InstrumentationName], "WebRequest") || string.Equals(span.Tags[Tags.InstrumentationName], "HttpMessageHandler"));
-                    Assert.False(span.Tags?.ContainsKey(Tags.Version), "External service span should not have service version tag.");
+                    Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
                 }
 
                 PropagationTestHelpers.AssertPropagationEnabled(spans.First(), processResult);

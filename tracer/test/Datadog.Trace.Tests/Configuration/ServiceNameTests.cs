@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.Configuration;
@@ -42,7 +44,7 @@ namespace Datadog.Trace.Tests.Configuration
         [InlineData("custom-service")]
         public void RetrievesUnmappedServiceNames(string serviceName)
         {
-            var expected = $"{ApplicationName}-{serviceName}";
+            var expected = ApplicationName;
 
             var actual = _serviceNames.GetServiceName(ApplicationName, serviceName);
 
@@ -56,7 +58,7 @@ namespace Datadog.Trace.Tests.Configuration
         public void DoesNotRequireAnyMappings(string serviceName)
         {
             var serviceNames = new ServiceNames(new Dictionary<string, string>());
-            var expected = $"{ApplicationName}-{serviceName}";
+            var expected = ApplicationName;
 
             var actual = serviceNames.GetServiceName(ApplicationName, serviceName);
 
@@ -67,7 +69,7 @@ namespace Datadog.Trace.Tests.Configuration
         public void CanPassNullToConstructor()
         {
             var serviceName = "elasticsearch";
-            var expected = $"{ApplicationName}-{serviceName}";
+            var expected = ApplicationName;
             var serviceNames = new ServiceNames(null);
 
             var actual = serviceNames.GetServiceName(ApplicationName, serviceName);
@@ -102,9 +104,9 @@ namespace Datadog.Trace.Tests.Configuration
             var elasticActual = serviceNames.GetServiceName(ApplicationName, "elasticsearch");
             var sqlActual = serviceNames.GetServiceName(ApplicationName, "sql-server");
 
-            Assert.Equal($"{ApplicationName}-mongodb", mongodbActual);
+            Assert.Equal(ApplicationName, mongodbActual);
             Assert.Equal("custom-name", elasticActual);
-            Assert.Equal($"{ApplicationName}-sql-server", sqlActual);
+            Assert.Equal(ApplicationName, sqlActual);
         }
     }
 }

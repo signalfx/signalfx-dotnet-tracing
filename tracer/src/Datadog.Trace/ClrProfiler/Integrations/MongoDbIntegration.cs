@@ -422,12 +422,14 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 Log.Warning(ex, "Unable to access IWireProtocol.Command properties.");
             }
 
+            string serviceName = tracer.Settings.GetServiceName(tracer, ServiceName);
+
             Scope scope = null;
 
             try
             {
                 var tags = new MongoDbTags();
-                scope = tracer.StartActiveWithTags(operationName ?? DefaultOperationName, tags: tags);
+                scope = tracer.StartActiveWithTags(operationName ?? DefaultOperationName, serviceName: serviceName, tags: tags);
                 var span = scope.Span;
                 span.LogicScope = DefaultOperationName;
                 span.Type = SpanTypes.MongoDb;
