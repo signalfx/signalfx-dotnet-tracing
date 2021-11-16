@@ -26,6 +26,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
     {
         internal const string IntegrationName = nameof(IntegrationIds.GraphQL);
         internal static readonly IntegrationInfo IntegrationId = IntegrationRegistry.GetIntegrationInfo(IntegrationName);
+        private const string ServiceName = "graphql";
 
         private const string Major2 = "2";
         private const string Major2Minor3 = "2.3";
@@ -243,13 +244,14 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             Tracer tracer = Tracer.Instance;
             string source = document.GetProperty<string>("OriginalQuery")
                                     .GetValueOrDefault();
+            string serviceName = tracer.Settings.GetServiceName(tracer, ServiceName);
 
             Scope scope = null;
 
             try
             {
                 var tags = new GraphQLTags();
-                scope = tracer.StartActiveWithTags(ValidateOperationName, tags: tags);
+                scope = tracer.StartActiveWithTags(ValidateOperationName, serviceName: serviceName, tags: tags);
                 var span = scope.Span;
                 span.LogicScope = ValidateOperationName;
                 DecorateSpan(span, tags);
@@ -284,6 +286,8 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                                                        .GetProperty<Enum>("OperationType")
                                                        .GetValueOrDefault()
                                                        .ToString();
+            string serviceName = tracer.Settings.GetServiceName(tracer, ServiceName);
+
             Scope scope = null;
 
             try
@@ -293,7 +297,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                     ? operationType
                     : $"{operationType} {operationName}";
 
-                scope = tracer.StartActiveWithTags(operation, tags: tags);
+                scope = tracer.StartActiveWithTags(operation, serviceName: serviceName, tags: tags);
                 var span = scope.Span;
                 DecorateSpan(span, tags);
                 span.ResourceName = $"{operationType} {operationName ?? "operation"}";
