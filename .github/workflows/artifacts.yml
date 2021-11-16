@@ -2,13 +2,13 @@ name: Publish Release Artifacts
 
 on:
   push:
-    branches:
-    - next-ver
     tags:
     - 'v*'
 
 jobs:
   linux_build:
+    name: Linux Build
+    if: github.event.base_ref == 'refs/heads/next-ver'
     runs-on: ubuntu-20.04
     timeout-minutes: 30
     strategy:
@@ -44,6 +44,7 @@ jobs:
 
   windows_build:
     name: Windows Build
+    if: github.event.base_ref == 'refs/heads/next-ver'
     runs-on: windows-2019
     steps:
       - run: git config --system core.longpaths true
