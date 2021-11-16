@@ -6,6 +6,7 @@
 // Modified by Splunk Inc.
 
 #if !NET452
+using System.Collections.Generic;
 using Datadog.Trace.TestHelpers;
 using Xunit;
 using Xunit.Abstractions;
@@ -44,6 +45,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
                     Assert.Equal(SpanTypes.Sql, span.Type);
                     Assert.Equal(dbType, span.Tags?[Tags.DbType]);
                     Assert.False(span.Tags?.ContainsKey(Tags.Version), "External service span should not have service version tag.");
+                    Assert.Contains(Tags.DbStatement, (IDictionary<string, string>)span.Tags);
                 }
             }
         }
@@ -75,6 +77,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
                     Assert.Equal(SpanTypes.Sql, span.Type);
                     Assert.Equal(dbType, span.Tags?[Tags.DbType]);
                     Assert.False(span.Tags?.ContainsKey(Tags.Version), "External service span should not have service version tag.");
+                    Assert.Contains(Tags.DbStatement, (IDictionary<string, string>)span.Tags);
                 }
             }
         }
