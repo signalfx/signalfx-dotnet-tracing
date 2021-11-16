@@ -52,6 +52,20 @@ namespace Datadog.Trace.ClrProfiler.Managed.Tests
             }
         }
 
+        [Fact]
+        public void CreateDbCommandScope_SetsDbStatementBasedOnCommandText()
+        {
+            // Set up tracer
+            var tracerSettings = new TracerSettings();
+            var tracer = new Tracer(tracerSettings);
+
+            // Create scope
+            using (var scope = CreateDbCommandScope(tracer, new CustomDbCommand()))
+            {
+                Assert.Equal("test_command", scope.Span.Tags.GetTag(Tags.DbStatement));
+            }
+        }
+
         [Theory]
         [MemberData(nameof(GetDbCommandScopeData))]
         public void CreateDbCommandScope_UsesReplacementServiceNameWhenProvided(IDbCommand command)
@@ -119,7 +133,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Tests
 
         private class CustomDbCommand : DbCommand
         {
-            public override string CommandText { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+            public override string CommandText { get => "test_command"; set => throw new NotImplementedException(); }
 
             public override int CommandTimeout { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 

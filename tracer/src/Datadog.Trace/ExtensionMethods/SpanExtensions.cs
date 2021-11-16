@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -44,8 +46,11 @@ namespace Datadog.Trace.ExtensionMethods
         /// <param name="command">The db command to get tags values from.</param>
         public static void AddTagsFromDbCommand(this Span span, IDbCommand command)
         {
-            span.ResourceName = command.CommandText;
+            var commandText = command.CommandText;
+            span.ResourceName = commandText;
             span.Type = SpanTypes.Sql;
+
+            span.SetTag(Tags.DbStatement, commandText);
 
             var tags = DbCommandCache.GetTagsFromDbCommand(command);
 

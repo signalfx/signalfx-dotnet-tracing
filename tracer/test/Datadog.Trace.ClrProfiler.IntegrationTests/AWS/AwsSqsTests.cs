@@ -139,7 +139,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AWS
                     .ExcludingMissingMembers()
                     .ExcludingDefaultSpanProperties()
                     .AssertMetricsMatchExcludingKeys("_dd.tracer_kr", "_sampling_priority_v1")
-                    .AssertTagsMatchAndSpecifiedTagsPresent("deployment.environment", "aws.requestId", "aws.queue.url", "runtime-id"));
+                    .AssertTagsMatchAndSpecifiedTagsPresent("deployment.environment", "aws.requestId", "aws.queue.url"));
             }
         }
 
@@ -151,7 +151,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AWS
                 {
                     Name = "sqs.request",
                     Resource = $"SQS.{operationName}",
-                    Service = "Samples.AWS.SQS-aws-sqs",
+                    Service = "Samples.AWS.SQS",
                     Tags = new()
                     {
                         { "component", "aws-sdk" },
@@ -162,10 +162,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AWS
                         { "http.method", "POST" },
                         { "http.status_code", "200" },
                     },
-                    Metrics = new()
-                    {
-                        { "_dd.top_level", 1 }
-                    },
+                    Metrics = new(),
                     Type = SpanTypes.Http,
                 };
             }

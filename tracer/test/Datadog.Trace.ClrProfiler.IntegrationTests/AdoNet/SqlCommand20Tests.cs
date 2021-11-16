@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #if NET452
 using System;
 using System.Collections.Generic;
@@ -43,7 +45,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
 
             const string dbType = "mssql";
             const string expectedOperationName = dbType + ".query";
-            const string expectedServiceName = "Samples.SqlServer.NetFramework20-" + dbType;
+            const string expectedServiceName = "Samples.SqlServer.NetFramework20";
 
             int agentPort = TcpPortProvider.GetOpenPort();
 
@@ -59,7 +61,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
                     Assert.Equal(expectedServiceName, span.Service);
                     Assert.Equal(SpanTypes.Sql, span.Type);
                     Assert.Equal(dbType, span.Tags[Tags.DbType]);
-                    Assert.False(span.Tags?.ContainsKey(Tags.Version), "External service span should not have service version tag.");
+                    Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
+                    Assert.Contains(Tags.DbStatement, (IDictionary<string, string>)span.Tags);
                 }
             }
         }

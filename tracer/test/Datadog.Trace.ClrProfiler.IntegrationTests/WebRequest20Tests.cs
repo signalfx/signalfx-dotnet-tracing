@@ -6,6 +6,7 @@
 // Modified by Splunk Inc.
 
 #if NET452
+using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.ClrProfiler.IntegrationTests.Helpers;
 using Datadog.Trace.TestHelpers;
@@ -34,7 +35,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
             int expectedSpanCount = enableCallTarget ? 45 : 25; // CallSite insturmentation doesn't instrument async requests
             const string expectedOperationName = "http.request";
-            const string expectedServiceName = "Samples.WebRequest.NetFramework20-http-client";
+            const string expectedServiceName = "Samples.WebRequest.NetFramework20";
 
             int agentPort = TcpPortProvider.GetOpenPort();
             int httpPort = TcpPortProvider.GetOpenPort();
@@ -54,7 +55,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     Assert.Equal(expectedServiceName, span.Service);
                     Assert.Equal(SpanTypes.Http, span.Type);
                     Assert.Equal("WebRequest", span.Tags[Tags.InstrumentationName]);
-                    Assert.False(span.Tags?.ContainsKey(Tags.Version), "External service span should not have service version tag.");
+                    Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
                 }
 
                 PropagationTestHelpers.AssertPropagationEnabled(spans.First(), processResult);

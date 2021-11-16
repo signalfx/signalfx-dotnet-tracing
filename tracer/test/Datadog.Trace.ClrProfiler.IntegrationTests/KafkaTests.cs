@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -138,7 +140,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         {
             producerSpans.Should()
                          .HaveCount(expectedCount)
-                         .And.OnlyContain(x => x.Service == "Samples.Kafka-kafka")
+                         .And.OnlyContain(x => x.Service == "Samples.Kafka")
                          .And.OnlyContain(x => x.Resource == resourceName)
                          .And.OnlyContain(x => x.Metrics.ContainsKey(Tags.Measured) && x.Metrics[Tags.Measured] == 1.0);
         }
@@ -148,7 +150,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             // HaveCountGreaterOrEqualTo because same message may be consumed by both
             consumerSpans.Should()
                          .HaveCountGreaterOrEqualTo(expectedCount)
-                         .And.OnlyContain(x => x.Service == "Samples.Kafka-kafka")
+                         .And.OnlyContain(x => x.Service == "Samples.Kafka")
                          .And.OnlyContain(x => x.Resource == resourceName)
                          .And.OnlyContain(x => x.Metrics.ContainsKey(Tags.Measured) && x.Metrics[Tags.Measured] == 1.0)
                          .And.OnlyContain(x => x.Metrics.ContainsKey(Metrics.MessageQueueTimeMs))
