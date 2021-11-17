@@ -180,6 +180,8 @@ namespace SignalFx.Tracing.Configuration
 
             TraceResponseHeaderEnabled = source?.GetBool(ConfigurationKeys.TraceResponseHeaderEnabled) ?? true;
 
+            DisableCancelKeyPressEvent = source?.GetBool(ConfigurationKeys.Debug.DisableCancelKeyPressEvent) ?? false;
+
             RouteTemplateResourceNamesEnabled = source?.GetBool(ConfigurationKeys.FeatureFlags.RouteTemplateResourceNamesEnabled) ?? true;
         }
 
@@ -420,6 +422,13 @@ namespace SignalFx.Tracing.Configuration
         /// </summary>
         /// <seealso cref="ConfigurationKeys.OutboundHttpExcludedHosts"/>
         public HashSet<string> OutboundHttpExcludedHosts { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the feature flag to enable subscription to the Console.CancelKeyPress event (Win32 SetConsoleCtrlHandler).
+        /// By default the handler is enabled.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.Debug.DisableCancelKeyPressEvent"/>
+        internal bool DisableCancelKeyPressEvent { get; }
 
         /// <summary>
         /// Gets a value indicating whether the feature flag to enable the updated ASP.NET resource names is enabled

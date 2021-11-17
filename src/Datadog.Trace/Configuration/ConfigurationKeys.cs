@@ -390,6 +390,13 @@ namespace SignalFx.Tracing.Configuration
             /// Configuration key for forcing the automatic instrumentation to only use the fallback method lookup mechanism.
             /// </summary>
             public const string ForceFallbackLookup = "SIGNALFX_TRACE_DEBUG_LOOKUP_FALLBACK";
+
+            /// <summary>
+            /// Configuration key for forcing disabling subscription to the Console.CancelKeyPress event (Win32 SetConsoleCtrlHandler).
+            /// By default the handler is enabled.
+            /// </summary>
+            /// <seealso cref="TracerSettings.DisableCancelKeyPressEvent"/>
+            public const string DisableCancelKeyPressEvent = "SIGNALFX_DISABLE_CONSOLE_CTRL_HANDLE";
         }
 
         internal static class FeatureFlags
