@@ -48,7 +48,6 @@ jobs:
       - run: git config --system core.longpaths true
       - uses: actions/checkout@v2
       - uses: microsoft/setup-msbuild@v1.0.2
-      - name: Run 'Clean BuildTracerHome ZipTracerHome'
         run: tracer\build.cmd Clean BuildTracerHome PackageTracerHome
         shell: cmd
       - uses: actions/upload-artifact@v2
