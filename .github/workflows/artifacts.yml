@@ -1,10 +1,15 @@
-name: Build artifacts
+name: Publish Release Artifacts
+
 on:
-  workflow_dispatch:
+  push:
+    tags:
+    - 'v*'
 
 jobs:
   linux_build:
-    runs-on: ubuntu-18.04
+    name: Linux Build
+    runs-on: ubuntu-20.04
+    timeout-minutes: 30
     strategy:
       matrix:
         baseImage: [alpine, debian]
@@ -29,9 +34,6 @@ jobs:
           --env NugetPackageDirectory=/project/packages \
           --env tracerHome=/project/tracer/bin/tracer-home \
           --env artifacts=/project/tracer/src/bin/artifacts \
-          --env SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN} \
-          --env Verify_DisableClipboard=true \
-          --env DiffEngine_Disabled=true \
           dd-trace-dotnet/${baseImage}-builder \
           dotnet /build/bin/Debug/_build.dll Clean BuildTracerHome ZipTracerHome
     - uses: actions/upload-artifact@v2
@@ -46,13 +48,7 @@ jobs:
       - run: git config --system core.longpaths true
       - uses: actions/checkout@v2
       - uses: microsoft/setup-msbuild@v1.0.2
-      - run: dotnet --list-sdks
-        shell: cmd
-      - run: choco install wixtoolset
-        shell: cmd
-      - run: tracer\build.cmd BuildTracerHome
-        shell: cmd
-      - run: tracer\build.cmd PackageTracerHome
+        run: tracer\build.cmd Clean BuildTracerHome PackageTracerHome
         shell: cmd
       - uses: actions/upload-artifact@v2
         with:
@@ -70,12 +66,12 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           path: .
-      - name: Extract tag name
+      - name: Extract Version from Tag
         id: get_version
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\/v}
-      - name: Extract release notes
-        run: awk '/## \[${{ steps.get_version.outputs.VERSION }}\]/,0' docs/CHANGELOG.md >> notes.md
-      - run: gh release create v${{ steps.get_version.outputs.VERSION }} -F notes.md artifacts/otel* artifacts/x64/en-us/opentelemetry* artifacts/x86/en-us/opentelemetry*
+      # TODO: Extract release notes
+      - name: Create Release
+        run: gh release create v${{ steps.get_version.outputs.VERSION }} --draft --prerelease artifacts/signalfx* artifacts/x64/en-us/*.msi  artifacts/x86/en-us/*.msi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
