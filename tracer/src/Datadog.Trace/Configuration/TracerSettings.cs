@@ -162,6 +162,10 @@ namespace Datadog.Trace.Configuration
                                    // default value
                                    false;
 
+            TagRedisCommands = source?.GetBool(ConfigurationKeys.TagRedisCommands) ??
+                            // default value
+                            true;
+
             RuntimeMetricsEnabled = source?.GetBool(ConfigurationKeys.RuntimeMetricsEnabled) ??
                                     false;
 
@@ -390,6 +394,14 @@ namespace Datadog.Trace.Configuration
         /// are enabled and sent to DogStatsd.
         /// </summary>
         public bool TracerMetricsEnabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether Redis integrations
+        /// should tag commands as db.statement.
+        /// Default is <c>true</c>.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.TagRedisCommands"/>
+        public bool TagRedisCommands { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the exporter to be used. The Tracer uses it to encode and
