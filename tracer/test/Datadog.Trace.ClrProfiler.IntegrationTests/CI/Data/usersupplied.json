@@ -27,6 +27,110 @@
   ],
   [
     {
+      "SIGNALFX_GIT_BRANCH": "origin/usersupplied-branch",
+      "SIGNALFX_GIT_COMMIT_AUTHOR_DATE": "usersupplied-authordate",
+      "SIGNALFX_GIT_COMMIT_AUTHOR_EMAIL": "usersupplied-authoremail",
+      "SIGNALFX_GIT_COMMIT_AUTHOR_NAME": "usersupplied-authorname",
+      "SIGNALFX_GIT_COMMIT_COMMITTER_DATE": "usersupplied-comitterdate",
+      "SIGNALFX_GIT_COMMIT_COMMITTER_EMAIL": "usersupplied-comitteremail",
+      "SIGNALFX_GIT_COMMIT_COMMITTER_NAME": "usersupplied-comittername",
+      "SIGNALFX_GIT_COMMIT_MESSAGE": "usersupplied-message",
+      "SIGNALFX_GIT_COMMIT_SHA": "usersupplied-commit",
+      "SIGNALFX_GIT_REPOSITORY_URL": "usersupplied-repo"
+    },
+    {
+      "git.branch": "usersupplied-branch",
+      "git.commit.author.date": "usersupplied-authordate",
+      "git.commit.author.email": "usersupplied-authoremail",
+      "git.commit.author.name": "usersupplied-authorname",
+      "git.commit.committer.date": "usersupplied-comitterdate",
+      "git.commit.committer.email": "usersupplied-comitteremail",
+      "git.commit.committer.name": "usersupplied-comittername",
+      "git.commit.message": "usersupplied-message",
+      "git.commit.sha": "usersupplied-commit",
+      "git.repository_url": "usersupplied-repo"
+    }
+  ],
+  [
+    {
+      "SIGNALFX_GIT_BRANCH": "refs/heads/usersupplied-branch",
+      "SIGNALFX_GIT_COMMIT_AUTHOR_DATE": "usersupplied-authordate",
+      "SIGNALFX_GIT_COMMIT_AUTHOR_EMAIL": "usersupplied-authoremail",
+      "SIGNALFX_GIT_COMMIT_AUTHOR_NAME": "usersupplied-authorname",
+      "SIGNALFX_GIT_COMMIT_COMMITTER_DATE": "usersupplied-comitterdate",
+      "SIGNALFX_GIT_COMMIT_COMMITTER_EMAIL": "usersupplied-comitteremail",
+      "SIGNALFX_GIT_COMMIT_COMMITTER_NAME": "usersupplied-comittername",
+      "SIGNALFX_GIT_COMMIT_MESSAGE": "usersupplied-message",
+      "SIGNALFX_GIT_COMMIT_SHA": "usersupplied-commit",
+      "SIGNALFX_GIT_REPOSITORY_URL": "usersupplied-repo"
+    },
+    {
+      "git.branch": "usersupplied-branch",
+      "git.commit.author.date": "usersupplied-authordate",
+      "git.commit.author.email": "usersupplied-authoremail",
+      "git.commit.author.name": "usersupplied-authorname",
+      "git.commit.committer.date": "usersupplied-comitterdate",
+      "git.commit.committer.email": "usersupplied-comitteremail",
+      "git.commit.committer.name": "usersupplied-comittername",
+      "git.commit.message": "usersupplied-message",
+      "git.commit.sha": "usersupplied-commit",
+      "git.repository_url": "usersupplied-repo"
+    }
+  ],
+  [
+    {
+      "SIGNALFX_GIT_BRANCH": "origin/tags/0.1.0",
+      "SIGNALFX_GIT_COMMIT_AUTHOR_DATE": "usersupplied-authordate",
+      "SIGNALFX_GIT_COMMIT_AUTHOR_EMAIL": "usersupplied-authoremail",
+      "SIGNALFX_GIT_COMMIT_AUTHOR_NAME": "usersupplied-authorname",
+      "SIGNALFX_GIT_COMMIT_COMMITTER_DATE": "usersupplied-comitterdate",
+      "SIGNALFX_GIT_COMMIT_COMMITTER_EMAIL": "usersupplied-comitteremail",
+      "SIGNALFX_GIT_COMMIT_COMMITTER_NAME": "usersupplied-comittername",
+      "SIGNALFX_GIT_COMMIT_MESSAGE": "usersupplied-message",
+      "SIGNALFX_GIT_COMMIT_SHA": "usersupplied-commit",
+      "SIGNALFX_GIT_REPOSITORY_URL": "usersupplied-repo"
+    },
+    {
+      "git.commit.author.date": "usersupplied-authordate",
+      "git.commit.author.email": "usersupplied-authoremail",
+      "git.commit.author.name": "usersupplied-authorname",
+      "git.commit.committer.date": "usersupplied-comitterdate",
+      "git.commit.committer.email": "usersupplied-comitteremail",
+      "git.commit.committer.name": "usersupplied-comittername",
+      "git.commit.message": "usersupplied-message",
+      "git.commit.sha": "usersupplied-commit",
+      "git.repository_url": "usersupplied-repo",
+      "git.tag": "0.1.0"
+    }
+  ],
+  [
+    {
+      "SIGNALFX_GIT_BRANCH": "refs/heads/tags/0.1.0",
+      "SIGNALFX_GIT_COMMIT_AUTHOR_DATE": "usersupplied-authordate",
+      "SIGNALFX_GIT_COMMIT_AUTHOR_EMAIL": "usersupplied-authoremail",
+      "SIGNALFX_GIT_COMMIT_AUTHOR_NAME": "usersupplied-authorname",
+      "SIGNALFX_GIT_COMMIT_COMMITTER_DATE": "usersupplied-comitterdate",
+      "SIGNALFX_GIT_COMMIT_COMMITTER_EMAIL": "usersupplied-comitteremail",
+      "SIGNALFX_GIT_COMMIT_COMMITTER_NAME": "usersupplied-comittername",
+      "SIGNALFX_GIT_COMMIT_MESSAGE": "usersupplied-message",
+      "SIGNALFX_GIT_COMMIT_SHA": "usersupplied-commit",
+      "SIGNALFX_GIT_REPOSITORY_URL": "usersupplied-repo"
+    },
+    {
+      "git.commit.author.date": "usersupplied-authordate",
+      "git.commit.author.email": "usersupplied-authoremail",
+      "git.commit.author.name": "usersupplied-authorname",
+      "git.commit.committer.date": "usersupplied-comitterdate",
+      "git.commit.committer.email": "usersupplied-comitteremail",
+      "git.commit.committer.name": "usersupplied-comittername",
+      "git.commit.message": "usersupplied-message",
+      "git.commit.sha": "usersupplied-commit",
+      "git.repository_url": "usersupplied-repo",
+      "git.tag": "0.1.0"
+    }
+  ],
+  [
+    {
       "SIGNALFX_GIT_COMMIT_AUTHOR_DATE": "usersupplied-authordate",
       "SIGNALFX_GIT_COMMIT_AUTHOR_EMAIL": "usersupplied-authoremail",
       "SIGNALFX_GIT_COMMIT_AUTHOR_NAME": "usersupplied-authorname",
