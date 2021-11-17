@@ -602,49 +602,6 @@ namespace Datadog.Trace.DiagnosticListeners
             return span;
         }
 
-        private Span StartCoreSpan(Tracer tracer, HttpContext httpContext, HttpRequest request)
-        {
-            string host = request.Host.Value;
-            string httpMethod = request.Method?.ToUpperInvariant() ?? "UNKNOWN";
-            string url = request.GetUrl();
-
-            if (tracer.Settings.RouteTemplateResourceNamesEnabled)
-            {
-                httpContext.Features.Set(new RequestTrackingFeature
-                {
-                    HttpMethod = httpMethod,
-                    OriginalUrl = url,
-                });
-            }
-
-            string absolutePath = request.Path.Value;
-
-            if (request.PathBase.HasValue)
-            {
-                absolutePath = request.PathBase.Value + absolutePath;
-            }
-
-            string resourceUrl = UriHelpers.GetCleanUriPath(absolutePath)
-                                           .ToLowerInvariant();
-
-            string resourceName = $"{httpMethod} {resourceUrl}";
-
-            SpanContext propagatedContext = ExtractPropagatedContext(tracer.TracerManager.Propagator, request);
-            var tagsFromHeaders = ExtractHeaderTags(request, tracer);
-
-            var tags = tracer.Settings.RouteTemplateResourceNamesEnabled ? new AspNetCoreEndpointTags() : new AspNetCoreTags();
-            var scope = tracer.StartActiveWithTags($"HTTP {httpMethod}", propagatedContext, tags: tags);
-            scope.Span.LogicScope = HttpRequestInOperationName;
-
-            // TODO: investigate if can be simplified
-            var remoteIp = httpContext?.Connection?.RemoteIpAddress?.ToString();
-            scope.Span.DecorateWebServerSpan(resourceName, httpMethod, host, url, tags, tagsFromHeaders, remoteIp);
-
-            tags.SetAnalyticsSampleRate(IntegrationId, tracer.Settings, enabledWithGlobalSetting: true);
-
-            return scope.Span;
-        }
-
         private void OnHostingHttpRequestInStart(object arg)
         {
             var tracer = CurrentTracer;
@@ -883,7 +840,7 @@ namespace Datadog.Trace.DiagnosticListeners
 
                 // we may need to update the resource name if none of the routing/mvc events updated it
                 // if we had an unhandled exception, the status code is already updated
-                if (string.IsNullOrEmpty(span.ResourceName) || !span.Error)
+                if (string.IsNullOrEmpty(span.ResourceName) || scope.Span.Status.StatusCode != StatusCode.Error)
                 {
                     var httpRequest = arg.DuckCast<HttpRequestInStopStruct>();
                     HttpContext httpContext = httpRequest.HttpContext;
@@ -892,10 +849,10 @@ namespace Datadog.Trace.DiagnosticListeners
                         span.ResourceName = AspNetCoreRequestHandler.GetDefaultResourceName(httpContext.Request);
                     }
 
-                    if (!span.Error)
+                    if (scope.Span.Status.StatusCode != StatusCode.Error)
                     {
                         span.SetHttpStatusCode(httpContext.Response.StatusCode, isServer: true, tracer.Settings);
-                        span.SetHeaderTags(new HeadersCollectionAdapter(httpContext.Response.Headers), tracer.Settings.HeaderTags, defaultTagPrefix: SpanContextPropagator.HttpResponseHeadersTagPrefix);
+                        span.SetHeaderTags(new HeadersCollectionAdapter(httpContext.Response.Headers), tracer.Settings.HeaderTags, defaultTagPrefix: PropagationExtensions.HttpResponseHeadersTagPrefix);
                     }
                 }
 
