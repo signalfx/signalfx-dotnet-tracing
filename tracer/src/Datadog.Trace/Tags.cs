@@ -125,6 +125,11 @@ namespace Datadog.Trace
         public const string DbName = "db.name";
 
         /// <summary>
+        /// The name of the operation.
+        /// </summary>
+        public const string DbOperation = "db.operation";
+
+        /// <summary>
         /// The command/query text
         /// </summary>
         public const string DbStatement = "db.statement";
@@ -483,7 +488,7 @@ namespace Datadog.Trace
 
         internal const string ElasticsearchAction = "elasticsearch.action";
 
-        internal const string ElasticsearchMethod = "elasticsearch.method";
+        internal const string ElasticsearchMethod = DbOperation;
 
         internal const string ElasticsearchUrl = "elasticsearch.url";
 
