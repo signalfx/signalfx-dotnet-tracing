@@ -235,9 +235,6 @@ namespace Datadog.Trace.Configuration
             KafkaCreateConsumerScopeEnabled = source?.GetBool(ConfigurationKeys.KafkaCreateConsumerScopeEnabled)
                                            ?? true; // default
 
-            DelayWcfInstrumentationEnabled = source?.GetBool(ConfigurationKeys.FeatureFlags.DelayWcfInstrumentationEnabled)
-                                            ?? false;
-
             TagMongoCommands = source?.GetBool(ConfigurationKeys.TagMongoCommands) ?? true;
 
             // we cached the static instance here, because is being used in the hotpath
@@ -484,12 +481,6 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="ConfigurationKeys.KafkaCreateConsumerScopeEnabled"/>
         public bool KafkaCreateConsumerScopeEnabled { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether to enable the updated WCF instrumentation that delays execution
-        /// until later in the WCF pipeline when the WCF server exception handling is established.
-        /// </summary>
-        internal bool DelayWcfInstrumentationEnabled { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the diagnostic log at startup is enabled
