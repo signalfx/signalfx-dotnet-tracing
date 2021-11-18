@@ -57,7 +57,6 @@ namespace SignalFx.Tracing.DiagnosticListeners
 
         protected override void OnNext(string eventName, object arg)
         {
-            Log.Information($"OnNext: [{eventName}]");
             switch (eventName)
             {
                 case "Microsoft.AspNetCore.Hosting.HttpRequestIn.Start":
