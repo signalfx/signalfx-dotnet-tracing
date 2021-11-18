@@ -121,10 +121,7 @@ namespace Benchmarks.Trace
 
             public long ContentLength => 0;
 
-            public string GetHeader(string headerName)
-            {
-                throw new NotImplementedException();
-            }
+            public string GetHeader(string headerName) => string.Empty;
 
             public Task<string> ReadAsStringAsync()
             {
