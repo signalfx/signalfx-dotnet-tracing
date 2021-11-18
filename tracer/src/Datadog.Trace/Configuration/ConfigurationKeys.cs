@@ -499,7 +499,7 @@ namespace Datadog.Trace.Configuration
             /// until later in the WCF pipeline when the WCF server exception handling is established.
             /// </summary>
             /// <seealso cref="TracerSettings.DelayWcfInstrumentationEnabled"/>
-            public const string DelayWcfInstrumentationEnabled = "DD_TRACE_DELAY_WCF_INSTRUMENTATION_ENABLED";
+            public const string DelayWcfInstrumentationEnabled = "SIGNALFX_TRACE_DELAY_WCF_INSTRUMENTATION_ENABLED";
         }
     }
 }
