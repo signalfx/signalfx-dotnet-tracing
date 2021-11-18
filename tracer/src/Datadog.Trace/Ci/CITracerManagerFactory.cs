@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using Datadog.Trace.Agent;
 using Datadog.Trace.Ci.Agent;
 using Datadog.Trace.Ci.Sampling;
@@ -19,7 +21,7 @@ namespace Datadog.Trace.Ci
     internal class CITracerManagerFactory : TracerManagerFactory
     {
         protected override TracerManager CreateTracerManagerFrom(
-            TracerSettings settings,
+            ImmutableTracerSettings settings,
             IAgentWriter agentWriter,
             ISampler sampler,
             IPropagator propagator,
@@ -33,12 +35,12 @@ namespace Datadog.Trace.Ci
             return new CITracerManager(settings, agentWriter, sampler, propagator, scopeManager, statsd, runtimeMetrics, libLogSubscriber, traceIdConvention, defaultServiceName);
         }
 
-        protected override ISampler GetSampler(TracerSettings settings)
+        protected override ISampler GetSampler(ImmutableTracerSettings settings)
         {
             return new CISampler();
         }
 
-        protected override IAgentWriter GetAgentWriter(TracerSettings settings, IDogStatsd statsd, ISampler sampler)
+        protected override IAgentWriter GetAgentWriter(ImmutableTracerSettings settings, IDogStatsd statsd, ISampler sampler)
         {
             return new CIAgentWriter(settings, sampler);
         }

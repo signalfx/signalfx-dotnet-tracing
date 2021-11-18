@@ -303,13 +303,13 @@ namespace Datadog.Trace.Tools.Runner
             var env = new NameValueCollection();
             if (!string.IsNullOrWhiteSpace(agentUrl))
             {
-                env["DD_TRACE_AGENT_URL"] = agentUrl;
+                env["SIGNALFX_TRACE_AGENT_URL"] = agentUrl;
             }
 
             var globalSettings = GlobalSettings.CreateDefaultConfigurationSource();
             globalSettings.Add(new NameValueConfigurationSource(env));
             var tracerSettings = new TracerSettings(globalSettings);
-            var agentWriter = new CIAgentWriter(tracerSettings, new CISampler());
+            var agentWriter = new CIAgentWriter(tracerSettings.Build(), new CISampler());
 
             try
             {

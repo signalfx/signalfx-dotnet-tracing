@@ -14,9 +14,9 @@ namespace Datadog.Trace.Agent.Zipkin
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(ZipkinExporter));
 
         private readonly Uri _tracesEndpoint;
-        private readonly TracerSettings _settings;
+        private readonly ImmutableTracerSettings _settings;
 
-        public ZipkinExporter(TracerSettings settings)
+        public ZipkinExporter(ImmutableTracerSettings settings)
         {
             Log.Debug("Creating new Zipkin exporter");
 

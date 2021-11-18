@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,7 +37,7 @@ namespace Datadog.Trace
         /// The primary factory method, called by <see cref="TracerManager"/>,
         /// providing the previous global <see cref="TracerManager"/> instance (may be null)
         /// </summary>
-        internal TracerManager CreateTracerManager(TracerSettings settings, TracerManager previous)
+        internal TracerManager CreateTracerManager(ImmutableTracerSettings settings, TracerManager previous)
         {
             // TODO: If relevant settings have not changed, continue using existing statsd/agent writer/runtime metrics etc
             return CreateTracerManager(
@@ -55,7 +57,7 @@ namespace Datadog.Trace
         /// Internal for use in tests that create "standalone" <see cref="TracerManager"/> by
         /// </summary>
         internal TracerManager CreateTracerManager(
-            TracerSettings settings,
+            ImmutableTracerSettings settings,
             IReadOnlyCollection<IOTelExtension> plugins,
             IAgentWriter agentWriter,
             ISampler sampler,
@@ -64,11 +66,8 @@ namespace Datadog.Trace
             RuntimeMetricsWriter runtimeMetrics,
             LibLogScopeEventSubscriber libLogSubscriber)
         {
-            settings ??= TracerSettings.FromDefaultSources();
-            // TODO: take an ImmutableTracerSettings instance instead
-            settings.Freeze();
+            settings ??= ImmutableTracerSettings.FromDefaultSources();
 
-            // TODO: use ImmutableTracerSettings instance instead
             var defaultServiceName = settings.ServiceName ??
                                      GetApplicationName() ??
                                      UnknownServiceName;
@@ -101,7 +100,7 @@ namespace Datadog.Trace
         ///  Can be overriden to create a different <see cref="TracerManager"/>, e.g. <see cref="Ci.CITracerManager"/>
         /// </summary>
         protected virtual TracerManager CreateTracerManagerFrom(
-            TracerSettings settings,
+            ImmutableTracerSettings settings,
             IAgentWriter agentWriter,
             ISampler sampler,
             IPropagator propagator,
@@ -113,7 +112,7 @@ namespace Datadog.Trace
             string defaultServiceName)
             => new TracerManager(settings, agentWriter, sampler, propagator, scopeManager, statsd, runtimeMetrics, libLogSubscriber, traceIdConvention, defaultServiceName);
 
-        protected virtual ISampler GetSampler(TracerSettings settings)
+        protected virtual ISampler GetSampler(ImmutableTracerSettings settings)
         {
             var sampler = new RuleBasedSampler(new RateLimiter(settings.MaxTracesSubmittedPerSecond));
 
@@ -142,7 +141,7 @@ namespace Datadog.Trace
             return sampler;
         }
 
-        protected virtual IAgentWriter GetAgentWriter(TracerSettings settings, IDogStatsd statsd, ISampler sampler)
+        protected virtual IAgentWriter GetAgentWriter(ImmutableTracerSettings settings, IDogStatsd statsd, ISampler sampler)
         {
             IMetrics metrics = statsd != null
                 ? new DogStatsdMetrics(statsd)
@@ -159,7 +158,7 @@ namespace Datadog.Trace
             }
         }
 
-        private static CompositeTextMapPropagator CreateCompositePropagator(TracerSettings settings, ITraceIdConvention traceIdConvention, IReadOnlyCollection<IOTelExtension> extensions)
+        private static CompositeTextMapPropagator CreateCompositePropagator(ImmutableTracerSettings settings, ITraceIdConvention traceIdConvention, IReadOnlyCollection<IOTelExtension> extensions)
         {
             var compositeProvider = new CompositePropagatorsProvider();
             compositeProvider.RegisterProvider(new OTelPropagatorsProvider());
@@ -179,7 +178,7 @@ namespace Datadog.Trace
             return new CompositeTextMapPropagator(propagators);
         }
 
-        private static IDogStatsd CreateDogStatsdClient(TracerSettings settings, string serviceName, int port)
+        private static IDogStatsd CreateDogStatsdClient(ImmutableTracerSettings settings, string serviceName, int port)
         {
             try
             {

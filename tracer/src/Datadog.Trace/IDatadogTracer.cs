@@ -22,7 +22,7 @@ namespace Datadog.Trace
 
         IPropagator Propagator { get; }
 
-        TracerSettings Settings { get; }
+        ImmutableTracerSettings Settings { get; }
 
         Span StartSpan(string operationName);
 

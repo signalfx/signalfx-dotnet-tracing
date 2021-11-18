@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using Datadog.Trace.Agent;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Conventions;
@@ -16,7 +18,7 @@ namespace Datadog.Trace.Ci
 {
     internal class CITracerManager : TracerManager, ILockedTracer
     {
-        public CITracerManager(TracerSettings settings, IAgentWriter agentWriter, ISampler sampler, IPropagator propagator, IScopeManager scopeManager, IDogStatsd statsd, RuntimeMetricsWriter runtimeMetricsWriter, LibLogScopeEventSubscriber libLogSubscriber, ITraceIdConvention traceIdConvention, string defaultServiceName)
+        public CITracerManager(ImmutableTracerSettings settings, IAgentWriter agentWriter, ISampler sampler, IPropagator propagator, IScopeManager scopeManager, IDogStatsd statsd, RuntimeMetricsWriter runtimeMetricsWriter, LibLogScopeEventSubscriber libLogSubscriber, ITraceIdConvention traceIdConvention, string defaultServiceName)
             : base(settings, agentWriter, sampler, propagator, scopeManager, statsd, runtimeMetricsWriter, libLogSubscriber, traceIdConvention, defaultServiceName)
         {
         }
