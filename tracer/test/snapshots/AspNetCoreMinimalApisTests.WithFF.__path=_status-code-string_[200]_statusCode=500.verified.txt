@@ -5,7 +5,7 @@
     Name: GET /status-code-string/{statuscode},
     LogicScope: aspnet_core_mvc.request,
     Resource: GET /status-code-string/{statuscode},
-    Service: Samples.AspNetCoreMvc30,
+    Service: Samples.AspNetCoreMinimalApis,
     Type: web,
     ParentId: Id_3,
     Tags: {
@@ -25,11 +25,11 @@
     Name: GET /status-code-string/{statuscode},
     LogicScope: aspnet_core.request,
     Resource: GET /status-code-string/{statuscode},
-    Service: Samples.AspNetCoreMvc30,
+    Service: Samples.AspNetCoreMinimalApis,
     Type: web,
     Error: 1,
     Tags: {
-      aspnet_core.endpoint: Samples.AspNetCoreMvc.Controllers.HomeController.StatusCodeTestString (Samples.AspNetCoreMvc30),
+      aspnet_core.endpoint: Samples.AspNetCoreMvc.Controllers.HomeController.StatusCodeTestString (Samples.AspNetCoreMinimalApis),
       aspnet_core.route: status-code-string/{statuscode},
       component: aspnet_core,
       datadog-header-tag: asp-net-core,
@@ -47,6 +47,8 @@
       sfx.error.stack: 
 System.Exception: Input was not a status code
 at Samples.AspNetCoreMvc.Controllers.HomeController.StatusCodeTestString(String input),
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: 0.0.1.0,
       span.kind: server,
       version: 1.0.0
     },
