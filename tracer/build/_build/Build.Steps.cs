@@ -350,7 +350,7 @@ partial class Build
             void CopyWaf(string architecture, IEnumerable<string> frameworks, AbsolutePath absolutePath, string wafFileName, string extension)
             {
                 var source = LibDdwafDirectory / "runtimes" / architecture / "native" / $"{wafFileName}.{extension}";
-                var nativeDir = DDTracerHomeDirectory / architecture / $"Datadog.Trace.ClrProfiler.Native.{extension}";
+                var nativeDir = DDTracerHomeDirectory / architecture / $"SignalFx.Tracing.ClrProfiler.Native.{extension}";
                 foreach (var fmk in frameworks)
                 {
                     var dest = absolutePath / "bin" / BuildConfiguration / fmk / architecture;
