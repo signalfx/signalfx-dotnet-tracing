@@ -20,7 +20,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class RabbitMQIntegration
     {
-        internal const string IntegrationName = nameof(IntegrationIds.RabbitMQ);
+        internal const string IntegrationName = nameof(Configuration.IntegrationId.RabbitMQ);
 
         private const string ServiceName = "rabbitmq";
         private const string SystemName = "rabbitmq";
@@ -34,7 +34,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
         internal const string GetCommand = "basic.get";
         internal const string PublishCommand = "basic.publish";
 
-        internal static readonly IntegrationInfo IntegrationId = IntegrationRegistry.GetIntegrationInfo(IntegrationName);
+        internal const IntegrationId IntegrationId = Configuration.IntegrationId.RabbitMQ;
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(RabbitMQIntegration));
 
         private static readonly string[] DeliveryModeStrings = { null, "1", "2" };

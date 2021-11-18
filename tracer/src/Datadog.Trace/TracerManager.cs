@@ -310,12 +310,16 @@ namespace Datadog.Trace
                     writer.WritePropertyName("disabled_integrations");
                     writer.WriteStartArray();
 
-                    // For consistency with previous diagnostic log, this only includes integrations
-                    // that were disabled with SIGNALFX_DISABLED_INTEGRATIONS, not integrations disabled with
-                    // SIGNALFX_INTEGRATION_{0}_DISABLED
-                    foreach (var integration in instanceSettings.Integrations.DisabledIntegrations)
+                    // In contrast to 1.x, this only shows _known_ integrations, but
+                    // lists them whether they were explicitly disabled with
+                    // SIGNALFX_DISABLED_INTEGRATIONS, SIGNALFX_TRACE_{0}_ENABLED, SIGNALFX_{0}_ENABLED,
+                    // or manually in code.
+                    foreach (var integration in instanceSettings.Integrations.Settings)
                     {
-                        writer.WriteValue(integration);
+                        if (integration.Enabled == false)
+                        {
+                            writer.WriteValue(integration);
+                        }
                     }
 
                     writer.WriteEndArray();

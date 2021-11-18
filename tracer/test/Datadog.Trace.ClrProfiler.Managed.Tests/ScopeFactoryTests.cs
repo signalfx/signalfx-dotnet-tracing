@@ -74,9 +74,24 @@ namespace Datadog.Trace.ClrProfiler.Managed.Tests
             var samplerMock = new Mock<ISampler>();
             var tracer = new Tracer(settings, plugins: null, writerMock.Object, samplerMock.Object, scopeManager: null, statsd: null);
 
-            using (var automaticScope = ScopeFactory.CreateOutboundHttpScope(tracer, method, new Uri(uri), new IntegrationInfo((int)IntegrationIds.HttpMessageHandler), out _))
+            using (var automaticScope = ScopeFactory.CreateOutboundHttpScope(tracer, method, new Uri(uri), IntegrationId.HttpMessageHandler, out _))
             {
                 Assert.Equal(expected, automaticScope.Span.ResourceName);
+            }
+        }
+
+        [Fact]
+        public void CreateOutboundHttpScope_Null_ResourceUri()
+        {
+            // Set up Tracer
+            var settings = new TracerSettings();
+            var writerMock = new Mock<IAgentWriter>();
+            var samplerMock = new Mock<ISampler>();
+            var tracer = new Tracer(settings, plugins: null, writerMock.Object, samplerMock.Object, scopeManager: null, statsd: null);
+
+            using (var automaticScope = ScopeFactory.CreateOutboundHttpScope(tracer, "GET", null, IntegrationId.HttpMessageHandler, out _))
+            {
+                Assert.Equal(expected: "GET ",  actual: automaticScope.Span.ResourceName);
             }
         }
 
@@ -101,7 +116,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Tests
 
             const string method = "GET";
 
-            using (var automaticScope = ScopeFactory.CreateOutboundHttpScope(tracer, method, new Uri(uri), new IntegrationInfo((int)IntegrationIds.HttpMessageHandler), out var tags))
+            using (var automaticScope = ScopeFactory.CreateOutboundHttpScope(tracer, method, new Uri(uri), IntegrationId.HttpMessageHandler, out var tags))
             {
                 Assert.Equal(expected, automaticScope.Span.GetTag(Tags.HttpUrl));
                 Assert.Equal(expected, tags.HttpUrl);
@@ -109,8 +124,8 @@ namespace Datadog.Trace.ClrProfiler.Managed.Tests
         }
 
         [Theory]
-        [InlineData((int)IntegrationIds.HttpMessageHandler, (int)IntegrationIds.HttpMessageHandler)] // This scenario may occur on any .NET runtime with nested HttpMessageHandler's and HttpSocketHandler's
-        [InlineData((int)IntegrationIds.WebRequest, (int)IntegrationIds.HttpMessageHandler)] // This scenario may occur on .NET Core where the underlying transport for WebRequest is HttpMessageHandler
+        [InlineData((int)IntegrationId.HttpMessageHandler, (int)IntegrationId.HttpMessageHandler)] // This scenario may occur on any .NET runtime with nested HttpMessageHandler's and HttpSocketHandler's
+        [InlineData((int)IntegrationId.WebRequest, (int)IntegrationId.HttpMessageHandler)] // This scenario may occur on .NET Core where the underlying transport for WebRequest is HttpMessageHandler
         public void CreateOutboundHttpScope_AlwaysCreatesOneAutomaticInstrumentationScope(int integration1, int integration2)
         {
             // Set up Tracer
@@ -129,9 +144,9 @@ namespace Datadog.Trace.ClrProfiler.Managed.Tests
                 manualScope.Span.ResourceName = $"{method} {url}";
                 manualScope.Span.ServiceName = $"{tracer.DefaultServiceName}-http-client";
 
-                using (var automaticScope1 = ScopeFactory.CreateOutboundHttpScope(tracer, method, new Uri(url), new IntegrationInfo(integration1), out _))
+                using (var automaticScope1 = ScopeFactory.CreateOutboundHttpScope(tracer, method, new Uri(url), (IntegrationId)integration1, out _))
                 {
-                    using (var automaticScope2 = ScopeFactory.CreateOutboundHttpScope(tracer, method, new Uri(url), new IntegrationInfo(integration2), out _))
+                    using (var automaticScope2 = ScopeFactory.CreateOutboundHttpScope(tracer, method, new Uri(url), (IntegrationId)integration2, out _))
                     {
                         Assert.NotNull(manualScope);
                         Assert.NotNull(automaticScope1);
