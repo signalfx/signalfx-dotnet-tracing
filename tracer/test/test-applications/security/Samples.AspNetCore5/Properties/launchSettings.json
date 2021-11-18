@@ -43,8 +43,7 @@
         "SIGNALFX_VERSION": "1.0.0",
         "SIGNALFX_TRACE_HEADER_TAGS": "sample.correlation.identifier, Server",
         "SIGNALFX_TRACE_DEBUG": "0",
-        "SIGNALFX_APPSEC_IPHEADER": "globalip-address",
-        "SIGNALFX_APPSEC_EXTRA_HEADERS": "header-one,header-two,header-three"
+        "SIGNALFX_APPSEC_IPHEADER": "globalip-address"
       },
       "Logging": {
         "LogLevel": {

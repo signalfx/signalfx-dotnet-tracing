@@ -243,12 +243,6 @@ namespace Datadog.Trace.Ci
             WorkspacePath = ExpandPath(WorkspacePath);
 
             // **********
-            // Clean Refs
-            // **********
-
-            CleanBranchAndTag();
-
-            // **********
             // Custom environment variables.
             // **********
             Branch = GetEnvironmentVariableIfIsNotEmpty("SIGNALFX_GIT_BRANCH", Branch);
@@ -262,6 +256,12 @@ namespace Datadog.Trace.Ci
             CommitterName = GetEnvironmentVariableIfIsNotEmpty("SIGNALFX_GIT_COMMIT_COMMITTER_NAME", CommitterName);
             CommitterEmail = GetEnvironmentVariableIfIsNotEmpty("SIGNALFX_GIT_COMMIT_COMMITTER_EMAIL", CommitterEmail);
             CommitterDate = GetDateTimeOffsetEnvironmentVariableIfIsNotEmpty("SIGNALFX_GIT_COMMIT_COMMITTER_DATE", CommitterDate);
+
+            // **********
+            // Clean Refs
+            // **********
+
+            CleanBranchAndTag();
         }
 
         private static string GetEnvironmentVariableIfIsNotEmpty(string key, string defaultValue)
@@ -556,7 +556,15 @@ namespace Datadog.Trace.Ci
         {
             IsCI = true;
             Provider = "github";
-            Repository = string.Format("https://github.com/{0}.git", EnvironmentHelpers.GetEnvironmentVariable("GITHUB_REPOSITORY"));
+
+            var serverUrl = EnvironmentHelpers.GetEnvironmentVariable("GITHUB_SERVER_URL");
+            if (string.IsNullOrWhiteSpace(serverUrl))
+            {
+                serverUrl = "https://github.com";
+            }
+
+            var rawRepository = $"{serverUrl}/{EnvironmentHelpers.GetEnvironmentVariable("GITHUB_REPOSITORY")}";
+            Repository = $"{rawRepository}.git";
             Commit = EnvironmentHelpers.GetEnvironmentVariable("GITHUB_SHA");
 
             string headRef = EnvironmentHelpers.GetEnvironmentVariable("GITHUB_HEAD_REF");
@@ -575,8 +583,17 @@ namespace Datadog.Trace.Ci
             PipelineId = EnvironmentHelpers.GetEnvironmentVariable("GITHUB_RUN_ID");
             PipelineNumber = EnvironmentHelpers.GetEnvironmentVariable("GITHUB_RUN_NUMBER");
             PipelineName = EnvironmentHelpers.GetEnvironmentVariable("GITHUB_WORKFLOW");
-            PipelineUrl = $"https://github.com/{EnvironmentHelpers.GetEnvironmentVariable("GITHUB_REPOSITORY")}/commit/{Commit}/checks";
-            JobUrl = PipelineUrl;
+            var attempts = EnvironmentHelpers.GetEnvironmentVariable("GITHUB_RUN_ATTEMPT");
+            if (string.IsNullOrWhiteSpace(attempts))
+            {
+                PipelineUrl = $"{rawRepository}/actions/runs/{PipelineId}";
+            }
+            else
+            {
+                PipelineUrl = $"{rawRepository}/actions/runs/{PipelineId}/attempts/{attempts}";
+            }
+
+            JobUrl = $"{serverUrl}/{EnvironmentHelpers.GetEnvironmentVariable("GITHUB_REPOSITORY")}/commit/{Commit}/checks";
         }
 
         private static void SetupTeamcityEnvironment()
