@@ -28,10 +28,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
             SetServiceVersion("1.0.0");
 
             SetCallTargetSettings(true);
-            if (enableRouteTemplateResourceNames)
-            {
-                SetEnvironmentVariable(ConfigurationKeys.FeatureFlags.RouteTemplateResourceNamesEnabled, "true");
-            }
+            SetEnvironmentVariable(ConfigurationKeys.FeatureFlags.RouteTemplateResourceNamesEnabled, enableRouteTemplateResourceNames.ToString());
 
             Fixture = fixture;
         }
