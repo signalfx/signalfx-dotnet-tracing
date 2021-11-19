@@ -43,7 +43,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
                 string serviceName = settings.GetServiceName(tracer, KafkaConstants.ServiceName);
                 var tags = new KafkaTags(SpanKinds.Producer);
 
-                var operationName = string.IsNullOrEmpty(topicPartition?.Topic) ? KafkaConstants.ProduceOperationName : $"{KafkaConstants.ConsumeOperationName} {topicPartition.Topic}";
+                var operationName = string.IsNullOrEmpty(topicPartition?.Topic) ? KafkaConstants.ProduceOperationName : $"{KafkaConstants.ProduceOperationName} {topicPartition.Topic}";
                 scope = tracer.StartActiveWithTags(
                     operationName,
                     tags: tags,
