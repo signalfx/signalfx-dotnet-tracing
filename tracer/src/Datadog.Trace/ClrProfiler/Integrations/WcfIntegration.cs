@@ -29,7 +29,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
     {
         private const string DefaultOperationName = "wcf.request";
         private const string Major4 = "4";
-        private const string Major5 = "5";
 
         private const string ChannelHandlerTypeName = "System.ServiceModel.Dispatcher.ChannelHandler";
         private const string HttpRequestMessagePropertyTypeName = "System.ServiceModel.Channels.HttpRequestMessageProperty";
@@ -52,7 +51,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
             TargetType = ChannelHandlerTypeName,
             TargetSignatureTypes = new[] { ClrNames.Bool, "System.ServiceModel.Channels.RequestContext", "System.ServiceModel.OperationContext" },
             TargetMinimumVersion = Major4,
-            TargetMaximumVersion = Major5)]
+            TargetMaximumVersion = Major4)]
         public static bool HandleRequest(
             object channelHandler,
             object requestContext,
@@ -110,18 +109,18 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
         internal static Scope CreateScope(object requestContext)
         {
-            var requestMessage = requestContext.GetProperty<object>("RequestMessage").GetValueOrDefault();
-
-            if (requestMessage == null)
-            {
-                return null;
-            }
-
             var tracer = Tracer.Instance;
 
             if (!tracer.Settings.IsIntegrationEnabled(IntegrationId))
             {
                 // integration disabled, don't create a scope, skip this trace
+                return null;
+            }
+
+            var requestMessage = requestContext.GetProperty<object>("RequestMessage").GetValueOrDefault();
+
+            if (requestMessage == null)
+            {
                 return null;
             }
 

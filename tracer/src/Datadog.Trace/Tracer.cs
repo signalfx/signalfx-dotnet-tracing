@@ -679,6 +679,11 @@ namespace Datadog.Trace
             {
                 try
                 {
+                    if (AzureAppServices.Metadata.IsRelevant)
+                    {
+                        return AzureAppServices.Metadata.SiteName;
+                    }
+
                     if (TryLoadAspNetSiteName(out var siteName))
                     {
                         return siteName;
