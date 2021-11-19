@@ -71,8 +71,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             VerifyProducerSpanProperties(successfulProducerSpans, GetSuccessfulResourceName("Produce", topic), ExpectedSuccessProducerSpans + ExpectedTombstoneProducerSpans);
             VerifyProducerSpanProperties(errorProducerSpans, ErrorProducerResourceName, ExpectedErrorProducerSpans);
 
-            allProducerSpans.Should().OnlyContain(span => span.Name == $"kafka.produce {topic}");
-            allConsumerSpans.Should().OnlyContain(span => span.Name == $"kafka.consume {topic}");
+            allProducerSpans.Where(span => span.Name == $"kafka.produce {topic}").Should().HaveCount(ExpectedSuccessProducerSpans + ExpectedTombstoneProducerSpans);
+            allProducerSpans.Where(span => span.Name == $"kafka.produce INVALID-TOPIC").Should().HaveCount(ExpectedErrorProducerSpans);
+            allConsumerSpans.Where(span => span.Name == $"kafka.consume {topic}").Should().HaveCount(ExpectedConsumerSpans);
 
             // Only successful spans with a delivery handler will have an offset
             successfulProducerSpans
