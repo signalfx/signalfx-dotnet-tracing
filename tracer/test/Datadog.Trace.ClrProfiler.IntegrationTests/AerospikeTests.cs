@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.TestHelpers;
@@ -65,8 +67,10 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 spans.Should()
                      .OnlyContain(span => span.Name == "aerospike.command")
+                     .And.OnlyContain(span => span.LogicScope == "aerospike.command")
                      .And.OnlyContain(span => span.Service == "Samples.Aerospike")
                      .And.OnlyContain(span => span.Tags[Tags.SpanKind] == SpanKinds.Client)
+                     .And.OnlyContain(span => span.Tags[Tags.DbType] == "aerospike")
                      .And.OnlyContain(span => ValidateSpanKey(span));
 
                 spans.Select(span => span.Resource).Should().ContainInOrder(expectedSpans);
