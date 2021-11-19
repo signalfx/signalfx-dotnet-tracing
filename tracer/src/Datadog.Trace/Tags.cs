@@ -508,6 +508,10 @@ namespace Datadog.Trace
 
         internal const string AerospikeUserKey = "db.aerospike.userkey";
 
+        internal const string CouchbaseOperationCode = "couchbase.operation.code";
+        internal const string CouchbaseOperationBucket = "couchbase.operation.bucket";
+        internal const string CouchbaseOperationKey = "couchbase.operation.key";
+
         /// <summary>
         /// Messaging tags
         /// </summary>
