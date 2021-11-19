@@ -217,7 +217,7 @@ namespace Datadog.Trace.Configuration
             }
 
             RouteTemplateResourceNamesEnabled = source?.GetBool(ConfigurationKeys.FeatureFlags.RouteTemplateResourceNamesEnabled)
-                                                   ?? false;
+                                                   ?? true;
 
             TraceResponseHeaderEnabled = source?.GetBool(ConfigurationKeys.TraceResponseHeaderEnabled) ?? true;
 
