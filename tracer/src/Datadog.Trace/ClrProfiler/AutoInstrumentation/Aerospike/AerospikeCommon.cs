@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Text;
 using Datadog.Trace.Configuration;
@@ -38,6 +40,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Aerospike
                 var serviceName = tracer.Settings.GetServiceName(tracer, ServiceName);
                 scope = tracer.StartActiveWithTags(OperationName, tags: tags, serviceName: serviceName);
                 var span = scope.Span;
+                span.LogicScope = OperationName;
 
                 if (target.TryDuckCast<HasKey>(out var hasKey))
                 {

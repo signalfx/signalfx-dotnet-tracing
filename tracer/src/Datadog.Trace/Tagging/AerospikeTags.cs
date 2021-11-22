@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using Datadog.Trace.ExtensionMethods;
 
 namespace Datadog.Trace.Tagging
@@ -12,6 +14,7 @@ namespace Datadog.Trace.Tagging
         protected static readonly IProperty<string>[] AerospikeTagsProperties =
             InstrumentationTagsProperties.Concat(
                 new ReadOnlyProperty<AerospikeTags, string>(Trace.Tags.InstrumentationName, t => t.InstrumentationName),
+                new ReadOnlyProperty<AerospikeTags, string>(Trace.Tags.DbType, t => t.DbType),
                 new Property<AerospikeTags, string>(Trace.Tags.AerospikeKey, t => t.Key, (t, v) => t.Key = v),
                 new Property<AerospikeTags, string>(Trace.Tags.AerospikeNamespace, t => t.Namespace, (t, v) => t.Namespace = v),
                 new Property<AerospikeTags, string>(Trace.Tags.AerospikeSetName, t => t.SetName, (t, v) => t.SetName = v),
@@ -19,7 +22,9 @@ namespace Datadog.Trace.Tagging
 
         public override string SpanKind => SpanKinds.Client;
 
-        public string InstrumentationName => "aerospike";
+        public string InstrumentationName => "Aerospike";
+
+        public string DbType => "aerospike";
 
         public string Key { get; set; }
 
