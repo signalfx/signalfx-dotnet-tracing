@@ -60,16 +60,20 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             // Due to manual/autocommit behaviour
             allSpans.Should().HaveCountGreaterOrEqualTo(TotalExpectedSpanCount);
 
-            var allProducerSpans = allSpans.Where(x => x.Name == "kafka.produce").ToList();
+            var allProducerSpans = allSpans.Where(x => x.LogicScope == "kafka.produce").ToList();
             var successfulProducerSpans = allProducerSpans.Where(x => x.Error == 0).ToList();
             var errorProducerSpans = allProducerSpans.Where(x => x.Error > 0).ToList();
 
-            var allConsumerSpans = allSpans.Where(x => x.Name == "kafka.consume").ToList();
+            var allConsumerSpans = allSpans.Where(x => x.LogicScope == "kafka.consume").ToList();
             var successfulConsumerSpans = allConsumerSpans.Where(x => x.Error == 0).ToList();
             var errorConsumerSpans = allConsumerSpans.Where(x => x.Error > 0).ToList();
 
             VerifyProducerSpanProperties(successfulProducerSpans, GetSuccessfulResourceName("Produce", topic), ExpectedSuccessProducerSpans + ExpectedTombstoneProducerSpans);
             VerifyProducerSpanProperties(errorProducerSpans, ErrorProducerResourceName, ExpectedErrorProducerSpans);
+
+            allProducerSpans.Where(span => span.Name == $"kafka.produce {topic}").Should().HaveCount(ExpectedSuccessProducerSpans + ExpectedTombstoneProducerSpans);
+            allProducerSpans.Where(span => span.Name == $"kafka.produce INVALID-TOPIC").Should().HaveCount(ExpectedErrorProducerSpans);
+            allConsumerSpans.Where(span => span.Name == $"kafka.consume {topic}").Should().HaveCount(ExpectedConsumerSpans);
 
             // Only successful spans with a delivery handler will have an offset
             successfulProducerSpans
