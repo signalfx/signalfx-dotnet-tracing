@@ -3,9 +3,18 @@
 ## [Unreleased]
 
 
-[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.14...HEAD)
+[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.15...HEAD)
 
-[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.14..HEAD)
+[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.15..HEAD)
+
+## [Release 0.1.15](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.1.15)
+
+- Remove informational log from hot path (ASP.NET Core performance bug)
+- Add option to disable CancelKeyPress event subscription (`SIGNALFX_DISABLE_CONSOLE_CTRL_HANDLE`)
+
+[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.14...v0.1.15)
+
+[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.14..v0.1.15)
 
 ## [Release 0.1.14](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.1.14)
 
@@ -13,9 +22,9 @@
 - Do not add Sever-Timing header on IIS apps using classic pool (fixes crash for this case)
 - Fix RabbitMq delivery mode tags
 
-[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.13...HEAD)
+[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.13...v0.1.14)
 
-[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.13..HEAD)
+[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.13..v0.1.14)
 
 ## [Release 0.1.13](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.1.13)
 
@@ -25,9 +34,9 @@
 - Added Server-Timing header to ASP.NET on IIS
 - Added RabbitMQ instrumentation
 
-[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.13...v0.1.14)
+[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.12...v0.1.13)
 
-[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.13..v0.1.14)
+[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.12..v0.1.13)
 
 ## [Release 0.1.12](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.1.12)
 
