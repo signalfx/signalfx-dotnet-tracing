@@ -201,7 +201,7 @@ namespace Datadog.Trace.Configuration
 
             var httpClientErrorStatusCodes = source?.GetString(ConfigurationKeys.HttpClientErrorStatusCodes) ??
                                         // Default value
-                                        "400-499";
+                                        "400-599";
             HttpClientErrorStatusCodes = ParseHttpCodesToArray(httpClientErrorStatusCodes);
 
             TraceBufferSize = source?.GetInt32(ConfigurationKeys.BufferSize)
