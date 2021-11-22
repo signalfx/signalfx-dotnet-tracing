@@ -65,6 +65,7 @@ Use these environment variables to configure the tracing library:
 | `SIGNALFX_RECORDED_VALUE_MAX_LENGTH` | The maximum length an attribute value can have. Values longer than this are truncated. Values are completely truncated when set to 0, and ignored when set to a negative value. | `12000` |
 | `SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS` | Enable the tagging of a Mongo command BsonDocument as db.statement. | `true` |
 | `SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS` | Enable the tagging of a Redis commands as db.statement. | `true` |
+| `SIGNALFX_TRACE_ROUTE_TEMPLATE_RESOURCE_NAMES_ENABLED` | ASP.NET span and resource names are based on routing configuration if applicable. | `true` |
 
 ## Ways to configure
 
