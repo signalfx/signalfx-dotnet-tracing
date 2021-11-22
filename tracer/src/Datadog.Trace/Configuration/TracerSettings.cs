@@ -75,8 +75,6 @@ namespace Datadog.Trace.Configuration
 
             DisabledIntegrationNames = new HashSet<string>(source.GetStrings(ConfigurationKeys.DisabledIntegrations), StringComparer.OrdinalIgnoreCase);
 
-            AdoNetExcludedTypes = new HashSet<string>(source.GetStrings(ConfigurationKeys.AdoNetExcludedTypes), StringComparer.OrdinalIgnoreCase);
-
             Integrations = new IntegrationSettingsCollection(source);
 
             var agentHost = source?.GetString(ConfigurationKeys.AgentHost) ??
@@ -281,12 +279,6 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="ConfigurationKeys.DisabledIntegrations"/>
         public HashSet<string> DisabledIntegrationNames { get; set; }
-
-        /// <summary>
-        /// Gets or sets the AdoNet types to exclude from automatic instrumentation.
-        /// </summary>
-        /// <seealso cref="ConfigurationKeys.AdoNetExcludedTypes"/>
-        public HashSet<string> AdoNetExcludedTypes { get; set; }
 
         /// <summary>
         /// Gets or sets the Uri where the Tracer can connect to the Agent.
@@ -581,7 +573,7 @@ namespace Datadog.Trace.Configuration
         /// <summary>
         /// Sets the mappings to use for service names within a <see cref="Span"/>
         /// </summary>
-        /// <param name="mappings">Mappings to use from original service name (e.g. <code>sql-server</code> or <code>graphql</code>)
+        /// <param name="mappings">Mappings to use from original service name (e.g. <code>mssql</code> or <code>graphql</code>)
         /// as the <see cref="KeyValuePair{TKey, TValue}.Key"/>) to replacement service names as <see cref="KeyValuePair{TKey, TValue}.Value"/>).</param>
         public void SetServiceNameMappings(IEnumerable<KeyValuePair<string, string>> mappings)
         {

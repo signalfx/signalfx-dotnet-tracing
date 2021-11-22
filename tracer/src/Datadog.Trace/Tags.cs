@@ -116,7 +116,7 @@ namespace Datadog.Trace
         public const string ErrorStack = "sfx.error.stack";
 
         /// <summary>
-        /// The type of database (e.g. mssql, mysql)
+        /// The type of database (e.g. "mssql", "mysql", "postgresql", "sqlite", "oracle")
         /// </summary>
         /// <remarks>
         /// Upstream uses "db.type", however, to better align with OpenTelemetry we use

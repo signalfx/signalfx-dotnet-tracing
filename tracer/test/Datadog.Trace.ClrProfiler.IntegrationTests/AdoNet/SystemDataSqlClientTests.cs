@@ -27,7 +27,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
         [MemberData(nameof(PackageVersions.SystemDataSqlClient), MemberType = typeof(PackageVersions))]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
-        public void SubmitsTracesWithNetStandard(string packageVersion)
+        public void SubmitsTraces(string packageVersion)
         {
             // ALWAYS: 98 spans
             // - SqlCommand: 21 spans (3 groups * 7 spans)
@@ -48,54 +48,47 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             // NETSTANDARD + CALLTARGET: +7 spans
             // - IDbCommandGenericConstrant<SqlCommand>-netstandard: 7 spans (1 group * 7 spans)
 
-            var expectedSpanCount = 168;
-
+            const int expectedSpanCount = 168;
             const string dbType = "mssql";
             const string expectedOperationName = dbType + ".query";
             const string expectedServiceName = "Samples.SqlServer";
 
             int agentPort = TcpPortProvider.GetOpenPort();
+            using var agent = new MockTracerAgent(agentPort);
+            using var process = RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion);
+            var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
 
-            using (var agent = new MockTracerAgent(agentPort))
-            using (RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion))
+            Assert.Equal(expectedSpanCount, spans.Count);
+
+            foreach (var span in spans)
             {
-                var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
-                Assert.Equal(expectedSpanCount, spans.Count);
-
-                foreach (var span in spans)
-                {
-                    Assert.Equal(expectedOperationName, span.Name);
-                    Assert.Equal(expectedServiceName, span.Service);
-                    Assert.Equal(SpanTypes.Sql, span.Type);
-                    Assert.Equal(dbType, span.Tags[Tags.DbType]);
-                    Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
-                    Assert.Contains(Tags.DbStatement, (IDictionary<string, string>)span.Tags);
-                }
+                Assert.Equal(expectedOperationName, span.Name);
+                Assert.Equal(expectedServiceName, span.Service);
+                Assert.Equal(SpanTypes.Sql, span.Type);
+                Assert.Equal(dbType, span.Tags[Tags.DbType]);
+                Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
+                Assert.Contains(Tags.DbStatement, (IDictionary<string, string>)span.Tags);
             }
         }
 
         [SkippableFact]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
-        public void SpansDisabledByAdoNetExcludedTypes()
+        public void IntegrationDisabled()
         {
-            var totalSpanCount = 21;
+            const int totalSpanCount = 21;
+            const string expectedOperationName = "mssql.query";
 
-            const string dbType = "mssql";
-            const string expectedOperationName = dbType + ".query";
-
-            SetEnvironmentVariable(ConfigurationKeys.AdoNetExcludedTypes, "System.Data.SqlClient.SqlCommand,Microsoft.Data.SqlClient.SqlCommand,MySql.Data.MySqlClient.MySqlCommand,Npgsql.NpgsqlCommand");
+            SetEnvironmentVariable($"SIGNALFX_TRACE_{nameof(IntegrationId.SqlClient)}_ENABLED", "false");
 
             string packageVersion = PackageVersions.SystemDataSqlClient.First()[0] as string;
             int agentPort = TcpPortProvider.GetOpenPort();
+            using var agent = new MockTracerAgent(agentPort);
+            using var process = RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion);
+            var spans = agent.WaitForSpans(totalSpanCount, returnAllOperations: true);
 
-            using (var agent = new MockTracerAgent(agentPort))
-            using (RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion))
-            {
-                var spans = agent.WaitForSpans(totalSpanCount, returnAllOperations: true);
-                Assert.NotEmpty(spans);
-                Assert.Empty(spans.Where(s => s.Name.Equals(expectedOperationName)));
-            }
+            Assert.NotEmpty(spans);
+            Assert.Empty(spans.Where(s => s.Name.Equals(expectedOperationName)));
         }
     }
 }

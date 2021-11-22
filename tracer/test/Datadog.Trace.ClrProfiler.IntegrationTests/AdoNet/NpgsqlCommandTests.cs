@@ -8,7 +8,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.Configuration;
-using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.TestHelpers;
 using Xunit;
 using Xunit.Abstractions;
@@ -26,7 +25,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
         [SkippableTheory]
         [MemberData(nameof(PackageVersions.Npgsql), MemberType = typeof(PackageVersions))]
         [Trait("Category", "EndToEnd")]
-        public void SubmitsTracesWithNetStandard(string packageVersion)
+        public void SubmitsTraces(string packageVersion)
         {
             // ALWAYS: 77 spans
             // - NpgsqlCommand: 21 spans (3 groups * 7 spans)
@@ -42,56 +41,48 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             //
             // NETSTANDARD + CALLTARGET: +7 spans
             // - IDbCommandGenericConstrant<NpgsqlCommand>-netstandard: 7 spans (1 group * 7 spans)
-            var expectedSpanCount = 147;
-
+            const int expectedSpanCount = 147;
             const string dbType = "postgresql";
             const string expectedOperationName = dbType + ".query";
             const string expectedServiceName = "Samples.Npgsql";
 
             int agentPort = TcpPortProvider.GetOpenPort();
+            using var agent = new MockTracerAgent(agentPort);
+            using var process = RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion);
+            var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
+            int actualSpanCount = spans.Count(s => s.ParentId.HasValue); // Remove unexpected DB spans from the calculation
 
-            using (var agent = new MockTracerAgent(agentPort))
-            using (RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion))
+            // Assert.Equal(expectedSpanCount, spans.Count); // Assert an exact match once we can correctly instrument the generic constraint case
+            Assert.Equal(expectedSpanCount, actualSpanCount);
+
+            foreach (var span in spans)
             {
-                var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
-                int actualSpanCount = spans.Where(s => s.ParentId.HasValue).Count(); // Remove unexpected DB spans from the calculation
-                // Assert.Equal(expectedSpanCount, spans.Count); // Assert an exact match once we can correctly instrument the generic constraint case
-
-                Assert.Equal(expectedSpanCount, actualSpanCount);
-
-                foreach (var span in spans)
-                {
-                    Assert.Equal(expectedOperationName, span.Name);
-                    Assert.Equal(expectedServiceName, span.Service);
-                    Assert.Equal(SpanTypes.Sql, span.Type);
-                    Assert.Equal(dbType, span.Tags[Tags.DbType]);
-                    Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
-                    Assert.Contains(Tags.DbStatement, (IDictionary<string, string>)span.Tags);
-                }
+                Assert.Equal(expectedOperationName, span.Name);
+                Assert.Equal(expectedServiceName, span.Service);
+                Assert.Equal(SpanTypes.Sql, span.Type);
+                Assert.Equal(dbType, span.Tags[Tags.DbType]);
+                Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
+                Assert.Contains(Tags.DbStatement, (IDictionary<string, string>)span.Tags);
             }
         }
 
         [SkippableFact]
         [Trait("Category", "EndToEnd")]
-        public void SpansDisabledByAdoNetExcludedTypes()
+        public void IntegrationDisabled()
         {
-            var totalSpanCount = 21;
+            const int totalSpanCount = 21;
+            const string expectedOperationName = "postgresql.query";
 
-            const string dbType = "postgresql";
-            const string expectedOperationName = dbType + ".query";
-
-            SetEnvironmentVariable(ConfigurationKeys.AdoNetExcludedTypes, "System.Data.SqlClient.SqlCommand,Microsoft.Data.SqlClient.SqlCommand,MySql.Data.MySqlClient.MySqlCommand,Npgsql.NpgsqlCommand");
+            SetEnvironmentVariable($"SIGNALFX_TRACE_{nameof(IntegrationId.Npgsql)}_ENABLED", "false");
 
             string packageVersion = PackageVersions.Npgsql.First()[0] as string;
             int agentPort = TcpPortProvider.GetOpenPort();
+            using var agent = new MockTracerAgent(agentPort);
+            using var process = RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion);
+            var spans = agent.WaitForSpans(totalSpanCount, returnAllOperations: true);
 
-            using (var agent = new MockTracerAgent(agentPort))
-            using (RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion))
-            {
-                var spans = agent.WaitForSpans(totalSpanCount, returnAllOperations: true);
-                Assert.NotEmpty(spans);
-                Assert.Empty(spans.Where(s => s.Name.Equals(expectedOperationName)));
-            }
+            Assert.NotEmpty(spans);
+            Assert.Empty(spans.Where(s => s.Name.Equals(expectedOperationName)));
         }
     }
 }

@@ -5,9 +5,6 @@
 
 // Modified by Splunk Inc.
 
-using System.Collections.Generic;
-using System.Linq;
-using Datadog.Trace.Configuration;
 using Datadog.Trace.TestHelpers;
 using Xunit;
 using Xunit.Abstractions;
@@ -24,53 +21,29 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
 
         [SkippableFact]
         [Trait("Category", "EndToEnd")]
-        public void SubmitsTracesWithNetStandard()
+        public void SubmitsTraces()
         {
-            var expectedSpanCount = 42;
-
+            const int expectedSpanCount = 21;
             const string dbType = "fake";
             const string expectedOperationName = dbType + ".query";
             const string expectedServiceName = "Samples.FakeDbCommand";
 
             int agentPort = TcpPortProvider.GetOpenPort();
 
-            using (var agent = new MockTracerAgent(agentPort))
-            using (RunSampleAndWaitForExit(agent.Port))
+            using var agent = new MockTracerAgent(agentPort);
+            using var process = RunSampleAndWaitForExit(agent.Port);
+            var spans = agent.WaitForSpans(expectedSpanCount);
+
+            Assert.Equal(expectedSpanCount, spans.Count);
+
+            foreach (var span in spans)
             {
-                var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
-                Assert.Equal(expectedSpanCount, spans.Count);
+                Assert.Equal(expectedServiceName, span.Service);
 
-                foreach (var span in spans)
-                {
-                    Assert.Equal(expectedOperationName, span.Name);
-                    Assert.Equal(expectedServiceName, span.Service);
-                    Assert.Equal(SpanTypes.Sql, span.Type);
-                    Assert.Equal(dbType, span.Tags[Tags.DbType]);
-                    Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
-                    Assert.Contains(Tags.DbStatement, (IDictionary<string, string>)span.Tags);
-                }
-            }
-        }
-
-        [SkippableFact]
-        [Trait("Category", "EndToEnd")]
-        public void SpansDisabledByAdoNetExcludedTypes()
-        {
-            var totalSpanCount = 21;
-
-            const string dbType = "fake";
-            const string expectedOperationName = dbType + ".query";
-
-            SetEnvironmentVariable(ConfigurationKeys.AdoNetExcludedTypes, "Samples.FakeDbCommand.FakeCommand,System.Data.Common.DbCommand,System.Data.SqlClient.SqlCommand,Microsoft.Data.SqlClient.SqlCommand,MySql.Data.MySqlClient.MySqlCommand,Npgsql.NpgsqlCommand");
-
-            int agentPort = TcpPortProvider.GetOpenPort();
-
-            using (var agent = new MockTracerAgent(agentPort))
-            using (RunSampleAndWaitForExit(agent.Port))
-            {
-                var spans = agent.WaitForSpans(totalSpanCount, returnAllOperations: true);
-                Assert.NotEmpty(spans);
-                Assert.Empty(spans.Where(s => s.Name.Equals(expectedOperationName)));
+                // we do NOT expect any `fake.query` spans
+                Assert.NotEqual(expectedOperationName, span.Name);
+                Assert.NotEqual(SpanTypes.Sql, span.Type);
+                Assert.False(span.Tags?.ContainsKey(Tags.DbType));
             }
         }
     }
