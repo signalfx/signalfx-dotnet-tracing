@@ -494,13 +494,13 @@ namespace Datadog.Trace
 
         internal const string RuntimeId = "runtime-id";
 
-        internal const string AerospikeKey = "aerospike.key";
+        internal const string AerospikeKey = "db.aerospike.key";
 
-        internal const string AerospikeNamespace = "aerospike.namespace";
+        internal const string AerospikeNamespace = "db.aerospike.namespace";
 
-        internal const string AerospikeSetName = "aerospike.setname";
+        internal const string AerospikeSetName = "db.aerospike.setname";
 
-        internal const string AerospikeUserKey = "aerospike.userkey";
+        internal const string AerospikeUserKey = "db.aerospike.userkey";
 
         /// <summary>
         /// Messaging tags
