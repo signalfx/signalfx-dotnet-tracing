@@ -1,4 +1,4 @@
-// <copyright file="KafkaHelper.cs" company="Datadog">
+﻿// <copyright file="KafkaHelper.cs" company="Datadog">
 // Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
@@ -34,7 +34,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
 
                 var parent = tracer.ActiveScope?.Span;
                 if (parent is not null &&
-                    parent.OperationName == KafkaConstants.ProduceOperationName &&
+                    parent.OperationName.StartsWith(KafkaConstants.ProduceOperationName) &&
                     parent.GetTag(Tags.InstrumentationName) != null)
                 {
                     return null;
@@ -43,8 +43,9 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
                 string serviceName = settings.GetServiceName(tracer, KafkaConstants.ServiceName);
                 var tags = new KafkaTags(SpanKinds.Producer);
 
+                var operationName = string.IsNullOrEmpty(topicPartition?.Topic) ? KafkaConstants.ProduceOperationName : $"{KafkaConstants.ProduceOperationName} {topicPartition.Topic}";
                 scope = tracer.StartActiveWithTags(
-                    KafkaConstants.ProduceOperationName,
+                    operationName,
                     tags: tags,
                     serviceName: serviceName,
                     finishOnClose: finishOnClose);
@@ -100,7 +101,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
 
                 var parent = tracer.ActiveScope?.Span;
                 if (parent is not null &&
-                    parent.OperationName == KafkaConstants.ConsumeOperationName &&
+                    parent.OperationName.StartsWith(KafkaConstants.ConsumeOperationName) &&
                     parent.GetTag(Tags.InstrumentationName) != null)
                 {
                     return null;
@@ -126,7 +127,8 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
 
                 var tags = new KafkaTags(SpanKinds.Consumer);
 
-                scope = tracer.StartActiveWithTags(KafkaConstants.ConsumeOperationName, parent: propagatedContext, tags: tags, serviceName: serviceName);
+                var operationName = string.IsNullOrEmpty(topic) ? KafkaConstants.ConsumeOperationName : $"{KafkaConstants.ConsumeOperationName} {topic}";
+                scope = tracer.StartActiveWithTags(operationName, parent: propagatedContext, tags: tags, serviceName: serviceName);
 
                 string resourceName = $"Consume Topic {(string.IsNullOrEmpty(topic) ? "kafka" : topic)}";
 
@@ -187,7 +189,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
 
                 var activeScope = tracer.ActiveScope;
                 var currentSpan = activeScope?.Span;
-                if (currentSpan?.OperationName != KafkaConstants.ConsumeOperationName)
+                if (currentSpan == null || !currentSpan.OperationName.StartsWith(KafkaConstants.ConsumeOperationName))
                 {
                     // Not currently in a consumer operation
                     return;
