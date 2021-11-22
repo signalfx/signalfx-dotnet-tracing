@@ -219,7 +219,7 @@ partial class Build
        .Executes(async () =>
         {
             var assemblies = TracerHomeDirectory
-                            .GlobFiles("**/Datadog.Trace.dll")
+                            .GlobFiles("**/SignalFx.Tracing.dll")
                             .Select(x => x.ToString())
                             .ToList();
 
