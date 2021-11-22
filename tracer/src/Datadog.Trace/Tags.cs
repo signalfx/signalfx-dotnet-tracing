@@ -197,12 +197,20 @@ namespace Datadog.Trace
         /// <summary>
         /// The hostname of a outgoing server connection.
         /// </summary>
-        public const string OutHost = "out.host";
+        /// <remarks>
+        /// Upstream uses "out.host", however, to better align with OpenTelemetry we use
+        /// "net.peer.name" instead.
+        /// </remarks>>
+        public const string OutHost = Net.PeerName;
 
         /// <summary>
         /// The port of a outgoing server connection.
         /// </summary>
-        public const string OutPort = "out.port";
+        /// <remarks>
+        /// Upstream uses "out.port", however, to better align with OpenTelemetry we use
+        /// "net.peer.port" instead.
+        /// </remarks>>
+        public const string OutPort = Net.PeerPort;
 
         /// <summary>
         /// The raw command sent to Redis.
@@ -606,6 +614,11 @@ namespace Datadog.Trace
             /// This should be the IP/hostname of the broker (or other network-level peer) this specific message is sent to/received from.
             /// </summary>
             public const string PeerName = "net.peer.name";
+
+            /// <summary>
+            /// Remote port number.
+            /// </summary>
+            public const string PeerPort = "net.peer.port";
         }
     }
 }
