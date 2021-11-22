@@ -30,6 +30,16 @@ namespace Datadog.Trace
         public const string Version = "version";
 
         /// <summary>
+        /// SingalFx Language tag, applied to root spans.
+        /// </summary>
+        public const string SignalFxLibrary = "signalfx.tracing.library";
+
+        /// <summary>
+        /// SingalFx Version tag, applied to root spans.
+        /// </summary>
+        public const string SignalFxVersion = "signalfx.tracing.version";
+
+        /// <summary>
         /// The name of the integration that generated the span.
         /// Use OpenTracing tag "component"
         /// </summary>
