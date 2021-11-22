@@ -278,8 +278,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     Assert.Equal("redis.command", span.LogicScope);
                     Assert.Equal("Samples.StackExchange.Redis", span.Service);
                     Assert.Equal(SpanTypes.Redis, span.Type);
-                    Assert.Equal(host, DictionaryExtensions.GetValueOrDefault(span.Tags, "out.host"));
-                    Assert.Equal(port, DictionaryExtensions.GetValueOrDefault(span.Tags, "out.port"));
+                    Assert.Equal(host, DictionaryExtensions.GetValueOrDefault(span.Tags, "net.peer.name"));
+                    Assert.Equal(port, DictionaryExtensions.GetValueOrDefault(span.Tags, "net.peer.port"));
                     Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
                 }
 
