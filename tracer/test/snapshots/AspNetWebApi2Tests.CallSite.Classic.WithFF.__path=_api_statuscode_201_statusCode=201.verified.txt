@@ -16,6 +16,7 @@
       http.status_code: 201,
       http.url: http://localhost:00000/api/statuscode/201,
       language: dotnet,
+      net.peer.ip: ::1,
       span.kind: server,
       version: 1.0.0
     }
@@ -35,6 +36,7 @@
       http.status_code: 201,
       http.url: http://localhost:00000/api/statuscode/201,
       language: dotnet,
+      net.peer.ip: ::1,
       runtime-id: Guid_1,
       span.kind: server,
       version: 1.0.0
