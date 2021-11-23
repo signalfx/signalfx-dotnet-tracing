@@ -281,6 +281,9 @@ namespace Datadog.Trace.TestHelpers
                 "ServiceHub.IdentityHost.exe;ServiceHub.VSDetouredHost.exe;ServiceHub.SettingsHost.exe;ServiceHub.Host.CLR.x86.exe;" +
                 "ServiceHub.RoslynCodeAnalysisService32.exe;MSBuild.exe;ServiceHub.ThreadedWaitDialog.exe";
 
+            // use DatadogAgent exporter instead of Zipkin, because most of the integration tests use MockTracerAgent instead of MockZipkinCollector
+            environmentVariables["SIGNALFX_EXPORTER"] = "DatadogAgent";
+
             foreach (var key in CustomEnvironmentVariables.Keys)
             {
                 environmentVariables[key] = CustomEnvironmentVariables[key];

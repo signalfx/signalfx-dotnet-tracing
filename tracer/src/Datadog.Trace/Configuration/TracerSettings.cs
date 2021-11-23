@@ -201,7 +201,7 @@ namespace Datadog.Trace.Configuration
 
             var httpClientErrorStatusCodes = source?.GetString(ConfigurationKeys.HttpClientErrorStatusCodes) ??
                                         // Default value
-                                        "400-499";
+                                        "400-599";
             HttpClientErrorStatusCodes = ParseHttpCodesToArray(httpClientErrorStatusCodes);
 
             TraceBufferSize = source?.GetInt32(ConfigurationKeys.BufferSize)
@@ -414,7 +414,7 @@ namespace Datadog.Trace.Configuration
         /// <summary>
         /// Gets or sets the name of the exporter to be used. The Tracer uses it to encode and
         /// dispatch traces.
-        /// Default is <c>"DatadogAgent"</c>.
+        /// Default is <c>"Zipkin"</c>.
         /// <seealso cref="ConfigurationKeys.Exporter"/>
         /// </summary>
         public ExporterType Exporter { get; set; }

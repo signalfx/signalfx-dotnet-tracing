@@ -42,17 +42,17 @@ Use these environment variables to configure the tracing library:
 | `SIGNALFX_API_KEY` | The API key used by the Agent. |  |
 | `SIGNALFX_TRACE_TRANSPORT` | Overrides the transport to use for communicating with the trace agent. Available values are: `datagod-tcp`, `datadog-named-pipes`. | `null` |
 | `SIGNALFX_HTTP_SERVER_ERROR_STATUSES` | The application's server http statuses to set spans as errors by. | `500-599` |
-| `SIGNALFX_HTTP_CLIENT_ERROR_STATUSES` | The application's client http statuses to set spans as errors by. | `400-499` |
+| `SIGNALFX_HTTP_CLIENT_ERROR_STATUSES` | The application's client http statuses to set spans as errors by. | `400-599` |
 | `SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED` | Enable to activate sending partial traces to the agent. | `false` |
 | `SIGNALFX_TRACE_PARTIAL_FLUSH_MIN_SPANS` | The minimum number of closed spans in a trace before it's partially flushed. `SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED` has to be enabled for this to take effect. | `500` |
 | `SIGNALFX_SERVICE` | Application's default service name. |  |
 | `SIGNALFX_ENV` | The value for the `deployment.environment` tag added to every span. |  |
-| `SIGNALFX_TRACE_ENABLED` | Enable to activate the tracer. | `true` | 
-| `SIGNALFX_TRACE_DEBUG` | Enable to activate debugging mode for the tracer. | `false` | 
-| `SIGNALFX_TRACE_AGENT_URL`, `SIGNALFX_ENDPOINT_URL` | The URL to where trace exporters (see: `SIGNALFX_EXPORTER`) send traces. | `http://localhost:8126` | 
+| `SIGNALFX_TRACE_ENABLED` | Enable to activate the tracer. | `true` |
+| `SIGNALFX_TRACE_DEBUG` | Enable to activate debugging mode for the tracer. | `false` |
+| `SIGNALFX_TRACE_AGENT_URL`, `SIGNALFX_ENDPOINT_URL` | The URL to where trace exporters (see: `SIGNALFX_EXPORTER`) send traces. | `http://localhost:8126` |
 | `SIGNALFX_TAGS` | Comma-separated list of key-value pairs to specify global span tags. For example: `"key1:val1,key2:val2"` |  |
 | `SIGNALFX_LOGS_INJECTION` | Enable to inject trace IDs, span IDs, service name and environment into logs. This requires a compatible logger or manual configuration. | `false` |
-| `SIGNALFX_EXPORTER` | The exporter to be used. The Tracer uses it to encode and dispatch traces. Available values are: `DatadogAgent`, `Zipkin`. | `DatadogAgent` |
+| `SIGNALFX_EXPORTER` | The exporter to be used. The Tracer uses it to encode and dispatch traces. Available values are: `DatadogAgent`, `Zipkin`. | `Zipkin` |
 | `SIGNALFX_MAX_LOGFILE_SIZE` | The maximum size for tracer log files, in bytes. | `10 MB` |
 | `SIGNALFX_TRACE_LOG_PATH` | The path of the profiler log file. | Linux: `/var/log/signalfx/dotnet/dotnet-profiler.log`<br>Windows: `%ProgramData%"\SignalFx .NET Tracing\logs\dotnet-profiler.log` |
 | `SIGNALFX_DIAGNOSTIC_SOURCE_ENABLED` | Enable to generate troubleshooting logs with the `System.Diagnostics.DiagnosticSource` class. | `true` |
@@ -113,8 +113,10 @@ After downloading the library, install the CLR Profiler and its components
 via your system's package manager.
 
 1. Download the latest release of the library.
-2. Install the CLR Profiler and its components with your system's package
+
+1. Install the CLR Profiler and its components with your system's package
 manager:
+
     ```bash
     # Use dpkg:
     $ dpkg -i signalfx-dotnet-tracing.deb
@@ -128,37 +130,47 @@ manager:
     # Install directly from the release bundle for musl-using systems (Alpine Linux):
     $ tar -xf signalfx-dotnet-tracing-musl.tar.gz -C /
     ```
+
 1. Configure the required environment variables:
+
     ```bash
-    $ source /opt/signalfx/defaults.env
+    source /opt/signalfx/defaults.env
     ```
-2. Set the service name:
+
+1. Set the service name:
+
     ```bash
-    $ export SIGNALFX_SERVICE='MyCoreService'
+    export SIGNALFX_SERVICE='MyCoreService'
     ```
-3. Set Zipkin exporter:
+
+1. Set OpenTelemetry conventions:
+
     ```bash
-    $ export SIGNALFX_EXPORTER='Zipkin'
+    export SIGNALFX_CONVENTION='OpenTelemetry'
     ```
-4. Set OpenTelemetry conventions:
+
+1. Set the endpoint, e.g. OpenTelemetry Collector:
+
     ```bash
-    $ export SIGNALFX_CONVENTION='OpenTelemetry'
+    export SIGNALFX_TRACE_AGENT_URL='http://<YourCollector>:9080/v1/trace'
     ```
-5. Set the endpoint, e.g. OpenTelemetry Collector:
+
+1. Optionally, enable trace injection in logs:
+
     ```bash
-    $ export SIGNALFX_TRACE_AGENT_URL='http://<YourCollector>:9080/v1/trace'
+    export SIGNALFX_LOGS_INJECTION=true
     ```
-6. Optionally, enable trace injection in logs:
+
+1. Optionally, create the default logging directory:
+
     ```bash
-    $ export SIGNALFX_LOGS_INJECTION=true
+    source /opt/signalfx/createLogPath.sh
     ```
-7. Optionally, create the default logging directory:
+
+1. Run your application:
+
     ```bash
-    $ source /opt/signalfx/createLogPath.sh
-    ```
-8. Run your application:
-    ```bash
-    $ dotnet run
+    dotnet run
     ```
 
 ### Windows
@@ -172,25 +184,35 @@ command session.
 1. Install the CLR Profiler using an installer file (`.msi` file) from the latest release.
 Choose the installer (x64 or x86) according to the architecture of the operating
 system where it will be running.
-2. Configure the required environment variables to enable the CLR Profiler:
+
+1. Configure the required environment variables to enable the CLR Profiler:
     - For .NET Framework applications:
+
     ```batch
     setx COR_PROFILER "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}" /m
     ```
+
    - For .NET Core applications:
+
    ```batch
    setx CORECLR_PROFILER "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}" /m
    ```
-3. Set the "service name" that better describes your application:
+
+1. Set the "service name" that better describes your application:
+
    ```batch
    setx SIGNALFX_SERVICE MyServiceName /m
    ```
-4. Set the endpoint, e.g. OpenTelemetry Collector that will forward
+
+1. Set the endpoint, e.g. OpenTelemetry Collector that will forward
 the trace data:
+
    ```batch
    setx SIGNALFX_TRACE_AGENT_URL http://localhost:9080/v1/trace /m
    ```
-5. Optionally, enable trace injection in logs:
+
+1. Optionally, enable trace injection in logs:
+
    ```batch
    setx SIGNALFX_LOGS_INJECTION true /m
    ```
@@ -198,43 +220,58 @@ the trace data:
 1. Enable instrumentation for the targeted application by setting
 the appropriate __CLR enable profiling__ environment variable.
 You can enable instrumentation at these levels:
- - For current command session
- - For a specific Windows Service
- - For a specific user
-The follow snippet describes how to enable instrumentation for
-the current command session according to the .NET runtime.
-To enable instrumentation at different levels, see
-[this](#enable-instrumentation-at-different-levels) section.
-   - For .NET Framework applications:
-   ```batch
-   set COR_ENABLE_PROFILING=1
-   ```
-   - For .NET Core applications:
-   ```batch
-   set CORECLR_ENABLE_PROFILING=1
-   ```
-8. Restart your application ensuring that all environment variables above are properly
+
+   - For current command session
+   - For a specific Windows Service
+   - For a specific user
+
+   The follow snippet describes how to enable instrumentation for
+   the current command session according to the .NET runtime.
+   To enable instrumentation at different levels, see
+   [this](#enable-instrumentation-at-different-levels) section.
+
+    - For .NET Framework applications:
+
+      ```batch
+      set COR_ENABLE_PROFILING=1
+      ```
+
+    - For .NET Core applications:
+
+      ```batch
+      set CORECLR_ENABLE_PROFILING=1
+      ```
+
+1. Restart your application ensuring that all environment variables above are properly
 configured. If you need to check the environment variables for a process use a tool
 like [Process Explorer](https://docs.microsoft.com/en-us/sysinternals/downloads/process-explorer).
 
 #### Enable instrumentation at different levels
 
 Enable instrumentation for a specific Windows service:
-   - For .NET Framework applications:
+
+- For .NET Framework applications:
+
    ```batch
    reg add HKLM\SYSTEM\CurrentControlSet\Services\<ServiceName>\Environment /v COR_ENABLE_PROFILING /d 1
    ```
-   - For .NET Core applications:
+
+- For .NET Core applications:
+
    ```batch
    reg add HKLM\SYSTEM\CurrentControlSet\Services\<ServiceName>\Environment /v CORECLR_ENABLE_PROFILING /d 1
    ```
 
 Enable instrumentation for a specific user:
-   - For .NET Framework applications:
+
+- For .NET Framework applications:
+
    ```batch
    setx /s %COMPUTERNAME% /u <[domain/]user> COR_ENABLE_PROFILING 1
    ```
-   - For .NET Core applications:
+
+- For .NET Core applications:
+
    ```batch
    setx /s %COMPUTERNAME% /u <[domain/]user> CORECLR_ENABLE_PROFILING 1
    ```
@@ -255,11 +292,14 @@ able to present a more detailed representation of the logic and functionality
 of your application, clients, and framework.
 
 1. Add the OpenTracing dependency to your project:
+
     ```xml
     <PackageReference Include="OpenTracing" Version="0.12.1" />
     ```
-2. Obtain the `OpenTracing.Util.GlobalTracer` instance and create spans that
+
+1. Obtain the `OpenTracing.Util.GlobalTracer` instance and create spans that
 automatically become child spans of any existing spans in the same context:
+
     ```csharp
     using OpenTracing;
     using OpenTracing.Util;
@@ -299,11 +339,12 @@ The proper binary needs to be selected when deploying to Linux, eg.: the default
 based on Debian and should use the `deb` package, see the [Linux](#Linux) setup section.
 
 If you are not sure what is the Linux distribution being used try the following commands:
+
 ```terminal
-$ lsb_release -a
-$ cat /etc/*release
-$ cat /etc/issue*
-$ cat /proc/version
+lsb_release -a
+cat /etc/*release
+cat /etc/issue*
+cat /proc/version
 ```
 
 ### High CPU usage
@@ -321,7 +362,7 @@ Follow the steps below to get the detailed logs from OpenTelemetry AutoInstrumen
 
 Set the environment variable `SIGNALFX_TRACE_DEBUG` to `true` before the instrumented process starts.
 By default, the library writes the log files under the below predefined locations.
-If needed, change the default location by updating the environment variable `SIGNALFX_TRACE_LOG_PATH` to an appropriate path. 
+If needed, change the default location by updating the environment variable `SIGNALFX_TRACE_LOG_PATH` to an appropriate path.
 On Linux, the default log location is `/var/log/signalfx/dotnet/`
 On Windows, the default log location is `%ProgramData%\SignalFx .NET Tracing\logs\`
 Compress the whole folder to capture the multiple log files and send the compressed folder to us.

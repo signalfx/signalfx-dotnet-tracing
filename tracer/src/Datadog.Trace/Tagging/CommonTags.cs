@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 namespace Datadog.Trace.Tagging
 {
     internal class CommonTags : TagsList
@@ -17,12 +19,18 @@ namespace Datadog.Trace.Tagging
         protected static readonly IProperty<string>[] CommonTagsProperties =
         {
             new Property<CommonTags, string>(Trace.Tags.Env, t => t.Environment, (t, v) => t.Environment = v),
-            new Property<CommonTags, string>(Trace.Tags.Version, t => t.Version, (t, v) => t.Version = v)
+            new Property<CommonTags, string>(Trace.Tags.Version, t => t.Version, (t, v) => t.Version = v),
+            new Property<CommonTags, string>(Trace.Tags.SignalFxVersion, t => t.SignalFxVersion, (t, v) => t.SignalFxVersion = v),
+            new Property<CommonTags, string>(Trace.Tags.SignalFxLibrary, t => t.SignalFxLibrary, (t, v) => t.SignalFxLibrary = v),
         };
 
         public string Environment { get; set; }
 
         public string Version { get; set; }
+
+        public string SignalFxVersion { get; set; }
+
+        public string SignalFxLibrary { get; set; }
 
         public double? SamplingPriority { get; set; }
 
