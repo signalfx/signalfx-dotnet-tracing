@@ -638,6 +638,7 @@ namespace Datadog.Trace.DiagnosticListeners
             var scope = tracer.StartActiveWithTags($"HTTP {httpMethod}", propagatedContext, tags: tags);
             scope.Span.LogicScope = HttpRequestInOperationName;
 
+            // TODO: investigate if can be simplified
             var remoteIp = httpContext?.Connection?.RemoteIpAddress?.ToString();
             scope.Span.DecorateWebServerSpan(resourceName, httpMethod, host, url, tags, tagsFromHeaders, remoteIp);
 
