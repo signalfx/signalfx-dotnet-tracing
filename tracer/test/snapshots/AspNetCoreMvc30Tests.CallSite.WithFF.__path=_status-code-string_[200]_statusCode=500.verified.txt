@@ -2,7 +2,8 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: aspnet_core_mvc.request,
+    Name: GET /status-code-string/{statuscode},
+    LogicScope: aspnet_core_mvc.request,
     Resource: GET /status-code-string/{statuscode},
     Service: Samples.AspNetCoreMvc30,
     Type: web,
@@ -12,7 +13,7 @@
       aspnet_core.controller: home,
       aspnet_core.route: status-code-string/{statuscode},
       component: aspnet_core,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       span.kind: server,
       version: 1.0.0
@@ -21,7 +22,8 @@
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: aspnet_core.request,
+    Name: GET /status-code-string/{statuscode},
+    LogicScope: aspnet_core.request,
     Resource: GET /status-code-string/{statuscode},
     Service: Samples.AspNetCoreMvc30,
     Type: web,
@@ -31,19 +33,20 @@
       aspnet_core.route: status-code-string/{statuscode},
       component: aspnet_core,
       datadog-header-tag: asp-net-core,
-      env: integration_tests,
-      error.msg: Input was not a status code,
-      error.stack: 
-System.Exception: Input was not a status code
-at Samples.AspNetCoreMvc.Controllers.HomeController.StatusCodeTestString(String input),
-      error.type: System.Exception,
+      deployment.environment: integration_tests,
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.request.headers.sample_correlation_identifier: 0000-0000-0000,
       http.status_code: 500,
       http.url: http://localhost:00000/status-code-string/%5B200%5D,
       language: dotnet,
+      net.peer.ip: 127.0.0.1,
       runtime-id: Guid_1,
+      sfx.error.kind: System.Exception,
+      sfx.error.message: Input was not a status code,
+      sfx.error.stack: 
+System.Exception: Input was not a status code
+at Samples.AspNetCoreMvc.Controllers.HomeController.StatusCodeTestString(String input),
       span.kind: server,
       version: 1.0.0
     },
