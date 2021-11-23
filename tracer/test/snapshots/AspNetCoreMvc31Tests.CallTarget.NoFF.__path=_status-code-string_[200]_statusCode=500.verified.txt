@@ -18,6 +18,7 @@
       http.status_code: 500,
       http.url: http://localhost:00000/status-code-string/%5B200%5D,
       language: dotnet,
+      net.peer.ip: 127.0.0.1,
       runtime-id: Guid_1,
       sfx.error.kind: System.Exception,
       sfx.error.message: Input was not a status code,

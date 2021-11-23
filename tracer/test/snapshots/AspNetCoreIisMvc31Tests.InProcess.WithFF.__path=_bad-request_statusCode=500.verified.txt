@@ -38,6 +38,7 @@
       http.status_code: 500,
       http.url: http://localhost:00000/bad-request,
       language: dotnet,
+      net.peer.ip: ::1,
       runtime-id: Guid_1,
       sfx.error.kind: System.Exception,
       sfx.error.message: This was a bad request.,

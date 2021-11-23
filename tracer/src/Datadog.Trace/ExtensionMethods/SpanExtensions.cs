@@ -67,7 +67,8 @@ namespace Datadog.Trace.ExtensionMethods
             string host,
             string httpUrl,
             WebTags tags,
-            IEnumerable<KeyValuePair<string, string>> tagsFromHeaders)
+            IEnumerable<KeyValuePair<string, string>> tagsFromHeaders,
+            string remoteIp = null)
         {
             span.Type = SpanTypes.Web;
             span.ResourceName = resourceName?.Trim();
@@ -75,6 +76,8 @@ namespace Datadog.Trace.ExtensionMethods
             tags.HttpMethod = method;
             tags.HttpRequestHeadersHost = host;
             tags.HttpUrl = httpUrl;
+
+            tags.PeerIp = remoteIp;
 
             foreach (KeyValuePair<string, string> kvp in tagsFromHeaders)
             {

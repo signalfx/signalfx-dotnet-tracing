@@ -469,14 +469,14 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                        .Replace("{area}", area)
                        .Replace("{controller}", controller)
                        .Replace("{action}", action);
-
                 span.DecorateWebServerSpan(
                     resourceName: resourceName,
                     method: method,
                     host: host,
                     httpUrl: rawUrl,
                     tags,
-                    headerTags);
+                    headerTags,
+                    HttpContext.Current?.Request.UserHostAddress);
 
                 span.LogicScope = OperationName;
                 span.OperationName = resourceName;

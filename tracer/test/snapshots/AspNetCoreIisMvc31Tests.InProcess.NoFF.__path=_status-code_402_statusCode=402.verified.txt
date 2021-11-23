@@ -16,6 +16,7 @@
       http.status_code: 402,
       http.url: http://localhost:00000/status-code/402,
       language: dotnet,
+      net.peer.ip: ::1,
       runtime-id: Guid_1,
       sfx.error.message: The HTTP response has status code 402.,
       span.kind: server,
