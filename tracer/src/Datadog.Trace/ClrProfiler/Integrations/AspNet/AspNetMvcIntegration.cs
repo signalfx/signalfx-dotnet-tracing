@@ -177,7 +177,8 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                         host: host,
                         httpUrl: url,
                         tags,
-                        tagsFromHeaders);
+                        tagsFromHeaders,
+                        httpContext.Request.UserHostAddress);
 
                     span.LogicScope = OperationName;
 

@@ -15,6 +15,7 @@ namespace Datadog.Trace.Tagging
                 new Property<WebTags, string>(Trace.Tags.HttpMethod, t => t.HttpMethod, (t, v) => t.HttpMethod = v),
                 new Property<WebTags, string>(Trace.Tags.HttpRequestHeadersHost, t => t.HttpRequestHeadersHost, (t, v) => t.HttpRequestHeadersHost = v),
                 new Property<WebTags, string>(Trace.Tags.HttpUrl, t => t.HttpUrl, (t, v) => t.HttpUrl = v),
+                new Property<WebTags, string>(Trace.Tags.Net.PeerIP, t => t.PeerIp, (t, v) => t.PeerIp = v),
                 new ReadOnlyProperty<WebTags, string>(Trace.Tags.Language, t => t.Language));
 
         public override string SpanKind => SpanKinds.Server;
@@ -24,6 +25,8 @@ namespace Datadog.Trace.Tagging
         public string HttpRequestHeadersHost { get; set; }
 
         public string HttpUrl { get; set; }
+
+        public string PeerIp { get; set; }
 
         public string Language => TracerConstants.Language;
 

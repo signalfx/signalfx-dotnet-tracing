@@ -126,7 +126,8 @@ namespace Datadog.Trace.PlatformHelpers
             var scope = tracer.StartActiveWithTags($"HTTP {httpMethod}", propagatedContext, tags: tags);
             scope.Span.LogicScope = _requestInOperationName;
 
-            scope.Span.DecorateWebServerSpan(resourceName, httpMethod, host, url, tags, tagsFromHeaders);
+            var remoteIp = httpContext?.Connection?.RemoteIpAddress?.ToString();
+            scope.Span.DecorateWebServerSpan(resourceName, httpMethod, host, url, tags, tagsFromHeaders, remoteIp);
 
             tags.SetAnalyticsSampleRate(_integrationId, tracer.Settings, enabledWithGlobalSetting: true);
 

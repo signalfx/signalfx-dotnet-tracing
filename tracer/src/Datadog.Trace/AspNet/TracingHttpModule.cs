@@ -128,7 +128,7 @@ namespace Datadog.Trace.AspNet
                 var tags = new WebTags();
                 scope = tracer.StartActiveWithTags(httpMethod, propagatedContext, tags: tags);
                 // Leave resourceName blank for now - we'll update it in OnEndRequest
-                scope.Span.DecorateWebServerSpan(resourceName: null, httpMethod, host, url, tags, tagsFromHeaders);
+                scope.Span.DecorateWebServerSpan(resourceName: null, httpMethod, host, url, tags, tagsFromHeaders, httpRequest.UserHostAddress);
                 scope.Span.LogicScope = _requestOperationName;
 
                 tags.SetAnalyticsSampleRate(IntegrationId, tracer.Settings, enabledWithGlobalSetting: true);
