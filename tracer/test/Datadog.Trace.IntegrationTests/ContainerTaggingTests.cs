@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Threading.Tasks;
 using Datadog.Trace.Configuration;
@@ -36,7 +38,11 @@ namespace Datadog.Trace.IntegrationTests
                     actualContainerId = args.Value.Request.Headers[AgentHttpHeaderNames.ContainerId];
                 };
 
-                var settings = new TracerSettings { AgentUri = new Uri($"http://localhost:{agent.Port}") };
+                var settings = new TracerSettings
+                {
+                    AgentUri = new Uri($"http://localhost:{agent.Port}"),
+                    Exporter = ExporterType.DatadogAgent
+                };
                 var tracer = new Tracer(settings);
 
                 using (var scope = tracer.StartActive("operationName"))

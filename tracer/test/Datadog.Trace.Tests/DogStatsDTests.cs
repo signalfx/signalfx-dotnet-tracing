@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Immutable;
 using System.Linq;
@@ -109,6 +111,7 @@ namespace Datadog.Trace.Tests
                     AgentUri = new Uri($"http://127.0.0.1:{agent.Port}"),
                     TracerMetricsEnabled = tracerMetricsEnabled,
                     StartupDiagnosticLogEnabled = false,
+                    Exporter = ExporterType.DatadogAgent
                 };
 
                 var tracer = new Tracer(settings, plugins: null, agentWriter: null, sampler: null, scopeManager: null, statsd);

@@ -13,11 +13,11 @@ namespace Datadog.Trace.Configuration
         /// <summary>
         /// The Datadog Agent exporter.
         /// </summary>
-        DatadogAgent = Default,
+        DatadogAgent,
 
         /// <summary>
         /// The Zipkin exporter.
         /// </summary>
-        Zipkin
+        Zipkin = Default,
     }
 }

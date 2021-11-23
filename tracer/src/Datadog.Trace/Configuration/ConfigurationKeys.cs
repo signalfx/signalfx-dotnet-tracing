@@ -343,7 +343,7 @@ namespace Datadog.Trace.Configuration
         /// <summary>
         /// Configuration key for the exporter to be used. The Tracer uses it to encode and
         /// dispatch traces.
-        /// Default is <c>"DatadogAgent"</c>.
+        /// Default is <c>"Zipkin"</c>.
         /// </summary>
         /// <seealso cref="TracerSettings.Exporter"/>
         public const string Exporter = "SIGNALFX_EXPORTER";

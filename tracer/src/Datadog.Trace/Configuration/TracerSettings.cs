@@ -414,7 +414,7 @@ namespace Datadog.Trace.Configuration
         /// <summary>
         /// Gets or sets the name of the exporter to be used. The Tracer uses it to encode and
         /// dispatch traces.
-        /// Default is <c>"DatadogAgent"</c>.
+        /// Default is <c>"Zipkin"</c>.
         /// <seealso cref="ConfigurationKeys.Exporter"/>
         /// </summary>
         public ExporterType Exporter { get; set; }
