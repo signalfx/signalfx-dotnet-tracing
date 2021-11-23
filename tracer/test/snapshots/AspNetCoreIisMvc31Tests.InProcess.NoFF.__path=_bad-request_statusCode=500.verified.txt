@@ -23,6 +23,8 @@
       sfx.error.stack: 
 System.Exception: This was a bad request.
 at Samples.AspNetCoreMvc.Controllers.HomeController.ThrowException(),
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: 0.0.1.0,
       span.kind: server,
       version: 1.0.0
     },

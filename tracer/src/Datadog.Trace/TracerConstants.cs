@@ -3,11 +3,14 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 namespace Datadog.Trace
 {
     internal static class TracerConstants
     {
         public const string Language = "dotnet";
+        public const string Library = "dotnet-tracing";
 
         /// <summary>
         /// 2^63-1
