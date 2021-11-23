@@ -159,6 +159,10 @@ namespace Samples.HttpMessageHandler
             {
                 context.Response.StatusCode = 502;
             }
+            else if (context.Request.RawUrl.Contains("/HttpClientErrorCode"))
+            {
+                context.Response.StatusCode = 400;
+            }
 
             context.Response.OutputStream.Write(responseBytes, 0, responseBytes.Length);
 
