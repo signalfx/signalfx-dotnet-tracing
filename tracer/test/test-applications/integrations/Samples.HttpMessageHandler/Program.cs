@@ -155,9 +155,13 @@ namespace Samples.HttpMessageHandler
             byte[] responseBytes = Utf8.GetBytes(ResponseContent);
             context.Response.ContentEncoding = Utf8;
             context.Response.ContentLength64 = responseBytes.Length;
-            if (context.Request.RawUrl == "/Samples.HttpMessageHandler/HttpErrorCode")
+            if (context.Request.RawUrl.Contains("/HttpErrorCode"))
             {
                 context.Response.StatusCode = 502;
+            }
+            else if (context.Request.RawUrl.Contains("/HttpClientErrorCode"))
+            {
+                context.Response.StatusCode = 400;
             }
 
             context.Response.OutputStream.Write(responseBytes, 0, responseBytes.Length);

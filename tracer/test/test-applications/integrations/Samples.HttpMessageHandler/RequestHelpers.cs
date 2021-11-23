@@ -159,9 +159,15 @@ namespace Samples.HttpMessageHandler
                         Console.WriteLine("Received response for client.SendAsync(HttpRequestMessage, HttpCompletionOption, CancellationToken)");
                     }
 
-                    using (Tracer.Instance.StartActive("ErrorSpanBelow"))
+                    using (Tracer.Instance.StartActive("Send.Get.HttpErrorCode"))
                     {
                         client.GetAsync($"{url}HttpErrorCode").Wait();
+                        Console.WriteLine("Received response for client.GetAsync Error Span");
+                    }
+
+                    using (Tracer.Instance.StartActive("Send.Get.HttpClientErrorCode"))
+                    {
+                        client.GetAsync($"{url}HttpClientErrorCode").Wait();
                         Console.WriteLine("Received response for client.GetAsync Error Span");
                     }
                 }
@@ -262,9 +268,15 @@ namespace Samples.HttpMessageHandler
                     Console.WriteLine("Received response for PUT client.Send(HttpRequestMessage, HttpCompletionOption, CancellationToken)");
                 }
 
-                using (Tracer.Instance.StartActive("ErrorSpanBelow"))
+                using (Tracer.Instance.StartActive("Send.Get.HttpErrorCode"))
                 {
                     client.Send(new HttpRequestMessage(HttpMethod.Get, $"{url}HttpErrorCode"));
+                    Console.WriteLine("Received response for client.Get Error Span");
+                }
+
+                using (Tracer.Instance.StartActive("Send.Get.HttpClientErrorCode"))
+                {
+                    client.Send(new HttpRequestMessage(HttpMethod.Get, $"{url}HttpClientErrorCode"));
                     Console.WriteLine("Received response for client.Get Error Span");
                 }
             }

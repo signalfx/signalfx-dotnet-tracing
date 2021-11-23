@@ -79,10 +79,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     Assert.Equal("HttpMessageHandler", span.Tags[Tags.InstrumentationName]);
                     Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
 
-                    if (span.Tags[Tags.HttpStatusCode] == "502")
-                    {
-                        Assert.Equal(1, span.Error);
-                    }
+                    var httpStatus = span.Tags[Tags.HttpStatusCode];
+                    var expectedError = httpStatus == "502" || httpStatus == "400" ? 1 : 0;
+                    Assert.Equal(expectedError, span.Error);
                 }
 
                 PropagationTestHelpers.AssertPropagationEnabled(spans.First(), processResult);
@@ -118,6 +117,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
             // net4x doesn't have patch
             var spansPerHttpClient = EnvironmentHelper.IsCoreClr() ? 35 : 31;
+
+            spansPerHttpClient++; // SignalFx adds Send.Get.HttpClientErrorCode span
 
             var expectedSpanCount = spansPerHttpClient * 2; // default HttpClient and CustomHttpClientHandler
 
@@ -155,6 +156,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             }
 
             var spansPerHttpClient = 21;
+
+            spansPerHttpClient++; // SignalFx adds Send.Get.HttpClientErrorCode span
 
             var expectedSpanCount = spansPerHttpClient * 2; // default HttpClient and CustomHttpClientHandler
 
