@@ -19,6 +19,7 @@
       http.status_code: 200,
       http.url: http://localhost:00000/Admin/Home,
       language: dotnet,
+      net.peer.ip: ::1,
       span.kind: server,
       version: 1.0.0
     }
@@ -38,6 +39,7 @@
       http.status_code: 200,
       http.url: http://localhost:00000/Admin/Home,
       language: dotnet,
+      net.peer.ip: ::1,
       runtime-id: Guid_1,
       span.kind: server,
       version: 1.0.0

@@ -10,17 +10,18 @@
     Error: 1,
     Tags: {
       deployment.environment: integration_tests,
-      error.msg: Oops, it broke.,
-      error.stack: 
-System.Exception: Oops, it broke.
-at Samples.AspNetMvc4.Controllers.HomeController.BadRequest(),
-      error.type: System.Exception,
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
       http.url: http://localhost:00000/Home/BadRequest,
       language: dotnet,
+      net.peer.ip: ::1,
       runtime-id: Guid_1,
+      sfx.error.kind: System.Exception,
+      sfx.error.message: Oops, it broke.,
+      sfx.error.stack: 
+System.Exception: Oops, it broke.
+at Samples.AspNetMvc4.Controllers.HomeController.BadRequest(),
       span.kind: server,
       version: 1.0.0
     },
@@ -33,9 +34,9 @@ at Samples.AspNetMvc4.Controllers.HomeController.BadRequest(),
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: GET /home/badrequest,
+    Name: GET home.badrequest,
     LogicScope: aspnet-mvc.request,
-    Resource: GET /home/badrequest,
+    Resource: GET home.badrequest,
     Service: sample,
     Type: web,
     ParentId: Id_2,
@@ -45,16 +46,17 @@ at Samples.AspNetMvc4.Controllers.HomeController.BadRequest(),
       aspnet.controller: home,
       aspnet.route: {controller}/{action}/{id},
       deployment.environment: integration_tests,
-      error.msg: Oops, it broke.,
-      error.stack: 
-System.Exception: Oops, it broke.
-at Samples.AspNetMvc4.Controllers.HomeController.BadRequest(),
-      error.type: System.Exception,
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
       http.url: http://localhost:00000/Home/BadRequest,
       language: dotnet,
+      net.peer.ip: ::1,
+      sfx.error.kind: System.Exception,
+      sfx.error.message: Oops, it broke.,
+      sfx.error.stack: 
+System.Exception: Oops, it broke.
+at Samples.AspNetMvc4.Controllers.HomeController.BadRequest(),
       span.kind: server,
       version: 1.0.0
     }
