@@ -492,6 +492,12 @@ namespace Datadog.Trace
                 spanContext.TraceContext.AddSpan(span);
             }
 
+            if (span.IsRootSpan)
+            {
+                span.SetTag(Tags.SignalFxLibrary, TracerConstants.Library);
+                span.SetTag(Tags.SignalFxVersion, TracerConstants.AssemblyVersion);
+            }
+
             return span;
         }
 

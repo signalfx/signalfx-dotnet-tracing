@@ -90,6 +90,12 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.CI
                         // check the version
                         AssertTargetSpanEqual(targetSpan, "version", "1.0.0");
 
+                        // check the SingalFx library name
+                        AssertTargetSpanEqual(targetSpan, "signalfx.tracing.library", "dotnet-tracing");
+
+                        // check the SingalFx library version
+                        AssertTargetSpanEqual(targetSpan, "signalfx.tracing.version", "0.0.1.0");
+
                         // checks the origin tag
                         CheckOriginTag(targetSpan);
 
