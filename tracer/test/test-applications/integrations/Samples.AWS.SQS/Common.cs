@@ -23,11 +23,27 @@ namespace Samples.AWS.SQS
                     dictSpanContext = JsonConvert.DeserializeObject<Dictionary<string, string>>(jsonSpanContext);
                 }
 
-                if (dictSpanContext[DDHttpHeaderNames.ParentId] is null ||
+                if (dictSpanContext.TryGetValue(DDHttpHeaderNames.ParentId, out var parentId))
+                {
+                    if (parentId is null ||
                     !ulong.TryParse(dictSpanContext[DDHttpHeaderNames.TraceId], out ulong result) ||
                     result != Tracer.Instance.ActiveScope.Span.TraceId.Lower)
+                    {
+                        throw new Exception($"The span context was not injected into the message properly. parent-id: {dictSpanContext[DDHttpHeaderNames.ParentId]}, trace-id: {dictSpanContext[DDHttpHeaderNames.TraceId]}, active trace-id: {Tracer.Instance.ActiveScope.Span.TraceId}");
+                    }
+                }
+                else if (dictSpanContext.TryGetValue(B3HttpHeaderNames.B3ParentId, out var parentIdB3))
                 {
-                    throw new Exception($"The span context was not injected into the message properly. parent-id: {dictSpanContext[DDHttpHeaderNames.ParentId]}, trace-id: {dictSpanContext[DDHttpHeaderNames.TraceId]}, active trace-id: {Tracer.Instance.ActiveScope.Span.TraceId}");
+                    if (parentIdB3 is null ||
+                    !ulong.TryParse(dictSpanContext[B3HttpHeaderNames.B3TraceId], out ulong resultB3) ||
+                    resultB3 != Tracer.Instance.ActiveScope.Span.TraceId.Lower)
+                    {
+                        throw new Exception($"The span context was not injected into the message properly. parent-id: {dictSpanContext[B3HttpHeaderNames.B3ParentId]}, trace-id: {dictSpanContext[B3HttpHeaderNames.B3TraceId]}, active trace-id: {Tracer.Instance.ActiveScope.Span.TraceId}");
+                    }
+                }
+                else
+                {
+                    throw new NotSupportedException("There is no data for Datadog nor B3 propagator");
                 }
             }
         }
