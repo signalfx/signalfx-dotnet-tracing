@@ -358,7 +358,7 @@ namespace Datadog.Trace.Configuration
 
         /// <summary>
         /// Configuration key for the propagators to be used.
-        /// Default is <c>Datadog</c>.
+        /// Default is <c>B3</c>.
         /// Supports multiple values separated with comma.
         /// <seealso cref="TracerSettings.Propagators"/>
         /// </summary>
