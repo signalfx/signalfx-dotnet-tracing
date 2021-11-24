@@ -11,7 +11,8 @@
     * Run `git cherry-pick --continue` every time that a conflict is resolved
 5. Build and fix any integration issues:
     * New usages of env vars, reg ex: ^[^#].*[^A-Z]DD_
-    * Old profiler ID: `846F5F1C-F9AE-4B07-969E-05C26BC060D8` (happens in launch.settings for new apps) use `B4C89B0F-9908-4F73-9F59-0D77C5A06874` instead.
+    * Upstream CLSID_CorProfiler: `846F5F1C-F9AE-4B07-969E-05C26BC060D8` (happens in launch.settings for new apps) use `B4C89B0F-9908-4F73-9F59-0D77C5A06874` instead.
+    * Upstream CLSID_New_CorProfiler: `50DA5EED-F1ED-B00B-1055-5AFE55A1ADE5` use `0F171A24-3497-4B05-AE6D-B6B313FBF83B` instead.
     * Old PublicKeyToken: `def86d061d0d2eeb` use `e43a27c2023d388a` instead.
     * Old log path: `/var/log/datadog` use `/var/log/signalfx` instead.
     * Run unit tests, commit any needed fixes, repeat until passing unit tests
