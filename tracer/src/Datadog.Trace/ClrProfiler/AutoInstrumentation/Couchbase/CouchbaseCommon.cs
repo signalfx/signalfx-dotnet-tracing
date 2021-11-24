@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using Datadog.Trace.ClrProfiler.CallTarget;
 using Datadog.Trace.Configuration;
@@ -113,7 +115,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Couchbase
 
             if (!result.Success)
             {
-                span.Error = true;
+                span.Status = SpanStatus.Error;
                 if (!string.IsNullOrEmpty(result.Message))
                 {
                     span.SetTag(Tags.ErrorMsg, result.Message);

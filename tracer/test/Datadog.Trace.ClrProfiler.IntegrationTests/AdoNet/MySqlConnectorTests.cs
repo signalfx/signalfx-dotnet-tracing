@@ -5,6 +5,7 @@
 
 // Modified by Splunk Inc.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.Configuration;

@@ -3,9 +3,13 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
+using System.Data.Common;
 using Datadog.Trace.ClrProfiler.AutoInstrumentation.AdoNet;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.TestHelpers;
@@ -53,6 +57,23 @@ namespace Datadog.Trace.ClrProfiler.Managed.Tests
             // Create scope
             using var scope = CreateDbCommandScope(tracer, command);
             Assert.Null(scope);
+        }
+
+        [Fact]
+        public void CreateDbCommandScope_SetsDbStatementBasedOnCommandText()
+        {
+            // Set up tracer
+            var tracerSettings = new TracerSettings();
+            // TODO PK: use non-obsolete code
+#pragma warning disable CS0618 // Type or member is obsolete
+            var tracer = new Tracer(tracerSettings);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+            // Create scope
+            using (var scope = CreateDbCommandScope(tracer, new CustomDbCommand()))
+            {
+                Assert.Equal("test_command", scope.Span.Tags.GetTag(Tags.DbStatement));
+            }
         }
 
         [Theory]
@@ -127,6 +148,55 @@ namespace Datadog.Trace.ClrProfiler.Managed.Tests
             return (Scope)typeof(DbScopeFactory.Cache<>).MakeGenericType(command.GetType())
                                                         .GetMethod(methodName)
                                                        ?.Invoke(null, arguments);
+        }
+
+        private class CustomDbCommand : DbCommand
+        {
+            public override string CommandText { get => "test_command"; set => throw new NotImplementedException(); }
+
+            public override int CommandTimeout { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+            public override CommandType CommandType { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+            public override bool DesignTimeVisible { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+            public override UpdateRowSource UpdatedRowSource { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+            protected override DbConnection DbConnection { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+            protected override DbParameterCollection DbParameterCollection => throw new NotImplementedException();
+
+            protected override DbTransaction DbTransaction { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+            public override void Cancel()
+            {
+                throw new NotImplementedException();
+            }
+
+            public override int ExecuteNonQuery()
+            {
+                throw new NotImplementedException();
+            }
+
+            public override object ExecuteScalar()
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void Prepare()
+            {
+                throw new NotImplementedException();
+            }
+
+            protected override DbParameter CreateDbParameter()
+            {
+                throw new NotImplementedException();
+            }
+
+            protected override DbDataReader ExecuteDbDataReader(CommandBehavior behavior)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }
