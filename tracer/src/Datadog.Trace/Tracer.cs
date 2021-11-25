@@ -126,12 +126,12 @@ namespace Datadog.Trace
 
             switch (Settings.Convention)
             {
-                case ConventionType.OpenTelemetry:
-                    TraceIdConvention = new OtelTraceIdConvention();
-                    break;
                 case ConventionType.Datadog:
-                default:
                     TraceIdConvention = new DatadogTraceIdConvention();
+                    break;
+                case ConventionType.OpenTelemetry:
+                default:
+                    TraceIdConvention = new OtelTraceIdConvention();
                     break;
             }
 
