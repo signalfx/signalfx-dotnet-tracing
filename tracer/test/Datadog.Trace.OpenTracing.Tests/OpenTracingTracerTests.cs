@@ -30,7 +30,9 @@ namespace Datadog.Trace.OpenTracing.Tests
             var settings = new TracerSettings
             {
                 // force to be a Datadog for unit tests purposes, default is B3
-                Propagators = new System.Collections.Generic.HashSet<string> { PropagatorTypes.Datadog }
+                Propagators = new System.Collections.Generic.HashSet<string> { PropagatorTypes.Datadog },
+                // force to be a Datadog for unit tests purposes, default is OpenTelemetry
+                Convention = ConventionType.Datadog
             };
             var writerMock = new Mock<IAgentWriter>();
             var samplerMock = new Mock<ISampler>();
