@@ -23,17 +23,18 @@
     Error: 1,
     Tags: {
       deployment.environment: integration_tests,
-      error.msg: Source: TerminatingQuerySuccessMessageHandler. Error: Query param ts was set to a non-true value,
-      error.stack: 
-System.ArgumentException: Source: TerminatingQuerySuccessMessageHandler. Error: Query param ts was set to a non-true value
-at Samples.AspNetMvc5.Handlers.TerminatingQuerySuccessMessageHandler.SendAsync(HttpRequestMessage request, CancellationToken cancellationToken),
-      error.type: System.ArgumentException,
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 500,
       http.url: http://localhost:00000/handler-api/api?ps=true&ts=false,
       language: dotnet,
+      net.peer.ip: ::1,
       runtime-id: Guid_1,
+      sfx.error.kind: System.ArgumentException,
+      sfx.error.message: Source: TerminatingQuerySuccessMessageHandler. Error: Query param ts was set to a non-true value,
+      sfx.error.stack: 
+System.ArgumentException: Source: TerminatingQuerySuccessMessageHandler. Error: Query param ts was set to a non-true value
+at Samples.AspNetMvc5.Handlers.TerminatingQuerySuccessMessageHandler.SendAsync(HttpRequestMessage request, CancellationToken cancellationToken),
       span.kind: server,
       version: 1.0.0
     },

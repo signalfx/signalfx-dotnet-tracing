@@ -2,7 +2,7 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: GET /not-found,
+    Name: HTTP GET,
     LogicScope: aspnet_core.request,
     Resource: GET /not-found,
     Service: Samples.AspNetCoreMvc30,
@@ -18,6 +18,7 @@
       http.status_code: 404,
       http.url: http://localhost:00000/not-found,
       language: dotnet,
+      net.peer.ip: 127.0.0.1,
       runtime-id: Guid_1,
       span.kind: server,
       version: 1.0.0

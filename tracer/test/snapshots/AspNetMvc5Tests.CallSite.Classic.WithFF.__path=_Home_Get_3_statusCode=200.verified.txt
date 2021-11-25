@@ -2,9 +2,9 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: GET /home/get/?,
+    Name: GET home.get,
     LogicScope: aspnet-mvc.request,
-    Resource: GET /home/get/?,
+    Resource: GET home.get,
     Service: sample,
     Type: web,
     ParentId: Id_3,
@@ -18,6 +18,7 @@
       http.status_code: 200,
       http.url: http://localhost:00000/Home/Get/3,
       language: dotnet,
+      net.peer.ip: ::1,
       span.kind: server,
       version: 1.0.0
     }
@@ -37,6 +38,7 @@
       http.status_code: 200,
       http.url: http://localhost:00000/Home/Get/3,
       language: dotnet,
+      net.peer.ip: ::1,
       runtime-id: Guid_1,
       span.kind: server,
       version: 1.0.0
