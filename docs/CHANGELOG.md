@@ -28,9 +28,7 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 - Adopt [OpenTelemetry Trace Semantic Conventions](https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions)
   in most of the instrumentations.
 
-[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.15...HEAD)
-
-[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.15..HEAD)
+---
 
 ## [Release 0.1.15](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.1.15)
 
@@ -42,9 +40,7 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 - Add option to disable CancelKeyPress event subscription (`SIGNALFX_DISABLE_CONSOLE_CTRL_HANDLE`).
 
-[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.14...v0.1.15)
-
-[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.14..v0.1.15)
+---
 
 ## [Release 0.1.14](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.1.14)
 
@@ -57,9 +53,7 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 - Remove "PreRelease" from AZ site extension.
 
-[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.13...v0.1.14)
-
-[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.13..v0.1.14)
+---
 
 ## [Release 0.1.13](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.1.13)
 
@@ -71,9 +65,7 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 - Added Server-Timing header to ASP.NET on IIS.
 - Added RabbitMQ instrumentation.
 
-[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.12...v0.1.13)
-
-[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.12..v0.1.13)
+---
 
 ## [Release 0.1.12](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.1.12)
 
@@ -83,9 +75,7 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 - Added Confluent.Kafka instrumentation for IConsumer.Consume, IProducer.Produce, and IProducer.ProduceAsync.
 - New instrumentations for SqlCommand: ExecuteXmlReader and ExecuteXmlReaderAsync methods.
 
-[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.11...v0.1.12)
-
-[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.11..v0.1.12)
+---
 
 ## [Release 0.1.11](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.1.11)
 
@@ -94,10 +84,6 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 - Optimized log injection for NLog 4.6+.
 - Optimized B3 context propagation.
 - Other optimizations: default sampler and span Id allocation.
-
-[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.10...v0.1.11)
-
-[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.10..v0.1.11)
 
 ---
 
