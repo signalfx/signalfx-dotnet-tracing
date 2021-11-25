@@ -148,7 +148,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 var versionRegex = string.Format(test.RegexFormat, versionProperty, @"""1.0.0""");
                 var envRegex = string.Format(test.RegexFormat, envProperty, @"""integration_tests""");
                 var serviceRegex = string.Format(test.RegexFormat, serviceProperty, @$"""{EnvironmentHelper.FullSampleName}""");
-                var traceIdRegex = string.Format(test.RegexFormat, traceIdProperty, @"("")?(\d\d+)(?(1)\1|)"); // Match a string of digits or string of digits surrounded by double quotes. See https://stackoverflow.com/a/3569031
+                var traceIdRegex = string.Format(test.RegexFormat, traceIdProperty, @"("")?([0-9a-f]{2,})(?(1)\1|)"); // Match a string of hexadecimal or decimal signs or string of hexadecimal or decimal signs surrounded by double quotes. See https://stackoverflow.com/a/3569031
                 var spanIdRegex = string.Format(test.RegexFormat, spanIdProperty, @"("")?(\d\d+)(?(1)\1|)"); // Match a string of digits or string of digits surrounded by double quotes. See https://stackoverflow.com/a/3569031
 
                 foreach (var log in tracedLogs)
