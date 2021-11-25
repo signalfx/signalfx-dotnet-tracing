@@ -107,6 +107,23 @@ namespace Datadog.Trace.Configuration
         public const string FileLogEnabled = "SIGNALFX_FILE_LOG_ENABLED";
 
         /// <summary>
+        /// Gets a value indicating whether stdout log is enabled.
+        /// Default is <c>false</c>.
+        /// </summary>
+        /// <remarks>
+        /// Not exposed via <see cref="TracerSettings"/> since the logger
+        /// is created before it is set.
+        /// </remarks>
+        /// <seealso cref="GlobalSettings.StdoutLogEnabled"/>
+        public const string StdoutLogEnabled = "SIGNALFX_STDOUT_LOG_ENABLED";
+
+        /// <summary>
+        /// Allows to override the default output template used with stdout logging.
+        /// It is ignored if stdout log is disabled.
+        /// </summary>
+        public const string StdoutLogTemplate = "SIGNALFX_STDOUT_LOG_TEMPLATE";
+
+        /// <summary>
         /// Configuration key for a list of integrations to disable. All other integrations remain enabled.
         /// Default is empty (all integrations are enabled).
         /// Supports multiple values separated with comma.

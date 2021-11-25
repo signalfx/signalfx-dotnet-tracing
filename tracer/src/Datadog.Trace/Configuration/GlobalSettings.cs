@@ -42,6 +42,8 @@ namespace Datadog.Trace.Configuration
 
             FileLogEnabled = source?.GetBool(ConfigurationKeys.FileLogEnabled) ?? true;
 
+            StdoutLogEnabled = source?.GetBool(ConfigurationKeys.StdoutLogEnabled) ?? false;
+
             if (TryLoadPluginJsonConfigurationFile(source, out JsonConfigurationSource jsonConfigurationSource))
             {
                 PluginsConfiguration = jsonConfigurationSource;
@@ -62,6 +64,13 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="ConfigurationKeys.FileLogEnabled"/>
         public bool FileLogEnabled { get; private set; }
+
+        /// <summary>
+        /// Gets a value indicating whether stdout log is enabled.
+        /// Default is <c>false</c>.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.StdoutLogEnabled"/>
+        public bool StdoutLogEnabled { get; private set; }
 
         /// <summary>
         /// Gets or sets the global settings instance.
