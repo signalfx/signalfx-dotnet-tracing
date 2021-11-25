@@ -429,7 +429,7 @@ namespace Datadog.Trace.Configuration
 
         /// <summary>
         /// Gets or sets the propagators be used.
-        /// Default is <c>Datadog</c>
+        /// Default is <c>B3</c>
         /// <seealso cref="ConfigurationKeys.Propagators"/>
         /// </summary>
         public HashSet<string> Propagators { get; set; }
@@ -762,9 +762,7 @@ namespace Datadog.Trace.Configuration
 
             if (!propagators.Any())
             {
-                // TODO: Default to W3C (be aware of integration tests)
-                // see more: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/context/api-propagators.md#global-propagators
-                return new HashSet<string>() { PropagatorTypes.Datadog };
+                return new HashSet<string>() { PropagatorTypes.B3 };
             }
 
             return new HashSet<string>(propagators);

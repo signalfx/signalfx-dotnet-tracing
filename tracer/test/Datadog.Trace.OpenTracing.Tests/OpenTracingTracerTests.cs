@@ -3,11 +3,14 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Datadog.Trace.Agent;
 using Datadog.Trace.Configuration;
+using Datadog.Trace.Configuration.Types;
 using Datadog.Trace.Propagation;
 using Datadog.Trace.Sampling;
 using Datadog.Trace.TestHelpers;
@@ -24,7 +27,11 @@ namespace Datadog.Trace.OpenTracing.Tests
 
         public OpenTracingTracerTests()
         {
-            var settings = new TracerSettings();
+            var settings = new TracerSettings
+            {
+                // force to be a Datadog for unit tests purposes, default is B3
+                Propagators = new System.Collections.Generic.HashSet<string> { PropagatorTypes.Datadog }
+            };
             var writerMock = new Mock<IAgentWriter>();
             var samplerMock = new Mock<ISampler>();
 
