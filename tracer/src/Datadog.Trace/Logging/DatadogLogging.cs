@@ -70,21 +70,30 @@ namespace Datadog.Trace.Logging
                 }
 
                 var domainMetadata = DomainMetadata.Instance;
-
-                // Ends in a dash because of the date postfix
-                var managedLogPath = Path.Combine(logDirectory, $"dotnet-tracer-managed-{domainMetadata.ProcessName}-.log");
-
                 var loggerConfiguration =
                     new LoggerConfiguration()
                        .Enrich.FromLogContext()
-                       .MinimumLevel.ControlledBy(LoggingLevelSwitch)
-                       .WriteTo.File(
+                       .MinimumLevel.ControlledBy(LoggingLevelSwitch);
+
+                if (GlobalSettings.Source.FileLogEnabled)
+                {
+                    // Ends in a dash because of the date postfix
+                    var managedLogPath = Path.Combine(logDirectory, $"dotnet-tracer-managed-{domainMetadata.ProcessName}-.log");
+
+                    loggerConfiguration = loggerConfiguration
+                        .WriteTo.File(
                             managedLogPath,
                             outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}{Properties}{NewLine}",
                             rollingInterval: RollingInterval.Day,
                             rollOnFileSizeLimit: true,
                             fileSizeLimitBytes: MaxLogFileSize,
                             shared: true);
+                }
+                else
+                {
+                    loggerConfiguration = loggerConfiguration
+                        .WriteTo.Sink<NullSink>();
+                }
 
                 try
                 {

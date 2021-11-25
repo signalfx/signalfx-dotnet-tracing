@@ -96,6 +96,17 @@ namespace Datadog.Trace.Configuration
         public const string DebugEnabled = "SIGNALFX_TRACE_DEBUG";
 
         /// <summary>
+        /// Gets a value indicating whether file log is enabled.
+        /// Default is <c>true</c>.
+        /// </summary>
+        /// <remarks>
+        /// Not exposed via <see cref="TracerSettings"/> since the logger
+        /// is created before it is set.
+        /// </remarks>
+        /// <seealso cref="GlobalSettings.FileLogEnabled"/>
+        public const string FileLogEnabled = "SIGNALFX_FILE_LOG_ENABLED";
+
+        /// <summary>
         /// Configuration key for a list of integrations to disable. All other integrations remain enabled.
         /// Default is empty (all integrations are enabled).
         /// Supports multiple values separated with comma.
