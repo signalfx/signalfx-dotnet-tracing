@@ -33,6 +33,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     prependSamplesToAppName: false),
                 output)
         {
+            SetEnvironmentVariable("SIGNALFX_CONVENTION", "Datadog");
         }
 
         public enum TracedLogTypes
