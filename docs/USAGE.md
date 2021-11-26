@@ -52,6 +52,9 @@ Use these environment variables to configure the tracing library:
 | `SIGNALFX_TRACE_AGENT_URL`, `SIGNALFX_ENDPOINT_URL` | The URL to where trace exporters send traces. | `http://localhost:8126` |
 | `SIGNALFX_TAGS` | Comma-separated list of key-value pairs to specify global span tags. For example: `"key1:val1,key2:val2"` |  |
 | `SIGNALFX_LOGS_INJECTION` | Enable to inject trace IDs, span IDs, service name and environment into logs. This requires a compatible logger or manual configuration. | `false` |
+| `SIGNALFX_STDOUT_LOG_ENABLED` | `false` | Enables `stdout` logging. This is disabled by default. |
+| `SIGNALFX_STDOUT_LOG_TEMPLATE` | `"[{Level:u3}] {Message:lj} {NewLine}{Exception}{NewLine}"` | Configures `stdout` log template. |
+| `SIGNALFX_FILE_LOG_ENABLED` | `true` | Enable file logging. This is enabled by default. |
 | `SIGNALFX_MAX_LOGFILE_SIZE` | The maximum size for tracer log files, in bytes. | `10 MB` |
 | `SIGNALFX_TRACE_LOG_PATH` | The path of the profiler log file. | Linux: `/var/log/signalfx/dotnet/dotnet-profiler.log`<br>Windows: `%ProgramData%"\SignalFx .NET Tracing\logs\dotnet-profiler.log` |
 | `SIGNALFX_DIAGNOSTIC_SOURCE_ENABLED` | Enable to generate troubleshooting logs with the `System.Diagnostics.DiagnosticSource` class. | `true` |
