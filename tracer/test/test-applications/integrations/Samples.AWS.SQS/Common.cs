@@ -26,8 +26,7 @@ namespace Samples.AWS.SQS
                 if (dictSpanContext.TryGetValue(DDHttpHeaderNames.ParentId, out var parentId))
                 {
                     if (parentId is null ||
-                    !ulong.TryParse(dictSpanContext[DDHttpHeaderNames.TraceId], out ulong result) ||
-                    result != Tracer.Instance.ActiveScope.Span.TraceId.Lower)
+                    !VerifyTraceId(Tracer.Instance.ActiveScope.Span.TraceId, dictSpanContext[DDHttpHeaderNames.TraceId]))
                     {
                         throw new Exception($"The span context was not injected into the message properly. parent-id: {dictSpanContext[DDHttpHeaderNames.ParentId]}, trace-id: {dictSpanContext[DDHttpHeaderNames.TraceId]}, active trace-id: {Tracer.Instance.ActiveScope.Span.TraceId}");
                     }
@@ -35,8 +34,7 @@ namespace Samples.AWS.SQS
                 else if (dictSpanContext.TryGetValue(B3HttpHeaderNames.B3ParentId, out var parentIdB3))
                 {
                     if (parentIdB3 is null ||
-                    !ulong.TryParse(dictSpanContext[B3HttpHeaderNames.B3TraceId], out ulong resultB3) ||
-                    resultB3 != Tracer.Instance.ActiveScope.Span.TraceId.Lower)
+                    !VerifyTraceId(Tracer.Instance.ActiveScope.Span.TraceId, dictSpanContext[B3HttpHeaderNames.B3TraceId]))
                     {
                         throw new Exception($"The span context was not injected into the message properly. parent-id: {dictSpanContext[B3HttpHeaderNames.B3ParentId]}, trace-id: {dictSpanContext[B3HttpHeaderNames.B3TraceId]}, active trace-id: {Tracer.Instance.ActiveScope.Span.TraceId}");
                     }
@@ -46,6 +44,23 @@ namespace Samples.AWS.SQS
                     throw new NotSupportedException("There is no data for Datadog nor B3 propagator");
                 }
             }
+        }
+
+        private static bool VerifyTraceId(TraceId expectedTraceId, string actualTraceId)
+        {
+            return VerifyTraceIdByDatadogConvention(expectedTraceId, actualTraceId) ||
+                    VerifyTraceIdByOpenTelemetryConvention(expectedTraceId, actualTraceId);
+        }
+
+        private static bool VerifyTraceIdByDatadogConvention(TraceId expectedTraceId, string actualTraceId)
+        {
+            return ulong.TryParse(actualTraceId, out ulong result) && result == expectedTraceId.Lower;
+        }
+
+        private static bool VerifyTraceIdByOpenTelemetryConvention(TraceId expectedTraceId, string actualTraceId)
+        {
+            var traceId = TraceId.CreateFromString(actualTraceId);
+            return expectedTraceId == traceId;
         }
 
         public static void AssertNoDistributedTracingHeaders(List<Message> messages)

@@ -6,7 +6,7 @@ namespace Datadog.Trace.Configuration
     public enum ConventionType
     {
         /// <summary>
-        /// The default convention. Currently it is Datadog (sic!).
+        /// The default convention. Currently it is OpenTelemetry.
         /// </summary>
         Default,
 

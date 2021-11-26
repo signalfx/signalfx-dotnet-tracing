@@ -178,7 +178,7 @@ namespace Datadog.Trace.Tests.Logging
             Assert.Equal(env, logEvent.Properties[CorrelationIdentifier.SerilogEnvKey].ToString().Trim(new[] { '\"' }), ignoreCase: true);
 
             Assert.True(logEvent.Properties.ContainsKey(CorrelationIdentifier.TraceIdKey));
-            Assert.Equal(traceId, TraceId.CreateDataDogCompatibleFromDecimalString(logEvent.Properties[CorrelationIdentifier.TraceIdKey].ToString().Trim(new[] { '\"' })));
+            Assert.Equal(traceId, TraceId.CreateFromString(logEvent.Properties[CorrelationIdentifier.TraceIdKey].ToString().Trim(new[] { '\"' })));
 
             Assert.True(logEvent.Properties.ContainsKey(CorrelationIdentifier.SpanIdKey));
             Assert.Equal(spanId, ulong.Parse(logEvent.Properties[CorrelationIdentifier.SpanIdKey].ToString().Trim(new[] { '\"' })));

@@ -22,6 +22,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             : base("HttpMessageHandler", output)
         {
             SetEnvironmentVariable("SIGNALFX_PROPAGATORS", "datadog,b3");
+            SetEnvironmentVariable("SIGNALFX_CONVENTION", "Datadog");
             SetEnvironmentVariable("SIGNALFX_HTTP_CLIENT_ERROR_STATUSES", "400-499, 502,-343,11-53, 500-500-200");
             SetServiceVersion("1.0.0");
         }
