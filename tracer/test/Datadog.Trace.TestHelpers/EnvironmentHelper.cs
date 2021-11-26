@@ -190,7 +190,9 @@ namespace Datadog.Trace.TestHelpers
                 "SIGNALFX_TAGS",
                 "SIGNALFX_APPSEC_ENABLED",
                 "SIGNALFX_TRACE_CALLTARGET_ENABLED",
-                "SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS"
+                "SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS",
+                "SIGNALFX_CONVENTION",
+                "SIGNALFX_PROPAGATORS"
             };
 
             foreach (string variable in environmentVariables)
