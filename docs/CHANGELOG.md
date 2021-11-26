@@ -22,7 +22,7 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 - Remove `SIGNALFX_APPEND_URL_PATH_TO_NAME` configuration as it was against the
   [OpenTelemetry Semantic conventions for HTTP spans](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md#name).
   Take notice that the URL is available via `http.url` tag.
-- Remove `SIGNALFX_SANITIZE_SQL_STATEMENTS` configuration as all field sanitizations are moving to the Collector.
+- Remove `SIGNALFX_SANITIZE_SQL_STATEMENTS` configuration as all field sanitizations are moving to the [Splunk Distribution of OpenTelemetry Collector](https://docs.splunk.com/Observability/gdi/opentelemetry/opentelemetry.html).
 
 ### Enhancements
 
