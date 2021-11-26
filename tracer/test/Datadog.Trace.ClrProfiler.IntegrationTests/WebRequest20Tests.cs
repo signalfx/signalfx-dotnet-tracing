@@ -21,6 +21,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             : base("WebRequest.NetFramework20", output)
         {
             SetServiceVersion("1.0.0");
+            SetEnvironmentVariable("SIGNALFX_CONVENTION", "Datadog");
             SetEnvironmentVariable("SIGNALFX_PROPAGATORS", "datadog,b3");
         }
 
