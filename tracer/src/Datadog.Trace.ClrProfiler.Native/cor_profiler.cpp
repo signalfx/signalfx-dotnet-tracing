@@ -21,6 +21,10 @@
 #include "stats.h"
 #include "util.h"
 #include "version.h"
+#include "ThreadSampler.h"
+
+// FIXME JBLEY make this a config attribute
+#define ENABLE_THREAD_SAMPLES 1
 
 #ifdef MACOS
 #include <mach-o/dyld.h>
@@ -38,6 +42,7 @@ CorProfiler* profiler = nullptr;
 HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_unknown)
 {
     auto _ = trace::Stats::Instance()->InitializeMeasure();
+    this->threadSampler = NULL;
 
     // check if debug mode is enabled
     if (IsDebugEnabled())
@@ -205,6 +210,10 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
 
     DWORD event_mask = COR_PRF_MONITOR_JIT_COMPILATION | COR_PRF_DISABLE_TRANSPARENCY_CHECKS_UNDER_FULL_TRUST |
                        COR_PRF_MONITOR_MODULE_LOADS | COR_PRF_MONITOR_ASSEMBLY_LOADS | COR_PRF_MONITOR_APPDOMAIN_LOADS;
+    if (ENABLE_THREAD_SAMPLES)
+    {
+        event_mask |= COR_PRF_MONITOR_THREADS | COR_PRF_ENABLE_STACK_SNAPSHOT;
+    }
 
     if (is_calltarget_enabled)
     {
@@ -300,6 +309,11 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
 
     //
     managed_profiler_assembly_reference = AssemblyReference::GetFromCache(managed_profiler_full_assembly_version);
+
+    if (ENABLE_THREAD_SAMPLES) {
+        this->threadSampler = new ThreadSampler();
+        this->threadSampler->StartSampling(this->info_);
+    }
 
     // we're in!
     Logger::Info("Profiler attached.");
@@ -3880,6 +3894,39 @@ HRESULT CorProfiler::CallTarget_RewriterCallback(RejitHandlerModule* moduleHandl
     Logger::Info("*** CallTarget_RewriterCallback() Finished: ", caller->type.name, ".", caller->name, "() [IsVoid=", isVoid,
                  ", IsStatic=", isStatic, ", IntegrationType=", method_replacement->wrapper_method.type_name,
                  ", Arguments=", numArgs, "]");
+    return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE CorProfiler::ThreadCreated(ThreadID threadId)
+{
+    if (threadSampler != NULL)
+    {
+        threadSampler->ThreadCreated(threadId);
+    }
+    return S_OK;
+}
+HRESULT STDMETHODCALLTYPE CorProfiler::ThreadDestroyed(ThreadID threadId)
+{
+    if (threadSampler != NULL)
+    {
+        threadSampler->ThreadDestroyed(threadId);
+    }
+    return S_OK;
+}
+HRESULT STDMETHODCALLTYPE CorProfiler::ThreadAssignedToOSThread(ThreadID managedThreadId, DWORD osThreadId)
+{
+    if (threadSampler != NULL)
+    {
+        threadSampler->ThreadAssignedToOSThread(managedThreadId, osThreadId);
+    }
+    return S_OK;
+}
+HRESULT STDMETHODCALLTYPE CorProfiler::ThreadNameChanged(ThreadID threadId, ULONG cchName, WCHAR name[])
+{
+    if (threadSampler != NULL)
+    {
+        threadSampler->ThreadNameChanged(threadId, cchName, name);
+    }
     return S_OK;
 }
 

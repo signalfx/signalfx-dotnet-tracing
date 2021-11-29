@@ -19,6 +19,7 @@
 
 namespace trace
 {
+class ThreadSampler;
 
 class CorProfiler : public CorProfilerBase
 {
@@ -42,6 +43,8 @@ private:
     bool in_azure_app_services = false;
     bool is_desktop_iis = false;
     bool is_net46_or_greater = false;
+
+    ThreadSampler* threadSampler;
 
     //
     // CallTarget Members
@@ -150,6 +153,12 @@ public:
     // Add Integrations methods
     //
     void InitializeProfiler(WCHAR* id, CallTargetDefinition* items, int size);
+
+    // ICorProfilerInfo callbacks to track thread naming (used by ThreadSampler only)
+    HRESULT STDMETHODCALLTYPE ThreadCreated(ThreadID threadId)override;
+    HRESULT STDMETHODCALLTYPE ThreadDestroyed(ThreadID threadId)override;
+    HRESULT STDMETHODCALLTYPE ThreadAssignedToOSThread(ThreadID managedThreadId, DWORD osThreadId) override;
+    HRESULT STDMETHODCALLTYPE ThreadNameChanged(ThreadID threadId, ULONG cchName, WCHAR name[]) override;
 };
 
 // Note: Generally you should not have a single, global callback implementation,
