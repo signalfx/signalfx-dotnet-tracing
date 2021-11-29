@@ -80,6 +80,7 @@ namespace Datadog.Trace
         /// </summary>
         public const string HttpStatusCode = "http.status_code";
 
+        /// <summary>
         /// The end point requested
         /// </summary>
         internal const string HttpEndpoint = "http.endpoint";
@@ -96,7 +97,7 @@ namespace Datadog.Trace
         /// Upstream does not have this tag, this is needed to better align with SFx.
         /// </remarks>
         public const string Error = "error";
-        
+
         /// <summary>
         /// The error message of an exception
         /// </summary>

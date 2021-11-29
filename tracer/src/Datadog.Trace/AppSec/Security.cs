@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +17,7 @@ using Datadog.Trace.AppSec.Waf.ReturnTypes.Managed;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Headers;
 using Datadog.Trace.Logging;
+using Datadog.Trace.Propagation;
 using Datadog.Trace.Vendors.Newtonsoft.Json;
 using Datadog.Trace.Vendors.Serilog.Events;
 
@@ -179,7 +182,7 @@ namespace Datadog.Trace.AppSec
 
         private static void AddHeaderTags(Span span, IHeadersCollection headers, Dictionary<string, string> headersToCollect)
         {
-            var tags = SpanContextPropagator.Instance.ExtractHeaderTags(headers, headersToCollect, defaultTagPrefix: SpanContextPropagator.HttpResponseHeadersTagPrefix);
+            var tags = PropagationExtensions.ExtractHeaderTags(headers, headersToCollect, defaultTagPrefix: PropagationExtensions.HttpResponseHeadersTagPrefix);
             foreach (var tag in tags)
             {
                 span.SetTag(tag.Key, tag.Value);
