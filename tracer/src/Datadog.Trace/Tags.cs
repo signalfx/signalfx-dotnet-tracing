@@ -80,6 +80,15 @@ namespace Datadog.Trace
         /// </summary>
         public const string HttpStatusCode = "http.status_code";
 
+        /// The end point requested
+        /// </summary>
+        internal const string HttpEndpoint = "http.endpoint";
+
+        /// <summary>
+        /// The user agent
+        /// </summary>
+        internal const string HttpUserAgent = "http.useragent";
+
         /// <summary>
         /// Whether a span denotes an error.
         /// </summary>
@@ -87,7 +96,7 @@ namespace Datadog.Trace
         /// Upstream does not have this tag, this is needed to better align with SFx.
         /// </remarks>
         public const string Error = "error";
-
+        
         /// <summary>
         /// The error message of an exception
         /// </summary>
@@ -491,6 +500,21 @@ namespace Datadog.Trace
         /// If a span was involved with an application security event
         /// </summary>
         internal const string AppSecEvent = "appsec.event";
+
+        /// <summary>
+        /// The details of the security event
+        /// </summary>
+        internal const string AppSecJson = "_dd.appsec.json";
+
+        /// <summary>
+        /// Should contain the public IP of the host initiating the request.
+        /// </summary>
+        internal const string ActorIp = "actor.ip";
+
+        /// <summary>
+        /// The ip as reported by the framework.
+        /// </summary>
+        internal const string NetworkClientIp = "network.client.ip";
 
         internal const string ElasticsearchAction = "elasticsearch.action";
 
