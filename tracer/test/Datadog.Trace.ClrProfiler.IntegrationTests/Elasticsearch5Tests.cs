@@ -28,8 +28,10 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         {
             foreach (var item in PackageVersions.ElasticSearch5)
             {
-                yield return item.Concat(false);
-                yield return item.Concat(true);
+                yield return item.Concat(false, false);
+                yield return item.Concat(true, false);
+                yield return item.Concat(false, true);
+                yield return item.Concat(true, true);
             }
         }
 
@@ -37,8 +39,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [MemberData(nameof(GetElasticsearch))]
         [Trait("Category", "EndToEnd")]
         [Trait("Category", "ArmUnsupported")]
-        public void SubmitsTraces(string packageVersion, bool enableCallTarget)
+        public void SubmitsTraces(string packageVersion, bool enableCallTarget, string tagQueries)
         {
+            SetEnvironmentVariable("SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES", tagQueries.ToString().ToLowerInvariant());
             SetCallTargetSettings(enableCallTarget);
 
             int agentPort = TcpPortProvider.GetOpenPort();
@@ -145,6 +148,27 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                                  .OrderBy(s => s.Start)
                                  .ToList();
 
+                var statementNames = new List<string>
+                {
+                    "Bulk",
+                    "BulkAlias",
+                    "ChangePassword",
+                    "ClusterAllocationExplain",
+                    "ClusterPutSettings",
+                    "ClusterReroute",
+                    "Create",
+                    "CreateIndex",
+                    "DeleteByQuery",
+                    "PutAlias",
+                    "PutIndexTemplate",
+                    "PutRole",
+                    "PutRole",
+                    "PutUser",
+                    "ReindexOnServer",
+                    "Search",
+                    "UpdateIndexSettings"
+                };
+
                 foreach (var span in spans)
                 {
                     Assert.Equal("elasticsearch.query", span.LogicScope);
@@ -152,6 +176,18 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     Assert.Equal("elasticsearch", span.Type);
                     Assert.Equal("elasticsearch", DictionaryExtensions.GetValueOrDefault(span.Tags, "db.system"));
                     Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
+
+                    span.Tags.TryGetValue(Tags.DbStatement, out string statement);
+                    if (enableCallTarget && tagQueries && statementNames.Contains(span.Name))
+                    {
+                        Assert.NotNull(statement);
+                        Assert.DoesNotContain(statement, "test_user");
+                        Assert.DoesNotContain(statement, "supersecret");
+                    }
+                    else
+                    {
+                        Assert.Null(statement);
+                    }
                 }
 
                 ValidateSpans(spans, (span) => span.Resource, expected);
