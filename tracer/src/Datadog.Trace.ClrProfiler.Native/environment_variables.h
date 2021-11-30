@@ -13,11 +13,6 @@ namespace environment {
     // Sets whether debug mode is enabled. Default is false.
     const WSTRING debug_enabled = WStr("SIGNALFX_TRACE_DEBUG");
 
-    // Sets the paths to integration definition JSON files.
-    // Supports multiple values separated with comma, for example:
-    // "C:\Program Files\SignalFx .NET Tracing\integrations.json,D:\temp\test_integrations.json"
-    const WSTRING integrations_path = WStr("SIGNALFX_INTEGRATIONS");
-
     // Sets the path to the profiler's home directory, for example:
     // "C:\Program Files\SignalFx .NET Tracing\" or "/opt/signalfx/"
     const WSTRING profiler_home_path = WStr("SIGNALFX_DOTNET_TRACER_HOME");

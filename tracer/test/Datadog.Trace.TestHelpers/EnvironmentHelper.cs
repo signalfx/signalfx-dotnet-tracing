@@ -168,7 +168,6 @@ namespace Datadog.Trace.TestHelpers
                 // SignalFx
                 "SIGNALFX_PROFILER_PROCESSES",
                 "SIGNALFX_DOTNET_TRACER_HOME",
-                "SIGNALFX_INTEGRATIONS",
                 "SIGNALFX_DISABLED_INTEGRATIONS",
                 "SIGNALFX_SERVICE",
                 "SIGNALFX_VERSION",
