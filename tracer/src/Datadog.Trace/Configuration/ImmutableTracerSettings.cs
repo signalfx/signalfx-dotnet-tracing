@@ -69,6 +69,7 @@ namespace Datadog.Trace.Configuration
             TraceBufferSize = settings.TraceBufferSize;
             TraceBatchInterval = settings.TraceBatchInterval;
             RouteTemplateResourceNamesEnabled = settings.RouteTemplateResourceNamesEnabled;
+            DelayWcfInstrumentationEnabled = settings.DelayWcfInstrumentationEnabled;
 
             TagMongoCommands = settings.TagMongoCommands;
             TagRedisCommands = settings.TagRedisCommands;
@@ -329,6 +330,12 @@ namespace Datadog.Trace.Configuration
         /// <seealso cref="ConfigurationKeys.Propagators"/>
         /// </summary>
         public HashSet<string> Propagators { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether to enable the updated WCF instrumentation that delays execution
+        /// until later in the WCF pipeline when the WCF server exception handling is established.
+        /// </summary>
+        internal bool DelayWcfInstrumentationEnabled { get; }
 
         /// <summary>
         /// Create a <see cref="ImmutableTracerSettings"/> populated from the default sources
