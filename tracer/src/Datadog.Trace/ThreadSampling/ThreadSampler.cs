@@ -4,11 +4,10 @@ using System.Threading;
 
 namespace Datadog.Trace.ThreadSampling
 {
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-#pragma warning disable SA1600 // Elements should be documented
+    /// <summary>
+    ///  Provides the managed-side thread sample reader
+    /// </summary>
     public class ThreadSampler
-#pragma warning restore SA1600 // Elements should be documented
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     {
         // FIXME JBLEY implement for real, clean up all these warnings
         private static void SampleReadingThread()
@@ -16,18 +15,31 @@ namespace Datadog.Trace.ThreadSampling
             while (true)
             {
                 Thread.Sleep(1000);
-                Console.WriteLine("-- ThreadSampler.cs running --");
-                byte[] buf = new byte[100 * 1024];
-                int read = signalfx_read_thread_samples(buf.Length, buf);
-                Console.WriteLine("read_thread_samples returned " + read);
+                Console.WriteLine("reading samples....");
+                // FIXME performance tuning, can reuse same buffer over and over
+                // FIXME consider calling twice in quick succession and allowing read=0 to silently skip?
+                try
+                {
+                    var start = DateTime.Now;
+                    byte[] buf = new byte[100 * 1024];
+                    int read = signalfx_read_thread_samples(buf.Length, buf);
+                    Console.WriteLine("read_thread_samples returned " + read + " bytes");
+                    var parser = new ThreadSampleNativeFormatParser(buf, read);
+                    parser.Parse();
+                    var end = DateTime.Now;
+                    Console.WriteLine("Parsed stack samples in " + ((end.Ticks - start.Ticks) / TimeSpan.TicksPerMillisecond) + " millis");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("could not read samples: " + e);
+                }
             }
         }
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-#pragma warning disable SA1600 // Elements should be documented
+        /// <summary>
+        ///  Initializes the managed-side thread sample reader
+        /// </summary>
         public static void Initialize()
-#pragma warning restore SA1600 // Elements should be documented
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             var thread = new Thread(new ThreadStart(SampleReadingThread));
             thread.IsBackground = true;

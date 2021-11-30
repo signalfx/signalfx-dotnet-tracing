@@ -191,7 +191,7 @@ class ThreadSamplesBuffer {
     }
     writeInt(str.length());
     memcpy(&buffer[pos], &str[0], 2 * str.length());
-    pos += 4 + 2 * str.length();
+    pos += 2 * str.length();
   }
   void writeByte(unsigned char b) {
       if (pos + 1 >= SAMPLES_BUFFER_SIZE) {
