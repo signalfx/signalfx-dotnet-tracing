@@ -25,8 +25,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         public const string ServiceName = "elasticsearch";
         public const string SpanType = "elasticsearch";
         public const string ComponentValue = "elasticsearch-net";
-        public const string Replacement = "?";
-        public static readonly List<Regex> SanitizePatterns = new List<Regex>() { new Regex("\"username\":\\s*\"([^\"]*)\""), new Regex("\"password\":\\s*\"([^\"]*)\"") };
         public static readonly Type CancellationTokenType = typeof(CancellationToken);
         public static readonly Type RequestPipelineType = Type.GetType("Elasticsearch.Net.IRequestPipeline, Elasticsearch.Net");
 
@@ -118,28 +116,6 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         }
 
         /// <summary>
-        /// Will replace all SanitizePatterns with Replacement, if any matches.
-        /// Used to prevent leaking sensitive information.
-        /// </summary>
-        /// <param name="data">The data to sanitize.</param>
-        /// <returns>The sanitized data.</returns>
-        public static string SanitizePostData(string data)
-        {
-            foreach (var pattern in SanitizePatterns)
-            {
-                data = pattern.Replace(data, (m) =>
-                {
-                    var group = m.Groups[1];
-                    var start = m.Value.Substring(0, group.Index - m.Index);
-                    var finish = m.Value.Substring(group.Index - m.Index + group.Length);
-                    return string.Format("{0}{1}{2}", start, Replacement, finish);
-                });
-            }
-
-            return data;
-        }
-
-        /// <summary>
         /// Will set the db.statement tag with truncated, sanitized post data.
         /// </summary>
         /// <param name="span">The Span to tag.</param>
@@ -161,8 +137,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 postData = System.Text.Encoding.UTF8.GetString(writtenBytes);
             }
 
-            string statement = SanitizePostData(postData);
-            span.SetTag(Tags.DbStatement, statement);
+            span.SetTag(Tags.DbStatement, postData);
         }
 
         /// <summary>

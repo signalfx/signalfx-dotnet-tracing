@@ -39,7 +39,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [MemberData(nameof(GetElasticsearch))]
         [Trait("Category", "EndToEnd")]
         [Trait("Category", "ArmUnsupported")]
-        public void SubmitsTraces(string packageVersion, bool enableCallTarget, string tagQueries)
+        public void SubmitsTraces(string packageVersion, bool enableCallTarget, bool tagQueries)
         {
             SetEnvironmentVariable("SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES", tagQueries.ToString().ToLowerInvariant());
             SetCallTargetSettings(enableCallTarget);
@@ -181,8 +181,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     if (enableCallTarget && tagQueries && statementNames.Contains(span.Name))
                     {
                         Assert.NotNull(statement);
-                        Assert.DoesNotContain(statement, "test_user");
-                        Assert.DoesNotContain(statement, "supersecret");
                     }
                     else
                     {

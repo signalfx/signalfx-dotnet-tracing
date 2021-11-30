@@ -198,8 +198,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     if (enableCallTarget && tagQueries && statementNames.Contains(span.Name))
                     {
                         Assert.NotNull(statement);
-                        Assert.DoesNotContain(statement, "test_user");
-                        Assert.DoesNotContain(statement, "supersecret");
                     }
                     else
                     {
