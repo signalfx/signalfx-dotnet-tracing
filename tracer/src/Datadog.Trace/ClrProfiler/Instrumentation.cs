@@ -171,6 +171,16 @@ namespace Datadog.Trace.ClrProfiler
                 }
             }
 #endif
+            // FIXME JBLEY config variable to turn this on
+            try
+            {
+                ThreadSampling.ThreadSampler.Initialize();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Can't initialize thread sampling: " + e);
+                // FIXME JBLEY logging
+            }
 
             Log.Debug("Initialization finished.");
         }

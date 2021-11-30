@@ -16,6 +16,74 @@
 #define STRING_LENGTH 256 // func name
 #define LONG_LENGTH 512 // class name
 
+
+
+
+static std::mutex bufferLock = std::mutex();
+static unsigned char* bufferA; // FIXME would like to use std::array, etc. if we can avoid extra copying
+static int bufferALen;
+static unsigned char* bufferB;
+static int bufferBLen;
+// Dirt-simple backpressure system to save overhead if managed code is not reading fast enough
+bool ShouldProduceThreadSample()
+{
+    std::lock_guard<std::mutex> guard(bufferLock);
+    return bufferA == NULL || bufferB == NULL;
+}
+void RecordProducedThreadSample(int len, unsigned char* buf)
+{
+    std::lock_guard<std::mutex> guard(bufferLock);
+    if (bufferA == NULL)
+    {
+        bufferA = buf;
+        bufferALen = len;
+    }
+    else if (bufferB == NULL)
+    {
+        bufferB = buf;
+        bufferBLen = len;
+    }
+    else
+    {
+        delete[] buf; // needs to be dropped now
+    }
+}
+// Can return 0 if none are pending
+int ConsumeOneThreadSample(int len, unsigned char* buf)
+{
+    unsigned char* toUse = NULL;
+    int toUseLen = 0;
+    {
+        std::lock_guard<std::mutex> guard(bufferLock);
+        if (bufferA != NULL)
+        {
+            toUse = bufferA;
+            toUseLen = bufferALen;
+            bufferA = NULL;
+            bufferALen = 0;            
+        }
+        else if (bufferB != NULL)
+        {
+            toUse = bufferB;
+            toUseLen = bufferBLen;
+            bufferB = NULL;
+            bufferBLen = 0;
+        }
+    }
+    if (toUse == NULL)
+    {
+        return 0;
+    }
+    if (len >= toUseLen)
+    {
+        memcpy(buf, toUse, toUseLen);
+    }
+    delete[] toUse;
+    return toUseLen;
+}
+
+
+
 namespace trace {
     // FIXME more copy and paste from sample code; clean up
 template <class MetaInterface>
@@ -57,11 +125,10 @@ class ThreadSamplesBuffer {
   unsigned int pos; // FIXME 
   std::unordered_map<FunctionID, int> codes;
 
-  ThreadSamplesBuffer(): buffer(new unsigned char[SAMPLES_BUFFER_SIZE]), pos(0) {
+  ThreadSamplesBuffer(unsigned char* buf): buffer(buf), pos(0) {
   }
   ~ThreadSamplesBuffer() { 
-    delete[] buffer;
-    buffer = NULL;
+    buffer = NULL; // specifically don't delete[] as ownership/lifecycle is complicated
   }
   void StartBatch() {
       // FIXME include current time, basic version nunmber, etc. etc.
@@ -139,12 +206,23 @@ class ThreadSamplesBuffer {
     class SamplingHelper {
      public:
       ICorProfilerInfo10* info10 = NULL;
-      ThreadSamplesBuffer* curBuffer = NULL;
-      void CycleBuffer() { 
-          if (curBuffer != NULL) {
-          delete curBuffer;
+      ThreadSamplesBuffer* curWriter = NULL;
+      unsigned char* curBuffer = NULL;
+      bool AllocateBuffer() { 
+          bool should = ShouldProduceThreadSample();
+          if (!should)
+          {
+              return should;
           }
-          curBuffer = new ThreadSamplesBuffer();
+          curBuffer = new unsigned char[SAMPLES_BUFFER_SIZE];
+          curWriter = new ThreadSamplesBuffer(curBuffer);
+          return should;
+      }
+      void PublishBuffer() {
+          RecordProducedThreadSample((int)curWriter->pos, curBuffer);
+          delete curWriter;
+          curWriter = NULL;
+          curBuffer = NULL;
       }
 
       private:
@@ -287,7 +365,7 @@ class ThreadSamplesBuffer {
         // FIXME implement
       SamplingHelper* helper = (SamplingHelper*)clientData;
         WSTRING* name = helper->Lookup(funcId, frameInfo);
-      helper->curBuffer->RecordFrame(funcId, *name);
+      helper->curWriter->RecordFrame(funcId, *name);
       #if PRINT_STACK_TRACES
         // Thanks, early unicode adopters!
         printf("    ");
@@ -311,7 +389,7 @@ class ThreadSamplesBuffer {
       ThreadID threadID;
       ULONG numReturned = 0;
 
-      helper.curBuffer->StartBatch();
+      helper.curWriter->StartBatch();
 
       std::lock_guard<std::mutex> guard(ts->threadStateLock);
 
@@ -321,7 +399,7 @@ class ThreadSamplesBuffer {
         auto found = ts->managedTid2state.find(threadID);
         // FIXME logic could be cleaned up here
         if (found != ts->managedTid2state.end() && found->second != NULL) {
-          helper.curBuffer->StartSample(threadID, found->second);
+            helper.curWriter->StartSample(threadID, found->second);
 #if PRINT_STACK_TRACES
           printf("   thread %i is known %i ", (int) threadID, (int) found->second->nativeId);
           WSTRING s = found->second->threadName;
@@ -334,7 +412,7 @@ class ThreadSamplesBuffer {
 #endif
         } else {
           auto unknown = ThreadState();
-          helper.curBuffer->StartSample(threadID, &unknown);
+            helper.curWriter->StartSample(threadID, &unknown);
         }
 
         totalThreads++;
@@ -343,9 +421,9 @@ class ThreadSamplesBuffer {
             &helper,  // FIXME pass helper state
             NULL, 0);
         // FIXME if localHr...
-        helper.curBuffer->EndSample();
+        helper.curWriter->EndSample();
       }
-      helper.curBuffer->EndBatch();
+      helper.curWriter->EndBatch();
       return totalThreads;
 
     }
@@ -360,7 +438,10 @@ class ThreadSamplesBuffer {
 
         while (1) {
           Sleep(1000);  // FIXME drift-free or no?
-          helper.CycleBuffer();
+          bool shouldSample = helper.AllocateBuffer();
+          if (!shouldSample) {
+              continue; // FIXME might like stats on how often this happens
+          }
 
           LARGE_INTEGER start, end, elapsedMicros, frequency;
           QueryPerformanceFrequency(&frequency);
@@ -372,7 +453,9 @@ class ThreadSamplesBuffer {
                 int totalThreads = CaptureSamples(ts, info10, helper);     
 
           hr = info10->ResumeRuntime();
+
           QueryPerformanceCounter(&end);
+          helper.PublishBuffer();
 
           elapsedMicros.QuadPart = end.QuadPart - start.QuadPart;
           elapsedMicros.QuadPart *= 1000000;
@@ -430,4 +513,13 @@ class ThreadSamplesBuffer {
       }
       state->threadName.append(_name, cchName); // FIXME utf8
     }
+ }
+
+ extern "C"
+ {
+     __declspec(dllexport) int signalfx_read_thread_samples(int len, unsigned char* buf)
+     {
+         printf("signalfx_read_thread_samples called 2\n");
+         return ConsumeOneThreadSample(len, buf);
+     }
  }

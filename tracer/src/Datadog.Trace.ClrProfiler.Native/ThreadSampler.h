@@ -2,6 +2,11 @@
 #include "clr_helpers.h"
 #include <mutex>
 
+extern "C"
+{
+    __declspec(dllexport) int signalfx_read_thread_samples(int len, unsigned char* buf);
+}
+
 namespace trace {
     class ThreadState {
  public:
