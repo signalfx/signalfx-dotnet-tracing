@@ -14,6 +14,7 @@ using Datadog.Trace.Util;
 using Datadog.Trace.Vendors.Serilog;
 using Datadog.Trace.Vendors.Serilog.Core;
 using Datadog.Trace.Vendors.Serilog.Events;
+using Datadog.Trace.Vendors.Serilog.Formatting.Display;
 using Datadog.Trace.Vendors.Serilog.Sinks.File;
 
 namespace Datadog.Trace.Logging
@@ -70,21 +71,40 @@ namespace Datadog.Trace.Logging
                 }
 
                 var domainMetadata = DomainMetadata.Instance;
-
-                // Ends in a dash because of the date postfix
-                var managedLogPath = Path.Combine(logDirectory, $"dotnet-tracer-managed-{domainMetadata.ProcessName}-.log");
-
                 var loggerConfiguration =
                     new LoggerConfiguration()
                        .Enrich.FromLogContext()
-                       .MinimumLevel.ControlledBy(LoggingLevelSwitch)
-                       .WriteTo.File(
+                       .MinimumLevel.ControlledBy(LoggingLevelSwitch);
+
+                if (GlobalSettings.Source.FileLogEnabled)
+                {
+                    // Ends in a dash because of the date postfix
+                    var managedLogPath = Path.Combine(logDirectory, $"dotnet-tracer-managed-{domainMetadata.ProcessName}-.log");
+
+                    loggerConfiguration = loggerConfiguration
+                        .WriteTo.File(
                             managedLogPath,
                             outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}{Properties}{NewLine}",
                             rollingInterval: RollingInterval.Day,
                             rollOnFileSizeLimit: true,
                             fileSizeLimitBytes: MaxLogFileSize,
                             shared: true);
+                }
+
+                if (GlobalSettings.Source.StdoutLogEnabled)
+                {
+                    var outputTemplate = Environment.GetEnvironmentVariable(ConfigurationKeys.StdoutLogTemplate) ??
+                        "[{Level:u3}] {Message:lj} {NewLine}{Exception}{NewLine}";
+
+                    loggerConfiguration.WriteTo.Sink(new ConsoleSink(outputTemplate), LogEventLevel.Verbose);
+                }
+
+                if (!GlobalSettings.Source.FileLogEnabled &&
+                    !GlobalSettings.Source.StdoutLogEnabled)
+                {
+                    loggerConfiguration = loggerConfiguration
+                        .WriteTo.Sink<NullSink>();
+                }
 
                 try
                 {
@@ -224,6 +244,23 @@ namespace Datadog.Trace.Logging
             }
 
             return logDirectory;
+        }
+
+        private class ConsoleSink : ILogEventSink
+        {
+            private readonly MessageTemplateTextFormatter _formatter;
+
+            public ConsoleSink(string outputTemplate)
+            {
+                outputTemplate = outputTemplate ?? throw new ArgumentNullException(nameof(outputTemplate));
+
+                _formatter = new MessageTemplateTextFormatter(outputTemplate, null);
+            }
+
+            public void Emit(LogEvent logEvent)
+            {
+                _formatter.Format(logEvent, Console.Out);
+            }
         }
     }
 }
