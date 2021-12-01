@@ -2,7 +2,6 @@
 #include <cinttypes>
 #include <map>
 
-#define PRINT_STACK_TRACES 0
 
 #if WIN32
 #define WSTRING std::wstring
@@ -12,12 +11,9 @@
 #define WSTR(str) u##str
 #endif  // WIN32
 
-// FIXME reconsider these constants
-#define STRING_LENGTH 256 // func name
-#define LONG_LENGTH 512 // class name
-
-
-
+#define MAX_FUNC_NAME_LEN 256
+#define MAX_CLASS_NAME_LEN 512
+#define MAX_STRING_LENGTH 512
 
 static std::mutex bufferLock = std::mutex();
 static unsigned char* bufferA; // FIXME would like to use std::array, etc. if we can avoid extra copying
@@ -118,8 +114,7 @@ class COMPtrHolder {
   MetaInterface* m_ptr;
 };
 
-// FIXME a rough prototype to flesh out overhead numbers
-  // If you change this, consider ThreadSampler.cs too
+// If you change this, consider ThreadSampler.cs too
 #define SAMPLES_BUFFER_SIZE (100 * 1024)
 
 class ThreadSamplesBuffer {
@@ -187,13 +182,16 @@ class ThreadSamplesBuffer {
     pos += 4;
   }
   void writeString(WSTRING & str) {
-      // FIXME limit string length / error out if > some threshold of reasonableness (e.g., 1 KB) -> also, use 2 byte length
-    if (pos + 4 + 2*str.length() >= SAMPLES_BUFFER_SIZE) {
-      return;
-    }
-    writeInt(str.length());
-    memcpy(&buffer[pos], &str[0], 2 * str.length());
-    pos += 2 * str.length();
+      // limit strings to a max length overall; this prevents (e.g.) thread names or 
+      // any other miscellaneous strings that come along from blowing things out
+      size_t usedLen = min(str.length(), MAX_STRING_LENGTH);
+      if (pos + 4 + 2 * usedLen >= SAMPLES_BUFFER_SIZE)
+      {
+        return;
+      }
+      writeInt(str.length());
+      memcpy(&buffer[pos], &str[0], 2 * usedLen);
+      pos += 2 * usedLen;
   }
   void writeByte(unsigned char b) {
       if (pos + 1 >= SAMPLES_BUFFER_SIZE) {
@@ -232,8 +230,6 @@ class ThreadSamplesBuffer {
 
           
       // FIXME audit this copy-and-paste, clean it up (e.g., prints), improve performance (even after LRU), doc its origins in the sample code
-       // FIXME also, before any of that, decide what I want to use for the frame format (hint: probably not the module name)
-
        // FIXME quick prototype (based on disabling the cache) suggests that this can be sped up around 20% by not double/triple-copying the class names and just using a single WCHAR buffer
       WSTRING GetClassName(ClassID classId) {
         ModuleID modId;
@@ -273,9 +269,9 @@ class ThreadSamplesBuffer {
           return WSTR("Unknown");
         }
 
-        WCHAR wName[LONG_LENGTH];
+        WCHAR wName[MAX_CLASS_NAME_LEN];
         DWORD dwTypeDefFlags = 0;
-        hr = pMDImport->GetTypeDefProps(classToken, wName, LONG_LENGTH, NULL,
+        hr = pMDImport->GetTypeDefProps(classToken, wName, MAX_CLASS_NAME_LEN, NULL,
                                         &dwTypeDefFlags, NULL);
         if (FAILED(hr)) {
           printf("GetTypeDefProps failed with hr=0x%x\n", hr);
@@ -312,8 +308,8 @@ class ThreadSamplesBuffer {
           printf("GetModuleMetaData failed with hr=0x%x\n", hr);
         }
 
-        WCHAR funcName[STRING_LENGTH];
-        hr = pIMDImport->GetMethodProps(token, NULL, funcName, STRING_LENGTH, 0,
+        WCHAR funcName[MAX_FUNC_NAME_LEN];
+        hr = pIMDImport->GetMethodProps(token, NULL, funcName, MAX_FUNC_NAME_LEN, 0,
                                         0, NULL, NULL, NULL, NULL);
         if (FAILED(hr)) {
           printf("GetMethodProps failed with hr=0x%x\n", hr);
@@ -363,19 +359,9 @@ class ThreadSamplesBuffer {
         _In_ ULONG32 contextSize,
         _In_ BYTE context[],
         _In_ void* clientData) {
-        // FIXME implement
       SamplingHelper* helper = (SamplingHelper*)clientData;
         WSTRING* name = helper->Lookup(funcId, frameInfo);
       helper->curWriter->RecordFrame(funcId, *name);
-      #if PRINT_STACK_TRACES
-        // Thanks, early unicode adopters!
-        printf("    ");
-        for (int i = 0; i < name->length(); i++) {
-          char16_t c = (*name)[i];
-          printf("%c", (char)c);
-        }
-        printf("\n");
-      #endif
       return S_OK;
     }
 
@@ -394,23 +380,10 @@ class ThreadSamplesBuffer {
 
       std::lock_guard<std::mutex> guard(ts->threadStateLock);
 
-      // FIXME experimented previously with capturing small batches (10 or so)
-      // and it didn't make a different in overhead; revisit
       while ((hr = threadEnum->Next(1, &threadID, &numReturned)) == S_OK) {
         auto found = ts->managedTid2state.find(threadID);
-        // FIXME logic could be cleaned up here
         if (found != ts->managedTid2state.end() && found->second != NULL) {
             helper.curWriter->StartSample(threadID, found->second);
-#if PRINT_STACK_TRACES
-          printf("   thread %i is known %i ", (int) threadID, (int) found->second->nativeId);
-          WSTRING s = found->second->threadName;
-          printf(" (len %i) ", (int)s.length());
-          for (int i = 0; i < s.length(); i++) {
-          
-              printf("%c", (char)(s[i]));
-          }
-          printf("\n");
-#endif
         } else {
           auto unknown = ThreadState();
             helper.curWriter->StartSample(threadID, &unknown);
@@ -419,7 +392,7 @@ class ThreadSamplesBuffer {
         totalThreads++;
         HRESULT localHr = info10->DoStackSnapshot(
             threadID, &FrameCallback, COR_PRF_SNAPSHOT_DEFAULT,
-            &helper,  // FIXME pass helper state
+            &helper,
             NULL, 0);
         // FIXME if localHr...
         helper.curWriter->EndSample();
@@ -430,7 +403,6 @@ class ThreadSamplesBuffer {
     }
 
     DWORD WINAPI SamplingThreadMain(_In_ LPVOID param) { 
-        printf("SamplingThreadMain\n");
         ThreadSampler* ts = (ThreadSampler*)param;
         ICorProfilerInfo10* info10 = ts->info10;
         HRESULT hr;
@@ -520,7 +492,6 @@ class ThreadSamplesBuffer {
  {
      __declspec(dllexport) int signalfx_read_thread_samples(int len, unsigned char* buf)
      {
-         printf("signalfx_read_thread_samples called 2\n");
          return ConsumeOneThreadSample(len, buf);
      }
  }

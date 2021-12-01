@@ -30,7 +30,6 @@ namespace trace {
                                                   WCHAR name[]);
 
 
-       // FIXME map of threadId->threadstate and locking thereof (writes from profiler callbacks, reads from SamplingThreadMain
        std::unordered_map<ThreadID, ThreadState*> managedTid2state;
        std::mutex threadStateLock;
 
