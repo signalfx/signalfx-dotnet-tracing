@@ -1,7 +1,7 @@
 #include "ThreadSampler.h"
 #include <cinttypes>
 #include <map>
-
+#include "logger.h"
 
 #if WIN32
 #define WSTRING std::wstring
@@ -238,7 +238,7 @@ class ThreadSamplesBuffer {
         HRESULT hr = S_OK;
 
         if (classId == NULL) {
-          printf("NULL classId passed to GetClassName\n");
+          Logger::Debug("NULL classId passed to GetClassName");
           return WSTR("Unknown");
         }
 
@@ -255,8 +255,7 @@ class ThreadSamplesBuffer {
           // type-loading is not yet complete. Cannot do anything about it.
           return WSTR("DataIncomplete");
         } else if (FAILED(hr)) {
-          printf("GetClassIDInfo returned hr=0x%x for classID=0x%" PRIx64 "\n",
-                 hr, (uint64_t)classId);
+          Logger::Debug("GetClassIDInfo failed: ", hr);
           return WSTR("Unknown");
         }
 
@@ -265,7 +264,7 @@ class ThreadSamplesBuffer {
                                                 IID_IMetaDataImport,
                                                 (IUnknown**)&pMDImport);
         if (FAILED(hr)) {
-          printf("GetModuleMetaData failed with hr=0x%x\n", hr);
+          Logger::Debug("GetModuleMetaData failed: ", hr);
           return WSTR("Unknown");
         }
 
@@ -274,7 +273,7 @@ class ThreadSamplesBuffer {
         hr = pMDImport->GetTypeDefProps(classToken, wName, MAX_CLASS_NAME_LEN, NULL,
                                         &dwTypeDefFlags, NULL);
         if (FAILED(hr)) {
-          printf("GetTypeDefProps failed with hr=0x%x\n", hr);
+          Logger::Debug("GetTypeDefProps failed: ", hr);
           return WSTR("Unknown");
         }
 
@@ -298,21 +297,22 @@ class ThreadSamplesBuffer {
             funcID, frameInfo, &classId, &moduleId, &token, 0,
             NULL,  NULL);
         if (FAILED(hr)) {
-          printf("GetFunctionInfo2 failed with hr=0x%x\n", hr);
+          Logger::Debug("GetFunctionInfo2 failed: ", hr);
         }
 
         COMPtrHolder<IMetaDataImport> pIMDImport;
         hr = info10->GetModuleMetaData(
             moduleId, ofRead, IID_IMetaDataImport, (IUnknown**)&pIMDImport);
         if (FAILED(hr)) {
-          printf("GetModuleMetaData failed with hr=0x%x\n", hr);
+          Logger::Debug("GetModuleMetaData failed: ", hr);
         }
 
         WCHAR funcName[MAX_FUNC_NAME_LEN];
+        funcName[0] = 0;
         hr = pIMDImport->GetMethodProps(token, NULL, funcName, MAX_FUNC_NAME_LEN, 0,
                                         0, NULL, NULL, NULL, NULL);
         if (FAILED(hr)) {
-          printf("GetMethodProps failed with hr=0x%x\n", hr);
+          Logger::Debug("GetMethodProps failed: ", hr);
         }
 
         WSTRING name;
@@ -440,11 +440,11 @@ class ThreadSamplesBuffer {
     }
 
     void ThreadSampler::StartSampling(ICorProfilerInfo3* info3) { 
-        printf("ThreadSampler::StartSampling\n");
+      Logger::Info("ThreadSampler::StartSampling");
       HRESULT hr = info3->QueryInterface<ICorProfilerInfo10>(&this->info10);
       if (FAILED(hr)) {
-        printf("ACK can't get profiler10? %i\n", (int)hr);
-        return;
+          Logger::Error("Can't get ICorProfilerInfo10; thread sampling will not run: ", hr);
+          return;
       }
       HANDLE bgThread =
           CreateThread(NULL, 0, &SamplingThreadMain, this, 0, NULL);
