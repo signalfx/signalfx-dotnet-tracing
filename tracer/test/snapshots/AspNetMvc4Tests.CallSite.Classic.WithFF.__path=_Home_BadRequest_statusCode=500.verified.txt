@@ -2,9 +2,9 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: GET,
+    Name: GET home.badrequest,
     LogicScope: aspnet.request,
-    Resource: GET /home/badrequest,
+    Resource: GET home.badrequest,
     Service: sample,
     Type: web,
     Error: 1,
@@ -22,6 +22,8 @@
       sfx.error.stack: 
 System.Exception: Oops, it broke.
 at Samples.AspNetMvc4.Controllers.HomeController.BadRequest(),
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: 0.0.1.0,
       span.kind: server,
       version: 1.0.0
     },

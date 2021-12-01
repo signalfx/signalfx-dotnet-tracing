@@ -486,14 +486,12 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 tags.AspNetArea = area;
                 tags.AspNetRoute = route;
 
-                if (newResourceNamesEnabled)
+                // set the resource name in the HttpContext so TracingHttpModule can update root span
+                var httpContext = HttpContext.Current;
+
+                if (httpContext is not null)
                 {
-                    // set the resource name in the HttpContext so TracingHttpModule can update root span
-                    var httpContext = System.Web.HttpContext.Current;
-                    if (httpContext is not null)
-                    {
-                        httpContext.Items[SharedConstants.HttpContextPropagatedResourceNameKey] = resourceName;
-                    }
+                    httpContext.Items[SharedConstants.HttpContextPropagatedResourceNameKey] = resourceName;
                 }
             }
             catch (Exception ex)
