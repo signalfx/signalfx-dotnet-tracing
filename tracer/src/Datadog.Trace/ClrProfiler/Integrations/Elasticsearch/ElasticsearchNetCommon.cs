@@ -86,23 +86,51 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         }
 
         /// <summary>
+        /// Will attempt to set the db.statement tag from RequestData.PostData, if applicable. In cases where
+        /// direct streaming is enabled, this will involve using the PostData object to synchronously write
+        /// its content to a byte array.
+        /// </summary>
+        /// <param name="scope">The scope to tag.</param>
+        /// <param name="requestData">The RequestData from which to retrieve the desired PostData content.</param>
+        public static void SetDbStatementFromRequestData(this Scope scope, object requestData)
+        {
+            if (!Tracer.Instance.Settings.TagElasticsearchQueries || scope?.Span == null)
+            {
+                return;
+            }
+
+            if (!ShouldAttemptWrittenBytes(requestData, out var postData, out var writtenBytes))
+            {
+                return;
+            }
+
+            if (writtenBytes == null)
+            {
+                var methodInfo = GetWriteMethodInfo(postData, requestData, out var connectionSettings);
+                using (var stream = new MemoryStream())
+                {
+                    var args = new object[] { stream, connectionSettings };
+                    methodInfo.Invoke(postData, args);
+                    writtenBytes = stream.ToArray();
+                }
+            }
+
+            SetDbStatement(scope.Span, writtenBytes);
+        }
+
+        /// <summary>
         /// Attempts to load the PostData.WrittenBytes property from Elasticsearch.Net.RequestData.
         /// This will return false if tagging Elasticsearch queries is disabled or if data isn't applicable
-        /// for the http method (no PostData was supplied to the request), and true otherwise.  It will
+        /// for the http method (no PostData was supplied to the request), and true otherwise. It will
         /// also obtain the PostData object in case manually writing the data is necessary (direct streaming enabled).
         /// </summary>
         /// <param name="requestData">The request data.</param>
         /// <param name="postData">The PostData property the request data.</param>
         /// <param name="writtenBytes">The WrittenBytes property of the PostData.</param>
         /// <returns>Whether the request is appplicable for retrieving PostData content.</returns>
-        public static bool ShouldAttemptWrittenBytes(object requestData, out object postData, out byte[] writtenBytes)
+        private static bool ShouldAttemptWrittenBytes(object requestData, out object postData, out byte[] writtenBytes)
         {
-            postData = null;
             writtenBytes = null;
-            if (!Tracer.Instance.Settings.TagElasticsearchQueries)
-            {
-                return false;
-            }
 
             postData = requestData.GetProperty("PostData")
                                   .GetValueOrDefault();
@@ -116,21 +144,24 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         }
 
         /// <summary>
-        /// Will set the db.statement tag with truncated, sanitized post data.
+        /// Will set the db.statement tag with truncated post data.
         /// </summary>
         /// <param name="span">The Span to tag.</param>
-        /// <param name="writtenBytes">The byte[] of data with which to encode, sanitize, truncate, and tag.</param>
-        public static void SetDbStatement(Span span, byte[] writtenBytes)
+        /// <param name="writtenBytes">The byte[] of data with which to encode, truncate, and tag.</param>
+        private static void SetDbStatement(Span span, byte[] writtenBytes)
         {
             if (span == null || writtenBytes == null)
             {
                 return;
             }
 
+            // the buffer size is set arbitrary
+            const int MaxBufferSize = 1024;
+
             string postData = null;
-            if (writtenBytes.Length > 1024)
+            if (writtenBytes.Length > MaxBufferSize)
             {
-                postData = System.Text.Encoding.UTF8.GetString(writtenBytes, 0, 1024);
+                postData = System.Text.Encoding.UTF8.GetString(writtenBytes, 0, MaxBufferSize);
             }
             else
             {
@@ -141,56 +172,19 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         }
 
         /// <summary>
-        /// Will get the Write or WriteAsync MethodInfo used to obtain the PostData's content when
-        /// WrittenBytes property is null (direct streaming enabled).  Also obtains the RequestData
+        /// Will get the Write MethodInfo used to obtain the PostData's content when
+        /// WrittenBytes property is null (direct streaming enabled). Also obtains the RequestData
         /// ConnectionSettings used by these methods.
         /// </summary>
-        /// <param name="methodName">The method to retrieve from PostData.</param>
         /// <param name="postData">The PostData from which to retrieve the desired MethodInfo.</param>
         /// <param name="requestData">The RequestData from which to retrieve the ConnectionSettings used by the write method.</param>
         /// <param name="connectionSettings">The RequestData.ConnectionSettings property.</param>
         /// <returns>The Write or WriteAsync MethodInfo.</returns>
-        public static MethodInfo GetWriteMethodInfo(string methodName, object postData, object requestData, out object connectionSettings)
+        private static MethodInfo GetWriteMethodInfo(object postData, object requestData, out object connectionSettings)
         {
             connectionSettings = requestData.GetProperty("ConnectionSettings").GetValueOrDefault();
             var postDataType = postData.GetType();
-            return postDataType.GetMethod(methodName);
-        }
-
-        /// <summary>
-        /// Will attempt to set the db.statement tag from RequestData.PostData, if applicable.  In cases where
-        /// direct streaming is enabled, this will involve using the PostData object to synchronously write
-        /// its content to a byte array.
-        /// </summary>
-        /// <param name="span">The Span to tag.</param>
-        /// <param name="requestData">The RequestData from which to retrieve the desired PostData content.</param>
-        public static void SetDbStatementFromRequestData(this Span span, object requestData)
-        {
-            if (span == null)
-            {
-                return;
-            }
-
-            object postData;
-            byte[] writtenBytes;
-            if (!ShouldAttemptWrittenBytes(requestData, out postData, out writtenBytes))
-            {
-                return;
-            }
-
-            if (writtenBytes == null)
-            {
-                object connectionSettings;
-                var methodInfo = GetWriteMethodInfo("Write", postData, requestData, out connectionSettings);
-                using (var stream = new MemoryStream())
-                {
-                    object[] args = new object[] { stream, connectionSettings };
-                    methodInfo.Invoke(postData, args);
-                    writtenBytes = stream.ToArray();
-                }
-            }
-
-            SetDbStatement(span, writtenBytes);
+            return postDataType.GetMethod("Write");
         }
     }
 }

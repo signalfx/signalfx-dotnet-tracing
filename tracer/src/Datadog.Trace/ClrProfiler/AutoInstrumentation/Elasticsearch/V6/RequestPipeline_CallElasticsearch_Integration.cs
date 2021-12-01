@@ -55,7 +55,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch.V6
         /// <returns>A response value, in an async scenario will be T of Task of T</returns>
         public static CallTargetReturn<TResponse> OnMethodEnd<TTarget, TResponse>(TTarget instance, TResponse response, Exception exception, CallTargetState state)
         {
-            state.Scope?.Span.SetDbStatementFromRequestData(state.State);
+            state.Scope.SetDbStatementFromRequestData(state.State);
             state.Scope.DisposeWithException(exception);
             return new CallTargetReturn<TResponse>(response);
         }
