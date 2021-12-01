@@ -5,6 +5,7 @@
 
 // Modified by Splunk Inc.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.Configuration;
@@ -38,7 +39,25 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             // CALLTARGET: +14 spans
             // - IDbCommandGenericConstraint<SqlCommand>: 7 spans (1 group * 7 spans)
             // - IDbCommandGenericConstraint<SqlCommand>-netstandard: 7 spans (1 group * 7 spans)
-            const int expectedSpanCount = 147;
+
+            // version 4.0 : 91 spans
+            // - SqlCommand: 21 spans (3 groups * 7 spans)
+            // - DbCommand:  21 spans (3 groups * 7 spans)
+            // - IDbCommand: 7 spans (1 groups * 7 spans)
+            // - DbCommand-netstandard:  21 spans (3 groups * 7 spans)
+            // - IDbCommand-netstandard: 7 spans (1 groups * 7 spans)
+            // - IDbCommandGenericConstraint<SqlCommand>: 7 spans (1 group * 7 spans)
+            // - IDbCommandGenericConstraint<SqlCommand>-netstandard: 7 spans (1 group * 7 spans)
+            var isVersion4 = !string.IsNullOrWhiteSpace(packageVersion)
+                          && new Version(packageVersion) >= new Version("4.0.0");
+
+            if (isVersion4 && FrameworkDescription.Instance.OSPlatform != OSPlatform.Windows)
+            {
+                // Version 4.0.0 has an issue on Linux https://github.com/dotnet/SqlClient/issues/1390
+                return;
+            }
+
+            var expectedSpanCount = isVersion4 ? 91 : 147;
             const string dbType = "mssql";
             const string expectedOperationName = dbType + ".query";
             const string expectedServiceName = "Samples.Microsoft.Data.SqlClient";

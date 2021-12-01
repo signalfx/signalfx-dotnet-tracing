@@ -5,6 +5,7 @@
 
 // Modified by Splunk Inc.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.Configuration;
@@ -29,6 +30,15 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
         [Trait("Category", "ArmUnsupported")]
         public void SubmitsTraces(string packageVersion)
         {
+#if NETCOREAPP3_0
+            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("IsAlpine")) // set in dockerfile
+             && !string.IsNullOrEmpty(packageVersion)
+             && new Version(packageVersion) >= new Version("6.0.0"))
+            {
+                Output.WriteLine("Skipping as Microsoft.Data.Sqlite hanqs on Alpine .NET Core 3.0 with 6.0.0 package");
+                return;
+            }
+#endif
             const int expectedSpanCount = 91;
             const string dbType = "sqlite";
             const string expectedOperationName = dbType + ".query";
