@@ -67,6 +67,7 @@ Use these environment variables to configure the tracing library:
 | `SIGNALFX_OUTBOUND_HTTP_EXCLUDED_HOSTS` |  | A semicolon-separated list of hosts for which HTTP outbound spans are not created. |
 | `SIGNALFX_PROFILER_EXCLUDE_PROCESSES` |  | Sets the filename of executables the profiler cannot attach to. If not defined (default), the profiler will attach to any process. Supports multiple values separated with semi-colons, for example: `MyApp.exe;dotnet.exe` |
 | `SIGNALFX_PROFILER_PROCESSES` |  | Sets the filename of executables the profiler can attach to. If not defined (default), the profiler will attach to any process. Supports multiple values separated with semi-colons, for example: `MyApp.exe;dotnet.exe` |
+| `SIGNALFX_PROPAGATOR` | `B3` | Sets the context propagation format. If not defined (default), the propagation format will be set to B3. The other option is `W3C`, which is recommended to get compatibility with other OpenTelemetry instrumentation. |
 | `SIGNALFX_RECORDED_VALUE_MAX_LENGTH` | `1200` | The maximum length an attribute value can have. Values longer than this are truncated. |
 | `SIGNALFX_SANITIZE_SQL_STATEMENTS` |  | Enable to stop sanitizing each SQL `db.statement`. |
 | `SIGNALFX_SERVICE_NAME_PER_SPAN_ENABLED` |  | Enable to allow manual instrumentation to have a different service name than the one you specify with `SIGNALFX_SERVICE_NAME`.  Add a tag `service.name` with the desired name to the manual instrumentation. |
