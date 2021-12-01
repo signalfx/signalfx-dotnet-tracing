@@ -189,11 +189,8 @@ namespace Datadog.Trace.ClrProfiler.Integrations
 
                     tags.SetAnalyticsSampleRate(IntegrationId, tracer.Settings, enabledWithGlobalSetting: true);
 
-                    if (newResourceNamesEnabled)
-                    {
-                        // set the resource name in the HttpContext so TracingHttpModule can update root span
-                        httpContext.Items[SharedConstants.HttpContextPropagatedResourceNameKey] = resourceName;
-                    }
+                    // set the resource name in the HttpContext so TracingHttpModule can update root span
+                    httpContext.Items[SharedConstants.HttpContextPropagatedResourceNameKey] = resourceName;
                 }
             }
             catch (Exception ex)
