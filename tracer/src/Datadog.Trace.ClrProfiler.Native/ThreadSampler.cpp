@@ -186,7 +186,6 @@ class ThreadSamplesBuffer {
     memcpy(&buffer[pos], &bigEnd, 4);
     pos += 4;
   }
-  // FIXME utf8 for real though
   void writeString(WSTRING & str) {
       // FIXME limit string length / error out if > some threshold of reasonableness (e.g., 1 KB) -> also, use 2 byte length
     if (pos + 4 + 2*str.length() >= SAMPLES_BUFFER_SIZE) {
@@ -233,7 +232,6 @@ class ThreadSamplesBuffer {
 
           
       // FIXME audit this copy-and-paste, clean it up (e.g., prints), improve performance (even after LRU), doc its origins in the sample code
-       // FIXME also just use utf8, blergh
        // FIXME also, before any of that, decide what I want to use for the frame format (hint: probably not the module name)
 
        // FIXME quick prototype (based on disabling the cache) suggests that this can be sped up around 20% by not double/triple-copying the class names and just using a single WCHAR buffer
@@ -514,7 +512,7 @@ class ThreadSamplesBuffer {
         state = new ThreadState();
         managedTid2state[threadId] = state;
       }
-      state->threadName.append(_name, cchName); // FIXME utf8
+      state->threadName.append(_name, cchName);
     }
  }
 

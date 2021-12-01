@@ -172,7 +172,7 @@ namespace Datadog.Trace.ClrProfiler
                 }
             }
 #endif
-            // FIXME JBLEY config variable to turn this on
+            // Thread Sampling ("profiling") feature
             try
             {
                 // If you change this, change environment_variables.h too
@@ -184,8 +184,7 @@ namespace Datadog.Trace.ClrProfiler
             }
             catch (Exception e)
             {
-                Console.WriteLine("Can't initialize thread sampling: " + e);
-                // FIXME JBLEY logging
+                Log.Error(e, "Cannot initialize thread sampling ");
             }
 
             Log.Debug("Initialization finished.");
