@@ -136,6 +136,10 @@ namespace PrepareRelease
                 "src/Datadog.Trace.ClrProfiler.Native/dd_profiler_constants.h",
                 FullAssemblyNameReplace);
 
+            SynchronizeVersion(
+                "src/Datadog.Trace.ClrProfiler.Native/dd_profiler_constants.h",
+                text => FunctionCallReplace(text, "WithVersion"));
+
             // Four-part AssemblyVersion update
             SynchronizeVersion(
                 "src/Datadog.Trace/TracerConstants.cs",
@@ -186,6 +190,15 @@ namespace PrepareRelease
             const string versionPrefix = "signalfx.tracing.version\", \"";
 
             return Regex.Replace(text, patternPrefix + VersionPattern(fourPartVersion: true), versionPrefix + FourPartVersionString(), RegexOptions.Singleline);
+        }
+
+        private string FunctionCallReplace(string text, string functionName)
+        {
+            const string split = ", ";
+            var pattern = @$"{functionName}\({VersionPattern(split, fourPartVersion: true)}\)";
+            var replacement = $"{functionName}({FourPartVersionString(split)})";
+
+            return Regex.Replace(text, pattern, replacement, RegexOptions.Singleline);
         }
 
         private string FourPartVersionReplace(string text)

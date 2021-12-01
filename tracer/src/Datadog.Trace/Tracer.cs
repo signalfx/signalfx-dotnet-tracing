@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Datadog.Trace.Agent;
+using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Propagation;
 using Datadog.Trace.Sampling;
@@ -307,7 +308,7 @@ namespace Datadog.Trace
         {
             if (parent == null && !ignoreActiveScope)
             {
-                parent = TracerManager.ScopeManager.Active?.Span?.Context;
+                parent = DistributedTracer.Instance.GetSpanContext() ?? TracerManager.ScopeManager.Active?.Span?.Context;
             }
 
             ITraceContext traceContext;

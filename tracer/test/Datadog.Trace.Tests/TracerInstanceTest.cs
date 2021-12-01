@@ -15,7 +15,7 @@ using Xunit;
 
 namespace Datadog.Trace.Tests
 {
-    [CollectionDefinition(nameof(TracerInstanceTest), DisableParallelization = true)]
+    [Collection(nameof(TracerInstanceTestCollection))]
     [TracerRestorer]
     public class TracerInstanceTest
     {
