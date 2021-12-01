@@ -72,7 +72,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             VerifyProducerSpanProperties(errorProducerSpans, ErrorProducerResourceName, ExpectedErrorProducerSpans);
 
             allProducerSpans.Where(span => span.Name == $"{topic} send").Should().HaveCount(ExpectedSuccessProducerSpans + ExpectedTombstoneProducerSpans);
-            allProducerSpans.Where(span => span.Name == $"INVALID-TOPIC receive").Should().HaveCount(ExpectedErrorProducerSpans);
+            allProducerSpans.Where(span => span.Name == $"INVALID-TOPIC send").Should().HaveCount(ExpectedErrorProducerSpans);
             allConsumerSpans.Where(span => span.Name == $"{topic} receive").Should().HaveCount(ExpectedConsumerSpans);
 
             // Only successful spans with a delivery handler will have an offset
