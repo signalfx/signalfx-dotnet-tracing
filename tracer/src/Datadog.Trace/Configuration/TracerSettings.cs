@@ -240,6 +240,8 @@ namespace Datadog.Trace.Configuration
 
             TagMongoCommands = source?.GetBool(ConfigurationKeys.TagMongoCommands) ?? true;
 
+            TagElasticsearchQueries = source?.GetBool(ConfigurationKeys.TagElasticsearchQueries) ?? true;
+
             // we cached the static instance here, because is being used in the hotpath
             // by IsIntegrationEnabled method (called from all integrations)
             _domainMetadata = DomainMetadata.Instance;
@@ -508,6 +510,14 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="ConfigurationKeys.TagMongoCommands"/>
         public bool TagMongoCommands { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether Elasticsearch integration
+        /// should tag PostData as db.statement.
+        /// Default is <c>true</c>.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.TagElasticsearchQueries"/>
+        public bool TagElasticsearchQueries { get; set; }
 
         /// <summary>
         /// Gets or sets a value with the maximum length a tag/log value can have.

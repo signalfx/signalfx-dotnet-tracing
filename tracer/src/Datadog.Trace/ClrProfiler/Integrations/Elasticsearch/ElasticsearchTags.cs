@@ -16,7 +16,8 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 new ReadOnlyProperty<ElasticsearchTags, string>(Trace.Tags.DbType, t => t.DbType),
                 new Property<ElasticsearchTags, string>(Trace.Tags.ElasticsearchAction, t => t.Action, (t, v) => t.Action = v),
                 new Property<ElasticsearchTags, string>(Trace.Tags.ElasticsearchMethod, t => t.Method, (t, v) => t.Method = v),
-                new Property<ElasticsearchTags, string>(Trace.Tags.ElasticsearchUrl, t => t.Url, (t, v) => t.Url = v));
+                new Property<ElasticsearchTags, string>(Trace.Tags.ElasticsearchUrl, t => t.Url, (t, v) => t.Url = v),
+                new Property<ElasticsearchTags, string>(Trace.Tags.DbStatement, t => t.DbStatement, (t, v) => t.DbStatement = v));
 
         public override string SpanKind => SpanKinds.Client;
 
@@ -29,6 +30,8 @@ namespace Datadog.Trace.ClrProfiler.Integrations
         public string Method { get; set; }
 
         public string Url { get; set; }
+
+        public string DbStatement { get; set; }
 
         protected override IProperty<string>[] GetAdditionalTags() => ElasticsearchTagsProperties;
     }
