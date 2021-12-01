@@ -15,6 +15,16 @@
 #define MAX_CLASS_NAME_LEN 512
 #define MAX_STRING_LENGTH 512
 
+#define MAX_CODES_PER_BUFFER (10 * 1000)
+
+// If you change this, consider ThreadSampler.cs too
+#define SAMPLES_BUFFER_SIZE (100 * 1024)
+
+
+// If you squint you can make out that the original bones of this came from sample code provided by the dotnet project:
+// https://github.com/dotnet/samples/blob/2cf486af936261b04a438ea44779cdc26c613f98/core/profiling/stacksampling/src/sampler.cpp
+// That stacksampling project is worth reading for a simpler (though higher overhead) take on thread sampling.
+
 static std::mutex bufferLock = std::mutex();
 static unsigned char* bufferA; // FIXME would like to use std::array, etc. if we can avoid extra copying
 static int bufferALen;
@@ -81,7 +91,7 @@ int ConsumeOneThreadSample(int len, unsigned char* buf)
 
 
 namespace trace {
-    // FIXME more copy and paste from sample code; clean up
+
 template <class MetaInterface>
 class COMPtrHolder {
  public:
@@ -113,9 +123,6 @@ class COMPtrHolder {
  private:
   MetaInterface* m_ptr;
 };
-
-// If you change this, consider ThreadSampler.cs too
-#define SAMPLES_BUFFER_SIZE (100 * 1024)
 
 class ThreadSamplesBuffer {
  public:
@@ -158,9 +165,11 @@ class ThreadSamplesBuffer {
     if (found != codes.end()) {
         writeShort(found->second);
     } else {
-        // FIXME limit # codes to prevent blowout and also to fit in the 16b max
         int code = codes.size() + 1;
-        codes[fid] = code;
+        if (codes.size() + 1 < MAX_CODES_PER_BUFFER)
+        {
+            codes[fid] = code;
+        }
         writeShort( -code );  // note negative sign indiciating definition of code
         writeString(str);
     }
@@ -169,7 +178,7 @@ class ThreadSamplesBuffer {
     if (pos + 2 >= SAMPLES_BUFFER_SIZE) {
       return;
     }
-    int16_t bigEnd = _byteswap_ushort(val);  // FIXME this doesn't smell right
+    int16_t bigEnd = _byteswap_ushort(val);
     memcpy(&buffer[pos], &bigEnd, 2);
     pos += 2;
   }
@@ -177,7 +186,7 @@ class ThreadSamplesBuffer {
     if (pos + 4 >= SAMPLES_BUFFER_SIZE) {
       return;
     }
-    int32_t bigEnd = _byteswap_ulong(val); // FIXME this doesn't smell right
+    int32_t bigEnd = _byteswap_ulong(val);
     memcpy(&buffer[pos], &bigEnd, 4);
     pos += 4;
   }
@@ -394,7 +403,10 @@ class ThreadSamplesBuffer {
             threadID, &FrameCallback, COR_PRF_SNAPSHOT_DEFAULT,
             &helper,
             NULL, 0);
-        // FIXME if localHr...
+        if (FAILED(hr))
+        {
+            Logger::Debug("DoStackSnapshot failed: ", hr);
+        }
         helper.curWriter->EndSample();
       }
       helper.curWriter->EndBatch();
@@ -410,21 +422,27 @@ class ThreadSamplesBuffer {
         helper.info10 = info10;
 
         while (1) {
-          Sleep(1000);  // FIXME drift-free or no?
+            // FIXME make configurable
+          Sleep(1000);
           bool shouldSample = helper.AllocateBuffer();
           if (!shouldSample) {
-              continue; // FIXME might like stats on how often this happens
+              Logger::Warn("Skipping a thread sample period, buffers are full");
+              // FIXME might like stats on how often this happens
+              continue; 
           }
+          int totalThreads = 0;
 
           LARGE_INTEGER start, end, elapsedMicros, frequency;
           QueryPerformanceFrequency(&frequency);
           QueryPerformanceCounter(&start);
 
           hr = info10->SuspendRuntime();
-          // FIXME if suspending fails, are we supposed to try to resume anyway?
-   
-                int totalThreads = CaptureSamples(ts, info10, helper);     
-
+          if (FAILED(hr)) {
+              Logger::Warn("Could not suspend runtime to sample threads: ", hr);
+          } else {
+              totalThreads = CaptureSamples(ts, info10, helper);
+          }
+          // I don't have any proof but I sure hope that if suspending fails then it's still ok to ask to resume, with no ill effects
           hr = info10->ResumeRuntime();
 
           QueryPerformanceCounter(&end);
