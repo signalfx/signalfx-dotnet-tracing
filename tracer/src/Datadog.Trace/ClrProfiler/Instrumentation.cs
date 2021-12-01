@@ -14,6 +14,7 @@ using Datadog.Trace.DiagnosticListeners;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Plugins;
 using Datadog.Trace.ServiceFabric;
+using Datadog.Trace.Util;
 
 namespace Datadog.Trace.ClrProfiler
 {
@@ -174,7 +175,12 @@ namespace Datadog.Trace.ClrProfiler
             // FIXME JBLEY config variable to turn this on
             try
             {
-                ThreadSampling.ThreadSampler.Initialize();
+                // If you change this, change environment_variables.h too
+                var enabled = EnvironmentHelpers.GetEnvironmentVariable("SIGNALFX_THREAD_SAMPLING_ENABLED", "false");
+                if (enabled != null && (enabled.ToLower() == "1" || enabled.ToLower() == "true"))
+                {
+                    ThreadSampling.ThreadSampler.Initialize();
+                }
             }
             catch (Exception e)
             {

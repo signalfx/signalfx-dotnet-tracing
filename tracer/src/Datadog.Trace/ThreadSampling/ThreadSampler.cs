@@ -9,19 +9,19 @@ namespace Datadog.Trace.ThreadSampling
     /// </summary>
     public class ThreadSampler
     {
-        // FIXME JBLEY implement for real, clean up all these warnings
+        private static int bufferSize = 100 * 1024; // If you change this, check with ThreadSampler.cpp first
+
         private static void SampleReadingThread()
         {
             while (true)
             {
                 Thread.Sleep(1000);
                 Console.WriteLine("reading samples....");
-                // FIXME performance tuning, can reuse same buffer over and over
                 // FIXME consider calling twice in quick succession and allowing read=0 to silently skip?
+                byte[] buf = new byte[bufferSize];
                 try
                 {
                     var start = DateTime.Now;
-                    byte[] buf = new byte[100 * 1024];
                     int read = signalfx_read_thread_samples(buf.Length, buf);
                     Console.WriteLine("read_thread_samples returned " + read + " bytes");
                     var parser = new ThreadSampleNativeFormatParser(buf, read);

@@ -23,9 +23,6 @@
 #include "version.h"
 #include "ThreadSampler.h"
 
-// FIXME JBLEY make this a config attribute
-#define ENABLE_THREAD_SAMPLES 1
-
 #ifdef MACOS
 #include <mach-o/dyld.h>
 #include <mach-o/getsect.h>
@@ -210,7 +207,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
 
     DWORD event_mask = COR_PRF_MONITOR_JIT_COMPILATION | COR_PRF_DISABLE_TRANSPARENCY_CHECKS_UNDER_FULL_TRUST |
                        COR_PRF_MONITOR_MODULE_LOADS | COR_PRF_MONITOR_ASSEMBLY_LOADS | COR_PRF_MONITOR_APPDOMAIN_LOADS;
-    if (ENABLE_THREAD_SAMPLES)
+    if (IsThreadSamplingEnabled())
     {
         event_mask |= COR_PRF_MONITOR_THREADS | COR_PRF_ENABLE_STACK_SNAPSHOT;
     }
@@ -310,7 +307,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
     //
     managed_profiler_assembly_reference = AssemblyReference::GetFromCache(managed_profiler_full_assembly_version);
 
-    if (ENABLE_THREAD_SAMPLES) {
+    if (IsThreadSamplingEnabled()) {
         this->threadSampler = new ThreadSampler();
         this->threadSampler->StartSampling(this->info_);
     }

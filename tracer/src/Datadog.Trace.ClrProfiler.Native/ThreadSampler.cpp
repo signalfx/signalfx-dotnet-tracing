@@ -92,9 +92,10 @@ class COMPtrHolder {
   COMPtrHolder() { m_ptr = NULL; }
 
   COMPtrHolder(MetaInterface* ptr) {
-    if (ptr != NULL) {
-      ptr->AddRef();
-    }
+      if (ptr != NULL)
+      {
+          ptr->AddRef();
+      }
     m_ptr = ptr;
   }
 
@@ -118,7 +119,9 @@ class COMPtrHolder {
 };
 
 // FIXME a rough prototype to flesh out overhead numbers
+  // If you change this, consider ThreadSampler.cs too
 #define SAMPLES_BUFFER_SIZE (100 * 1024)
+
 class ThreadSamplesBuffer {
  public:
   unsigned char* buffer;

@@ -121,6 +121,9 @@ namespace environment {
     // Sets whether to enable NGEN images.
     const WSTRING clr_enable_ngen = WStr("SIGNALFX_CLR_ENABLE_NGEN");
 
+    // If you change this, change corresponding logic in Instrument.cs too
+    const WSTRING thread_sampling_enabled = WStr("SIGNALFX_THREAD_SAMPLING_ENABLED");
+
 } // namespace environment
 } // namespace trace
 

@@ -107,6 +107,11 @@ bool IsDomainNeutralInstrumentation()
     CheckIfTrue(GetEnvironmentValue(environment::domain_neutral_instrumentation));
 }
 
+bool IsThreadSamplingEnabled()
+{
+    CheckIfTrue(GetEnvironmentValue(environment::thread_sampling_enabled));
+}
+
 } // namespace trace
 
 #endif // DD_CLR_PROFILER_ENVIRONMENT_VARIABLES_UTIL_H_

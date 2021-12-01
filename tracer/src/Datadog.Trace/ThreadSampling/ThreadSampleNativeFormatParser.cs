@@ -9,7 +9,7 @@ namespace Datadog.Trace.ThreadSampling
     /// </summary>
     internal class ThreadSampleNativeFormatParser
     {
-        private static bool printStackTraces = true;
+        private static bool printStackTraces = false;
 
         private byte[] buf;
         private int len;
