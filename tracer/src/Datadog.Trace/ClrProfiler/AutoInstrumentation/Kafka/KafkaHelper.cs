@@ -1,4 +1,4 @@
-﻿// <copyright file="KafkaHelper.cs" company="Datadog">
+// <copyright file="KafkaHelper.cs" company="Datadog">
 // Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
@@ -16,6 +16,8 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
     {
         private const string SystemName = "kafka";
         private const string OperationReceive = "receive";
+        private const string OperationSend = "send";
+
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(KafkaHelper));
         private static bool _headersInjectionEnabled = true;
 
@@ -43,7 +45,9 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
                 string serviceName = settings.GetServiceName(tracer, KafkaConstants.ServiceName);
                 var tags = new KafkaTags(SpanKinds.Producer);
 
-                var operationName = string.IsNullOrEmpty(topicPartition?.Topic) ? KafkaConstants.ProduceOperationName : $"{KafkaConstants.ProduceOperationName} {topicPartition.Topic}";
+                var topic = topicPartition?.Topic;
+                var operationName = string.IsNullOrEmpty(topic) ? $"(default) {OperationSend}" : $"{topic} {OperationSend}";
+
                 scope = tracer.StartActiveWithTags(
                     operationName,
                     tags: tags,
@@ -127,7 +131,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
 
                 var tags = new KafkaTags(SpanKinds.Consumer);
 
-                var operationName = string.IsNullOrEmpty(topic) ? KafkaConstants.ConsumeOperationName : $"{KafkaConstants.ConsumeOperationName} {topic}";
+                var operationName = string.IsNullOrEmpty(topic) ? $"(default) {OperationReceive}" : $"{topic} {OperationReceive}";
                 scope = tracer.StartActiveWithTags(operationName, parent: propagatedContext, tags: tags, serviceName: serviceName);
 
                 string resourceName = $"Consume Topic {(string.IsNullOrEmpty(topic) ? "kafka" : topic)}";
