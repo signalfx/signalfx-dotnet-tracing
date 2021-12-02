@@ -6,6 +6,7 @@
 // Modified by Splunk Inc.
 
 using System;
+using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Propagation;
 using Datadog.Trace.Tagging;
@@ -49,7 +50,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
                 var isMissingTopic = string.IsNullOrEmpty(topic);
                 var operationName = isMissingTopic ? $"(default) {OperationSend}" : $"{topic} {OperationSend}";
 
-                scope = tracer.StartActiveWithTags(
+                scope = tracer.StartActiveInternal(
                     operationName,
                     tags: tags,
                     serviceName: serviceName,
@@ -134,7 +135,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
 
                 var isMissingTopic = string.IsNullOrEmpty(topic);
                 var operationName = isMissingTopic ? $"(default) {OperationReceive}" : $"{topic} {OperationReceive}";
-                scope = tracer.StartActiveWithTags(operationName, parent: propagatedContext, tags: tags, serviceName: serviceName);
+                scope = tracer.StartActiveInternal(operationName, parent: propagatedContext, tags: tags, serviceName: serviceName);
 
                 string resourceName = $"Consume Topic {(isMissingTopic ? "kafka" : topic)}";
 
@@ -193,7 +194,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
                     return;
                 }
 
-                var activeScope = tracer.ActiveScope;
+                var activeScope = tracer.InternalActiveScope;
                 var currentSpan = activeScope?.Span;
                 if (currentSpan == null || !ReferenceEquals(currentSpan.LogicScope, KafkaConstants.ConsumeOperationName))
                 {

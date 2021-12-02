@@ -53,8 +53,6 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
 
             try
             {
-                Span parent = tracer.ActiveScope?.Span;
-
                 tags = new RabbitMQTags(spanKind);
                 string operation = CommandToOperation(command);
                 string operationName = string.IsNullOrWhiteSpace(exchange)
@@ -62,7 +60,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
                     : $"{exchange} {operation}";
 
                 string serviceName = tracer.Settings.GetServiceName(tracer, ServiceName);
-                scope = tracer.StartActiveWithTags(operationName, parent: parentContext, tags: tags, serviceName: serviceName, startTime: startTime);
+                scope = tracer.StartActiveInternal(operationName, parent: parentContext, tags: tags, serviceName: serviceName, startTime: startTime);
                 var span = scope.Span;
 
                 span.Type = SpanTypes.Queue;

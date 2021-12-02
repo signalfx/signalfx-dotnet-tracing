@@ -62,8 +62,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch
 
             try
             {
-                var operationName = requestName ?? OperationName;
-                scope = tracer.StartActiveWithTags(operationName, serviceName: serviceName, tags: tags);
+                scope = tracer.StartActiveInternal(OperationName, serviceName: serviceName, tags: tags);
                 var span = scope.Span;
                 span.LogicScope = OperationName;
                 span.ResourceName = requestName ?? path ?? string.Empty;

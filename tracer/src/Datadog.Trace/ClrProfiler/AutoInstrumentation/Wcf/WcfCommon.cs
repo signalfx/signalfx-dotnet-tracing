@@ -94,7 +94,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
                     : DefaultOperationName;
 
                 var tags = new WebTags();
-                scope = tracer.StartActiveWithTags(operationName, propagatedContext, tags: tags);
+                scope = tracer.StartActiveInternal(operationName, propagatedContext, tags: tags);
                 var span = scope.Span;
                 span.LogicScope = DefaultOperationName;
 

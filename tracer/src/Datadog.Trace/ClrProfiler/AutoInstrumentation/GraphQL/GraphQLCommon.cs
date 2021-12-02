@@ -45,7 +45,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.GraphQL
             try
             {
                 var tags = new GraphQLTags();
-                scope = tracer.StartActiveWithTags(ValidateOperationName, tags: tags);
+                scope = tracer.StartActiveInternal(ValidateOperationName, tags: tags);
 
                 var span = scope.Span;
                 span.LogicScope = ValidateOperationName;
@@ -82,7 +82,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.GraphQL
                     : $"{operationType} {operationName}";
 
                 var tags = new GraphQLTags();
-                scope = tracer.StartActiveWithTags(operation, tags: tags);
+                scope = tracer.StartActiveInternal(operation, tags: tags);
 
                 var span = scope.Span;
                 span.Type = SpanTypes.GraphQL;

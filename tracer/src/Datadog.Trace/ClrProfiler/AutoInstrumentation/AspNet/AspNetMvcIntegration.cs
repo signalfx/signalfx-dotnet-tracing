@@ -138,7 +138,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
                     var tracer = Tracer.Instance;
                     var tagsFromHeaders = Enumerable.Empty<KeyValuePair<string, string>>();
 
-                    if (tracer.ActiveScope == null)
+                    if (tracer.InternalActiveScope == null)
                     {
                         try
                         {
@@ -155,7 +155,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
                     }
 
                     var tags = new AspNetTags();
-                    scope = Tracer.Instance.StartActiveWithTags(resourceName, propagatedContext, tags: tags);
+                    scope = Tracer.Instance.StartActiveInternal(resourceName, propagatedContext, tags: tags);
                     span = scope.Span;
 
                     span.DecorateWebServerSpan(
