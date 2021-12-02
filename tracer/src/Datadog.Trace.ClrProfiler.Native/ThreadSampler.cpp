@@ -13,6 +13,7 @@
 #define SAMPLES_BUFFER_SIZE (100 * 1024)
 
 #define DEFAULT_SAMPLE_PERIOD 1000
+#define MINIMUM_SAMPLE_PERIOD 1000
 
 
 // If you squint you can make out that the original bones of this came from sample code provided by the dotnet project:
@@ -415,9 +416,8 @@ class ThreadSamplesBuffer {
             return DEFAULT_SAMPLE_PERIOD;
         }
         try {
-            return std::stoi(val);
-        }
-        catch (...) {
+            return max(MINIMUM_SAMPLE_PERIOD, std::stoi(val));
+        } catch (...) {
             return DEFAULT_SAMPLE_PERIOD;
         }
     }
