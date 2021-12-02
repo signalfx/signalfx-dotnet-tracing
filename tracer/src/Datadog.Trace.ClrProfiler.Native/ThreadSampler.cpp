@@ -2,6 +2,7 @@
 #include <cinttypes>
 #include <map>
 #include "logger.h"
+#include <chrono>
 
 #define MAX_FUNC_NAME_LEN 256
 #define MAX_CLASS_NAME_LEN 512
@@ -132,8 +133,11 @@ class ThreadSamplesBuffer {
     buffer = NULL; // specifically don't delete[] as ownership/lifecycle is complicated
   }
   void StartBatch() {
-      // FIXME include current time, basic version nunmber, etc. etc.
     writeByte(0x01);
+    writeInt(1); // version number
+    std::chrono::milliseconds ms =
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+    writeInt64((int64_t) ms.count());
   }
 
   void StartSample(ThreadID id, ThreadState* state) { 
@@ -194,7 +198,7 @@ class ThreadSamplesBuffer {
       {
         return;
       }
-      writeInt(str.length());
+      writeInt(usedLen);
       memcpy(&buffer[pos], &str[0], 2 * usedLen);
       pos += 2 * usedLen;
   }
@@ -204,6 +208,16 @@ class ThreadSamplesBuffer {
     }
       buffer[pos] = b;
       pos++;
+  }
+  void writeInt64(int64_t val)
+  {
+      if (pos + 8 > SAMPLES_BUFFER_SIZE)
+      {
+          return;
+      }
+      uint64_t bigEnd = _byteswap_uint64(val);
+      memcpy(&buffer[pos], &bigEnd, 8);
+      pos += 8;  
   }
  };
 

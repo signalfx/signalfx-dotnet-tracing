@@ -42,6 +42,13 @@ namespace Datadog.Trace.ThreadSampling
                 if (op == 0x01)
                 {
                     // start batch, nothing here
+                    int version = ReadInt();
+                    if (version != 1)
+                    {
+                        return; // not able to parse
+                    }
+
+                    long millis = ReadInt64();
                 }
                 else if (op == 0x02)
                 {
@@ -114,6 +121,27 @@ namespace Datadog.Trace.ThreadSampling
             int i4 = buf[pos + 3] & 0xFF;
             pos += 4;
             return i1 + i2 + i3 + i4;
+        }
+
+        private long ReadInt64()
+        {
+            long l1 = buf[pos] & 0xFF;
+            l1 <<= 56;
+            long l2 = buf[pos + 1] & 0xFF;
+            l2 <<= 48;
+            long l3 = buf[pos + 2] & 0xFF;
+            l3 <<= 40;
+            long l4 = buf[pos + 3] & 0xFF;
+            l4 <<= 32;
+            long l5 = buf[pos + 4] & 0xFF;
+            l5 <<= 24;
+            long l6 = buf[pos + 5] & 0xFF;
+            l6 <<= 16;
+            long l7 = buf[pos + 6] & 0xFF;
+            l7 <<= 8;
+            long l8 = buf[pos + 7] & 0xFF;
+            pos += 8;
+            return l1 + l2 + l3 + l4 + l5 + l6 + l7 + l8;
         }
     }
 }
