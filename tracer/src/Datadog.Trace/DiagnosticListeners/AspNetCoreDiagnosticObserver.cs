@@ -631,7 +631,7 @@ namespace Datadog.Trace.DiagnosticListeners
 
             string resourceName = $"{httpMethod} {resourceUrl}";
 
-            SpanContext propagatedContext = ExtractPropagatedContext(tracer.Propagator, request);
+            SpanContext propagatedContext = ExtractPropagatedContext(tracer.TracerManager.Propagator, request);
             var tagsFromHeaders = ExtractHeaderTags(request, tracer);
 
             var tags = tracer.Settings.RouteTemplateResourceNamesEnabled ? new AspNetCoreEndpointTags() : new AspNetCoreTags();

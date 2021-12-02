@@ -62,7 +62,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Http.WebRequest
                 }
 
                 // Check if any headers were injected by a previous call
-                var existingSpanContext = Tracer.Instance.Propagator.Extract(request.Headers, (headers, key) => headers.GetValues(key));
+                var existingSpanContext = Tracer.Instance.TracerManager.Propagator.Extract(request.Headers, (headers, key) => headers.GetValues(key));
 
                 // If this operation creates the trace, then we need to re-apply the sampling priority
                 bool setSamplingPriority = existingSpanContext?.SamplingPriority != null && Tracer.Instance.ActiveScope == null;

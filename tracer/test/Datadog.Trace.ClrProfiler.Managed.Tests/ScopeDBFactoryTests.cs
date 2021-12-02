@@ -56,7 +56,10 @@ namespace Datadog.Trace.ClrProfiler.Managed.Tests
         {
             // Set up tracer
             var tracerSettings = new TracerSettings();
+            // TODO PK: use non-obsolete code
+#pragma warning disable CS0618 // Type or member is obsolete
             var tracer = new Tracer(tracerSettings);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             // Create scope
             using (var scope = CreateDbCommandScope(tracer, new CustomDbCommand()))

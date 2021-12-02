@@ -59,7 +59,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
             {
                 try
                 {
-                    propagatedContext = tracer.Propagator.Extract(basicProperties.Headers, ContextPropagation.HeadersGetter);
+                    propagatedContext = tracer.TracerManager.Propagator.Extract(basicProperties.Headers, ContextPropagation.HeadersGetter);
                 }
                 catch (Exception ex)
                 {

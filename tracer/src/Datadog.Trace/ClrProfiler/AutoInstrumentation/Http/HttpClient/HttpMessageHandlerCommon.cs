@@ -28,7 +28,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Http.HttpClient
                     tags.HttpClientHandlerType = instance.GetType().FullName;
 
                     // add distributed tracing headers to the HTTP request
-                    tracer.Propagator.Inject(scope.Span.Context, new HttpHeadersCollection(requestMessage.Headers));
+                    tracer.TracerManager.Propagator.Inject(scope.Span.Context, new HttpHeadersCollection(requestMessage.Headers));
 
                     return new CallTargetState(scope);
                 }

@@ -1,4 +1,4 @@
-﻿// <copyright file="TracerManagerFactory.cs" company="Datadog">
+// <copyright file="TracerManagerFactory.cs" company="Datadog">
 // Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
@@ -50,6 +50,7 @@ namespace Datadog.Trace
         }
 
         // TODO PK fix cref /// <see cref="Tracer(TracerSettings, IReadOnlyCollection{IOTelExtension}, IAgentWriter, ISampler, IScopeManager, IDogStatsd)"/>
+
         /// <summary>
         /// Internal for use in tests that create "standalone" <see cref="TracerManager"/> by
         /// </summary>
@@ -155,18 +156,6 @@ namespace Datadog.Trace
                     var apiRequestFactory = TransportStrategy.Get(settings);
                     var api = new Api(settings.AgentUri, apiRequestFactory, statsd, rates => sampler.SetDefaultSampleRates(rates), settings.PartialFlushEnabled);
                     return new AgentWriter(api, metrics, maxBufferSize: settings.TraceBufferSize);
-            }
-        }
-
-        private ITraceIdConvention GetTraceIdConvention(ConventionType convention)
-        {
-            switch (convention)
-            {
-                case ConventionType.Datadog:
-                    return new DatadogTraceIdConvention();
-                case ConventionType.OpenTelemetry:
-                default:
-                    return new OtelTraceIdConvention();
             }
         }
 
@@ -295,6 +284,18 @@ namespace Datadog.Trace
 #endif
             siteName = default;
             return false;
+        }
+
+        private ITraceIdConvention GetTraceIdConvention(ConventionType convention)
+        {
+            switch (convention)
+            {
+                case ConventionType.Datadog:
+                    return new DatadogTraceIdConvention();
+                case ConventionType.OpenTelemetry:
+                default:
+                    return new OtelTraceIdConvention();
+            }
         }
     }
 }

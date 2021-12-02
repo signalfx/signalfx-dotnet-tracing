@@ -76,7 +76,10 @@ namespace Datadog.Trace.ClrProfiler
                 var plugins = PluginManager.TryLoadPlugins(GlobalSettings.Source.PluginsConfiguration);
 
                 // First call to create Tracer instace
+                // TODO PK: remove call to Tracer.Instane
+#pragma warning disable CS0618 // Type or member is obsolete
                 Tracer.Instance = new Tracer(plugins);
+#pragma warning restore CS0618 // Type or member is obsolete
                 Log.Debug("Sending CallTarget integration definitions to native library.");
                 var payload = InstrumentationDefinitions.GetAllDefinitions();
                 NativeMethods.InitializeProfiler(payload.DefinitionsId, payload.Definitions);

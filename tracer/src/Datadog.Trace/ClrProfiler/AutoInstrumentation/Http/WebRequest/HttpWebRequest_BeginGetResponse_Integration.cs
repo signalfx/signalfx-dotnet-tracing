@@ -46,7 +46,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Http.WebRequest
                 var tracer = Tracer.Instance;
 
                 // We may have already set headers
-                var propagator = tracer.Propagator;
+                var propagator = tracer.TracerManager.Propagator;
                 var requestContext = propagator.Extract(request.Headers, (headers, key) => headers.GetValues(key));
                 if (requestContext is null || requestContext.TraceId == TraceId.Zero)
                 {

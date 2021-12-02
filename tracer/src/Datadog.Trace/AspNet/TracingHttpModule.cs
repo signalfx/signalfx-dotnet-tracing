@@ -104,7 +104,7 @@ namespace Datadog.Trace.AspNet
                 HttpRequest httpRequest = httpContext.Request;
                 SpanContext propagatedContext = null;
                 var tagsFromHeaders = Enumerable.Empty<KeyValuePair<string, string>>();
-                var propagator = tracer.Propagator;
+                var propagator = tracer.TracerManager.Propagator;
 
                 if (tracer.ActiveScope == null)
                 {

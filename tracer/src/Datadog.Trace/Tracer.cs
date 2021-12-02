@@ -77,6 +77,16 @@ namespace Datadog.Trace
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="Tracer"/> class and extends
+        /// implementation with plugins
+        /// </summary>
+        /// <param name="plugins">Plugins to extend with</param>
+        public Tracer(IReadOnlyCollection<IOTelExtension> plugins)
+            : this(settings: null, plugins: plugins, agentWriter: null, sampler: null, scopeManager: null, statsd: null)
+        {
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Tracer"/> class.
         /// For testing only.
         /// Note that this API does NOT replace the global Tracer instance.
@@ -85,7 +95,6 @@ namespace Datadog.Trace
         internal Tracer(TracerSettings settings, IReadOnlyCollection<IOTelExtension> plugins, IAgentWriter agentWriter, ISampler sampler, IScopeManager scopeManager, IDogStatsd statsd)
             : this(TracerManagerFactory.Instance.CreateTracerManager(settings, plugins, agentWriter, sampler, scopeManager, statsd, runtimeMetrics: null, libLogSubscriber: null))
         {
-            // TODO PK: use plugins parameter
         }
 
         /// <summary>
@@ -153,6 +162,10 @@ namespace Datadog.Trace
             }
         }
 
+        internal static string RuntimeId => LazyInitializer.EnsureInitialized(ref _runtimeId, () => Guid.NewGuid().ToString());
+
+        internal static int LiveTracerCount => _liveTracerCount;
+
         /// <summary>
         /// Gets the active scope
         /// </summary>
@@ -179,13 +192,9 @@ namespace Datadog.Trace
         ISampler IDatadogTracer.Sampler => TracerManager.Sampler;
 
         /// <summary>
-        /// Gets the propagator logic <see cref="TracerSettings.Propagators"/>.
+        /// Gets the <see cref="IPropagator"/> instance used by this <see cref="IDatadogTracer"/> instance.
         /// </summary>
-        internal IPropagator Propagator => TracerManager.Propagator;
-
-        internal static string RuntimeId => LazyInitializer.EnsureInitialized(ref _runtimeId, () => Guid.NewGuid().ToString());
-
-        internal static int LiveTracerCount => _liveTracerCount;
+        IPropagator IDatadogTracer.Propagator => TracerManager.Propagator;
 
         internal TracerManager TracerManager => _tracerManager ?? TracerManager.Instance;
 
@@ -307,7 +316,7 @@ namespace Datadog.Trace
             }
         }
 
-        internal SpanContext CreateSpanContext(ISpanContext parent = null, string serviceName = null, bool ignoreActiveScope = false, ulong? traceId = null, ulong? spanId = null)
+        internal SpanContext CreateSpanContext(ISpanContext parent = null, string serviceName = null, bool ignoreActiveScope = false, TraceId? traceId = null, ulong? spanId = null)
         {
             if (parent == null && !ignoreActiveScope)
             {
@@ -337,11 +346,11 @@ namespace Datadog.Trace
 
         internal Scope StartActiveWithTags(string operationName, ISpanContext parent = null, string serviceName = null, DateTimeOffset? startTime = null, bool ignoreActiveScope = false, bool finishOnClose = true, ITags tags = null, ulong? spanId = null)
         {
-            var span = StartSpan(operationName, tags, parent, serviceName, startTime, ignoreActiveScope, spanId);
+            var span = StartSpan(operationName, tags, parent, serviceName, startTime, ignoreActiveScope, spanId: spanId);
             return TracerManager.ScopeManager.Activate(span, finishOnClose);
         }
 
-        internal Span StartSpan(string operationName, ITags tags, ISpanContext parent = null, string serviceName = null, DateTimeOffset? startTime = null, bool ignoreActiveScope = false, ulong? traceId = null, ulong? spanId = null, bool addToTraceContext = true)
+        internal Span StartSpan(string operationName, ITags tags, ISpanContext parent = null, string serviceName = null, DateTimeOffset? startTime = null, bool ignoreActiveScope = false, TraceId? traceId = null, ulong? spanId = null, bool addToTraceContext = true)
         {
             var spanContext = CreateSpanContext(parent, serviceName, ignoreActiveScope, traceId, spanId);
 

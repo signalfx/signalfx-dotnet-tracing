@@ -1,4 +1,4 @@
-﻿// <copyright file="TracerManager.cs" company="Datadog">
+// <copyright file="TracerManager.cs" company="Datadog">
 // Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
@@ -103,7 +103,6 @@ namespace Datadog.Trace
         /// </summary>
         public ISampler Sampler { get; }
 
-        
         /// <summary>
         /// Gets the <see cref="IPropagator"/> instance used by this <see cref="IDatadogTracer"/> instance.
         /// </summary>
