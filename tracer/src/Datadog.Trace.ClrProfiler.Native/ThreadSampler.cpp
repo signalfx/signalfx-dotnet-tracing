@@ -12,6 +12,7 @@
 // If you change this, consider ThreadSampler.cs too
 #define SAMPLES_BUFFER_SIZE (100 * 1024)
 
+// If you change these, change ThreadSampler.cs too
 #define DEFAULT_SAMPLE_PERIOD 1000
 #define MINIMUM_SAMPLE_PERIOD 1000
 
