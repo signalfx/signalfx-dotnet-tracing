@@ -48,7 +48,11 @@ namespace Datadog.Trace.ThreadSampling
                         return; // not able to parse
                     }
 
-                    long millis = ReadInt64();
+                    long sampleStartMillis = ReadInt64();
+                    // Would like to use DateTimeOffset.FromUnixTimeMilliseconds here but version compatibility won't allow it
+                    // A tick is 100 nanos and the big constant there is the unix epoch compared to the windows one, in ticks
+                    var sampleStart = new DateTime((sampleStartMillis * 10000) + 621_355_968_000_000_000).ToLocalTime();
+                    Console.WriteLine("thread samples captured at " + sampleStart.ToLongDateString() + " " + sampleStart.ToLongTimeString());
                 }
                 else if (op == 0x02)
                 {
@@ -85,6 +89,11 @@ namespace Datadog.Trace.ThreadSampling
                 else if (op == 0x06)
                 {
                     // end batch, nothing here
+                }
+                else if (op == 0x07)
+                {
+                    int microsSuspended = ReadInt();
+                    Console.WriteLine("  clr was suspended for " + microsSuspended + " micros");
                 }
                 else
                 {

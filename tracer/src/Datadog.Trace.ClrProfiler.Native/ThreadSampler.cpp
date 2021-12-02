@@ -124,7 +124,7 @@ class COMPtrHolder {
 class ThreadSamplesBuffer {
  public:
   unsigned char* buffer;
-  unsigned int pos; // FIXME 
+  unsigned int pos; // FIXME would prefer a buffer class of some type here
   std::unordered_map<FunctionID, int> codes;
 
   ThreadSamplesBuffer(unsigned char* buf): buffer(buf), pos(0) {
@@ -155,8 +155,10 @@ class ThreadSamplesBuffer {
   }
   void EndBatch() { 
       writeByte(0x06); 
-      // FIXME include metadata, like overhead time
-      printf("end batch in %i bytes\n", pos);
+  }
+  void WriteFinalStats(int microsSuspended) {
+      writeByte(0x07);
+      writeInt(microsSuspended);
   }
 
   private:
@@ -385,13 +387,10 @@ class ThreadSamplesBuffer {
     }
 
     // Factored out from the loop to a separate function for easier auditing and control of the threadstate lock
-    // FIXME return type void in the future; metadata written to output structure instead
-    int CaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, SamplingHelper& helper) {
+    void CaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, SamplingHelper& helper) {
       ICorProfilerThreadEnum* threadEnum = NULL;
       HRESULT hr = info10->EnumThreads(&threadEnum);
       // FIXME check hr
-      int totalThreads = 0;
-
       ThreadID threadID;
       ULONG numReturned = 0;
 
@@ -408,7 +407,6 @@ class ThreadSamplesBuffer {
             helper.curWriter->StartSample(threadID, &unknown);
         }
 
-        totalThreads++;
         HRESULT localHr = info10->DoStackSnapshot(
             threadID, &FrameCallback, COR_PRF_SNAPSHOT_DEFAULT,
             &helper,
@@ -420,8 +418,6 @@ class ThreadSamplesBuffer {
         helper.curWriter->EndSample();
       }
       helper.curWriter->EndBatch();
-      return totalThreads;
-
     }
 
     int GetSamplingPeriod()
@@ -453,7 +449,6 @@ class ThreadSamplesBuffer {
               // FIXME might like stats on how often this happens
               continue; 
           }
-          int totalThreads = 0;
 
           LARGE_INTEGER start, end, elapsedMicros, frequency;
           QueryPerformanceFrequency(&frequency);
@@ -463,18 +458,20 @@ class ThreadSamplesBuffer {
           if (FAILED(hr)) {
               Logger::Warn("Could not suspend runtime to sample threads: ", hr);
           } else {
-              totalThreads = CaptureSamples(ts, info10, helper);
+              CaptureSamples(ts, info10, helper);
           }
           // I don't have any proof but I sure hope that if suspending fails then it's still ok to ask to resume, with no ill effects
           hr = info10->ResumeRuntime();
 
           QueryPerformanceCounter(&end);
-          helper.PublishBuffer();
-
           elapsedMicros.QuadPart = end.QuadPart - start.QuadPart;
           elapsedMicros.QuadPart *= 1000000;
           elapsedMicros.QuadPart /= frequency.QuadPart;
-          printf("Resuming runtime (%i threads) after %lli micros\n", (int) totalThreads, (long long) elapsedMicros.QuadPart);
+          printf("Resuming runtime after %i micros\n", (int) elapsedMicros.QuadPart);
+          helper.curWriter->WriteFinalStats((int)(elapsedMicros.QuadPart));
+
+          helper.PublishBuffer();
+
         }
 
         return 0;
