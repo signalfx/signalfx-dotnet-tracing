@@ -46,7 +46,8 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
                 var tags = new KafkaTags(SpanKinds.Producer);
 
                 var topic = topicPartition?.Topic;
-                var operationName = string.IsNullOrEmpty(topic) ? $"(default) {OperationSend}" : $"{topic} {OperationSend}";
+                var isMissingTopic = string.IsNullOrEmpty(topic);
+                var operationName = isMissingTopic ? $"(default) {OperationSend}" : $"{topic} {OperationSend}";
 
                 scope = tracer.StartActiveWithTags(
                     operationName,
@@ -54,7 +55,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
                     serviceName: serviceName,
                     finishOnClose: finishOnClose);
 
-                string resourceName = $"Produce Topic {(string.IsNullOrEmpty(topicPartition?.Topic) ? "kafka" : topicPartition?.Topic)}";
+                string resourceName = $"Produce Topic {(isMissingTopic ? "kafka" : topic)}";
 
                 var span = scope.Span;
                 span.LogicScope = KafkaConstants.ProduceOperationName;
@@ -131,10 +132,11 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
 
                 var tags = new KafkaTags(SpanKinds.Consumer);
 
-                var operationName = string.IsNullOrEmpty(topic) ? $"(default) {OperationReceive}" : $"{topic} {OperationReceive}";
+                var isMissingTopic = string.IsNullOrEmpty(topic);
+                var operationName = isMissingTopic ? $"(default) {OperationReceive}" : $"{topic} {OperationReceive}";
                 scope = tracer.StartActiveWithTags(operationName, parent: propagatedContext, tags: tags, serviceName: serviceName);
 
-                string resourceName = $"Consume Topic {(string.IsNullOrEmpty(topic) ? "kafka" : topic)}";
+                string resourceName = $"Consume Topic {(isMissingTopic ? "kafka" : topic)}";
 
                 var span = scope.Span;
                 span.LogicScope = KafkaConstants.ConsumeOperationName;
