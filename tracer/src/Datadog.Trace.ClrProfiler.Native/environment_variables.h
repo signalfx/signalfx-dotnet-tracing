@@ -124,6 +124,7 @@ namespace environment {
     // If you change this, change corresponding logic in Instrument.cs too
     const WSTRING thread_sampling_enabled = WStr("SIGNALFX_THREAD_SAMPLING_ENABLED");
 
+    const WSTRING thread_sampling_period = WStr("SIGNALFX_THREAD_SAMPLING_PERIOD");
 } // namespace environment
 } // namespace trace
 

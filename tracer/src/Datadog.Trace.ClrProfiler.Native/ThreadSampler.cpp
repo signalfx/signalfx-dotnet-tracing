@@ -3,14 +3,6 @@
 #include <map>
 #include "logger.h"
 
-#if WIN32
-#define WSTRING std::wstring
-#define WSTR(str) L##str
-#else  // WIN32
-#define WSTRING std::u16string
-#define WSTR(str) u##str
-#endif  // WIN32
-
 #define MAX_FUNC_NAME_LEN 256
 #define MAX_CLASS_NAME_LEN 512
 #define MAX_STRING_LENGTH 512
@@ -19,6 +11,8 @@
 
 // If you change this, consider ThreadSampler.cs too
 #define SAMPLES_BUFFER_SIZE (100 * 1024)
+
+#define DEFAULT_SAMPLE_PERIOD 1000
 
 
 // If you squint you can make out that the original bones of this came from sample code provided by the dotnet project:
@@ -248,7 +242,7 @@ class ThreadSamplesBuffer {
 
         if (classId == NULL) {
           Logger::Debug("NULL classId passed to GetClassName");
-          return WSTR("Unknown");
+          return WStr("Unknown");
         }
 
         hr = info10->GetClassIDInfo2(classId, &modId, &classToken,
@@ -256,16 +250,16 @@ class ThreadSamplesBuffer {
                                               NULL, NULL);
         if (CORPROF_E_CLASSID_IS_ARRAY == hr) {
           // We have a ClassID of an array.
-          return WSTR("ArrayClass");
+          return WStr("ArrayClass");
         } else if (CORPROF_E_CLASSID_IS_COMPOSITE == hr) {
           // We have a composite class
-          return WSTR("CompositeClass");
+          return WStr("CompositeClass");
         } else if (CORPROF_E_DATAINCOMPLETE == hr) {
           // type-loading is not yet complete. Cannot do anything about it.
-          return WSTR("DataIncomplete");
+          return WStr("DataIncomplete");
         } else if (FAILED(hr)) {
           Logger::Debug("GetClassIDInfo failed: ", hr);
-          return WSTR("Unknown");
+          return WStr("Unknown");
         }
 
         COMPtrHolder<IMetaDataImport> pMDImport;
@@ -274,7 +268,7 @@ class ThreadSamplesBuffer {
                                                 (IUnknown**)&pMDImport);
         if (FAILED(hr)) {
           Logger::Debug("GetModuleMetaData failed: ", hr);
-          return WSTR("Unknown");
+          return WStr("Unknown");
         }
 
         WCHAR wName[MAX_CLASS_NAME_LEN];
@@ -283,10 +277,10 @@ class ThreadSamplesBuffer {
                                         &dwTypeDefFlags, NULL);
         if (FAILED(hr)) {
           Logger::Debug("GetTypeDefProps failed: ", hr);
-          return WSTR("Unknown");
+          return WStr("Unknown");
         }
 
-        WSTRING name = WSTR("");
+        WSTRING name = WStr("");
         name += wName;
 
         return name;
@@ -295,7 +289,7 @@ class ThreadSamplesBuffer {
       WSTRING GetFunctionName(FunctionID funcID,
                                        const COR_PRF_FRAME_INFO frameInfo) {
         if (funcID == NULL) {
-          return WSTR("Unknown_Native_Function");
+          return WStr("Unknown_Native_Function");
         }
 
         ClassID classId = NULL;
@@ -331,10 +325,10 @@ class ThreadSamplesBuffer {
         if (classId != 0) {
           name += GetClassName(classId);
         } else {
-          name += WSTR("SharedGenericFunction");
+          name += WStr("SharedGenericFunction");
         }
 
-        name += WSTR("::");
+        name += WStr("::");
 
         name += funcName;
 
@@ -414,7 +408,22 @@ class ThreadSamplesBuffer {
 
     }
 
+    int GetSamplingPeriod()
+    {
+        WSTRING val = GetEnvironmentValue(environment::thread_sampling_period);
+        if (val.empty()) {
+            return DEFAULT_SAMPLE_PERIOD;
+        }
+        try {
+            return std::stoi(val);
+        }
+        catch (...) {
+            return DEFAULT_SAMPLE_PERIOD;
+        }
+    }
+
     DWORD WINAPI SamplingThreadMain(_In_ LPVOID param) { 
+        int sleepMillis = GetSamplingPeriod();
         ThreadSampler* ts = (ThreadSampler*)param;
         ICorProfilerInfo10* info10 = ts->info10;
         HRESULT hr;
@@ -422,8 +431,7 @@ class ThreadSamplesBuffer {
         helper.info10 = info10;
 
         while (1) {
-            // FIXME make configurable
-          Sleep(1000);
+          Sleep(sleepMillis);
           bool shouldSample = helper.AllocateBuffer();
           if (!shouldSample) {
               Logger::Warn("Skipping a thread sample period, buffers are full");
