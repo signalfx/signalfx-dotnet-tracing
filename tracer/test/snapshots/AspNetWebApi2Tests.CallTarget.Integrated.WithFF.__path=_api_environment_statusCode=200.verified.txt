@@ -24,9 +24,9 @@
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: GET,
+    Name: GET api/environment,
     LogicScope: aspnet.request,
-    Resource: GET /api/environment,
+    Resource: GET api/environment,
     Service: sample,
     Type: web,
     Tags: {
@@ -38,6 +38,8 @@
       language: dotnet,
       net.peer.ip: ::1,
       runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: 0.0.1.0,
       span.kind: server,
       version: 1.0.0
     },
