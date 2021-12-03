@@ -222,9 +222,6 @@ jobs:
       run: docker-compose build --build-arg dotnet_tracer_msi=.$relativeArtifacts/{{ matrix.platform }}/en-us/*.msi --build-arg ENABLE_32_BIT=${{ env.enable32bit }} IntegrationTests.IIS
     - name: docker-compose start IIS containers
       run: docker-compose up -d IntegrationTests.IIS
-    - name: GacAdd
-      run: ./tracer/build.cmd GacAdd -Framework ${{ matrix.framework }}
-      if: ${{ matrix.framework  == 'net461' }}
     - name: RunWindowsIisIntegrationTests
       run: ./tracer/build.cmd RunWindowsIisIntegrationTests -Framework ${{ matrix.framework }}
     - name: docker-compose stop services
