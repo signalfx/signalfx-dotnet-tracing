@@ -20,7 +20,7 @@ COPY ./artifacts /app/install
 
 ARG INSTALL_CMD
 RUN mkdir -p /opt/datadog \
-    && mkdir -p /var/log/datadog \
+    && mkdir -p /var/log/signalfx \
     && cd /app/install \
     && $INSTALL_CMD \
     && rm -rf /app/install
