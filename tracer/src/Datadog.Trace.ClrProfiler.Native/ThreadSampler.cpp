@@ -121,18 +121,15 @@ class COMPtrHolder {
   MetaInterface* m_ptr;
 };
 
-class ThreadSamplesBuffer {
- public:
-  unsigned char* buffer;
-  unsigned int pos; // FIXME would prefer a buffer class of some type here
-  std::unordered_map<FunctionID, int> codes;
-
-  ThreadSamplesBuffer(unsigned char* buf): buffer(buf), pos(0) {
+ThreadSamplesBuffer::ThreadSamplesBuffer(unsigned char* buf) : buffer(buf), pos(0)
+  {
   }
-  ~ThreadSamplesBuffer() { 
+ThreadSamplesBuffer ::~ThreadSamplesBuffer()
+  { 
     buffer = NULL; // specifically don't delete[] as ownership/lifecycle is complicated
   }
-  void StartBatch() {
+  void ThreadSamplesBuffer::StartBatch()
+  {
     writeByte(0x01);
     writeInt(1); // version number
     std::chrono::milliseconds ms =
@@ -140,29 +137,33 @@ class ThreadSamplesBuffer {
     writeInt64((int64_t) ms.count());
   }
 
-  void StartSample(ThreadID id, ThreadState* state) { 
+  void ThreadSamplesBuffer::StartSample(ThreadID id, ThreadState* state) { 
     writeByte(0x02);
     writeInt(id);
     writeInt(state->nativeId);
     writeString(state->threadName);
   }
   // FIXME line numbers
-  void RecordFrame(FunctionID fid, WSTRING &frame) { 
+  void ThreadSamplesBuffer::RecordFrame(FunctionID fid, WSTRING& frame)
+  { 
     writeCodedFrameString(fid, frame);
   }
-  void EndSample() { 
+  void ThreadSamplesBuffer::EndSample()
+  { 
       writeShort(0);
   }
-  void EndBatch() { 
+  void ThreadSamplesBuffer::EndBatch()
+  { 
       writeByte(0x06); 
   }
-  void WriteFinalStats(int microsSuspended) {
+  void ThreadSamplesBuffer::WriteFinalStats(int microsSuspended)
+  {
       writeByte(0x07);
       writeInt(microsSuspended);
   }
 
-  private:
-  void writeCodedFrameString(FunctionID fid, WSTRING& str) {
+  void ThreadSamplesBuffer::writeCodedFrameString(FunctionID fid, WSTRING& str)
+  {
     auto found = codes.find(fid);
     if (found != codes.end()) {
         writeShort(found->second);
@@ -176,7 +177,8 @@ class ThreadSamplesBuffer {
         writeString(str);
     }
   }
-  void writeShort(int16_t val) {
+  void ThreadSamplesBuffer::writeShort(int16_t val)
+  {
     if (pos + 2 >= SAMPLES_BUFFER_SIZE) {
       return;
     }
@@ -184,7 +186,8 @@ class ThreadSamplesBuffer {
     memcpy(&buffer[pos], &bigEnd, 2);
     pos += 2;
   }
-  void writeInt(int32_t val) {
+  void ThreadSamplesBuffer::writeInt(int32_t val)
+  {
     if (pos + 4 >= SAMPLES_BUFFER_SIZE) {
       return;
     }
@@ -192,7 +195,8 @@ class ThreadSamplesBuffer {
     memcpy(&buffer[pos], &bigEnd, 4);
     pos += 4;
   }
-  void writeString(WSTRING & str) {
+  void ThreadSamplesBuffer::writeString(WSTRING& str)
+  {
       // limit strings to a max length overall; this prevents (e.g.) thread names or 
       // any other miscellaneous strings that come along from blowing things out
       size_t usedLen = min(str.length(), MAX_STRING_LENGTH);
@@ -204,16 +208,17 @@ class ThreadSamplesBuffer {
       memcpy(&buffer[pos], &str[0], 2 * usedLen);
       pos += 2 * usedLen;
   }
-  void writeByte(unsigned char b) {
+  void ThreadSamplesBuffer::writeByte(unsigned char b)
+  {
       if (pos + 1 >= SAMPLES_BUFFER_SIZE) {
       return;
     }
       buffer[pos] = b;
       pos++;
   }
-  void writeInt64(int64_t val)
+  void ThreadSamplesBuffer::writeInt64(int64_t val)
   {
-      if (pos + 8 > SAMPLES_BUFFER_SIZE)
+      if (pos + 8 >= SAMPLES_BUFFER_SIZE)
       {
           return;
       }
@@ -221,7 +226,6 @@ class ThreadSamplesBuffer {
       memcpy(&buffer[pos], &bigEnd, 8);
       pos += 8;  
   }
- };
 
 
     class SamplingHelper {
@@ -522,6 +526,7 @@ class ThreadSamplesBuffer {
         state = new ThreadState();
         managedTid2state[threadId] = state;
       }
+      state->threadName.clear();
       state->threadName.append(_name, cchName);
     }
  }

@@ -35,4 +35,30 @@ namespace trace {
 
     };
 
-}  // namespace trace
+
+    class ThreadSamplesBuffer
+    {
+    public:
+        unsigned char* buffer;
+        unsigned int pos; // FIXME would prefer a buffer class of some type here
+        std::unordered_map<FunctionID, int> codes;
+
+        ThreadSamplesBuffer(unsigned char* buf);
+        ~ThreadSamplesBuffer();
+        void StartBatch();
+        void StartSample(ThreadID id, ThreadState* state);
+        void RecordFrame(FunctionID fid, WSTRING& frame);
+        void EndSample();
+        void EndBatch();
+        void WriteFinalStats(int microsSuspended);
+
+    private:
+        void writeCodedFrameString(FunctionID fid, WSTRING& str);
+        void writeShort(int16_t val);
+        void writeInt(int32_t val);
+        void writeString(WSTRING& str);
+        void writeByte(unsigned char b);
+        void writeInt64(int64_t val);
+    };
+
+  }  // namespace trace
