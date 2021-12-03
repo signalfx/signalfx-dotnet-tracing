@@ -28,12 +28,12 @@ static int bufferALen;
 static unsigned char* bufferB;
 static int bufferBLen;
 // Dirt-simple backpressure system to save overhead if managed code is not reading fast enough
-bool ShouldProduceThreadSample()
+bool ThreadSampling_ShouldProduceThreadSample()
 {
     std::lock_guard<std::mutex> guard(bufferLock);
     return bufferA == NULL || bufferB == NULL;
 }
-void RecordProducedThreadSample(int len, unsigned char* buf)
+void ThreadSampling_RecordProducedThreadSample(int len, unsigned char* buf)
 {
     std::lock_guard<std::mutex> guard(bufferLock);
     if (bufferA == NULL)
@@ -52,7 +52,7 @@ void RecordProducedThreadSample(int len, unsigned char* buf)
     }
 }
 // Can return 0 if none are pending
-int ConsumeOneThreadSample(int len, unsigned char* buf)
+int ThreadSampling_ConsumeOneThreadSample(int len, unsigned char* buf)
 {
     unsigned char* toUse = NULL;
     int toUseLen = 0;
@@ -234,7 +234,7 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
       ThreadSamplesBuffer* curWriter = NULL;
       unsigned char* curBuffer = NULL;
       bool AllocateBuffer() { 
-          bool should = ShouldProduceThreadSample();
+          bool should = ThreadSampling_ShouldProduceThreadSample();
           if (!should)
           {
               return should;
@@ -244,7 +244,7 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
           return should;
       }
       void PublishBuffer() {
-          RecordProducedThreadSample((int)curWriter->pos, curBuffer);
+          ThreadSampling_RecordProducedThreadSample((int)curWriter->pos, curBuffer);
           delete curWriter;
           curWriter = NULL;
           curBuffer = NULL;
@@ -535,6 +535,6 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
  {
      __declspec(dllexport) int signalfx_read_thread_samples(int len, unsigned char* buf)
      {
-         return ConsumeOneThreadSample(len, buf);
+         return ThreadSampling_ConsumeOneThreadSample(len, buf);
      }
  }

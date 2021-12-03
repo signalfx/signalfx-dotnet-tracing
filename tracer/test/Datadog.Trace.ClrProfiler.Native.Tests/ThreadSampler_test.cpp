@@ -93,3 +93,35 @@ TEST(ThreadSamplerTest, BufferOverrunBehavior)
         ASSERT_EQ('x', buf[i]);
     }
 }
+
+TEST(ThreadSamplerTest, StaticBufferManagement)
+{
+    unsigned char* bufA = new unsigned char[1];
+    unsigned char* bufB = new unsigned char[2];
+    unsigned char* bufC = new unsigned char[3];
+    unsigned char readBuf[4];
+    bufA[0] = 'A';
+    bufB[0] = 'B';
+    bufC[0] = 'C';
+    ASSERT_EQ(true, ThreadSampling_ShouldProduceThreadSample());
+    ASSERT_EQ(0, ThreadSampling_ConsumeOneThreadSample(4, readBuf));
+
+    ThreadSampling_RecordProducedThreadSample(1, bufA);
+    ThreadSampling_RecordProducedThreadSample(2, bufB);
+    ASSERT_EQ(false, ThreadSampling_ShouldProduceThreadSample());
+
+    ThreadSampling_RecordProducedThreadSample(3, bufC); // no-op (but deletes the buf)
+    ASSERT_EQ(false, ThreadSampling_ShouldProduceThreadSample());
+
+    ASSERT_EQ(1, ThreadSampling_ConsumeOneThreadSample(4, readBuf));
+    ASSERT_EQ('A', readBuf[0]);
+    ASSERT_EQ(2, ThreadSampling_ConsumeOneThreadSample(4, readBuf));
+    ASSERT_EQ('B', readBuf[0]);
+    ASSERT_EQ(0, ThreadSampling_ConsumeOneThreadSample(4, readBuf));
+
+    unsigned char* bufD = new unsigned char[4];
+    bufD[0] = 'D';
+    ThreadSampling_RecordProducedThreadSample(4, bufD);
+    ASSERT_EQ(4, ThreadSampling_ConsumeOneThreadSample(4, readBuf));
+    ASSERT_EQ('D', readBuf[0]);
+}

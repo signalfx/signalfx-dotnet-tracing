@@ -62,3 +62,8 @@ namespace trace {
     };
 
   }  // namespace trace
+
+bool ThreadSampling_ShouldProduceThreadSample();
+void ThreadSampling_RecordProducedThreadSample(int len, unsigned char* buf);
+// Can return 0 if none are pending
+int ThreadSampling_ConsumeOneThreadSample(int len, unsigned char* buf);
