@@ -136,7 +136,7 @@ namespace Datadog.Trace.AppSec.Waf.Initialization
             var paths = new List<string>();
 
             // the real trace home
-            var tracerHome = Environment.GetEnvironmentVariable("DD_DOTNET_TRACER_HOME");
+            var tracerHome = Environment.GetEnvironmentVariable("SIGNALFX_DOTNET_TRACER_HOME");
             if (!string.IsNullOrWhiteSpace(tracerHome))
             {
                 paths.Add(tracerHome);
