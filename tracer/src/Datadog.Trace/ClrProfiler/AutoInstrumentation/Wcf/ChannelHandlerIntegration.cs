@@ -31,7 +31,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
         ReturnTypeName = ClrNames.Bool,
         ParameterTypeNames = new[] { "System.ServiceModel.Channels.RequestContext", "System.ServiceModel.OperationContext" },
         MinimumVersion = "4.0.0",
-        MaximumVersion = "5.*.*",
+        MaximumVersion = "4.*.*",
         IntegrationName = IntegrationName)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
