@@ -222,8 +222,12 @@ jobs:
       run: docker-compose build --build-arg dotnet_tracer_msi=.$relativeArtifacts/{{ matrix.platform }}/en-us/*.msi --build-arg ENABLE_32_BIT=${{ env.enable32bit }} IntegrationTests.IIS
     - name: docker-compose start IIS containers
       run: docker-compose up -d IntegrationTests.IIS
+    # Workaround around long name being hit in MultiDomainHostTests.WorksInsideTheGAC tests
     - name: RunWindowsIisIntegrationTests
-      run: ./tracer/build.cmd RunWindowsIisIntegrationTests -Framework ${{ matrix.framework }}
+      run: |
+        subst y: .
+        y:
+        ./tracer/build.cmd RunWindowsIisIntegrationTests -Framework ${{ matrix.framework }}
     - name: docker-compose stop services
       run: docker-compose down
       if: (${{ job.status }} != 'cancelled')
