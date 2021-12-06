@@ -70,20 +70,10 @@ namespace Datadog.Trace
         public Tracer(TracerSettings settings)
         {
             // TODO: Switch to immutable settings
-            Configure(settings);
+            Configure(settings, null);
 
             // update the count of Tracer instances
             Interlocked.Increment(ref _liveTracerCount);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Tracer"/> class and extends
-        /// implementation with plugins
-        /// </summary>
-        /// <param name="plugins">Plugins to extend with</param>
-        public Tracer(IReadOnlyCollection<IOTelExtension> plugins)
-            : this(settings: null, plugins: plugins, agentWriter: null, sampler: null, scopeManager: null, statsd: null)
-        {
         }
 
         /// <summary>
@@ -204,9 +194,10 @@ namespace Datadog.Trace
         /// </summary>
         /// <param name="settings"> A <see cref="TracerSettings"/> instance with the desired settings,
         /// or null to use the default configuration sources. This is used to configure global settings</param>
-        public static void Configure(TracerSettings settings)
+        /// <param name="plugins">Plugins to extend with</param>
+        public static void Configure(TracerSettings settings, IReadOnlyCollection<IOTelExtension> plugins)
         {
-            TracerManager.ReplaceGlobalManager(settings?.Build(), TracerManagerFactory.Instance);
+            TracerManager.ReplaceGlobalManager(settings?.Build(), plugins, TracerManagerFactory.Instance);
         }
 
         /// <summary>

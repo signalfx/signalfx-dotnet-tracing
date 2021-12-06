@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
@@ -52,7 +54,7 @@ namespace Datadog.Trace.Ci
 
             // Initialize Tracer
             Log.Information("Initialize Test Tracer instance");
-            TracerManager.ReplaceGlobalManager(tracerSettings.Build(), new CITracerManagerFactory());
+            TracerManager.ReplaceGlobalManager(tracerSettings.Build(), null, new CITracerManagerFactory());
         }
 
         internal static void FlushSpans()

@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Net.Http;
 using Datadog.Trace.Configuration;
@@ -39,7 +41,7 @@ namespace Datadog.Trace.OpenTracing
                 configuration.ServiceName = defaultServiceName;
             }
 
-            Tracer.Configure(configuration);
+            Tracer.Configure(configuration, null);
             return new OpenTracingTracer(Tracer.Instance);
         }
 

@@ -37,12 +37,12 @@ namespace Datadog.Trace
         /// The primary factory method, called by <see cref="TracerManager"/>,
         /// providing the previous global <see cref="TracerManager"/> instance (may be null)
         /// </summary>
-        internal TracerManager CreateTracerManager(ImmutableTracerSettings settings, TracerManager previous)
+        internal TracerManager CreateTracerManager(ImmutableTracerSettings settings, IReadOnlyCollection<IOTelExtension> plugins, TracerManager previous)
         {
             // TODO: If relevant settings have not changed, continue using existing statsd/agent writer/runtime metrics etc
             return CreateTracerManager(
                 settings,
-                plugins: null,
+                plugins: plugins,
                 agentWriter: null,
                 sampler: null,
                 scopeManager: previous?.ScopeManager, // no configuration, so can always use the same one
@@ -50,7 +50,6 @@ namespace Datadog.Trace
                 runtimeMetrics: null,
                 libLogSubscriber: null);
         }
-
 
         /// <summary>
         /// Internal for use in tests that create "standalone" <see cref="TracerManager"/> by
