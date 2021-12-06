@@ -2,8 +2,9 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: aspnet.request,
-    Resource: GET /home/identifier/badvalue,
+    Name: GET home.identifier,
+    LogicScope: aspnet.request,
+    Resource: GET home.identifier,
     Service: sample,
     Type: web,
     Error: 1,
@@ -24,6 +25,8 @@ Parameter name: parameters,
 System.ArgumentException: The parameters dictionary contains a null entry for parameter 'id' of non-nullable type 'System.Int32' for method 'System.Web.Mvc.ActionResult Identifier(Int32)' in 'Samples.AspNetMvc4.Controllers.HomeController'. An optional parameter must be a reference type, a nullable type, or be declared as an optional parameter.
 Parameter name: parameters
 at System.Web.Mvc.ActionDescriptor.ExtractParameterFromDictionary(ParameterInfo parameterInfo, IDictionary`2 parameters, MethodInfo methodInfo),
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: 0.0.1.0,
       span.kind: server,
       version: 1.0.0
     },

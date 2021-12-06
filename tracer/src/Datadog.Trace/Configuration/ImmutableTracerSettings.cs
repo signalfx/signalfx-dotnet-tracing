@@ -73,6 +73,7 @@ namespace Datadog.Trace.Configuration
 
             TagMongoCommands = settings.TagMongoCommands;
             TagRedisCommands = settings.TagRedisCommands;
+            TagElasticsearchQueries = settings.TagElasticsearchQueries;
             TraceResponseHeaderEnabled = settings.TraceResponseHeaderEnabled;
             RecordedValueMaxLength = settings.RecordedValueMaxLength;
             SignalFxAccessToken = settings.SignalFxAccessToken;
@@ -291,6 +292,13 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="ConfigurationKeys.TagRedisCommands"/>
         public bool TagRedisCommands { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether Elasticsearch integration
+        /// should tag PostData as db.statement.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.TagElasticsearchQueries"/>
+        public bool TagElasticsearchQueries { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether context server timing header will be added.

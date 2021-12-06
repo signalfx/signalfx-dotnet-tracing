@@ -174,6 +174,7 @@ namespace Datadog.Trace.TestHelpers
                 "SIGNALFX_TAGS",
                 "SIGNALFX_APPSEC_ENABLED",
                 "SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS",
+                "SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES",
                 "SIGNALFX_CONVENTION",
                 "SIGNALFX_PROPAGATORS"
             };

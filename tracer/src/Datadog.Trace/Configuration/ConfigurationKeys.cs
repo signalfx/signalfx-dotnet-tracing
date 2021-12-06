@@ -466,6 +466,13 @@ namespace Datadog.Trace.Configuration
         public const string TagMongoCommands = "SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS";
 
         /// <summary>
+        /// Configuration key for enabling or disabling tagging Elasticsearch
+        /// PostData as db.statement.
+        /// </summary>
+        /// <seealso cref="TracerSettings.TagElasticsearchQueries"/>
+        public const string TagElasticsearchQueries = "SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES";
+
+        /// <summary>
         /// String format patterns used to match integration-specific configuration keys.
         /// </summary>
         public static class Integrations

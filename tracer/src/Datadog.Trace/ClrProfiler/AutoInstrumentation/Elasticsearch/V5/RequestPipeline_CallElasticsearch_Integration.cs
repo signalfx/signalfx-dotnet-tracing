@@ -39,7 +39,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch.V5
         {
             var scope = ElasticsearchNetCommon.CreateScope(Tracer.Instance, ElasticsearchV5Constants.IntegrationId, instance.DuckCast<RequestPipelineStruct>(), new RequestDataV5(requestData));
 
-            return new CallTargetState(scope);
+            return new CallTargetState(scope, requestData);
         }
 
         /// <summary>
@@ -54,6 +54,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch.V5
         /// <returns>A response value, in an async scenario will be T of Task of T</returns>
         public static CallTargetReturn<TResponse> OnMethodEnd<TTarget, TResponse>(TTarget instance, TResponse response, Exception exception, CallTargetState state)
         {
+            state.Scope.SetDbStatementFromRequestData(state.State);
             state.Scope.DisposeWithException(exception);
             return new CallTargetReturn<TResponse>(response);
         }

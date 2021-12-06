@@ -182,6 +182,8 @@ namespace Datadog.Trace.AspNet
                             && !string.IsNullOrEmpty(resourceName))
                         {
                             scope.Span.ResourceName = resourceName;
+                            // Resource name with low cardinality, update the operation name.
+                            scope.Span.OperationName = resourceName;
                         }
                         else
                         {

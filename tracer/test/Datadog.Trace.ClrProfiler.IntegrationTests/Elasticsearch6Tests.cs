@@ -24,12 +24,23 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetServiceVersion("1.0.0");
         }
 
+        public static IEnumerable<object[]> GetElasticsearch()
+        {
+            foreach (var item in PackageVersions.ElasticSearch6)
+            {
+                yield return item.Concat(true);
+                yield return item.Concat(false);
+            }
+        }
+
         [SkippableTheory]
-        [MemberData(nameof(PackageVersions.ElasticSearch6), MemberType = typeof(PackageVersions))]
+        [MemberData(nameof(GetElasticsearch))]
         [Trait("Category", "EndToEnd")]
         [Trait("Category", "ArmUnsupported")]
-        public void SubmitsTraces(string packageVersion)
+        public void SubmitsTraces(string packageVersion, bool tagQueries)
         {
+            SetEnvironmentVariable("SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES", tagQueries.ToString().ToLowerInvariant());
+
             int agentPort = TcpPortProvider.GetOpenPort();
 
             using (var agent = new MockTracerAgent(agentPort))
@@ -68,6 +79,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                         "IndicesStats",
                         "DeleteIndex",
                         "GetAlias",
+                        "ReindexOnServer",
 
                         "CatAliases",
                         "CatAllocation",
@@ -141,6 +153,35 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                                  .OrderBy(s => s.Start)
                                  .ToList();
 
+                var statementNames = new List<string>
+                {
+                    "Bulk",
+                    "BulkAlias",
+                    "ChangePassword",
+                    "ClusterAllocationExplain",
+                    "ClusterPutSettings",
+                    "ClusterReroute",
+                    "Create",
+                    "CreateIndex",
+                    "DeleteByQuery",
+                    "FlushJob",
+                    "GetAnomalyRecords",
+                    "GetBuckets",
+                    "GetCategories",
+                    "GetInfluencers",
+                    "GetModelSnapshots",
+                    "PutAlias",
+                    "PutIndexTemplate",
+                    "PutJob",
+                    "PutRole",
+                    "PutUser",
+                    "PutRoleMapping",
+                    "ReindexOnServer",
+                    "Search",
+                    "UpdateIndexSettings",
+                    "ValidateJob",
+                };
+
                 foreach (var span in spans)
                 {
                     Assert.Equal("elasticsearch.query", span.LogicScope);
@@ -148,6 +189,16 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     Assert.Equal("elasticsearch", span.Type);
                     Assert.Equal("elasticsearch", DictionaryExtensions.GetValueOrDefault(span.Tags, "db.system"));
                     Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
+
+                    span.Tags.TryGetValue(Tags.DbStatement, out string statement);
+                    if (enableCallTarget && tagQueries && statementNames.Contains(span.Name))
+                    {
+                        Assert.NotNull(statement);
+                    }
+                    else
+                    {
+                        Assert.Null(statement);
+                    }
                 }
 
                 ValidateSpans(spans, (span) => span.Resource, expected);

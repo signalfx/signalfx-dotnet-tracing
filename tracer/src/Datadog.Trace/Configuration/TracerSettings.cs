@@ -236,6 +236,8 @@ namespace Datadog.Trace.Configuration
 
             DelayWcfInstrumentationEnabled = source?.GetBool(ConfigurationKeys.FeatureFlags.DelayWcfInstrumentationEnabled)
                                             ?? false;
+
+            TagElasticsearchQueries = source?.GetBool(ConfigurationKeys.TagElasticsearchQueries) ?? true;
         }
 
         /// <summary>
@@ -483,6 +485,14 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="ConfigurationKeys.TagMongoCommands"/>
         public bool TagMongoCommands { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether Elasticsearch integration
+        /// should tag PostData as db.statement.
+        /// Default is <c>true</c>.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.TagElasticsearchQueries"/>
+        public bool TagElasticsearchQueries { get; set; }
 
         /// <summary>
         /// Gets or sets a value with the maximum length a tag/log value can have.
