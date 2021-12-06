@@ -25,6 +25,7 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 - Remove `SIGNALFX_USE_WEBSERVER_RESOURCE_AS_OPERATION_NAME` configuration. New, fixed behavior is equivalent to flag enabled,
   in order to better align with  [OpenTelemetry Semantic conventions for HTTP spans](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md#name).
 - Remove `SIGNALFX_SANITIZE_SQL_STATEMENTS` configuration as all field sanitizations are moving to the [Splunk Distribution of OpenTelemetry Collector](https://docs.splunk.com/Observability/gdi/opentelemetry/opentelemetry.html).
+- Remove `SIGNALFX_INTEGRATIONS`. This configuration is not needed. The insrtumenation called `CallSite` was removed.
 
 ### Enhancements
 
