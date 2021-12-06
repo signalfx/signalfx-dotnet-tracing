@@ -16,13 +16,13 @@ jobs:
 
     env:
       baseImage: ${{ matrix.baseImage }}
-      dotnetCoreSdk5Version: 5.0.401
+      dotnetSdkVersion: 6.0.100
     steps:
     - uses: actions/checkout@v2
     - name: Build Docker image
       run: |
         docker build \
-          --build-arg DOTNETSDK_VERSION=${dotnetCoreSdk5Version} \
+          --build-arg DOTNETSDK_VERSION=${dotnetSdkVersion} \
           --tag dd-trace-dotnet/${baseImage}-builder \
           --target builder \
           --file "./tracer/build/_build/docker/${baseImage}.dockerfile" \
