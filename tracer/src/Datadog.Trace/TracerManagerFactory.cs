@@ -51,11 +51,11 @@ namespace Datadog.Trace
                 libLogSubscriber: null);
         }
 
-        // TODO PK fix cref /// <see cref="Tracer(TracerSettings, IReadOnlyCollection{IOTelExtension}, IAgentWriter, ISampler, IScopeManager, IDogStatsd)"/>
 
         /// <summary>
         /// Internal for use in tests that create "standalone" <see cref="TracerManager"/> by
         /// </summary>
+        /// <see cref="Tracer(TracerSettings, IReadOnlyCollection{IOTelExtension}, IAgentWriter, ISampler, IScopeManager, IDogStatsd)"/>
         internal TracerManager CreateTracerManager(
             ImmutableTracerSettings settings,
             IReadOnlyCollection<IOTelExtension> plugins,
