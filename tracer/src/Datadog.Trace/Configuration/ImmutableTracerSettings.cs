@@ -298,7 +298,7 @@ namespace Datadog.Trace.Configuration
         /// should tag PostData as db.statement.
         /// </summary>
         /// <seealso cref="ConfigurationKeys.TagElasticsearchQueries"/>
-        public bool TagElasticsearchQueries { get; set; }
+        public bool TagElasticsearchQueries { get; }
 
         /// <summary>
         /// Gets a value indicating whether context server timing header will be added.
