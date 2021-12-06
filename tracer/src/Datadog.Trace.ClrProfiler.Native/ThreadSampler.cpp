@@ -254,7 +254,7 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
       }
 
       private:
-       std::unordered_map<FunctionID, WSTRING*> nameCache; // FIXME replace with real multi-level LRU anbd also figure out string ownership to not leak memory forever
+      FrameNameCache nameCache;
 
           
       // FIXME audit this copy-and-paste, clean it up (e.g., prints), improve performance (even after LRU), doc its origins in the sample code
@@ -365,16 +365,13 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
      public:
 
       WSTRING* Lookup(FunctionID fid, COR_PRF_FRAME_INFO frame) {
-        WSTRING* answer = NULL;
-        auto found = nameCache.find(fid);
-        if (found != nameCache.end()) {
-          answer = found->second;
-        } else {
-          answer = new WSTRING(
-              this->GetFunctionName(fid, frame));  // FIXME again memory leak
-          nameCache[fid] = answer; 
-        }
-        return answer;
+          WSTRING* answer = nameCache.get(fid);
+          if (answer != NULL) {
+              return answer;
+          }
+          answer = new WSTRING(this->GetFunctionName(fid, frame));
+          nameCache.put(fid, answer);
+          return answer;
       }
     };
 
