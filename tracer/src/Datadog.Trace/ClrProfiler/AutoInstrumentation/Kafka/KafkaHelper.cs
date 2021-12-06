@@ -1,4 +1,4 @@
-﻿// <copyright file="KafkaHelper.cs" company="Datadog">
+// <copyright file="KafkaHelper.cs" company="Datadog">
 // Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
@@ -16,6 +16,8 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
     {
         private const string SystemName = "kafka";
         private const string OperationReceive = "receive";
+        private const string OperationSend = "send";
+
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(KafkaHelper));
         private static bool _headersInjectionEnabled = true;
 
@@ -34,7 +36,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
 
                 var parent = tracer.ActiveScope?.Span;
                 if (parent is not null &&
-                    parent.OperationName.StartsWith(KafkaConstants.ProduceOperationName) &&
+                    ReferenceEquals(parent.LogicScope, KafkaConstants.ProduceOperationName) &&
                     parent.GetTag(Tags.InstrumentationName) != null)
                 {
                     return null;
@@ -43,14 +45,17 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
                 string serviceName = settings.GetServiceName(tracer, KafkaConstants.ServiceName);
                 var tags = new KafkaTags(SpanKinds.Producer);
 
-                var operationName = string.IsNullOrEmpty(topicPartition?.Topic) ? KafkaConstants.ProduceOperationName : $"{KafkaConstants.ProduceOperationName} {topicPartition.Topic}";
+                var topic = topicPartition?.Topic;
+                var isMissingTopic = string.IsNullOrEmpty(topic);
+                var operationName = isMissingTopic ? $"(default) {OperationSend}" : $"{topic} {OperationSend}";
+
                 scope = tracer.StartActiveWithTags(
                     operationName,
                     tags: tags,
                     serviceName: serviceName,
                     finishOnClose: finishOnClose);
 
-                string resourceName = $"Produce Topic {(string.IsNullOrEmpty(topicPartition?.Topic) ? "kafka" : topicPartition?.Topic)}";
+                string resourceName = $"Produce Topic {(isMissingTopic ? "kafka" : topic)}";
 
                 var span = scope.Span;
                 span.LogicScope = KafkaConstants.ProduceOperationName;
@@ -101,7 +106,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
 
                 var parent = tracer.ActiveScope?.Span;
                 if (parent is not null &&
-                    parent.OperationName.StartsWith(KafkaConstants.ConsumeOperationName) &&
+                    ReferenceEquals(parent.LogicScope, KafkaConstants.ConsumeOperationName) &&
                     parent.GetTag(Tags.InstrumentationName) != null)
                 {
                     return null;
@@ -127,10 +132,11 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
 
                 var tags = new KafkaTags(SpanKinds.Consumer);
 
-                var operationName = string.IsNullOrEmpty(topic) ? KafkaConstants.ConsumeOperationName : $"{KafkaConstants.ConsumeOperationName} {topic}";
+                var isMissingTopic = string.IsNullOrEmpty(topic);
+                var operationName = isMissingTopic ? $"(default) {OperationReceive}" : $"{topic} {OperationReceive}";
                 scope = tracer.StartActiveWithTags(operationName, parent: propagatedContext, tags: tags, serviceName: serviceName);
 
-                string resourceName = $"Consume Topic {(string.IsNullOrEmpty(topic) ? "kafka" : topic)}";
+                string resourceName = $"Consume Topic {(isMissingTopic ? "kafka" : topic)}";
 
                 var span = scope.Span;
                 span.LogicScope = KafkaConstants.ConsumeOperationName;
@@ -189,7 +195,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
 
                 var activeScope = tracer.ActiveScope;
                 var currentSpan = activeScope?.Span;
-                if (currentSpan == null || !currentSpan.OperationName.StartsWith(KafkaConstants.ConsumeOperationName))
+                if (currentSpan == null || !ReferenceEquals(currentSpan.LogicScope, KafkaConstants.ConsumeOperationName))
                 {
                     // Not currently in a consumer operation
                     return;

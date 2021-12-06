@@ -874,7 +874,7 @@ namespace Datadog.Trace.ClrProfiler.Integrations
                 tags = new RabbitMQTags(spanKind);
                 string operation = CommandToOperation(command);
                 string operationName = string.IsNullOrWhiteSpace(exchange)
-                    ? operation
+                    ? $"(default) {operation}"
                     : $"{exchange} {operation}";
 
                 scope = tracer.StartActiveWithTags(operationName, parent: parentContext, tags: tags, startTime: startTime);
