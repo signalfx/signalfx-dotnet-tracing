@@ -248,7 +248,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
             if (string.IsNullOrWhiteSpace(destination))
             {
-                Assert.Equal(span.Name, operation);
+                Assert.Equal(span.Name, $"(default) {operation}");
             }
             else
             {

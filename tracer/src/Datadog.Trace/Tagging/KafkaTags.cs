@@ -16,10 +16,10 @@ namespace Datadog.Trace.Tagging
 
         private static readonly IProperty<string>[] KafkaTagsProperties =
             MessagingTagsProperties.Concat(
-                new ReadOnlyProperty<KafkaTags, string>(Trace.Tags.InstrumentationName, t => t.InstrumentationName),
-                new Property<KafkaTags, string>(Trace.Tags.KafkaPartition, t => t.Partition, (t, v) => t.Partition = v),
-                new Property<KafkaTags, string>(Trace.Tags.KafkaOffset, t => t.Offset, (t, v) => t.Offset = v),
-                new Property<KafkaTags, string>(Trace.Tags.KafkaTombstone, t => t.Tombstone, (t, v) => t.Tombstone = v));
+                new ReadOnlyProperty<KafkaTags, string>(Tags.InstrumentationName, t => t.InstrumentationName),
+                new Property<KafkaTags, string>(Tags.KafkaPartition, t => t.Partition, (t, v) => t.Partition = v),
+                new Property<KafkaTags, string>(Tags.KafkaOffset, t => t.Offset, (t, v) => t.Offset = v),
+                new Property<KafkaTags, string>(Tags.KafkaTombstone, t => t.Tombstone, (t, v) => t.Tombstone = v));
 
         private static readonly IProperty<double?>[] KafkaTagsMetrics =
             InstrumentationMetricsProperties.Concat(
