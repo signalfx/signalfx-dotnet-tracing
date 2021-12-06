@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Generic;
 using Datadog.Trace.Ci;
@@ -77,7 +79,7 @@ namespace Datadog.Trace.Tests
                     StartupDiagnosticLogEnabled = false,
                     GlobalTags = new Dictionary<string, string> { { "test-tag", "original-value" } },
                 };
-                Tracer.Configure(oldSettings);
+                Tracer.Configure(oldSettings, null);
 
                 var span = Tracer.Instance.StartActive("Test span");
 
@@ -89,7 +91,7 @@ namespace Datadog.Trace.Tests
                     GlobalTags = new Dictionary<string, string> { { "test-tag", "new-value" } },
                 };
 
-                Tracer.Configure(newSettings);
+                Tracer.Configure(newSettings, null);
 
                 span.Dispose();
 

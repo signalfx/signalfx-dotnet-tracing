@@ -174,7 +174,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
 
                     span.Tags.TryGetValue(Tags.DbStatement, out string statement);
-                    if (enableCallTarget && tagQueries && statementNames.Contains(span.Name))
+                    if (tagQueries && statementNames.Contains(span.Name))
                     {
                         Assert.NotNull(statement);
                     }
