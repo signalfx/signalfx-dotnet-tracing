@@ -25,6 +25,9 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 - Remove `SIGNALFX_USE_WEBSERVER_RESOURCE_AS_OPERATION_NAME` configuration. New, fixed behavior is equivalent to flag enabled,
   in order to better align with  [OpenTelemetry Semantic conventions for HTTP spans](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md#name).
 - Remove `SIGNALFX_SANITIZE_SQL_STATEMENTS` configuration as all field sanitizations are moving to the [Splunk Distribution of OpenTelemetry Collector](https://docs.splunk.com/Observability/gdi/opentelemetry/opentelemetry.html).
+- Remove `SIGNALFX_OUTBOUND_HTTP_EXCLUDED_HOSTS` configuration as [Splunk Distribution of OpenTelemetry Collector](https://docs.splunk.com/Observability/gdi/opentelemetry/opentelemetry.html) is the recommended place for spans filtering.
+  If you need span exclusion for specific url substrings, it can be configured using `SIGNALFX_TRACE_HTTP_CLIENT_EXCLUDED_URL_SUBSTRINGS` environment variable.
+- Remove `SIGNALFX_INSTRUMENTATION_ASPNETCORE_DIAGNOSTIC_LISTENERS` configuration which is no longer needed. It provided a workaround for an issue in a specific version of a library, which broke default instrumentation, and was already fixed.  
 
 ### Enhancements
 
