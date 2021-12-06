@@ -78,6 +78,7 @@ namespace Datadog.Trace.Configuration
             SignalFxAccessToken = settings.SignalFxAccessToken;
             Convention = settings.Convention;
             Exporter = settings.Exporter;
+            Propagators = settings.Propagators;
 
             // we cached the static instance here, because is being used in the hotpath
             // by IsIntegrationEnabled method (called from all integrations)
