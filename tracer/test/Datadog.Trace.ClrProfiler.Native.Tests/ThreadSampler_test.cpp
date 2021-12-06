@@ -129,7 +129,7 @@ TEST(ThreadSamplerTest, StaticBufferManagement)
 TEST(ThreadSamplerTest, LRUCache)
 {
     int max = 10000;
-    FrameNameCache cache;
+    NameCache cache(max);
     for (int i = 1; i <= max; i++)
     {
         ASSERT_EQ(NULL, cache.get(i));

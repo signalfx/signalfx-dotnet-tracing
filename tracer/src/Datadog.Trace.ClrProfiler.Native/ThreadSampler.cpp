@@ -17,9 +17,10 @@
 #define DEFAULT_SAMPLE_PERIOD 1000
 #define MINIMUM_SAMPLE_PERIOD 1000
 
-// FIXME make configurable (hidden)? and also consider what default should really be
-// Check the constants in ThreadSampler_test.cpp if this changes
-#define MAX_LRU_SIZE 10000
+// FIXME make configurable (hidden)?
+// These numbers were chosen to keep total overhead under 1 MB of RAM in typical cases (name lengths being the biggest variable)
+#define MAX_FUNCTION_NAME_CACHE_SIZE 6000
+#define MAX_CLASS_NAME_CACHE_SIZE 1000
 
 // If you squint you can make out that the original bones of this came from sample code provided by the dotnet project:
 // https://github.com/dotnet/samples/blob/2cf486af936261b04a438ea44779cdc26c613f98/core/profiling/stacksampling/src/sampler.cpp
@@ -236,6 +237,12 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
       ICorProfilerInfo10* info10 = NULL;
       ThreadSamplesBuffer* curWriter = NULL;
       unsigned char* curBuffer = NULL;
+      NameCache functionNameCache;
+      NameCache classNameCache;
+      SamplingHelper() : functionNameCache(MAX_FUNCTION_NAME_CACHE_SIZE), classNameCache(MAX_CLASS_NAME_CACHE_SIZE)
+      {
+      }
+
       bool AllocateBuffer() { 
           bool should = ThreadSampling_ShouldProduceThreadSample();
           if (!should)
@@ -253,10 +260,7 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
           curBuffer = NULL;
       }
 
-      private:
-      FrameNameCache nameCache;
-
-          
+      private:          
       // FIXME audit this copy-and-paste, clean it up (e.g., prints), improve performance (even after LRU), doc its origins in the sample code
        // FIXME quick prototype (based on disabling the cache) suggests that this can be sped up around 20% by not double/triple-copying the class names and just using a single WCHAR buffer
       WSTRING GetClassName(ClassID classId) {
@@ -348,7 +352,7 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
         // If the ClassID returned from GetFunctionInfo is 0, then the function
         // is a shared generic function.
         if (classId != 0) {
-          name += GetClassName(classId);
+          name += *LookupClassName(classId);
         } else {
           name += WStr("SharedGenericFunction");
         }
@@ -365,12 +369,23 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
      public:
 
       WSTRING* Lookup(FunctionID fid, COR_PRF_FRAME_INFO frame) {
-          WSTRING* answer = nameCache.get(fid);
+          WSTRING* answer = functionNameCache.get(fid);
           if (answer != NULL) {
               return answer;
           }
           answer = new WSTRING(this->GetFunctionName(fid, frame));
-          nameCache.put(fid, answer);
+          functionNameCache.put(fid, answer);
+          return answer;
+      }
+
+      WSTRING* LookupClassName(ClassID cid) {
+          WSTRING* answer = functionNameCache.get(cid);
+          if (answer != NULL)
+          {
+              return answer;
+          }
+          answer = new WSTRING(this->GetClassName(cid));
+          functionNameCache.put(cid, answer);
           return answer;
       }
     };
@@ -529,8 +544,11 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
       state->threadName.clear();
       state->threadName.append(_name, cchName);
     }
+
+    NameCache::NameCache(int maximumSize) : maxSize(maximumSize) {
+    }
    
-    WSTRING* FrameNameCache::get(FunctionID key)
+    WSTRING* NameCache::get(FunctionID key)
     {
         auto found = map.find(key);
         if (found == map.end()) {
@@ -542,13 +560,13 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
         return found->second->second;
     }
 
-    void FrameNameCache::put(FunctionID key, WSTRING* val)
+    void NameCache::put(FunctionID key, WSTRING* val)
     {
         auto pair = std::pair<FunctionID, WSTRING*>(key, val);
         list.push_front(pair);
         map[key] = list.begin();
 
-        if (map.size() > MAX_LRU_SIZE) {
+        if (map.size() > maxSize) {
             auto lru = list.end();
             lru--;
             delete lru->second; // FIXME consider using WSTRING directly instead of WSTRING*

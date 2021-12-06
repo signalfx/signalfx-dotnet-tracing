@@ -61,12 +61,14 @@ namespace trace {
         void writeInt64(int64_t val);
     };
 
-    class FrameNameCache
+    class NameCache
     {
     public:
-        WSTRING* get(FunctionID key);
-        void put(FunctionID key, WSTRING* val);
+        NameCache(int maximumSize);
+        WSTRING* get(UINT_PTR key);
+        void put(UINT_PTR key, WSTRING* val);
     private:
+        int maxSize;
         std::list<std::pair<FunctionID, WSTRING*>> list;
         std::unordered_map<FunctionID, std::list<std::pair<FunctionID, WSTRING*>>::iterator> map;
     };
