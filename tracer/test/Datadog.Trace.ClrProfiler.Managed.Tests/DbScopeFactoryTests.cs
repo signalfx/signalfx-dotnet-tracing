@@ -5,11 +5,9 @@
 
 // Modified by Splunk Inc.
 
-using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
-using System.Data.Common;
 using Datadog.Trace.ClrProfiler.AutoInstrumentation.AdoNet;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.TestHelpers;
@@ -67,7 +65,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Tests
             var tracer = TracerHelper.Create(tracerSettings);
 
             // Create scope
-            using var scope = CreateDbCommandScope(tracer, new CustomDbCommand());
+            using var scope = CreateDbCommandScope(tracer, new System.Data.SqlClient.SqlCommand { CommandText = "test_command" });
             Assert.Equal("test_command", scope.Span.Tags.GetTag(Tags.DbStatement));
         }
 
@@ -143,55 +141,6 @@ namespace Datadog.Trace.ClrProfiler.Managed.Tests
             return (Scope)typeof(DbScopeFactory.Cache<>).MakeGenericType(command.GetType())
                                                         .GetMethod(methodName)
                                                        ?.Invoke(null, arguments);
-        }
-
-        private class CustomDbCommand : DbCommand
-        {
-            public override string CommandText { get => "test_command"; set => throw new NotImplementedException(); }
-
-            public override int CommandTimeout { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-            public override CommandType CommandType { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-            public override bool DesignTimeVisible { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-            public override UpdateRowSource UpdatedRowSource { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-            protected override DbConnection DbConnection { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-            protected override DbParameterCollection DbParameterCollection => throw new NotImplementedException();
-
-            protected override DbTransaction DbTransaction { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-            public override void Cancel()
-            {
-                throw new NotImplementedException();
-            }
-
-            public override int ExecuteNonQuery()
-            {
-                throw new NotImplementedException();
-            }
-
-            public override object ExecuteScalar()
-            {
-                throw new NotImplementedException();
-            }
-
-            public override void Prepare()
-            {
-                throw new NotImplementedException();
-            }
-
-            protected override DbParameter CreateDbParameter()
-            {
-                throw new NotImplementedException();
-            }
-
-            protected override DbDataReader ExecuteDbDataReader(CommandBehavior behavior)
-            {
-                throw new NotImplementedException();
-            }
         }
     }
 }
