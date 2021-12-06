@@ -125,3 +125,33 @@ TEST(ThreadSamplerTest, StaticBufferManagement)
     ASSERT_EQ(4, ThreadSampling_ConsumeOneThreadSample(4, readBuf));
     ASSERT_EQ('D', readBuf[0]);
 }
+
+TEST(ThreadSamplerTest, LRUCache)
+{
+    int max = 10000;
+    FrameNameCache cache;
+    for (int i = 1; i <= max; i++)
+    {
+        ASSERT_EQ(NULL, cache.get(i));
+        WSTRING* val = new WSTRING(L"Function ");
+        val->append(std::to_wstring(i));
+        cache.put(i, val);
+        ASSERT_EQ(val, cache.get(i));
+    }
+    // Now cache is full; add another and item 1 gets kicked out
+    WSTRING* funcMaxPlus1 = new WSTRING(L"Function max+1");
+    ASSERT_EQ(NULL, cache.get(max+1));
+    cache.put(max + 1, funcMaxPlus1);
+    ASSERT_EQ(NULL, cache.get(1));
+    ASSERT_EQ(funcMaxPlus1, cache.get(max+1));
+
+    // Put 1 back, 2 falls off and everything else is there
+    WSTRING* func1 = new WSTRING(L"Function 1");
+    cache.put(1, func1);
+    ASSERT_EQ(NULL, cache.get(2));
+    ASSERT_EQ(func1, cache.get(1));
+    ASSERT_EQ(funcMaxPlus1, cache.get(max+1));
+    for (int i = 3; i <= max; i++) {
+        ASSERT_EQ(true, cache.get(i) != NULL);
+    }
+}

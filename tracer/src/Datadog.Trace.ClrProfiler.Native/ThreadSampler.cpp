@@ -17,6 +17,9 @@
 #define DEFAULT_SAMPLE_PERIOD 1000
 #define MINIMUM_SAMPLE_PERIOD 1000
 
+// FIXME make configurable (hidden)? and also consider what default should really be
+// Check the constants in ThreadSampler_test.cpp if this changes
+#define MAX_LRU_SIZE 10000
 
 // If you squint you can make out that the original bones of this came from sample code provided by the dotnet project:
 // https://github.com/dotnet/samples/blob/2cf486af936261b04a438ea44779cdc26c613f98/core/profiling/stacksampling/src/sampler.cpp
@@ -529,7 +532,36 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
       state->threadName.clear();
       state->threadName.append(_name, cchName);
     }
- }
+   
+    WSTRING* FrameNameCache::get(FunctionID key)
+    {
+        auto found = map.find(key);
+        if (found == map.end()) {
+            return NULL;
+        }
+        // This voodoo moves the single item in the iterator to the front of the list
+        // (as it is now the most-recently-used)
+        list.splice(list.begin(), list, found->second);
+        return found->second->second;
+    }
+
+    void FrameNameCache::put(FunctionID key, WSTRING* val)
+    {
+        auto pair = std::pair<FunctionID, WSTRING*>(key, val);
+        list.push_front(pair);
+        map[key] = list.begin();
+
+        if (map.size() > MAX_LRU_SIZE) {
+            auto lru = list.end();
+            lru--;
+            delete lru->second; // FIXME consider using WSTRING directly instead of WSTRING*
+            list.pop_back();
+            map.erase(lru->first);        
+        }
+    }
+
+
+}
 
  extern "C"
  {

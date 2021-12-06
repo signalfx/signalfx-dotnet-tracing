@@ -61,6 +61,16 @@ namespace trace {
         void writeInt64(int64_t val);
     };
 
+    class FrameNameCache
+    {
+    public:
+        WSTRING* get(FunctionID key);
+        void put(FunctionID key, WSTRING* val);
+    private:
+        std::list<std::pair<FunctionID, WSTRING*>> list;
+        std::unordered_map<FunctionID, std::list<std::pair<FunctionID, WSTRING*>>::iterator> map;
+    };
+
   }  // namespace trace
 
 bool ThreadSampling_ShouldProduceThreadSample();
