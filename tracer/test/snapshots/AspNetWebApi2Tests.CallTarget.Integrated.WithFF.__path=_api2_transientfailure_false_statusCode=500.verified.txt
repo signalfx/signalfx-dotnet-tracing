@@ -15,9 +15,9 @@
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: GET,
+    Name: GET api2/transientfailure/{value},
     LogicScope: aspnet.request,
-    Resource: GET /api2/transientfailure/false,
+    Resource: GET api2/transientfailure/{value},
     Service: sample,
     Type: web,
     Error: 1,
@@ -35,6 +35,8 @@
       sfx.error.stack: 
 System.ArgumentException: Passed in value was not 'true': false
 at Samples.AspNetMvc5.Controllers.ConventionsController.TransientFailure(String value),
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: 0.0.1.0,
       span.kind: server,
       version: 1.0.0
     },
