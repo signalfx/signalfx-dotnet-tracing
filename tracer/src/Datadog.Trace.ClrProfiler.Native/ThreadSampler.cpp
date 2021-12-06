@@ -147,9 +147,8 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
     writeInt(state->nativeId);
     writeString(state->threadName);
   }
-  // FIXME line numbers
   void ThreadSamplesBuffer::RecordFrame(FunctionID fid, WSTRING& frame)
-  { 
+  {
     writeCodedFrameString(fid, frame);
   }
   void ThreadSamplesBuffer::EndSample()
@@ -261,7 +260,6 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
       }
 
       private:          
-      // FIXME audit this copy-and-paste, clean it up (e.g., prints), improve performance (even after LRU), doc its origins in the sample code
        // FIXME quick prototype (based on disabling the cache) suggests that this can be sped up around 20% by not double/triple-copying the class names and just using a single WCHAR buffer
       WSTRING GetClassName(ClassID classId) {
         ModuleID modId;
@@ -401,6 +399,7 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
         _In_ void* clientData) {
       SamplingHelper* helper = (SamplingHelper*)clientData;
         WSTRING* name = helper->Lookup(funcId, frameInfo);
+      // This is where line numbers could be calculated
       helper->curWriter->RecordFrame(funcId, *name);
       return S_OK;
     }
@@ -409,7 +408,10 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
     void CaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, SamplingHelper& helper) {
       ICorProfilerThreadEnum* threadEnum = NULL;
       HRESULT hr = info10->EnumThreads(&threadEnum);
-      // FIXME check hr
+      if (FAILED(hr)) {
+          Logger::Debug("Could not EnumThreads: ", hr);
+          return;
+      }
       ThreadID threadID;
       ULONG numReturned = 0;
 
@@ -430,8 +432,7 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
             threadID, &FrameCallback, COR_PRF_SNAPSHOT_DEFAULT,
             &helper,
             NULL, 0);
-        if (FAILED(hr))
-        {
+        if (FAILED(hr)) {
             Logger::Debug("DoStackSnapshot failed: ", hr);
         }
         helper.curWriter->EndSample();
@@ -465,7 +466,6 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
           bool shouldSample = helper.AllocateBuffer();
           if (!shouldSample) {
               Logger::Warn("Skipping a thread sample period, buffers are full");
-              // FIXME might like stats on how often this happens
               continue; 
           }
 
@@ -508,9 +508,11 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
     }
 
     void ThreadSampler::ThreadCreated(ThreadID threadId) {
-        // FIXME why do the thread* things arrive out of order?
-        // deliberate nop since the actual value carriers will fault in.
-        // hopefully the destroyed event is not called out of order with the others...
+        // So it seems the Thread* items can be/are called out of order.  ThreadCreated doesn't carry any valuable
+        // ThreadState information so this is a deliberate nop.  The other methods will fault in ThreadStates
+        // as needed.
+        // Hopefully the destroyed event is not called out of order with the others... if so, the worst that happens
+        // is we get an empty name string and a 0 in the native ID column
     }
     void ThreadSampler::ThreadDestroyed(ThreadID threadId) {
       std::lock_guard<std::mutex> guard(threadStateLock);
