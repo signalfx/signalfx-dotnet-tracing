@@ -74,6 +74,7 @@ namespace Datadog.Trace.Tests
             {
                 var oldSettings = new TracerSettings
                 {
+                    Exporter = ExporterType.DatadogAgent,
                     AgentUri = new Uri($"http://127.0.0.1:{agent.Port}"),
                     TracerMetricsEnabled = false,
                     StartupDiagnosticLogEnabled = false,
@@ -85,6 +86,7 @@ namespace Datadog.Trace.Tests
 
                 var newSettings = new TracerSettings
                 {
+                    Exporter = ExporterType.DatadogAgent,
                     AgentUri = new Uri($"http://127.0.0.1:{agent.Port}"),
                     TracerMetricsEnabled = false,
                     StartupDiagnosticLogEnabled = false,
