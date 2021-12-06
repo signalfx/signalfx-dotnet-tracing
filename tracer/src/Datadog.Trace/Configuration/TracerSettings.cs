@@ -52,8 +52,6 @@ namespace Datadog.Trace.Configuration
         /// <param name="source">The <see cref="IConfigurationSource"/> to use when retrieving configuration values.</param>
         public TracerSettings(IConfigurationSource source)
         {
-            ConfigurationSource = source;
-
             Environment = source?.GetString(ConfigurationKeys.Environment);
 
             ServiceName = source?.GetString(ConfigurationKeys.ServiceName) ??
@@ -239,11 +237,6 @@ namespace Datadog.Trace.Configuration
             DelayWcfInstrumentationEnabled = source?.GetBool(ConfigurationKeys.FeatureFlags.DelayWcfInstrumentationEnabled)
                                             ?? false;
         }
-
-        /// <summary>
-        /// Gets <see cref="IConfigurationSource"/> used for creation of <see cref="TracerSettings"/> instance.
-        /// </summary>
-        public IConfigurationSource ConfigurationSource { get; }
 
         /// <summary>
         /// Gets or sets the default environment name applied to all spans.
