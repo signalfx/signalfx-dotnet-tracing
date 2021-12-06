@@ -2,7 +2,7 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: GET home.identifier,
+    Name: GET /home/get,
     LogicScope: aspnet.request,
     Resource: GET home.identifier,
     Service: sample,

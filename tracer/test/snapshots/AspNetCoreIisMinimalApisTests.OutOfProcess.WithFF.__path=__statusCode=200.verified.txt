@@ -21,7 +21,8 @@
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: aspnet_core.request,
+    Name: GET /home/index,
+    LogicScope: aspnet.request,
     Resource: GET /home/index,
     Service: Samples.AspNetCoreMinimalApis,
     Type: web,
@@ -36,6 +37,8 @@
       http.url: http://localhost:00000/,
       language: dotnet,
       runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: 0.0.1.0,
       span.kind: server,
       version: 1.0.0
     },

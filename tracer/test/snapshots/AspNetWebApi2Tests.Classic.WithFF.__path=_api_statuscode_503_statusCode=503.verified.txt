@@ -25,8 +25,9 @@
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: aspnet.request,
-    Resource: GET /api/statuscode/?,
+    Name: GET api/statuscode/{value},
+    LogicScope: aspnet.request,
+    Resource: GET api/statuscode/{value},
     Service: sample,
     Type: web,
     Error: 1,
@@ -40,6 +41,8 @@
       net.peer.ip: ::1,
       runtime-id: Guid_1,
       sfx.error.message: The HTTP response has status code 503.,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: 0.0.1.0,
       span.kind: server,
       version: 1.0.0
     },

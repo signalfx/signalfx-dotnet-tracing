@@ -2,9 +2,23 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: aspnet-webapi.request,
+    Name: CustomTracingExceptionHandler.handle-async,
+    Resource: CustomTracingExceptionHandler.handle-async,
+    Service: sample,
+    ParentId: Id_3,
+    Tags: {
+      deployment.environment: integration_tests,
+      span.kind: server,
+      version: 1.0.0
+    }
+  },
+  {
+    TraceId: Id_1,
+    SpanId: Id_3,
+    Name: GET api/transient-failure/{value},
+    LogicScope: aspnet.request,
     Resource: GET api/transient-failure/{value},
-    Service: Samples.Owin.WebApi2,
+    Service: sample,
     Type: web,
     Error: 1,
     Tags: {

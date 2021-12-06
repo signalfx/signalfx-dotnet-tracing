@@ -28,9 +28,9 @@
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: GET home.statuscode,
+    Name: GET /statuscode/{value},
     LogicScope: aspnet.request,
-    Resource: GET home.statuscode,
+    Resource: GET /statuscode/{value},
     Service: sample,
     Type: web,
     Error: 1,
