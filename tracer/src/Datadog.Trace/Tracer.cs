@@ -256,7 +256,7 @@ namespace Datadog.Trace
                 {
                     var detectedVersion = string.IsNullOrEmpty(value) ? "{detection failed}" : value;
 
-                    Log.Warning("DATADOG TRACER DIAGNOSTICS - Partial flush should only be enabled with agent 7.26.0+ (detected version: {version})", detectedVersion);
+                    Log.Warning("TRACER DIAGNOSTICS - Partial flush should only be enabled with agent 7.26.0+ (detected version: {version})", detectedVersion);
                 }
             }
         }
@@ -648,11 +648,11 @@ namespace Datadog.Trace
                     writer.WriteEndObject();
                 }
 
-                Log.Information("DATADOG TRACER CONFIGURATION - {Configuration}", stringWriter.ToString());
+                Log.Information("TRACER CONFIGURATION - {Configuration}", stringWriter.ToString());
             }
             catch (Exception ex)
             {
-                Log.Warning(ex, "DATADOG TRACER DIAGNOSTICS - Error fetching configuration");
+                Log.Warning(ex, "TRACER DIAGNOSTICS - Error fetching configuration");
             }
         }
 
