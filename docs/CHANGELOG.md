@@ -28,6 +28,8 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 - Remove `SIGNALFX_OUTBOUND_HTTP_EXCLUDED_HOSTS` configuration as [Splunk Distribution of OpenTelemetry Collector](https://docs.splunk.com/Observability/gdi/opentelemetry/opentelemetry.html) is the recommended place for spans filtering.
   If you need span exclusion for specific url substrings, it can be configured using `SIGNALFX_TRACE_HTTP_CLIENT_EXCLUDED_URL_SUBSTRINGS` environment variable.
 - Remove `SIGNALFX_INSTRUMENTATION_ASPNETCORE_DIAGNOSTIC_LISTENERS` configuration which is no longer needed. It provided a workaround for an issue in a specific version of a library, which broke default instrumentation, and was already fixed.  
+- Remove `SIGNALFX_SERVICE_NAME_PER_SPAN_ENABLED` configuration as [the OpenTelemetry specification](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/sdk.md)
+  requires that the resources (such us as [service](https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/resource/semantic_conventions#service)) have to be immutable.
 - Remove `SIGNALFX_INTEGRATIONS`. This configuration is not needed. The insrtumenation called `CallSite` was removed.
 
 ### Enhancements

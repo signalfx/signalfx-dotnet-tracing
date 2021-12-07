@@ -361,11 +361,11 @@ namespace Datadog.Trace
                     // ReSharper restore MethodHasAsyncOverload
                 }
 
-                Log.Information("DATADOG TRACER CONFIGURATION - {Configuration}", stringWriter.ToString());
+                Log.Information("TRACER CONFIGURATION - {Configuration}", stringWriter.ToString());
             }
             catch (Exception ex)
             {
-                Log.Warning(ex, "DATADOG TRACER DIAGNOSTICS - Error fetching configuration");
+                Log.Warning(ex, "TRACER DIAGNOSTICS - Error fetching configuration");
             }
         }
 

@@ -251,7 +251,7 @@ namespace Datadog.Trace.Agent
                     {
                         var detectedVersion = string.IsNullOrEmpty(agentVersion) ? "{detection failed}" : agentVersion;
 
-                        _log.Warning("DATADOG TRACER DIAGNOSTICS - Partial flush should only be enabled with agent 7.26.0+ (detected version: {version})", detectedVersion);
+                        _log.Warning("TRACER DIAGNOSTICS - Partial flush should only be enabled with agent 7.26.0+ (detected version: {version})", detectedVersion);
                         return true;
                     }
                 }
