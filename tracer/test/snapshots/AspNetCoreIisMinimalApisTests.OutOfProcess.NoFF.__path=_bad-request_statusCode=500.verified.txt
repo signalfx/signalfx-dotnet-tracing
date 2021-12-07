@@ -2,25 +2,29 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: aspnet_core.request,
+    Name: GET bad-request,
+    LogicScope: aspnet_core.request,
     Resource: GET bad-request,
     Service: Samples.AspNetCoreMinimalApis,
     Type: web,
     Error: 1,
     Tags: {
       component: aspnet_core,
-      env: integration_tests,
-      error.msg: This was a bad request.,
-      error.stack: 
-System.Exception: This was a bad request.
-at Samples.AspNetCoreMvc.Controllers.HomeController.ThrowException(),
-      error.type: System.Exception,
+      deployment.environment: integration_tests,
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 500,
       http.url: http://localhost:00000/bad-request,
       language: dotnet,
+      net.peer.ip: 127.0.0.1,
       runtime-id: Guid_1,
+      sfx.error.kind: System.Exception,
+      sfx.error.message: This was a bad request.,
+      sfx.error.stack: 
+System.Exception: This was a bad request.
+at Samples.AspNetCoreMvc.Controllers.HomeController.ThrowException(),
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: 0.0.1.0,
       span.kind: server,
       version: 1.0.0
     },
