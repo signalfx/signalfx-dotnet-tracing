@@ -10,7 +10,7 @@ Use these environment variables to configure the tracing library:
 
 | Environment variable | Description | Default |
 |-|-|-|
-| `SIGNALFX_ACCESS_TOKEN` | The access token for your SignalFx organization. It enables sending traces directly to the SignalFx ingestion endpoint. To do so, the `SIGNALFX_TRACE_AGENT_URL` must be set with: `https://ingest.<REALM>.signalfx.com/v2/trace`. |  |
+| `SIGNALFX_ACCESS_TOKEN` | The access token for your SignalFx organization. It enables sending traces directly to the SignalFx ingestion endpoint. To do so, the `SIGNALFX_ENDPOINT_URL` must be set with: `https://ingest.<REALM>.signalfx.com/v2/trace`. |  |
 | `SIGNALFX_TRACE_CONFIG_FILE` | The file path of a JSON configuration file that will be loaded. |  |
 | `SIGNALFX_VERSION` | The application's version that will populate `version` tag on spans. |  |
 | `SIGNALFX_TRACE_ADONET_EXCLUDED_TYPES` | Comma-separated list of AdoNet types that will be excluded from automatic instrumentation. |  |
@@ -32,7 +32,7 @@ Use these environment variables to configure the tracing library:
 | `SIGNALFX_ENV` | The value for the `deployment.environment` tag added to every span. |  |
 | `SIGNALFX_TRACE_ENABLED` | Enable to activate the tracer. | `true` |
 | `SIGNALFX_TRACE_DEBUG` | Enable to activate debugging mode for the tracer. | `false` |
-| `SIGNALFX_TRACE_AGENT_URL`, `SIGNALFX_ENDPOINT_URL` | The URL to where trace exporters send traces. | `http://localhost:8126` |
+| `SIGNALFX_ENDPOINT_URL` | The URL to where trace exporters send traces. | `http://localhost:8126` |
 | `SIGNALFX_TAGS` | Comma-separated list of key-value pairs to specify global span tags. For example: `"key1:val1,key2:val2"` |  |
 | `SIGNALFX_LOGS_INJECTION` | Enable to inject trace IDs, span IDs, service name and environment into logs. This requires a compatible logger or manual configuration. | `false` |
 | `SIGNALFX_STDOUT_LOG_ENABLED` | Enables `stdout` logging. This is disabled by default. | `false` |
@@ -131,7 +131,7 @@ manager:
 1. Set the endpoint, e.g. OpenTelemetry Collector:
 
     ```bash
-    export SIGNALFX_TRACE_AGENT_URL='http://<YourCollector>:9080/v1/trace'
+    export SIGNALFX_ENDPOINT_URL='http://<YourCollector>:9080/v1/trace'
     ```
 
 1. Optionally, enable trace injection in logs:

@@ -12,6 +12,7 @@ This section contains list of internal configuration settings (these should not 
 ## Unsupported upstream configuration
 
 | `SIGNALFX_AGENT_HOST` | The host name of the targeted SatsD server. |  |
+| `SIGNALFX_TRACE_AGENT_URL` | Alias for `SIGNALFX_ENDPOINT_URL`. The URL to where trace exporters send traces. | `http://localhost:8126` |
 | `SIGNALFX_TRACE_AGENT_PORT` | The Agent port where the Tracer can send traces | `localhost` |
 | `SIGNALFX_TRACE_PIPE_NAME` | The named pipe where the Tracer can send traces. |  |
 | `SIGNALFX_TRACE_PIPE_TIMEOUT_MS` | The timeout in milliseconds for named pipes communication. | `100` |
