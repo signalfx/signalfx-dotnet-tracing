@@ -73,8 +73,6 @@ namespace Datadog.Trace
         /// </summary>
         SpanStatus Status { get; set; }
 
-        internal ITags Tags { get; set; }
-
         /// <summary>
         /// Add a the specified tag to this span.
         /// </summary>
