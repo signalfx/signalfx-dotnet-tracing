@@ -40,9 +40,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         {
             SetEnvironmentVariable("SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES", tagQueries.ToString().ToLowerInvariant());
 
-            int agentPort = TcpPortProvider.GetOpenPort();
-
-            using (var agent = new MockTracerAgent(agentPort))
+            using (var agent = EnvironmentHelper.GetMockAgent())
             using (RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion))
             {
                 var expected = new List<string>();
@@ -193,12 +191,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("Category", "ArmUnsupported")]
         public void IntegrationDisabled()
         {
-            int agentPort = TcpPortProvider.GetOpenPort();
             string packageVersion = PackageVersions.ElasticSearch5.First()[0] as string;
 
             SetEnvironmentVariable($"SIGNALFX_TRACE_{nameof(IntegrationId.ElasticsearchNet)}_ENABLED", "false");
 
-            using var agent = new MockTracerAgent(agentPort);
+            using var agent = EnvironmentHelper.GetMockAgent();
             using var process = RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion);
             var spans = agent.WaitForSpans(1).Where(s => s.Type == "elasticsearch").ToList();
 

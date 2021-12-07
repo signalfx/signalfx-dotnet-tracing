@@ -31,10 +31,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             var expectedSpanCount = 28; // 7 queries * 3 groups + CallTarget support instrumenting a constrained generic caller.
             const string dbType = "mssql";
             const string expectedOperationName = dbType + ".query";
-            const string expectedServiceName = "Samples.SqlServer.NetFramework20";
-
-            int agentPort = TcpPortProvider.GetOpenPort();
-            using var agent = new MockTracerAgent(agentPort);
+            const string expectedServiceName = "Samples.SqlServer.NetFramework20-" + dbType;
+            using var agent = EnvironmentHelper.GetMockAgent();
             using var process = RunSampleAndWaitForExit(agent.Port);
             var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
 
@@ -60,9 +58,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             const string expectedOperationName = "mssql.query";
 
             SetEnvironmentVariable($"SIGNALFX_TRACE_{nameof(IntegrationId.SqlClient)}_ENABLED", "false");
-
-            int agentPort = TcpPortProvider.GetOpenPort();
-            using var agent = new MockTracerAgent(agentPort);
+            using var agent = EnvironmentHelper.GetMockAgent();
             using var process = RunSampleAndWaitForExit(agent.Port);
             var spans = agent.WaitForSpans(totalSpanCount, returnAllOperations: true);
 
