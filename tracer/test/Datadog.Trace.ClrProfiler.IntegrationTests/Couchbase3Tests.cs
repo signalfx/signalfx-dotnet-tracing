@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.TestHelpers;
@@ -46,7 +48,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 foreach (var span in spans)
                 {
                     Assert.Equal("couchbase.query", span.Name);
-                    Assert.Equal("Samples.Couchbase3-couchbase", span.Service);
+                    Assert.Equal("Samples.Couchbase3", span.Service);
                     Assert.False(span.Tags?.ContainsKey(Tags.Version), "External service span should not have service version tag.");
                 }
 
