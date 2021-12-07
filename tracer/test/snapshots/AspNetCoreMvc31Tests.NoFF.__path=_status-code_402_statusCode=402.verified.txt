@@ -2,7 +2,8 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: aspnet_core.request,
+    Name: GET status-code/{statusCode},
+    LogicScope: aspnet_core.request,
     Resource: GET status-code/{statusCode},
     Service: Samples.AspNetCoreMvc31,
     Type: web,
