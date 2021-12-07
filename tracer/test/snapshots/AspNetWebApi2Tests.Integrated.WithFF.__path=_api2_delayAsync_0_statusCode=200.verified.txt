@@ -2,7 +2,8 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: aspnet-webapi.request,
+    Name: GET api2/delayasync/{value},
+    LogicScope: aspnet-webapi.request,
     Resource: GET api2/delayasync/{value},
     Service: sample,
     Type: web,

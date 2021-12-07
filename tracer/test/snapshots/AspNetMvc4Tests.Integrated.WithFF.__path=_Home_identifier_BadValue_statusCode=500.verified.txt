@@ -2,7 +2,7 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: GET /home/get,
+    Name: GET home.identifier,
     LogicScope: aspnet.request,
     Resource: GET home.identifier,
     Service: sample,
@@ -39,8 +39,9 @@ at System.Web.Mvc.ActionDescriptor.ExtractParameterFromDictionary(ParameterInfo 
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: aspnet-mvc.request,
-    Resource: GET /home/identifier/badvalue,
+    Name: GET home.identifier,
+    LogicScope: aspnet-mvc.request,
+    Resource: GET home.identifier,
     Service: sample,
     Type: web,
     ParentId: Id_2,
