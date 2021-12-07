@@ -260,8 +260,7 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
       }
 
       private:          
-       // FIXME quick prototype (based on disabling the cache) suggests that this can be sped up around 20% by not double/triple-copying the class names and just using a single WCHAR buffer
-      WSTRING GetClassName(ClassID classId) {
+      void GetClassName(ClassID classId, WSTRING & result) {
         ModuleID modId;
         mdTypeDef classToken;
         ClassID parentClassID;
@@ -269,24 +268,29 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
 
         if (classId == NULL) {
           Logger::Debug("NULL classId passed to GetClassName");
-          return WStr("Unknown");
+          result.append(L"Unknown");
+          return;
         }
 
         hr = info10->GetClassIDInfo2(classId, &modId, &classToken,
                                               &parentClassID, 0,
                                               NULL, NULL);
         if (CORPROF_E_CLASSID_IS_ARRAY == hr) {
-          // We have a ClassID of an array.
-          return WStr("ArrayClass");
+            // We have a ClassID of an array.
+            result.append(L"ArrayClass");
+            return;
         } else if (CORPROF_E_CLASSID_IS_COMPOSITE == hr) {
-          // We have a composite class
-          return WStr("CompositeClass");
+            // We have a composite class
+            result.append(L"CompositeClass");
+            return;
         } else if (CORPROF_E_DATAINCOMPLETE == hr) {
-          // type-loading is not yet complete. Cannot do anything about it.
-          return WStr("DataIncomplete");
+            // type-loading is not yet complete. Cannot do anything about it.
+            result.append(L"DataIncomplete");
+            return;
         } else if (FAILED(hr)) {
-          Logger::Debug("GetClassIDInfo failed: ", hr);
-          return WStr("Unknown");
+            Logger::Debug("GetClassIDInfo failed: ", hr);
+            result.append(L"Unknown");
+            return;
         }
 
         COMPtrHolder<IMetaDataImport> pMDImport;
@@ -294,8 +298,9 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
                                                 IID_IMetaDataImport,
                                                 (IUnknown**)&pMDImport);
         if (FAILED(hr)) {
-          Logger::Debug("GetModuleMetaData failed: ", hr);
-          return WStr("Unknown");
+            Logger::Debug("GetModuleMetaData failed: ", hr);
+            result.append(L"Unknown");
+            return;
         }
 
         WCHAR wName[MAX_CLASS_NAME_LEN];
@@ -303,20 +308,19 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
         hr = pMDImport->GetTypeDefProps(classToken, wName, MAX_CLASS_NAME_LEN, NULL,
                                         &dwTypeDefFlags, NULL);
         if (FAILED(hr)) {
-          Logger::Debug("GetTypeDefProps failed: ", hr);
-          return WStr("Unknown");
+            Logger::Debug("GetTypeDefProps failed: ", hr);
+            result.append(L"Unknown");
+            return;
         }
 
-        WSTRING name = WStr("");
-        name += wName;
-
-        return name;
+        result.append(wName);
       }
 
-      WSTRING GetFunctionName(FunctionID funcID,
-                                       const COR_PRF_FRAME_INFO frameInfo) {
+      void GetFunctionName(FunctionID funcID,
+                                       const COR_PRF_FRAME_INFO frameInfo, WSTRING & result) {
         if (funcID == NULL) {
-          return WStr("Unknown_Native_Function");
+            result.append(L"Unknown_Native_Function");
+            return;
         }
 
         ClassID classId = NULL;
@@ -345,23 +349,19 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
           Logger::Debug("GetMethodProps failed: ", hr);
         }
 
-        WSTRING name;
-
         // If the ClassID returned from GetFunctionInfo is 0, then the function
         // is a shared generic function.
         if (classId != 0) {
-          name += *LookupClassName(classId);
+            LookupClassName(classId, result);
         } else {
-          name += WStr("SharedGenericFunction");
+            result.append(L"SharedGenericFunction");
         }
 
-        name += WStr("::");
+        result.append(L"::");
 
-        name += funcName;
+        result.append(funcName);
 
         // FIXME What about method signature to differentiate overloaded methods?
-
-        return name;
       }
 
      public:
@@ -371,20 +371,23 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
           if (answer != NULL) {
               return answer;
           }
-          answer = new WSTRING(this->GetFunctionName(fid, frame));
+          answer = new WSTRING();
+          this->GetFunctionName(fid, frame, *answer);
           functionNameCache.put(fid, answer);
           return answer;
       }
 
-      WSTRING* LookupClassName(ClassID cid) {
+      void LookupClassName(ClassID cid, WSTRING & result) {
           WSTRING* answer = functionNameCache.get(cid);
           if (answer != NULL)
           {
-              return answer;
+              result.append(*answer);
+              return;
           }
-          answer = new WSTRING(this->GetClassName(cid));
+          answer = new WSTRING();
+          this->GetClassName(cid, *answer);
+          result.append(*answer);
           functionNameCache.put(cid, answer);
-          return answer;
       }
     };
 
