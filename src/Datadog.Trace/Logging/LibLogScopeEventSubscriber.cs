@@ -15,6 +15,7 @@ namespace SignalFx.Tracing.Logging
     {
         private readonly IScopeManager _scopeManager;
         private readonly ILogProvider _logProvider;
+        private readonly TracerSettings _settings;
 
         // Each mapped context sets a key-value pair into the logging context
         // Disposing the returned context unsets the key-value pair
@@ -44,6 +45,7 @@ namespace SignalFx.Tracing.Logging
         public LibLogScopeEventSubscriber(IScopeManager scopeManager, TracerSettings settings)
         {
             _scopeManager = scopeManager;
+            _settings = settings;
 
             _logProvider = LogProvider.CurrentLogProvider ?? LogProvider.ResolveLogProvider();
             if (_logProvider is SerilogLogProvider)
@@ -53,41 +55,17 @@ namespace SignalFx.Tracing.Logging
                     _scopeManager.SpanOpened += StackOnSpanOpened;
                     _scopeManager.SpanClosed += StackOnSpanClosed;
             }
-            else if (_logProvider is NLogLogProvider && UseNLogOptimized())
+            else if (_logProvider is NLogLogProvider)
             {
                 // This NLog version can use the value readers optimization.
-                UseValueReaders(settings);
+                _scopeManager.SpanActivated += ActivateMappedContext;
+                _scopeManager.TraceEnded += DeactivateMappedContext;
             }
             else
             {
                 _scopeManager.SpanActivated += MapOnSpanActivated;
                 _scopeManager.TraceEnded += MapOnTraceEnded;
             }
-        }
-
-        public static bool UseNLogOptimized()
-        {
-            // This code checks the same requisits from LibLog\5.0.6\LogProviders\NLogLogProvider.cs to see
-            // if the code can use an optimized path for NLog.
-            var ndlcContextType = Type.GetType("NLog.NestedDiagnosticsLogicalContext, NLog");
-            if (ndlcContextType != null)
-            {
-                var pushObjectMethod = ndlcContextType.GetMethod("PushObject", typeof(object));
-                if (pushObjectMethod != null)
-                {
-                    var mdlcContextType = Type.GetType("NLog.MappedDiagnosticsLogicalContext, NLog");
-                    if (mdlcContextType != null)
-                    {
-                        var setScopedMethod = mdlcContextType.GetMethod("SetScoped", typeof(string), typeof(object));
-                        if (setScopedMethod != null)
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            return false;
         }
 
         public void StackOnSpanOpened(object sender, SpanEventArgs spanEventArgs)
@@ -119,6 +97,11 @@ namespace SignalFx.Tracing.Logging
                 _scopeManager.SpanOpened -= StackOnSpanOpened;
                 _scopeManager.SpanClosed -= StackOnSpanClosed;
             }
+            else if (_logProvider is NLogLogProvider)
+            {
+                _scopeManager.SpanActivated -= ActivateMappedContext;
+                _scopeManager.TraceEnded -= DeactivateMappedContext;
+            }
             else
             {
                 _scopeManager.SpanActivated -= MapOnSpanActivated;
@@ -128,37 +111,34 @@ namespace SignalFx.Tracing.Logging
             RemoveAllCorrelationIdentifierContexts();
         }
 
-        private void UseValueReaders(TracerSettings settings)
+        private void ActivateMappedContext(object sender, SpanEventArgs spanEventArgs)
         {
-            var traceIdReader = new ValueReader(() =>
-            {
-                return _scopeManager.Active?.Span?.TraceId.ToString() ?? TraceId.Zero.ToString();
-            });
-            LogProvider.OpenMappedContext(
-                CorrelationIdentifier.TraceIdKey, traceIdReader, destructure: false);
+            var span = spanEventArgs.Span;
+            OpenMappedContext(
+                span.TraceId.ToString(),
+                span.SpanId.ToString("x16"),
+                span.ServiceName ?? _settings.ServiceName,
+                _settings.Environment);
+        }
 
-            var spanIdReader = new ValueReader(() =>
-            {
-                return _scopeManager.Active?.Span?.SpanId.ToString("x16") ?? "0000000000000000";
-            });
-            LogProvider.OpenMappedContext(
-                CorrelationIdentifier.SpanIdKey, spanIdReader, destructure: false);
+        private void DeactivateMappedContext(object sender, SpanEventArgs spanEventArgs)
+        {
+            OpenMappedContext(null, null, null, null);
+        }
 
-            var serviceReader = new ValueReader(() =>
-            {
-                // It is possible to have service name per span so try that first, anyway it should not
-                // fail but use settings as a fallback just in case.
-                return _scopeManager.Active?.Span?.ServiceName ?? settings.ServiceName;
-            });
+        private void OpenMappedContext(string traceIdStr, string spanIdStr, string service, string environment)
+        {
             LogProvider.OpenMappedContext(
-                CorrelationIdentifier.ServiceNameKey, serviceReader, destructure: false);
+                CorrelationIdentifier.TraceIdKey, traceIdStr, destructure: false);
 
-            var environmentReader = new ValueReader(() =>
-            {
-                return settings.Environment ?? string.Empty;
-            });
             LogProvider.OpenMappedContext(
-                CorrelationIdentifier.ServiceEnvironmentKey, environmentReader, destructure: false);
+                CorrelationIdentifier.SpanIdKey, spanIdStr, destructure: false);
+
+            LogProvider.OpenMappedContext(
+                CorrelationIdentifier.ServiceNameKey, service, destructure: false);
+
+            LogProvider.OpenMappedContext(
+                CorrelationIdentifier.ServiceEnvironmentKey, environment, destructure: false);
         }
 
         private void RemoveLastCorrelationIdentifierContext()
@@ -216,21 +196,6 @@ namespace SignalFx.Tracing.Logging
             {
                 _safeToAddToMdc = false;
                 RemoveAllCorrelationIdentifierContexts();
-            }
-        }
-
-        private class ValueReader
-        {
-            private readonly Func<string> readerFunc;
-
-            public ValueReader(Func<string> reader)
-            {
-                readerFunc = reader;
-            }
-
-            public override string ToString()
-            {
-                return readerFunc();
             }
         }
 
