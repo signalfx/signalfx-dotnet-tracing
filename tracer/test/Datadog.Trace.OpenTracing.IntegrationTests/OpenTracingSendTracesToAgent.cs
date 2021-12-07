@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.TestHelpers;
@@ -23,6 +25,7 @@ namespace Datadog.Trace.OpenTracing.IntegrationTests
                 var settings = new TracerSettings
                 {
                     Exporter = ExporterType.DatadogAgent,
+                    Convention = ConventionType.Datadog,
                     AgentUri = new Uri($"http://127.0.0.1:{agent.Port}"),
                     TracerMetricsEnabled = false,
                 };
@@ -51,6 +54,7 @@ namespace Datadog.Trace.OpenTracing.IntegrationTests
                 var settings = new TracerSettings
                 {
                     Exporter = ExporterType.DatadogAgent,
+                    Convention = ConventionType.Datadog,
                     AgentUri = new Uri($"http://127.0.0.1:{agent.Port}"),
                     TracerMetricsEnabled = false,
                 };
@@ -81,6 +85,7 @@ namespace Datadog.Trace.OpenTracing.IntegrationTests
                 var settings = new TracerSettings
                 {
                     Exporter = ExporterType.DatadogAgent,
+                    Convention = ConventionType.Datadog,
                     AgentUri = new Uri($"http://127.0.0.1:{agent.Port}"),
                     TracerMetricsEnabled = false,
                 };
@@ -105,16 +110,18 @@ namespace Datadog.Trace.OpenTracing.IntegrationTests
         private static void CompareSpans(MockTracerAgent.Span receivedSpan, OpenTracingSpan openTracingSpan)
         {
             var span = openTracingSpan.DDSpan;
-            receivedSpan.Should().BeEquivalentTo(new
+            receivedSpan.Should().BeEquivalentTo(
+            new
             {
-                TraceId = span.TraceId,
+                TraceId = span.TraceId.Lower,
                 SpanId = span.SpanId,
                 Name = span.OperationName,
                 Resource = span.ResourceName,
                 Service = span.ServiceName,
                 Type = span.Type,
                 Tags = span.Tags,
-            });
+            },
+            config => config.Excluding(span => span.Tags.Metrics));
         }
     }
 }
