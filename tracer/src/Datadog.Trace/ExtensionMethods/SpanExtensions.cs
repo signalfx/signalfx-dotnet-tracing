@@ -36,12 +36,11 @@ namespace Datadog.Trace.ExtensionMethods
 
             span.SetTag(Tags.DbStatement, commandText);
 
-            var tags = DbCommandCache.GetTagsFromDbCommand(command);
-
-            foreach (var pair in tags)
-            {
-                span.SetTag(pair.Key, pair.Value);
-            }
+            var tag = DbCommandCache.GetTagsFromDbCommand(command);
+            
+            span.SetTag(Tags.DbName, tag.DbName);
+            span.SetTag(Tags.DbUser, tag.DbUser);
+            span.SetTag(Tags.OutHost, tag.OutHost);
         }
 
         /// <summary>

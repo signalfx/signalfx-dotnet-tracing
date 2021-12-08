@@ -35,6 +35,17 @@ namespace Datadog.Trace.Configuration
             }
         }
 
+        public bool TryGetServiceName(string key, out string name)
+        {
+            if (_mappings is not null && _mappings.TryGetValue(key, out name))
+            {
+                return true;
+            }
+
+            name = null;
+            return false;
+        }
+
         public void SetServiceNameMappings(IEnumerable<KeyValuePair<string, string>> mappings)
         {
             lock (_lock)

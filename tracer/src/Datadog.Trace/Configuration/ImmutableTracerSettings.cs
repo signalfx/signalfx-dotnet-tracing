@@ -396,5 +396,10 @@ namespace Datadog.Trace.Configuration
         {
             return ServiceNameMappings.GetServiceName(tracer.DefaultServiceName, serviceName);
         }
+
+        internal bool TryGetServiceName(string key, out string serviceName)
+        {
+            return ServiceNameMappings.TryGetServiceName(key, out serviceName);
+        }
     }
 }
