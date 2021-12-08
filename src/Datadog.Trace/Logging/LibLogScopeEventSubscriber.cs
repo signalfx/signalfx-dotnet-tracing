@@ -55,7 +55,7 @@ namespace SignalFx.Tracing.Logging
                     _scopeManager.SpanOpened += StackOnSpanOpened;
                     _scopeManager.SpanClosed += StackOnSpanClosed;
             }
-            else if (_logProvider is NLogLogProvider)
+            else if (_logProvider is NLogLogProvider && UseNLogOptimized())
             {
                 // This NLog version can use the value readers optimization.
                 _scopeManager.SpanActivated += ActivateMappedContext;
@@ -97,7 +97,7 @@ namespace SignalFx.Tracing.Logging
                 _scopeManager.SpanOpened -= StackOnSpanOpened;
                 _scopeManager.SpanClosed -= StackOnSpanClosed;
             }
-            else if (_logProvider is NLogLogProvider)
+            else if (_logProvider is NLogLogProvider && UseNLogOptimized())
             {
                 _scopeManager.SpanActivated -= ActivateMappedContext;
                 _scopeManager.TraceEnded -= DeactivateMappedContext;
@@ -109,6 +109,31 @@ namespace SignalFx.Tracing.Logging
             }
 
             RemoveAllCorrelationIdentifierContexts();
+        }
+
+        private static bool UseNLogOptimized()
+        {
+            // This code checks the same requisits from LibLog\5.0.6\LogProviders\NLogLogProvider.cs to see
+            // if the code can use an optimized path for NLog.
+            var ndlcContextType = Type.GetType("NLog.NestedDiagnosticsLogicalContext, NLog");
+            if (ndlcContextType != null)
+            {
+                var pushObjectMethod = ndlcContextType.GetMethod("PushObject", typeof(object));
+                if (pushObjectMethod != null)
+                {
+                    var mdlcContextType = Type.GetType("NLog.MappedDiagnosticsLogicalContext, NLog");
+                    if (mdlcContextType != null)
+                    {
+                        var setScopedMethod = mdlcContextType.GetMethod("SetScoped", typeof(string), typeof(object));
+                        if (setScopedMethod != null)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
         }
 
         private void ActivateMappedContext(object sender, SpanEventArgs spanEventArgs)
