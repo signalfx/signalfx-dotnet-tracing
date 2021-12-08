@@ -107,7 +107,19 @@ namespace Datadog.Trace.Security.IntegrationTests
              {
              s => Assert.Matches("aspnet(-mvc)?.request", s.LogicScope ?? s.Name),
              s => Assert.Equal("sample", s.Service),
-             s => Assert.Equal("web", s.Type)
+             s => Assert.Equal("web", s.Type),
+             s =>
+                 {
+                    var securityTags = new Dictionary<string, string>()
+                    {
+                        { "network.client.ip", "::1" },
+                    };
+                    foreach (var kvp in securityTags)
+                    {
+                        Assert.True(s.Tags.TryGetValue(kvp.Key, out var tagValue), $"The tag {kvp.Key} was not found");
+                        Assert.Equal(kvp.Value, tagValue);
+                    }
+                 },
              });
         }
     }
