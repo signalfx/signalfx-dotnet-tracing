@@ -30,6 +30,14 @@ namespace Datadog.Trace.Tests.Logging
             layout.Attributes.Add(new JsonAttribute("time", Layout.FromString("${longdate}")));
             layout.Attributes.Add(new JsonAttribute("level", Layout.FromString("${level:uppercase=true}")));
             layout.Attributes.Add(new JsonAttribute("message", Layout.FromString("${message}")));
+            layout.Attributes.Add(new JsonAttribute(LoggingProviderTestHelpers.CustomPropertyName, Layout.FromString($"${{mdlc:item={LoggingProviderTestHelpers.CustomPropertyName}}}")));
+
+            // MapDiagnosticLogicalContext attributes required by NLog v 4.6+
+            layout.Attributes.Add(new JsonAttribute("trace_id", Layout.FromString("${mdlc:item=trace_id}")));
+            layout.Attributes.Add(new JsonAttribute("span_id", Layout.FromString("${mdlc:item=span_id}")));
+            layout.Attributes.Add(new JsonAttribute("service.name", Layout.FromString("${mdlc:item=service.name}")));
+            layout.Attributes.Add(new JsonAttribute("deployment.environment", Layout.FromString("${mdlc:item=deployment.environment}")));
+
             _target = new MemoryTarget
             {
                 Layout = layout
@@ -105,10 +113,10 @@ namespace Datadog.Trace.Tests.Logging
             // Scope: Default values of TraceId=0,SpanId=0
             // Custom property: N/A
             logString = filteredLogs[logIndex++];
-            Assert.Contains(string.Format(ExpectedIdStringFormat, CorrelationIdentifier.SpanIdKey, 0), logString);
-            Assert.Contains(string.Format(ExpectedIdStringFormat, CorrelationIdentifier.TraceIdKey, TraceId.Zero), logString);
-            Assert.Contains(string.Format(ExpectedStringFormat, CorrelationIdentifier.ServiceNameKey, string.Empty), logString);
-            Assert.Contains(string.Format(ExpectedStringFormat, CorrelationIdentifier.ServiceEnvironmentKey, string.Empty), logString);
+            Assert.DoesNotContain($"\"{CorrelationIdentifier.SpanIdKey}\"", logString);
+            Assert.DoesNotContain($"\"{CorrelationIdentifier.TraceIdKey}\"", logString);
+            Assert.DoesNotContain($"\"{CorrelationIdentifier.ServiceNameKey}\"", logString);
+            Assert.DoesNotContain($"\"{CorrelationIdentifier.ServiceEnvironmentKey}\"", logString);
             Assert.DoesNotContain($"\"{LoggingProviderTestHelpers.CustomPropertyName}\"", logString);
         }
 
