@@ -27,7 +27,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class AspNetMvcIntegration
     {
-        internal const string HttpContextKey = "__Datadog.Trace.ClrProfiler.Integrations.AspNetMvcIntegration";
+        internal const string HttpContextKey = "__SignalFx.Tracing.ClrProfiler.Integrations.AspNetMvcIntegration";
 
         private const string OperationName = "aspnet-mvc.request";
 
