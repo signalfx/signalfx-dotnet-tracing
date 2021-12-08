@@ -63,5 +63,5 @@ Configuration to send data directly to Splunk Observability Cloud:
 
  ```sh
 export SIGNALFX_ACCESS_TOKEN=secret
-export SIGNALFX_TRACE_AGENT_URL=https://ingest.us0.signalfx.com/v2/trace
+export SIGNALFX_ENDPOINT_URL=https://ingest.us0.signalfx.com/v2/trace
 ```
