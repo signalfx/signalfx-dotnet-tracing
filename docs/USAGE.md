@@ -131,7 +131,7 @@ manager:
 1. Set the endpoint, e.g. OpenTelemetry Collector:
 
     ```bash
-    export SIGNALFX_ENDPOINT_URL='http://<YourCollector>:9080/v1/trace'
+    export SIGNALFX_ENDPOINT_URL='http://<YourCollector>:9411/api/v2/spans'
     ```
 
 1. Optionally, enable trace injection in logs:
@@ -187,7 +187,7 @@ system where it will be running.
 the trace data:
 
    ```batch
-   setx SIGNALFX_TRACE_AGENT_URL http://localhost:9080/v1/trace /m
+   setx SIGNALFX_ENDPOINT_URL http://localhost:9411/api/v2/spans /m
    ```
 
 1. Optionally, enable trace injection in logs:
