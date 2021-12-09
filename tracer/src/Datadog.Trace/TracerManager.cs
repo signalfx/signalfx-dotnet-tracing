@@ -17,7 +17,6 @@ using Datadog.Trace.Conventions;
 using Datadog.Trace.DogStatsd;
 using Datadog.Trace.Logging;
 using Datadog.Trace.PlatformHelpers;
-using Datadog.Trace.Plugins;
 using Datadog.Trace.Propagation;
 using Datadog.Trace.RuntimeMetrics;
 using Datadog.Trace.Sampling;
@@ -79,7 +78,7 @@ namespace Datadog.Trace
                     ref _instance,
                     ref _globalInstanceInitialized,
                     ref _globalInstanceLock,
-                    () => CreateInitializedTracer(settings: null, plugins: null, TracerManagerFactory.Instance));
+                    () => CreateInitializedTracer(settings: null, TracerManagerFactory.Instance));
             }
         }
 
@@ -126,16 +125,15 @@ namespace Datadog.Trace
         /// which use the global <see cref="TracerManager"/>
         /// </summary>
         /// <param name="settings">The settings to use </param>
-        /// <param name="plugins">Plugins to extend with</param>
         /// <param name="factory">The factory to use to create the <see cref="TracerManager"/></param>
-        public static void ReplaceGlobalManager(ImmutableTracerSettings settings, IReadOnlyCollection<IOTelExtension> plugins, TracerManagerFactory factory)
+        public static void ReplaceGlobalManager(ImmutableTracerSettings settings, TracerManagerFactory factory)
         {
             TracerManager oldManager;
             TracerManager newManager;
             lock (_globalInstanceLock)
             {
                 oldManager = _instance;
-                newManager = CreateInitializedTracer(settings, plugins, factory);
+                newManager = CreateInitializedTracer(settings, factory);
                 _instance = newManager;
                 _globalInstanceInitialized = true;
             }
@@ -370,14 +368,14 @@ namespace Datadog.Trace
         }
 
         // should only be called inside a global lock, i.e. by TracerManager.Instance or ReplaceGlobalManager
-        private static TracerManager CreateInitializedTracer(ImmutableTracerSettings settings, IReadOnlyCollection<IOTelExtension> plugins, TracerManagerFactory factory)
+        private static TracerManager CreateInitializedTracer(ImmutableTracerSettings settings, TracerManagerFactory factory)
         {
             if (_instance is ILockedTracer)
             {
                 throw new InvalidOperationException("The current tracer instance cannot be replaced.");
             }
 
-            var newManager = factory.CreateTracerManager(settings, plugins, _instance);
+            var newManager = factory.CreateTracerManager(settings, _instance);
 
             if (_firstInitialization)
             {

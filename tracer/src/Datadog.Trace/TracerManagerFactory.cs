@@ -17,7 +17,6 @@ using Datadog.Trace.Conventions;
 using Datadog.Trace.DogStatsd;
 using Datadog.Trace.Logging;
 using Datadog.Trace.PlatformHelpers;
-using Datadog.Trace.Plugins;
 using Datadog.Trace.Propagation;
 using Datadog.Trace.RuntimeMetrics;
 using Datadog.Trace.Sampling;
@@ -37,12 +36,11 @@ namespace Datadog.Trace
         /// The primary factory method, called by <see cref="TracerManager"/>,
         /// providing the previous global <see cref="TracerManager"/> instance (may be null)
         /// </summary>
-        internal TracerManager CreateTracerManager(ImmutableTracerSettings settings, IReadOnlyCollection<IOTelExtension> plugins, TracerManager previous)
+        internal TracerManager CreateTracerManager(ImmutableTracerSettings settings, TracerManager previous)
         {
             // TODO: If relevant settings have not changed, continue using existing statsd/agent writer/runtime metrics etc
             return CreateTracerManager(
                 settings,
-                plugins: plugins,
                 agentWriter: null,
                 sampler: null,
                 scopeManager: previous?.ScopeManager, // no configuration, so can always use the same one
@@ -54,10 +52,9 @@ namespace Datadog.Trace
         /// <summary>
         /// Internal for use in tests that create "standalone" <see cref="TracerManager"/> by
         /// </summary>
-        /// <see cref="Tracer(TracerSettings, IReadOnlyCollection{IOTelExtension}, IAgentWriter, ISampler, IScopeManager, IDogStatsd)"/>
+        /// <see cref="Tracer(TracerSettings, IAgentWriter, ISampler, IScopeManager, IDogStatsd)"/>
         internal TracerManager CreateTracerManager(
             ImmutableTracerSettings settings,
-            IReadOnlyCollection<IOTelExtension> plugins,
             IAgentWriter agentWriter,
             ISampler sampler,
             IScopeManager scopeManager,
@@ -77,7 +74,7 @@ namespace Datadog.Trace
                          ? (statsd ?? CreateDogStatsdClient(settings, defaultServiceName, settings.DogStatsdPort))
                          : null;
             sampler ??= GetSampler(settings);
-            var propagator = CreateCompositePropagator(settings, traceIdConvention, plugins ?? Array.Empty<IOTelExtension>());
+            var propagator = CreateCompositePropagator(settings, traceIdConvention);
             agentWriter ??= GetAgentWriter(settings, statsd, sampler);
             scopeManager ??= new AsyncLocalScopeManager();
 
@@ -157,18 +154,10 @@ namespace Datadog.Trace
             }
         }
 
-        private static CompositeTextMapPropagator CreateCompositePropagator(ImmutableTracerSettings settings, ITraceIdConvention traceIdConvention, IReadOnlyCollection<IOTelExtension> extensions)
+        private static CompositeTextMapPropagator CreateCompositePropagator(ImmutableTracerSettings settings, ITraceIdConvention traceIdConvention)
         {
             var compositeProvider = new CompositePropagatorsProvider();
             compositeProvider.RegisterProvider(new OTelPropagatorsProvider());
-
-            foreach (var extension in extensions)
-            {
-                if (extension is IPropagatorsProvider provider)
-                {
-                    compositeProvider.RegisterProvider(provider);
-                }
-            }
 
             var propagators = compositeProvider
                .GetPropagators(settings.Propagators, traceIdConvention)

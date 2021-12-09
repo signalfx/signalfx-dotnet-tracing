@@ -26,7 +26,7 @@ namespace Benchmarks.Trace
                 ServiceVersion = "version"
             };
 
-            LogInjectionTracer = new Tracer(logInjectionSettings, null, new DummyAgentWriter(), null, null, null);
+            LogInjectionTracer = new Tracer(logInjectionSettings, new DummyAgentWriter(), null, null, null);
             Tracer.UnsafeSetTracerInstance(LogInjectionTracer);
 
             var services = new ServiceCollection();

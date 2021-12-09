@@ -28,7 +28,7 @@ namespace Datadog.Trace.Tests.Logging
             settings.ServiceVersion = "custom-version";
             settings.Environment = "custom-env";
 
-            return new Tracer(settings, plugins: null, writerMock.Object, samplerMock.Object, scopeManager: null, statsd: null);
+            return new Tracer(settings, writerMock.Object, samplerMock.Object, scopeManager: null, statsd: null);
         }
 
         internal static void LogInSpanWithServiceName(Tracer tracer, ILog logger, Func<string, object, bool, IDisposable> openMappedContext, string service, out Scope scope)

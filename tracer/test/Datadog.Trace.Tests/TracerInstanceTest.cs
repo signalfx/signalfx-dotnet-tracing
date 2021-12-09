@@ -61,8 +61,8 @@ namespace Datadog.Trace.Tests
 
             Assert.Throws<InvalidOperationException>(() => Tracer.Instance = null);
 
-            Assert.Throws<InvalidOperationException>(() => TracerManager.ReplaceGlobalManager(null, null, TracerManagerFactory.Instance));
-            Assert.Throws<InvalidOperationException>(() => TracerManager.ReplaceGlobalManager(null, null, new CITracerManagerFactory()));
+            Assert.Throws<InvalidOperationException>(() => TracerManager.ReplaceGlobalManager(null, TracerManagerFactory.Instance));
+            Assert.Throws<InvalidOperationException>(() => TracerManager.ReplaceGlobalManager(null, new CITracerManagerFactory()));
         }
 
         [Fact]
@@ -80,7 +80,7 @@ namespace Datadog.Trace.Tests
                     StartupDiagnosticLogEnabled = false,
                     GlobalTags = new Dictionary<string, string> { { "test-tag", "original-value" } },
                 };
-                Tracer.Configure(oldSettings, null);
+                Tracer.Configure(oldSettings);
 
                 var span = Tracer.Instance.StartActive("Test span");
 
@@ -93,7 +93,7 @@ namespace Datadog.Trace.Tests
                     GlobalTags = new Dictionary<string, string> { { "test-tag", "new-value" } },
                 };
 
-                Tracer.Configure(newSettings, null);
+                Tracer.Configure(newSettings);
 
                 span.Dispose();
 
