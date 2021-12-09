@@ -79,7 +79,7 @@ const WSTRING system_private_corelib_assemblyName = WStr("System.Private.CoreLib
 const WSTRING datadog_trace_clrprofiler_managed_loader_assemblyName = WStr("SignalFx.Tracing.ClrProfiler.Managed.Loader");
 
 const WSTRING managed_profiler_full_assembly_version =
-    WStr("SignalFx.Tracing, Version=0.0.1.0, Culture=neutral, PublicKeyToken=e43a27c2023d388a");
+    WStr("SignalFx.Tracing, Version=0.2.0.0, Culture=neutral, PublicKeyToken=e43a27c2023d388a");
 
 const WSTRING managed_profiler_name = WStr("SignalFx.Tracing");
 
