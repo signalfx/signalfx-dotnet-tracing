@@ -29,8 +29,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             }
         }
 
-        [SkippableTheory]
-        [MemberData(nameof(GetCouchbase))]
+        // [SkippableTheory]
+        [Theory]
+        [MemberData(nameof(GetCouchbase), Skip = "TODO enable Couchbase3 tests")]
         [Trait("Category", "EndToEnd")]
         [Trait("Category", "ArmUnsupported")]
         public void SubmitTraces(string packageVersion)
@@ -49,7 +50,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 {
                     Assert.Equal("couchbase.query", span.Name);
                     Assert.Equal("Samples.Couchbase3", span.Service);
-                    Assert.False(span.Tags?.ContainsKey(Tags.Version), "External service span should not have service version tag.");
+                    Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
                 }
 
                 var expected = new List<string>
