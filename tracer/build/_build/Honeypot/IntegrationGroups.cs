@@ -110,7 +110,7 @@ namespace Honeypot
                 {
                     IntegrationName = Name,
                     NugetPackageSearchName = packageName,
-                    MinVersion = "0.2.0",
+                    MinVersion = "0.0.1",
                     MaxVersionExclusive = "255.255.255"
                 };
 
