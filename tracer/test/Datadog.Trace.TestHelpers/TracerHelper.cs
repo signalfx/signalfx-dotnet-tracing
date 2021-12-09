@@ -5,10 +5,8 @@
 
 // Modified by Splunk Inc.
 
-using System.Collections.Generic;
 using Datadog.Trace.Agent;
 using Datadog.Trace.Configuration;
-using Datadog.Trace.Plugins;
 using Datadog.Trace.Sampling;
 using Datadog.Trace.Vendors.StatsdClient;
 
@@ -21,13 +19,12 @@ namespace Datadog.Trace.TestHelpers
         /// </summary>
         public static Tracer Create(
             TracerSettings settings = null,
-            IReadOnlyCollection<IOTelExtension> plugins = null,
             IAgentWriter agentWriter = null,
             ISampler sampler = null,
             IScopeManager scopeManager = null,
             IDogStatsd statsd = null)
         {
-            return new Tracer(settings, plugins, agentWriter, sampler, scopeManager, statsd);
+            return new Tracer(settings, agentWriter, sampler, scopeManager, statsd);
         }
     }
 }

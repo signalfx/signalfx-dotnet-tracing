@@ -30,7 +30,7 @@ namespace Datadog.Trace.OpenTracing.IntegrationTests
                     TracerMetricsEnabled = false,
                 };
 
-                var innerTracer = new Tracer(settings, plugins: null, agentWriter: null, sampler: null, scopeManager: null, statsd: null);
+                var innerTracer = new Tracer(settings, agentWriter: null, sampler: null, scopeManager: null, statsd: null);
                 var tracer = new OpenTracingTracer(innerTracer);
 
                 var span = (OpenTracingSpan)tracer.BuildSpan("Operation")
@@ -59,7 +59,7 @@ namespace Datadog.Trace.OpenTracing.IntegrationTests
                     TracerMetricsEnabled = false,
                 };
 
-                var innerTracer = new Tracer(settings, plugins: null, agentWriter: null, sampler: null, scopeManager: null, statsd: null);
+                var innerTracer = new Tracer(settings, agentWriter: null, sampler: null, scopeManager: null, statsd: null);
                 var tracer = new OpenTracingTracer(innerTracer);
 
                 var span = (OpenTracingSpan)tracer.BuildSpan("Operation")
@@ -90,7 +90,7 @@ namespace Datadog.Trace.OpenTracing.IntegrationTests
                     TracerMetricsEnabled = false,
                 };
 
-                var innerTracer = new Tracer(settings, plugins: null, agentWriter: null, sampler: null, scopeManager: null, statsd: null);
+                var innerTracer = new Tracer(settings, agentWriter: null, sampler: null, scopeManager: null, statsd: null);
                 var tracer = new OpenTracingTracer(innerTracer);
 
                 var span = (OpenTracingSpan)tracer.BuildSpan("Aᛗᚪᚾᚾᚪ")

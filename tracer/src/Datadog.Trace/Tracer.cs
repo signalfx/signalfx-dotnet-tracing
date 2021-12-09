@@ -9,10 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Datadog.Trace.Abstractions;
 using Datadog.Trace.Agent;
 using Datadog.Trace.Configuration;
-using Datadog.Trace.Plugins;
 using Datadog.Trace.Propagation;
 using Datadog.Trace.Sampling;
 using Datadog.Trace.Tagging;
@@ -70,7 +68,7 @@ namespace Datadog.Trace
         public Tracer(TracerSettings settings)
         {
             // TODO: Switch to immutable settings
-            Configure(settings, null);
+            Configure(settings);
 
             // update the count of Tracer instances
             Interlocked.Increment(ref _liveTracerCount);
@@ -82,8 +80,8 @@ namespace Datadog.Trace
         /// Note that this API does NOT replace the global Tracer instance.
         /// The <see cref="TracerManager"/> created will be scoped specifically to this instance.
         /// </summary>
-        internal Tracer(TracerSettings settings, IReadOnlyCollection<IOTelExtension> plugins, IAgentWriter agentWriter, ISampler sampler, IScopeManager scopeManager, IDogStatsd statsd)
-            : this(TracerManagerFactory.Instance.CreateTracerManager(settings?.Build(), plugins, agentWriter, sampler, scopeManager, statsd, runtimeMetrics: null, libLogSubscriber: null))
+        internal Tracer(TracerSettings settings, IAgentWriter agentWriter, ISampler sampler, IScopeManager scopeManager, IDogStatsd statsd)
+            : this(TracerManagerFactory.Instance.CreateTracerManager(settings?.Build(), agentWriter, sampler, scopeManager, statsd, runtimeMetrics: null, libLogSubscriber: null))
         {
         }
 
@@ -194,10 +192,9 @@ namespace Datadog.Trace
         /// </summary>
         /// <param name="settings"> A <see cref="TracerSettings"/> instance with the desired settings,
         /// or null to use the default configuration sources. This is used to configure global settings</param>
-        /// <param name="plugins">Plugins to extend with</param>
-        public static void Configure(TracerSettings settings, IReadOnlyCollection<IOTelExtension> plugins)
+        public static void Configure(TracerSettings settings)
         {
-            TracerManager.ReplaceGlobalManager(settings?.Build(), plugins, TracerManagerFactory.Instance);
+            TracerManager.ReplaceGlobalManager(settings?.Build(), TracerManagerFactory.Instance);
         }
 
         /// <summary>

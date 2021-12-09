@@ -43,11 +43,6 @@ namespace Datadog.Trace.Configuration
             FileLogEnabled = source?.GetBool(ConfigurationKeys.FileLogEnabled) ?? true;
 
             StdoutLogEnabled = source?.GetBool(ConfigurationKeys.StdoutLogEnabled) ?? false;
-
-            if (TryLoadPluginJsonConfigurationFile(source, out JsonConfigurationSource jsonConfigurationSource))
-            {
-                PluginsConfiguration = jsonConfigurationSource;
-            }
         }
 
         /// <summary>
@@ -84,11 +79,6 @@ namespace Datadog.Trace.Configuration
         /// or a configuration file, not through code.
         /// </summary>
         internal bool DiagnosticSourceEnabled { get; }
-
-        /// <summary>
-        /// Gets the plugins configuration.
-        /// </summary>
-        internal JsonConfigurationSource PluginsConfiguration { get; }
 
         /// <summary>
         /// Set whether debug mode is enabled.
@@ -154,13 +144,6 @@ namespace Datadog.Trace.Configuration
             }
 
             return configurationSource;
-        }
-
-        private static bool TryLoadPluginJsonConfigurationFile(IConfigurationSource configurationSource, out JsonConfigurationSource jsonConfigurationSource)
-        {
-            var configurationFileName = configurationSource?.GetString(ConfigurationKeys.PluginConfigurationFileName);
-
-            return TryLoadJsonConfigurationFile(configurationFileName, out jsonConfigurationSource);
         }
 
         private static bool TryLoadJsonConfigurationFile(IConfigurationSource configurationSource, out JsonConfigurationSource jsonConfigurationSource)

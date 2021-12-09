@@ -41,7 +41,7 @@ namespace Datadog.Trace.OpenTracing
                 configuration.ServiceName = defaultServiceName;
             }
 
-            Tracer.Configure(configuration, null);
+            Tracer.Configure(configuration);
             return new OpenTracingTracer(Tracer.Instance);
         }
 
