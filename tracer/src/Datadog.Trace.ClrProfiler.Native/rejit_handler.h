@@ -25,7 +25,7 @@ struct RejitItem
     int m_type = 0;
     std::unique_ptr<std::vector<ModuleID>> m_modulesId = nullptr;
     std::unique_ptr<std::vector<mdMethodDef>> m_methodDefs = nullptr;
-    std::unique_ptr<std::vector<IntegrationMethod>> m_integrationMethods = nullptr;
+    std::unique_ptr<std::vector<IntegrationDefinition>> m_integrationDefinitions = nullptr;
     //
     std::promise<ULONG>* m_promise = nullptr;
 
@@ -35,7 +35,7 @@ struct RejitItem
               std::unique_ptr<std::vector<mdMethodDef>>&& methodDefs);
 
     RejitItem(std::unique_ptr<std::vector<ModuleID>>&& modulesId,
-              std::unique_ptr<std::vector<IntegrationMethod>>&& integrationMethods, std::promise<ULONG>* promise);
+              std::unique_ptr<std::vector<IntegrationDefinition>>&& integrationDefinitions, std::promise<ULONG>* promise);
 
     static std::unique_ptr<RejitItem> CreateEndRejitThread();
 };
@@ -53,7 +53,7 @@ private:
     mdMethodDef m_methodDef;
     ICorProfilerFunctionControl* m_pFunctionControl;
     std::unique_ptr<FunctionInfo> m_functionInfo;
-    std::unique_ptr<MethodReplacement> m_methodReplacement;
+    std::unique_ptr<IntegrationDefinition> m_integrationDefinition;
 
     std::mutex m_ngenModulesLock;
     std::unordered_map<ModuleID, bool> m_ngenModules;
@@ -71,8 +71,8 @@ public:
     FunctionInfo* GetFunctionInfo();
     void SetFunctionInfo(const FunctionInfo& functionInfo);
 
-    MethodReplacement* GetMethodReplacement();
-    void SetMethodReplacement(const MethodReplacement& methodReplacement);
+    IntegrationDefinition* GetIntegrationDefinition();
+    void SetIntegrationDefinition(const IntegrationDefinition& integrationDefinition);
 
     void RequestRejitForInlinersInModule(ModuleID moduleId);
 };
@@ -117,13 +117,13 @@ private:
     std::unordered_map<ModuleID, std::unique_ptr<RejitHandlerModule>> m_modules;
     AssemblyProperty* m_pCorAssemblyProperty = nullptr;
 
-    ICorProfilerInfo4* m_profilerInfo;
-    ICorProfilerInfo6* m_profilerInfo6;
+    ICorProfilerInfo7* m_profilerInfo;
     ICorProfilerInfo10* m_profilerInfo10;
     std::function<HRESULT(RejitHandlerModule*, RejitHandlerModuleMethod*)> m_rewriteCallback;
 
     std::unique_ptr<UniqueBlockingQueue<RejitItem>> m_rejit_queue;
     std::unique_ptr<std::thread> m_rejit_queue_thread;
+    bool enable_by_ref_instrumentation = false;
 
     std::mutex m_ngenModules_lock;
     std::vector<ModuleID> m_ngenModules;
@@ -134,14 +134,13 @@ private:
     void RequestRejit(std::vector<ModuleID>& modulesVector, std::vector<mdMethodDef>& modulesMethodDef);
 
 public:
-    RejitHandler(ICorProfilerInfo4* pInfo,
-                 std::function<HRESULT(RejitHandlerModule*, RejitHandlerModuleMethod*)> rewriteCallback);
-    RejitHandler(ICorProfilerInfo6* pInfo,
+    RejitHandler(ICorProfilerInfo7* pInfo,
                  std::function<HRESULT(RejitHandlerModule*, RejitHandlerModuleMethod*)> rewriteCallback);
     RejitHandler(ICorProfilerInfo10* pInfo,
                  std::function<HRESULT(RejitHandlerModule*, RejitHandlerModuleMethod*)> rewriteCallback);
 
     RejitHandlerModule* GetOrAddModule(ModuleID moduleId);
+    void SetEnableByRefInstrumentation(bool enableByRefInstrumentation);
 
     void RemoveModule(ModuleID moduleId);
     bool HasModuleAndMethod(ModuleID moduleId, mdMethodDef methodDef);
@@ -149,7 +148,7 @@ public:
     void AddNGenModule(ModuleID moduleId);
 
     void EnqueueProcessModule(const std::vector<ModuleID>& modulesVector,
-                              const std::vector<IntegrationMethod>& integrations,
+                              const std::vector<IntegrationDefinition>& integrationDefinitions,
                               std::promise<ULONG>* promise);
     void EnqueueForRejit(std::vector<ModuleID>& modulesVector, std::vector<mdMethodDef>& modulesMethodDef);
 
@@ -159,13 +158,12 @@ public:
                                   ICorProfilerFunctionControl* pFunctionControl);
     HRESULT NotifyReJITCompilationStarted(FunctionID functionId, ReJITID rejitId);
 
-    ICorProfilerInfo4* GetCorProfilerInfo();
-    ICorProfilerInfo6* GetCorProfilerInfo6();
+    ICorProfilerInfo7* GetCorProfilerInfo();
 
     void SetCorAssemblyProfiler(AssemblyProperty* pCorAssemblyProfiler);
     void RequestRejitForNGenInliners();
     ULONG ProcessModuleForRejit(const std::vector<ModuleID>& modules,
-                                const std::vector<IntegrationMethod>& integrations,
+                                const std::vector<IntegrationDefinition>& integrationDefinitions,
                                 bool enqueueInSameThread = false);
 };
 

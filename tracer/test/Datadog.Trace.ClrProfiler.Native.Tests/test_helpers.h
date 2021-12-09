@@ -15,7 +15,6 @@ class CLRHelperTestBase : public ::testing::Test {
   Version min_ver_ = Version(0, 0, 0, 0);
   Version max_ver_ = Version(USHRT_MAX, USHRT_MAX, USHRT_MAX, USHRT_MAX);
   std::vector<WSTRING> empty_sig_type_;
-  std::vector<USHORT> empty_load_args_;
 
   void LoadMetadataDependencies() {
     ICLRMetaHost* metahost = nullptr;
@@ -57,6 +56,17 @@ class CLRHelperTestBase : public ::testing::Test {
   }
 
   void SetUp() override { LoadMetadataDependencies(); }
+
+  static Enumerator<mdMethodDef> EnumMethods(const ComPtr<IMetaDataImport2>& metadata_import,
+                                             const mdToken& parent_token)
+  {
+      return Enumerator<mdMethodDef>(
+          [metadata_import, parent_token](HCORENUM* ptr, mdMethodDef arr[], ULONG max, ULONG* cnt) -> HRESULT {
+              return metadata_import->EnumMethods(ptr, parent_token, arr, max, cnt);
+          },
+          [metadata_import](HCORENUM ptr) -> void { metadata_import->CloseEnum(ptr); });
+  }
+
 
   FunctionInfo FunctionToTest(const WSTRING& type_name, const WSTRING& method_name) const {
     for (auto& type_def : EnumTypeDefs(metadata_import_)) {

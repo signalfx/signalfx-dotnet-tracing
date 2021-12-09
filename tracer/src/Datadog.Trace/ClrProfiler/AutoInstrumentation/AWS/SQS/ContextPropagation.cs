@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,7 +22,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AWS.SQS
             // Consolidate headers into one JSON object with <header_name>:<value>
             StringBuilder sb = new();
             sb.Append('{');
-            var propagator = Tracer.Instance.Propagator;
+            var propagator = Tracer.Instance.TracerManager.Propagator;
             propagator.Inject(context, sb, ((carrier, key, value) => carrier.AppendFormat("\"{0}\":\"{1}\",", key, value)));
             sb.Remove(startIndex: sb.Length - 1, length: 1); // Remove trailing comma
             sb.Append('}');

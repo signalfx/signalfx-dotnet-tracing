@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using Datadog.Trace.Logging;
 using Datadog.Trace.Util;
 
@@ -88,7 +90,7 @@ namespace Datadog.Trace
 
         private SpanContext(TraceId? traceId, string serviceName)
         {
-            TraceId = traceId ?? Tracer.Instance.TraceIdConvention.GenerateNewTraceId();
+            TraceId = traceId ?? Tracer.Instance.TracerManager.TraceIdConvention.GenerateNewTraceId();
             ServiceName = serviceName;
         }
 

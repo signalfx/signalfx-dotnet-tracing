@@ -3,18 +3,15 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-using System;
-using Datadog.Trace.Configuration;
-
 namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AdoNet
 {
     internal static class AdoNetConstants
     {
-        internal const string IntegrationName = nameof(IntegrationIds.AdoNet);
-        internal static readonly IntegrationInfo IntegrationId = IntegrationRegistry.GetIntegrationInfo(IntegrationName);
-
         internal struct SystemDataClientData : IAdoNetClientData
         {
+            // note: not a real integration id, cannot be used for configuration
+            public string IntegrationName => "AdoNet";
+
             public string AssemblyName => "System.Data";
 
             public string SqlCommandType => "System.Data.Common.DbCommand";
@@ -23,24 +20,27 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AdoNet
 
             public string MaximumVersion => "4.*.*";
 
-            public string DataReaderType => AdoNet.AdoNetConstants.TypeNames.DbDataReaderType;
+            public string DataReaderType => TypeNames.DbDataReaderType;
 
-            public string DataReaderTaskType => AdoNet.AdoNetConstants.TypeNames.DbDataReaderTaskType;
+            public string DataReaderTaskType => TypeNames.DbDataReaderTaskType;
         }
 
         internal struct SystemDataCommonClientData : IAdoNetClientData
         {
+            // note: not a real integration id, cannot be used for configuration
+            public string IntegrationName => "AdoNet";
+
             public string AssemblyName => "System.Data.Common";
 
             public string SqlCommandType => "System.Data.Common.DbCommand";
 
             public string MinimumVersion => "4.0.0";
 
-            public string MaximumVersion => "5.*.*";
+            public string MaximumVersion => "6.*.*";
 
-            public string DataReaderType => AdoNet.AdoNetConstants.TypeNames.DbDataReaderType;
+            public string DataReaderType => TypeNames.DbDataReaderType;
 
-            public string DataReaderTaskType => AdoNet.AdoNetConstants.TypeNames.DbDataReaderTaskType;
+            public string DataReaderTaskType => TypeNames.DbDataReaderTaskType;
         }
 
         public static class TypeNames

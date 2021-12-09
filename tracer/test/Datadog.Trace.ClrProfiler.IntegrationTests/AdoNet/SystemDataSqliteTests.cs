@@ -5,7 +5,6 @@
 
 // Modified by Splunk Inc.
 
-#if !NET452
 using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.Configuration;
@@ -23,71 +22,53 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             SetServiceVersion("1.0.0");
         }
 
-        [SkippableTheory]
-        [InlineData(true)]
+        [SkippableFact]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         [Trait("Category", "ArmUnsupported")]
-        public void SubmitsTracesWithNetStandard(bool enableCallTarget)
+        public void SubmitsTraces()
         {
-            SetCallTargetSettings(enableCallTarget);
-
-            var expectedSpanCount = 91;
-
+            const int expectedSpanCount = 91;
             const string dbType = "sqlite";
             const string expectedOperationName = dbType + ".query";
             const string expectedServiceName = "Samples.SQLite.Core";
 
-            // NOTE: opt into the additional instrumentation of calls into netstandard.dll
-            SetEnvironmentVariable("SIGNALFX_TRACE_NETSTANDARD_ENABLED", "true");
-
             int agentPort = TcpPortProvider.GetOpenPort();
+            using var agent = new MockTracerAgent(agentPort);
+            using var process = RunSampleAndWaitForExit(agent.Port);
+            var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
 
-            using (var agent = new MockTracerAgent(agentPort))
-            using (RunSampleAndWaitForExit(agent.Port))
+            Assert.Equal(expectedSpanCount, spans.Count);
+
+            foreach (var span in spans)
             {
-                var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
-                Assert.Equal(expectedSpanCount, spans.Count);
-
-                foreach (var span in spans)
-                {
-                    Assert.Equal(expectedOperationName, span.Name);
-                    Assert.Equal(expectedServiceName, span.Service);
-                    Assert.Equal(SpanTypes.Sql, span.Type);
-                    Assert.Equal(dbType, span.Tags[Tags.DbType]);
-                    Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
-                    Assert.Contains(Tags.DbStatement, (IDictionary<string, string>)span.Tags);
-                }
+                Assert.Equal(expectedOperationName, span.Name);
+                Assert.Equal(expectedServiceName, span.Service);
+                Assert.Equal(SpanTypes.Sql, span.Type);
+                Assert.Equal(dbType, span.Tags[Tags.DbType]);
+                Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
+                Assert.Contains(Tags.DbStatement, (IDictionary<string, string>)span.Tags);
             }
         }
 
-        [SkippableTheory]
-        [InlineData(false)]
-        [InlineData(true)]
+        [SkippableFact]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         [Trait("Category", "ArmUnsupported")]
-        public void SpansDisabledByAdoNetExcludedTypes(bool enableCallTarget)
+        public void IntegrationDisabled()
         {
-            SetCallTargetSettings(enableCallTarget);
+            const int totalSpanCount = 21;
+            const string expectedOperationName = "sqlite.query";
 
-            var totalSpanCount = 21;
-
-            const string dbType = "mssql";
-            const string expectedOperationName = dbType + ".query";
-
-            SetEnvironmentVariable(ConfigurationKeys.AdoNetExcludedTypes, "System.Data.SQLite.SQLiteCommand,Microsoft.Data.Sqlite.SqliteCommand");
+            SetEnvironmentVariable($"SIGNALFX_TRACE_{nameof(IntegrationId.Sqlite)}_ENABLED", "false");
 
             int agentPort = TcpPortProvider.GetOpenPort();
+            using var agent = new MockTracerAgent(agentPort);
+            using var process = RunSampleAndWaitForExit(agent.Port);
+            var spans = agent.WaitForSpans(totalSpanCount, returnAllOperations: true);
 
-            using (var agent = new MockTracerAgent(agentPort))
-            using (RunSampleAndWaitForExit(agent.Port))
-            {
-                var spans = agent.WaitForSpans(totalSpanCount, returnAllOperations: true);
-                Assert.NotEmpty(spans);
-                Assert.Empty(spans.Where(s => s.Name.Equals(expectedOperationName)));
-            }
+            Assert.NotEmpty(spans);
+            Assert.Empty(spans.Where(s => s.Name.Equals(expectedOperationName)));
         }
     }
 }
-#endif

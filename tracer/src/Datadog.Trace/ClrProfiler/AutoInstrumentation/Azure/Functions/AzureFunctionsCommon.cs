@@ -17,11 +17,11 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Azure.Functions
 {
     internal static class AzureFunctionsCommon
     {
-        public const string IntegrationName = nameof(IntegrationIds.AzureFunctions);
+        public const string IntegrationName = nameof(Configuration.IntegrationId.AzureFunctions);
 
         public const string OperationName = "azure-functions.invoke";
         public const string SpanType = SpanTypes.Serverless;
-        public static readonly IntegrationInfo IntegrationId = IntegrationRegistry.GetIntegrationInfo(nameof(IntegrationIds.AzureFunctions));
+        public const IntegrationId IntegrationId = Configuration.IntegrationId.AzureFunctions;
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(AzureFunctionsCommon));
         private static readonly AspNetCoreHttpRequestHandler AspNetCoreRequestHandler = new AspNetCoreHttpRequestHandler(Log, OperationName, IntegrationId);
@@ -29,13 +29,15 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Azure.Functions
         public static CallTargetState OnFunctionMiddlewareBegin<TTarget>(TTarget instance, HttpContext httpContext)
         {
             var tracer = Tracer.Instance;
-            var security = Security.Instance;
 
-            var scope = AspNetCoreRequestHandler.StartAspNetCorePipelineScope(tracer, security, httpContext);
-
-            if (scope != null)
+            if (tracer.Settings.IsIntegrationEnabled(IntegrationId))
             {
-                return new CallTargetState(scope);
+                var scope = AspNetCoreRequestHandler.StartAspNetCorePipelineScope(tracer, httpContext, httpContext.Request, resourceName: null);
+
+                if (scope != null)
+                {
+                    return new CallTargetState(scope);
+                }
             }
 
             return CallTargetState.GetDefault();

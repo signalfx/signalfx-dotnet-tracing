@@ -28,7 +28,7 @@ namespace Benchmarks.Trace
             settings.StartupDiagnosticLogEnabled = false;
             settings.TraceEnabled = false;
 
-            var api = new Api(settings.AgentUri, new FakeApiRequestFactory(), statsd: null);
+            var api = new Api(settings.AgentUri, new FakeApiRequestFactory(), statsd: null, updateSampleRates: null, isPartialFlushEnabled: false);
 
             AgentWriter = new AgentWriter(api, new NullMetrics(), automaticFlush: false);
 
@@ -121,10 +121,7 @@ namespace Benchmarks.Trace
 
             public long ContentLength => 0;
 
-            public string GetHeader(string headerName)
-            {
-                throw new NotImplementedException();
-            }
+            public string GetHeader(string headerName) => string.Empty;
 
             public Task<string> ReadAsStringAsync()
             {

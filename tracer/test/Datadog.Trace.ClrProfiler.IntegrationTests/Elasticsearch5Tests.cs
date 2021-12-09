@@ -7,12 +7,11 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Datadog.Trace.Configuration;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.TestHelpers;
 using Xunit;
 using Xunit.Abstractions;
-
-#if !NET452
 
 namespace Datadog.Trace.ClrProfiler.IntegrationTests
 {
@@ -24,14 +23,12 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetServiceVersion("1.0.0");
         }
 
-        public static System.Collections.Generic.IEnumerable<object[]> GetElasticsearch()
+        public static IEnumerable<object[]> GetElasticsearch()
         {
             foreach (var item in PackageVersions.ElasticSearch5)
             {
-                yield return item.Concat(false, false);
-                yield return item.Concat(true, false);
-                yield return item.Concat(false, true);
-                yield return item.Concat(true, true);
+                yield return item.Concat(true);
+                yield return item.Concat(false);
             }
         }
 
@@ -39,10 +36,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [MemberData(nameof(GetElasticsearch))]
         [Trait("Category", "EndToEnd")]
         [Trait("Category", "ArmUnsupported")]
-        public void SubmitsTraces(string packageVersion, bool enableCallTarget, bool tagQueries)
+        public void SubmitsTraces(string packageVersion, bool tagQueries)
         {
             SetEnvironmentVariable("SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES", tagQueries.ToString().ToLowerInvariant());
-            SetCallTargetSettings(enableCallTarget);
 
             int agentPort = TcpPortProvider.GetOpenPort();
 
@@ -178,7 +174,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
 
                     span.Tags.TryGetValue(Tags.DbStatement, out string statement);
-                    if (enableCallTarget && tagQueries && statementNames.Contains(span.Name))
+                    if (tagQueries && statementNames.Contains(span.Name))
                     {
                         Assert.NotNull(statement);
                     }
@@ -191,7 +187,22 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 ValidateSpans(spans, (span) => span.Resource, expected);
             }
         }
+
+        [SkippableFact]
+        [Trait("Category", "EndToEnd")]
+        [Trait("Category", "ArmUnsupported")]
+        public void IntegrationDisabled()
+        {
+            int agentPort = TcpPortProvider.GetOpenPort();
+            string packageVersion = PackageVersions.ElasticSearch5.First()[0] as string;
+
+            SetEnvironmentVariable($"SIGNALFX_TRACE_{nameof(IntegrationId.ElasticsearchNet)}_ENABLED", "false");
+
+            using var agent = new MockTracerAgent(agentPort);
+            using var process = RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion);
+            var spans = agent.WaitForSpans(1).Where(s => s.Type == "elasticsearch").ToList();
+
+            Assert.Empty(spans);
+        }
     }
 }
-
-#endif

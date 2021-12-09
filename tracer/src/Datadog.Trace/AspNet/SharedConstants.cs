@@ -3,10 +3,12 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 namespace Datadog.Trace.AspNet
 {
     internal static class SharedConstants
     {
-        public const string HttpContextPropagatedResourceNameKey = "__Datadog.Trace.ClrProfiler.Managed.AspNetMvcIntegration-aspnet.resourcename";
+        public const string HttpContextPropagatedResourceNameKey = "__SignalFx.Tracing.ClrProfiler.Managed.AspNetMvcIntegration-aspnet.resourcename";
     }
 }

@@ -5,7 +5,6 @@
 
 // Modified by Splunk Inc.
 
-#if !NET452
 using System.Collections.Generic;
 using Datadog.Trace.TestHelpers;
 using Xunit;
@@ -59,9 +58,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             const string expectedOperationName = dbType + ".query";
             const string expectedServiceName = "Samples.Dapper";
 
-            // NOTE: opt into the additional instrumentation of calls into netstandard.dll
-            SetEnvironmentVariable("SIGNALFX_TRACE_NETSTANDARD_ENABLED", "true");
-
             int agentPort = TcpPortProvider.GetOpenPort();
 
             using (var agent = new MockTracerAgent(agentPort))
@@ -83,4 +79,3 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
         }
     }
 }
-#endif

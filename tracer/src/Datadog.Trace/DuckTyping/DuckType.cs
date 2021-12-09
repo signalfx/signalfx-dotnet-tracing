@@ -20,7 +20,7 @@ namespace Datadog.Trace.DuckTyping
     /// <typeparam name="T">Type of struct</typeparam>
     /// <param name="instance">Object instance</param>
     /// <returns>Proxy instance</returns>
-    public delegate T CreateProxyInstance<T>(object instance);
+    internal delegate T CreateProxyInstance<T>(object instance);
 
     /// <summary>
     /// Duck Type
@@ -969,11 +969,6 @@ namespace Datadog.Trace.DuckTyping
             /// </summary>
             public static readonly Type Type = typeof(T);
 
-            /// <summary>
-            /// Gets if the T type is visible
-            /// </summary>
-            public static readonly bool IsVisible = Type.IsPublic || Type.IsNestedPublic;
-
             private static CreateTypeResult _fastPath = default;
 
             /// <summary>
@@ -991,7 +986,7 @@ namespace Datadog.Trace.DuckTyping
                     return fastPath;
                 }
 
-                CreateTypeResult result = GetProxySlow(targetType);
+                CreateTypeResult result = GetOrCreateProxyType(Type, targetType);
 
                 fastPath = _fastPath;
                 if (fastPath.TargetType is null)
@@ -1034,18 +1029,6 @@ namespace Datadog.Trace.DuckTyping
                 return GetProxy(instance.GetType()).CanCreate();
             }
 
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private static CreateTypeResult GetProxySlow(Type targetType)
-            {
-#if NET45
-                if (!Type.IsValueType && !IsVisible)
-                {
-                    DuckTypeTypeIsNotPublicException.Throw(Type, nameof(Type));
-                }
-#endif
-                return GetOrCreateProxyType(Type, targetType);
-            }
-
             /// <summary>
             /// Create a reverse proxy type for a target instance using the T proxy definition
             /// </summary>
@@ -1077,7 +1060,7 @@ namespace Datadog.Trace.DuckTyping
                     return fastPath;
                 }
 
-                CreateTypeResult result = GetReverseProxySlow(targetType);
+                CreateTypeResult result = GetOrCreateReverseProxyType(Type, targetType);
 
                 fastPath = _fastPath;
                 if (fastPath.TargetType is null)
@@ -1086,18 +1069,6 @@ namespace Datadog.Trace.DuckTyping
                 }
 
                 return result;
-            }
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private static CreateTypeResult GetReverseProxySlow(Type targetType)
-            {
-#if NET45
-                if (!Type.IsValueType && !IsVisible)
-                {
-                    DuckTypeTypeIsNotPublicException.Throw(Type, nameof(Type));
-                }
-#endif
-                return GetOrCreateReverseProxyType(Type, targetType);
             }
         }
     }

@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using Datadog.Trace.ClrProfiler.CallTarget;
-using Datadog.Trace.ClrProfiler.Integrations;
 using Datadog.Trace.DuckTyping;
 using Datadog.Trace.Tagging;
 
@@ -32,8 +31,6 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
     public class BasicPublishIntegration
     {
         private const string Command = RabbitMQIntegration.PublishCommand;
-
-        private static readonly string[] DeliveryModeStrings = { null, "1", "2" };
 
         /// <summary>
         /// OnMethodBegin callback
@@ -76,7 +73,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
                         basicProperties.Headers = new Dictionary<string, object>();
                     }
 
-                    tracer.Propagator.Inject(scope.Span.Context, basicProperties.Headers, ContextPropagation.HeadersSetter);
+                    tracer.TracerManager.Propagator.Inject(scope.Span.Context, basicProperties.Headers, ContextPropagation.HeadersSetter);
                 }
             }
 

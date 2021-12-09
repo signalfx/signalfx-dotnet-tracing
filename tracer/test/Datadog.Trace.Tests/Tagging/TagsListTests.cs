@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Datadog.Trace.Agent.MessagePack;
-using Datadog.Trace.ClrProfiler.Integrations.AdoNet;
+using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.Tagging;
 using Datadog.Trace.Util;
 using Datadog.Trace.Vendors.MessagePack;
@@ -68,7 +68,7 @@ namespace Datadog.Trace.Tests.Tagging
         public void GetAll_When_MissingTags()
         {
             var tags = new EmptyTags();
-            var values = ArrayHelper.Empty<string>();
+            var values = Array.Empty<string>();
 
             ValidateTags(tags.GetAllTags(), values);
         }

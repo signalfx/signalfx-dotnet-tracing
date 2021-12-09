@@ -13,11 +13,6 @@ namespace environment {
     // Sets whether debug mode is enabled. Default is false.
     const WSTRING debug_enabled = WStr("SIGNALFX_TRACE_DEBUG");
 
-    // Sets the paths to integration definition JSON files.
-    // Supports multiple values separated with comma, for example:
-    // "C:\Program Files\SignalFx .NET Tracing\integrations.json,D:\temp\test_integrations.json"
-    const WSTRING integrations_path = WStr("SIGNALFX_INTEGRATIONS");
-
     // Sets the path to the profiler's home directory, for example:
     // "C:\Program Files\SignalFx .NET Tracing\" or "/opt/signalfx/"
     const WSTRING profiler_home_path = WStr("SIGNALFX_DOTNET_TRACER_HOME");
@@ -74,16 +69,6 @@ namespace environment {
     // https://github.com/dotnet/coreclr/issues/12468
     const WSTRING clr_disable_optimizations = WStr("SIGNALFX_CLR_DISABLE_OPTIMIZATIONS");
 
-    // Sets whether to intercept method calls when the caller method is inside a
-    // domain-neutral assembly. This is dangerous because the integration assembly
-    // SignalFx.Tracing.dll must also be loaded domain-neutral,
-    // otherwise a sharing violation (HRESULT 0x80131401) may occur. This setting should only be
-    // enabled when there is only one AppDomain or, when hosting applications in IIS,
-    // the user can guarantee that all Application Pools on the system have at most
-    // Default is false. Only used in .NET Framework 4.5 and 4.5.1.
-    // https://github.com/DataDog/dd-trace-dotnet/pull/671
-    const WSTRING domain_neutral_instrumentation = WStr("SIGNALFX_TRACE_DOMAIN_NEUTRAL_INSTRUMENTATION");
-
     // Indicates whether the profiler is running in the context
     // of Azure App Services
     const WSTRING azure_app_services = WStr("SIGNALFX_AZURE_APP_SERVICES");
@@ -102,21 +87,11 @@ namespace environment {
     // Default is false until official support is announced.
     const WSTRING azure_functions_enabled = WStr("SIGNALFX_TRACE_AZURE_FUNCTIONS_ENABLED");
 
-    // Determine whether to instrument calls into netstandard.dll.
-    // Default to false for now to avoid the unexpected overhead of additional spans.
-    const WSTRING netstandard_enabled = WStr("SIGNALFX_TRACE_NETSTANDARD_ENABLED");
-
     // Enable the profiler to dump the IL original code and modification to the log.
     const WSTRING dump_il_rewrite_enabled = WStr("SIGNALFX_DUMP_ILREWRITE_ENABLED");
 
     // Sets whether to enable JIT inlining
     const WSTRING clr_enable_inlining = WStr("SIGNALFX_CLR_ENABLE_INLINING");
-
-    // Sets whether to enable the CallTarget instrumentation mode
-    const WSTRING calltarget_enabled = WStr("SIGNALFX_TRACE_CALLTARGET_ENABLED");
-
-    // Custom internal tracer profiler path
-    const WSTRING internal_trace_profiler_path = WStr("SIGNALFX_INTERNAL_TRACE_NATIVE_ENGINE_PATH");
 
     // Sets whether to enable NGEN images.
     const WSTRING clr_enable_ngen = WStr("SIGNALFX_CLR_ENABLE_NGEN");

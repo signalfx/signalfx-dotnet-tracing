@@ -21,7 +21,6 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
         MethodName = "InvokeEnd",
         ReturnTypeName = ClrNames.Object,
         ParameterTypeNames = new[] { ClrNames.Object, "System.Object[]&", ClrNames.IAsyncResult },
-        TargetMethodArgumentsToLoad = new ushort[] { 0, 2 }, // DO NOT pass the "out object[]" parameter into the instrumentation method
         MinimumVersion = "4.0.0",
         MaximumVersion = "4.*.*",
         IntegrationName = WcfCommon.IntegrationName)]

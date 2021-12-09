@@ -28,7 +28,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Http.WebRequest
         MethodName = MethodName,
         ReturnTypeName = ClrNames.Stream,
         MinimumVersion = WebRequestCommon.Major4,
-        MaximumVersion = WebRequestCommon.Major5,
+        MaximumVersion = WebRequestCommon.Major6,
         IntegrationName = WebRequestCommon.IntegrationName)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -58,7 +58,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Http.WebRequest
                         // The expected sequence of calls is GetRequestStream -> GetResponse. Headers can't be modified after calling GetRequestStream.
                         // At the same time, we don't want to set an active scope now, because it's possible that GetResponse will never be called.
                         // Instead, we generate a spancontext and inject it in the headers. GetResponse will fetch them and create an active scope with the right id.
-                        tracer.Propagator.Inject(span.Context, request.Headers.Wrap());
+                        tracer.TracerManager.Propagator.Inject(span.Context, request.Headers.Wrap());
                     }
                 }
             }

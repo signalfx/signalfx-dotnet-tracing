@@ -16,7 +16,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Http.HttpClient
 {
     internal static class HttpMessageHandlerCommon
     {
-        public static CallTargetState OnMethodBegin<TTarget, TRequest>(TTarget instance, TRequest requestMessage, CancellationToken cancellationToken, IntegrationInfo integrationId, Func<bool> isTracingEnableFunc = null)
+        public static CallTargetState OnMethodBegin<TTarget, TRequest>(TTarget instance, TRequest requestMessage, CancellationToken cancellationToken, IntegrationId integrationId, Func<bool> isTracingEnableFunc = null)
             where TRequest : IHttpRequestMessage
         {
             if (requestMessage.Instance is not null && IsTracingEnabled(requestMessage.Headers, isTracingEnableFunc))
@@ -28,7 +28,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Http.HttpClient
                     tags.HttpClientHandlerType = instance.GetType().FullName;
 
                     // add distributed tracing headers to the HTTP request
-                    tracer.Propagator.Inject(scope.Span.Context, new HttpHeadersCollection(requestMessage.Headers));
+                    tracer.TracerManager.Propagator.Inject(scope.Span.Context, new HttpHeadersCollection(requestMessage.Headers));
 
                     return new CallTargetState(scope);
                 }
@@ -51,7 +51,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Http.HttpClient
             {
                 if (responseMessage.Instance is not null)
                 {
-                    scope.Span.SetHttpStatusCode(responseMessage.StatusCode, isServer: false);
+                    scope.Span.SetHttpStatusCode(responseMessage.StatusCode, false, Tracer.Instance.Settings);
                 }
 
                 if (exception != null)

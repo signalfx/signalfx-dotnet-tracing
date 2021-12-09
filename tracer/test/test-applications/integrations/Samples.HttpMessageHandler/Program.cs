@@ -48,7 +48,6 @@ namespace Samples.HttpMessageHandler
                     RequestHelpers.SendAsyncHttpClientRequests(client, tracingDisabled, url, RequestContent);
                 }
 
-#if !NET452
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
                     // send async http requests using HttpClient with raw WinHttpHandler
@@ -59,7 +58,6 @@ namespace Samples.HttpMessageHandler
                         RequestHelpers.SendAsyncHttpClientRequests(client, tracingDisabled, url, RequestContent);
                     }
                 }
-#endif
 
 #if NETCOREAPP
                 // send async http requests using HttpClient with raw SocketsHttpHandler
@@ -71,7 +69,7 @@ namespace Samples.HttpMessageHandler
                 }
 #endif
 
-#if NET5_0
+#if NET5_0_OR_GREATER
                 // send sync http requests using HttpClient
                 Console.WriteLine();
                 Console.WriteLine("Sending sync request with default HttpClient.");

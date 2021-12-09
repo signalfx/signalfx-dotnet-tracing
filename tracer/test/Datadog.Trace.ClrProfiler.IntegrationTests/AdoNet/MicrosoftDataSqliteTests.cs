@@ -5,11 +5,10 @@
 
 // Modified by Splunk Inc.
 
-#if !NET452
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.Configuration;
-using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.TestHelpers;
 using Xunit;
 using Xunit.Abstractions;
@@ -29,67 +28,59 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         [Trait("Category", "ArmUnsupported")]
-        public void SubmitsTracesWithNetStandard(string packageVersion)
+        public void SubmitsTraces(string packageVersion)
         {
-            SetCallTargetSettings(enableCallTarget: true);
-
-            var expectedSpanCount = 91;
-
+#if NETCOREAPP3_0
+            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("IsAlpine")) // set in dockerfile
+             && !string.IsNullOrEmpty(packageVersion)
+             && new Version(packageVersion) >= new Version("6.0.0"))
+            {
+                Output.WriteLine("Skipping as Microsoft.Data.Sqlite hanqs on Alpine .NET Core 3.0 with 6.0.0 package");
+                return;
+            }
+#endif
+            const int expectedSpanCount = 91;
             const string dbType = "sqlite";
             const string expectedOperationName = dbType + ".query";
             const string expectedServiceName = "Samples.Microsoft.Data.Sqlite";
 
-            // NOTE: opt into the additional instrumentation of calls into netstandard.dll
-            SetEnvironmentVariable("SIGNALFX_TRACE_NETSTANDARD_ENABLED", "true");
-
             int agentPort = TcpPortProvider.GetOpenPort();
+            using var agent = new MockTracerAgent(agentPort);
+            using var process = RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion);
+            var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
 
-            using (var agent = new MockTracerAgent(agentPort))
-            using (RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion))
+            Assert.Equal(expectedSpanCount, spans.Count);
+
+            foreach (var span in spans)
             {
-                var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
-                Assert.Equal(expectedSpanCount, spans.Count);
-
-                foreach (var span in spans)
-                {
-                    Assert.Equal(expectedOperationName, span.Name);
-                    Assert.Equal(expectedServiceName, span.Service);
-                    Assert.Equal(SpanTypes.Sql, span.Type);
-                    Assert.Equal(dbType, span.Tags[Tags.DbType]);
-                    Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
-                    Assert.Contains(Tags.DbStatement, (IDictionary<string, string>)span.Tags);
-                }
+                Assert.Equal(expectedOperationName, span.Name);
+                Assert.Equal(expectedServiceName, span.Service);
+                Assert.Equal(SpanTypes.Sql, span.Type);
+                Assert.Equal(dbType, span.Tags[Tags.DbType]);
+                Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
+                Assert.Contains(Tags.DbStatement, (IDictionary<string, string>)span.Tags);
             }
         }
 
-        [SkippableTheory]
-        [InlineData(false)]
-        [InlineData(true)]
+        [SkippableFact]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         [Trait("Category", "ArmUnsupported")]
-        public void SpansDisabledByAdoNetExcludedTypes(bool enableCallTarget)
+        public void IntegrationDisabled()
         {
-            SetCallTargetSettings(enableCallTarget);
+            const int totalSpanCount = 21;
+            const string expectedOperationName = "mssql.query";
 
-            var totalSpanCount = 21;
-
-            const string dbType = "mssql";
-            const string expectedOperationName = dbType + ".query";
-
-            SetEnvironmentVariable(ConfigurationKeys.AdoNetExcludedTypes, "System.Data.SQLite.SQLiteCommand,Microsoft.Data.Sqlite.SqliteCommand");
+            SetEnvironmentVariable($"SIGNALFX_TRACE_{nameof(IntegrationId.Sqlite)}_ENABLED", "false");
 
             string packageVersion = PackageVersions.MicrosoftDataSqlite.First()[0] as string;
             int agentPort = TcpPortProvider.GetOpenPort();
+            using var agent = new MockTracerAgent(agentPort);
+            using var process = RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion);
+            var spans = agent.WaitForSpans(totalSpanCount, returnAllOperations: true);
 
-            using (var agent = new MockTracerAgent(agentPort))
-            using (RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion))
-            {
-                var spans = agent.WaitForSpans(totalSpanCount, returnAllOperations: true);
-                Assert.NotEmpty(spans);
-                Assert.Empty(spans.Where(s => s.Name.Equals(expectedOperationName)));
-            }
+            Assert.NotEmpty(spans);
+            Assert.Empty(spans.Where(s => s.Name.Equals(expectedOperationName)));
         }
     }
 }
-#endif

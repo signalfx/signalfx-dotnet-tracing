@@ -29,7 +29,7 @@ namespace Benchmarks.Trace
             };
 
             LogInjectionTracer = new Tracer(logInjectionSettings, null, new DummyAgentWriter(), null, null, null);
-            Tracer.Instance = LogInjectionTracer;
+            Tracer.UnsafeSetTracerInstance(LogInjectionTracer);
 
             var repository = (Hierarchy)log4net.LogManager.GetRepository();
             var patternLayout = new PatternLayout { ConversionPattern = "%date [%thread] %-5level %logger {deployment.environment=%property{deployment.environment}, service.name=%property{service.name}, service.version=%property{service.version}, trace_id=%property{trace_id}, span_id=%property{span_id}} - %message%newline" };

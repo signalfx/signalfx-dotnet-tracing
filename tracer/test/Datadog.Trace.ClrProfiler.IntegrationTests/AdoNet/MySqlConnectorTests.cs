@@ -5,10 +5,10 @@
 
 // Modified by Splunk Inc.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.Configuration;
-using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.TestHelpers;
 using Xunit;
 using Xunit.Abstractions;
@@ -23,22 +23,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             SetServiceVersion("1.0.0");
         }
 
-        public static IEnumerable<object[]> GetMySqlConnector()
-        {
-            foreach (object[] item in PackageVersions.MySqlConnector)
-            {
-                yield return item.Concat(false);
-                yield return item.Concat(true);
-            }
-        }
-
         [Theory]
-        [MemberData(nameof(GetMySqlConnector))]
+        [MemberData(nameof(PackageVersions.MySqlConnector), MemberType = typeof(PackageVersions))]
         [Trait("Category", "EndToEnd")]
-        public void SubmitsTraces(string packageVersion, bool enableCallTarget)
+        public void SubmitsTraces(string packageVersion)
         {
-            SetCallTargetSettings(enableCallTarget);
-
             // ALWAYS: 75 spans
             // - MySqlCommand: 21 spans (3 groups * 7 spans - 6 missing spans)
             // - DbCommand:  42 spans (6 groups * 7 spans)
@@ -54,72 +43,47 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             //
             // NETSTANDARD + CALLTARGET: +7 spans
             // - IDbCommandGenericConstrant<MySqlCommand>-netstandard: 7 spans (1 group * 7 spans)
-#if NET452
-            var expectedSpanCount = 71;
-#else
-            var expectedSpanCount = 127;
-#endif
-
-            if (enableCallTarget)
-            {
-#if NET452
-                expectedSpanCount = 84;
-#else
-                expectedSpanCount = 147;
-#endif
-            }
-
+            const int expectedSpanCount = 147;
             const string dbType = "mysql";
             const string expectedOperationName = dbType + ".query";
             const string expectedServiceName = "Samples.MySqlConnector";
 
-            // NOTE: opt into the additional instrumentation of calls into netstandard.dll
-            SetEnvironmentVariable("SIGNALFX_TRACE_NETSTANDARD_ENABLED", "true");
-
             int agentPort = TcpPortProvider.GetOpenPort();
+            using var agent = new MockTracerAgent(agentPort);
+            using var process = RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion);
+            var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
+            int actualSpanCount = spans.Count(s => s.ParentId.HasValue && !s.Resource.Equals("SHOW WARNINGS", StringComparison.OrdinalIgnoreCase)); // Remove unexpected DB spans from the calculation
 
-            using (var agent = new MockTracerAgent(agentPort))
-            using (RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion))
+            Assert.Equal(expectedSpanCount, actualSpanCount);
+
+            foreach (var span in spans)
             {
-                var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
-                int actualSpanCount = spans.Where(s => s.ParentId.HasValue && !s.Resource.Equals("SHOW WARNINGS", System.StringComparison.OrdinalIgnoreCase)).Count(); // Remove unexpected DB spans from the calculation
-                Assert.Equal(expectedSpanCount, actualSpanCount);
-
-                foreach (var span in spans)
-                {
-                    Assert.Equal(expectedOperationName, span.Name);
-                    Assert.Equal(expectedServiceName, span.Service);
-                    Assert.Equal(SpanTypes.Sql, span.Type);
-                    Assert.Equal(dbType, span.Tags[Tags.DbType]);
-                    Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
-                    Assert.Contains(Tags.DbStatement, (IDictionary<string, string>)span.Tags);
-                }
+                Assert.Equal(expectedOperationName, span.Name);
+                Assert.Equal(expectedServiceName, span.Service);
+                Assert.Equal(SpanTypes.Sql, span.Type);
+                Assert.Equal(dbType, span.Tags[Tags.DbType]);
+                Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
+                Assert.Contains(Tags.DbStatement, (IDictionary<string, string>)span.Tags);
             }
         }
 
-        [Theory]
-        [MemberData(nameof(GetMySqlConnector))]
+        [SkippableFact]
         [Trait("Category", "EndToEnd")]
-        public void SpansDisabledByAdoNetExcludedTypes(string packageVersion, bool enableCallTarget)
+        public void IntegrationDisabled()
         {
-            SetCallTargetSettings(enableCallTarget);
+            const int totalSpanCount = 21;
+            const string expectedOperationName = "mysql.query";
 
-            var totalSpanCount = 21;
+            SetEnvironmentVariable($"SIGNALFX_TRACE_{nameof(IntegrationId.MySql)}_ENABLED", "false");
 
-            const string dbType = "mysql";
-            const string expectedOperationName = dbType + ".query";
-
-            SetEnvironmentVariable(ConfigurationKeys.AdoNetExcludedTypes, "System.Data.SqlClient.SqlCommand,Microsoft.Data.SqlClient.SqlCommand,MySql.Data.MySqlClient.MySqlCommand,Npgsql.NpgsqlCommand,MySqlConnector.MySqlCommand");
-
+            string packageVersion = PackageVersions.MySqlConnector.First()[0] as string;
             int agentPort = TcpPortProvider.GetOpenPort();
+            using var agent = new MockTracerAgent(agentPort);
+            using var process = RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion);
+            var spans = agent.WaitForSpans(totalSpanCount, returnAllOperations: true);
 
-            using (var agent = new MockTracerAgent(agentPort))
-            using (RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion))
-            {
-                var spans = agent.WaitForSpans(totalSpanCount, returnAllOperations: true);
-                Assert.NotEmpty(spans);
-                Assert.Empty(spans.Where(s => s.Name.Equals(expectedOperationName)));
-            }
+            Assert.NotEmpty(spans);
+            Assert.Empty(spans.Where(s => s.Name.Equals(expectedOperationName)));
         }
     }
 }

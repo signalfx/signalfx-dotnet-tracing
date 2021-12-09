@@ -30,7 +30,7 @@ namespace Datadog.Trace.Agent
 
         public Task<bool> Ping()
         {
-            return _exporter.SendTracesAsync(ArrayHelper.Empty<Span[]>());
+            return _exporter.SendTracesAsync(Array.Empty<Span[]>());
         }
 
         public void WriteTrace(ArraySegment<Span> trace)

@@ -5,7 +5,6 @@
 
 // Modified by Splunk Inc.
 
-#if !NET452
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,21 +26,19 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetServiceVersion("1.0.0");
         }
 
-        public static IEnumerable<object[]> GetRabbitMQVersions()
-        {
-            foreach (object[] item in PackageVersions.RabbitMQ)
-            {
-                yield return item.Concat(new object[] { false, }).ToArray();
-                yield return item.Concat(new object[] { true }).ToArray();
-            }
-        }
-
         [SkippableTheory]
-        [MemberData(nameof(GetRabbitMQVersions))]
+        [MemberData(nameof(PackageVersions.RabbitMQ), MemberType = typeof(PackageVersions))]
         [Trait("Category", "EndToEnd")]
-        public void SubmitsTraces(string packageVersion, bool enableCallTarget)
+        public void SubmitsTraces(string packageVersion)
         {
-            SetCallTargetSettings(enableCallTarget);
+#if NET6_0_OR_GREATER
+            if (packageVersion?.StartsWith("3.") == true)
+            {
+                // Versions 3.* of RabbitMQ.Client aren't compatible with .NET 6
+                // https://github.com/dotnet/runtime/issues/61167
+                return;
+            }
+#endif
 
             var expectedSpanCount = 26;
 
@@ -260,4 +257,3 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         }
     }
 }
-#endif

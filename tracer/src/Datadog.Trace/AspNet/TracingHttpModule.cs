@@ -32,7 +32,7 @@ namespace Datadog.Trace.AspNet
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class TracingHttpModule : IHttpModule
     {
-        internal static readonly IntegrationInfo IntegrationId = IntegrationRegistry.GetIntegrationInfo(nameof(IntegrationIds.AspNet));
+        internal static readonly IntegrationId IntegrationId = IntegrationId.AspNet;
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(TracingHttpModule));
 
@@ -104,7 +104,7 @@ namespace Datadog.Trace.AspNet
                 HttpRequest httpRequest = httpContext.Request;
                 SpanContext propagatedContext = null;
                 var tagsFromHeaders = Enumerable.Empty<KeyValuePair<string, string>>();
-                var propagator = tracer.Propagator;
+                var propagator = tracer.TracerManager.Propagator;
 
                 if (tracer.ActiveScope == null)
                 {
@@ -176,7 +176,7 @@ namespace Datadog.Trace.AspNet
                     {
                         AddHeaderTagsFromHttpResponse(app.Context, scope);
 
-                        scope.Span.SetHttpStatusCode(app.Context.Response.StatusCode, isServer: true);
+                        scope.Span.SetHttpStatusCode(app.Context.Response.StatusCode, isServer: true, Tracer.Instance.Settings);
 
                         if (app.Context.Items[SharedConstants.HttpContextPropagatedResourceNameKey] is string resourceName
                             && !string.IsNullOrEmpty(resourceName))
@@ -251,7 +251,7 @@ namespace Datadog.Trace.AspNet
             {
                 try
                 {
-                    scope.Span.SetHeaderTags<IHeadersCollection>(httpContext.Response.Headers.Wrap(), Tracer.Instance.Settings.HeaderTags, defaultTagPrefix: PropagationExtensions.HttpResponseHeadersTagPrefix);
+                    scope.Span.SetHeaderTags(httpContext.Response.Headers.Wrap(), Tracer.Instance.Settings.HeaderTags, defaultTagPrefix: PropagationExtensions.HttpResponseHeadersTagPrefix);
                 }
                 catch (PlatformNotSupportedException ex)
                 {

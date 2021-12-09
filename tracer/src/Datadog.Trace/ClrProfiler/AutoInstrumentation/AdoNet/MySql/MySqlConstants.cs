@@ -11,6 +11,8 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AdoNet.MySql
     {
         internal struct MySqlDataClientData : IAdoNetClientData
         {
+            public string IntegrationName => nameof(IntegrationId.MySql);
+
             public string AssemblyName => "MySql.Data";
 
             public string SqlCommandType => "MySql.Data.MySqlClient.MySqlCommand";
@@ -26,6 +28,8 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AdoNet.MySql
 
         internal struct MySqlData8ClientData : IAdoNetClientData
         {
+            public string IntegrationName => nameof(IntegrationId.MySql);
+
             public string AssemblyName => "MySql.Data";
 
             public string SqlCommandType => "MySql.Data.MySqlClient.MySqlCommand";
@@ -41,13 +45,15 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AdoNet.MySql
 
         internal struct MySqlConnectorClientData : IAdoNetClientData
         {
+            public string IntegrationName => nameof(IntegrationId.MySql);
+
             public string AssemblyName => "MySqlConnector";
 
             public string SqlCommandType => "MySqlConnector.MySqlCommand";
 
             public string MinimumVersion => "1.0.0";
 
-            public string MaximumVersion => "1.*.*";
+            public string MaximumVersion => "2.*.*";
 
             public string DataReaderType => "MySqlConnector.MySqlDataReader";
 

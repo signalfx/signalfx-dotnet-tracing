@@ -21,14 +21,14 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Http.HttpClient.HttpClie
         ReturnTypeName = ClrNames.HttpResponseMessage,
         ParameterTypeNames = new[] { ClrNames.HttpRequestMessage, ClrNames.CancellationToken },
         MinimumVersion = "5.0.0",
-        MaximumVersion = "5.*.*",
+        MaximumVersion = "6.*.*",
         IntegrationName = IntegrationName)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class HttpClientHandlerSyncIntegration
     {
-        private const string IntegrationName = nameof(IntegrationIds.HttpMessageHandler);
-        private static readonly IntegrationInfo IntegrationId = IntegrationRegistry.GetIntegrationInfo(IntegrationName);
+        private const string IntegrationName = nameof(Configuration.IntegrationId.HttpMessageHandler);
+        private const IntegrationId IntegrationId = Configuration.IntegrationId.HttpMessageHandler;
 
         /// <summary>
         /// OnMethodBegin callback

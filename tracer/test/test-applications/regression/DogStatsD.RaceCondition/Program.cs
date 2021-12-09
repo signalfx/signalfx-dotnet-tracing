@@ -19,13 +19,13 @@ namespace DogStatsD.RaceCondition
                 InMemoryLog4NetLogger.Setup();
                 var logger = LogManager.GetLogger(typeof(Program));
                 var ddTraceSettings = TracerSettings.FromDefaultSources();
-                ddTraceSettings.AnalyticsEnabled = true;
                 ddTraceSettings.LogsInjectionEnabled = true;
                 ddTraceSettings.TraceEnabled = true;
                 ddTraceSettings.TracerMetricsEnabled = true;
                 GlobalSettings.SetDebugEnabled(true);
 
-                var tracer = new Tracer(ddTraceSettings);
+                Tracer.Configure(ddTraceSettings, null);
+                var tracer = Tracer.Instance;
                 var totalIterations = 100;
                 var threadRepresentation = Enumerable.Range(0, 25).ToArray();
                 var threadCount = threadRepresentation.Length;

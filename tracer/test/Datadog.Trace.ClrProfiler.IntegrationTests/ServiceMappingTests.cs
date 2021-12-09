@@ -22,33 +22,25 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetServiceVersion("1.0.0");
         }
 
-        [SkippableTheory]
+        [SkippableFact]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
-        [InlineData(false)]
-        [InlineData(true)]
-        public void RenamesService(bool enableCallTarget)
+        public void RenamesService()
         {
-            SetCallTargetSettings(enableCallTarget);
-
-            var (ignoreAsync, expectedSpanCount) = (EnvironmentHelper.IsCoreClr(), enableCallTarget) switch
-            {
-                (false, false) => (true, 30), // .NET Framework CallSite instrumentation doesn't cover Async / TaskAsync operations
-                _ => (false, 76)
-            };
+            var expectedSpanCount = 76;
 
             const string expectedOperationName = "http.request";
             const string expectedServiceName = "my-custom-client";
 
             int agentPort = TcpPortProvider.GetOpenPort();
             int httpPort = TcpPortProvider.GetOpenPort();
-            var extraArgs = ignoreAsync ? "IgnoreAsync " : string.Empty;
+            var extraArgs = string.Empty;
 
             Output.WriteLine($"Assigning port {agentPort} for the agentPort.");
             Output.WriteLine($"Assigning port {httpPort} for the httpPort.");
 
             using (var agent = new MockTracerAgent(agentPort))
-            using (RunSampleAndWaitForExit(agent.Port, arguments: $"{extraArgs}Port={httpPort}"))
+            using (RunSampleAndWaitForExit(agent.Port, arguments: $"Port={httpPort}"))
             {
                 var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
                 Assert.Equal(expectedSpanCount, spans.Count);

@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Propagation;
@@ -14,15 +16,13 @@ namespace Datadog.Trace
     {
         string DefaultServiceName { get; }
 
-        string AgentVersion { get; set; }
-
         IScopeManager ScopeManager { get; }
 
         ISampler Sampler { get; }
 
         IPropagator Propagator { get; }
 
-        TracerSettings Settings { get; }
+        ImmutableTracerSettings Settings { get; }
 
         Span StartSpan(string operationName);
 

@@ -120,7 +120,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
 
                     try
                     {
-                        propagatedContext = tracer.Propagator.Extract(headers);
+                        propagatedContext = tracer.TracerManager.Propagator.Extract(headers);
                     }
                     catch (Exception ex)
                     {

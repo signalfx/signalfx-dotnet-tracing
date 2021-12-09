@@ -25,17 +25,31 @@ namespace Datadog.Trace.PlatformHelpers
     internal sealed class AspNetCoreHttpRequestHandler
     {
         private readonly IDatadogLogger _log;
-        private readonly IntegrationInfo _integrationId;
-        private readonly string _requestInOperationName = "aspnet_core.request";
+        private readonly IntegrationId _integrationId;
+        private readonly string _requestInOperationName;
 
         public AspNetCoreHttpRequestHandler(
             IDatadogLogger log,
             string requestInOperationName,
-            IntegrationInfo integrationInfo)
+            IntegrationId integrationInfo)
         {
             _log = log;
             _integrationId = integrationInfo;
             _requestInOperationName = requestInOperationName;
+        }
+
+        public string GetDefaultResourceName(HttpRequest request)
+        {
+            string httpMethod = request.Method?.ToUpperInvariant() ?? "UNKNOWN";
+
+            string absolutePath = request.PathBase.HasValue
+                                      ? request.PathBase.ToUriComponent() + request.Path.ToUriComponent()
+                                      : request.Path.ToUriComponent();
+
+            string resourceUrl = UriHelpers.GetCleanUriPath(absolutePath)
+                                           .ToLowerInvariant();
+
+            return $"{httpMethod} {resourceUrl}";
         }
 
         private SpanContext ExtractPropagatedContext(HttpRequest request)
@@ -48,7 +62,7 @@ namespace Datadog.Trace.PlatformHelpers
                 if (requestHeaders != null)
                 {
                     var tracer = Tracer.Instance;
-                    var propagator = tracer.Propagator;
+                    var propagator = tracer.TracerManager.Propagator;
                     return propagator.Extract(new HeadersCollectionAdapter(requestHeaders));
                 }
             }
@@ -85,23 +99,12 @@ namespace Datadog.Trace.PlatformHelpers
             return Enumerable.Empty<KeyValuePair<string, string>>();
         }
 
-        private Scope StartCoreScope(Tracer tracer, HttpContext httpContext, HttpRequest request)
+        public Scope StartAspNetCorePipelineScope(Tracer tracer, HttpContext httpContext, HttpRequest request, string resourceName)
         {
             string host = request.Host.Value;
             string httpMethod = request.Method?.ToUpperInvariant() ?? "UNKNOWN";
             string url = request.GetUrl();
-
-            string absolutePath = request.Path.ToUriComponent();
-
-            if (request.PathBase.HasValue)
-            {
-                absolutePath = request.PathBase.ToUriComponent() + absolutePath;
-            }
-
-            string resourceUrl = UriHelpers.GetCleanUriPath(absolutePath)
-                                           .ToLowerInvariant();
-
-            string resourceName = $"{httpMethod} {resourceUrl}";
+            resourceName ??= GetDefaultResourceName(request);
 
             SpanContext propagatedContext = ExtractPropagatedContext(request);
             var tagsFromHeaders = ExtractHeaderTags(request, tracer);
@@ -110,12 +113,8 @@ namespace Datadog.Trace.PlatformHelpers
 
             if (tracer.Settings.RouteTemplateResourceNamesEnabled)
             {
-                httpContext.Features.Set(new RequestTrackingFeature
-                {
-                    HttpMethod = httpMethod,
-                    OriginalUrl = url,
-                });
-
+                var originalPath = request.PathBase.HasValue ? request.PathBase.Add(request.Path) : request.Path;
+                httpContext.Features.Set(new RequestTrackingFeature(originalPath));
                 tags = new AspNetCoreEndpointTags();
             }
             else
@@ -135,58 +134,16 @@ namespace Datadog.Trace.PlatformHelpers
             return scope;
         }
 
-        public Scope StartAspNetCorePipelineScope(Tracer tracer, IDatadogSecurity security, HttpContext httpContext)
-        {
-            Scope scope = null;
-
-            if (tracer.Settings.IsIntegrationEnabled(_integrationId))
-            {
-                scope = StartCoreScope(tracer, httpContext, httpContext.Request);
-            }
-
-            return scope;
-        }
-
-        private readonly struct HeadersCollectionAdapter : IHeadersCollection
-        {
-            private readonly IHeaderDictionary _headers;
-
-            public HeadersCollectionAdapter(IHeaderDictionary headers)
-            {
-                _headers = headers;
-            }
-
-            public IEnumerable<string> GetValues(string name)
-            {
-                if (_headers.TryGetValue(name, out var values))
-                {
-                    return values.ToArray();
-                }
-
-                return Enumerable.Empty<string>();
-            }
-
-            public void Set(string name, string value)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void Add(string name, string value)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void Remove(string name)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
         /// <summary>
         /// Holds state that we want to pass between diagnostic source events
         /// </summary>
         internal class RequestTrackingFeature
         {
+            public RequestTrackingFeature(PathString originalPath)
+            {
+                OriginalPath = originalPath;
+            }
+
             /// <summary>
             /// Gets or sets a value indicating whether the pipeline using endpoint routing
             /// </summary>
@@ -208,14 +165,23 @@ namespace Datadog.Trace.PlatformHelpers
             public string ResourceName { get; set; }
 
             /// <summary>
-            /// Gets or sets the HTTP method, as it requires normalization, so avoids repeatedly calculations
+            /// Gets a value indicating the original combined Path and PathBase
             /// </summary>
-            public string HttpMethod { get; set; }
+            public PathString OriginalPath { get; }
 
-            /// <summary>
-            /// Gets or Sets the original URL received by the pipeline
-            /// </summary>
-            public string OriginalUrl { get; set; }
+            public bool MatchesOriginalPath(HttpRequest request)
+            {
+                if (!request.PathBase.HasValue)
+                {
+                    return OriginalPath.Equals(request.Path, StringComparison.OrdinalIgnoreCase);
+                }
+
+                return OriginalPath.StartsWithSegments(
+                           request.PathBase,
+                           StringComparison.OrdinalIgnoreCase,
+                           out var remaining)
+                    && remaining.Equals(request.Path, StringComparison.OrdinalIgnoreCase);
+            }
         }
     }
 }

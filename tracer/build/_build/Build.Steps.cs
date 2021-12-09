@@ -108,7 +108,6 @@ partial class Build
 
     readonly IEnumerable<TargetFramework> TargetFrameworks = new[]
     {
-        TargetFramework.NET45,
         TargetFramework.NET461,
         TargetFramework.NETSTANDARD2_0,
         TargetFramework.NETCOREAPP3_1,
@@ -263,20 +262,6 @@ partial class Build
         .Description("Compiles the native loader unit tests")
         .DependsOn(CompileNativeTestsWindows)
         .DependsOn(CompileNativeTestsLinux);
-
-
-    Target CopyIntegrationsJson => _ => _
-        .Unlisted()
-        .After(Clean)
-        .After(CreateRequiredDirectories)
-        .Executes(() =>
-        {
-            var source = TracerDirectory / "integrations.json";
-            var dest = TracerHomeDirectory;
-
-            Logger.Info($"Copying '{source}' to '{dest}'");
-            CopyFileToDirectory(source, dest, FileExistsPolicy.Overwrite);
-        });
 
     Target DownloadLibDdwaf => _ => _
         .Unlisted()
@@ -463,7 +448,7 @@ partial class Build
 
     Target CreateDdTracerHome => _ => _
        .Unlisted()
-       .After(PublishNativeProfiler, CopyIntegrationsJson, PublishManagedProfiler, DownloadLibDdwaf, CopyLibDdwaf)
+       .After(PublishNativeProfiler, PublishManagedProfiler, DownloadLibDdwaf, CopyLibDdwaf)
        .Executes(() =>
        {
            // start by copying everything from the tracer home dir
@@ -635,7 +620,6 @@ partial class Build
                         "netstandard2.0/",
                         "netcoreapp3.1/",
                         $"{NativeProfilerModule}.so",
-                        "integrations.json",
                         "createLogPath.sh",
                     };
 
@@ -708,13 +692,7 @@ partial class Build
                 .ToList();
 
             testProjects.ForEach(EnsureResultsDirectory);
-            var filter = (string.IsNullOrEmpty(Filter), IsArm64, IsAlpine) switch
-            {
-                (true, true, false) => "(Category!=ArmUnsupported)",
-                (true, false, true) => "(Category!=AlpineUnsupported)",
-                (true, true, true) => "(Category!=AlpineUnsupported)&(Category!=ArmUnsupported)",
-                _ => Filter
-            };
+            var filter = string.IsNullOrEmpty(Filter) && IsArm64 ? "(Category!=ArmUnsupported)" : Filter;
             try
             {
                 DotNetTest(x => x
@@ -808,14 +786,13 @@ partial class Build
         .Requires(() => Framework)
         .Executes(() =>
         {
-            var regressionsDirectory = Solution.GetProject(Projects.EntityFramework6xMdTokenLookupFailure)
+            var regressionsDirectory = Solution.GetProject(Projects.AutomapperTest)
                 .Directory.Parent;
 
             var regressionLibs = GlobFiles(regressionsDirectory / "**" / "*.csproj")
                  .Where(path =>
                     (path, Solution.GetProject(path).TryGetTargetFrameworks()) switch
                     {
-                        _ when path.Contains("EntityFramework6x.MdTokenLookupFailure") => false,
                         _ when path.Contains("ExpenseItDemo") => false,
                         _ when path.Contains("StackExchange.Redis.AssemblyConflict.LegacyProject") => false,
                         _ when path.Contains("MismatchedTracerVersions") => false,
@@ -1110,7 +1087,6 @@ partial class Build
                 "Samples.WebRequest.NetFramework20",
                 "AutomapperTest", // I think we _should_ run this one (assuming it has tests)
                 "DogStatsD.RaceCondition",
-                "EntityFramework6x.MdTokenLookupFailure",
                 "LargePayload", // I think we _should_ run this one (assuming it has tests)
                 "Sandbox.ManualTracing",
                 "StackExchange.Redis.AssemblyConflict.LegacyProject",
@@ -1151,9 +1127,10 @@ partial class Build
                         "Samples.AspNetCoreMvc21" => Framework == TargetFramework.NETCOREAPP2_1,
                         "Samples.AspNetCoreMvc30" => Framework == TargetFramework.NETCOREAPP3_0,
                         "Samples.AspNetCoreMvc31" => Framework == TargetFramework.NETCOREAPP3_1,
+                        "Samples.AspNetCoreMinimalApis" => Framework == TargetFramework.NET6_0,
                         "Samples.AspNetCore2" => Framework == TargetFramework.NETCOREAPP2_1,
-                        "Samples.AspNetCore5" => Framework == TargetFramework.NET5_0 || Framework == TargetFramework.NETCOREAPP3_1 || Framework == TargetFramework.NETCOREAPP3_0,
-                        "Samples.GraphQL4" => Framework == TargetFramework.NETCOREAPP3_1 || Framework == TargetFramework.NET5_0,
+                        "Samples.AspNetCore5" => Framework == TargetFramework.NET6_0 || Framework == TargetFramework.NET5_0 || Framework == TargetFramework.NETCOREAPP3_1 || Framework == TargetFramework.NETCOREAPP3_0,
+                        "Samples.GraphQL4" => Framework == TargetFramework.NETCOREAPP3_1 || Framework == TargetFramework.NET5_0 || Framework == TargetFramework.NET6_0,
                         var name when projectsToSkip.Contains(name) => false,
                         var name when TestAllPackageVersions && multiPackageProjects.Contains(name) => false,
                         "Samples.AspNetCoreRazorPages" => true,
@@ -1211,12 +1188,14 @@ partial class Build
             var targets = new[] { "RestoreSamplesForPackageVersionsOnly", "RestoreAndBuildSamplesForPackageVersionsOnly" };
 
             // /nowarn:NU1701 - Package 'x' was restored using '.NETFramework,Version=v4.6.1' instead of the project target framework '.NETCoreApp,Version=v2.1'.
+            // /nowarn:NETSDK1138 - Package 'x' was restored using '.NETFramework,Version=v4.6.1' instead of the project target framework '.NETCoreApp,Version=v2.1'.
             DotNetMSBuild(x => x
                 .SetTargetPath(MsBuildProject)
                 .SetConfiguration(BuildConfiguration)
                 .EnableNoDependencies()
                 .SetProperty("TargetFramework", Framework.ToString())
                 .SetProperty("BuildInParallel", "true")
+                .SetProperty("CheckEolTargetFramework", "false")
                 .SetProcessArgumentConfigurator(arg => arg.Add("/nowarn:NU1701"))
                 .When(TestAllPackageVersions, o => o.SetProperty("TestAllPackageVersions", "true"))
                 .When(IncludeMinorPackageVersions, o => o.SetProperty("IncludeMinorPackageVersions", "true"))
@@ -1260,12 +1239,11 @@ partial class Build
         .After(CompileLinuxIntegrationTests)
         .Description("Runs the linux integration tests")
         .Requires(() => Framework)
-        .Requires(() => IsLinux)
+        .Requires(() => !IsWin)
         .Executes(() =>
         {
             ParallelIntegrationTests.ForEach(EnsureResultsDirectory);
             ClrProfilerIntegrationTests.ForEach(EnsureResultsDirectory);
-
 
             var filter = (string.IsNullOrEmpty(Filter), IsArm64) switch
             {

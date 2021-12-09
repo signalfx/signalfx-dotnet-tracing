@@ -19,6 +19,7 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 ### Breaking changes
 
+- There is no support for .NET older than .NET 4.6.2.
 - Remove `SIGNALFX_APPEND_URL_PATH_TO_NAME` configuration as it was against the
   [OpenTelemetry Semantic conventions for HTTP spans](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md#name).
   Take notice that the URL is available via `http.url` tag.
@@ -30,6 +31,8 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 - Remove `SIGNALFX_INSTRUMENTATION_ASPNETCORE_DIAGNOSTIC_LISTENERS` configuration which is no longer needed. It provided a workaround for an issue in a specific version of a library, which broke default instrumentation, and was already fixed.  
 - Remove `SIGNALFX_SERVICE_NAME_PER_SPAN_ENABLED` configuration as [the OpenTelemetry specification](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/sdk.md)
   requires that the resources (such us as [service](https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/resource/semantic_conventions#service)) have to be immutable.
+- Remove `SIGNALFX_INTEGRATIONS`. This configuration is not needed. The insrtumenation called `CallSite` was removed.
+- Deprecate `SIGNALFX_TRACE_LOG_PATH`. Please use `SIGNALFX_TRACE_LOG_DIRECTORY`.
 
 ### Enhancements
 

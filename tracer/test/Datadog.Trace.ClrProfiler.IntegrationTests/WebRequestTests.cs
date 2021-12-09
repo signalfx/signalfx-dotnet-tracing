@@ -27,33 +27,24 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetEnvironmentVariable("SIGNALFX_PROPAGATORS", "datadog,b3");
         }
 
-        [SkippableTheory]
+        [SkippableFact]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
-        [InlineData(false)]
-        [InlineData(true)]
-        public void SubmitsTraces(bool enableCallTarget)
+        public void SubmitsTraces()
         {
-            SetCallTargetSettings(enableCallTarget);
-
-            var (ignoreAsync, expectedSpanCount) = (EnvironmentHelper.IsCoreClr(), enableCallTarget) switch
-            {
-                (false, false) => (true, 30), // .NET Framework CallSite instrumentation doesn't cover Async / TaskAsync operations
-                _ => (false, 76)
-            };
+            var expectedSpanCount = 76;
 
             const string expectedOperationName = "http.request";
             const string expectedServiceName = "Samples.WebRequest";
 
             int agentPort = TcpPortProvider.GetOpenPort();
             int httpPort = TcpPortProvider.GetOpenPort();
-            var extraArgs = ignoreAsync ? "IgnoreAsync " : string.Empty;
 
             Output.WriteLine($"Assigning port {agentPort} for the agentPort.");
             Output.WriteLine($"Assigning port {httpPort} for the httpPort.");
 
             using (var agent = new MockTracerAgent(agentPort))
-            using (ProcessResult processResult = RunSampleAndWaitForExit(agent.Port, arguments: $"{extraArgs}Port={httpPort}"))
+            using (ProcessResult processResult = RunSampleAndWaitForExit(agent.Port, arguments: $"Port={httpPort}"))
             {
                 var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName).OrderBy(s => s.Start);
                 spans.Should().HaveCount(expectedSpanCount);
@@ -73,15 +64,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             }
         }
 
-        [SkippableTheory]
+        [SkippableFact]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
-        [InlineData(false)]
-        [InlineData(true)]
-        public void TracingDisabled_DoesNotSubmitsTraces(bool enableCallTarget)
+        public void TracingDisabled_DoesNotSubmitsTraces()
         {
-            SetCallTargetSettings(enableCallTarget);
-
             const string expectedOperationName = "http.request";
 
             int agentPort = TcpPortProvider.GetOpenPort();

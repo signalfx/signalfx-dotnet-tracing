@@ -36,7 +36,6 @@ namespace Datadog.Trace.Configuration
         private const int DefaultRecordedValueMaxLength = 12000;
 
         private int _partialFlushMinSpans;
-        private DomainMetadata _domainMetadata;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TracerSettings"/> class with default values.
@@ -53,8 +52,6 @@ namespace Datadog.Trace.Configuration
         /// <param name="source">The <see cref="IConfigurationSource"/> to use when retrieving configuration values.</param>
         public TracerSettings(IConfigurationSource source)
         {
-            ConfigurationSource = source;
-
             Environment = source?.GetString(ConfigurationKeys.Environment);
 
             ServiceName = source?.GetString(ConfigurationKeys.ServiceName) ??
@@ -75,8 +72,6 @@ namespace Datadog.Trace.Configuration
             }
 
             DisabledIntegrationNames = new HashSet<string>(source.GetStrings(ConfigurationKeys.DisabledIntegrations), StringComparer.OrdinalIgnoreCase);
-
-            AdoNetExcludedTypes = new HashSet<string>(source.GetStrings(ConfigurationKeys.AdoNetExcludedTypes), StringComparer.OrdinalIgnoreCase);
 
             Integrations = new IntegrationSettingsCollection(source);
 
@@ -120,9 +115,11 @@ namespace Datadog.Trace.Configuration
                 AgentUri = builder.Uri;
             }
 
+#pragma warning disable 618 // App analytics is deprecated, but still used
             AnalyticsEnabled = source?.GetBool(ConfigurationKeys.GlobalAnalyticsEnabled) ??
                                // default value
                                false;
+#pragma warning restore 618
 
             LogsInjectionEnabled = source?.GetBool(ConfigurationKeys.LogsInjectionEnabled) ??
                                    // default value
@@ -235,22 +232,13 @@ namespace Datadog.Trace.Configuration
             KafkaCreateConsumerScopeEnabled = source?.GetBool(ConfigurationKeys.KafkaCreateConsumerScopeEnabled)
                                            ?? true; // default
 
+            TagMongoCommands = source?.GetBool(ConfigurationKeys.TagMongoCommands) ?? true;
+
             DelayWcfInstrumentationEnabled = source?.GetBool(ConfigurationKeys.FeatureFlags.DelayWcfInstrumentationEnabled)
                                             ?? false;
 
-            TagMongoCommands = source?.GetBool(ConfigurationKeys.TagMongoCommands) ?? true;
-
             TagElasticsearchQueries = source?.GetBool(ConfigurationKeys.TagElasticsearchQueries) ?? true;
-
-            // we cached the static instance here, because is being used in the hotpath
-            // by IsIntegrationEnabled method (called from all integrations)
-            _domainMetadata = DomainMetadata.Instance;
         }
-
-        /// <summary>
-        /// Gets <see cref="IConfigurationSource"/> used for creation of <see cref="TracerSettings"/> instance.
-        /// </summary>
-        public IConfigurationSource ConfigurationSource { get; }
 
         /// <summary>
         /// Gets or sets the default environment name applied to all spans.
@@ -285,24 +273,10 @@ namespace Datadog.Trace.Configuration
         public bool TraceEnabled { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether debug is enabled for a tracer.
-        /// This property is obsolete. Manage the debug setting through GlobalSettings.
-        /// </summary>
-        /// <seealso cref="GlobalSettings.DebugEnabled"/>
-        [Obsolete]
-        public bool DebugEnabled { get; set; }
-
-        /// <summary>
         /// Gets or sets the names of disabled integrations.
         /// </summary>
         /// <seealso cref="ConfigurationKeys.DisabledIntegrations"/>
         public HashSet<string> DisabledIntegrationNames { get; set; }
-
-        /// <summary>
-        /// Gets or sets the AdoNet types to exclude from automatic instrumentation.
-        /// </summary>
-        /// <seealso cref="ConfigurationKeys.AdoNetExcludedTypes"/>
-        public HashSet<string> AdoNetExcludedTypes { get; set; }
 
         /// <summary>
         /// Gets or sets the Uri where the Tracer can connect to the Agent.
@@ -348,6 +322,7 @@ namespace Datadog.Trace.Configuration
         /// See the documentation for more details.
         /// </summary>
         /// <seealso cref="ConfigurationKeys.GlobalAnalyticsEnabled"/>
+        [Obsolete(DeprecationMessages.AppAnalytics)]
         public bool AnalyticsEnabled { get; set; }
 
         /// <summary>
@@ -415,7 +390,7 @@ namespace Datadog.Trace.Configuration
 
         /// <summary>
         /// Gets or sets the name of the exporter to be used. The Tracer uses it to encode and
-        /// dispatch traces.
+        /// dispatch traces.S
         /// Default is <c>"Zipkin"</c>.
         /// <seealso cref="ConfigurationKeys.Exporter"/>
         /// </summary>
@@ -610,7 +585,7 @@ namespace Datadog.Trace.Configuration
         /// <summary>
         /// Sets the mappings to use for service names within a <see cref="Span"/>
         /// </summary>
-        /// <param name="mappings">Mappings to use from original service name (e.g. <code>sql-server</code> or <code>graphql</code>)
+        /// <param name="mappings">Mappings to use from original service name (e.g. <code>mssql</code> or <code>graphql</code>)
         /// as the <see cref="KeyValuePair{TKey, TValue}.Key"/>) to replacement service names as <see cref="KeyValuePair{TKey, TValue}.Value"/>).</param>
         public void SetServiceNameMappings(IEnumerable<KeyValuePair<string, string>> mappings)
         {
@@ -618,66 +593,15 @@ namespace Datadog.Trace.Configuration
         }
 
         /// <summary>
-        /// Populate the internal structures. Modifying the settings past this point is not supported
+        /// Create an instance of <see cref="ImmutableTracerSettings"/> that can be used to build a <see cref="Tracer"/>
         /// </summary>
-        internal void Freeze()
+        /// <returns>The <see cref="ImmutableTracerSettings"/> that can be passed to a <see cref="Tracer"/> instance</returns>
+        public ImmutableTracerSettings Build()
         {
-            Integrations.SetDisabledIntegrations(DisabledIntegrationNames);
+            return new ImmutableTracerSettings(this);
         }
 
-        internal bool IsErrorStatusCode(int statusCode, bool serverStatusCode)
-        {
-            var source = serverStatusCode ? HttpServerErrorStatusCodes : HttpClientErrorStatusCodes;
-
-            if (source == null)
-            {
-                return false;
-            }
-
-            if (statusCode >= source.Length)
-            {
-                return false;
-            }
-
-            return source[statusCode];
-        }
-
-        internal bool IsIntegrationEnabled(IntegrationInfo integration, bool defaultValue = true)
-        {
-            if (TraceEnabled && !_domainMetadata.ShouldAvoidAppDomain())
-            {
-                return Integrations[integration].Enabled ?? defaultValue;
-            }
-
-            return false;
-        }
-
-        internal bool IsIntegrationEnabled(string integrationName)
-        {
-            if (TraceEnabled && !_domainMetadata.ShouldAvoidAppDomain())
-            {
-                bool? enabled = Integrations[integrationName].Enabled;
-                return enabled != false;
-            }
-
-            return false;
-        }
-
-        internal double? GetIntegrationAnalyticsSampleRate(IntegrationInfo integration, bool enabledWithGlobalSetting)
-        {
-            var integrationSettings = Integrations[integration];
-            var analyticsEnabled = integrationSettings.AnalyticsEnabled ?? (enabledWithGlobalSetting && AnalyticsEnabled);
-            return analyticsEnabled ? integrationSettings.AnalyticsSampleRate : (double?)null;
-        }
-
-        internal bool IsNetStandardFeatureFlagEnabled()
-        {
-            var value = EnvironmentHelpers.GetEnvironmentVariable(ConfigurationKeys.FeatureFlags.NetStandardEnabled, string.Empty);
-
-            return value == "1" || value == "true";
-        }
-
-        internal IDictionary<string, string> InitializeHeaderTags(IDictionary<string, string> configurationDictionary)
+        private static IDictionary<string, string> InitializeHeaderTags(IDictionary<string, string> configurationDictionary)
         {
             var headerTags = new Dictionary<string, string>();
 
@@ -696,7 +620,8 @@ namespace Datadog.Trace.Configuration
             return headerTags;
         }
 
-        internal IEnumerable<string> TrimSplitString(string textValues, char separator)
+        // internal for testing
+        internal static IEnumerable<string> TrimSplitString(string textValues, char separator)
         {
             var values = textValues.Split(separator);
 
@@ -709,7 +634,7 @@ namespace Datadog.Trace.Configuration
             }
         }
 
-        internal bool[] ParseHttpCodesToArray(string httpStatusErrorCodes)
+        internal static bool[] ParseHttpCodesToArray(string httpStatusErrorCodes)
         {
             bool[] httpErrorCodesArray = new bool[600];
 
@@ -759,11 +684,6 @@ namespace Datadog.Trace.Configuration
             }
 
             return httpErrorCodesArray;
-        }
-
-        internal string GetServiceName(Tracer tracer, string serviceName)
-        {
-            return ServiceNameMappings.GetServiceName(tracer.DefaultServiceName, serviceName);
         }
 
         private static HashSet<string> GetPropagators(IConfigurationSource source)
