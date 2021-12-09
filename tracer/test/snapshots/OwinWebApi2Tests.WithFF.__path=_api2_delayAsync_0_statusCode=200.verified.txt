@@ -15,12 +15,7 @@
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
-<<<<<<< HEAD
       http.url: http://localhost:00000/api2/delayAsync/0,
-=======
-      http.url: http://localhost:00000/api2/delayasync/0,
-      http_useragent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36,
->>>>>>> d233ed263 (Use the non truncated UserAgent property in .netfx webapi (#2128))
       language: dotnet,
       runtime-id: Guid_1,
       signalfx.tracing.library: dotnet-tracing,
