@@ -1,0 +1,1 @@
+https://github.com/protobuf-net/protobuf-net/archive/refs/tags/2.4.0.zip

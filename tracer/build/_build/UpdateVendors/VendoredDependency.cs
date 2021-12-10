@@ -55,6 +55,13 @@ namespace UpdateVendors
                 downloadUrl: "https://github.com/JamesNK/Newtonsoft.Json/archive/12.0.1.zip",
                 pathToSrc: new[] { "Newtonsoft.Json-12.0.1", "src", "Newtonsoft.Json" },
                 transform: filePath => RewriteCsFileWithStandardTransform(filePath, originalNamespace: "Newtonsoft.Json"));
+
+            Add(
+                libraryName: "protobuf-net",
+                version: "2.4.0",
+                downloadUrl: "https://github.com/protobuf-net/protobuf-net/archive/refs/tags/2.4.0.zip",
+                pathToSrc: new[] { "protobuf-net-2.4.0", "src", "protobuf-net" },
+                transform: filePath => RewriteCsFileWithStandardTransform(filePath, originalNamespace: "ProtoBuf"));
         }
 
         public static List<VendoredDependency> All { get; set; } = new List<VendoredDependency>();
