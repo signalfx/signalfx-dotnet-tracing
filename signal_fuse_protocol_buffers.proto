@@ -1,3 +1,5 @@
+syntax="proto3";
+
 package com.signalfuse.metrics.protobuf;
 
 option csharp_namespace = "Datadog.Tracer.SignalFx.Metrics.Protobuf";
