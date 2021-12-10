@@ -68,7 +68,7 @@ partial class Build : NukeBuild
     readonly string Version = "0.2.0";
 
     [Parameter("Whether the build version is a prerelease(for packaging purposes). Default is latest")]
-    readonly bool IsPrerelease = false;
+    readonly bool IsPrerelease = true;
 
     [Parameter("Prints the available drive space before executing each target. Defaults to false")]
     readonly bool PrintDriveSpace = false;

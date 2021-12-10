@@ -110,7 +110,7 @@ const AssemblyProperty managed_profiler_assembly_property = AssemblyProperty(
                   49,  105, 236, 40,  21,  176, 12, 238, 238, 204, 141, 90,  27,  244, 61,  182, 125, 41,  97,  163,
                   233, 190, 161, 57,  127, 4,   62, 192, 116, 145, 112, 150, 73,  37,  47,  85,  101, 183, 86,  197},
     160, 32772, 1)
-        .WithVersion(1, 30, 0, 0);
+        .WithVersion(2, 0, 0, 0);
 
 } // namespace trace
 
