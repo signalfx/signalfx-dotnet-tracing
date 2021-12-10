@@ -4,19 +4,21 @@
 //   Input: signal_fuse_protocol_buffers.proto
 // </auto-generated>
 
+// Vendored namespaces adjusted: global::ProtoBuf. changed to global::Datadog.Trace.Vendors.ProtoBuf.
+
 #region Designer generated code
 #pragma warning disable CS0612, CS0618, CS1591, CS3021, IDE0079, IDE1006, RCS1036, RCS1057, RCS1085, RCS1192
 namespace Datadog.Tracer.SignalFx.Metrics.Protobuf
 {
 
-    [global::ProtoBuf.ProtoContract()]
-    public partial class Datum : global::ProtoBuf.IExtensible
+    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
+    public partial class Datum : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+        private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
+        global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::Datadog.Trace.Vendors.ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
-        [global::ProtoBuf.ProtoMember(1)]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(1)]
         [global::System.ComponentModel.DefaultValue("")]
         public string strValue
         {
@@ -27,7 +29,7 @@ namespace Datadog.Tracer.SignalFx.Metrics.Protobuf
         public void ResetstrValue() => __pbn__strValue = null;
         private string __pbn__strValue;
 
-        [global::ProtoBuf.ProtoMember(2)]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(2)]
         public double doubleValue
         {
             get => __pbn__doubleValue.GetValueOrDefault();
@@ -37,7 +39,7 @@ namespace Datadog.Tracer.SignalFx.Metrics.Protobuf
         public void ResetdoubleValue() => __pbn__doubleValue = null;
         private double? __pbn__doubleValue;
 
-        [global::ProtoBuf.ProtoMember(3)]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(3)]
         public long intValue
         {
             get => __pbn__intValue.GetValueOrDefault();
@@ -49,14 +51,14 @@ namespace Datadog.Tracer.SignalFx.Metrics.Protobuf
 
     }
 
-    [global::ProtoBuf.ProtoContract()]
-    public partial class Dimension : global::ProtoBuf.IExtensible
+    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
+    public partial class Dimension : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+        private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
+        global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::Datadog.Trace.Vendors.ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
-        [global::ProtoBuf.ProtoMember(1)]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(1)]
         [global::System.ComponentModel.DefaultValue("")]
         public string key
         {
@@ -67,7 +69,7 @@ namespace Datadog.Tracer.SignalFx.Metrics.Protobuf
         public void Resetkey() => __pbn__key = null;
         private string __pbn__key;
 
-        [global::ProtoBuf.ProtoMember(2)]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(2)]
         [global::System.ComponentModel.DefaultValue("")]
         public string value
         {
@@ -80,14 +82,14 @@ namespace Datadog.Tracer.SignalFx.Metrics.Protobuf
 
     }
 
-    [global::ProtoBuf.ProtoContract()]
-    public partial class DataPoint : global::ProtoBuf.IExtensible
+    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
+    public partial class DataPoint : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+        private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
+        global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::Datadog.Trace.Vendors.ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
-        [global::ProtoBuf.ProtoMember(1)]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(1)]
         [global::System.ComponentModel.DefaultValue("")]
         public string source
         {
@@ -98,7 +100,7 @@ namespace Datadog.Tracer.SignalFx.Metrics.Protobuf
         public void Resetsource() => __pbn__source = null;
         private string __pbn__source;
 
-        [global::ProtoBuf.ProtoMember(2)]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(2)]
         [global::System.ComponentModel.DefaultValue("")]
         public string metric
         {
@@ -109,7 +111,7 @@ namespace Datadog.Tracer.SignalFx.Metrics.Protobuf
         public void Resetmetric() => __pbn__metric = null;
         private string __pbn__metric;
 
-        [global::ProtoBuf.ProtoMember(3)]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(3)]
         public long timestamp
         {
             get => __pbn__timestamp.GetValueOrDefault();
@@ -119,10 +121,10 @@ namespace Datadog.Tracer.SignalFx.Metrics.Protobuf
         public void Resettimestamp() => __pbn__timestamp = null;
         private long? __pbn__timestamp;
 
-        [global::ProtoBuf.ProtoMember(4)]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(4)]
         public Datum value { get; set; }
 
-        [global::ProtoBuf.ProtoMember(5)]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(5)]
         public MetricType metricType
         {
             get => __pbn__metricType.GetValueOrDefault();
@@ -132,31 +134,31 @@ namespace Datadog.Tracer.SignalFx.Metrics.Protobuf
         public void ResetmetricType() => __pbn__metricType = null;
         private MetricType? __pbn__metricType;
 
-        [global::ProtoBuf.ProtoMember(6)]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(6)]
         public global::System.Collections.Generic.List<Dimension> dimensions { get; } = new global::System.Collections.Generic.List<Dimension>();
 
     }
 
-    [global::ProtoBuf.ProtoContract()]
-    public partial class DataPointUploadMessage : global::ProtoBuf.IExtensible
+    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
+    public partial class DataPointUploadMessage : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+        private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
+        global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::Datadog.Trace.Vendors.ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
-        [global::ProtoBuf.ProtoMember(1)]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(1)]
         public global::System.Collections.Generic.List<DataPoint> datapoints { get; } = new global::System.Collections.Generic.List<DataPoint>();
 
     }
 
-    [global::ProtoBuf.ProtoContract()]
-    public partial class PointValue : global::ProtoBuf.IExtensible
+    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
+    public partial class PointValue : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+        private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
+        global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::Datadog.Trace.Vendors.ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
-        [global::ProtoBuf.ProtoMember(3)]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(3)]
         public long timestamp
         {
             get => __pbn__timestamp.GetValueOrDefault();
@@ -166,12 +168,12 @@ namespace Datadog.Tracer.SignalFx.Metrics.Protobuf
         public void Resettimestamp() => __pbn__timestamp = null;
         private long? __pbn__timestamp;
 
-        [global::ProtoBuf.ProtoMember(4)]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(4)]
         public Datum value { get; set; }
 
     }
 
-    [global::ProtoBuf.ProtoContract()]
+    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
     public enum MetricType
     {
         GAUGE = 0,
