@@ -504,7 +504,7 @@ namespace Datadog.Trace.Vendors.ProtoBuf.Meta
             AttributeMap[] typeAttribs = AttributeMap.Create(model, type, false);
             for (int i = 0; i < typeAttribs.Length; i++)
             {
-                if (typeAttribs[i].AttributeType.FullName == "ProtoBuf.ProtoContractAttribute")
+                if (typeAttribs[i].AttributeType.FullName == "Datadog.Trace.Vendors.ProtoBuf.ProtoContractAttribute")
                 {
                     if (typeAttribs[i].TryGet("AsReferenceDefault", out object tmp)) return (bool)tmp;
                 }
@@ -541,7 +541,7 @@ namespace Datadog.Trace.Vendors.ProtoBuf.Meta
                 AttributeMap item = (AttributeMap)typeAttribs[i];
                 object tmp;
                 string fullAttributeTypeName = item.AttributeType.FullName;
-                if (!isEnum && fullAttributeTypeName == "ProtoBuf.ProtoIncludeAttribute")
+                if (!isEnum && fullAttributeTypeName == "Datadog.Trace.Vendors.ProtoBuf.ProtoIncludeAttribute")
                 {
                     int tag = 0;
                     if (item.TryGet("tag", out tmp)) tag = (int)tmp;
@@ -571,7 +571,7 @@ namespace Datadog.Trace.Vendors.ProtoBuf.Meta
                     if (IsValidSubType(knownType)) AddSubType(tag, knownType, dataFormat);
                 }
 
-                if (fullAttributeTypeName == "ProtoBuf.ProtoPartialIgnoreAttribute")
+                if (fullAttributeTypeName == "Datadog.Trace.Vendors.ProtoBuf.ProtoPartialIgnoreAttribute")
                 {
                     if (item.TryGet(nameof(ProtoPartialIgnoreAttribute.MemberName), out tmp) && tmp != null)
                     {
@@ -579,13 +579,13 @@ namespace Datadog.Trace.Vendors.ProtoBuf.Meta
                         partialIgnores.Add((string)tmp);
                     }
                 }
-                if (!isEnum && fullAttributeTypeName == "ProtoBuf.ProtoPartialMemberAttribute")
+                if (!isEnum && fullAttributeTypeName == "Datadog.Trace.Vendors.ProtoBuf.ProtoPartialMemberAttribute")
                 {
                     if (partialMembers == null) partialMembers = new BasicList();
                     partialMembers.Add(item);
                 }
 
-                if (fullAttributeTypeName == "ProtoBuf.ProtoContractAttribute")
+                if (fullAttributeTypeName == "Datadog.Trace.Vendors.ProtoBuf.ProtoContractAttribute")
                 {
                     if (item.TryGet(nameof(ProtoContractAttribute.Name), out tmp)) name = (string)tmp;
                     if (Helpers.IsEnum(type)) // note this is subtly different to isEnum; want to do this even if [Flags]
@@ -714,10 +714,10 @@ namespace Datadog.Trace.Vendors.ProtoBuf.Meta
                     AttributeMap[] memberAttribs = AttributeMap.Create(model, method, false);
                     if (memberAttribs != null && memberAttribs.Length > 0)
                     {
-                        CheckForCallback(method, memberAttribs, "ProtoBuf.ProtoBeforeSerializationAttribute", ref callbacks, 0);
-                        CheckForCallback(method, memberAttribs, "ProtoBuf.ProtoAfterSerializationAttribute", ref callbacks, 1);
-                        CheckForCallback(method, memberAttribs, "ProtoBuf.ProtoBeforeDeserializationAttribute", ref callbacks, 2);
-                        CheckForCallback(method, memberAttribs, "ProtoBuf.ProtoAfterDeserializationAttribute", ref callbacks, 3);
+                        CheckForCallback(method, memberAttribs, "Datadog.Trace.Vendors.ProtoBuf.ProtoBeforeSerializationAttribute", ref callbacks, 0);
+                        CheckForCallback(method, memberAttribs, "Datadog.Trace.Vendors.ProtoBuf.ProtoAfterSerializationAttribute", ref callbacks, 1);
+                        CheckForCallback(method, memberAttribs, "Datadog.Trace.Vendors.ProtoBuf.ProtoBeforeDeserializationAttribute", ref callbacks, 2);
+                        CheckForCallback(method, memberAttribs, "Datadog.Trace.Vendors.ProtoBuf.ProtoAfterDeserializationAttribute", ref callbacks, 3);
                         CheckForCallback(method, memberAttribs, "System.Runtime.Serialization.OnSerializingAttribute", ref callbacks, 4);
                         CheckForCallback(method, memberAttribs, "System.Runtime.Serialization.OnSerializedAttribute", ref callbacks, 5);
                         CheckForCallback(method, memberAttribs, "System.Runtime.Serialization.OnDeserializingAttribute", ref callbacks, 6);
@@ -805,7 +805,7 @@ namespace Datadog.Trace.Vendors.ProtoBuf.Meta
             {
                 switch (attributes[i].AttributeType.FullName)
                 {
-                    case "ProtoBuf.ProtoContractAttribute":
+                    case "Datadog.Trace.Vendors.ProtoBuf.ProtoContractAttribute":
                         bool tmp = false;
                         GetFieldBoolean(ref tmp, attributes[i], "UseProtoMembersOnly");
                         if (tmp) return AttributeFamily.ProtoBuf;
@@ -962,14 +962,14 @@ namespace Datadog.Trace.Vendors.ProtoBuf.Meta
 
             if (isEnum)
             {
-                attrib = GetAttribute(attribs, "ProtoBuf.ProtoIgnoreAttribute");
+                attrib = GetAttribute(attribs, "Datadog.Trace.Vendors.ProtoBuf.ProtoIgnoreAttribute");
                 if (attrib != null)
                 {
                     ignore = true;
                 }
                 else
                 {
-                    attrib = GetAttribute(attribs, "ProtoBuf.ProtoEnumAttribute");
+                    attrib = GetAttribute(attribs, "Datadog.Trace.Vendors.ProtoBuf.ProtoEnumAttribute");
 #if PORTABLE || CF || COREFX || PROFILE259
 					fieldNumber = Convert.ToInt32(((FieldInfo)member).GetValue(null));
 #else
@@ -1002,8 +1002,8 @@ namespace Datadog.Trace.Vendors.ProtoBuf.Meta
 
             if (!ignore && !done) // always consider ProtoMember 
             {
-                attrib = GetAttribute(attribs, "ProtoBuf.ProtoMemberAttribute");
-                GetIgnore(ref ignore, attrib, attribs, "ProtoBuf.ProtoIgnoreAttribute");
+                attrib = GetAttribute(attribs, "Datadog.Trace.Vendors.ProtoBuf.ProtoMemberAttribute");
+                GetIgnore(ref ignore, attrib, attribs, "Datadog.Trace.Vendors.ProtoBuf.ProtoIgnoreAttribute");
 
                 if (!ignore && attrib != null)
                 {
@@ -1187,7 +1187,7 @@ namespace Datadog.Trace.Vendors.ProtoBuf.Meta
                 vm.IsMap = ignoreListHandling ? false : vm.ResolveMapTypes(out var _, out var _, out var _);
                 if (vm.IsMap) // is it even *allowed* to be a map?
                 {
-                    if ((attrib = GetAttribute(attribs, "ProtoBuf.ProtoMapAttribute")) != null)
+                    if ((attrib = GetAttribute(attribs, "Datadog.Trace.Vendors.ProtoBuf.ProtoMapAttribute")) != null)
                     {
                         if (attrib.TryGet(nameof(ProtoMapAttribute.DisableMap), out object tmp) && (bool)tmp)
                         {

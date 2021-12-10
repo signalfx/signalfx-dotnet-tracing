@@ -20,7 +20,7 @@ namespace Datadog.Trace.Vendors.ProtoBuf.ServiceModel
     ///  </behaviors>
     ///  <extensions>
     ///    <behaviorExtensions>
-    ///      <add name="ProtoBufSerialization" type="ProtoBuf.ServiceModel.ProtoBehaviorExtension, protobuf-net, Version=1.0.0.255, Culture=neutral, PublicKeyToken=257b51d87d2e4d67"/>
+    ///      <add name="ProtoBufSerialization" type="Datadog.Trace.Vendors.ProtoBuf.ServiceModel.ProtoBehaviorExtension, protobuf-net, Version=1.0.0.255, Culture=neutral, PublicKeyToken=257b51d87d2e4d67"/>
     ///    </behaviorExtensions>
     ///  </extensions>
     /// 
