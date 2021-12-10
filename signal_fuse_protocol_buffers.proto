@@ -1,5 +1,7 @@
 package com.signalfuse.metrics.protobuf;
 
+option csharp_namespace = "Datadog.Tracer.SignalFx.Metrics.Protobuf";
+
 enum MetricType {
     /**
      * Numerical: Periodic, instantaneous measurement of some state.
