@@ -167,6 +167,11 @@ namespace Datadog.Trace
         }
 
         /// <summary>
+        /// Gets the active span context dictionary by consulting DistributedTracer.Instance
+        /// </summary>
+        internal IReadOnlyDictionary<string, string> DistributedSpanContext => DistributedTracer.Instance.GetSpanContextRaw() ?? InternalActiveScope?.Span?.Context;
+
+        /// <summary>
         /// Gets the active scope
         /// </summary>
         internal Scope InternalActiveScope => TracerManager.ScopeManager.Active;
