@@ -14,14 +14,13 @@ Use these environment variables to configure the tracing library:
 | `SIGNALFX_TRACE_CONFIG_FILE` | The file path of a JSON configuration file that will be loaded. |  |
 | `SIGNALFX_VERSION` | The application's version that will populate `version` tag on spans. |  |
 | `SIGNALFX_TRACE_HEADER_TAGS` | Comma-separated map of header keys to tag name, that will be automatically applied as tags on traces. | `"key1:val1,key2:val2"` |
-| `SIGNALFX_TRACE_BUFFER_SIZE` | The size in bytes of the trace buffer. | `1024 * 1024 * 10 (10MB)` |
-| `SIGNALFX_TRACE_BATCH_INTERVAL` | The batch interval in milliseconds for the serialization queue. | `100` |
+| `SIGNALFX_TRACE_BUFFER_SIZE` | The size in bytes of the trace buffer. | `1024 * 1024 * 10 (10MB)` | <!-- TODO: check if it is used now and if it was used in prev version -->
+| `SIGNALFX_TRACE_BATCH_INTERVAL` | The batch interval in milliseconds for the serialization queue. | `100` | <!-- TODO: check if it is used now and if it was used in prev version -->
 | `SIGNALFX_MAX_TRACES_PER_SECOND` | The number of traces allowed to be submitted per second. | `100` |
 | `SIGNALFX_TRACE_RESPONSE_HEADER_ENABLED` | Enable to add server trace information to HTTP response headers. | `true` |
 | `SIGNALFX_TRACE_STARTUP_LOGS` | Enable to activate diagnostic log at stratup. | `true` |
 | `SIGNALFX_TRACE_SAMPLING_RULES` | Comma separated list of sampling rules taht enabled custom sampling rules based on regular expressions. The rule is matched in order of specification. The first match in a list is used. The item "sample_rate" is required in decimal format. The item "service" is optional in regular expression format, to match on service name. The item "name" is optional in regular expression format, to match on operation name. | `'[{"sample_rate":0.5, "service":"cart.*"}],[{"sample_rate":0.2, "name":"http.request"}]'` |
 | `SIGNALFX_TRACE_SAMPLE_RATE` | The global rate for the sampler. |  |
-| `SIGNALFX_DOGSTATSD_PORT` | The port of the targeted StatsD server. | `8125` |
 | `SIGNALFX_TRACE_LOGGING_RATE` | The number of seconds between identical log messages for Tracer log files. Setting to 0 disables rate limiting. | `60` |
 | `SIGNALFX_TRACE_LOG_DIRECTORY` | The directory of the .NET Tracer logs. Overrides the value in `SIGNALFX_TRACE_LOG_PATH` if present. | Linux: `/var/log/signalfx/dotnet/`<br>Windows: `%ProgramData%"\SignalFx .NET Tracing\logs\` |
 | `SIGNALFX_HTTP_SERVER_ERROR_STATUSES` | The application's server http statuses to set spans as errors by. | `500-599` |
@@ -56,7 +55,7 @@ Use these environment variables to configure the tracing library:
 
 There are following ways to apply configuration settings (priority is from first to last):
 
-1. [Environment variables)(#environment-variables)
+1. [Environment variables](#environment-variables)
 2. [`web.config` or `app.config` file](#web.config-and-app.config)
 3. [JSON configuration file](#json-configuration-file)
 
@@ -104,16 +103,16 @@ manager:
 
     ```bash
     # Use dpkg:
-    $ dpkg -i signalfx-dotnet-tracing.deb
+    dpkg -i signalfx-dotnet-tracing.deb
 
     # Use rpm:
-    $ rpm -ivh signalfx-dotnet-tracing.rpm
+    rpm -ivh signalfx-dotnet-tracing.rpm
 
     # Install directly from the release bundle:
-    $ tar -xf signalfx-dotnet-tracing.tar.gz -C /
+    tar -xf signalfx-dotnet-tracing.tar.gz -C /
 
     # Install directly from the release bundle for musl-using systems (Alpine Linux):
-    $ tar -xf signalfx-dotnet-tracing-musl.tar.gz -C /
+    tar -xf signalfx-dotnet-tracing-musl.tar.gz -C /
     ```
 
 1. Configure the required environment variables:
@@ -125,10 +124,10 @@ manager:
 1. Set the service name:
 
     ```bash
-    export SIGNALFX_SERVICE='MyCoreService'
+    export SIGNALFX_SERVICE='my-service-name'
     ```
 
-1. Set the endpoint, e.g. OpenTelemetry Collector:
+1. Set the trace endpoint, e.g. [Splunk OpenTelemetry Collector](https://github.com/signalfx/splunk-otel-collector):
 
     ```bash
     export SIGNALFX_ENDPOINT_URL='http://<YourCollector>:9411/api/v2/spans'
@@ -143,10 +142,10 @@ manager:
 1. Optionally, create the default logging directory:
 
     ```bash
-    source /opt/signalfx/createLogPath.sh
+    /opt/signalfx/createLogPath.sh
     ```
 
-1. Run your application:
+1. Run your application, e.g.:
 
     ```bash
     dotnet run
@@ -177,14 +176,13 @@ system where it will be running.
    setx CORECLR_PROFILER "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}" /m
    ```
 
-1. Set the "service name" that better describes your application:
+1. Set the service name:
 
    ```batch
-   setx SIGNALFX_SERVICE MyServiceName /m
+   setx SIGNALFX_SERVICE my-service-name /m
    ```
 
-1. Set the endpoint, e.g. OpenTelemetry Collector that will forward
-the trace data:
+1. Set the trace endpoint, e.g. [Splunk OpenTelemetry Collector](https://github.com/signalfx/splunk-otel-collector):
 
    ```batch
    setx SIGNALFX_ENDPOINT_URL http://localhost:9411/api/v2/spans /m
