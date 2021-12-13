@@ -33,7 +33,7 @@ for version 2.1.0 and 2.1.2.
 
 ## Usage
 
-See [USAGE.md](USAGE.md) for installation, usage and configuration instructions.
+See [advanced-config.md](advanced-config.md) for installation, usage and configuration instructions.
 
 ## Windows
 

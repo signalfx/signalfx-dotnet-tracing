@@ -60,6 +60,6 @@ Available layouts:
 
 - `trace_id`
 - `span_id`
-- `service.name` - [`SIGNALFX_SERVICE_NAME`](/USAGE.md#configuration-values) configuration option
-- `service.version` - [`SIGNALFX_VERSION`](/USAGE.md#configuration-values) configuration option
-- `deployment.environment` - [`SIGNALFX_ENV`](/USAGE.md#configuration-values) configuration option
+- `service.name` - [`SIGNALFX_SERVICE_NAME`](/advanced-config.md#configuration-values) configuration option
+- `service.version` - [`SIGNALFX_VERSION`](/advanced-config.md#configuration-values) configuration option
+- `deployment.environment` - [`SIGNALFX_ENV`](/advanced-config.md#configuration-values) configuration option
