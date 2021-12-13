@@ -26,7 +26,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
         {
             try
             {
-                var assembly = Assembly.Load("SignalFx.Tracing.ClrProfiler.Managed, Version=0.1.15.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb");
+                var assembly = Assembly.Load("SignalFx.Tracing.ClrProfiler.Managed, Version=0.1.16.0, Culture=neutral, PublicKeyToken=def86d061d0d2eeb");
 
                 if (assembly != null)
                 {
