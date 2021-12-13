@@ -313,6 +313,11 @@ the compressed folder to us.
 After obtaining the logs, remember to remove the environment variable
 `SIGNALFX_TRACE_DEBUG` to avoid unnecessary overhead.
 
+## Contributing
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) before creating an issue or
+a pull request.
+
 ## License
 
 The SignalFx Tracing Library is a redistribution of the
