@@ -195,13 +195,13 @@ namespace Datadog.Trace.Tests.Configuration
 
             if (key == "SIGNALFX_SERVICE_NAME")
             {
-                // We need to ensure SIGNALFX_SERVICE is empty.
+                // We need to ensure SIGNALFX_SERVICE_NAME is empty.
                 string originalServiceName = Environment.GetEnvironmentVariable(ConfigurationKeys.ServiceName);
                 Environment.SetEnvironmentVariable(ConfigurationKeys.ServiceName, null, EnvironmentVariableTarget.Process);
 
                 settings = GetTracerSettings(key, value);
 
-                // after load settings we can restore the original SIGNALFX_SERVICE
+                // after load settings we can restore the original SIGNALFX_SERVICE_NAME
                 Environment.SetEnvironmentVariable(ConfigurationKeys.ServiceName, originalServiceName, EnvironmentVariableTarget.Process);
             }
             else if (key == ConfigurationKeys.AgentHost || key == ConfigurationKeys.AgentPort)

@@ -58,7 +58,7 @@ namespace Datadog.Trace.Configuration
         public const string ProfilerLogPath = "SIGNALFX_TRACE_LOG_PATH";
         public const string RuntimeMetricsEnabled = "SIGNALFX_RUNTIME_METRICS_ENABLED";
         public const string SerializationBatchInterval = "SIGNALFX_TRACE_BATCH_INTERVAL";
-        public const string ServiceName = "SIGNALFX_SERVICE";
+        public const string ServiceName = "SIGNALFX_SERVICE_NAME";
         public const string ServiceNameMappings = "SIGNALFX_TRACE_SERVICE_MAPPING";
         public const string ServiceVersion = "SIGNALFX_VERSION";
         public const string StartupDiagnosticLogEnabled = "SIGNALFX_TRACE_STARTUP_LOGS";

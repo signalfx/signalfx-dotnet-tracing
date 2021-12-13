@@ -41,7 +41,7 @@ namespace environment {
     // Sets the default service name for every span.
     // If not set, Tracer will try to determine service name automatically
     // from application name (e.g. entry assembly or IIS application name).
-    const WSTRING service_name = WStr("SIGNALFX_SERVICE");
+    const WSTRING service_name = WStr("SIGNALFX_SERVICE_NAME");
 
     // Sets the "service_version" tag for every span that belong to the root service (and not an external service).
     const WSTRING service_version = WStr("SIGNALFX_VERSION");
