@@ -1,14 +1,36 @@
 #pragma once
 #include "clr_helpers.h"
 #include <mutex>
+#include <cinttypes>
 
 extern "C"
 {
-    __declspec(dllexport) int signalfx_read_thread_samples(int len, unsigned char* buf);
+    __declspec(dllexport) int SignalFx_read_thread_samples(int len, unsigned char* buf);
+    __declspec(dllexport) void SignalFx_set_native_context(uint64_t traceIdHigh, uint64_t traceIdLow, uint64_t spanId);
 }
 
 namespace trace
 {
+class ThreadSpanContext
+{
+public:
+    uint64_t traceIdHigh;
+    uint64_t traceIdLow;
+    uint64_t spanId;
+
+    ThreadSpanContext() : traceIdHigh(0), traceIdLow(0), spanId(0)
+    {
+    }
+    ThreadSpanContext(uint64_t _traceIdHigh, uint64_t _traceIdLow, uint64_t _spanId) :
+        traceIdHigh(_traceIdHigh), traceIdLow(_traceIdLow), spanId(_spanId)
+    {
+    }
+    ThreadSpanContext(ThreadSpanContext const& other) :
+        traceIdHigh(other.traceIdHigh), traceIdLow(other.traceIdLow), spanId(other.spanId)
+    {
+    }
+};
+
 class ThreadState
 {
 public:
@@ -46,7 +68,7 @@ public:
     ThreadSamplesBuffer(unsigned char* buf);
     ~ThreadSamplesBuffer();
     void StartBatch();
-    void StartSample(ThreadID id, ThreadState* state);
+    void StartSample(ThreadID id, ThreadState* state, ThreadSpanContext spanContext);
     void RecordFrame(FunctionID fid, WSTRING& frame);
     void EndSample();
     void EndBatch();
@@ -73,6 +95,8 @@ private:
     std::list<std::pair<FunctionID, WSTRING*>> list;
     std::unordered_map<FunctionID, std::list<std::pair<FunctionID, WSTRING*>>::iterator> map;
 };
+
+
 
 } // namespace trace
 

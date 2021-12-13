@@ -9,7 +9,7 @@ namespace Datadog.Trace.ThreadSampling
     /// </summary>
     internal class ThreadSampleNativeFormatParser
     {
-        private static bool printStackTraces = false;
+        private static bool printStackTraces = true;
 
         private byte[] buf;
         private int len;
@@ -59,9 +59,12 @@ namespace Datadog.Trace.ThreadSampling
                     int managedId = ReadInt();
                     int nativeId = ReadInt();
                     string threadName = ReadString();
+                    long traceIdHigh = ReadInt64();
+                    long traceIdLow = ReadInt64();
+                    long spanId = ReadInt64();
                     if (printStackTraces)
                     {
-                        Console.WriteLine("thread " + managedId + " " + nativeId + " " + threadName);
+                        Console.WriteLine("thread mid=" + managedId + " nid=" + nativeId + " name=[" + threadName + "] traceHigh=" + traceIdHigh + " traceLow=" + traceIdLow + " span=" + spanId);
                     }
 
                     short code = ReadShort();

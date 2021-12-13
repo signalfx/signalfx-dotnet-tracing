@@ -45,14 +45,14 @@ TEST(ThreadSamplerTest, BasicBufferBehavior)
     threadState.threadName.append(longThreadName);
 
     tsb.StartBatch();
-    tsb.StartSample(1, &threadState);
+    tsb.StartSample(1, &threadState, ThreadSpanContext());
     tsb.RecordFrame(7001, frame1);
     tsb.RecordFrame(7002, frame2);
     tsb.RecordFrame(7001, frame1);
     tsb.EndSample();
     tsb.EndBatch();
     tsb.WriteFinalStats(100);
-    ASSERT_EQ(1260, tsb.pos); // not manually calculated but does depend on thread name limiting and not repeating frame strings
+    ASSERT_EQ(1284, tsb.pos); // not manually calculated but does depend on thread name limiting and not repeating frame strings
     ASSERT_EQ(2, tsb.codes.size());
 }
 
@@ -78,7 +78,7 @@ TEST(ThreadSamplerTest, BufferOverrunBehavior)
     // Now exerise some methods and ensure that no changes to the buffer or pos happen
 
     tsb.StartBatch();
-    tsb.StartSample(1, &threadState);
+    tsb.StartSample(1, &threadState, ThreadSpanContext());
     tsb.RecordFrame(7001, frame1);
     tsb.RecordFrame(7002, frame2);
     tsb.RecordFrame(7001, frame1);

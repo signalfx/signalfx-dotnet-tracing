@@ -1,7 +1,6 @@
 #include "ThreadSampler.h"
 #include "logger.h"
 #include <chrono>
-#include <cinttypes>
 #include <map>
 
 #define MAX_FUNC_NAME_LEN 256
@@ -32,6 +31,12 @@ static unsigned char* bufferA; // FIXME would like to use std::array, etc. if we
 static int bufferALen;
 static unsigned char* bufferB;
 static int bufferBLen;
+
+static std::mutex threadSpanContextLock;
+static std::unordered_map<ThreadID, trace::ThreadSpanContext> threadSpanContextMap;
+
+static ICorProfilerInfo* profilerInfo; // FIXME should really refactor and have a single static instance of ThreadSampler
+
 // Dirt-simple backpressure system to save overhead if managed code is not reading fast enough
 bool ThreadSampling_ShouldProduceThreadSample()
 {
@@ -155,12 +160,16 @@ void ThreadSamplesBuffer::StartBatch()
     writeInt64((int64_t) ms.count());
 }
 
-void ThreadSamplesBuffer::StartSample(ThreadID id, ThreadState* state)
+void ThreadSamplesBuffer::StartSample(ThreadID id, ThreadState* state, ThreadSpanContext context)
 {
     writeByte(0x02);
     writeInt(id);
     writeInt(state->nativeId);
     writeString(state->threadName);
+    writeInt64(context.traceIdHigh);
+    writeInt64(context.traceIdLow);
+    writeInt64(context.spanId);
+    // Feature possibilities: (managed/native) thread priority, cpu/wait times, etc.
 }
 void ThreadSamplesBuffer::RecordFrame(FunctionID fid, WSTRING& frame)
 {
@@ -450,19 +459,18 @@ void CaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, SamplingHelpe
 
     helper.curWriter->StartBatch();
 
-    std::lock_guard<std::mutex> guard(ts->threadStateLock);
-
     while ((hr = threadEnum->Next(1, &threadID, &numReturned)) == S_OK)
     {
+        ThreadSpanContext spanContext = threadSpanContextMap[threadID];
         auto found = ts->managedTid2state.find(threadID);
         if (found != ts->managedTid2state.end() && found->second != NULL)
         {
-            helper.curWriter->StartSample(threadID, found->second);
+            helper.curWriter->StartSample(threadID, found->second, spanContext);
         }
         else
         {
             auto unknown = ThreadState();
-            helper.curWriter->StartSample(threadID, &unknown);
+            helper.curWriter->StartSample(threadID, &unknown, spanContext);
         }
 
         HRESULT localHr = info10->DoStackSnapshot(threadID, &FrameCallback, COR_PRF_SNAPSHOT_DEFAULT, &helper, NULL, 0);
@@ -492,6 +500,38 @@ int GetSamplingPeriod()
     }
 }
 
+void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, SamplingHelper & helper)
+{
+    std::lock_guard<std::mutex> threadStateGuard(ts->threadStateLock);
+    std::lock_guard<std::mutex> spanContextGuard(threadSpanContextLock);
+
+    LARGE_INTEGER start, end, elapsedMicros, frequency;
+    QueryPerformanceFrequency(&frequency);
+    QueryPerformanceCounter(&start);
+
+    HRESULT hr = info10->SuspendRuntime();
+    if (FAILED(hr))
+    {
+        Logger::Warn("Could not suspend runtime to sample threads: ", hr);
+    }
+    else
+    {
+        CaptureSamples(ts, info10, helper);
+    }
+    // I don't have any proof but I sure hope that if suspending fails then it's still ok to ask to resume, with no
+    // ill effects
+    hr = info10->ResumeRuntime();
+
+    QueryPerformanceCounter(&end);
+    elapsedMicros.QuadPart = end.QuadPart - start.QuadPart;
+    elapsedMicros.QuadPart *= 1000000;
+    elapsedMicros.QuadPart /= frequency.QuadPart;
+    printf("Resuming runtime after %i micros\n", (int) elapsedMicros.QuadPart);
+    helper.curWriter->WriteFinalStats((int) (elapsedMicros.QuadPart));
+
+    helper.PublishBuffer();
+}
+
 DWORD WINAPI SamplingThreadMain(_In_ LPVOID param)
 {
     int sleepMillis = GetSamplingPeriod();
@@ -505,37 +545,12 @@ DWORD WINAPI SamplingThreadMain(_In_ LPVOID param)
     {
         Sleep(sleepMillis);
         bool shouldSample = helper.AllocateBuffer();
-        if (!shouldSample)
-        {
+        if (!shouldSample) {
             Logger::Warn("Skipping a thread sample period, buffers are full");
             continue;
+        } else {
+            PauseClrAndCaptureSamples(ts, info10, helper);
         }
-
-        LARGE_INTEGER start, end, elapsedMicros, frequency;
-        QueryPerformanceFrequency(&frequency);
-        QueryPerformanceCounter(&start);
-
-        hr = info10->SuspendRuntime();
-        if (FAILED(hr))
-        {
-            Logger::Warn("Could not suspend runtime to sample threads: ", hr);
-        }
-        else
-        {
-            CaptureSamples(ts, info10, helper);
-        }
-        // I don't have any proof but I sure hope that if suspending fails then it's still ok to ask to resume, with no
-        // ill effects
-        hr = info10->ResumeRuntime();
-
-        QueryPerformanceCounter(&end);
-        elapsedMicros.QuadPart = end.QuadPart - start.QuadPart;
-        elapsedMicros.QuadPart *= 1000000;
-        elapsedMicros.QuadPart /= frequency.QuadPart;
-        printf("Resuming runtime after %i micros\n", (int) elapsedMicros.QuadPart);
-        helper.curWriter->WriteFinalStats((int) (elapsedMicros.QuadPart));
-
-        helper.PublishBuffer();
     }
 
     return 0;
@@ -544,6 +559,7 @@ DWORD WINAPI SamplingThreadMain(_In_ LPVOID param)
 void ThreadSampler::StartSampling(ICorProfilerInfo3* info3)
 {
     Logger::Info("ThreadSampler::StartSampling");
+    profilerInfo = info3;
     HRESULT hr = info3->QueryInterface<ICorProfilerInfo10>(&this->info10);
     if (FAILED(hr))
     {
@@ -563,14 +579,21 @@ void ThreadSampler::ThreadCreated(ThreadID threadId)
 }
 void ThreadSampler::ThreadDestroyed(ThreadID threadId)
 {
-    std::lock_guard<std::mutex> guard(threadStateLock);
-
-    ThreadState* state = managedTid2state[threadId];
-    if (state != NULL)
     {
-        delete state;
+        std::lock_guard<std::mutex> guard(threadStateLock);
+
+        ThreadState* state = managedTid2state[threadId];
+        if (state != NULL)
+        {
+            delete state;
+        }
+        managedTid2state.erase(threadId);
     }
-    managedTid2state.erase(threadId);
+    {
+        std::lock_guard<std::mutex> guard(threadSpanContextLock);
+
+        threadSpanContextMap.erase(threadId);
+    }
 }
 void ThreadSampler::ThreadAssignedToOSThread(ThreadID threadId, DWORD osThreadId)
 {
@@ -602,6 +625,7 @@ NameCache::NameCache(int maximumSize) : maxSize(maximumSize)
 {
 }
 
+// FIXME these should be UINT_PTR
 WSTRING* NameCache::get(FunctionID key)
 {
     auto found = map.find(key);
@@ -635,8 +659,21 @@ void NameCache::put(FunctionID key, WSTRING* val)
 
 extern "C"
 {
-    __declspec(dllexport) int signalfx_read_thread_samples(int len, unsigned char* buf)
+    __declspec(dllexport) int SignalFx_read_thread_samples(int len, unsigned char* buf)
     {
         return ThreadSampling_ConsumeOneThreadSample(len, buf);
+    }
+    __declspec(dllexport) void SignalFx_set_native_context(uint64_t traceIdHigh, uint64_t traceIdLow, uint64_t spanId)
+    {
+        ThreadID threadId;
+        HRESULT hr = profilerInfo->GetCurrentThreadID(&threadId);
+        if (FAILED(hr)) {
+            trace::Logger::Debug("GetCurrentThreadID failed: ", hr);
+            return;
+        }
+
+        std::lock_guard<std::mutex> guard(threadSpanContextLock);
+
+        threadSpanContextMap[threadId] = trace::ThreadSpanContext(traceIdHigh, traceIdLow, spanId);
     }
 }

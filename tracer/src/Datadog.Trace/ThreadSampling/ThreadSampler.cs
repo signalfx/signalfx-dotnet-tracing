@@ -41,7 +41,7 @@ namespace Datadog.Trace.ThreadSampling
         private static void ReadOneSample(byte[] buf)
         {
             var start = DateTime.Now;
-            int read = signalfx_read_thread_samples(buf.Length, buf);
+            int read = SignalFx_read_thread_samples(buf.Length, buf);
             if (read > 0)
             {
                 var parser = new ThreadSampleNativeFormatParser(buf, read);
@@ -83,11 +83,9 @@ namespace Datadog.Trace.ThreadSampling
         }
 
         [DllImport("SignalFx.Tracing.ClrProfiler.Native")]
-#pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable SA1400 // Access modifier should be declared
-        static extern int signalfx_read_thread_samples(int len, byte[] buf);
+        static extern int SignalFx_read_thread_samples(int len, byte[] buf);
 #pragma warning restore SA1400 // Access modifier should be declared
-#pragma warning restore SA1300 // Element should begin with upper-case letter
 
     }
 }
