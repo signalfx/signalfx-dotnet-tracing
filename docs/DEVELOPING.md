@@ -4,7 +4,7 @@
 
 Minimum requirements:
 
-- [Visual Studio 2019 (16.8)](https://visualstudio.microsoft.com/downloads/) or newer
+- [Visual Studio 2022 (17.0)](https://visualstudio.microsoft.com/downloads/) or newer
   - Workloads
     - Desktop development with C++
     - .NET desktop development
