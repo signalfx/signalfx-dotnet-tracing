@@ -15,12 +15,12 @@ There are following ways to apply configuration settings
     For an application running on .NET Framework, web configuration file (`web.config`)
     or application configuration file (`app.config`) can be used to configure settings.
 
-    Example with `SIGNALFX_SERVICE` setting:
+    Example with `SIGNALFX_SERVICE_NAME` setting:
 
     ```xml
     <configuration>
     <appSettings>
-        <add key="SIGNALFX_SERVICE" value="my-service-name" />
+        <add key="SIGNALFX_SERVICE_NAME" value="my-service-name" />
     </appSettings>
     </configuration>
     ```
@@ -30,11 +30,11 @@ There are following ways to apply configuration settings
     To use it, set environment variable `SIGNALFX_TRACE_CONFIG_FILE`
     or `web.config` / `app.config` to set configuration file path.
 
-    Example with `SIGNALFX_SERVICE` setting:
+    Example with `SIGNALFX_SERVICE_NAME` setting:
 
     ```json
     {
-        "SIGNALFX_SERVICE": "my-service-name"
+        "SIGNALFX_SERVICE_NAME": "my-service-name"
     }
     ```
 
@@ -60,7 +60,7 @@ Use these environment variables to configure the tracing library:
 | `SIGNALFX_HTTP_SERVER_ERROR_STATUSES` | The application's server http statuses to set spans as errors by. | `500-599` |
 | `SIGNALFX_HTTP_CLIENT_ERROR_STATUSES` | The application's client http statuses to set spans as errors by. | `400-599` |
 | `SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED` | Enable to activate sending partial traces to the agent. | `false` |
-| `SIGNALFX_SERVICE` | Application's default service name. |  |
+| `SIGNALFX_SERVICE_NAME` | Application's default service name. |  |
 | `SIGNALFX_ENV` | The value for the `deployment.environment` tag added to every span. |  |
 | `SIGNALFX_TRACE_ENABLED` | Enable to activate the tracer. | `true` |
 | `SIGNALFX_TRACE_DEBUG` | Enable to activate debugging mode for the tracer. | `false` |

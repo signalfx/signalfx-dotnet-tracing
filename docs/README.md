@@ -61,7 +61,7 @@ system where it will be running.
 1. Set the service name:
 
    ```batch
-   setx SIGNALFX_SERVICE my-service-name /m
+   setx SIGNALFX_SERVICE_NAME my-service-name /m
    ```
 
 1. Set the trace endpoint, e.g. [Splunk OpenTelemetry Collector](https://github.com/signalfx/splunk-otel-collector):
@@ -168,7 +168,7 @@ manager:
 1. Set the service name:
 
     ```bash
-    export SIGNALFX_SERVICE='my-service-name'
+    export SIGNALFX_SERVICE_NAME='my-service-name'
     ```
 
 1. Set the trace endpoint, e.g. [Splunk OpenTelemetry Collector](https://github.com/signalfx/splunk-otel-collector):

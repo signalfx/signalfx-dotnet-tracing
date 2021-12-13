@@ -121,7 +121,7 @@ namespace Datadog.Trace.Tools.Runner
 
             if (!string.IsNullOrWhiteSpace(options.Service))
             {
-                envVars["SIGNALFX_SERVICE"] = options.Service;
+                envVars["SIGNALFX_SERVICE_NAME"] = options.Service;
             }
 
             if (!string.IsNullOrWhiteSpace(options.Version))
