@@ -23,11 +23,23 @@ namespace Datadog.Trace.Vendors.ProtoBuf.Meta
     /// </summary>
     internal class ValueMember
     {
-        private readonly int fieldNumber;
+        private int _fieldNumber;
         /// <summary>
         /// The number that identifies this member in a protobuf stream
         /// </summary>
-        public int FieldNumber => fieldNumber;
+        public int FieldNumber
+        {
+            get => _fieldNumber;
+            internal set
+            {
+                if (_fieldNumber != value)
+                {
+                    MetaType.AssertValidFieldNumber(value);
+                    ThrowIfFrozen();
+                    _fieldNumber = value;
+                }
+            }
+        }
 
         private readonly MemberInfo originalMember;
         private MemberInfo backingMember;
@@ -128,7 +140,7 @@ namespace Datadog.Trace.Vendors.ProtoBuf.Meta
         /// </summary>
         internal ValueMember(RuntimeTypeModel model, int fieldNumber, Type memberType, Type itemType, Type defaultType, DataFormat dataFormat)
         {
-            this.fieldNumber = fieldNumber;
+            _fieldNumber = fieldNumber;
             this.memberType = memberType ?? throw new ArgumentNullException(nameof(memberType));
             this.itemType = itemType;
             this.defaultType = defaultType;
@@ -496,13 +508,13 @@ namespace Datadog.Trace.Vendors.ProtoBuf.Meta
 	                {
 		                throw new InvalidOperationException("Unable to resolve MapDecorator constructor");
 	                }
-	                ser = (IProtoSerializer)ctors.First().Invoke(new object[] {model, concreteType, keySer, valueSer, fieldNumber,
+	                ser = (IProtoSerializer)ctors.First().Invoke(new object[] {model, concreteType, keySer, valueSer, _fieldNumber,
 		                DataFormat == DataFormat.Group ? WireType.StartGroup : WireType.String, keyWireType, valueWireType, OverwriteList });
 #else
                     var ctors = typeof(MapDecorator<,,>).MakeGenericType(new Type[] { dictionaryType, keyType, valueType }).GetConstructors(
                         BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
                     if (ctors.Length != 1) throw new InvalidOperationException("Unable to resolve MapDecorator constructor");
-                    ser = (IProtoSerializer)ctors[0].Invoke(new object[] {model, concreteType, keySer, valueSer, fieldNumber,
+                    ser = (IProtoSerializer)ctors[0].Invoke(new object[] {model, concreteType, keySer, valueSer, _fieldNumber,
                         DataFormat == DataFormat.Group ? WireType.StartGroup : WireType.String, keyWireType, valueWireType, OverwriteList });
 #endif
                 }
@@ -524,11 +536,11 @@ namespace Datadog.Trace.Vendors.ProtoBuf.Meta
                         }
                         ser = new TagDecorator(NullDecorator.Tag, wireType, IsStrict, ser);
                         ser = new NullDecorator(model, ser);
-                        ser = new TagDecorator(fieldNumber, WireType.StartGroup, false, ser);
+                        ser = new TagDecorator(_fieldNumber, WireType.StartGroup, false, ser);
                     }
                     else
                     {
-                        ser = new TagDecorator(fieldNumber, wireType, IsStrict, ser);
+                        ser = new TagDecorator(_fieldNumber, wireType, IsStrict, ser);
                     }
                     // apply lists if appropriate
                     if (itemType != null)
@@ -540,11 +552,11 @@ namespace Datadog.Trace.Vendors.ProtoBuf.Meta
                             , "Wrong type in the tail; expected {0}, received {1}", ser.ExpectedType, underlyingItemType);
                         if (memberType.IsArray)
                         {
-                            ser = new ArrayDecorator(model, ser, fieldNumber, IsPacked, wireType, memberType, OverwriteList, SupportNull);
+                            ser = new ArrayDecorator(model, ser, _fieldNumber, IsPacked, wireType, memberType, OverwriteList, SupportNull);
                         }
                         else
                         {
-                            ser = ListDecorator.Create(model, memberType, defaultType, ser, fieldNumber, IsPacked, wireType, member != null && PropertyDecorator.CanWrite(model, member), OverwriteList, SupportNull);
+                            ser = ListDecorator.Create(model, memberType, defaultType, ser, _fieldNumber, IsPacked, wireType, member != null && PropertyDecorator.CanWrite(model, member), OverwriteList, SupportNull);
                         }
                     }
                     else if (defaultValue != null && !IsRequired && getSpecified == null)

@@ -14,7 +14,7 @@ namespace Datadog.Trace.Vendors.ProtoBuf.Meta
     /// <summary>
     /// Provides protobuf serialization support for a number of types
     /// </summary>
-    internal abstract class TypeModel
+    internal abstract partial class TypeModel
     {
 #if COREFX
         internal TypeInfo MapType(TypeInfo type)
@@ -1187,9 +1187,10 @@ namespace Datadog.Trace.Vendors.ProtoBuf.Meta
         /// can be used "as is", or can be compiled for
         /// optimal performance.
         /// </summary>
+        [Obsolete("Please use RuntimeTypeModel.Create", false)]
         public static RuntimeTypeModel Create()
         {
-            return new RuntimeTypeModel(false);
+            return RuntimeTypeModel.Create();
         }
 #endif
 

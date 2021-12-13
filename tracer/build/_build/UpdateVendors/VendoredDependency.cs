@@ -58,9 +58,9 @@ namespace UpdateVendors
 
             Add(
                 libraryName: "protobuf-net",
-                version: "2.4.0",
-                downloadUrl: "https://github.com/protobuf-net/protobuf-net/archive/refs/tags/2.4.0.zip",
-                pathToSrc: new[] { "protobuf-net-2.4.0", "src", "protobuf-net" },
+                version: "2.4.6",
+                downloadUrl: "https://github.com/protobuf-net/protobuf-net/archive/69e1777a431d5ed4faee639ca4cec5b835aea8ca.zip",
+                pathToSrc: new[] { "protobuf-net-69e1777a431d5ed4faee639ca4cec5b835aea8ca", "src", "protobuf-net" },
                 transform: filePath => RewriteCsFileWithStandardTransform(filePath, originalNamespace: "ProtoBuf"));
         }
 

@@ -381,7 +381,23 @@ namespace Datadog.Trace.Vendors.ProtoBuf.Meta
             CascadeDependents(list, temp);
         }
 
-        internal RuntimeTypeModel(bool isDefault)
+#if !NO_RUNTIME
+        /// <summary>
+        /// Creates a new runtime model, to which the caller
+        /// can add support for a range of types. A model
+        /// can be used "as is", or can be compiled for
+        /// optimal performance.
+        /// </summary>
+        /// <param name="name">not used currently; this is for compatibility with v3</param>
+#pragma warning disable IDE0060 // Remove unused parameter
+        public static RuntimeTypeModel Create(string name = null)
+#pragma warning restore IDE0060 // Remove unused parameter
+        {
+            return new RuntimeTypeModel(false);
+        }
+#endif
+
+        private RuntimeTypeModel(bool isDefault)
         {
             AutoAddMissingTypes = true;
             UseImplicitZeroDefaults = true;
@@ -1971,7 +1987,35 @@ namespace Datadog.Trace.Vendors.ProtoBuf.Meta
             }
         }
 
+        /// <summary>
+        /// Raised before a type is auto-configured; this allows the auto-configuration to be electively suppressed
+        /// </summary>
+        /// <remarks>This callback should be fast and not involve complex external calls, as it may block the model</remarks>
+        public event EventHandler<TypeAddedEventArgs> BeforeApplyDefaultBehaviour;
+
+        /// <summary>
+        /// Raised after a type is auto-configured; this allows additional external customizations
+        /// </summary>
+        /// <remarks>This callback should be fast and not involve complex external calls, as it may block the model</remarks>
+        public event EventHandler<TypeAddedEventArgs> AfterApplyDefaultBehaviour;
+
+        internal static void OnBeforeApplyDefaultBehaviour(MetaType metaType, ref TypeAddedEventArgs args)
+            => OnApplyDefaultBehaviour((metaType?.Model as RuntimeTypeModel)?.BeforeApplyDefaultBehaviour, metaType, ref args);
+
+        internal static void OnAfterApplyDefaultBehaviour(MetaType metaType, ref TypeAddedEventArgs args)
+            => OnApplyDefaultBehaviour((metaType?.Model as RuntimeTypeModel)?.AfterApplyDefaultBehaviour, metaType, ref args);
+
+        private static void OnApplyDefaultBehaviour(
+            EventHandler<TypeAddedEventArgs> handler, MetaType metaType, ref TypeAddedEventArgs args)
+        {
+            if (handler != null)
+            {
+                if (args == null) args = new TypeAddedEventArgs(metaType);
+                handler(metaType.Model, args);
+            }
+        }
     }
+
     /// <summary>
     /// Contains the stack-trace of the owning code when a lock-contention scenario is detected
     /// </summary>
