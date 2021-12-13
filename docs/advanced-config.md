@@ -14,8 +14,6 @@ Use these environment variables to configure the tracing library:
 | `SIGNALFX_TRACE_CONFIG_FILE` | The file path of a JSON configuration file that will be loaded. |  |
 | `SIGNALFX_VERSION` | The application's version that will populate `version` tag on spans. |  |
 | `SIGNALFX_TRACE_HEADER_TAGS` | Comma-separated map of header keys to tag name, that will be automatically applied as tags on traces. | `"key1:val1,key2:val2"` |
-| `SIGNALFX_TRACE_BUFFER_SIZE` | The size in bytes of the trace buffer. | `1024 * 1024 * 10 (10MB)` | <!-- TODO: check if it is used now and if it was used in prev version -->
-| `SIGNALFX_TRACE_BATCH_INTERVAL` | The batch interval in milliseconds for the serialization queue. | `100` | <!-- TODO: check if it is used now and if it was used in prev version -->
 | `SIGNALFX_MAX_TRACES_PER_SECOND` | The number of traces allowed to be submitted per second. | `100` |
 | `SIGNALFX_TRACE_RESPONSE_HEADER_ENABLED` | Enable to add server trace information to HTTP response headers. | `true` |
 | `SIGNALFX_TRACE_STARTUP_LOGS` | Enable to activate diagnostic log at stratup. | `true` |

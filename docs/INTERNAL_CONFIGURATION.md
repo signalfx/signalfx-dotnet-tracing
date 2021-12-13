@@ -16,6 +16,8 @@ This section contains list of internal configuration settings (these should not 
 | `SIGNALFX_TRACE_AGENT_PORT` | The Agent port where the Tracer can send traces | `localhost` |
 | `SIGNALFX_TRACE_PIPE_NAME` | The named pipe where the Tracer can send traces. |  |
 | `SIGNALFX_TRACE_PIPE_TIMEOUT_MS` | The timeout in milliseconds for named pipes communication. | `100` |
+| `SIGNALFX_TRACE_BUFFER_SIZE` | The size in bytes of the trace buffer. | `1024 * 1024 * 10 (10MB)` |
+| `SIGNALFX_TRACE_BATCH_INTERVAL` | The batch interval in milliseconds for the serialization queue. | `100` |
 | `SIGNALFX_DOGSTATSD_PORT` | The port of the targeted StatsD server. | `8125` |
 | `SIGNALFX_DOGSTATSD_PIPE_NAME` | The named pipe that DogStatsD binds to. |  |
 | `SIGNALFX_APM_RECEIVER_PORT` | The port for Trace Agent binding. | `8126` |
