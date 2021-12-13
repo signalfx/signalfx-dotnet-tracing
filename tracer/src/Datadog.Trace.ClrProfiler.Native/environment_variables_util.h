@@ -93,7 +93,7 @@ bool IsThreadSamplingEnabled()
 
 bool IsVersionCompatibilityEnabled()
 {
-    ToBooleanWithDefault(GetEnvironmentValue(environment::internal_version_compatibility), false);
+    ToBooleanWithDefault(GetEnvironmentValue(environment::internal_version_compatibility), true);
 }
 
 } // namespace trace
