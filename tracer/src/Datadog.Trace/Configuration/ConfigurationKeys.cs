@@ -33,7 +33,7 @@ namespace Datadog.Trace.Configuration
         /// and used to determine service name of some child spans.
         /// </summary>
         /// <seealso cref="TracerSettings.ServiceName"/>
-        public const string ServiceName = "SIGNALFX_SERVICE";
+        public const string ServiceName = "SIGNALFX_SERVICE_NAME";
 
         /// <summary>
         /// Configuration key for the application's version. Sets the "version" tag on every <see cref="Span"/>.

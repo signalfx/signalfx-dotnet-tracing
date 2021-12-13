@@ -1241,7 +1241,7 @@ stages:
         ./run.sh "linux"
       displayName: Crank
       env:
-        SIGNALFX_SERVICE: dd-trace-dotnet
+        SIGNALFX_SERVICE_NAME: dd-trace-dotnet
 
   - job: Windows64
     timeoutInMinutes: 60
@@ -1261,7 +1261,7 @@ stages:
         ./run.sh "windows"
       displayName: Crank
       env:
-        SIGNALFX_SERVICE: dd-trace-dotnet
+        SIGNALFX_SERVICE_NAME: dd-trace-dotnet
 
   - job: LinuxArm64
     timeoutInMinutes: 60
@@ -1280,7 +1280,7 @@ stages:
         ./run.sh "linux_arm64"
       displayName: Crank
       env:
-        SIGNALFX_SERVICE: dd-trace-dotnet
+        SIGNALFX_SERVICE_NAME: dd-trace-dotnet
         SIGNALFX_ENV: CI
 
 - stage: coverage
@@ -1379,13 +1379,13 @@ stages:
       workingDirectory: $(System.DefaultWorkingDirectory)/tracer/build/timeit/Samples.HttpMessageHandler
       displayName: Execute Samples.HttpMessageHandler benchmark
       env:
-        SIGNALFX_SERVICE: dd-trace-dotnet
+        SIGNALFX_SERVICE_NAME: dd-trace-dotnet
 
     - script: run.cmd
       workingDirectory: $(System.DefaultWorkingDirectory)/tracer/build/timeit/Samples.FakeDbCommand
       displayName: Execute Samples.FakeDbCommand benchmark
       env:
-        SIGNALFX_SERVICE: dd-trace-dotnet
+        SIGNALFX_SERVICE_NAME: dd-trace-dotnet
 
     - task: PowerShell@2
       displayName: Wait 20 seconds to agent flush before finishing pipeline
