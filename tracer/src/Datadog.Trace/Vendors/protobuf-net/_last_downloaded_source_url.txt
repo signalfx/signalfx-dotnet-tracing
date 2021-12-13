@@ -1,0 +1,1 @@
+https://github.com/protobuf-net/protobuf-net/archive/69e1777a431d5ed4faee639ca4cec5b835aea8ca.zip
