@@ -2,8 +2,7 @@
 
 The SignalFx Tracing Library for .NET provides an
 OpenTracing-compatible tracer and automatically configured instrumentations
-for popular .NET libraries and frameworks.  It supports .NET Core 2.0+ on
-Linux and Windows and .NET Framework 4.6.2+ on Windows.
+for popular .NET libraries and frameworks.
 
 Where applicable, context propagation uses
 [B3 headers](https://github.com/openzipkin/b3-propagation).
