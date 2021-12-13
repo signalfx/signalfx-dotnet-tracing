@@ -169,7 +169,7 @@ namespace Datadog.Trace.TestHelpers
                 "SIGNALFX_PROFILER_PROCESSES",
                 "SIGNALFX_DOTNET_TRACER_HOME",
                 "SIGNALFX_DISABLED_INTEGRATIONS",
-                "SIGNALFX_SERVICE",
+                "SIGNALFX_SERVICE_NAME",
                 "SIGNALFX_VERSION",
                 "SIGNALFX_TAGS",
                 "SIGNALFX_APPSEC_ENABLED",

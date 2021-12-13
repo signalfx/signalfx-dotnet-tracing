@@ -26,7 +26,7 @@ Use these environment variables to configure the tracing library:
 | `SIGNALFX_HTTP_SERVER_ERROR_STATUSES` | The application's server http statuses to set spans as errors by. | `500-599` |
 | `SIGNALFX_HTTP_CLIENT_ERROR_STATUSES` | The application's client http statuses to set spans as errors by. | `400-599` |
 | `SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED` | Enable to activate sending partial traces to the agent. | `false` |
-| `SIGNALFX_SERVICE` | Application's default service name. |  |
+| `SIGNALFX_SERVICE_NAME` | Application's default service name. |  |
 | `SIGNALFX_ENV` | The value for the `deployment.environment` tag added to every span. |  |
 | `SIGNALFX_TRACE_ENABLED` | Enable to activate the tracer. | `true` |
 | `SIGNALFX_TRACE_DEBUG` | Enable to activate debugging mode for the tracer. | `false` |
@@ -67,12 +67,12 @@ Environment variables are the main way to configure values. A setting configured
 
 For an application running on .NET Framework, web configuration file (`web.config`) or application configuration file (`app.config`) can be used to configure settings.
 
-See example with `SIGNALFX_SERVICE` overload.
+See example with `SIGNALFX_SERVICE_NAME` overload.
 
 ```xml
 <configuration>
   <appSettings>
-    <add key="SIGNALFX_SERVICE" value="my-service-name" />
+    <add key="SIGNALFX_SERVICE_NAME" value="my-service-name" />
   </appSettings>
 </configuration>
 ```
@@ -81,11 +81,11 @@ See example with `SIGNALFX_SERVICE` overload.
 
 Use environment variable `SIGNALFX_TRACE_CONFIG_FILE` or `web.config` / `app.config` to set configuration file path . This cannot be set via JSON configuration file.
 
-See example with `SIGNALFX_SERVICE` overload.
+See example with `SIGNALFX_SERVICE_NAME` overload.
 
 ```json
 {
-    "SIGNALFX_SERVICE": "my-service-name"
+    "SIGNALFX_SERVICE_NAME": "my-service-name"
 }
 ```
 
@@ -124,7 +124,7 @@ manager:
 1. Set the service name:
 
     ```bash
-    export SIGNALFX_SERVICE='my-service-name'
+    export SIGNALFX_SERVICE_NAME='my-service-name'
     ```
 
 1. Set the trace endpoint, e.g. [Splunk OpenTelemetry Collector](https://github.com/signalfx/splunk-otel-collector):
@@ -179,7 +179,7 @@ system where it will be running.
 1. Set the service name:
 
    ```batch
-   setx SIGNALFX_SERVICE my-service-name /m
+   setx SIGNALFX_SERVICE_NAME my-service-name /m
    ```
 
 1. Set the trace endpoint, e.g. [Splunk OpenTelemetry Collector](https://github.com/signalfx/splunk-otel-collector):
