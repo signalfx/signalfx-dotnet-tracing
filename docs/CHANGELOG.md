@@ -2,10 +2,17 @@
 
 ## [Unreleased]
 
+[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.16...HEAD)
 
-[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.15...HEAD)
+[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.16..HEAD)
 
-[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.15..HEAD)
+## [Release 0.1.16](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.1.16)
+
+- Fix NLog integration when using ILogger
+
+[Commits](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.15...v0.1.16)
+
+[Full diff](https://github.com/signalfx/signalfx-dotnet-tracing/compare/v0.1.15..v0.1.16)
 
 ## [Release 0.1.15](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.1.15)
 
