@@ -3,7 +3,7 @@
 ## Configuration methods
 
 You can apply configuration settings in the following ways
-(values take precedense from the top to the bottom):
+, with environment variables taking precedence over XML and JSON:
 
 1. Environment variables
 
