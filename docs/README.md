@@ -24,7 +24,7 @@ with its [Zipkin Receiver](https://github.com/open-telemetry/opentelemetry-colle
 can be used to receive, process and export telemetry data.
 However, until [OpenTelemetry .NET Auto-Instrumentation](https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation)
 is not useable, SignalFx Instrumentation for .NET is not able
-to corelated the spans created with [OpenTelemetry .NET](https://github.com/open-telemetry/opentelemetry-dotnet)
+to correlated the spans created with [OpenTelemetry .NET](https://github.com/open-telemetry/opentelemetry-dotnet)
 and [`ActivitySource`](https://docs.microsoft.com/en-us/dotnet/core/diagnostics/distributed-tracing-instrumentation-walkthroughs).
 
 ---
