@@ -1,11 +1,31 @@
-# SignalFx Tracing Library for .NET
+# SignalFx Instrumentation for .NET
 
-The SignalFx Tracing Library for .NET provides an
-OpenTracing-compatible tracer and automatically configured instrumentations
+The SignalFx Instrumentationy for .NET provides automatic instrumentations
 for popular .NET libraries and frameworks.
 
-Where applicable, context propagation uses
-[B3 headers](https://github.com/openzipkin/b3-propagation).
+The SignalFx Instrumentation for .NET is a [.NET Profiler](https://docs.microsoft.com/en-us/dotnet/framework/unmanaged-api/profiling/profiling-overview)
+which instruments supported libraries and frameworks with bytecode manipulation.
+
+By default:
+
+- all spans are sampled and reported,
+- [B3 headers](https://github.com/openzipkin/b3-propagation) are used for context
+  propagation,
+- Zipkin trace exporter is used to send spans as JSON in the [Zipkin v2 format](https://zipkin.io/zipkin-api/#/default/post_spans).
+
+The SignalFx Instrumentationy for .NET registers an OpenTracing `GlobalTracer`
+so you can support existing custom instrumentation or add custom
+instrumentation to your application later.
+
+Whenever possible, SignalFx Instrumentation for .NET complies
+to the [OpenTelemetry Trace Semantic Conventions](https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions).
+[OpenTelemetry Collector Contrib](https://github.com/open-telemetry/opentelemetry-collector-contrib)
+with its [Zipkin Receiver](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/zipkinreceiver)
+can be used to receive, process and export telemetry data.
+However, until [OpenTelemetry .NET Auto-Instrumentation](https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation)
+is not useable, SignalFx Instrumentation for .NET is not able
+to corelated the spans created with [OpenTelemetry .NET](https://github.com/open-telemetry/opentelemetry-dotnet)
+and [`ActivitySource`](https://docs.microsoft.com/en-us/dotnet/core/diagnostics/distributed-tracing-instrumentation-walkthroughs).
 
 ---
 
@@ -202,7 +222,7 @@ a pull request.
 
 ## License
 
-The SignalFx Tracing Library is a redistribution of the
+The SignalFx Instrumentation for .NET is a redistribution of the
 [.NET Tracer for Datadog APM](https://github.com/DataDog/dd-trace-dotnet).
 It is licensed under the terms of the Apache Software License version 2.0.
 For more details, see [the license file](../LICENSE).
