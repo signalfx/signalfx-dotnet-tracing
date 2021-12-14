@@ -2,18 +2,18 @@
 
 ## Configuration Methods
 
-There are following ways to apply configuration settings
-(prioritized from top to bottom):
+You can apply configuration settings in the following ways
+(values take precedense from the top to the bottom):
 
 1. Environment variables
 
-    Environment variables are the main way to configure values.
-    A setting configured via an environment variable cannot be overridden.
+    Environment variables are the main way to configure the settings.
 
 2. `web.config` or `app.config` file
 
-    For an application running on .NET Framework, web configuration file (`web.config`)
-    or application configuration file (`app.config`) can be used to configure settings.
+    For an application running on .NET Framework, you can use a web configuration
+    file  (`web.config`) or an application configuration file (`app.config`) to
+    configure the settings.
 
     Example with `SIGNALFX_SERVICE_NAME` setting:
 
@@ -27,8 +27,8 @@ There are following ways to apply configuration settings
 
 3. JSON configuration file
 
-    To use it, set environment variable `SIGNALFX_TRACE_CONFIG_FILE`
-    or `web.config` / `app.config` to set configuration file path.
+    To use it, set the JSON configuration file path as the value for
+    `SIGNALFX_TRACE_CONFIG_FILE` using one of the previous methods.
 
     Example with `SIGNALFX_SERVICE_NAME` setting:
 
