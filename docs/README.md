@@ -70,12 +70,6 @@ system where it will be running.
    setx SIGNALFX_ENDPOINT_URL http://localhost:9411/api/v2/spans /m
    ```
 
-1. Optionally, enable trace injection in logs:
-
-   ```batch
-   setx SIGNALFX_LOGS_INJECTION true /m
-   ```
-
 1. Enable instrumentation for the targeted application by setting
 the appropriate __CLR enable profiling__ environment variable.
 You can enable instrumentation at these levels:
@@ -177,12 +171,6 @@ manager:
     export SIGNALFX_ENDPOINT_URL='http://<YourCollector>:9411/api/v2/spans'
     ```
 
-1. Optionally, enable trace injection in logs:
-
-    ```bash
-    export SIGNALFX_LOGS_INJECTION=true
-    ```
-
 1. Optionally, create the default logging directory:
 
     ```bash
@@ -205,14 +193,7 @@ See [advanced-config.md](advanced-config.md).
 
 ## Correlating traces with logs
 
-The SignalFx-Tracing Library for .NET implements the
-[Profiling API](https://docs.microsoft.com/en-us/dotnet/framework/unmanaged-api/profiling/)
-and should only require basic configuration of your application environment.
-
-You can link individual log entries with trace IDs and span IDs associated with
-corresponding events. If your application uses a supported logger, enable trace
-injection to automatically include trace context in your application's logs.
-For more information, see [Inject traces in logs](../tracer/samples/AutomaticTraceIdInjection/README.md).
+See [correlating-traces-with-logs.md](correlating-traces-with-logs.md).
 
 ## Troubleshooting
 
