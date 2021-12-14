@@ -2,25 +2,21 @@
 
 The SignalFx Tracing Library for .NET provides an
 OpenTracing-compatible tracer and automatically configured instrumentations
-for popular .NET libraries and frameworks.  It supports .NET Core 2.0+ on
-Linux and Windows and .NET Framework 4.6.2+ on Windows.
+for popular .NET libraries and frameworks.
 
 Where applicable, context propagation uses
 [B3 headers](https://github.com/openzipkin/b3-propagation).
 
-The SignalFx-Tracing Library for .NET implements the
-[Profiling API](https://docs.microsoft.com/en-us/dotnet/framework/unmanaged-api/profiling/)
-and should only require basic configuration of your application environment.
+---
 
-You can link individual log entries with trace IDs and span IDs associated with
-corresponding events. If your application uses a supported logger, enable trace
-injection to automatically include trace context in your application's logs.
-For more information, see [Inject traces in logs](/customer-samples/AutomaticTraceIdInjection/README.md).
+## Requirements
+
+## Supported .NET versions
+
+- .NET Core 3.1, .NET 5.0 and higher on Windows and Linux
+- .NET Framework 4.6.2 and higher on Windows
 
 ## Supported libraries and frameworks
-
-There are [known .NET Core runtime issues](https://github.com/dotnet/coreclr/issues/18448)
-for version 2.1.0 and 2.1.2.
 
 | Library | Versions Supported | Notes |
 | ---     | ---                | ---   |
@@ -31,80 +27,184 @@ for version 2.1.0 and 2.1.2.
 | StackExchange.Redis | `StackExchange.Redis` NuGet 1.0+ | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS=false` (`true` by default). |
 | WebClient | Supported .NET versions | by way of `System.Net.WebRequest` instrumentation |
 
-## Usage
+## Get started
 
-See [USAGE.md](USAGE.md) for installation, usage and configuration instructions.
+### Windows
 
-## Windows
+**Warning**: Pay close attention to the scope of environment variables. Ensure they
+are properly set prior to launching the targeted process. The following steps set the
+environment variables at the machine level, with the exception of the variables used
+for finer control of which processes will be instrumented, which are set in the current
+command session.
 
-### Minimum requirements
-- [Visual Studio 2019 (16.8)](https://visualstudio.microsoft.com/downloads/) or newer
-  - Workloads
-    - Desktop development with C++
-    - .NET desktop development
-    - .NET Core cross-platform development
-    - Optional: ASP.NET and web development (to build samples)
-  - Individual components
-    - .NET Framework 4.7 targeting pack
-- [.NET 5.0 SDK](https://dotnet.microsoft.com/download/dotnet/5.0)
-- [.NET 5.0 x86 SDK](https://dotnet.microsoft.com/download/dotnet/5.0) to run 32-bit tests locally
-- Optional: [ASP.NET Core 2.1 Runtime](https://dotnet.microsoft.com/download/dotnet-core/2.1) to test in .NET Core 2.1 locally.
-- Optional: [ASP.NET Core 3.0 Runtime](https://dotnet.microsoft.com/download/dotnet-core/3.0) to test in .NET Core 3.0 locally.
-- Optional: [ASP.NET Core 3.1 Runtime](https://dotnet.microsoft.com/download/dotnet-core/3.1) to test in .NET Core 3.1 locally.
-- Optional: [nuget.exe CLI](https://www.nuget.org/downloads) v5.3 or newer
-- Optional: [WiX Toolset 3.11.1](http://wixtoolset.org/releases/) or newer to build Windows installer (msi)
-  - [WiX Toolset Visual Studio Extension](https://wixtoolset.org/releases/) to build installer from Visual Studio
-- Optional: [Docker for Windows](https://docs.docker.com/docker-for-windows/) to build Linux binaries and run integration tests on Linux containers. See [section on Docker Compose](#building-and-running-tests-with-docker-compose).
-  - Requires Windows 10 (1607 Anniversary Update, Build 14393 or newer)
+1. Install the CLR Profiler using an installer file (`.msi` file) from the latest release.
+Choose the installer (x64 or x86) according to the architecture of the operating
+system where it will be running.
 
+1. Configure the required environment variables to enable the CLR Profiler:
+    - For .NET Framework applications:
 
-This repository uses [Nuke](https://nuke.build/) for build automation. To see a list of possible targets run:
+    ```batch
+    setx COR_PROFILER "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}" /m
+    ```
 
-```cmd
-.\build.cmd --help
-```
+   - For .NET Core applications:
 
-For example:
+   ```batch
+   setx CORECLR_PROFILER "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}" /m
+   ```
 
-```powershell
-# Clean and build the main tracer project
-.\build.cmd Clean BuildTracerHome
+1. Set the service name:
 
-# Build and run managed and native unit tests. Requires BuildTracerHome to have previously been run
-.\build.cmd BuildAndRunManagedUnitTests BuildAndRunNativeUnitTests 
+   ```batch
+   setx SIGNALFX_SERVICE_NAME my-service-name /m
+   ```
 
-# Build NuGet packages and MSIs. Requires BuildTracerHome to have previously been run
-.\build.cmd PackageTracerHome 
+1. Set the trace endpoint, e.g. [Splunk OpenTelemetry Collector](https://github.com/signalfx/splunk-otel-collector):
 
-# Build and run integration tests. Requires BuildTracerHome to have previously been run
-.\build.cmd BuildAndRunWindowsIntegrationTests
-```
+   ```batch
+   setx SIGNALFX_ENDPOINT_URL http://localhost:9411/api/v2/spans /m
+   ```
 
-## Linux
+1. Enable instrumentation for the targeted application by setting
+the appropriate __CLR enable profiling__ environment variable.
+You can enable instrumentation at these levels:
 
-The recommended approach for Linux is to build using Docker. You can use this approach for both Windows and Linux hosts. The _build_in_docker.sh_ script automates building a Docker image with the required dependencies, and running the specified Nuke targets. For example:
+   - For current command session
+   - For a specific Windows Service
+   - For a specific user
 
-```bash
-# Clean and build the main tracer project
-./build_in_docker.sh Clean BuildTracerHome
+   The follow snippet describes how to enable instrumentation for
+   the current command session according to the .NET runtime.
+   To enable instrumentation at different levels, see
+   [this](#enable-instrumentation-at-different-levels) section.
 
-# Build and run managed unit tests. Requires BuildTracerHome to have previously been run
-./build_in_docker.sh BuildAndRunManagedUnitTests 
+    - For .NET Framework applications:
 
-# Build and run integration tests. Requires BuildTracerHome to have previously been run
-./build_in_docker.sh BuildAndRunLinuxIntegrationTests
-```
+      ```batch
+      set COR_ENABLE_PROFILING=1
+      ```
 
-## Further Reading
+    - For .NET Core applications:
 
-OpenTelemetry AutoInstrumentation
-- [OpenTelemetry AutoInstrumentation](https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation)
+      ```batch
+      set CORECLR_ENABLE_PROFILING=1
+      ```
 
-Microsoft .NET Profiling APIs
-- [Profiling API](https://docs.microsoft.com/en-us/dotnet/framework/unmanaged-api/profiling/)
-- [Metadata API](https://docs.microsoft.com/en-us/dotnet/framework/unmanaged-api/metadata/)
-- [The Book of the Runtime - Profiling](https://github.com/dotnet/coreclr/blob/master/Documentation/botr/profiling.md)
+1. Restart your application ensuring that all environment variables above are properly
+configured. If you need to check the environment variables for a process use a tool
+like [Process Explorer](https://docs.microsoft.com/en-us/sysinternals/downloads/process-explorer).
 
-OpenTracing
-- [OpenTracing documentation](https://github.com/opentracing/opentracing-csharp)
-- [OpenTracing terminology](https://github.com/opentracing/specification/blob/master/specification.md)
+#### Enable instrumentation at different levels
+
+Enable instrumentation for a specific Windows service:
+
+- For .NET Framework applications:
+
+   ```batch
+   reg add HKLM\SYSTEM\CurrentControlSet\Services\<ServiceName>\Environment /v COR_ENABLE_PROFILING /d 1
+   ```
+
+- For .NET Core applications:
+
+   ```batch
+   reg add HKLM\SYSTEM\CurrentControlSet\Services\<ServiceName>\Environment /v CORECLR_ENABLE_PROFILING /d 1
+   ```
+
+Enable instrumentation for a specific user:
+
+- For .NET Framework applications:
+
+   ```batch
+   setx /s %COMPUTERNAME% /u <[domain/]user> COR_ENABLE_PROFILING 1
+   ```
+
+- For .NET Core applications:
+
+   ```batch
+   setx /s %COMPUTERNAME% /u <[domain/]user> CORECLR_ENABLE_PROFILING 1
+   ```
+
+### Linux
+
+After downloading the library, install the CLR Profiler and its components
+via your system's package manager.
+
+1. Download the latest release of the library.
+
+1. Install the CLR Profiler and its components with your system's package
+manager:
+
+    ```bash
+    # Use dpkg:
+    dpkg -i signalfx-dotnet-tracing.deb
+
+    # Use rpm:
+    rpm -ivh signalfx-dotnet-tracing.rpm
+
+    # Install directly from the release bundle:
+    tar -xf signalfx-dotnet-tracing.tar.gz -C /
+
+    # Install directly from the release bundle for musl-using systems (Alpine Linux):
+    tar -xf signalfx-dotnet-tracing-musl.tar.gz -C /
+    ```
+
+1. Configure the required environment variables:
+
+    ```bash
+    source /opt/signalfx/defaults.env
+    ```
+
+1. Set the service name:
+
+    ```bash
+    export SIGNALFX_SERVICE_NAME='my-service-name'
+    ```
+
+1. Set the trace endpoint, e.g. [Splunk OpenTelemetry Collector](https://github.com/signalfx/splunk-otel-collector):
+
+    ```bash
+    export SIGNALFX_ENDPOINT_URL='http://<YourCollector>:9411/api/v2/spans'
+    ```
+
+1. Optionally, create the default logging directory:
+
+    ```bash
+    /opt/signalfx/createLogPath.sh
+    ```
+
+1. Run your application, e.g.:
+
+    ```bash
+    dotnet run
+    ```
+
+## Manual instrumentation
+
+See [manual-instrumentation.md](manual-instrumentation.md).
+
+## Advanced configuration
+
+See [advanced-config.md](advanced-config.md).
+
+## Correlating traces with logs
+
+See [correlating-traces-with-logs.md](correlating-traces-with-logs.md).
+
+## Troubleshooting
+
+See [troubleshooting.md](troubleshooting.md).
+
+## Contributing
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) before creating an issue or
+a pull request.
+
+## License
+
+The SignalFx Tracing Library is a redistribution of the
+[.NET Tracer for Datadog APM](https://github.com/DataDog/dd-trace-dotnet).
+It is licensed under the terms of the Apache Software License version 2.0.
+For more details, see [the license file](../LICENSE).
+
+The third-party dependencies list can be found [here](../LICENSE-3rdparty.csv).

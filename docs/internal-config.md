@@ -1,21 +1,26 @@
-# Internal Configuration
+# Internal configuration
 
-This section contains list of internal configuration settings (these should not be changed by the users).
+This section contains list of internal and not supported configuration settings.
+These settings should be never used by the users.
 
-## New configuration
+## New settings
 
 | Environment variable | Description | Default |
 |-|-|-|
 | `SIGNALFX_EXPORTER` | The exporter to be used. The Tracer uses it to encode and dispatch traces. Available values are: `DatadogAgent`, `Zipkin`. | `Zipkin` |
 | `SIGNALFX_CONVENTION` | Sets the semantic and trace id conventions for the tracer. Available values are: `Datadog` (64bit trace id), `OpenTelemetry` (128 bit trace id). | `OpenTelemetry` |
 
-## Unsupported upstream configuration
+## Unsupported upstream settings
 
+| Environment variable | Description | Default |
+|-|-|-|
 | `SIGNALFX_AGENT_HOST` | The host name of the targeted SatsD server. |  |
 | `SIGNALFX_TRACE_AGENT_URL` | Alias for `SIGNALFX_ENDPOINT_URL`. The URL to where trace exporters send traces. | `http://localhost:8126` |
 | `SIGNALFX_TRACE_AGENT_PORT` | The Agent port where the Tracer can send traces | `localhost` |
 | `SIGNALFX_TRACE_PIPE_NAME` | The named pipe where the Tracer can send traces. |  |
 | `SIGNALFX_TRACE_PIPE_TIMEOUT_MS` | The timeout in milliseconds for named pipes communication. | `100` |
+| `SIGNALFX_TRACE_BUFFER_SIZE` | The size in bytes of the trace buffer. | `1024 * 1024 * 10 (10MB)` |
+| `SIGNALFX_TRACE_BATCH_INTERVAL` | The batch interval in milliseconds for the serialization queue. | `100` |
 | `SIGNALFX_DOGSTATSD_PORT` | The port of the targeted StatsD server. | `8125` |
 | `SIGNALFX_DOGSTATSD_PIPE_NAME` | The named pipe that DogStatsD binds to. |  |
 | `SIGNALFX_APM_RECEIVER_PORT` | The port for Trace Agent binding. | `8126` |
