@@ -29,8 +29,7 @@ These are ";" delimited lists that control the inclusion/exclusion of processes.
 ## Investigating other issues
 
 If none of the suggestions above solves your issue, detailed logs are necessary.
-Follow the steps below to get the detailed logs from
-SignalFx Tracing Library for .NET.
+Follow the steps below to get detailed logs.
 
 Set the environment variable `SIGNALFX_TRACE_DEBUG` to `true` before
 the instrumented process starts.
