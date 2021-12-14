@@ -13,7 +13,7 @@ Where applicable, context propagation uses
 
 ## Supported .NET versions
 
-- .NET (Core) 3.1 and higher on Windows and Linux
+- .NET Core 3.1, .NET 5.0 and higher on Windows and Linux
 - .NET Framework 4.6.2 and higher on Windows
 
 ## Supported libraries and frameworks
