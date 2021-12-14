@@ -1,6 +1,6 @@
-# Advanced Configuration
+# Advanced configuration
 
-## Configuration Methods
+## Configuration methods
 
 You can apply configuration settings in the following ways
 (values take precedense from the top to the bottom):
