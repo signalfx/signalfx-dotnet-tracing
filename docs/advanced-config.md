@@ -42,8 +42,6 @@ There are following ways to apply configuration settings
 
 Use these environment variables to configure the tracing library:
 
-<!-- markdownlint-disable MD013 -->
-
 | Setting | Description | Default |
 |-|-|-|
 | `SIGNALFX_ACCESS_TOKEN` | The access token for your SignalFx organization. It enables sending traces directly to the SignalFx ingestion endpoint. To do so, the `SIGNALFX_ENDPOINT_URL` must be set with: `https://ingest.<REALM>.signalfx.com/v2/trace`. |  |
@@ -84,5 +82,3 @@ Use these environment variables to configure the tracing library:
 | `SIGNALFX_TRACE_ROUTE_TEMPLATE_RESOURCE_NAMES_ENABLED` | ASP.NET span and resource names are based on routing configuration if applicable. | `true` |
 | `SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES` | Enable the tagging of a Elasticsearch command PostData as `db.statement`. It may introduce overhead for direct streaming users. | `true` |
 | `SIGNALFX_TRACE_DELAY_WCF_INSTRUMENTATION_ENABLED` | Enable the updated WCF instrumentation that delays execution until later in the WCF pipeline when the WCF server exception handling is established. | `false` |
-
-<!-- markdownlint-enable MD013 -->

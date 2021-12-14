@@ -18,8 +18,6 @@ Where applicable, context propagation uses
 
 ## Supported libraries and frameworks
 
-<!-- markdownlint-disable MD013 -->
-
 | Library | Versions Supported | Notes |
 | ---     | ---                | ---   |
 | Elasticsearch.Net | `Elasticsearch.Net` NuGet 5.3 - 7.x | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES=false` (`true` by default, which may introduce overhead for direct streaming users). |
@@ -28,8 +26,6 @@ Where applicable, context propagation uses
 | ServiceStack.Redis | `ServiceStack.Redis` NuGet 4.0+ | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS=false` (`true` by default). |
 | StackExchange.Redis | `StackExchange.Redis` NuGet 1.0+ | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS=false` (`true` by default). |
 | WebClient | Supported .NET versions | by way of `System.Net.WebRequest` instrumentation |
-
-<!-- markdownlint-enable MD013 -->
 
 ## Get started
 
