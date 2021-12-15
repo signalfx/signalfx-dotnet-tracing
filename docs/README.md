@@ -4,7 +4,8 @@ The SignalFx Instrumentationy for .NET provides automatic instrumentations
 for popular .NET libraries and frameworks.
 
 The SignalFx Instrumentation for .NET is a [.NET Profiler](https://docs.microsoft.com/en-us/dotnet/framework/unmanaged-api/profiling/profiling-overview)
-which instruments supported libraries and frameworks with bytecode manipulation.
+which instruments supported libraries and frameworks with bytecode manipulation
+to capture and send telemetry data (metrics, traces, and logs).
 
 By default:
 
@@ -49,73 +50,63 @@ and [`ActivitySource`](https://docs.microsoft.com/en-us/dotnet/core/diagnostics/
 
 ## Get started
 
-### Windows
+Make sure  you set up the Splunk OpenTelemtry Collector
+to receive telemetry data.
 
-**Warning**: Pay close attention to the scope of environment variables. Ensure they
-are properly set prior to launching the targeted process. The following steps set the
-environment variables at the machine level, with the exception of the variables used
-for finer control of which processes will be instrumented, which are set in the current
-command session.
+### Installation
 
-1. Install the CLR Profiler using an installer file (`.msi` file) from the latest release.
-Choose the installer (x64 or x86) according to the architecture of the operating
-system where it will be running.
+You can find the latest installation packages on the
+[Releases](https://github.com/signalfx/signalfx-dotnet-tracing/releases/lastest)
+page.
 
-1. Configure the required environment variables to enable the CLR Profiler:
-    - For .NET Framework applications:
+| Sufix         | Operating System    | Architecture | Installing via Command Line | Notes |
+| ---           | ---                 | ---          | ---          | ---   |
+| `x86_64.rpm`  | Red Hat-based Linux distributions | x64 | `rpm -ivh signalfx-dotnet-tracing.rpm` | RPM package |
+| `musl.tar.gz` | x64 Linux distributions using [musl](https://wiki.musl-libc.org/projects-using-musl.html) | x64 | `tar -xf signalfx-dotnet-tracing-musl.tar.gz -C /` | Alpine Linux uses musl |
+| `x64.msi`     | Windows 64-bit | x64 |  `msiexec /i signalfx-dotnet-tracing-x64.msi /quiet` | |
+| `x86.msi`     | Windows 32-bit | x86 | `msiexec /i signalfx-dotnet-tracing-x86.msi /quiet` | |
+| `musl.tar.gz` | x64 Linux distributions using [qlibc](https://wiki.musl-libc.org/projects-using-musl.html) | x86 | `tar -xf signalfx-dotnet-tracing.tar.gz -C /` | Currently, all [officially supported Linux distribtions](https://docs.microsoft.com/dotnet/core/install/linux) but Alpine uses glibc |
+| `amd64.deb`   | Debian-based Linux distributions | x64 | `dpkg -i signalfx-dotnet-tracing.debm` | DEB package |
 
-    ```batch
-    setx COR_PROFILER "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}" /m
-    ```
+:warning: On Linux, after the installation, you need to additionally run:
 
-   - For .NET Core applications:
+```bash
+/opt/signalfx/createLogPath.sh
+```
 
-   ```batch
-   setx CORECLR_PROFILER "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}" /m
-   ```
+### Instrument an application on Windows
 
-1. Set the service name:
+```powershell
+$Env:COR_PROFILER = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"      # Select the .NET Framework Profiler
+$Env:COR_ENABLE_PROFILING = "1"                                   # Enable the .NET Framework Profiler
+$Env:CORECLR_PROFILER = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"  # Select the .NET (Core) Profiler
+$Env:CORECLR_ENABLE_PROFILING = "1"                               # Enable the .NET (Core) Profiler
+# now the auto-instrumentation is configured in this shell session
+# you can set additional settings and run your application e.g.
+$Env:SIGNALFX_SERVICE_NAME = "my-service-name"                    # Set the service name
+dotnet run                                                        # Run your application                                                     
+```
 
-   ```batch
-   setx SIGNALFX_SERVICE_NAME my-service-name /m
-   ```
+### Instrument an application on Linux
 
-1. Set the trace endpoint, e.g. [Splunk OpenTelemetry Collector](https://github.com/signalfx/splunk-otel-collector):
+```bash
+source /opt/signalfx/defaults.env               # Enable the .NET (Core) Profiler
+# now the auto-instrumentation is configured in this shell session
+# you can set additional settings and run your application e.g.
+export SIGNALFX_SERVICE_NAME="my-service-name"  # Set the service name
+dotnet run                                      # Run your application 
+```
 
-   ```batch
-   setx SIGNALFX_ENDPOINT_URL http://localhost:9411/api/v2/spans /m
-   ```
+### Instrument a Windows Service
 
-1. Enable instrumentation for the targeted application by setting
-the appropriate __CLR enable profiling__ environment variable.
-You can enable instrumentation at these levels:
+<!-- TODO:
 
-   - For current command session
-   - For a specific Windows Service
-   - For a specific user
-
-   The follow snippet describes how to enable instrumentation for
-   the current command session according to the .NET runtime.
-   To enable instrumentation at different levels, see
-   [this](#enable-instrumentation-at-different-levels) section.
-
-    - For .NET Framework applications:
-
-      ```batch
-      set COR_ENABLE_PROFILING=1
-      ```
-
-    - For .NET Core applications:
-
-      ```batch
-      set CORECLR_ENABLE_PROFILING=1
-      ```
-
-1. Restart your application ensuring that all environment variables above are properly
-configured. If you need to check the environment variables for a process use a tool
-like [Process Explorer](https://docs.microsoft.com/en-us/sysinternals/downloads/process-explorer).
-
-#### Enable instrumentation at different levels
+Update this section to use a PowerShell script that sets all of the following env vars:
+COR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}
+COR_ENABLE_PROFILING=1
+CORECLR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}
+CORECLR_ENABLE_PROFILING=1
+-->
 
 Enable instrumentation for a specific Windows service:
 
@@ -125,87 +116,23 @@ Enable instrumentation for a specific Windows service:
    reg add HKLM\SYSTEM\CurrentControlSet\Services\<ServiceName>\Environment /v COR_ENABLE_PROFILING /d 1
    ```
 
-- For .NET Core applications:
+- For .NET or .NET Core applications:
 
    ```batch
    reg add HKLM\SYSTEM\CurrentControlSet\Services\<ServiceName>\Environment /v CORECLR_ENABLE_PROFILING /d 1
    ```
 
-Enable instrumentation for a specific user:
+### Instrument IIS
 
-- For .NET Framework applications:
-
-   ```batch
-   setx /s %COMPUTERNAME% /u <[domain/]user> COR_ENABLE_PROFILING 1
-   ```
-
-- For .NET Core applications:
-
-   ```batch
-   setx /s %COMPUTERNAME% /u <[domain/]user> CORECLR_ENABLE_PROFILING 1
-   ```
-
-### Linux
-
-After downloading the library, install the CLR Profiler and its components
-via your system's package manager.
-
-1. Download the latest release of the library.
-
-1. Install the CLR Profiler and its components with your system's package
-manager:
-
-    ```bash
-    # Use dpkg:
-    dpkg -i signalfx-dotnet-tracing.deb
-
-    # Use rpm:
-    rpm -ivh signalfx-dotnet-tracing.rpm
-
-    # Install directly from the release bundle:
-    tar -xf signalfx-dotnet-tracing.tar.gz -C /
-
-    # Install directly from the release bundle for musl-using systems (Alpine Linux):
-    tar -xf signalfx-dotnet-tracing-musl.tar.gz -C /
-    ```
-
-1. Configure the required environment variables:
-
-    ```bash
-    source /opt/signalfx/defaults.env
-    ```
-
-1. Set the service name:
-
-    ```bash
-    export SIGNALFX_SERVICE_NAME='my-service-name'
-    ```
-
-1. Set the trace endpoint, e.g. [Splunk OpenTelemetry Collector](https://github.com/signalfx/splunk-otel-collector):
-
-    ```bash
-    export SIGNALFX_ENDPOINT_URL='http://<YourCollector>:9411/api/v2/spans'
-    ```
-
-1. Optionally, create the default logging directory:
-
-    ```bash
-    /opt/signalfx/createLogPath.sh
-    ```
-
-1. Run your application, e.g.:
-
-    ```bash
-    dotnet run
-    ```
-
-## Manual instrumentation
-
-See [manual-instrumentation.md](manual-instrumentation.md).
+<!-- TODO -->
 
 ## Advanced configuration
 
 See [advanced-config.md](advanced-config.md).
+
+## Manual instrumentation
+
+See [manual-instrumentation.md](manual-instrumentation.md).
 
 ## Correlating traces with logs
 
