@@ -64,7 +64,7 @@ page.
 | `x86_64.rpm`  | Red Hat-based Linux distributions | x64 | `rpm -ivh signalfx-dotnet-tracing.rpm` | RPM package |
 | `x64.msi`     | Windows 64-bit | x64 |  `msiexec /i signalfx-dotnet-tracing-x64.msi /quiet` | |
 | `x86.msi`     | Windows 32-bit | x86 | `msiexec /i signalfx-dotnet-tracing-x86.msi /quiet` | |
-| `tar.gz` | x64 Linux distributions using [qlibc](https://wiki.musl-libc.org/projects-using-musl.html) | x64 | `tar -xf signalfx-dotnet-tracing.tar.gz -C /` | Currently, all [officially supported Linux distribtions](https://docs.microsoft.com/dotnet/core/install/linux) except Alpine use glibc |
+| `tar.gz` | Linux distributions using [qlibc](https://wiki.musl-libc.org/projects-using-musl.html) | x64 | `tar -xf signalfx-dotnet-tracing.tar.gz -C /` | Currently, all [officially supported Linux distribtions](https://docs.microsoft.com/dotnet/core/install/linux) except Alpine use glibc |
 | `amd64.deb`   | Debian-based Linux distributions | x64 | `dpkg -i signalfx-dotnet-tracing.debm` | DEB package |
 <!-- TODO: | `musl.tar.gz` | x64 Linux distributions using [musl](https://wiki.musl-libc.org/projects-using-musl.html) | x64 | `tar -xf signalfx-dotnet-tracing-musl.tar.gz -C /` | Alpine Linux uses musl | -->
 
