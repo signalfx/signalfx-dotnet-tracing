@@ -148,8 +148,8 @@ namespace Datadog.Trace
                 case ExporterType.Zipkin:
                     return new ExporterWriter(new ZipkinExporter(settings), metrics);
                 default:
-                    var apiRequestFactory = TransportStrategy.Get(settings);
-                    var api = new Api(settings.AgentUri, apiRequestFactory, statsd, rates => sampler.SetDefaultSampleRates(rates), settings.PartialFlushEnabled);
+                    var apiRequestFactory = TransportStrategy.Get(settings.ExporterSettings);
+                    var api = new Api(settings.ExporterSettings.AgentUri, apiRequestFactory, statsd, rates => sampler.SetDefaultSampleRates(rates), settings.PartialFlushEnabled);
                     return new AgentWriter(api, metrics, maxBufferSize: settings.TraceBufferSize);
             }
         }
@@ -204,7 +204,7 @@ namespace Datadog.Trace
                 {
                     statsd.Configure(new StatsdConfig
                     {
-                        StatsdServerName = settings.AgentUri.DnsSafeHost,
+                        StatsdServerName = settings.ExporterSettings.AgentUri.DnsSafeHost,
                         StatsdPort = port,
                         ConstantTags = constantTags.ToArray()
                     });

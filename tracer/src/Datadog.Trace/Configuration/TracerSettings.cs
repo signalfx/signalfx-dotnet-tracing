@@ -13,7 +13,6 @@ using System.Text.RegularExpressions;
 using Datadog.Trace.Configuration.Types;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.PlatformHelpers;
-using Datadog.Trace.Util;
 using Datadog.Trace.Vendors.Serilog;
 
 namespace Datadog.Trace.Configuration
@@ -24,12 +23,12 @@ namespace Datadog.Trace.Configuration
     public class TracerSettings
     {
         /// <summary>
-        /// The default host value for <see cref="AgentUri"/>.
+        /// The default host value for <see cref="ExporterSettings.AgentUri"/>.
         /// </summary>
         public const string DefaultAgentHost = "localhost";
 
         /// <summary>
-        /// The default port value for <see cref="AgentUri"/>.
+        /// The default port value for <see cref="ExporterSettings.AgentUri"/>.
         /// </summary>
         public const int DefaultAgentPort = 9411;
 
@@ -75,45 +74,7 @@ namespace Datadog.Trace.Configuration
 
             Integrations = new IntegrationSettingsCollection(source);
 
-            var agentHost = source?.GetString(ConfigurationKeys.AgentHost) ??
-                            // backwards compatibility for names used in the past
-                            source?.GetString("SIGNALFX_TRACE_AGENT_HOSTNAME") ??
-                            // default value
-                            DefaultAgentHost;
-
-            var agentPort = source?.GetInt32(ConfigurationKeys.AgentPort) ??
-                            // backwards compatibility for names used in the past
-                            source?.GetInt32("SIGNALFX_TRACE_AGENT_PORT") ??
-                            // default value
-                            DefaultAgentPort;
-
-            var agentUri = source?.GetString(ConfigurationKeys.AgentUri) ??
-                           source?.GetString(ConfigurationKeys.EndpointUrl) ??
-                           // default value
-                           $"http://{agentHost}:{agentPort}/api/v2/spans";
-
-            AgentUri = new Uri(agentUri);
-
-            TracesPipeName = source?.GetString(ConfigurationKeys.TracesPipeName);
-
-            TracesPipeTimeoutMs = source?.GetInt32(ConfigurationKeys.TracesPipeTimeoutMs)
-#if DEBUG
-            ?? 20_000;
-#else
-            ?? 500;
-#endif
-
-            TracesTransport = source?.GetString(ConfigurationKeys.TracesTransport);
-
-            if (string.Equals(AgentUri.Host, "localhost", StringComparison.OrdinalIgnoreCase))
-            {
-                // Replace localhost with 127.0.0.1 to avoid DNS resolution.
-                // When ipv6 is enabled, localhost is first resolved to ::1, which fails
-                // because the trace agent is only bound to ipv4.
-                // This causes delays when sending traces.
-                var builder = new UriBuilder(agentUri) { Host = "127.0.0.1" };
-                AgentUri = builder.Uri;
-            }
+            ExporterSettings = new ExporterSettings(source);
 
 #pragma warning disable 618 // App analytics is deprecated, but still used
             AnalyticsEnabled = source?.GetBool(ConfigurationKeys.GlobalAnalyticsEnabled) ??
@@ -151,10 +112,6 @@ namespace Datadog.Trace.Configuration
                                       ?.ToDictionary(kvp => kvp.Key.Trim(), kvp => kvp.Value.Trim());
 
             ServiceNameMappings = new ServiceNames(serviceNameMappings);
-
-            DogStatsdPort = source?.GetInt32(ConfigurationKeys.DogStatsdPort) ??
-                            // default value
-                            8125;
 
             TracerMetricsEnabled = source?.GetBool(ConfigurationKeys.TracerMetricsEnabled) ??
                                    // default value
@@ -279,41 +236,9 @@ namespace Datadog.Trace.Configuration
         public HashSet<string> DisabledIntegrationNames { get; set; }
 
         /// <summary>
-        /// Gets or sets the Uri where the Tracer can connect to the Agent.
-        /// Default is <c>"http://localhost:8126"</c>.
+        /// Gets or sets the transport settings that dictate how the tracer connects to the agent.
         /// </summary>
-        /// <seealso cref="ConfigurationKeys.AgentUri"/>
-        /// <seealso cref="ConfigurationKeys.AgentHost"/>
-        /// <seealso cref="ConfigurationKeys.AgentPort"/>
-        public Uri AgentUri { get; set; }
-
-        /// <summary>
-        /// Gets or sets the key used to determine the transport for sending traces.
-        /// Default is <c>null</c>, which will use the default path decided in <see cref="Agent.Api"/>.
-        /// </summary>
-        /// <seealso cref="ConfigurationKeys.TracesTransport"/>
-        public string TracesTransport { get; set; }
-
-        /// <summary>
-        /// Gets or sets the windows pipe name where the Tracer can connect to the Agent.
-        /// Default is <c>null</c>.
-        /// </summary>
-        /// <seealso cref="ConfigurationKeys.TracesPipeName"/>
-        public string TracesPipeName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the timeout in milliseconds for the windows named pipe requests.
-        /// Default is <c>100</c>.
-        /// </summary>
-        /// <seealso cref="ConfigurationKeys.TracesPipeTimeoutMs"/>
-        public int TracesPipeTimeoutMs { get; set; }
-
-        /// <summary>
-        /// Gets or sets the windows pipe name where the Tracer can send stats.
-        /// Default is <c>null</c>.
-        /// </summary>
-        /// <seealso cref="ConfigurationKeys.MetricsPipeName"/>
-        public string MetricsPipeName { get; set; }
+        public ExporterSettings ExporterSettings { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether default Analytics are enabled.
@@ -366,13 +291,6 @@ namespace Datadog.Trace.Configuration
         /// Gets or sets the map of header keys to tag names, which are applied to the root <see cref="Span"/> of incoming requests.
         /// </summary>
         public IDictionary<string, string> HeaderTags { get; set; }
-
-        /// <summary>
-        /// Gets or sets the port where the DogStatsd server is listening for connections.
-        /// Default is <c>8125</c>.
-        /// </summary>
-        /// <seealso cref="ConfigurationKeys.DogStatsdPort"/>
-        public int DogStatsdPort { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether internal metrics
