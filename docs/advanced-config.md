@@ -62,7 +62,7 @@ Use these environment variables to configure the tracing library:
 | `SIGNALFX_ENV` | The value for the `deployment.environment` tag added to every span. |  |
 | `SIGNALFX_TRACE_ENABLED` | Enable to activate the tracer. | `true` |
 | `SIGNALFX_TRACE_DEBUG` | Enable to activate debugging mode for the tracer. | `false` |
-| `SIGNALFX_ENDPOINT_URL` | The URL to where trace exporters send traces. | `http://localhost:8126` |
+| `SIGNALFX_ENDPOINT_URL` | The URL to where trace exporters send traces. | `http://localhost:9411/api/v2/spans` |
 | `SIGNALFX_TAGS` | Comma-separated list of key-value pairs to specify global span tags. For example: `"key1:val1,key2:val2"` |  |
 | `SIGNALFX_LOGS_INJECTION` | Enable to inject trace IDs, span IDs, service name and environment into logs. This requires a compatible logger or manual configuration. | `false` |
 | `SIGNALFX_STDOUT_LOG_ENABLED` | Enables `stdout` logging. This is disabled by default. | `false` |
