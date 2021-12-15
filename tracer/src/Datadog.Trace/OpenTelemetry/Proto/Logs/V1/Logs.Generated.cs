@@ -4,163 +4,165 @@
 //   Input: logs.proto
 // </auto-generated>
 
+// Vendored namespaces adjusted: global::ProtoBuf. changed to global::Datadog.Trace.Vendors.ProtoBuf.
+
 #region Designer generated code
 #pragma warning disable CS0612, CS0618, CS1591, CS3021, IDE0079, IDE1006, RCS1036, RCS1057, RCS1085, RCS1192
 namespace Datadog.Tracer.OpenTelemetry.Proto.Logs.V1
 {
 
-    [global::ProtoBuf.ProtoContract()]
-    public partial class LogsData : global::ProtoBuf.IExtensible
+    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
+    public partial class LogsData : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+        private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
+        global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::Datadog.Trace.Vendors.ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
-        [global::ProtoBuf.ProtoMember(1, Name = @"resource_logs")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(1, Name = @"resource_logs")]
         public global::System.Collections.Generic.List<ResourceLogs> ResourceLogs { get; } = new global::System.Collections.Generic.List<ResourceLogs>();
 
     }
 
-    [global::ProtoBuf.ProtoContract()]
-    public partial class ResourceLogs : global::ProtoBuf.IExtensible
+    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
+    public partial class ResourceLogs : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+        private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
+        global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::Datadog.Trace.Vendors.ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
-        [global::ProtoBuf.ProtoMember(1, Name = @"resource")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(1, Name = @"resource")]
         public global::Datadog.Tracer.OpenTelemetry.Proto.Resource.V1.Resource Resource { get; set; }
 
-        [global::ProtoBuf.ProtoMember(2, Name = @"instrumentation_library_logs")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(2, Name = @"instrumentation_library_logs")]
         public global::System.Collections.Generic.List<InstrumentationLibraryLogs> InstrumentationLibraryLogs { get; } = new global::System.Collections.Generic.List<InstrumentationLibraryLogs>();
 
-        [global::ProtoBuf.ProtoMember(3, Name = @"schema_url")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(3, Name = @"schema_url")]
         [global::System.ComponentModel.DefaultValue("")]
         public string SchemaUrl { get; set; } = "";
 
     }
 
-    [global::ProtoBuf.ProtoContract()]
-    public partial class InstrumentationLibraryLogs : global::ProtoBuf.IExtensible
+    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
+    public partial class InstrumentationLibraryLogs : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+        private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
+        global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::Datadog.Trace.Vendors.ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
-        [global::ProtoBuf.ProtoMember(1, Name = @"instrumentation_library")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(1, Name = @"instrumentation_library")]
         public global::Datadog.Tracer.OpenTelemetry.Proto.Common.V1.InstrumentationLibrary InstrumentationLibrary { get; set; }
 
-        [global::ProtoBuf.ProtoMember(2, Name = @"logs")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(2, Name = @"logs")]
         public global::System.Collections.Generic.List<LogRecord> Logs { get; } = new global::System.Collections.Generic.List<LogRecord>();
 
-        [global::ProtoBuf.ProtoMember(3, Name = @"schema_url")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(3, Name = @"schema_url")]
         [global::System.ComponentModel.DefaultValue("")]
         public string SchemaUrl { get; set; } = "";
 
     }
 
-    [global::ProtoBuf.ProtoContract()]
-    public partial class LogRecord : global::ProtoBuf.IExtensible
+    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
+    public partial class LogRecord : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+        private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
+        global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::Datadog.Trace.Vendors.ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
-        [global::ProtoBuf.ProtoMember(1, Name = @"time_unix_nano", DataFormat = global::ProtoBuf.DataFormat.FixedSize)]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(1, Name = @"time_unix_nano", DataFormat = global::Datadog.Trace.Vendors.ProtoBuf.DataFormat.FixedSize)]
         public ulong TimeUnixNano { get; set; }
 
-        [global::ProtoBuf.ProtoMember(2, Name = @"severity_number")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(2, Name = @"severity_number")]
         public SeverityNumber SeverityNumber { get; set; }
 
-        [global::ProtoBuf.ProtoMember(3, Name = @"severity_text")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(3, Name = @"severity_text")]
         [global::System.ComponentModel.DefaultValue("")]
         public string SeverityText { get; set; } = "";
 
-        [global::ProtoBuf.ProtoMember(4, Name = @"name")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(4, Name = @"name")]
         [global::System.ComponentModel.DefaultValue("")]
         public string Name { get; set; } = "";
 
-        [global::ProtoBuf.ProtoMember(5, Name = @"body")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(5, Name = @"body")]
         public global::Datadog.Tracer.OpenTelemetry.Proto.Common.V1.AnyValue Body { get; set; }
 
-        [global::ProtoBuf.ProtoMember(6, Name = @"attributes")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(6, Name = @"attributes")]
         public global::System.Collections.Generic.List<global::Datadog.Tracer.OpenTelemetry.Proto.Common.V1.KeyValue> Attributes { get; } = new global::System.Collections.Generic.List<global::Datadog.Tracer.OpenTelemetry.Proto.Common.V1.KeyValue>();
 
-        [global::ProtoBuf.ProtoMember(7, Name = @"dropped_attributes_count")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(7, Name = @"dropped_attributes_count")]
         public uint DroppedAttributesCount { get; set; }
 
-        [global::ProtoBuf.ProtoMember(8, Name = @"flags", DataFormat = global::ProtoBuf.DataFormat.FixedSize)]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(8, Name = @"flags", DataFormat = global::Datadog.Trace.Vendors.ProtoBuf.DataFormat.FixedSize)]
         public uint Flags { get; set; }
 
-        [global::ProtoBuf.ProtoMember(9, Name = @"trace_id")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(9, Name = @"trace_id")]
         public byte[] TraceId { get; set; }
 
-        [global::ProtoBuf.ProtoMember(10, Name = @"span_id")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(10, Name = @"span_id")]
         public byte[] SpanId { get; set; }
 
     }
 
-    [global::ProtoBuf.ProtoContract()]
+    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
     public enum SeverityNumber
     {
-        [global::ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_UNSPECIFIED")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_UNSPECIFIED")]
         SeverityNumberUnspecified = 0,
-        [global::ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_TRACE")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_TRACE")]
         SeverityNumberTrace = 1,
-        [global::ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_TRACE2")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_TRACE2")]
         SeverityNumberTrace2 = 2,
-        [global::ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_TRACE3")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_TRACE3")]
         SeverityNumberTrace3 = 3,
-        [global::ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_TRACE4")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_TRACE4")]
         SeverityNumberTrace4 = 4,
-        [global::ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_DEBUG")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_DEBUG")]
         SeverityNumberDebug = 5,
-        [global::ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_DEBUG2")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_DEBUG2")]
         SeverityNumberDebug2 = 6,
-        [global::ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_DEBUG3")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_DEBUG3")]
         SeverityNumberDebug3 = 7,
-        [global::ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_DEBUG4")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_DEBUG4")]
         SeverityNumberDebug4 = 8,
-        [global::ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_INFO")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_INFO")]
         SeverityNumberInfo = 9,
-        [global::ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_INFO2")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_INFO2")]
         SeverityNumberInfo2 = 10,
-        [global::ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_INFO3")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_INFO3")]
         SeverityNumberInfo3 = 11,
-        [global::ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_INFO4")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_INFO4")]
         SeverityNumberInfo4 = 12,
-        [global::ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_WARN")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_WARN")]
         SeverityNumberWarn = 13,
-        [global::ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_WARN2")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_WARN2")]
         SeverityNumberWarn2 = 14,
-        [global::ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_WARN3")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_WARN3")]
         SeverityNumberWarn3 = 15,
-        [global::ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_WARN4")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_WARN4")]
         SeverityNumberWarn4 = 16,
-        [global::ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_ERROR")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_ERROR")]
         SeverityNumberError = 17,
-        [global::ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_ERROR2")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_ERROR2")]
         SeverityNumberError2 = 18,
-        [global::ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_ERROR3")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_ERROR3")]
         SeverityNumberError3 = 19,
-        [global::ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_ERROR4")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_ERROR4")]
         SeverityNumberError4 = 20,
-        [global::ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_FATAL")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_FATAL")]
         SeverityNumberFatal = 21,
-        [global::ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_FATAL2")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_FATAL2")]
         SeverityNumberFatal2 = 22,
-        [global::ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_FATAL3")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_FATAL3")]
         SeverityNumberFatal3 = 23,
-        [global::ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_FATAL4")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoEnum(Name = @"SEVERITY_NUMBER_FATAL4")]
         SeverityNumberFatal4 = 24,
     }
 
-    [global::ProtoBuf.ProtoContract()]
+    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
     public enum LogRecordFlags
     {
-        [global::ProtoBuf.ProtoEnum(Name = @"LOG_RECORD_FLAG_UNSPECIFIED")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoEnum(Name = @"LOG_RECORD_FLAG_UNSPECIFIED")]
         LogRecordFlagUnspecified = 0,
-        [global::ProtoBuf.ProtoEnum(Name = @"LOG_RECORD_FLAG_TRACE_FLAGS_MASK")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoEnum(Name = @"LOG_RECORD_FLAG_TRACE_FLAGS_MASK")]
         LogRecordFlagTraceFlagsMask = 255,
     }
 

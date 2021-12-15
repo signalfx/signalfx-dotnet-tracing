@@ -4,22 +4,24 @@
 //   Input: resource.proto
 // </auto-generated>
 
+// Vendored namespaces adjusted: global::ProtoBuf. changed to global::Datadog.Trace.Vendors.ProtoBuf.
+
 #region Designer generated code
 #pragma warning disable CS0612, CS0618, CS1591, CS3021, IDE0079, IDE1006, RCS1036, RCS1057, RCS1085, RCS1192
 namespace Datadog.Tracer.OpenTelemetry.Proto.Resource.V1
 {
 
-    [global::ProtoBuf.ProtoContract()]
-    public partial class Resource : global::ProtoBuf.IExtensible
+    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
+    public partial class Resource : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+        private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
+        global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::Datadog.Trace.Vendors.ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
-        [global::ProtoBuf.ProtoMember(1, Name = @"attributes")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(1, Name = @"attributes")]
         public global::System.Collections.Generic.List<global::Datadog.Tracer.OpenTelemetry.Proto.Common.V1.KeyValue> Attributes { get; } = new global::System.Collections.Generic.List<global::Datadog.Tracer.OpenTelemetry.Proto.Common.V1.KeyValue>();
 
-        [global::ProtoBuf.ProtoMember(2, Name = @"dropped_attributes_count")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(2, Name = @"dropped_attributes_count")]
         public uint DroppedAttributesCount { get; set; }
 
     }

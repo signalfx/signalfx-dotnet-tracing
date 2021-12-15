@@ -4,156 +4,158 @@
 //   Input: common.proto
 // </auto-generated>
 
+// Vendored namespaces adjusted: global::ProtoBuf. changed to global::Datadog.Trace.Vendors.ProtoBuf.
+
 #region Designer generated code
 #pragma warning disable CS0612, CS0618, CS1591, CS3021, IDE0079, IDE1006, RCS1036, RCS1057, RCS1085, RCS1192
 namespace Datadog.Tracer.OpenTelemetry.Proto.Common.V1
 {
 
-    [global::ProtoBuf.ProtoContract()]
-    public partial class AnyValue : global::ProtoBuf.IExtensible
+    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
+    public partial class AnyValue : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+        private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
+        global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::Datadog.Trace.Vendors.ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
-        [global::ProtoBuf.ProtoMember(1, Name = @"string_value")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(1, Name = @"string_value")]
         [global::System.ComponentModel.DefaultValue("")]
         public string StringValue
         {
             get => __pbn__value.Is(1) ? ((string)__pbn__value.Object) : "";
-            set => __pbn__value = new global::ProtoBuf.DiscriminatedUnion64Object(1, value);
+            set => __pbn__value = new global::Datadog.Trace.Vendors.ProtoBuf.DiscriminatedUnion64Object(1, value);
         }
         public bool ShouldSerializeStringValue() => __pbn__value.Is(1);
-        public void ResetStringValue() => global::ProtoBuf.DiscriminatedUnion64Object.Reset(ref __pbn__value, 1);
+        public void ResetStringValue() => global::Datadog.Trace.Vendors.ProtoBuf.DiscriminatedUnion64Object.Reset(ref __pbn__value, 1);
 
-        private global::ProtoBuf.DiscriminatedUnion64Object __pbn__value;
+        private global::Datadog.Trace.Vendors.ProtoBuf.DiscriminatedUnion64Object __pbn__value;
 
-        [global::ProtoBuf.ProtoMember(2, Name = @"bool_value")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(2, Name = @"bool_value")]
         public bool BoolValue
         {
             get => __pbn__value.Is(2) ? __pbn__value.Boolean : default;
-            set => __pbn__value = new global::ProtoBuf.DiscriminatedUnion64Object(2, value);
+            set => __pbn__value = new global::Datadog.Trace.Vendors.ProtoBuf.DiscriminatedUnion64Object(2, value);
         }
         public bool ShouldSerializeBoolValue() => __pbn__value.Is(2);
-        public void ResetBoolValue() => global::ProtoBuf.DiscriminatedUnion64Object.Reset(ref __pbn__value, 2);
+        public void ResetBoolValue() => global::Datadog.Trace.Vendors.ProtoBuf.DiscriminatedUnion64Object.Reset(ref __pbn__value, 2);
 
-        [global::ProtoBuf.ProtoMember(3, Name = @"int_value")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(3, Name = @"int_value")]
         public long IntValue
         {
             get => __pbn__value.Is(3) ? __pbn__value.Int64 : default;
-            set => __pbn__value = new global::ProtoBuf.DiscriminatedUnion64Object(3, value);
+            set => __pbn__value = new global::Datadog.Trace.Vendors.ProtoBuf.DiscriminatedUnion64Object(3, value);
         }
         public bool ShouldSerializeIntValue() => __pbn__value.Is(3);
-        public void ResetIntValue() => global::ProtoBuf.DiscriminatedUnion64Object.Reset(ref __pbn__value, 3);
+        public void ResetIntValue() => global::Datadog.Trace.Vendors.ProtoBuf.DiscriminatedUnion64Object.Reset(ref __pbn__value, 3);
 
-        [global::ProtoBuf.ProtoMember(4, Name = @"double_value")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(4, Name = @"double_value")]
         public double DoubleValue
         {
             get => __pbn__value.Is(4) ? __pbn__value.Double : default;
-            set => __pbn__value = new global::ProtoBuf.DiscriminatedUnion64Object(4, value);
+            set => __pbn__value = new global::Datadog.Trace.Vendors.ProtoBuf.DiscriminatedUnion64Object(4, value);
         }
         public bool ShouldSerializeDoubleValue() => __pbn__value.Is(4);
-        public void ResetDoubleValue() => global::ProtoBuf.DiscriminatedUnion64Object.Reset(ref __pbn__value, 4);
+        public void ResetDoubleValue() => global::Datadog.Trace.Vendors.ProtoBuf.DiscriminatedUnion64Object.Reset(ref __pbn__value, 4);
 
-        [global::ProtoBuf.ProtoMember(5, Name = @"array_value")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(5, Name = @"array_value")]
         public ArrayValue ArrayValue
         {
             get => __pbn__value.Is(5) ? ((ArrayValue)__pbn__value.Object) : default;
-            set => __pbn__value = new global::ProtoBuf.DiscriminatedUnion64Object(5, value);
+            set => __pbn__value = new global::Datadog.Trace.Vendors.ProtoBuf.DiscriminatedUnion64Object(5, value);
         }
         public bool ShouldSerializeArrayValue() => __pbn__value.Is(5);
-        public void ResetArrayValue() => global::ProtoBuf.DiscriminatedUnion64Object.Reset(ref __pbn__value, 5);
+        public void ResetArrayValue() => global::Datadog.Trace.Vendors.ProtoBuf.DiscriminatedUnion64Object.Reset(ref __pbn__value, 5);
 
-        [global::ProtoBuf.ProtoMember(6, Name = @"kvlist_value")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(6, Name = @"kvlist_value")]
         public KeyValueList KvlistValue
         {
             get => __pbn__value.Is(6) ? ((KeyValueList)__pbn__value.Object) : default;
-            set => __pbn__value = new global::ProtoBuf.DiscriminatedUnion64Object(6, value);
+            set => __pbn__value = new global::Datadog.Trace.Vendors.ProtoBuf.DiscriminatedUnion64Object(6, value);
         }
         public bool ShouldSerializeKvlistValue() => __pbn__value.Is(6);
-        public void ResetKvlistValue() => global::ProtoBuf.DiscriminatedUnion64Object.Reset(ref __pbn__value, 6);
+        public void ResetKvlistValue() => global::Datadog.Trace.Vendors.ProtoBuf.DiscriminatedUnion64Object.Reset(ref __pbn__value, 6);
 
-        [global::ProtoBuf.ProtoMember(7, Name = @"bytes_value")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(7, Name = @"bytes_value")]
         public byte[] BytesValue
         {
             get => __pbn__value.Is(7) ? ((byte[])__pbn__value.Object) : default;
-            set => __pbn__value = new global::ProtoBuf.DiscriminatedUnion64Object(7, value);
+            set => __pbn__value = new global::Datadog.Trace.Vendors.ProtoBuf.DiscriminatedUnion64Object(7, value);
         }
         public bool ShouldSerializeBytesValue() => __pbn__value.Is(7);
-        public void ResetBytesValue() => global::ProtoBuf.DiscriminatedUnion64Object.Reset(ref __pbn__value, 7);
+        public void ResetBytesValue() => global::Datadog.Trace.Vendors.ProtoBuf.DiscriminatedUnion64Object.Reset(ref __pbn__value, 7);
 
     }
 
-    [global::ProtoBuf.ProtoContract()]
-    public partial class ArrayValue : global::ProtoBuf.IExtensible
+    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
+    public partial class ArrayValue : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+        private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
+        global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::Datadog.Trace.Vendors.ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
-        [global::ProtoBuf.ProtoMember(1, Name = @"values")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(1, Name = @"values")]
         public global::System.Collections.Generic.List<AnyValue> Values { get; } = new global::System.Collections.Generic.List<AnyValue>();
 
     }
 
-    [global::ProtoBuf.ProtoContract()]
-    public partial class KeyValueList : global::ProtoBuf.IExtensible
+    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
+    public partial class KeyValueList : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+        private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
+        global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::Datadog.Trace.Vendors.ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
-        [global::ProtoBuf.ProtoMember(1, Name = @"values")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(1, Name = @"values")]
         public global::System.Collections.Generic.List<KeyValue> Values { get; } = new global::System.Collections.Generic.List<KeyValue>();
 
     }
 
-    [global::ProtoBuf.ProtoContract()]
-    public partial class KeyValue : global::ProtoBuf.IExtensible
+    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
+    public partial class KeyValue : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+        private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
+        global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::Datadog.Trace.Vendors.ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
-        [global::ProtoBuf.ProtoMember(1, Name = @"key")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(1, Name = @"key")]
         [global::System.ComponentModel.DefaultValue("")]
         public string Key { get; set; } = "";
 
-        [global::ProtoBuf.ProtoMember(2, Name = @"value")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(2, Name = @"value")]
         public AnyValue Value { get; set; }
 
     }
 
-    [global::ProtoBuf.ProtoContract()]
+    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
     [global::System.Obsolete]
-    public partial class StringKeyValue : global::ProtoBuf.IExtensible
+    public partial class StringKeyValue : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+        private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
+        global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::Datadog.Trace.Vendors.ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
-        [global::ProtoBuf.ProtoMember(1, Name = @"key")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(1, Name = @"key")]
         [global::System.ComponentModel.DefaultValue("")]
         public string Key { get; set; } = "";
 
-        [global::ProtoBuf.ProtoMember(2, Name = @"value")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(2, Name = @"value")]
         [global::System.ComponentModel.DefaultValue("")]
         public string Value { get; set; } = "";
 
     }
 
-    [global::ProtoBuf.ProtoContract()]
-    public partial class InstrumentationLibrary : global::ProtoBuf.IExtensible
+    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
+    public partial class InstrumentationLibrary : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+        private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
+        global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::Datadog.Trace.Vendors.ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
-        [global::ProtoBuf.ProtoMember(1, Name = @"name")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(1, Name = @"name")]
         [global::System.ComponentModel.DefaultValue("")]
         public string Name { get; set; } = "";
 
-        [global::ProtoBuf.ProtoMember(2, Name = @"version")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(2, Name = @"version")]
         [global::System.ComponentModel.DefaultValue("")]
         public string Version { get; set; } = "";
 
