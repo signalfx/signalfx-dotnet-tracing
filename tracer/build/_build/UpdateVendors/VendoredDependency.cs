@@ -118,6 +118,23 @@ namespace UpdateVendors
                             }
                         }
 
+                        // Special ProtoBuf handling
+                        if (originalNamespace.Equals("ProtoBuf"))
+                        {
+                            builder.Replace("\"ProtoBuf.ProtoContractAttribute\"", "\"Datadog.Trace.Vendors.ProtoBuf.ProtoContractAttribute\"");
+                            builder.Replace("\"ProtoBuf.ProtoIncludeAttribute\"", "\"Datadog.Trace.Vendors.ProtoBuf.ProtoIncludeAttribute\"");
+                            builder.Replace("\"ProtoBuf.ProtoPartialMemberAttribute\"", "\"Datadog.Trace.Vendors.ProtoBuf.ProtoPartialMemberAttribute\"");
+                            builder.Replace("\"ProtoBuf.ProtoPartialIgnoreAttribute\"", "\"Datadog.Trace.Vendors.ProtoBuf.ProtoPartialIgnoreAttribute\"");
+                            builder.Replace("\"ProtoBuf.ProtoAfterDeserializationAttribute\"", "\"Datadog.Trace.Vendors.ProtoBuf.ProtoAfterDeserializationAttribute\"");
+                            builder.Replace("\"ProtoBuf.ProtoBeforeDeserializationAttribute\"", "\"Datadog.Trace.Vendors.ProtoBuf.ProtoBeforeDeserializationAttribute\"");
+                            builder.Replace("\"ProtoBuf.ProtoAfterSerializationAttribute\"", "\"Datadog.Trace.Vendors.ProtoBuf.ProtoAfterSerializationAttribute\"");
+                            builder.Replace("\"ProtoBuf.ProtoBeforeSerializationAttribute\"", "\"Datadog.Trace.Vendors.ProtoBuf.ProtoBeforeSerializationAttribute\"");
+                            builder.Replace("\"ProtoBuf.ProtoEnumAttribute\"", "\"Datadog.Trace.Vendors.ProtoBuf.ProtoEnumAttribute\"");
+                            builder.Replace("\"ProtoBuf.ProtoMapAttribute\"", "\"Datadog.Trace.Vendors.ProtoBuf.ProtoMapAttribute\"");
+                            builder.Replace("\"ProtoBuf.ProtoIgnoreAttribute\"", "\"Datadog.Trace.Vendors.ProtoBuf.ProtoIgnoreAttribute\"");
+                            builder.Replace("\"ProtoBuf.ProtoMemberAttribute\"", "\"Datadog.Trace.Vendors.ProtoBuf.ProtoMemberAttribute\"");
+                        }
+
                         // Prevent namespace conflicts
                         builder.Replace($"using {originalNamespace}", $"using Datadog.Trace.Vendors.{originalNamespace}");
                         builder.Replace($"namespace {originalNamespace}", $"namespace Datadog.Trace.Vendors.{originalNamespace}");
