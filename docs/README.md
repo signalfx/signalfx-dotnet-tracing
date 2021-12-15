@@ -59,7 +59,7 @@ You can find the latest installation packages on the
 [Releases](https://github.com/signalfx/signalfx-dotnet-tracing/releases/latest)
 page.
 
-| Sufix         | Operating System    | Architecture | Installing via Command Line | Notes |
+| File         | Operating system    | Architecture | Install command | Notes |
 | ---           | ---                 | ---          | ---          | ---   |
 | `x86_64.rpm`  | Red Hat-based Linux distributions | x64 | `rpm -ivh signalfx-dotnet-tracing.rpm` | RPM package |
 | `x64.msi`     | Windows 64-bit | x64 |  `msiexec /i signalfx-dotnet-tracing-x64.msi /quiet` | |
@@ -81,8 +81,8 @@ $Env:COR_PROFILER = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"      # Select the .
 $Env:COR_ENABLE_PROFILING = "1"                                   # Enable the .NET Framework Profiler
 $Env:CORECLR_PROFILER = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"  # Select the .NET (Core) Profiler
 $Env:CORECLR_ENABLE_PROFILING = "1"                               # Enable the .NET (Core) Profiler
-# now the auto-instrumentation is configured in this shell session
-# you can set additional settings and run your application e.g.
+# Now the autoinstrumentation is configured in this shell session.
+# You can set additional settings and run your application, for example:
 $Env:SIGNALFX_SERVICE_NAME = "my-service-name"                    # Set the service name
 dotnet run                                                        # Run your application                                                     
 ```
@@ -91,8 +91,8 @@ dotnet run                                                        # Run your app
 
 ```bash
 source /opt/signalfx/defaults.env               # Enable the .NET (Core) Profiler
-# now the auto-instrumentation is configured in this shell session
-# you can set additional settings and run your application e.g.
+# Now the autoinstrumentation is configured in this shell session.
+# You can set additional settings and run your application, for example:
 export SIGNALFX_SERVICE_NAME="my-service-name"  # Set the service name
 dotnet run                                      # Run your application 
 ```
