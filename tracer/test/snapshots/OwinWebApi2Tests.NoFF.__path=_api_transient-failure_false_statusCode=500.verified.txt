@@ -22,7 +22,7 @@
 System.ArgumentException: Passed in value was not 'true': false
 at Samples.AspNetMvc5.Controllers.ApiController.TransientFailure(String value),
       signalfx.tracing.library: dotnet-tracing,
-      signalfx.tracing.version: 0.0.1.0,
+      signalfx.tracing.version: x.y.z,
       span.kind: server,
       version: 1.0.0
     },
@@ -42,7 +42,7 @@ at Samples.AspNetMvc5.Controllers.ApiController.TransientFailure(String value),
       deployment.environment: integration_tests,
       runtime-id: Guid_1,
       signalfx.tracing.library: dotnet-tracing,
-      signalfx.tracing.version: 0.0.1.0,
+      signalfx.tracing.version: x.y.z,
       span.kind: server,
       version: 1.0.0
     },
