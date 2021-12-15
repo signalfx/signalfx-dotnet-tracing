@@ -74,7 +74,7 @@ page.
 /opt/signalfx/createLogPath.sh
 ```
 
-### Instrument an application on Windows
+### Instrument a .NET application on Windows
 
 ```powershell
 $Env:COR_PROFILER = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"      # Select the .NET Framework Profiler
@@ -87,7 +87,7 @@ $Env:SIGNALFX_SERVICE_NAME = "my-service-name"                    # Set the serv
 dotnet run                                                        # Run your application                                                     
 ```
 
-### Instrument an application on Linux
+### Instrument a .NET application on Linux
 
 ```bash
 source /opt/signalfx/defaults.env               # Enable the .NET (Core) Profiler
@@ -97,7 +97,7 @@ export SIGNALFX_SERVICE_NAME="my-service-name"  # Set the service name
 dotnet run                                      # Run your application 
 ```
 
-### Instrument a Windows Service
+### Instrument a Windows Service running a .NET application running
 
 <!-- TODO:
 
@@ -122,7 +122,7 @@ Enable instrumentation for a specific Windows service:
    reg add HKLM\SYSTEM\CurrentControlSet\Services\<ServiceName>\Environment /v CORECLR_ENABLE_PROFILING /d 1
    ```
 
-### Instrument IIS
+### Instrument an ASP.NET application deployed on IIS
 
 <!-- TODO -->
 
