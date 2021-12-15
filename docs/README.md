@@ -50,13 +50,13 @@ and [`ActivitySource`](https://docs.microsoft.com/en-us/dotnet/core/diagnostics/
 
 ## Get started
 
-Make sure  you set up the Splunk OpenTelemtry Collector
+Make sure you set up the [Splunk OpenTelemtry Collector](https://github.com/signalfx/splunk-otel-collector)
 to receive telemetry data.
 
 ### Installation
 
 You can find the latest installation packages on the
-[Releases](https://github.com/signalfx/signalfx-dotnet-tracing/releases/lastest)
+[Releases](https://github.com/signalfx/signalfx-dotnet-tracing/releases/latest)
 page.
 
 | Sufix         | Operating System    | Architecture | Installing via Command Line | Notes |
