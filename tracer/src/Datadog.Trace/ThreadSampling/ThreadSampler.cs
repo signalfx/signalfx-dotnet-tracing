@@ -54,10 +54,10 @@ namespace Datadog.Trace.ThreadSampling
         private static void SampleReadingThread()
         {
             int period = GetThreadSamplingPeriod();
+            byte[] buf = new byte[bufferSize];
             while (true)
             {
                 Thread.Sleep(period);
-                byte[] buf = new byte[bufferSize];
                 try
                 {
                     // Call twice in quick succession to catch up any blips; the second will likely return 0 (no buffer)
