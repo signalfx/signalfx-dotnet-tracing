@@ -4,9 +4,9 @@ Check if you are not hitting one of the issues listed below.
 
 ## Linux instrumentation not working
 
-The proper binary needs to be selected when deploying to Linux,
+The proper installation package needs to be selected when deploying to Linux,
 eg.: the default Microsoft .NET images are based on Debian and should use
-the `deb` package, see the [Linux](README.md#Linux) setup section.
+the `deb` package.
 
 If you are not sure what is the Linux distribution being used try the following commands:
 
@@ -19,14 +19,22 @@ cat /proc/version
 
 ## High CPU usage
 
-The default installation of auto-instrumentation enables tracing all .NET processes
-on the box.
-In the typical scenarios (dedicated VMs or containers), this is not a problem.
-Use the environment variables `SIGNALFX_PROFILER_EXCLUDE_PROCESSES` and `SIGNALFX_PROFILER_PROCESSES`
-to include/exclude applications from the tracing auto-instrumentation.
+Check if you have not enabled the auto-instrumentation globally
+by setting the environment variables on system or user level.
+
+If it was really intended, then use the
+`SIGNALFX_PROFILER_EXCLUDE_PROCESSES` and `SIGNALFX_PROFILER_PROCESSES`
+environment variables to include/exclude applications from the tracing auto-instrumentation.
 These are ";" delimited lists that control the inclusion/exclusion of processes.
 
 ## Investigating other issues
+
+Check that all [settings](advanced-config.md) are properly configured.
+
+If you need to check the environment variables for a process on Windows, use a tool
+like [Process Explorer](https://docs.microsoft.com/en-us/sysinternals/downloads/process-explorer).
+On Linux you can simply run: `cat /proc/<pid>/environ`
+where `<pid>` is the Process ID.
 
 If none of the suggestions above solves your issue, detailed logs are necessary.
 Follow the steps below to get detailed logs.

@@ -54,7 +54,7 @@ Use these environment variables to configure the tracing library:
 | `SIGNALFX_TRACE_SAMPLING_RULES` | Comma separated list of sampling rules taht enabled custom sampling rules based on regular expressions. The rule is matched in order of specification. The first match in a list is used. The item "sample_rate" is required in decimal format. The item "service" is optional in regular expression format, to match on service name. The item "name" is optional in regular expression format, to match on operation name. | `'[{"sample_rate":0.5, "service":"cart.*"}],[{"sample_rate":0.2, "name":"http.request"}]'` |
 | `SIGNALFX_TRACE_SAMPLE_RATE` | The global rate for the sampler. |  |
 | `SIGNALFX_TRACE_LOGGING_RATE` | The number of seconds between identical log messages for Tracer log files. Setting to 0 disables rate limiting. | `60` |
-| `SIGNALFX_TRACE_LOG_DIRECTORY` | The directory of the .NET Tracer logs. Overrides the value in `SIGNALFX_TRACE_LOG_PATH` if present. | Linux: `/var/log/signalfx/dotnet/`<br>Windows: `%ProgramData%"\SignalFx .NET Tracing\logs\` |
+| `SIGNALFX_TRACE_LOG_DIRECTORY` | The directory of the .NET Tracer logs. Overrides the value in `SIGNALFX_TRACE_LOG_PATH` if present. | Linux: `/var/log/signalfx/dotnet/`<br>Windows: `%ProgramData%\SignalFx .NET Tracing\logs\` |
 | `SIGNALFX_HTTP_SERVER_ERROR_STATUSES` | The application's server http statuses to set spans as errors by. | `500-599` |
 | `SIGNALFX_HTTP_CLIENT_ERROR_STATUSES` | The application's client http statuses to set spans as errors by. | `400-599` |
 | `SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED` | Enable to activate sending partial traces to the agent. | `false` |
@@ -69,7 +69,7 @@ Use these environment variables to configure the tracing library:
 | `SIGNALFX_STDOUT_LOG_TEMPLATE` | Configures `stdout` log template. See more about Serilog formatting options [here](https://github.com/serilog/serilog/wiki/Configuration-Basics#output-templates). | `"[{Level:u3}] {Message:lj} {NewLine}{Exception}{NewLine}"` |
 | `SIGNALFX_FILE_LOG_ENABLED` | Enable file logging. This is enabled by default. | `true` |
 | `SIGNALFX_MAX_LOGFILE_SIZE` | The maximum size for tracer log files, in bytes. | `10 MB` |
-| `SIGNALFX_TRACE_LOG_PATH` | (Deprecated) The path of the profiler log file. | Linux: `/var/log/signalfx/dotnet/dotnet-profiler.log`<br>Windows: `%ProgramData%"\SignalFx .NET Tracing\logs\dotnet-profiler.log` |
+| `SIGNALFX_TRACE_LOG_PATH` | (Deprecated) The path of the profiler log file. | Linux: `/var/log/signalfx/dotnet/dotnet-profiler.log`<br>Windows: `%ProgramData%\SignalFx .NET Tracing\logs\dotnet-profiler.log` |
 | `SIGNALFX_DIAGNOSTIC_SOURCE_ENABLED` | Enable to generate troubleshooting logs with the `System.Diagnostics.DiagnosticSource` class. | `true` |
 | `SIGNALFX_DISABLED_INTEGRATIONS` | The integrations you want to disable, if any, separated by a comma. These are the supported integrations: `AspNetMvc`, `AspNetWebApi2`, `DbCommand`, `ElasticsearchNet5`, `ElasticsearchNet6`, `GraphQL`, `HttpMessageHandler`, `IDbCommand`, `MongoDb`, `NpgsqlCommand`, `OpenTracing`, `ServiceStackRedis`, `SqlCommand`, `StackExchangeRedis`, `Wcf`, `WebRequest` |  |
 | `SIGNALFX_PROPAGATORS` | Comma separated list of the propagators for the tracer. Available propagators are: `Datadog`, `B3`, `W3C`. The Tracer will try to execute extraction in the given order. | `B3` |
