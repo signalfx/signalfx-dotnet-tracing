@@ -12,7 +12,8 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        baseImage: [alpine, debian]
+        baseImage: [debian]
+        # TODO: baseImage: [alpine, debian]
 
     env:
       baseImage: ${{ matrix.baseImage }}
