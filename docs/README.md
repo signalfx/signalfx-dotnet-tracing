@@ -76,12 +76,23 @@ On Linux, after the installation, you can optionally create the log directory:
 
 ### Instrument a .NET application on Windows
 
+Before running the application, set the following environment variables:
+
+```env
+COR_ENABLE_PROFILING=1
+COR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}
+CORECLR_ENABLE_PROFILING=1
+CORECLR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}
+```
+
+Example in PowerShell:
+
 ```powershell
 $Env:COR_ENABLE_PROFILING = "1"                                   # Enable the .NET Framework Profiler
 $Env:COR_PROFILER = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"      # Select the .NET Framework Profiler
 $Env:CORECLR_ENABLE_PROFILING = "1"                               # Enable the .NET (Core) Profiler
 $Env:CORECLR_PROFILER = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"  # Select the .NET (Core) Profiler
-# Now the autoinstrumentation is configured in this shell session.
+# Now the auto-instrumentation is configured in this shell session.
 # You can set additional settings and run your application, for example:
 $Env:SIGNALFX_SERVICE_NAME = "my-service-name"                    # Set the service name
 dotnet run                                                        # Run your application                                                     
@@ -89,12 +100,23 @@ dotnet run                                                        # Run your app
 
 ### Instrument a .NET application on Linux
 
+Before running the application, set the following environment variables:
+
+```env
+CORECLR_ENABLE_PROFILING=1
+CORECLR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}
+CORECLR_PROFILER_PATH=/opt/signalfx/SignalFx.Tracing.ClrProfiler.Native.so
+SIGNALFX_DOTNET_TRACER_HOME=/opt/signalfx" 
+```
+
+Example in Bash:
+
 ```bash
 export CORECLR_ENABLE_PROFILING="1"                                                 # Enable the .NET (Core) Profiler
 export CORECLR_PROFILER="{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"                    # Select the .NET (Core) Profiler
 export CORECLR_PROFILER_PATH="/opt/signalfx/SignalFx.Tracing.ClrProfiler.Native.so" # Select the .NET (Core) Profiler file path
 export SIGNALFX_DOTNET_TRACER_HOME="/opt/signalfx"                                  # Select the SignalFx Instrumentation for .NET home folder
-# Now the autoinstrumentation is configured in this shell session.
+# Now the auto-instrumentation is configured in this shell session.
 # You can set additional settings and run your application, for example:
 export SIGNALFX_SERVICE_NAME="my-service-name"  # Set the service name
 dotnet run                                      # Run your application 
@@ -102,28 +124,29 @@ dotnet run                                      # Run your application
 
 ### Instrument a Windows Service running a .NET application running
 
-<!-- TODO:
+Configure the Windows Service so that the following environment variables are set:
 
-Update this section to use a PowerShell script that sets all of the following env vars:
-COR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}
+```env
 COR_ENABLE_PROFILING=1
-CORECLR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}
+COR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}
 CORECLR_ENABLE_PROFILING=1
--->
+CORECLR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}
+```
 
-Enable instrumentation for a specific Windows service:
+Example in PowerShell:
 
-- For .NET Framework applications:
-
-   ```batch
-   reg add HKLM\SYSTEM\CurrentControlSet\Services\<ServiceName>\Environment /v COR_ENABLE_PROFILING /d 1
-   ```
-
-- For .NET or .NET Core applications:
-
-   ```batch
-   reg add HKLM\SYSTEM\CurrentControlSet\Services\<ServiceName>\Environment /v CORECLR_ENABLE_PROFILING /d 1
-   ```
+```powershell
+$svcName = "MySrv"    # The name of the Windows Service you want to instrument
+[string[]] $vars = @(
+   "COR_ENABLE_PROFILING=1",                                  # Enable the .NET Framework Profiler
+   "COR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}",     # Select the .NET Framework Profiler
+   "CORECLR_ENABLE_PROFILING=1",                              # Enable the .NET (Core) Profiler
+   "CORECLR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}", # Select the .NET (Core) Profiler
+   "SIGNALFX_SERVICE_NAME=my-service-name"                    # Set the service name
+)
+Set-ItemProperty HKLM:SYSTEM\CurrentControlSet\Services\$svcName -Name Environment -Value $vars
+# Now each time you start the service, it will be auto-instrumented.
+```
 
 ### Instrument an ASP.NET application deployed on IIS
 
