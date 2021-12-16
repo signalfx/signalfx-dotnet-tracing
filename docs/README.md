@@ -68,7 +68,7 @@ page.
 | `amd64.deb`   | Debian-based Linux distributions | x64 | `dpkg -i signalfx-dotnet-tracing.debm` | DEB package |
 <!-- TODO: | `musl.tar.gz` | x64 Linux distributions using [musl](https://wiki.musl-libc.org/projects-using-musl.html) | x64 | `tar -xf signalfx-dotnet-tracing-musl.tar.gz -C /` | Alpine Linux uses musl | -->
 
-On Linux, after the installation, you need to additionally run:
+On Linux, after the installation, you can optionally create the log directory:
 
 ```bash
 /opt/signalfx/createLogPath.sh

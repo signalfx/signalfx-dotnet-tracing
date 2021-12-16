@@ -36,17 +36,22 @@ like [Process Explorer](https://docs.microsoft.com/en-us/sysinternals/downloads/
 On Linux you can simply run: `cat /proc/<pid>/environ`
 where `<pid>` is the Process ID.
 
-If none of the suggestions above solves your issue, detailed logs are necessary.
-Follow the steps below to get detailed logs.
+If all settings look fine and none of the suggestions above solves your issue,
+detailed logs are necessary. Follow the steps below to get detailed logs.
 
 Set the environment variable `SIGNALFX_TRACE_DEBUG` to `true` before
 the instrumented process starts.
 By default, the library writes the log files under the below predefined locations.
 If needed, change the default location by updating the environment variable
 `SIGNALFX_TRACE_LOG_DIRECTORY` to an appropriate path.
-On Linux, the default log location is `/var/log/signalfx/dotnet/`
+
+On Linux, the default log location is `/var/log/signalfx/dotnet/`. If it does not
+exist, then run `/opt/signalfx/createLogPath.sh` to create it with appropriate permissions.
+
 On Windows, the default log location is `%ProgramData%\SignalFx .NET Tracing\logs\`
+
 Compress the whole folder to capture the multiple log files and send
 the compressed folder to us.
+
 After obtaining the logs, remember to remove the environment variable
 `SIGNALFX_TRACE_DEBUG` to avoid unnecessary overhead.
