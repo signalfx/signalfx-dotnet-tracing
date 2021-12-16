@@ -53,6 +53,14 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 ---
 
+## [Release 0.1.16](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.1.16)
+
+### Bugfixes
+
+- Fix NLog integration when using ILogger.
+
+---
+
 ## [Release 0.1.15](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.1.15)
 
 ### Bugfixes
