@@ -10,7 +10,9 @@
 #define MAX_CODES_PER_BUFFER (10 * 1000)
 
 // If you change this, consider ThreadSampler.cs too
-#define SAMPLES_BUFFER_SIZE (100 * 1024)
+#define SAMPLES_BUFFER_MAXIMUM_SIZE (200 * 1024)
+
+#define SAMPLES_BUFFER_DEFAULT_SIZE 20 * 1024
 
 // If you change these, change ThreadSampler.cs too
 #define DEFAULT_SAMPLE_PERIOD 1000
@@ -27,10 +29,8 @@
 // That stacksampling project is worth reading for a simpler (though higher overhead) take on thread sampling.
 
 static std::mutex bufferLock = std::mutex();
-static unsigned char* bufferA; // FIXME would like to use std::array, etc. if we can avoid extra copying
-static int bufferALen;
-static unsigned char* bufferB;
-static int bufferBLen;
+static std::vector<unsigned char>* bufferA;
+static std::vector<unsigned char>* bufferB;
 
 static std::mutex threadSpanContextLock;
 static std::unordered_map<ThreadID, trace::ThreadSpanContext> threadSpanContextMap;
@@ -43,55 +43,41 @@ bool ThreadSampling_ShouldProduceThreadSample()
     std::lock_guard<std::mutex> guard(bufferLock);
     return bufferA == NULL || bufferB == NULL;
 }
-void ThreadSampling_RecordProducedThreadSample(int len, unsigned char* buf)
+void ThreadSampling_RecordProducedThreadSample(std::vector<unsigned char>* buf)
 {
     std::lock_guard<std::mutex> guard(bufferLock);
-    if (bufferA == NULL)
-    {
+    if (bufferA == NULL) {
         bufferA = buf;
-        bufferALen = len;
-    }
-    else if (bufferB == NULL)
-    {
+    } else if (bufferB == NULL) {
         bufferB = buf;
-        bufferBLen = len;
-    }
-    else
-    {
-        delete[] buf; // needs to be dropped now
+    } else {
+        delete buf; // needs to be dropped now
     }
 }
 // Can return 0 if none are pending
 int ThreadSampling_ConsumeOneThreadSample(int len, unsigned char* buf)
 {
-    unsigned char* toUse = NULL;
-    int toUseLen = 0;
+    std::vector<unsigned char>* toUse = NULL;
     {
         std::lock_guard<std::mutex> guard(bufferLock);
         if (bufferA != NULL)
         {
             toUse = bufferA;
-            toUseLen = bufferALen;
             bufferA = NULL;
-            bufferALen = 0;
         }
         else if (bufferB != NULL)
         {
             toUse = bufferB;
-            toUseLen = bufferBLen;
             bufferB = NULL;
-            bufferBLen = 0;
         }
     }
     if (toUse == NULL)
     {
         return 0;
     }
-    if (len >= toUseLen)
-    {
-        memcpy(buf, toUse, toUseLen);
-    }
-    delete[] toUse;
+    int toUseLen = min(toUse->size(), len);
+    memcpy(buf, toUse->data(), toUseLen);
+    delete toUse;
     return toUseLen;
 }
 
@@ -144,15 +130,18 @@ private:
     MetaInterface* m_ptr;
 };
 
-ThreadSamplesBuffer::ThreadSamplesBuffer(unsigned char* buf) : buffer(buf), pos(0)
+ThreadSamplesBuffer::ThreadSamplesBuffer(std::vector<unsigned char>* buf) : buffer(buf)
 {
 }
 ThreadSamplesBuffer ::~ThreadSamplesBuffer()
 {
     buffer = NULL; // specifically don't delete[] as ownership/lifecycle is complicated
 }
+
+#define CHECK_SAMPLES_BUFFER_LENGTH() {  if (buffer->size() >= SAMPLES_BUFFER_MAXIMUM_SIZE) { return; } }
 void ThreadSamplesBuffer::StartBatch()
 {
+    CHECK_SAMPLES_BUFFER_LENGTH();
     writeByte(0x01);
     writeInt(1); // version number
     std::chrono::milliseconds ms =
@@ -162,6 +151,7 @@ void ThreadSamplesBuffer::StartBatch()
 
 void ThreadSamplesBuffer::StartSample(ThreadID id, ThreadState* state, ThreadSpanContext context)
 {
+    CHECK_SAMPLES_BUFFER_LENGTH();
     writeByte(0x02);
     writeInt(id);
     writeInt(state->nativeId);
@@ -173,18 +163,22 @@ void ThreadSamplesBuffer::StartSample(ThreadID id, ThreadState* state, ThreadSpa
 }
 void ThreadSamplesBuffer::RecordFrame(FunctionID fid, WSTRING& frame)
 {
+    CHECK_SAMPLES_BUFFER_LENGTH();
     writeCodedFrameString(fid, frame);
 }
 void ThreadSamplesBuffer::EndSample()
 {
+    CHECK_SAMPLES_BUFFER_LENGTH();
     writeShort(0);
 }
 void ThreadSamplesBuffer::EndBatch()
 {
+    CHECK_SAMPLES_BUFFER_LENGTH();
     writeByte(0x06);
 }
 void ThreadSamplesBuffer::WriteFinalStats(int microsSuspended)
 {
+    CHECK_SAMPLES_BUFFER_LENGTH();
     writeByte(0x07);
     writeInt(microsSuspended);
 }
@@ -209,55 +203,40 @@ void ThreadSamplesBuffer::writeCodedFrameString(FunctionID fid, WSTRING& str)
 }
 void ThreadSamplesBuffer::writeShort(int16_t val)
 {
-    if (pos + 2 >= SAMPLES_BUFFER_SIZE)
-    {
-        return;
-    }
-    int16_t bigEnd = _byteswap_ushort(val);
-    memcpy(&buffer[pos], &bigEnd, 2);
-    pos += 2;
+    buffer->push_back(((val >> 8) & 0xFF));
+    buffer->push_back(val & 0xFF);
 }
 void ThreadSamplesBuffer::writeInt(int32_t val)
 {
-    if (pos + 4 >= SAMPLES_BUFFER_SIZE)
-    {
-        return;
-    }
-    int32_t bigEnd = _byteswap_ulong(val);
-    memcpy(&buffer[pos], &bigEnd, 4);
-    pos += 4;
+    buffer->push_back(((val >> 24) & 0xFF));
+    buffer->push_back(((val >> 16) & 0xFF));
+    buffer->push_back(((val >> 8) & 0xFF));
+    buffer->push_back(val & 0xFF);
 }
 void ThreadSamplesBuffer::writeString(WSTRING& str)
 {
     // limit strings to a max length overall; this prevents (e.g.) thread names or
     // any other miscellaneous strings that come along from blowing things out
     size_t usedLen = min(str.length(), MAX_STRING_LENGTH);
-    if (pos + 4 + 2 * usedLen >= SAMPLES_BUFFER_SIZE)
-    {
-        return;
-    }
     writeInt(usedLen);
-    memcpy(&buffer[pos], &str[0], 2 * usedLen);
-    pos += 2 * usedLen;
+    // odd bit of casting since we're copying bytes, not wchars
+    unsigned char* strBegin = (unsigned char*)(&str.c_str()[0]);
+    buffer->insert(buffer->end(), strBegin, strBegin + usedLen * 2);
 }
 void ThreadSamplesBuffer::writeByte(unsigned char b)
 {
-    if (pos + 1 >= SAMPLES_BUFFER_SIZE)
-    {
-        return;
-    }
-    buffer[pos] = b;
-    pos++;
+    buffer->push_back(b);
 }
 void ThreadSamplesBuffer::writeInt64(int64_t val)
 {
-    if (pos + 8 >= SAMPLES_BUFFER_SIZE)
-    {
-        return;
-    }
-    uint64_t bigEnd = _byteswap_uint64(val);
-    memcpy(&buffer[pos], &bigEnd, 8);
-    pos += 8;
+    buffer->push_back(((val >> 56) & 0xFF));
+    buffer->push_back(((val >> 48) & 0xFF));
+    buffer->push_back(((val >> 40) & 0xFF));
+    buffer->push_back(((val >> 32) & 0xFF));
+    buffer->push_back(((val >> 24) & 0xFF));
+    buffer->push_back(((val >> 16) & 0xFF));
+    buffer->push_back(((val >> 8) & 0xFF));
+    buffer->push_back(val & 0xFF);
 }
 
 class SamplingHelper
@@ -265,7 +244,7 @@ class SamplingHelper
 public:
     ICorProfilerInfo10* info10 = NULL;
     ThreadSamplesBuffer* curWriter = NULL;
-    unsigned char* curBuffer = NULL;
+    std::vector<unsigned char>* curBuffer = NULL;
     NameCache functionNameCache;
     NameCache classNameCache;
     SamplingHelper() : functionNameCache(MAX_FUNCTION_NAME_CACHE_SIZE), classNameCache(MAX_CLASS_NAME_CACHE_SIZE)
@@ -279,13 +258,14 @@ public:
         {
             return should;
         }
-        curBuffer = new unsigned char[SAMPLES_BUFFER_SIZE];
+        curBuffer = new std::vector<unsigned char>();
+        curBuffer->reserve(SAMPLES_BUFFER_DEFAULT_SIZE);
         curWriter = new ThreadSamplesBuffer(curBuffer);
         return should;
     }
     void PublishBuffer()
     {
-        ThreadSampling_RecordProducedThreadSample((int) curWriter->pos, curBuffer);
+        ThreadSampling_RecordProducedThreadSample(curBuffer);
         delete curWriter;
         curWriter = NULL;
         curBuffer = NULL;

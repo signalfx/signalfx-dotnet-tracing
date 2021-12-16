@@ -2,6 +2,7 @@
 #include "clr_helpers.h"
 #include <mutex>
 #include <cinttypes>
+#include <vector>
 
 extern "C"
 {
@@ -61,11 +62,10 @@ public:
 class ThreadSamplesBuffer
 {
 public:
-    unsigned char* buffer;
-    unsigned int pos; // FIXME would prefer a buffer class of some type here
     std::unordered_map<FunctionID, int> codes;
+    std::vector<unsigned char>* buffer;
 
-    ThreadSamplesBuffer(unsigned char* buf);
+    ThreadSamplesBuffer(std::vector<unsigned char>* buf);
     ~ThreadSamplesBuffer();
     void StartBatch();
     void StartSample(ThreadID id, ThreadState* state, ThreadSpanContext spanContext);
@@ -101,6 +101,6 @@ private:
 } // namespace trace
 
 bool ThreadSampling_ShouldProduceThreadSample();
-void ThreadSampling_RecordProducedThreadSample(int len, unsigned char* buf);
+void ThreadSampling_RecordProducedThreadSample(std::vector<unsigned char>* buf);
 // Can return 0 if none are pending
 int ThreadSampling_ConsumeOneThreadSample(int len, unsigned char* buf);

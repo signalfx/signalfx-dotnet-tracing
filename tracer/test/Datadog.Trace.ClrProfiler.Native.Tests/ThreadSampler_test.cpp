@@ -32,14 +32,14 @@ TEST(ThreadSamplerTest, ThreadStateTracking)
 
 TEST(ThreadSamplerTest, BasicBufferBehavior)
 {
-    unsigned char buf[100 * 1024];
+    auto buf = std::vector<unsigned char>();
     WSTRING longThreadName = WStr("");
     for (int i = 0; i < 400; i++) {
         longThreadName.append(WStr("blah blah "));
     }
     WSTRING frame1 = WStr("SomeFairlyLongClassName::SomeMildlyLongMethodName");
     WSTRING frame2 = WStr("SomeFairlyLongClassName::ADifferentMethodName");
-    ThreadSamplesBuffer tsb(buf);
+    ThreadSamplesBuffer tsb(&buf);
     ThreadState threadState;
     threadState.nativeId = 1000;
     threadState.threadName.append(longThreadName);
@@ -52,15 +52,13 @@ TEST(ThreadSamplerTest, BasicBufferBehavior)
     tsb.EndSample();
     tsb.EndBatch();
     tsb.WriteFinalStats(100);
-    ASSERT_EQ(1284, tsb.pos); // not manually calculated but does depend on thread name limiting and not repeating frame strings
+    ASSERT_EQ(1284, tsb.buffer->size()); // not manually calculated but does depend on thread name limiting and not repeating frame strings
     ASSERT_EQ(2, tsb.codes.size());
 }
 
 TEST(ThreadSamplerTest, BufferOverrunBehavior)
 {
-    unsigned char buf[200 * 1024];
-    memset(buf, 'x',  200 * 1024);
-    memset(buf, 'V',  100 * 1024);
+    auto buf = std::vector<unsigned char>();
     WSTRING longThreadName = WStr("");
     for (int i = 0; i < 400; i++)
     {
@@ -68,49 +66,48 @@ TEST(ThreadSamplerTest, BufferOverrunBehavior)
     }
     WSTRING frame1 = WStr("SomeFairlyLongClassName::SomeMildlyLongMethodName");
     WSTRING frame2 = WStr("SomeFairlyLongClassName::ADifferentMethodName");
-    ThreadSamplesBuffer tsb(buf);
+    ThreadSamplesBuffer tsb(&buf);
 
     ThreadState threadState;
     threadState.nativeId = 1000;
     threadState.threadName.append(longThreadName);
-
-    tsb.pos = 100 * 1024 - 1;
-    // Now exerise some methods and ensure that no changes to the buffer or pos happen
-
-    tsb.StartBatch();
-    tsb.StartSample(1, &threadState, ThreadSpanContext());
-    tsb.RecordFrame(7001, frame1);
-    tsb.RecordFrame(7002, frame2);
-    tsb.RecordFrame(7001, frame1);
-    tsb.EndSample();
-    tsb.EndBatch();
-    tsb.WriteFinalStats(100);
-    ASSERT_EQ(100 * 1024 - 1, tsb.pos);
-    for (int i = 0; i < 100 * 1024; i++) {
-        ASSERT_EQ('V', buf[i]);
+   
+    // Now span a bunch of data and ensure we don't overflow (too much)
+    for (int i = 0; i < 100000; i++)
+    {
+        tsb.StartBatch();
+        tsb.StartSample(1, &threadState, ThreadSpanContext());
+        tsb.RecordFrame(7001, frame1);
+        tsb.RecordFrame(7002, frame2);
+        tsb.RecordFrame(7001, frame1);
+        tsb.EndSample();
+        tsb.EndBatch();
+        tsb.WriteFinalStats(100);
     }
-    for (int i = 100 * 1024; i < 200 * 1024; i++) {
-        ASSERT_EQ('x', buf[i]);
-    }
+    // 200k buffer plus one more thread entry before it stops adding more
+    ASSERT_EQ(buf.size(), 205814); 
 }
 
 TEST(ThreadSamplerTest, StaticBufferManagement)
 {
-    unsigned char* bufA = new unsigned char[1];
-    unsigned char* bufB = new unsigned char[2];
-    unsigned char* bufC = new unsigned char[3];
+    auto bufA = new std::vector<unsigned char>();
+    bufA->resize(1);
+    std::fill(bufA->begin(), bufA->end(), 'A');
+    auto bufB = new std::vector<unsigned char>();
+    bufB->resize(2);
+    std::fill(bufB->begin(), bufB->end(), 'B');
+    auto bufC = new std::vector<unsigned char>();
+    bufC->resize(4);
+    std::fill(bufC->begin(), bufC->end(), 'C');
     unsigned char readBuf[4];
-    bufA[0] = 'A';
-    bufB[0] = 'B';
-    bufC[0] = 'C';
     ASSERT_EQ(true, ThreadSampling_ShouldProduceThreadSample());
     ASSERT_EQ(0, ThreadSampling_ConsumeOneThreadSample(4, readBuf));
 
-    ThreadSampling_RecordProducedThreadSample(1, bufA);
-    ThreadSampling_RecordProducedThreadSample(2, bufB);
+    ThreadSampling_RecordProducedThreadSample(bufA);
+    ThreadSampling_RecordProducedThreadSample(bufB);
     ASSERT_EQ(false, ThreadSampling_ShouldProduceThreadSample());
 
-    ThreadSampling_RecordProducedThreadSample(3, bufC); // no-op (but deletes the buf)
+    ThreadSampling_RecordProducedThreadSample(bufC); // no-op (but deletes the buf)
     ASSERT_EQ(false, ThreadSampling_ShouldProduceThreadSample());
 
     ASSERT_EQ(1, ThreadSampling_ConsumeOneThreadSample(4, readBuf));
@@ -119,11 +116,20 @@ TEST(ThreadSamplerTest, StaticBufferManagement)
     ASSERT_EQ('B', readBuf[0]);
     ASSERT_EQ(0, ThreadSampling_ConsumeOneThreadSample(4, readBuf));
 
-    unsigned char* bufD = new unsigned char[4];
-    bufD[0] = 'D';
-    ThreadSampling_RecordProducedThreadSample(4, bufD);
+    auto bufD = new std::vector<unsigned char>();
+    bufD->resize(4);
+    std::fill(bufD->begin(), bufD->end(), 'D');
+    ThreadSampling_RecordProducedThreadSample(bufD);
     ASSERT_EQ(4, ThreadSampling_ConsumeOneThreadSample(4, readBuf));
     ASSERT_EQ('D', readBuf[0]);
+
+    // Finally, publish something too big for readBuf and ensure nothing explodes
+    auto bufE = new std::vector<unsigned char>();
+    bufE->resize(5);
+    std::fill(bufE->begin(), bufE->end(), 'E');
+    ThreadSampling_RecordProducedThreadSample(bufE);
+    ASSERT_EQ(4, ThreadSampling_ConsumeOneThreadSample(4, readBuf));
+    ASSERT_EQ('E', readBuf[0]);
 }
 
 TEST(ThreadSamplerTest, LRUCache)

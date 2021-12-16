@@ -10,7 +10,7 @@ namespace Datadog.Trace.ThreadSampling
     public class ThreadSampler
     {
         // If you change any of these constants, check with ThreadSampler.cpp first
-        private static int bufferSize = 100 * 1024;
+        private static int bufferSize = 200 * 1024;
         private static int defaultSamplePeriod = 1000;
         private static int minimumSamplePeriod = 1000;
 
