@@ -33,11 +33,10 @@ Check that all [settings](advanced-config.md) are properly configured.
 
 If you need to check the environment variables for a process on Windows, use a tool
 like [Process Explorer](https://docs.microsoft.com/en-us/sysinternals/downloads/process-explorer).
-On Linux you can simply run: `cat /proc/<pid>/environ`
+On Linux, run: `cat /proc/<pid>/environ`
 where `<pid>` is the Process ID.
 
-If all settings look fine and none of the suggestions above solves your issue,
-detailed logs are necessary. Follow the steps below to get detailed logs.
+Enable debug logging If none of the suggestions solved your issue. Follow these steps to enable debug logging for .NET instrumentation:
 
 Set the environment variable `SIGNALFX_TRACE_DEBUG` to `true` before
 the instrumented process starts.
@@ -46,7 +45,7 @@ If needed, change the default location by updating the environment variable
 `SIGNALFX_TRACE_LOG_DIRECTORY` to an appropriate path.
 
 On Linux, the default log location is `/var/log/signalfx/dotnet/`. If it does not
-exist, then run `/opt/signalfx/createLogPath.sh` to create it with appropriate permissions.
+exist, run `/opt/signalfx/createLogPath.sh` to create it with the required permissions.
 
 On Windows, the default log location is `%ProgramData%\SignalFx .NET Tracing\logs\`
 
