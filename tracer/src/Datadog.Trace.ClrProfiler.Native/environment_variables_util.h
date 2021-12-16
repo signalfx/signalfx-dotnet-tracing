@@ -86,16 +86,6 @@ bool IsAzureFunctionsEnabled()
     CheckIfTrue(GetEnvironmentValue(environment::azure_functions_enabled));
 }
 
-bool IsNetstandardEnabled()
-{
-    CheckIfTrue(GetEnvironmentValue(environment::netstandard_enabled));
-}
-
-bool IsDomainNeutralInstrumentation()
-{
-    CheckIfTrue(GetEnvironmentValue(environment::domain_neutral_instrumentation));
-}
-
 bool IsThreadSamplingEnabled()
 {
     CheckIfTrue(GetEnvironmentValue(environment::thread_sampling_enabled));
