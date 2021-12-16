@@ -76,7 +76,7 @@ On Linux, after the installation, you can optionally create the log directory:
 
 ### Instrument a .NET application on Windows
 
-Before running the application, you need to set the following environment variables:
+Before running the application, set the following environment variables:
 
 ```env
 COR_ENABLE_PROFILING=1
@@ -100,7 +100,7 @@ dotnet run                                                        # Run your app
 
 ### Instrument a .NET application on Linux
 
-Before running the application, you need to set the following environment variables:
+Before running the application, set the following environment variables:
 
 ```env
 CORECLR_ENABLE_PROFILING=1
@@ -124,8 +124,7 @@ dotnet run                                      # Run your application
 
 ### Instrument a Windows Service running a .NET application running
 
-You need to configure the Windows Service
-so that the following environment variables are set:
+Configure the Windows Service so that the following environment variables are set:
 
 ```env
 COR_ENABLE_PROFILING=1
@@ -146,7 +145,7 @@ $svcName = "MySrv"    # The name of the Windows Service you want to instrument
    "SIGNALFX_SERVICE_NAME=my-service-name"                    # Set the service name
 )
 Set-ItemProperty HKLM:SYSTEM\CurrentControlSet\Services\$svcName -Name Environment -Value $vars
-# Now each time you start the given Windows Service, it will be auto-instrumented.
+# Now each time you start the service, it will be auto-instrumented.
 ```
 
 ### Instrument an ASP.NET application deployed on IIS
