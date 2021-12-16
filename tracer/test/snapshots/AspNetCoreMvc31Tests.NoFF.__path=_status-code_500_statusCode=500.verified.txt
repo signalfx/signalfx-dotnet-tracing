@@ -24,7 +24,7 @@
       runtime-id: Guid_1,
       sfx.error.message: The HTTP response has status code 500.,
       signalfx.tracing.library: dotnet-tracing,
-      signalfx.tracing.version: 0.0.1.0,
+      signalfx.tracing.version: x.y.z,
       span.kind: server,
       version: 1.0.0
     },

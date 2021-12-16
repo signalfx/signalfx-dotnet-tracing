@@ -46,7 +46,7 @@
 System.Exception: Input was not a status code
 at Samples.AspNetCoreMvc.Controllers.HomeController.StatusCodeTestString(String input),
       signalfx.tracing.library: dotnet-tracing,
-      signalfx.tracing.version: 0.0.1.0,
+      signalfx.tracing.version: x.y.z,
       span.kind: server,
       version: 1.0.0
     },
