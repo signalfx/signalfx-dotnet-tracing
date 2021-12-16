@@ -3,6 +3,9 @@
 #include <mutex>
 #include <cinttypes>
 #include <vector>
+#include <list>
+#include <utility>
+#include <unordered_map>
 
 extern "C"
 {
