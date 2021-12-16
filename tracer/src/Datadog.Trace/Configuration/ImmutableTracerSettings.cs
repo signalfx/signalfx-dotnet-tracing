@@ -177,12 +177,6 @@ namespace Datadog.Trace.Configuration
         public bool TracerMetricsEnabled { get; }
 
         /// <summary>
-        /// Gets a value indicating whether runtime metrics
-        /// are enabled and sent to DogStatsd.
-        /// </summary>
-        public bool RuntimeMetricsEnabled { get; }
-
-        /// <summary>
         /// Gets a value indicating whether partial flush is enabled
         /// </summary>
         public bool PartialFlushEnabled { get; }
@@ -203,6 +197,12 @@ namespace Datadog.Trace.Configuration
         /// Gets a value indicating whether the diagnostic log at startup is enabled
         /// </summary>
         public bool StartupDiagnosticLogEnabled { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether runtime metrics
+        /// are enabled and sent to DogStatsd.
+        /// </summary>
+        internal bool RuntimeMetricsEnabled { get; }
 
         /// <summary>
         /// Gets the comma separated list of url patterns to skip tracing.
