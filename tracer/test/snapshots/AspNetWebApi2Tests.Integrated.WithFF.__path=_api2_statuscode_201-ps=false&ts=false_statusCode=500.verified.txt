@@ -36,7 +36,7 @@
 System.ArgumentException: Source: PassThroughQuerySuccessMessageHandler. Error: Query param ps was set to a non-true value
 at Samples.AspNetMvc5.Handlers.PassThroughQuerySuccessMessageHandler.<SendAsync>d__1.MoveNext(),
       signalfx.tracing.library: dotnet-tracing,
-      signalfx.tracing.version: 0.0.1.0,
+      signalfx.tracing.version: x.y.z,
       span.kind: server,
       version: 1.0.0
     },

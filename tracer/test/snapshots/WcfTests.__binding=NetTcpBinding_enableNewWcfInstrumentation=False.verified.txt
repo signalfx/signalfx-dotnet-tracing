@@ -13,7 +13,7 @@
       language: dotnet,
       runtime-id: Guid_1,
       signalfx.tracing.library: dotnet-tracing,
-      signalfx.tracing.version: 0.0.1.0,
+      signalfx.tracing.version: x.y.z,
       span.kind: server,
       version: 1.0.0
     },
@@ -37,7 +37,7 @@
       language: dotnet,
       runtime-id: Guid_1,
       signalfx.tracing.library: dotnet-tracing,
-      signalfx.tracing.version: 0.0.1.0,
+      signalfx.tracing.version: x.y.z,
       span.kind: server,
       version: 1.0.0
     },
@@ -61,7 +61,7 @@
       language: dotnet,
       runtime-id: Guid_1,
       signalfx.tracing.library: dotnet-tracing,
-      signalfx.tracing.version: 0.0.1.0,
+      signalfx.tracing.version: x.y.z,
       span.kind: server,
       version: 1.0.0
     },
@@ -85,7 +85,7 @@
       language: dotnet,
       runtime-id: Guid_1,
       signalfx.tracing.library: dotnet-tracing,
-      signalfx.tracing.version: 0.0.1.0,
+      signalfx.tracing.version: x.y.z,
       span.kind: server,
       version: 1.0.0
     },
@@ -109,7 +109,7 @@
       language: dotnet,
       runtime-id: Guid_1,
       signalfx.tracing.library: dotnet-tracing,
-      signalfx.tracing.version: 0.0.1.0,
+      signalfx.tracing.version: x.y.z,
       span.kind: server,
       version: 1.0.0
     },
@@ -133,7 +133,7 @@
       language: dotnet,
       runtime-id: Guid_1,
       signalfx.tracing.library: dotnet-tracing,
-      signalfx.tracing.version: 0.0.1.0,
+      signalfx.tracing.version: x.y.z,
       span.kind: server,
       version: 1.0.0
     },
