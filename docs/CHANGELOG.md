@@ -10,6 +10,14 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 ## Unreleased
 
 ### General
+### Breaking changes
+### Enhancements
+
+---
+
+## [Release 0.2.0](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.2.0)
+
+### General
 
 - The release contains significant changes as it is based on the latest
   [.NET Tracer for Datadog APM](https://github.com/DataDog/dd-trace-dotnet)
