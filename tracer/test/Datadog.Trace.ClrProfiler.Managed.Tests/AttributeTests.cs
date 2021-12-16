@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,7 +42,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Tests
                         foreach (var namedArg in attribute.NamedArguments)
                         {
                             var argumentType = namedArg.TypedValue.ArgumentType;
-                            if (argumentType.Assembly != coreAssembly)
+                            if (argumentType.Assembly != coreAssembly && argumentType.FullName != "Datadog.Trace.Vendors.ProtoBuf.DataFormat")
                             {
                                 invalidAttributeUsages.Add($"{type.FullName}.{member.Name} => {attribute.AttributeType.FullName}({namedArg.MemberName} : {argumentType.FullName})");
                             }
