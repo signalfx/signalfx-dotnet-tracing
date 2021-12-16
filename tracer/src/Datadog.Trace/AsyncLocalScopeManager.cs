@@ -12,7 +12,7 @@ namespace Datadog.Trace
     internal class AsyncLocalScopeManager : ScopeManagerBase
     {
         private static readonly bool PushScopeToNative;
-        private readonly AsyncLocalCompat<Scope> _activeScope = new AsyncLocalCompat<Scope>();
+        private readonly AsyncLocal<Scope> _activeScope = new();
 
         static AsyncLocalScopeManager()
         {
@@ -32,12 +32,12 @@ namespace Datadog.Trace
         {
             get
             {
-                return _activeScope.Get();
+                return _activeScope.Value;
             }
 
             protected set
             {
-                _activeScope.Set(value);
+                _activeScope.Value = value;
                 if (PushScopeToNative)
                 {
                     // nop

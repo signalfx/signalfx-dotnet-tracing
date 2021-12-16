@@ -8,12 +8,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Datadog.Trace.Configuration;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.TestHelpers;
 using Xunit;
 using Xunit.Abstractions;
-
-#if !NET452
 
 namespace Datadog.Trace.ClrProfiler.IntegrationTests
 {
@@ -23,13 +22,10 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             : base("Elasticsearch.V7", output)
         {
             SetServiceVersion("1.0.0");
-            SetCallTargetSettings(true);
         }
 
-        public static IEnumerable<object[]> GetElasticsearch() => PackageVersions.ElasticSearch7;
-
         [SkippableTheory]
-        [MemberData(nameof(GetElasticsearch))]
+        [MemberData(nameof(PackageVersions.ElasticSearch7), MemberType = typeof(PackageVersions))]
         [Trait("Category", "EndToEnd")]
         public void SubmitsTraces(string packageVersion)
         {
@@ -156,7 +152,22 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 ValidateSpans(spans, (span) => span.Resource, expected);
             }
         }
+
+        [SkippableFact]
+        [Trait("Category", "EndToEnd")]
+        [Trait("Category", "ArmUnsupported")]
+        public void IntegrationDisabled()
+        {
+            int agentPort = TcpPortProvider.GetOpenPort();
+            string packageVersion = PackageVersions.ElasticSearch7.First()[0] as string;
+
+            SetEnvironmentVariable($"SIGNALFX_TRACE_{nameof(IntegrationId.ElasticsearchNet)}_ENABLED", "false");
+
+            using var agent = new MockTracerAgent(agentPort);
+            using var process = RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion);
+            var spans = agent.WaitForSpans(1).Where(s => s.Type == "elasticsearch").ToList();
+
+            Assert.Empty(spans);
+        }
     }
 }
-
-#endif

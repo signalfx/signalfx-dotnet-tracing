@@ -5,7 +5,7 @@
 
 // Modified by Splunk Inc.
 
-#if NET452
+#if NETFRAMEWORK
 using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.ClrProfiler.IntegrationTests.Helpers;
@@ -25,16 +25,12 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetEnvironmentVariable("SIGNALFX_PROPAGATORS", "datadog,b3");
         }
 
-        [SkippableTheory]
+        [SkippableFact]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
-        [InlineData(false)]
-        [InlineData(true)]
-        public void SubmitsTraces(bool enableCallTarget)
+        public void SubmitsTraces()
         {
-            SetCallTargetSettings(enableCallTarget);
-
-            int expectedSpanCount = enableCallTarget ? 45 : 25; // CallSite insturmentation doesn't instrument async requests
+            int expectedSpanCount = 45;
             const string expectedOperationName = "http.request";
             const string expectedServiceName = "Samples.WebRequest.NetFramework20";
 
@@ -63,15 +59,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             }
         }
 
-        [SkippableTheory]
+        [SkippableFact]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
-        [InlineData(false)]
-        [InlineData(true)]
-        public void TracingDisabled_DoesNotSubmitsTraces(bool enableCallTarget)
+        public void TracingDisabled_DoesNotSubmitsTraces()
         {
-            SetCallTargetSettings(enableCallTarget);
-
             const string expectedOperationName = "http.request";
 
             int agentPort = TcpPortProvider.GetOpenPort();

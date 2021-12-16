@@ -65,7 +65,7 @@ partial class Build : NukeBuild
     readonly bool IsAlpine = false;
 
     [Parameter("The build version. Default is latest")]
-    readonly string Version = "0.0.1";
+    readonly string Version = "0.2.0";
 
     [Parameter("Whether the build version is a prerelease(for packaging purposes). Default is latest")]
     readonly bool IsPrerelease = false;
@@ -144,7 +144,6 @@ partial class Build : NukeBuild
         .DependsOn(PublishManagedProfiler)
         .DependsOn(CompileNativeSrc)
         .DependsOn(PublishNativeProfiler)
-        .DependsOn(CopyIntegrationsJson)
         .DependsOn(DownloadLibDdwaf)
         .DependsOn(CopyLibDdwaf)
         .DependsOn(CreateDdTracerHome);
@@ -239,7 +238,7 @@ partial class Build : NukeBuild
         .DependsOn(CompileLinuxIntegrationTests);
 
     Target BuildAndRunLinuxIntegrationTests => _ => _
-        .Requires(() => IsLinux)
+        .Requires(() => !IsWin)
         .Description("Builds and runs the linux integration tests. Requires docker-compose dependencies")
         .DependsOn(BuildLinuxIntegrationTests)
         .DependsOn(RunLinuxIntegrationTests);
@@ -338,7 +337,7 @@ partial class Build : NukeBuild
                     .EnableNoRestore()
                     .EnableNoBuild()
                     .SetApplicationArguments("-r net472 netcoreapp3.1 -m -f * --iterationTime 2000")
-                    .SetProcessEnvironmentVariable("SIGNALFX_SERVICE", "otel-trace-dotnet")
+                    .SetProcessEnvironmentVariable("SIGNALFX_SERVICE_NAME", "otel-trace-dotnet")
                     .SetProcessEnvironmentVariable("SIGNALFX_ENV", "CI")
                     .When(!string.IsNullOrEmpty(NugetPackageDirectory), o => o.SetPackageDirectory(NugetPackageDirectory))
                 );

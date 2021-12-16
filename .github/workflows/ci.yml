@@ -40,7 +40,7 @@ on:
   workflow_dispatch:
 env:
   buildConfiguration: Release
-  dotnetCoreSdk5Version: 5.0.401
+  dotnetSdkVersion: 6.0.100
   relativeTracerHome: /tracer/src/bin/windows-tracer-home
   relativeArtifacts: /tracer/src/bin/artifacts
   binDir: ${{ github.workspace }}/tracer/src/bin
@@ -63,6 +63,13 @@ jobs:
     runs-on: ${{ matrix.machine }}
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: | 
+          2.1.x
+          3.1.x
+          5.0.x
+          6.0.x
     - name: Install CMake 3.19.8
       if: ${{ runner.os == 'Linux' }}
       run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh -o cmakeinstall.sh && chmod +x cmakeinstall.sh && sudo ./cmakeinstall.sh --prefix=/usr/local --exclude-subdir
@@ -104,6 +111,13 @@ jobs:
     runs-on: ${{ matrix.machine }}
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: | 
+          2.1.x
+          3.1.x
+          5.0.x
+          6.0.x
     - run: ./tracer/build.cmd BuildTracerHome BuildAndRunManagedUnitTests
     - uses: actions/upload-artifact@v2
       with:
@@ -121,6 +135,13 @@ jobs:
     runs-on: ${{ matrix.machine }}
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: | 
+          2.1.x
+          3.1.x
+          5.0.x
+          6.0.x
     - name: Install CMake 3.19.8
       if: ${{ runner.os == 'Linux' }}
       run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh -o cmakeinstall.sh && chmod +x cmakeinstall.sh && sudo ./cmakeinstall.sh --prefix=/usr/local --exclude-subdir
@@ -133,12 +154,19 @@ jobs:
       matrix:
         machine: [ windows-2019 ]
         platform: [ x64 ]
-        framework: [ net452, net461, netcoreapp3.1, net5.0 ]
+        framework: [ net461, netcoreapp3.1, net5.0, net6.0 ]
         target: [ BuildAndRunWindowsIntegrationTests, BuildAndRunWindowsRegressionTests ]
     runs-on: ${{ matrix.machine }}
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: | 
+          2.1.x
+          3.1.x
+          5.0.x
+          6.0.x
     - name: Start CosmosDB Emulator
       if: ${{ matrix.target == 'BuildAndRunWindowsIntegrationTests' }}
       shell: powershell
@@ -166,15 +194,22 @@ jobs:
       matrix:
         #TODO: base-image: [ debian, alpine ]
         base-image: [ debian ]
-        framework: [ netcoreapp3.1, net5.0 ]
+        framework: [ netcoreapp3.1, net5.0, net6.0 ]
     runs-on: ubuntu-20.04
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: | 
+          2.1.x
+          3.1.x
+          5.0.x
+          6.0.x
     - name: Build Docker image
       run: |
         docker build \
-          --build-arg DOTNETSDK_VERSION=${dotnetCoreSdk5Version} \
+          --build-arg DOTNETSDK_VERSION=${dotnetSdkVersion} \
           --tag dd-trace-dotnet/${{ matrix.base-image }}-builder \
           --target builder \
           --file "./tracer/build/_build/docker/${{ matrix.base-image }}.dockerfile" \
@@ -213,16 +248,28 @@ jobs:
       matrix:
         platform:
         - x64
+        framework: [ netcoreapp3.1, net461 ]
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v2
-    - run: ./tracer/build.cmd BuildTracerHome PackageTracerHome BuildWindowsIntegrationTests -Framework netcoreapp3.1
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: | 
+          2.1.x
+          3.1.x
+          5.0.x
+          6.0.x
+    - run: ./tracer/build.cmd BuildTracerHome PackageTracerHome BuildWindowsIntegrationTests -Framework ${{ matrix.framework }}
     - name: docker-compose build IIS containers
       run: docker-compose build --build-arg dotnet_tracer_msi=.$relativeArtifacts/{{ matrix.platform }}/en-us/*.msi --build-arg ENABLE_32_BIT=${{ env.enable32bit }} IntegrationTests.IIS
     - name: docker-compose start IIS containers
       run: docker-compose up -d IntegrationTests.IIS
+    # Workaround around long name being hit in MultiDomainHostTests.WorksInsideTheGAC tests
     - name: RunWindowsIisIntegrationTests
-      run: ./tracer/build.cmd RunWindowsIisIntegrationTests -Framework netcoreapp3.1
+      run: |
+        subst y: .
+        y:
+        ./tracer/build.cmd RunWindowsIisIntegrationTests -Framework ${{ matrix.framework }}
     - name: docker-compose stop services
       run: docker-compose down
       if: (${{ job.status }} != 'cancelled')

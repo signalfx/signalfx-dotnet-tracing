@@ -38,7 +38,7 @@ namespace Datadog.Trace.Tests
             IConfigurationSource source = new NameValueConfigurationSource(collection);
             var settings = new TracerSettings(source);
 
-            var tracer = new Tracer(settings, plugins: null, _writerMock.Object, _samplerMock.Object, scopeManager: null, statsd: null);
+            var tracer = new Tracer(settings, _writerMock.Object, _samplerMock.Object, scopeManager: null, statsd: null);
             var span = tracer.StartSpan("Operation");
 
             Assert.Equal(span.GetTag(tagKey), value);
@@ -57,7 +57,7 @@ namespace Datadog.Trace.Tests
             var settings = new TracerSettings(source);
             Assert.True(settings.GlobalTags.Any());
 
-            var tracer = new Tracer(settings, plugins: null, _writerMock.Object, _samplerMock.Object, scopeManager: null, statsd: null);
+            var tracer = new Tracer(settings, _writerMock.Object, _samplerMock.Object, scopeManager: null, statsd: null);
             var span = tracer.StartSpan("Operation");
 
             Assert.Equal(span.GetTag(tagKey), envValue);
@@ -80,7 +80,7 @@ namespace Datadog.Trace.Tests
 
             _writerMock.Invocations.Clear();
 
-            var tracer = new Tracer(tracerSettings, plugins: null, _writerMock.Object, _samplerMock.Object, scopeManager: null, statsd: null);
+            var tracer = new Tracer(tracerSettings, _writerMock.Object, _samplerMock.Object, scopeManager: null, statsd: null);
             var span = tracer.StartSpan("TestTracerDisabled");
             span.Dispose();
 
@@ -112,8 +112,7 @@ namespace Datadog.Trace.Tests
         [InlineData("", new string[0])]
         public void ParseStringArraySplit(string input, string[] expected)
         {
-            var tracerSettings = new TracerSettings();
-            var result = tracerSettings.TrimSplitString(input, ',').ToArray();
+            var result = TracerSettings.TrimSplitString(input, ',').ToArray();
             Assert.Equal(expected: expected, actual: result);
         }
 
@@ -125,9 +124,7 @@ namespace Datadog.Trace.Tests
         [InlineData("400-403, 500-501-234, s342, 500-503", "400,401,402,403,500,501,502,503")]
         public void ParseHttpCodes(string original, string expected)
         {
-            var tracerSettings = new TracerSettings();
-
-            bool[] errorStatusCodesArray = tracerSettings.ParseHttpCodesToArray(original);
+            bool[] errorStatusCodesArray = TracerSettings.ParseHttpCodesToArray(original);
             string[] expectedKeysArray = expected.Split(new[] { ',' }, System.StringSplitOptions.RemoveEmptyEntries);
 
             foreach (var value in expectedKeysArray)

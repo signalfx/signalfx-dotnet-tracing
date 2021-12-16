@@ -28,7 +28,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             {
                 bool fastPath = i < 9;
                 yield return new object[] { i, fastPath };
-                yield return new object[] { i, fastPath };
             }
         }
 
@@ -36,8 +35,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [MemberData(nameof(MethodArgumentsData))]
         public void MethodArgumentsInstrumentation(int numberOfArguments, bool fastPath)
         {
-            SetCallTargetSettings(enableCallTarget: true);
-            SetEnvironmentVariable("SIGNALFX_INTEGRATIONS", Path.Combine(EnvironmentHelper.GetSampleProjectDirectory(), "integrations.json"));
             int agentPort = TcpPortProvider.GetOpenPort();
 
             using (new MockTracerAgent(agentPort))
@@ -77,6 +74,63 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     Assert.Equal(42, endMethodCount);
                     Assert.Equal(10, exceptionCount);
                 }
+
+                foreach (var typeName in typeNames)
+                {
+                    Assert.Contains(typeName, processResult.StandardOutput);
+                }
+            }
+        }
+
+        [SkippableFact]
+        public void MethodRefArguments()
+        {
+            int agentPort = TcpPortProvider.GetOpenPort();
+
+            using (new MockTracerAgent(agentPort))
+            using (var processResult = RunSampleAndWaitForExit(agentPort, arguments: "withref"))
+            {
+                int beginMethodCount = Regex.Matches(processResult.StandardOutput, $"ProfilerOK: BeginMethod\\({1}\\)").Count;
+                int begin2MethodCount = Regex.Matches(processResult.StandardOutput, $"ProfilerOK: BeginMethod\\({2}\\)").Count;
+                int endMethodCount = Regex.Matches(processResult.StandardOutput, "ProfilerOK: EndMethod\\(").Count;
+
+                string[] typeNames = new string[]
+                {
+                    ".VoidMethod",
+                    ".VoidRefMethod",
+                };
+
+                Assert.Equal(2, beginMethodCount);
+                Assert.Equal(2, begin2MethodCount);
+                Assert.Equal(4, endMethodCount);
+
+                foreach (var typeName in typeNames)
+                {
+                    Assert.Contains(typeName, processResult.StandardOutput);
+                }
+            }
+        }
+
+        [SkippableFact]
+        public void MethodOutArguments()
+        {
+            int agentPort = TcpPortProvider.GetOpenPort();
+
+            using (new MockTracerAgent(agentPort))
+            using (var processResult = RunSampleAndWaitForExit(agentPort, arguments: "without"))
+            {
+                int beginMethodCount = Regex.Matches(processResult.StandardOutput, $"ProfilerOK: BeginMethod\\({1}\\)").Count;
+                int begin2MethodCount = Regex.Matches(processResult.StandardOutput, $"ProfilerOK: BeginMethod\\({2}\\)").Count;
+                int endMethodCount = Regex.Matches(processResult.StandardOutput, "ProfilerOK: EndMethod\\(").Count;
+
+                string[] typeNames = new string[]
+                {
+                    ".VoidMethod",
+                };
+
+                Assert.Equal(1, beginMethodCount);
+                Assert.Equal(1, begin2MethodCount);
+                Assert.Equal(2, endMethodCount);
 
                 foreach (var typeName in typeNames)
                 {

@@ -54,14 +54,16 @@ namespace Datadog.Trace.Tests.Configuration
         public static IEnumerable<object[]> GetDefaultTestData()
         {
             yield return new object[] { CreateFunc(s => s.TraceEnabled), true };
-            yield return new object[] { CreateFunc(s => s.AgentUri), new Uri("http://127.0.0.1:8126/") };
+            yield return new object[] { CreateFunc(s => s.AgentUri), new Uri("http://127.0.0.1:9411/api/v2/spans") };
             yield return new object[] { CreateFunc(s => s.Environment), null };
             yield return new object[] { CreateFunc(s => s.ServiceName), null };
             yield return new object[] { CreateFunc(s => s.SignalFxAccessToken), null };
             yield return new object[] { CreateFunc(s => s.DisabledIntegrationNames.Count), 0 };
             yield return new object[] { CreateFunc(s => s.LogsInjectionEnabled), false };
             yield return new object[] { CreateFunc(s => s.GlobalTags.Count), 0 };
+#pragma warning disable 618 // App analytics is deprecated but supported
             yield return new object[] { CreateFunc(s => s.AnalyticsEnabled), false };
+#pragma warning restore 618
             yield return new object[] { CreateFunc(s => s.CustomSamplingRules), null };
             yield return new object[] { CreateFunc(s => s.MaxTracesSubmittedPerSecond), 100 };
             yield return new object[] { CreateFunc(s => s.TracerMetricsEnabled), false };
@@ -74,8 +76,8 @@ namespace Datadog.Trace.Tests.Configuration
             yield return new object[] { ConfigurationKeys.TraceEnabled, "true", CreateFunc(s => s.TraceEnabled), true };
             yield return new object[] { ConfigurationKeys.TraceEnabled, "false", CreateFunc(s => s.TraceEnabled), false };
 
-            yield return new object[] { ConfigurationKeys.AgentHost, "test-host", CreateFunc(s => s.AgentUri), new Uri("http://test-host:8126/") };
-            yield return new object[] { ConfigurationKeys.AgentPort, "9000", CreateFunc(s => s.AgentUri), new Uri("http://127.0.0.1:9000/") };
+            yield return new object[] { ConfigurationKeys.AgentHost, "test-host", CreateFunc(s => s.AgentUri), new Uri("http://test-host:9411/api/v2/spans") };
+            yield return new object[] { ConfigurationKeys.AgentPort, "9000", CreateFunc(s => s.AgentUri), new Uri("http://127.0.0.1:9000/api/v2/spans") };
 
             yield return new object[] { ConfigurationKeys.EndpointUrl, "http://localhost:9411/api/v2/spans", CreateFunc(s => s.AgentUri), new Uri("http://127.0.0.1:9411/api/v2/spans") };
             yield return new object[] { ConfigurationKeys.EndpointUrl, "https://ingest.realm.sfx.com/v2/trace", CreateFunc(s => s.AgentUri), new Uri("https://ingest.realm.sfx.com/v2/trace") };
@@ -91,15 +93,15 @@ namespace Datadog.Trace.Tests.Configuration
 
             yield return new object[] { ConfigurationKeys.DisabledIntegrations, "integration1,integration2,,INTEGRATION2", CreateFunc(s => s.DisabledIntegrationNames.Count), 2 };
 
-            yield return new object[] { ConfigurationKeys.AdoNetExcludedTypes, "System.Data.SqlClient.SqlCommand,SYSTEM.DATA.SQLCLIENT.SQLCOMMAND,,System.Data.SqlClient.SqlConnection", CreateFunc(s => s.AdoNetExcludedTypes.Count), 2 };
-
             yield return new object[] { ConfigurationKeys.GlobalTags, "k1:v1, k2:v2", CreateFunc(s => s.GlobalTags), TagsK1V1K2V2 };
             yield return new object[] { ConfigurationKeys.GlobalTags, "keyonly:,nocolon,:,:valueonly,k2:v2", CreateFunc(s => s.GlobalTags), TagsK2V2 };
             yield return new object[] { "SIGNALFX_TRACE_GLOBAL_TAGS", "k1:v1, k2:v2", CreateFunc(s => s.GlobalTags), TagsK1V1K2V2 };
             yield return new object[] { ConfigurationKeys.GlobalTags, "k1:v1,k1:v2", CreateFunc(s => s.GlobalTags.Count), 1 };
 
+#pragma warning disable 618 // App Analytics is deprecated but still supported
             yield return new object[] { ConfigurationKeys.GlobalAnalyticsEnabled, "true", CreateFunc(s => s.AnalyticsEnabled), true };
             yield return new object[] { ConfigurationKeys.GlobalAnalyticsEnabled, "false", CreateFunc(s => s.AnalyticsEnabled), false };
+#pragma warning restore 618
 
             yield return new object[] { ConfigurationKeys.HeaderTags, "header1:tag1,header2:Content-Type,header3: Content-Type ,header4:C!!!ont_____ent----tYp!/!e,header5:Some.Header,header6:9invalidtagname,:invalidtagonly,validheaderonly:,validheaderwithoutcolon,:", CreateFunc(s => s.HeaderTags), HeaderTagsWithOptionalMappings };
             yield return new object[] { ConfigurationKeys.HeaderTags, "header1:tag1,header2:tag1", CreateFunc(s => s.HeaderTags), HeaderTagsSameTag };
@@ -193,13 +195,13 @@ namespace Datadog.Trace.Tests.Configuration
 
             if (key == "SIGNALFX_SERVICE_NAME")
             {
-                // We need to ensure SIGNALFX_SERVICE is empty.
+                // We need to ensure SIGNALFX_SERVICE_NAME is empty.
                 string originalServiceName = Environment.GetEnvironmentVariable(ConfigurationKeys.ServiceName);
                 Environment.SetEnvironmentVariable(ConfigurationKeys.ServiceName, null, EnvironmentVariableTarget.Process);
 
                 settings = GetTracerSettings(key, value);
 
-                // after load settings we can restore the original SIGNALFX_SERVICE
+                // after load settings we can restore the original SIGNALFX_SERVICE_NAME
                 Environment.SetEnvironmentVariable(ConfigurationKeys.ServiceName, originalServiceName, EnvironmentVariableTarget.Process);
             }
             else if (key == ConfigurationKeys.AgentHost || key == ConfigurationKeys.AgentPort)

@@ -5,6 +5,8 @@
 
 // Modified by Splunk Inc.
 
+using System;
+
 namespace Datadog.Trace.Configuration
 {
     /// <summary>
@@ -20,11 +22,6 @@ namespace Datadog.Trace.Configuration
         public const string ConfigurationFileName = "SIGNALFX_TRACE_CONFIG_FILE";
 
         /// <summary>
-        /// Configuration key for the path to the plugins configuration file.
-        /// </summary>
-        public const string PluginConfigurationFileName = "SIGNALFX_DOTNET_TRACER_PLUGINS_FILE";
-
-        /// <summary>
         /// Configuration key for the application's environment. Sets the "deployment.environment" tag on every <see cref="Span"/>.
         /// </summary>
         /// <seealso cref="TracerSettings.Environment"/>
@@ -36,7 +33,7 @@ namespace Datadog.Trace.Configuration
         /// and used to determine service name of some child spans.
         /// </summary>
         /// <seealso cref="TracerSettings.ServiceName"/>
-        public const string ServiceName = "SIGNALFX_SERVICE";
+        public const string ServiceName = "SIGNALFX_SERVICE_NAME";
 
         /// <summary>
         /// Configuration key for the application's version. Sets the "version" tag on every <see cref="Span"/>.
@@ -92,8 +89,35 @@ namespace Datadog.Trace.Configuration
         /// Configuration key for enabling or disabling the Tracer's debug mode.
         /// Default is value is false (disabled).
         /// </summary>
-        /// <seealso cref="TracerSettings.DebugEnabled"/>
         public const string DebugEnabled = "SIGNALFX_TRACE_DEBUG";
+
+        /// <summary>
+        /// Gets a value indicating whether file log is enabled.
+        /// Default is <c>true</c>.
+        /// </summary>
+        /// <remarks>
+        /// Not exposed via <see cref="TracerSettings"/> since the logger
+        /// is created before it is set.
+        /// </remarks>
+        /// <seealso cref="GlobalSettings.FileLogEnabled"/>
+        public const string FileLogEnabled = "SIGNALFX_FILE_LOG_ENABLED";
+
+        /// <summary>
+        /// Gets a value indicating whether stdout log is enabled.
+        /// Default is <c>false</c>.
+        /// </summary>
+        /// <remarks>
+        /// Not exposed via <see cref="TracerSettings"/> since the logger
+        /// is created before it is set.
+        /// </remarks>
+        /// <seealso cref="GlobalSettings.StdoutLogEnabled"/>
+        public const string StdoutLogEnabled = "SIGNALFX_STDOUT_LOG_ENABLED";
+
+        /// <summary>
+        /// Allows to override the default output template used with stdout logging.
+        /// It is ignored if stdout log is disabled.
+        /// </summary>
+        public const string StdoutLogTemplate = "SIGNALFX_STDOUT_LOG_TEMPLATE";
 
         /// <summary>
         /// Configuration key for a list of integrations to disable. All other integrations remain enabled.
@@ -102,14 +126,6 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="TracerSettings.DisabledIntegrationNames"/>
         public const string DisabledIntegrations = "SIGNALFX_DISABLED_INTEGRATIONS";
-
-        /// <summary>
-        /// Configuration key for a list of AdoNet types that will be excluded from automatic instrumentation.
-        /// Default is empty (all AdoNet types are included in automatic instrumentation).
-        /// Supports multiple values separated with comma.
-        /// </summary>
-        /// <seealso cref="TracerSettings.AdoNetExcludedTypes"/>
-        public const string AdoNetExcludedTypes = "SIGNALFX_TRACE_ADONET_EXCLUDED_TYPES";
 
         /// <summary>
         /// Configuration key for the Agent host where the Tracer can send traces.
@@ -174,6 +190,7 @@ namespace Datadog.Trace.Configuration
         /// Configuration key for enabling or disabling default Analytics.
         /// </summary>
         /// <seealso cref="TracerSettings.AnalyticsEnabled"/>
+        [Obsolete(DeprecationMessages.AppAnalytics)]
         public const string GlobalAnalyticsEnabled = "SIGNALFX_TRACE_ANALYTICS_ENABLED";
 
         /// <summary>
@@ -304,6 +321,7 @@ namespace Datadog.Trace.Configuration
         /// This also determines the output folder of the .NET Tracer managed log files.
         /// Overridden by <see cref="LogDirectory"/> if present.
         /// </summary>
+        [Obsolete(DeprecationMessages.LogPath)]
         public const string ProfilerLogPath = "SIGNALFX_TRACE_LOG_PATH";
 
         /// <summary>
@@ -443,6 +461,13 @@ namespace Datadog.Trace.Configuration
         public const string TagMongoCommands = "SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS";
 
         /// <summary>
+        /// Configuration key for enabling or disabling tagging Elasticsearch
+        /// PostData as db.statement.
+        /// </summary>
+        /// <seealso cref="TracerSettings.TagElasticsearchQueries"/>
+        public const string TagElasticsearchQueries = "SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES";
+
+        /// <summary>
         /// String format patterns used to match integration-specific configuration keys.
         /// </summary>
         public static class Integrations
@@ -455,11 +480,13 @@ namespace Datadog.Trace.Configuration
             /// <summary>
             /// Configuration key pattern for enabling or disabling Analytics in an integration.
             /// </summary>
+            [Obsolete(DeprecationMessages.AppAnalytics)]
             public const string AnalyticsEnabled = "SIGNALFX_TRACE_{0}_ANALYTICS_ENABLED";
 
             /// <summary>
             /// Configuration key pattern for setting Analytics sampling rate in an integration.
             /// </summary>
+            [Obsolete(DeprecationMessages.AppAnalytics)]
             public const string AnalyticsSampleRate = "SIGNALFX_TRACE_{0}_ANALYTICS_SAMPLE_RATE";
         }
 
@@ -488,11 +515,6 @@ namespace Datadog.Trace.Configuration
             /// </summary>
             /// <seealso cref="TracerSettings.RouteTemplateResourceNamesEnabled"/>
             public const string RouteTemplateResourceNamesEnabled = "SIGNALFX_TRACE_ROUTE_TEMPLATE_RESOURCE_NAMES_ENABLED";
-
-            /// <summary>
-            /// Feature Flag: enables instrumenting calls to netstandard.dll (only applies to CallSite instrumentation)
-            /// </summary>
-            public const string NetStandardEnabled = "SIGNALFX_TRACE_NETSTANDARD_ENABLED";
 
             /// <summary>
             /// Configuration key to enable or disable the updated WCF instrumentation that delays execution

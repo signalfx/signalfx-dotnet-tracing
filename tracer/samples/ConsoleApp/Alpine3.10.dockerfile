@@ -16,7 +16,7 @@ COPY --from=build /app/out .
 
 # Set up Datadog APM
 RUN apk --no-cache update && apk add curl
-ARG TRACER_VERSION=0.0.1
+ARG TRACER_VERSION=0.2.0
 RUN mkdir -p /var/log/signalfx
 RUN mkdir -p /opt/signalfx
 RUN curl -L https://github.com/signalfx/signalfx-dotnet-tracing/releases/download/v${TRACER_VERSION}/signalfx-dotnet-tracing-${TRACER_VERSION}-musl.tar.gz \
@@ -25,7 +25,6 @@ RUN curl -L https://github.com/signalfx/signalfx-dotnet-tracing/releases/downloa
 ENV CORECLR_ENABLE_PROFILING=1
 ENV CORECLR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}
 ENV CORECLR_PROFILER_PATH=/opt/signalfx/SignalFx.Tracing.ClrProfiler.Native.so
-ENV SIGNALFX_INTEGRATIONS=/opt/signalfx/integrations.json
 ENV SIGNALFX_DOTNET_TRACER_HOME=/opt/signalfx
 
 CMD ["dotnet", "ConsoleApp.dll"]

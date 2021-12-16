@@ -15,9 +15,9 @@ namespace Datadog.Trace.Agent
 
         private readonly JsonSerializer _serializer = new JsonSerializer();
 
-        private readonly TracerSettings _settings;
+        private readonly ImmutableTracerSettings _settings;
 
-        public ZipkinSerializer(TracerSettings settings)
+        public ZipkinSerializer(ImmutableTracerSettings settings)
         {
             _settings = settings;
         }
@@ -47,7 +47,7 @@ namespace Datadog.Trace.Agent
             private readonly Span _span;
             private readonly IDictionary<string, string> _tags;
 
-            public ZipkinSpan(Span span, TracerSettings settings)
+            public ZipkinSpan(Span span, ImmutableTracerSettings settings)
             {
                 _span = span;
                 _tags = BuildTags(span, settings);
@@ -107,7 +107,7 @@ namespace Datadog.Trace.Agent
                 get => _tags;
             }
 
-            private static IDictionary<string, string> BuildTags(Span span, TracerSettings settings)
+            private static IDictionary<string, string> BuildTags(Span span, ImmutableTracerSettings settings)
             {
                 var spanTags = span?.Tags?.GetAllTags();
                 var tags = new Dictionary<string, string>(spanTags.Count);

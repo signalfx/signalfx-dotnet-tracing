@@ -9,7 +9,6 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using Datadog.Trace.ClrProfiler.CallTarget;
-using Datadog.Trace.ClrProfiler.Integrations;
 using Datadog.Trace.Configuration;
 
 namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Redis.ServiceStack
@@ -30,8 +29,8 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Redis.ServiceStack
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class RedisNativeClientSendReceiveIntegration
     {
-        private const string IntegrationName = nameof(IntegrationIds.ServiceStackRedis);
-        private static readonly IntegrationInfo IntegrationId = IntegrationRegistry.GetIntegrationInfo(IntegrationName);
+        private const string IntegrationName = nameof(Configuration.IntegrationId.ServiceStackRedis);
+        private const IntegrationId IntegrationId = Configuration.IntegrationId.ServiceStackRedis;
 
         /// <summary>
         /// OnMethodBegin callback

@@ -9,7 +9,6 @@ using System.ComponentModel;
 using System.Reflection;
 using Datadog.Trace.ClrProfiler.CallTarget;
 using Datadog.Trace.ClrProfiler.Emit;
-using Datadog.Trace.ClrProfiler.Integrations;
 using Datadog.Trace.Configuration;
 
 namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
@@ -53,7 +52,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
             }
 
             var requestContext = WcfCommon.GetCurrentOperationContext()?.GetProperty<object>("RequestContext").GetValueOrDefault();
-            return new CallTargetState(WcfIntegration.CreateScope(requestContext));
+            return new CallTargetState(WcfCommon.CreateScope(requestContext));
         }
 
         /// <summary>

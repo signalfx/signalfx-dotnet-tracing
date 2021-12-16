@@ -1,4 +1,4 @@
-﻿// <copyright file="KafkaProduceAsyncIntegration.cs" company="Datadog">
+// <copyright file="KafkaProduceAsyncIntegration.cs" company="Datadog">
 // Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
@@ -50,7 +50,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
 
             if (scope is not null)
             {
-                KafkaHelper.TryInjectHeaders<TTopicPartition, TMessage>(Tracer.Instance.Propagator, scope.Span.Context, message);
+                KafkaHelper.TryInjectHeaders<TTopicPartition, TMessage>(Tracer.Instance.TracerManager.Propagator, scope.Span.Context, message);
                 return new CallTargetState(scope);
             }
 

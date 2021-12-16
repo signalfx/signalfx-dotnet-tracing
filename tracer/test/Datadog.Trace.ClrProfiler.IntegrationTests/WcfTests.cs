@@ -41,17 +41,16 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         {
             foreach (var binding in Bindings)
             {
-                // When using the binding example, it is expected that CallSite or CallTarget w/ Old WCF fails,
-                // so only include CallTarget w/ New WCF
+                // When using the binding example, it is expected that Old WCF fails,
+                // so only test New WCF
                 if (binding == "Custom")
                 {
-                    yield return new object[] { binding, true, true };
+                    yield return new object[] { binding, true };
                     continue;
                 }
 
-                yield return new object[] { binding, false, false };
-                yield return new object[] { binding, true, false };
-                yield return new object[] { binding, true, true };
+                yield return new object[] { binding, false };
+                yield return new object[] { binding, true };
             }
         }
 
@@ -59,9 +58,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         [MemberData(nameof(GetData))]
-        public async Task SubmitsTraces(string binding, bool enableCallTarget, bool enableNewWcfInstrumentation)
+        public async Task SubmitsTraces(string binding, bool enableNewWcfInstrumentation)
         {
-            SetCallTargetSettings(enableCallTarget);
             if (enableNewWcfInstrumentation)
             {
                 SetEnvironmentVariable("SIGNALFX_TRACE_DELAY_WCF_INSTRUMENTATION_ENABLED", "true");
@@ -84,7 +82,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 agent.SpanFilters.Add(s => !s.Resource.Contains("schemas.xmlsoap.org") && !s.Resource.Contains("www.w3.org"));
                 var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedLogicScope);
 
-                var settings = VerifyHelper.GetSpanVerifierSettings(binding, enableCallTarget, enableNewWcfInstrumentation);
+                var settings = VerifyHelper.GetSpanVerifierSettings(binding, enableNewWcfInstrumentation);
 
                 await Verifier.Verify(spans, settings)
                               .UseMethodName("_");

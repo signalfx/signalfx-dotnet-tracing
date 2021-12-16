@@ -32,7 +32,7 @@ namespace Datadog.Trace.Tests
             _writerMock = new Mock<IAgentWriter>();
             var samplerMock = new Mock<ISampler>();
 
-            _tracer = new Tracer(settings, plugins: null, _writerMock.Object, samplerMock.Object, scopeManager: null, statsd: null);
+            _tracer = new Tracer(settings, _writerMock.Object, samplerMock.Object, scopeManager: null, statsd: null);
         }
 
         [Fact]

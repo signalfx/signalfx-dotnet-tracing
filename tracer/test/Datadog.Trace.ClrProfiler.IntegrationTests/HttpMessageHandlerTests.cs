@@ -37,20 +37,19 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             };
 
         public static IEnumerable<object[]> IntegrationConfig() =>
-            from enableCallTarget in new[] { true, false }
             from instrumentationOptions in InstrumentationOptionsValues
             from socketHandlerEnabled in new[] { true, false }
-            select new object[] { enableCallTarget, instrumentationOptions, socketHandlerEnabled };
+            select new object[] { instrumentationOptions, socketHandlerEnabled };
 
         [SkippableTheory]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         [MemberData(nameof(IntegrationConfig))]
-        public void HttpClient_SubmitsTraces(bool enableCallTarget, InstrumentationOptions instrumentation, bool enableSocketsHandler)
+        public void HttpClient_SubmitsTraces(InstrumentationOptions instrumentation, bool enableSocketsHandler)
         {
-            ConfigureInstrumentation(enableCallTarget, instrumentation, enableSocketsHandler);
+            ConfigureInstrumentation(instrumentation, enableSocketsHandler);
 
-            var expectedAsyncCount = CalculateExpectedAsyncSpans(instrumentation, enableCallTarget);
+            var expectedAsyncCount = CalculateExpectedAsyncSpans(instrumentation);
             var expectedSyncCount = CalculateExpectedSyncSpans(instrumentation);
 
             var expectedSpanCount = expectedAsyncCount + expectedSyncCount;
@@ -93,9 +92,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         [MemberData(nameof(IntegrationConfig))]
-        public void TracingDisabled_DoesNotSubmitsTraces(bool enableCallTarget, InstrumentationOptions instrumentation, bool enableSocketsHandler)
+        public void TracingDisabled_DoesNotSubmitsTraces(InstrumentationOptions instrumentation, bool enableSocketsHandler)
         {
-            ConfigureInstrumentation(enableCallTarget, instrumentation, enableSocketsHandler);
+            ConfigureInstrumentation(instrumentation, enableSocketsHandler);
 
             const string expectedOperationName = "http.request";
 
@@ -112,7 +111,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             }
         }
 
-        private static int CalculateExpectedAsyncSpans(InstrumentationOptions instrumentation, bool enableCallTarget)
+        private static int CalculateExpectedAsyncSpans(InstrumentationOptions instrumentation)
         {
             var isWindows = RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows);
 
@@ -123,13 +122,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
             var expectedSpanCount = spansPerHttpClient * 2; // default HttpClient and CustomHttpClientHandler
 
-#if !NET452
             // WinHttpHandler instrumentation is off by default, and only available on Windows
-            if (enableCallTarget && isWindows && (instrumentation.InstrumentWinHttpOrCurlHandler ?? false))
+            if (isWindows && (instrumentation.InstrumentWinHttpOrCurlHandler ?? false))
             {
                 expectedSpanCount += spansPerHttpClient;
             }
-#endif
 
             // SocketsHttpHandler instrumentation is on by default
             if (EnvironmentHelper.IsCoreClr() && (instrumentation.InstrumentSocketHandler ?? true))
@@ -138,7 +135,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             }
 
 #if NETCOREAPP2_1 || NETCOREAPP3_0 || NETCOREAPP3_1
-            if (enableCallTarget && instrumentation.InstrumentWinHttpOrCurlHandler == true)
+            if (instrumentation.InstrumentWinHttpOrCurlHandler == true)
             {
                 // Add 1 span for internal WinHttpHandler and CurlHandler using the HttpMessageInvoker
                 expectedSpanCount++;
@@ -171,10 +168,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             return expectedSpanCount;
         }
 
-        private void ConfigureInstrumentation(bool enableCallTarget, InstrumentationOptions instrumentation, bool enableSocketsHandler)
+        private void ConfigureInstrumentation(InstrumentationOptions instrumentation, bool enableSocketsHandler)
         {
-            SetCallTargetSettings(enableCallTarget);
-
             // Should HttpClient try to use HttpSocketsHandler
             SetEnvironmentVariable("DOTNET_SYSTEM_NET_HTTP_USESOCKETSHTTPHANDLER", enableSocketsHandler ? "1" : "0");
 

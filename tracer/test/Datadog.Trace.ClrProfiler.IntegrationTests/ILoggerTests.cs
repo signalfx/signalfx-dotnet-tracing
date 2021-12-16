@@ -4,8 +4,6 @@
 // </copyright>
 
 // Modified by Splunk Inc.
-
-#if !NET452
 using System;
 using Datadog.Trace.TestHelpers;
 using FluentAssertions;
@@ -34,7 +32,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         {
             SetServiceVersion("1.0.0");
             SetEnvironmentVariable("SIGNALFX_LOGS_INJECTION", "true");
-            SetCallTargetSettings(true);
         }
 
         [SkippableFact]
@@ -54,4 +51,3 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         }
     }
 }
-#endif

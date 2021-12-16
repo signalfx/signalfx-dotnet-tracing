@@ -82,7 +82,8 @@ namespace Datadog.Trace.Tools.Runner.Crank
                         tracerSettings.ServiceName = "crank";
                     }
 
-                    Tracer tracer = new Tracer(tracerSettings);
+                    Tracer.Configure(tracerSettings);
+                    Tracer tracer = Tracer.Instance;
 
                     foreach (var jobItem in result.JobResults.Jobs)
                     {

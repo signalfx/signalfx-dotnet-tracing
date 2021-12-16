@@ -17,6 +17,7 @@
     * Old log path: `/var/log/datadog` use `/var/log/signalfx` instead.
     * Run unit tests, commit any needed fixes, repeat until passing unit tests
     * Update version in `tracer\src\Datadog.Trace.ClrProfiler.Native\version.h` if the upstream bumped it.
+    * Update `launchSettings.json` files: change `Datadog.Trace.ClrProfiler.Native.dll` to `SignalFx.Tracing.ClrProfiler.Native.dll` for `CORECLR_PROFILER_PATH` and `COR_PROFILER_PATH`
     * Update versions and integrations json by running: `nuke UpdateIntegrationsJson` (remember to revert wcf and other windows-only frameworks if you are using different platform)
     * Run build via nuke and commit any needed fixes, until it passes:
 
@@ -30,10 +31,10 @@ Windows in Git Bash:
 
 ```sh
 git clean -fXd ; ./tracer/build.cmd ; \
+Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.cmd BuildAndRunWindowsIntegrationTests --framework net6.0 ; \
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.cmd BuildAndRunWindowsIntegrationTests --framework net5.0 ; \
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.cmd BuildAndRunWindowsIntegrationTests --framework netcoreapp3.1 ; \
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.cmd BuildAndRunWindowsIntegrationTests --framework net461 ; \
-Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.cmd BuildAndRunWindowsIntegrationTests --framework net452 ; \
 ./tracer/build.cmd OverwriteSnaphotFiles
 ```
 
@@ -42,6 +43,7 @@ Windows in Ubuntu WSL:
 ```sh
 git clean -fXd ; ./tracer/build.sh ; \
 docker-compose run --rm StartDependencies ; \
+Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.sh BuildAndRunLinuxIntegrationTests --framework net6.0 ; \
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.sh BuildAndRunLinuxIntegrationTests --framework net5.0 ; \
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.sh BuildAndRunLinuxIntegrationTests --framework netcoreapp3.1 ; \
 docker-compose down ; \

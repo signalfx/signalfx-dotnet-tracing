@@ -81,6 +81,16 @@ namespace Datadog.Trace
         public const string HttpStatusCode = "http.status_code";
 
         /// <summary>
+        /// The end point requested
+        /// </summary>
+        internal const string HttpEndpoint = "http.endpoint";
+
+        /// <summary>
+        /// The user agent
+        /// </summary>
+        internal const string HttpUserAgent = "http.useragent";
+
+        /// <summary>
         /// Whether a span denotes an error.
         /// </summary>
         /// <remarks>
@@ -116,7 +126,7 @@ namespace Datadog.Trace
         public const string ErrorStack = "sfx.error.stack";
 
         /// <summary>
-        /// The type of database (e.g. mssql, mysql)
+        /// The type of database (e.g. "mssql", "mysql", "postgresql", "sqlite", "oracle")
         /// </summary>
         /// <remarks>
         /// Upstream uses "db.type", however, to better align with OpenTelemetry we use
@@ -157,52 +167,52 @@ namespace Datadog.Trace
         /// <summary>
         /// The ASP.NET routing template.
         /// </summary>
-        public const string AspNetRoute = "aspnet.route";
+        internal const string AspNetRoute = "aspnet.route";
 
         /// <summary>
         /// The MVC or Web API controller name.
         /// </summary>
-        public const string AspNetController = "aspnet.controller";
+        internal const string AspNetController = "aspnet.controller";
 
         /// <summary>
         /// The MVC or Web API action name.
         /// </summary>
-        public const string AspNetAction = "aspnet.action";
+        internal const string AspNetAction = "aspnet.action";
 
         /// <summary>
         /// The MVC or Web API area name.
         /// </summary>
-        public const string AspNetArea = "aspnet.area";
+        internal const string AspNetArea = "aspnet.area";
 
         /// <summary>
         /// The ASP.NET routing template.
         /// </summary>
-        public const string AspNetCoreRoute = "aspnet_core.route";
+        internal const string AspNetCoreRoute = "aspnet_core.route";
 
         /// <summary>
         /// The MVC or Web API controller name.
         /// </summary>
-        public const string AspNetCoreController = "aspnet_core.controller";
+        internal const string AspNetCoreController = "aspnet_core.controller";
 
         /// <summary>
         /// The MVC or Web API action name.
         /// </summary>
-        public const string AspNetCoreAction = "aspnet_core.action";
+        internal const string AspNetCoreAction = "aspnet_core.action";
 
         /// <summary>
         /// The MVC or Web API area name.
         /// </summary>
-        public const string AspNetCoreArea = "aspnet_core.area";
+        internal const string AspNetCoreArea = "aspnet_core.area";
 
         /// <summary>
         /// The Razor Pages page name.
         /// </summary>
-        public const string AspNetCorePage = "aspnet_core.page";
+        internal const string AspNetCorePage = "aspnet_core.page";
 
         /// <summary>
         /// The Endpoint name in ASP.NET Core endpoint routing.
         /// </summary>
-        public const string AspNetCoreEndpoint = "aspnet_core.endpoint";
+        internal const string AspNetCoreEndpoint = "aspnet_core.endpoint";
 
         /// <summary>
         /// The hostname of a outgoing server connection.
@@ -225,57 +235,57 @@ namespace Datadog.Trace
         /// <summary>
         /// The raw command sent to Redis.
         /// </summary>
-        public const string RedisRawCommand = DbStatement;
+        internal const string RedisRawCommand = DbStatement;
 
         /// <summary>
         /// A MongoDB query.
         /// </summary>
-        public const string MongoDbQuery = "mongodb.query";
+        internal const string MongoDbQuery = "mongodb.query";
 
         /// <summary>
         /// A MongoDB collection name.
         /// </summary>
-        public const string MongoDbCollection = "mongodb.collection";
+        internal const string MongoDbCollection = "mongodb.collection";
 
         /// <summary>
         /// The operation name of the GraphQL request.
         /// </summary>
-        public const string GraphQLOperationName = "graphql.operation.name";
+        internal const string GraphQLOperationName = "graphql.operation.name";
 
         /// <summary>
         /// The operation type of the GraphQL request.
         /// </summary>
-        public const string GraphQLOperationType = "graphql.operation.type";
+        internal const string GraphQLOperationType = "graphql.operation.type";
 
         /// <summary>
         /// The source defining the GraphQL request.
         /// </summary>
-        public const string GraphQLSource = "graphql.source";
+        internal const string GraphQLSource = "graphql.source";
 
         /// <summary>
         /// The AMQP method.
         /// </summary>
-        public const string AmqpCommand = "amqp.command";
+        internal const string AmqpCommand = "amqp.command";
 
         /// <summary>
         /// The name of the AMQP exchange the message was originally published to.
         /// </summary>
-        public const string AmqpExchange = "amqp.exchange";
+        internal const string AmqpExchange = "amqp.exchange";
 
         /// <summary>
         /// The routing key for the AMQP message.
         /// </summary>
-        public const string AmqpRoutingKey = "amqp.routing_key";
+        internal const string AmqpRoutingKey = "amqp.routing_key";
 
         /// <summary>
         /// The name of the queue for the AMQP message.
         /// </summary>
-        public const string AmqpQueue = "amqp.queue";
+        internal const string AmqpQueue = "amqp.queue";
 
         /// <summary>
         /// The delivery mode of the AMQP message.
         /// </summary>
-        public const string AmqpDeliveryMode = "amqp.delivery_mode";
+        internal const string AmqpDeliveryMode = "amqp.delivery_mode";
 
         /// <summary>
         /// The partition associated with a record
@@ -284,7 +294,7 @@ namespace Datadog.Trace
         /// Upstream uses "kafka.partition", however, to better align with OpenTelemetry we use
         /// "messaging.kafka.partition" instead.
         /// </remarks>
-        public const string KafkaPartition = "messaging.kafka.partition";
+        internal const string KafkaPartition = "messaging.kafka.partition";
 
         /// <summary>
         /// The offset inside a partition associated with a record
@@ -293,7 +303,7 @@ namespace Datadog.Trace
         /// Upstream uses "kafka.offset", however, to better align with OpenTelemetry we use
         /// "messaging.kafka.offset" instead.
         /// </remarks>
-        public const string KafkaOffset = "messaging.kafka.offset";
+        internal const string KafkaOffset = "messaging.kafka.offset";
 
         /// <summary>
         /// Whether the record was a "tombstone" record
@@ -302,7 +312,7 @@ namespace Datadog.Trace
         /// Upstream uses "kafka.tombstone", however, to better align with OpenTelemetry we use
         /// "messaging.kafka.tombstone" instead.
         /// </remarks>
-        public const string KafkaTombstone = "messaging.kafka.tombstone";
+        internal const string KafkaTombstone = "messaging.kafka.tombstone";
 
         /// <summary>
         /// The size of the message.
@@ -312,54 +322,42 @@ namespace Datadog.Trace
         /// <summary>
         /// The agent that instrumented the associated AWS SDK span.
         /// </summary>
-        public const string AwsAgentName = "aws.agent";
+        internal const string AwsAgentName = "aws.agent";
 
         /// <summary>
         /// The operation associated with the AWS SDK span.
         /// </summary>
-        public const string AwsOperationName = "aws.operation";
+        internal const string AwsOperationName = "aws.operation";
 
         /// <summary>
         /// The region associated with the AWS SDK span.
         /// </summary>
-        public const string AwsRegion = "aws.region";
+        internal const string AwsRegion = "aws.region";
 
         /// <summary>
         /// The request ID associated with the AWS SDK span.
         /// </summary>
-        public const string AwsRequestId = "aws.requestId";
+        internal const string AwsRequestId = "aws.requestId";
 
         /// <summary>
         /// The service associated with the AWS SDK span.
         /// </summary>
-        public const string AwsServiceName = "aws.service";
+        internal const string AwsServiceName = "aws.service";
 
         /// <summary>
         /// The queue name associated with the AWS SDK span.
         /// </summary>
-        public const string AwsQueueName = "aws.queue.name";
+        internal const string AwsQueueName = "aws.queue.name";
 
         /// <summary>
         /// The queue URL associated with the AWS SDK span.
         /// </summary>
-        public const string AwsQueueUrl = "aws.queue.url";
+        internal const string AwsQueueUrl = "aws.queue.url";
 
         /// <summary>
         /// The sampling priority for the entire trace.
         /// </summary>
         public const string SamplingPriority = "sampling.priority";
-
-        /// <summary>
-        /// Obsolete. Use <see cref="ManualKeep"/>.
-        /// </summary>
-        [Obsolete("This field will be removed in futures versions of this library. Use ManualKeep instead.")]
-        public const string ForceKeep = "force.keep";
-
-        /// <summary>
-        /// Obsolete. Use <see cref="ManualDrop"/>.
-        /// </summary>
-        [Obsolete("This field will be removed in futures versions of this library. Use ManualDrop instead.")]
-        public const string ForceDrop = "force.drop";
 
         /// <summary>
         /// A user-friendly tag that sets the sampling priority to <see cref="Trace.SamplingPriority.UserKeep"/>.
@@ -374,7 +372,7 @@ namespace Datadog.Trace
         /// <summary>
         /// Configures Trace Analytics.
         /// </summary>
-        public const string Analytics = "_dd1.sr.eausr";
+        internal const string Analytics = "_dd1.sr.eausr";
 
         /// <summary>
         /// Language tag, applied to root spans that are .NET runtime (e.g., ASP.NET)
@@ -385,64 +383,64 @@ namespace Datadog.Trace
         /// The runtime family tag, it will be placed on the service entry span, the first span opened for a
         /// service. For this library it will always have the value "dotnet".
         /// </summary>
-        public const string RuntimeFamily = "_dd.runtime_family";
+        internal const string RuntimeFamily = "_dd.runtime_family";
 
         /// <summary>
         /// The resource ID of the site instance in Azure App Services where the traced application is running.
         /// </summary>
-        public const string AzureAppServicesResourceId = "aas.resource.id";
+        internal const string AzureAppServicesResourceId = "aas.resource.id";
 
         /// <summary>
         /// The resource group of the site instance in Azure App Services where the traced application is running.
         /// </summary>
-        public const string AzureAppServicesResourceGroup = "aas.resource.group";
+        internal const string AzureAppServicesResourceGroup = "aas.resource.group";
 
         /// <summary>
         /// The site name of the site instance in Azure where the traced application is running.
         /// </summary>
-        public const string AzureAppServicesSiteName = "aas.site.name";
+        internal const string AzureAppServicesSiteName = "aas.site.name";
 
         /// <summary>
         /// The version of the extension installed where the traced application is running.
         /// </summary>
-        public const string AzureAppServicesExtensionVersion = "aas.environment.extension_version";
+        internal const string AzureAppServicesExtensionVersion = "aas.environment.extension_version";
 
         /// <summary>
         /// The instance name in Azure where the traced application is running.
         /// </summary>
-        public const string AzureAppServicesInstanceName = "aas.environment.instance_name";
+        internal const string AzureAppServicesInstanceName = "aas.environment.instance_name";
 
         /// <summary>
         /// The instance ID in Azure where the traced application is running.
         /// </summary>
-        public const string AzureAppServicesInstanceId = "aas.environment.instance_id";
+        internal const string AzureAppServicesInstanceId = "aas.environment.instance_id";
 
         /// <summary>
         /// The operating system in Azure where the traced application is running.
         /// </summary>
-        public const string AzureAppServicesOperatingSystem = "aas.environment.os";
+        internal const string AzureAppServicesOperatingSystem = "aas.environment.os";
 
         /// <summary>
         /// The runtime in Azure where the traced application is running.
         /// </summary>
-        public const string AzureAppServicesRuntime = "aas.environment.runtime";
+        internal const string AzureAppServicesRuntime = "aas.environment.runtime";
 
         /// <summary>
         /// The kind of application instance running in Azure.
         /// Possible values: app, api, mobileapp, app_linux, app_linux_container, functionapp, functionapp_linux, functionapp_linux_container
         /// </summary>
-        public const string AzureAppServicesSiteKind = "aas.site.kind";
+        internal const string AzureAppServicesSiteKind = "aas.site.kind";
 
         /// <summary>
         /// The type of application instance running in Azure.
         /// Possible values: app, function
         /// </summary>
-        public const string AzureAppServicesSiteType = "aas.site.type";
+        internal const string AzureAppServicesSiteType = "aas.site.type";
 
         /// <summary>
         /// The subscription ID of the site instance in Azure App Services where the traced application is running.
         /// </summary>
-        public const string AzureAppServicesSubscriptionId = "aas.subscription.id";
+        internal const string AzureAppServicesSubscriptionId = "aas.subscription.id";
 
         /// <summary>
         /// The type of trigger for an azure function
@@ -467,42 +465,57 @@ namespace Datadog.Trace
         /// <summary>
         /// Configures the origin of the trace
         /// </summary>
-        public const string Origin = "_dd.origin";
+        internal const string Origin = "_dd.origin";
 
         /// <summary>
         /// Configures the measured metric for a span.
         /// </summary>
-        public const string Measured = "_dd.measured";
+        internal const string Measured = "_dd.measured";
 
         /// <summary>
         /// The name of the Msmq command the message was published to.
         /// </summary>
-        public const string MsmqCommand = "msmq.command";
+        internal const string MsmqCommand = "msmq.command";
 
         /// <summary>
         /// Is the msmq queue supporting transactional messages
         /// </summary>
-        public const string MsmqIsTransactionalQueue = "msmq.queue.transactional";
+        internal const string MsmqIsTransactionalQueue = "msmq.queue.transactional";
 
         /// <summary>
         /// The name of the Msmq queue the message was published to, containing host name and path.
         /// </summary>
-        public const string MsmqQueuePath = "msmq.queue.path";
+        internal const string MsmqQueuePath = "msmq.queue.path";
 
         /// <summary>
         /// A boolean indicating if it's part of a transaction.
         /// </summary>
-        public const string MsmqMessageWithTransaction = "msmq.message.transactional";
+        internal const string MsmqMessageWithTransaction = "msmq.message.transactional";
 
         /// <summary>
         /// A CosmosDb container name.
         /// </summary>
-        public const string CosmosDbContainer = "cosmosdb.container";
+        internal const string CosmosDbContainer = "cosmosdb.container";
 
         /// <summary>
         /// If a span was involved with an application security event
         /// </summary>
-        public const string AppSecEvent = "appsec.event";
+        internal const string AppSecEvent = "appsec.event";
+
+        /// <summary>
+        /// The details of the security event
+        /// </summary>
+        internal const string AppSecJson = "_dd.appsec.json";
+
+        /// <summary>
+        /// Should contain the public IP of the host initiating the request.
+        /// </summary>
+        internal const string ActorIp = "actor.ip";
+
+        /// <summary>
+        /// The ip as reported by the framework.
+        /// </summary>
+        internal const string NetworkClientIp = "network.client.ip";
 
         internal const string ElasticsearchAction = "elasticsearch.action";
 
@@ -519,6 +532,10 @@ namespace Datadog.Trace
         internal const string AerospikeSetName = "db.aerospike.setname";
 
         internal const string AerospikeUserKey = "db.aerospike.userkey";
+
+        internal const string CouchbaseOperationCode = "couchbase.operation.code";
+        internal const string CouchbaseOperationBucket = "couchbase.operation.bucket";
+        internal const string CouchbaseOperationKey = "couchbase.operation.key";
 
         /// <summary>
         /// Messaging tags

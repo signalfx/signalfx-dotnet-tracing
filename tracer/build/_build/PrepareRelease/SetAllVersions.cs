@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.IO;
 using System.Text;
@@ -139,6 +141,19 @@ namespace PrepareRelease
                 "src/Datadog.Trace/TracerConstants.cs",
                 FourPartVersionReplace);
 
+            // Four-part Sfx tag version update (Tests)
+            SynchronizeVersion(
+                "test/Datadog.Trace.ClrProfiler.IntegrationTests/CI/MsTestV2Tests.cs",
+                FourPartAssertVersionReplace);
+
+            SynchronizeVersion(
+                "test/Datadog.Trace.ClrProfiler.IntegrationTests/CI/NUnitTests.cs",
+                FourPartAssertVersionReplace);
+
+            SynchronizeVersion(
+                "test/Datadog.Trace.ClrProfiler.IntegrationTests/CI/XUnitTests.cs",
+                FourPartAssertVersionReplace);
+
             // Native profiler updates
             SynchronizeVersion(
                 "src/Datadog.Trace.ClrProfiler.Native/CMakeLists.txt",
@@ -159,14 +174,18 @@ namespace PrepareRelease
 
             // Deployment updates
             SynchronizeVersion(
-                "integrations.json",
-                FullAssemblyNameReplace);
-
-            SynchronizeVersion(
                 "src/WindowsInstaller/WindowsInstaller.wixproj",
                 WixProjReplace);
 
             Console.WriteLine($"Completed synchronizing versions to {VersionString()}");
+        }
+
+        private string FourPartAssertVersionReplace(string text)
+        {
+            const string patternPrefix = "signalfx\\.tracing\\.version\", \"";
+            const string versionPrefix = "signalfx.tracing.version\", \"";
+
+            return Regex.Replace(text, patternPrefix + VersionPattern(fourPartVersion: true), versionPrefix + FourPartVersionString(), RegexOptions.Singleline);
         }
 
         private string FourPartVersionReplace(string text)

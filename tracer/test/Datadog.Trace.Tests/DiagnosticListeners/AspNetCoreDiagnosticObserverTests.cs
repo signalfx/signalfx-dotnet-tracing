@@ -40,7 +40,8 @@ namespace Datadog.Trace.Tests.DiagnosticListeners
 
             var testServer = new TestServer(builder);
             var client = testServer.CreateClient();
-            var observers = new List<DiagnosticObserver> { new AspNetCoreDiagnosticObserver() };
+            var tracer = GetTracer();
+            var observers = new List<DiagnosticObserver> { new AspNetCoreDiagnosticObserver(tracer, security: null) };
             string retValue = null;
 
             using (var diagnosticManager = new DiagnosticManager(observers))
@@ -82,12 +83,15 @@ namespace Datadog.Trace.Tests.DiagnosticListeners
             Assert.Equal("aspnet_core.request", span.LogicScope);
             Assert.Equal("aspnet_core", span.GetTag(Tags.InstrumentationName));
             Assert.Equal(SpanTypes.Web, span.Type);
-            Assert.Equal("GET /home/?/action", span.ResourceName);
             Assert.Equal(SpanKinds.Server, span.GetTag(Tags.SpanKind));
             Assert.Equal("GET", span.GetTag(Tags.HttpMethod));
             Assert.Equal("localhost", span.GetTag(Tags.HttpRequestHeadersHost));
             Assert.Equal("http://localhost/home/1/action", span.GetTag(Tags.HttpUrl));
             Assert.Equal(TracerConstants.Language, span.GetTag(Tags.Language));
+
+            // Resource isn't populated until request end
+            observer.OnNext(new KeyValuePair<string, object>("Microsoft.AspNetCore.Hosting.HttpRequestIn.Stop", context));
+            Assert.Equal("GET /home/?/action", span.ResourceName);
         }
 
         private static Tracer GetTracer()
@@ -96,7 +100,7 @@ namespace Datadog.Trace.Tests.DiagnosticListeners
             var writerMock = new Mock<IAgentWriter>();
             var samplerMock = new Mock<ISampler>();
 
-            return new Tracer(settings, plugins: null, writerMock.Object, samplerMock.Object, scopeManager: null, statsd: null);
+            return new Tracer(settings, writerMock.Object, samplerMock.Object, scopeManager: null, statsd: null);
         }
 
         private static HttpContext GetHttpContext()

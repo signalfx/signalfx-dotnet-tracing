@@ -19,15 +19,13 @@ using Datadog.Trace.TestHelpers;
 using Xunit;
 using Xunit.Abstractions;
 
-#if !NET452
-
 namespace Datadog.Trace.ClrProfiler.IntegrationTests
 {
 #if NETCOREAPP3_1 || NET5_0
     public class GraphQL4Tests : GraphQLTests
     {
         public GraphQL4Tests(ITestOutputHelper output)
-            : base("GraphQL4", output, callTargetOnly: true)
+            : base("GraphQL4", output)
         {
         }
     }
@@ -36,7 +34,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
     public class GraphQL3Tests : GraphQLTests
     {
         public GraphQL3Tests(ITestOutputHelper output)
-            : base("GraphQL3", output, callTargetOnly: true)
+            : base("GraphQL3", output)
         {
         }
     }
@@ -44,7 +42,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
     public class GraphQL2Tests : GraphQLTests
     {
         public GraphQL2Tests(ITestOutputHelper output)
-            : base("GraphQL", output, callTargetOnly: false)
+            : base("GraphQL", output)
         {
         }
     }
@@ -56,35 +54,23 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         private static readonly string _graphQLValidateOperationName = "graphql.validate";
         private static readonly string _graphQLExecuteOperationName = "graphql.execute";
 
-        private readonly bool _callTargetOnly;
-
         private List<RequestInfo> _requests;
         private List<WebServerSpanExpectation> _expectations;
         private int _expectedGraphQLValidateSpanCount;
         private int _expectedGraphQLExecuteSpanCount;
 
-        protected GraphQLTests(string sampleAppName, ITestOutputHelper output, bool callTargetOnly = false)
+        protected GraphQLTests(string sampleAppName, ITestOutputHelper output)
             : base(sampleAppName, output)
         {
             InitializeExpectations(sampleAppName);
-            _callTargetOnly = callTargetOnly;
             SetServiceVersion(ServiceVersion);
         }
 
-        [SkippableTheory]
+        [SkippableFact]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
-        [InlineData(false)]
-        [InlineData(true)]
-        public void SubmitsTraces(bool enableCallTarget)
+        public void SubmitsTraces()
         {
-            if (_callTargetOnly && !enableCallTarget)
-            {
-                return;
-            }
-
-            SetCallTargetSettings(enableCallTarget);
-
             int agentPort = TcpPortProvider.GetOpenPort();
             int aspNetCorePort = TcpPortProvider.GetOpenPort();
 
@@ -340,5 +326,3 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         }
     }
 }
-
-#endif

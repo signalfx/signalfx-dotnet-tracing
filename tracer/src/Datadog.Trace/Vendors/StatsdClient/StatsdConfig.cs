@@ -42,7 +42,7 @@ namespace Datadog.Trace.Vendors.StatsdClient
         /// <summary>
         /// The name of the environment variable defining the service name
         /// </summary>
-        public const string ServiceEnvVar = "SIGNALFX_SERVICE";
+        public const string ServiceEnvVar = "SIGNALFX_SERVICE_NAME";
 
         /// <summary>
         /// The name of the environment variable defining the environment name

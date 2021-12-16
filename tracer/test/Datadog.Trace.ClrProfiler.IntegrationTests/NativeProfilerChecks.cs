@@ -21,7 +21,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Fact]
         public void RunChecksProject()
         {
-            SetCallTargetSettings(enableCallTarget: true);
             SetEnvironmentVariable("SIGNALFX_TRACE_DEBUG", "1");
             int agentPort = TcpPortProvider.GetOpenPort();
 

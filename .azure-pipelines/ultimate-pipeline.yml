@@ -62,7 +62,7 @@ schedules:
 # Global variables
 variables:
   buildConfiguration: Release
-  dotnetCoreSdk5Version: 5.0.401
+  dotnetCoreSdkLatestVersion: 6.0.100
   relativeTracerHome: /tracer/src/bin/windows-tracer-home
   relativeArtifacts: /tracer/src/bin/artifacts
   ddTracerHome: $(System.DefaultWorkingDirectory)/tracer/src/bin/dd-tracer-home
@@ -71,11 +71,11 @@ variables:
   profilerHome: $(System.DefaultWorkingDirectory)/profiler/bin/profiler-home # Important, put the profiler assets into the working directory so it can be saved across build stages more easily
   monitoringHome: $(System.DefaultWorkingDirectory)/shared/bin/monitoring-home
   artifacts: $(System.DefaultWorkingDirectory)/tracer/src/bin/artifacts
-  ddApiKey: $(DD_API_KEY)
+  ddApiKey: $(SIGNALFX_API_KEY)
   isMainBranch: $[in(variables['Build.SourceBranch'], 'refs/heads/master', 'refs/heads/main')]
   isMainOrReleaseBranch: $[or(in(variables['Build.SourceBranch'], 'refs/heads/master', 'refs/heads/main'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'))]
   isPullRequest: $[eq(variables['Build.Reason'], 'PullRequest')]
-  DD_DOTNET_TRACER_MSBUILD:
+  SIGNALFX_DOTNET_TRACER_MSBUILD:
   NugetPackageDirectory: $(System.DefaultWorkingDirectory)/packages
   relativeNugetPackageDirectory: packages
   # For scheduled builds, only run benchmarks and crank (and deps).
@@ -93,8 +93,8 @@ resources:
     ports:
     - 8126:8126
     env:
-      DD_API_KEY: $(ddApiKey)
-      DD_INSIDE_CI: true
+      SIGNALFX_API_KEY: $(ddApiKey)
+      SIGNALFX_INSIDE_CI: true
   repositories:
   - repository: dd-continuous-profiler-dotnet
     type: github
@@ -117,7 +117,7 @@ stages:
     - checkout: self
       path: s
 
-    - template: steps/install-dotnet-5-sdk.yml
+    - template: steps/install-latest-dotnet-sdk.yml
 
     # workaround for "Unable move and reuse existing repository to required location."
     # https://github.com/microsoft/azure-pipelines-yaml/issues/403
@@ -247,7 +247,7 @@ stages:
     pool:
       vmImage: macOS-10.15
     steps:
-    - template: steps/install-dotnet-5-sdk.yml
+    - template: steps/install-latest-dotnet-sdk.yml
 
     - script: ./tracer/build.sh BuildTracerHome
       displayName: Build tracer home
@@ -275,7 +275,7 @@ stages:
       # Temporarily use the profiling repo's commit hash for the beta MSI's filename
       BetaMsiSuffix: $[ stageDependencies.build_windows.build.outputs['SetMsiSuffix.BetaMsiSuffix']]
     steps:
-      - template: steps/install-dotnet-5-sdk.yml
+      - template: steps/install-latest-dotnet-sdk.yml
       - template: steps/restore-working-directory.yml
       - script: echo $(BetaMsiSuffix) # TODO Remove
 
@@ -473,9 +473,10 @@ stages:
     pool:
       vmImage: ubuntu-18.04
     steps:
+    - checkout: none
     - bash: |
         matrix="{"
-        for framework in "net452" "net461" "netcoreapp2.1" "netcoreapp3.0" "netcoreapp3.1" "net5.0"; do
+        for framework in "net461" "netcoreapp2.1" "netcoreapp3.0" "netcoreapp3.1" "net5.0" "net6.0"; do
           for platform in "x64" "x86"; do
             name="${platform}_${framework//./_}"
             if [ $target == "BuildAndRunWindowsIntegrationTests" ]; then cosmos=true; else cosmos=false; fi
@@ -548,9 +549,10 @@ stages:
     pool:
       vmImage: ubuntu-18.04
     steps:
+      - checkout: none
       - bash: |
           matrix="{"
-          for framework in "net452" "net461" "netcoreapp2.1" "netcoreapp3.0" "netcoreapp3.1" "net5.0"; do
+          for framework in "net461" "netcoreapp2.1" "netcoreapp3.0" "netcoreapp3.1" "net5.0" "net6.0"; do
             for platform in "x64" "x86"; do
               name="${framework//./_}_${platform}"
               if [ $platform == "x86" ]; then enable32bit=true; else enable32bit=false; fi
@@ -652,6 +654,9 @@ stages:
         debian_net5_0:
           publishTargetFramework: net5.0
           baseImage: debian
+        debian_net6_0:
+          publishTargetFramework: net6.0
+          baseImage: debian
         alpine_netcoreapp2_1:
           publishTargetFramework: netcoreapp2.1
           baseImage: alpine
@@ -663,6 +668,9 @@ stages:
           baseImage: alpine
         alpine_net5_0:
           publishTargetFramework: net5.0
+          baseImage: alpine
+        alpine_net6_0:
+          publishTargetFramework: net6.0
           baseImage: alpine
 
     variables:
@@ -749,10 +757,15 @@ stages:
         jobs: [Test]
 
     - job: Test
+      strategy:
+        matrix:
+          net5_0:
+            publishTargetFramework: net5.0
+          net6_0:
+            publishTargetFramework: net6.0
       variables:
         TestAllPackageVersions: true
         IncludeMinorPackageVersions:  $[or(eq(variables.isMainOrReleaseBranch, 'true'), eq(variables.perform_comprehensive_testing, 'true'))]
-        publishTargetFramework: net5.0
         baseImage: debian
       workspace:
         clean: all
@@ -848,7 +861,7 @@ stages:
 
     steps:
 
-    - template: steps/install-dotnet-5-sdk.yml
+    - template: steps/install-latest-dotnet-sdk.yml
     - template: steps/restore-working-directory.yml
 
     - script: tracer\build.cmd RunBenchmarks
@@ -890,7 +903,7 @@ stages:
       dd_agent: dd_agent
 
     steps:
-    - template: steps/install-dotnet-5-sdk.yml
+    - template: steps/install-latest-dotnet-sdk.yml
     - template: steps/restore-working-directory.yml
 
     - task: DownloadPipelineArtifact@2
@@ -1221,7 +1234,6 @@ stages:
         path: $(System.DefaultWorkingDirectory)/tracer/tracer-home-linux
 
     - script: |
-        test ! -s "tracer/tracer-home-linux/integrations.json" && echo "tracer/tracer-home-linux/integrations.json does not exist" && exit 1
         test ! -s "tracer/tracer-home-linux/Datadog.Trace.ClrProfiler.Native.so" && echo "tracer/tracer-home-linux/Datadog.Trace.ClrProfiler.Native.so does not exist" && exit 1
         test ! -s "tracer/tracer-home-linux/libddwaf.so" && echo "tracer/tracer-home-linux/libddwaf.so does not exist" && exit 1
         cd $(System.DefaultWorkingDirectory)/tracer/build/crank
@@ -1229,7 +1241,7 @@ stages:
         ./run.sh "linux"
       displayName: Crank
       env:
-        DD_SERVICE: dd-trace-dotnet
+        SIGNALFX_SERVICE_NAME: dd-trace-dotnet
 
   - job: Windows64
     timeoutInMinutes: 60
@@ -1242,7 +1254,6 @@ stages:
         path: $(System.DefaultWorkingDirectory)/tracer/tracer-home-win
 
     - script: |
-        test ! -s "tracer/tracer-home-win/integrations.json" && echo "tracer/tracer-home-win/integrations.json does not exist" && exit 1
         test ! -s "tracer/tracer-home-win/win-x64/Datadog.Trace.ClrProfiler.Native.dll" && echo "tracer/tracer-home-win/win-x64/Datadog.Trace.ClrProfiler.Native.dll does not exist" && exit 1
         test ! -s "tracer/tracer-home-win/win-x64/ddwaf.dll" && echo "tracer/tracer-home-win/win-x64/ddwaf.dll does not exist" && exit 1
         cd $(System.DefaultWorkingDirectory)/tracer/build/crank
@@ -1250,7 +1261,7 @@ stages:
         ./run.sh "windows"
       displayName: Crank
       env:
-        DD_SERVICE: dd-trace-dotnet
+        SIGNALFX_SERVICE_NAME: dd-trace-dotnet
 
   - job: LinuxArm64
     timeoutInMinutes: 60
@@ -1263,15 +1274,14 @@ stages:
         path: $(System.DefaultWorkingDirectory)/tracer/tracer-home-linux-arm64
 
     - script: |
-        test ! -s "tracer/tracer-home-linux-arm64/integrations.json" && echo "tracer/tracer-home-linux-arm64/integrations.json does not exist" && exit 1
         test ! -s "tracer/tracer-home-linux-arm64/Datadog.Trace.ClrProfiler.Native.so" && echo "tracer/tracer-home-linux-arm64/Datadog.Trace.ClrProfiler.Native.so does not exist" && exit 1
         cd $(System.DefaultWorkingDirectory)/tracer/build/crank
         chmod +x ./run.sh
         ./run.sh "linux_arm64"
       displayName: Crank
       env:
-        DD_SERVICE: dd-trace-dotnet
-        DD_ENV: CI
+        SIGNALFX_SERVICE_NAME: dd-trace-dotnet
+        SIGNALFX_ENV: CI
 
 - stage: coverage
   condition: and(succeeded(), eq(variables['isScheduledBuild'], 'False'), ne(variables['isNgenTestBuild'], 'True'))
@@ -1284,7 +1294,7 @@ stages:
         vmImage: windows-2019
 
       steps:
-      - template: steps/install-dotnet-5-sdk.yml
+      - template: steps/install-latest-dotnet-sdk.yml
       - template: steps/restore-working-directory.yml
 
       - task: DownloadPipelineArtifact@2
@@ -1369,13 +1379,13 @@ stages:
       workingDirectory: $(System.DefaultWorkingDirectory)/tracer/build/timeit/Samples.HttpMessageHandler
       displayName: Execute Samples.HttpMessageHandler benchmark
       env:
-        DD_SERVICE: dd-trace-dotnet
+        SIGNALFX_SERVICE_NAME: dd-trace-dotnet
 
     - script: run.cmd
       workingDirectory: $(System.DefaultWorkingDirectory)/tracer/build/timeit/Samples.FakeDbCommand
       displayName: Execute Samples.FakeDbCommand benchmark
       env:
-        DD_SERVICE: dd-trace-dotnet
+        SIGNALFX_SERVICE_NAME: dd-trace-dotnet
 
     - task: PowerShell@2
       displayName: Wait 20 seconds to agent flush before finishing pipeline
@@ -1411,7 +1421,6 @@ stages:
           echo Moving $PACKAGE_NAME to system-tests/binaries
           mv $(Build.ArtifactStagingDirectory)/$PACKAGE_NAME system-tests/binaries/
         displayName: Move dotnet binary to system test folder
-
       - script: ./build.sh dotnet
         workingDirectory: system-tests
         displayName: Build images
@@ -1420,9 +1429,189 @@ stages:
         workingDirectory: system-tests
         displayName: Run tests
         env:
-          DD_API_KEY: $(SYSTEM_TESTS_DD_API_KEY)
+          SIGNALFX_API_KEY: $(SYSTEM_TESTS_SIGNALFX_API_KEY)
 
       - publish: system-tests/logs
         condition: always()
         displayName: System tests logs
         artifact: system-tests
+
+- stage: installer_smoke_tests
+  condition: and(succeeded(), eq(variables['isScheduledBuild'], 'False'))
+  dependsOn: [build_linux]
+  jobs:
+  - template: steps/update-github-status-jobs.yml
+    parameters:
+      jobs: [linux]
+
+  - job: generator
+    pool:
+      vmImage: ubuntu-18.04
+    steps:
+    - checkout: none
+    - bash: |
+        matrix="{"
+        for i in \
+          "net6.0 6.0-bullseye-slim" \
+          "net5.0 5.0-bullseye-slim" \
+          "net5.0 5.0-buster-slim" \
+          "net5.0 5.0-focal" \
+          "netcoreapp3.1 3.1-bullseye-slim" \
+          "netcoreapp3.1 3.1-buster-slim" \
+          "netcoreapp3.1 3.1-bionic" \
+          "netcoreapp2.1 2.1-bionic" \
+          "netcoreapp2.1 2.1-stretch-slim" \
+        ; do fwAndImage=( $i )
+          publishFramework="${fwAndImage[0]}";
+          runtimeImageTag="${fwAndImage[1]}";
+          name="${runtimeImageTag//./_}"
+
+          matrix="${matrix} '${name}':"
+          matrix="${matrix} { 'installCmd': 'dpkg -i ./datadog-dotnet-apm*_amd64.deb', "
+          matrix="${matrix} 'dockerTag': '${name}', "
+          matrix="${matrix} 'publishFramework': '${publishFramework}', "
+          matrix="${matrix} 'linuxArtifacts': 'linux-packages-debian', "
+          matrix="${matrix} 'runtimeImage': 'mcr.microsoft.com/dotnet/aspnet:${runtimeImageTag}' },"
+        done;
+
+        for i in \
+          "net5.0 35-5.0" \
+          "netcoreapp3.1 35-3.1" \
+          "net6.0 34-6.0" \
+          "net5.0 34-5.0" \
+          "netcoreapp3.1 34-3.1" \
+          "net5.0 33-5.0" \
+          "netcoreapp3.1 33-3.1" \
+          "netcoreapp3.1 29-3.1" \
+          "netcoreapp2.1 29-2.1" \
+        ; do fwAndImage=( $i )
+          publishFramework="${fwAndImage[0]}";
+          runtimeImageTag="${fwAndImage[1]}";
+          name="${runtimeImageTag//./_}"
+
+          matrix="${matrix} 'fedora-${name}':"
+          matrix="${matrix} { 'installCmd': 'rpm -Uvh ./datadog-dotnet-apm*-1.x86_64.rpm', "
+          matrix="${matrix} 'dockerTag': '${name}', "
+          matrix="${matrix} 'publishFramework': '${publishFramework}', "
+          matrix="${matrix} 'linuxArtifacts': 'linux-packages-debian', "
+          matrix="${matrix} 'runtimeImage': 'andrewlock/dotnet-fedora:${runtimeImageTag}' },"
+        done;
+
+        for i in \
+          "net6.0 6.0-alpine3.14" \
+          "net5.0 5.0-alpine3.14" \
+          "net5.0 5.0-alpine3.13" \
+          "netcoreapp3.1 3.1-alpine3.14" \
+          "netcoreapp3.1 3.1-alpine3.13" \
+          "netcoreapp2.1 2.1-alpine3.12" \
+        ; do fwAndImage=( $i )
+          publishFramework="${fwAndImage[0]}";
+          runtimeImageTag="${fwAndImage[1]}";
+          name="${runtimeImageTag//./_}"
+
+          matrix="${matrix} '${name}':"
+          matrix="${matrix} { 'installCmd': 'tar -C /opt/datadog -xzf ./datadog-dotnet-apm*-musl.tar.gz', "
+          matrix="${matrix} 'dockerTag': '${name}', "
+          matrix="${matrix} 'publishFramework': '${publishFramework}', "
+          matrix="${matrix} 'linuxArtifacts': 'linux-packages-alpine', "
+          matrix="${matrix} 'runtimeImage': 'mcr.microsoft.com/dotnet/aspnet:${runtimeImageTag}' },"
+        done;
+        matrix="${matrix::-1} }"
+        echo "##vso[task.setVariable variable=values;isOutput=true]${matrix}"
+      name: mtrx
+
+  - job: linux
+    dependsOn: [generator]
+    strategy:
+      matrix: $[ dependencies.generator.outputs['mtrx.values'] ]
+    variables:
+      smokeTestAppDir: "$(System.DefaultWorkingDirectory)/tracer/test/test-applications/regression/AspNetCoreSmokeTest"
+    pool:
+      vmImage: ubuntu-18.04
+
+    steps:
+    - task: DownloadPipelineArtifact@2
+      displayName: Download artifacts to smoke test directory
+      inputs:
+        artifact: $(linuxArtifacts)
+        path: $(smokeTestAppDir)/artifacts
+
+    - script: |
+        docker build \
+          --build-arg DOTNETSDK_VERSION=$(dotnetCoreSdkLatestVersion) \
+          --build-arg RUNTIME_IMAGE=$(runtimeImage) \
+          --build-arg PUBLISH_FRAMEWORK=$(publishFramework) \
+          --build-arg INSTALL_CMD="$(installCmd)" \
+          --tag dd-trace-dotnet/$(dockerTag)-smoke-test \
+          --file "$(System.DefaultWorkingDirectory)/tracer/build/_build/docker/smoke.dockerfile" \
+          "$(smokeTestAppDir)"
+      displayName: Build $(dockerTag) Docker image
+
+    - script: docker run --rm dd-trace-dotnet/$(dockerTag)-smoke-test
+      displayName: Test $(dockerTag) Docker image
+
+- stage: installer_smoke_tests_arm64
+  condition: and(succeeded(), eq(variables['isScheduledBuild'], 'False'))
+  dependsOn: [build_arm64]
+  jobs:
+    - template: steps/update-github-status-jobs.yml
+      parameters:
+        jobs: [linux]
+
+    - job: generator
+      pool:
+        vmImage: ubuntu-18.04
+      steps:
+        - checkout: none
+        - bash: |
+            matrix="{"
+            for i in \
+              "net6.0 6.0-bullseye-slim" \
+              "net5.0 5.0-bullseye-slim" \
+              "net5.0 5.0-buster-slim" \
+              "net5.0 5.0-focal" \
+            ; do fwAndImage=( $i )
+              publishFramework="${fwAndImage[0]}";
+              runtimeImageTag="${fwAndImage[1]}";
+              name="${runtimeImageTag//./_}"
+
+              matrix="${matrix} '${name}':"
+              matrix="${matrix} { 'installCmd': 'dpkg -i ./datadog-dotnet-apm_*_arm64.deb', "
+              matrix="${matrix} 'dockerTag': '${name}', "
+              matrix="${matrix} 'publishFramework': '${publishFramework}', "
+              matrix="${matrix} 'linuxArtifacts': 'linux-packages-arm64', "
+              matrix="${matrix} 'runtimeImage': 'mcr.microsoft.com/dotnet/aspnet:${runtimeImageTag}' },"
+            done;
+            matrix="${matrix::-1} }"
+            echo "##vso[task.setVariable variable=values;isOutput=true]${matrix}"
+          name: mtrx
+
+    - job: linux
+      dependsOn: [generator]
+      strategy:
+        matrix: $[ dependencies.generator.outputs['mtrx.values'] ]
+      variables:
+        smokeTestAppDir: "$(System.DefaultWorkingDirectory)/tracer/test/test-applications/regression/AspNetCoreSmokeTest"
+      pool:
+        name: Arm64
+
+      steps:
+        - task: DownloadPipelineArtifact@2
+          displayName: Download artifacts to smoke test directory
+          inputs:
+            artifact: $(linuxArtifacts)
+            path: $(smokeTestAppDir)/artifacts
+
+        - script: |
+            docker build \
+              --build-arg DOTNETSDK_VERSION=$(dotnetCoreSdkLatestVersion) \
+              --build-arg RUNTIME_IMAGE=$(runtimeImage) \
+              --build-arg PUBLISH_FRAMEWORK=$(publishFramework) \
+              --build-arg INSTALL_CMD="$(installCmd)" \
+              --tag dd-trace-dotnet/$(dockerTag)-smoke-test \
+              --file "$(System.DefaultWorkingDirectory)/tracer/build/_build/docker/smoke.dockerfile" \
+              "$(smokeTestAppDir)"
+          displayName: Build $(dockerTag) Docker image
+
+        - script: docker run --rm dd-trace-dotnet/$(dockerTag)-smoke-test
+          displayName: Test $(dockerTag) Docker image

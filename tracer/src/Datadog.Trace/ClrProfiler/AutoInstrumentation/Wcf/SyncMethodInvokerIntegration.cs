@@ -9,7 +9,6 @@ using System.ComponentModel;
 using System.Reflection;
 using Datadog.Trace.ClrProfiler.CallTarget;
 using Datadog.Trace.ClrProfiler.Emit;
-using Datadog.Trace.ClrProfiler.Integrations;
 using Datadog.Trace.Configuration;
 
 namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
@@ -23,7 +22,6 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
         MethodName = "Invoke",
         ReturnTypeName = ClrNames.Object,
         ParameterTypeNames = new[] { ClrNames.Object, "System.Object[]", "System.Object[]&" },
-        TargetMethodArgumentsToLoad = new ushort[] { 0, 1 }, // DO NOT pass the "out object[]" parameter into the instrumentation method
         MinimumVersion = "4.0.0",
         MaximumVersion = "4.*.*",
         IntegrationName = WcfCommon.IntegrationName)]
@@ -38,8 +36,9 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
         /// <param name="instance">Instance value, aka `this` of the instrumented method.</param>
         /// <param name="instanceArg">RequestContext instance</param>
         /// <param name="inputs">Input arguments</param>
+        /// <param name="outputs">Output arguments</param>
         /// <returns>Calltarget state value</returns>
-        public static CallTargetState OnMethodBegin<TTarget>(TTarget instance, object instanceArg, object[] inputs)
+        public static CallTargetState OnMethodBegin<TTarget>(TTarget instance, object instanceArg, object[] inputs, ref object[] outputs)
         {
             // TODO Just use the OperationContext.Current object to get the span information
             // context.IncomingMessageHeaders contains:
@@ -54,7 +53,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
             }
 
             var requestContext = WcfCommon.GetCurrentOperationContext()?.GetProperty<object>("RequestContext").GetValueOrDefault();
-            return new CallTargetState(WcfIntegration.CreateScope(requestContext));
+            return new CallTargetState(WcfCommon.CreateScope(requestContext));
         }
 
         /// <summary>

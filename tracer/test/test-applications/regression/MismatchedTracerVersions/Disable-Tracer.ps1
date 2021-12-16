@@ -1,7 +1,6 @@
 $ErrorActionPreference = 'SilentlyContinue'
 
 Remove-Item 'env:SIGNALFX_DOTNET_TRACER_HOME'
-Remove-Item 'env:SIGNALFX_INTEGRATIONS'
 Remove-Item 'env:SIGNALFX_TRACE_LOG_DIRECTORY'
 Remove-Item 'env:SIGNALFX_PROFILER_EXCLUDE_PROCESSES'
 

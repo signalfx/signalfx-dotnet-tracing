@@ -15,7 +15,7 @@ namespace Datadog.Trace.Tests.Agent.Zipkin
         [Fact]
         public void RoundTripRootSpanTest()
         {
-            var settings = new TracerSettings();
+            var settings = new TracerSettings().Build();
             var span = SpanFactory.CreateSpan();
             var zipkinSpan = new ZipkinSpan(span, settings);
 
@@ -49,7 +49,7 @@ namespace Datadog.Trace.Tests.Agent.Zipkin
             {
                 RecordedValueMaxLength = expected.Length,
             };
-            var zipkinSpan = new ZipkinSpan(span, settings);
+            var zipkinSpan = new ZipkinSpan(span, settings.Build());
             var tags = zipkinSpan.Tags;
             Assert.Single(tags);
             Assert.Equal(expected, tags.First().Value);

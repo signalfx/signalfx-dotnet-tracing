@@ -39,7 +39,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.CI
 
             try
             {
-                SetCallTargetSettings(true);
                 SetEnvironmentVariable("SIGNALFX_CIVISIBILITY_ENABLED", "1");
                 SetEnvironmentVariable("SIGNALFX_TRACE_DEBUG", "1");
                 SetEnvironmentVariable("SIGNALFX_DUMP_ILREWRITE_ENABLED", "1");
@@ -84,7 +83,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.CI
                         AssertTargetSpanEqual(targetSpan, "signalfx.tracing.library", "dotnet-tracing");
 
                         // check the SingalFx library version
-                        AssertTargetSpanEqual(targetSpan, "signalfx.tracing.version", "0.0.1.0");
+                        AssertTargetSpanEqual(targetSpan, "signalfx.tracing.version", "0.2.0.0");
 
                         // checks the runtime id tag
                         AssertTargetSpanExists(targetSpan, Tags.RuntimeId);

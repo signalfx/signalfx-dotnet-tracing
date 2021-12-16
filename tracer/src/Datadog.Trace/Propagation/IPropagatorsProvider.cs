@@ -1,5 +1,4 @@
 using Datadog.Trace.Conventions;
-using Datadog.Trace.Plugins;
 
 namespace Datadog.Trace.Propagation
 {
@@ -7,7 +6,7 @@ namespace Datadog.Trace.Propagation
     /// Factory interface for propagators.
     /// Implementation must have a default (parameterless) constructor.
     /// </summary>
-    public interface IPropagatorsProvider : IOTelExtension
+    public interface IPropagatorsProvider
     {
         /// <summary>
         /// Gets propagator for propagator id.

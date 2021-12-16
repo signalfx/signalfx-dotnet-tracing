@@ -28,7 +28,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Http.WebRequest
         MethodName = MethodName,
         ReturnTypeName = WebRequestCommon.WebResponseTypeName,
         MinimumVersion = WebRequestCommon.Major4,
-        MaximumVersion = WebRequestCommon.Major5,
+        MaximumVersion = WebRequestCommon.Major6,
         IntegrationName = WebRequestCommon.IntegrationName)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -63,7 +63,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Http.WebRequest
             {
                 if (returnValue is HttpWebResponse response)
                 {
-                    state.Scope.Span.SetHttpStatusCode((int)response.StatusCode, isServer: false);
+                    state.Scope.Span.SetHttpStatusCode((int)response.StatusCode, false, Tracer.Instance.Settings);
                 }
 
                 state.Scope.DisposeWithException(exception);

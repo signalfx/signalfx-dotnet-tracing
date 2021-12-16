@@ -40,10 +40,9 @@ namespace Datadog.Trace.Configuration
                                       // default value
                                       true;
 
-            if (TryLoadPluginJsonConfigurationFile(source, out JsonConfigurationSource jsonConfigurationSource))
-            {
-                PluginsConfiguration = jsonConfigurationSource;
-            }
+            FileLogEnabled = source?.GetBool(ConfigurationKeys.FileLogEnabled) ?? true;
+
+            StdoutLogEnabled = source?.GetBool(ConfigurationKeys.StdoutLogEnabled) ?? false;
         }
 
         /// <summary>
@@ -53,6 +52,20 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="ConfigurationKeys.DebugEnabled"/>
         public bool DebugEnabled { get; private set; }
+
+        /// <summary>
+        /// Gets a value indicating whether file log is enabled.
+        /// Default is <c>true</c>.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.FileLogEnabled"/>
+        public bool FileLogEnabled { get; private set; }
+
+        /// <summary>
+        /// Gets a value indicating whether stdout log is enabled.
+        /// Default is <c>false</c>.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.StdoutLogEnabled"/>
+        public bool StdoutLogEnabled { get; private set; }
 
         /// <summary>
         /// Gets or sets the global settings instance.
@@ -66,11 +79,6 @@ namespace Datadog.Trace.Configuration
         /// or a configuration file, not through code.
         /// </summary>
         internal bool DiagnosticSourceEnabled { get; }
-
-        /// <summary>
-        /// Gets the plugins configuration.
-        /// </summary>
-        internal JsonConfigurationSource PluginsConfiguration { get; }
 
         /// <summary>
         /// Set whether debug mode is enabled.
@@ -136,13 +144,6 @@ namespace Datadog.Trace.Configuration
             }
 
             return configurationSource;
-        }
-
-        private static bool TryLoadPluginJsonConfigurationFile(IConfigurationSource configurationSource, out JsonConfigurationSource jsonConfigurationSource)
-        {
-            var configurationFileName = configurationSource?.GetString(ConfigurationKeys.PluginConfigurationFileName);
-
-            return TryLoadJsonConfigurationFile(configurationFileName, out jsonConfigurationSource);
         }
 
         private static bool TryLoadJsonConfigurationFile(IConfigurationSource configurationSource, out JsonConfigurationSource jsonConfigurationSource)

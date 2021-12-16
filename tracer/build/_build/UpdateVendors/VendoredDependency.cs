@@ -55,6 +55,13 @@ namespace UpdateVendors
                 downloadUrl: "https://github.com/JamesNK/Newtonsoft.Json/archive/12.0.1.zip",
                 pathToSrc: new[] { "Newtonsoft.Json-12.0.1", "src", "Newtonsoft.Json" },
                 transform: filePath => RewriteCsFileWithStandardTransform(filePath, originalNamespace: "Newtonsoft.Json"));
+
+            Add(
+                libraryName: "protobuf-net",
+                version: "2.4.6",
+                downloadUrl: "https://github.com/protobuf-net/protobuf-net/archive/69e1777a431d5ed4faee639ca4cec5b835aea8ca.zip",
+                pathToSrc: new[] { "protobuf-net-69e1777a431d5ed4faee639ca4cec5b835aea8ca", "src", "protobuf-net" },
+                transform: filePath => RewriteCsFileWithStandardTransform(filePath, originalNamespace: "ProtoBuf"));
         }
 
         public static List<VendoredDependency> All { get; set; } = new List<VendoredDependency>();
@@ -109,6 +116,23 @@ namespace UpdateVendors
                                 builder.Replace($"Func<", $"System.Func<");
                                 builder.Replace($"Action<", $"System.Action<");
                             }
+                        }
+
+                        // Special ProtoBuf handling
+                        if (originalNamespace.Equals("ProtoBuf"))
+                        {
+                            builder.Replace("\"ProtoBuf.ProtoContractAttribute\"", "\"Datadog.Trace.Vendors.ProtoBuf.ProtoContractAttribute\"");
+                            builder.Replace("\"ProtoBuf.ProtoIncludeAttribute\"", "\"Datadog.Trace.Vendors.ProtoBuf.ProtoIncludeAttribute\"");
+                            builder.Replace("\"ProtoBuf.ProtoPartialMemberAttribute\"", "\"Datadog.Trace.Vendors.ProtoBuf.ProtoPartialMemberAttribute\"");
+                            builder.Replace("\"ProtoBuf.ProtoPartialIgnoreAttribute\"", "\"Datadog.Trace.Vendors.ProtoBuf.ProtoPartialIgnoreAttribute\"");
+                            builder.Replace("\"ProtoBuf.ProtoAfterDeserializationAttribute\"", "\"Datadog.Trace.Vendors.ProtoBuf.ProtoAfterDeserializationAttribute\"");
+                            builder.Replace("\"ProtoBuf.ProtoBeforeDeserializationAttribute\"", "\"Datadog.Trace.Vendors.ProtoBuf.ProtoBeforeDeserializationAttribute\"");
+                            builder.Replace("\"ProtoBuf.ProtoAfterSerializationAttribute\"", "\"Datadog.Trace.Vendors.ProtoBuf.ProtoAfterSerializationAttribute\"");
+                            builder.Replace("\"ProtoBuf.ProtoBeforeSerializationAttribute\"", "\"Datadog.Trace.Vendors.ProtoBuf.ProtoBeforeSerializationAttribute\"");
+                            builder.Replace("\"ProtoBuf.ProtoEnumAttribute\"", "\"Datadog.Trace.Vendors.ProtoBuf.ProtoEnumAttribute\"");
+                            builder.Replace("\"ProtoBuf.ProtoMapAttribute\"", "\"Datadog.Trace.Vendors.ProtoBuf.ProtoMapAttribute\"");
+                            builder.Replace("\"ProtoBuf.ProtoIgnoreAttribute\"", "\"Datadog.Trace.Vendors.ProtoBuf.ProtoIgnoreAttribute\"");
+                            builder.Replace("\"ProtoBuf.ProtoMemberAttribute\"", "\"Datadog.Trace.Vendors.ProtoBuf.ProtoMemberAttribute\"");
                         }
 
                         // Prevent namespace conflicts

@@ -5,11 +5,10 @@
 
 // Modified by Splunk Inc.
 
-#if !NET452
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.Configuration;
-using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.TestHelpers;
 using Xunit;
 using Xunit.Abstractions;
@@ -24,28 +23,12 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             SetServiceVersion("1.0.0");
         }
 
-        public static IEnumerable<object[]> GetMicrosoftDataSqlClient()
-        {
-            foreach (object[] item in PackageVersions.MicrosoftDataSqlClient)
-            {
-                // Callsite instrumentation is not supported with 3.*
-                if (!item.Cast<string>().First().StartsWith("3"))
-                {
-                    yield return item.Concat(false);
-                }
-
-                yield return item.Concat(true);
-            }
-        }
-
         [SkippableTheory]
-        [MemberData(nameof(GetMicrosoftDataSqlClient))]
+        [MemberData(nameof(PackageVersions.MicrosoftDataSqlClient), MemberType = typeof(PackageVersions))]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
-        public void SubmitsTracesWithNetStandard(string packageVersion, bool enableCallTarget)
+        public void SubmitsTraces(string packageVersion)
         {
-            SetCallTargetSettings(enableCallTarget);
-
             // ALWAYS: 133 spans
             // - SqlCommand: 21 spans (3 groups * 7 spans)
             // - DbCommand:  42 spans (6 groups * 7 spans)
@@ -53,78 +36,69 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             // - DbCommand-netstandard:  42 spans (6 groups * 7 spans)
             // - IDbCommand-netstandard: 14 spans (2 groups * 7 spans)
             //
-            // CALLSITE: +4 spans
-            // - IDbCommandGenericConstrant<T>: 4 spans (2 group * 2 spans)
-            //
             // CALLTARGET: +14 spans
-            // - IDbCommandGenericConstrant<SqlCommand>: 7 spans (1 group * 7 spans)
-            // - IDbCommandGenericConstrant<SqlCommand>-netstandard: 7 spans (1 group * 7 spans)
-#if NET461
-            var expectedSpanCount = 133;
-#else
-            var expectedSpanCount = 137;
-#endif
+            // - IDbCommandGenericConstraint<SqlCommand>: 7 spans (1 group * 7 spans)
+            // - IDbCommandGenericConstraint<SqlCommand>-netstandard: 7 spans (1 group * 7 spans)
 
-            if (enableCallTarget)
+            // version 4.0 : 91 spans
+            // - SqlCommand: 21 spans (3 groups * 7 spans)
+            // - DbCommand:  21 spans (3 groups * 7 spans)
+            // - IDbCommand: 7 spans (1 groups * 7 spans)
+            // - DbCommand-netstandard:  21 spans (3 groups * 7 spans)
+            // - IDbCommand-netstandard: 7 spans (1 groups * 7 spans)
+            // - IDbCommandGenericConstraint<SqlCommand>: 7 spans (1 group * 7 spans)
+            // - IDbCommandGenericConstraint<SqlCommand>-netstandard: 7 spans (1 group * 7 spans)
+            var isVersion4 = !string.IsNullOrWhiteSpace(packageVersion)
+                          && new Version(packageVersion) >= new Version("4.0.0");
+
+            if (isVersion4 && FrameworkDescription.Instance.OSPlatform != OSPlatform.Windows)
             {
-                expectedSpanCount = 147;
+                // Version 4.0.0 has an issue on Linux https://github.com/dotnet/SqlClient/issues/1390
+                return;
             }
 
+            var expectedSpanCount = isVersion4 ? 91 : 147;
             const string dbType = "mssql";
             const string expectedOperationName = dbType + ".query";
             const string expectedServiceName = "Samples.Microsoft.Data.SqlClient";
 
-            // NOTE: opt into the additional instrumentation of calls into netstandard.dll
-            SetEnvironmentVariable("SIGNALFX_TRACE_NETSTANDARD_ENABLED", "true");
-
             int agentPort = TcpPortProvider.GetOpenPort();
+            using var agent = new MockTracerAgent(agentPort);
+            using var process = RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion);
+            var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
+            int actualSpanCount = spans.Count(s => s.ParentId.HasValue); // Remove unexpected DB spans from the calculation
 
-            using (var agent = new MockTracerAgent(agentPort))
-            using (RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion))
+            Assert.Equal(expectedSpanCount, actualSpanCount);
+
+            foreach (var span in spans)
             {
-                var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
-                int actualSpanCount = spans.Where(s => s.ParentId.HasValue).Count(); // Remove unexpected DB spans from the calculation
-                Assert.Equal(expectedSpanCount, actualSpanCount);
-
-                foreach (var span in spans)
-                {
-                    Assert.Equal(expectedOperationName, span.Name);
-                    Assert.Equal(expectedServiceName, span.Service);
-                    Assert.Equal(SpanTypes.Sql, span.Type);
-                    Assert.Equal(dbType, span.Tags[Tags.DbType]);
-                    Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
-                    Assert.Contains(Tags.DbStatement, (IDictionary<string, string>)span.Tags);
-                }
+                Assert.Equal(expectedOperationName, span.Name);
+                Assert.Equal(expectedServiceName, span.Service);
+                Assert.Equal(SpanTypes.Sql, span.Type);
+                Assert.Equal(dbType, span.Tags[Tags.DbType]);
+                Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
+                Assert.Contains(Tags.DbStatement, (IDictionary<string, string>)span.Tags);
             }
         }
 
-        [SkippableTheory]
-        [InlineData(false)]
-        [InlineData(true)]
+        [SkippableFact]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
-        public void SpansDisabledByAdoNetExcludedTypes(bool enableCallTarget)
+        public void IntegrationDisabled()
         {
-            SetCallTargetSettings(enableCallTarget);
+            const int totalSpanCount = 21;
+            const string expectedOperationName = "mssql.query";
 
-            var totalSpanCount = 21;
-
-            const string dbType = "mssql";
-            const string expectedOperationName = dbType + ".query";
-
-            SetEnvironmentVariable(ConfigurationKeys.AdoNetExcludedTypes, "System.Data.SqlClient.SqlCommand,Microsoft.Data.SqlClient.SqlCommand,MySql.Data.MySqlClient.MySqlCommand,Npgsql.NpgsqlCommand");
+            SetEnvironmentVariable($"SIGNALFX_TRACE_{nameof(IntegrationId.SqlClient)}_ENABLED", "false");
 
             string packageVersion = PackageVersions.MicrosoftDataSqlClient.First()[0] as string;
             int agentPort = TcpPortProvider.GetOpenPort();
+            using var agent = new MockTracerAgent(agentPort);
+            using var process = RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion);
+            var spans = agent.WaitForSpans(totalSpanCount, returnAllOperations: true);
 
-            using (var agent = new MockTracerAgent(agentPort))
-            using (RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion))
-            {
-                var spans = agent.WaitForSpans(totalSpanCount, returnAllOperations: true);
-                Assert.NotEmpty(spans);
-                Assert.Empty(spans.Where(s => s.Name.Equals(expectedOperationName)));
-            }
+            Assert.NotEmpty(spans);
+            Assert.Empty(spans.Where(s => s.Name.Equals(expectedOperationName)));
         }
     }
 }
-#endif

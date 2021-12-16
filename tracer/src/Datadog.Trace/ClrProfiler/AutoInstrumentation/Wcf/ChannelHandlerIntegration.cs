@@ -7,10 +7,17 @@
 
 #if NETFRAMEWORK
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
+using System.Net;
 using Datadog.Trace.ClrProfiler.CallTarget;
-using Datadog.Trace.ClrProfiler.Integrations;
+using Datadog.Trace.ClrProfiler.Emit;
 using Datadog.Trace.Configuration;
+using Datadog.Trace.ExtensionMethods;
+using Datadog.Trace.Logging;
+using Datadog.Trace.Propagation;
+using Datadog.Trace.Tagging;
 
 namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
 {
@@ -24,13 +31,13 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
         ReturnTypeName = ClrNames.Bool,
         ParameterTypeNames = new[] { "System.ServiceModel.Channels.RequestContext", "System.ServiceModel.OperationContext" },
         MinimumVersion = "4.0.0",
-        MaximumVersion = "5.*.*",
+        MaximumVersion = "4.*.*",
         IntegrationName = IntegrationName)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class ChannelHandlerIntegration
     {
-        private const string IntegrationName = nameof(IntegrationIds.Wcf);
+        private const string IntegrationName = nameof(Configuration.IntegrationId.Wcf);
 
         /// <summary>
         /// OnMethodBegin callback
@@ -49,7 +56,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
                 return CallTargetState.GetDefault();
             }
 
-            return new CallTargetState(WcfIntegration.CreateScope(request));
+            return new CallTargetState(WcfCommon.CreateScope(request));
         }
 
         /// <summary>

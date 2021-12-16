@@ -10,8 +10,6 @@ using System.Web;
 using Datadog.Trace.AppSec;
 using Datadog.Trace.AppSec.Transport.Http;
 using Datadog.Trace.ClrProfiler.CallTarget;
-using Datadog.Trace.ClrProfiler.Integrations;
-using Datadog.Trace.ClrProfiler.Integrations.AspNet;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.DuckTyping;
 using Datadog.Trace.Util;
@@ -42,7 +40,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
         private const string MinimumVersion = "4";
         private const string MaximumVersion = "5";
 
-        private const string IntegrationName = nameof(IntegrationIds.AspNetMvc);
+        private const string IntegrationName = nameof(IntegrationId.AspNetMvc);
 
         /// <summary>
         /// OnMethodBegin callback

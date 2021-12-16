@@ -12,7 +12,6 @@ using Datadog.Trace.Ci;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.DiagnosticListeners;
 using Datadog.Trace.Logging;
-using Datadog.Trace.Plugins;
 using Datadog.Trace.ServiceFabric;
 using Datadog.Trace.Util;
 
@@ -73,11 +72,17 @@ namespace Datadog.Trace.ClrProfiler
 
             try
             {
-                // Creates GlobalSettings instance and loads plugins
-                var plugins = PluginManager.TryLoadPlugins(GlobalSettings.Source.PluginsConfiguration);
+                Log.Debug("Enabling by ref instrumentation.");
+                NativeMethods.EnableByRefInstrumentation();
+                Log.Information("ByRef instrumentation enabled.");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "ByRef instrumentation cannot be enabled: ");
+            }
 
-                // First call to create Tracer instace
-                Tracer.Instance = new Tracer(plugins);
+            try
+            {
                 Log.Debug("Sending CallTarget integration definitions to native library.");
                 var payload = InstrumentationDefinitions.GetAllDefinitions();
                 NativeMethods.InitializeProfiler(payload.DefinitionsId, payload.Definitions);

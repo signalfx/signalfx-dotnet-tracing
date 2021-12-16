@@ -1,26 +1,43 @@
-# SignalFx Tracing Library for .NET
+# SignalFx Instrumentation for .NET
 
-The SignalFx Tracing Library for .NET provides an
-OpenTracing-compatible tracer and automatically configured instrumentations
-for popular .NET libraries and frameworks.  It supports .NET Core 2.0+ on
-Linux and Windows and .NET Framework 4.5+ on Windows.
+The SignalFx Instrumentationy for .NET provides automatic instrumentations
+for popular .NET libraries and frameworks.
 
-Where applicable, context propagation uses
-[B3 headers](https://github.com/openzipkin/b3-propagation).
+The SignalFx Instrumentation for .NET is a [.NET Profiler](https://docs.microsoft.com/en-us/dotnet/framework/unmanaged-api/profiling/profiling-overview)
+which instruments supported libraries and frameworks with bytecode manipulation
+to capture and send telemetry data (metrics, traces, and logs).
 
-The SignalFx-Tracing Library for .NET implements the
-[Profiling API](https://docs.microsoft.com/en-us/dotnet/framework/unmanaged-api/profiling/)
-and should only require basic configuration of your application environment.
+By default:
 
-You can link individual log entries with trace IDs and span IDs associated with
-corresponding events. If your application uses a supported logger, enable trace
-injection to automatically include trace context in your application's logs.
-For more information, see [Inject traces in logs](/customer-samples/AutomaticTraceIdInjection/README.md).
+- all spans are sampled and reported,
+- [B3 headers](https://github.com/openzipkin/b3-propagation) are used for context
+  propagation,
+- Zipkin trace exporter is used to send spans as JSON in the [Zipkin v2 format](https://zipkin.io/zipkin-api/#/default/post_spans).
+
+The SignalFx Instrumentationy for .NET registers an OpenTracing `GlobalTracer`
+so you can support existing custom instrumentation or add custom
+instrumentation to your application later.
+
+Whenever possible, SignalFx Instrumentation for .NET complies
+to the [OpenTelemetry Trace Semantic Conventions](https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions).
+[OpenTelemetry Collector Contrib](https://github.com/open-telemetry/opentelemetry-collector-contrib)
+with its [Zipkin Receiver](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/zipkinreceiver)
+can be used to receive, process and export telemetry data.
+However, until [OpenTelemetry .NET Auto-Instrumentation](https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation)
+is not useable, SignalFx Instrumentation for .NET is not able
+to correlate the spans created with [OpenTelemetry .NET](https://github.com/open-telemetry/opentelemetry-dotnet)
+and [`ActivitySource`](https://docs.microsoft.com/en-us/dotnet/core/diagnostics/distributed-tracing-instrumentation-walkthroughs).
+
+---
+
+## Requirements
+
+### Supported .NET versions
+
+- .NET Core 3.1, .NET 5.0 and higher on Windows and Linux (except Alpine Linux)
+- .NET Framework 4.6.2 and higher on Windows
 
 ## Supported libraries and frameworks
-
-There are [known .NET Core runtime issues](https://github.com/dotnet/coreclr/issues/18448)
-for version 2.1.0 and 2.1.2.
 
 | Library | Versions Supported | Notes |
 | ---     | ---                | ---   |
@@ -31,80 +48,113 @@ for version 2.1.0 and 2.1.2.
 | StackExchange.Redis | `StackExchange.Redis` NuGet 1.0+ | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS=false` (`true` by default). |
 | WebClient | Supported .NET versions | by way of `System.Net.WebRequest` instrumentation |
 
-## Usage
+## Get started
 
-See [USAGE.md](USAGE.md) for installation, usage and configuration instructions.
+Make sure you set up the [Splunk OpenTelemtry Collector](https://github.com/signalfx/splunk-otel-collector)
+to receive telemetry data.
 
-## Windows
+### Installation
 
-### Minimum requirements
-- [Visual Studio 2019 (16.8)](https://visualstudio.microsoft.com/downloads/) or newer
-  - Workloads
-    - Desktop development with C++
-    - .NET desktop development
-    - .NET Core cross-platform development
-    - Optional: ASP.NET and web development (to build samples)
-  - Individual components
-    - .NET Framework 4.7 targeting pack
-- [.NET 5.0 SDK](https://dotnet.microsoft.com/download/dotnet/5.0)
-- [.NET 5.0 x86 SDK](https://dotnet.microsoft.com/download/dotnet/5.0) to run 32-bit tests locally
-- Optional: [ASP.NET Core 2.1 Runtime](https://dotnet.microsoft.com/download/dotnet-core/2.1) to test in .NET Core 2.1 locally.
-- Optional: [ASP.NET Core 3.0 Runtime](https://dotnet.microsoft.com/download/dotnet-core/3.0) to test in .NET Core 3.0 locally.
-- Optional: [ASP.NET Core 3.1 Runtime](https://dotnet.microsoft.com/download/dotnet-core/3.1) to test in .NET Core 3.1 locally.
-- Optional: [nuget.exe CLI](https://www.nuget.org/downloads) v5.3 or newer
-- Optional: [WiX Toolset 3.11.1](http://wixtoolset.org/releases/) or newer to build Windows installer (msi)
-  - [WiX Toolset Visual Studio Extension](https://wixtoolset.org/releases/) to build installer from Visual Studio
-- Optional: [Docker for Windows](https://docs.docker.com/docker-for-windows/) to build Linux binaries and run integration tests on Linux containers. See [section on Docker Compose](#building-and-running-tests-with-docker-compose).
-  - Requires Windows 10 (1607 Anniversary Update, Build 14393 or newer)
+You can find the latest installation packages on the
+[Releases](https://github.com/signalfx/signalfx-dotnet-tracing/releases/latest)
+page.
 
+| File         | Operating system    | Architecture | Install command | Notes |
+| ---           | ---                 | ---          | ---          | ---   |
+| `x86_64.rpm`  | Red Hat-based Linux distributions | x64 | `rpm -ivh signalfx-dotnet-tracing.rpm` | RPM package |
+| `x64.msi`     | Windows 64-bit | x64 |  `msiexec /i signalfx-dotnet-tracing-x64.msi /quiet` | |
+| `x86.msi`     | Windows 32-bit | x86 | `msiexec /i signalfx-dotnet-tracing-x86.msi /quiet` | |
+| `tar.gz` | Linux distributions using [qlibc](https://wiki.musl-libc.org/projects-using-musl.html) | x64 | `tar -xf signalfx-dotnet-tracing.tar.gz -C /` | Currently, all [officially supported Linux distribtions](https://docs.microsoft.com/dotnet/core/install/linux) except Alpine use glibc |
+| `amd64.deb`   | Debian-based Linux distributions | x64 | `dpkg -i signalfx-dotnet-tracing.debm` | DEB package |
+<!-- TODO: | `musl.tar.gz` | x64 Linux distributions using [musl](https://wiki.musl-libc.org/projects-using-musl.html) | x64 | `tar -xf signalfx-dotnet-tracing-musl.tar.gz -C /` | Alpine Linux uses musl | -->
 
-This repository uses [Nuke](https://nuke.build/) for build automation. To see a list of possible targets run:
-
-```cmd
-.\build.cmd --help
-```
-
-For example:
-
-```powershell
-# Clean and build the main tracer project
-.\build.cmd Clean BuildTracerHome
-
-# Build and run managed and native unit tests. Requires BuildTracerHome to have previously been run
-.\build.cmd BuildAndRunManagedUnitTests BuildAndRunNativeUnitTests 
-
-# Build NuGet packages and MSIs. Requires BuildTracerHome to have previously been run
-.\build.cmd PackageTracerHome 
-
-# Build and run integration tests. Requires BuildTracerHome to have previously been run
-.\build.cmd BuildAndRunWindowsIntegrationTests
-```
-
-## Linux
-
-The recommended approach for Linux is to build using Docker. You can use this approach for both Windows and Linux hosts. The _build_in_docker.sh_ script automates building a Docker image with the required dependencies, and running the specified Nuke targets. For example:
+On Linux, after the installation, you can optionally create the log directory:
 
 ```bash
-# Clean and build the main tracer project
-./build_in_docker.sh Clean BuildTracerHome
-
-# Build and run managed unit tests. Requires BuildTracerHome to have previously been run
-./build_in_docker.sh BuildAndRunManagedUnitTests 
-
-# Build and run integration tests. Requires BuildTracerHome to have previously been run
-./build_in_docker.sh BuildAndRunLinuxIntegrationTests
+/opt/signalfx/createLogPath.sh
 ```
 
-## Further Reading
+### Instrument a .NET application on Windows
 
-OpenTelemetry AutoInstrumentation
-- [OpenTelemetry AutoInstrumentation](https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation)
+```powershell
+$Env:COR_ENABLE_PROFILING = "1"                                   # Enable the .NET Framework Profiler
+$Env:COR_PROFILER = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"      # Select the .NET Framework Profiler
+$Env:CORECLR_ENABLE_PROFILING = "1"                               # Enable the .NET (Core) Profiler
+$Env:CORECLR_PROFILER = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"  # Select the .NET (Core) Profiler
+# Now the autoinstrumentation is configured in this shell session.
+# You can set additional settings and run your application, for example:
+$Env:SIGNALFX_SERVICE_NAME = "my-service-name"                    # Set the service name
+dotnet run                                                        # Run your application                                                     
+```
 
-Microsoft .NET Profiling APIs
-- [Profiling API](https://docs.microsoft.com/en-us/dotnet/framework/unmanaged-api/profiling/)
-- [Metadata API](https://docs.microsoft.com/en-us/dotnet/framework/unmanaged-api/metadata/)
-- [The Book of the Runtime - Profiling](https://github.com/dotnet/coreclr/blob/master/Documentation/botr/profiling.md)
+### Instrument a .NET application on Linux
 
-OpenTracing
-- [OpenTracing documentation](https://github.com/opentracing/opentracing-csharp)
-- [OpenTracing terminology](https://github.com/opentracing/specification/blob/master/specification.md)
+```bash
+export CORECLR_ENABLE_PROFILING="1"                                                 # Enable the .NET (Core) Profiler
+export CORECLR_PROFILER="{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"                    # Select the .NET (Core) Profiler
+export CORECLR_PROFILER_PATH="/opt/signalfx/SignalFx.Tracing.ClrProfiler.Native.so" # Select the .NET (Core) Profiler file path
+export SIGNALFX_DOTNET_TRACER_HOME="/opt/signalfx"                                  # Select the SignalFx Instrumentation for .NET home folder
+# Now the autoinstrumentation is configured in this shell session.
+# You can set additional settings and run your application, for example:
+export SIGNALFX_SERVICE_NAME="my-service-name"  # Set the service name
+dotnet run                                      # Run your application 
+```
+
+### Instrument a Windows Service running a .NET application running
+
+<!-- TODO:
+
+Update this section to use a PowerShell script that sets all of the following env vars:
+COR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}
+COR_ENABLE_PROFILING=1
+CORECLR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}
+CORECLR_ENABLE_PROFILING=1
+-->
+
+Enable instrumentation for a specific Windows service:
+
+- For .NET Framework applications:
+
+   ```batch
+   reg add HKLM\SYSTEM\CurrentControlSet\Services\<ServiceName>\Environment /v COR_ENABLE_PROFILING /d 1
+   ```
+
+- For .NET or .NET Core applications:
+
+   ```batch
+   reg add HKLM\SYSTEM\CurrentControlSet\Services\<ServiceName>\Environment /v CORECLR_ENABLE_PROFILING /d 1
+   ```
+
+### Instrument an ASP.NET application deployed on IIS
+
+<!-- TODO -->
+
+## Advanced configuration
+
+See [advanced-config.md](advanced-config.md).
+
+## Manual instrumentation
+
+See [manual-instrumentation.md](manual-instrumentation.md).
+
+## Correlating traces with logs
+
+See [correlating-traces-with-logs.md](correlating-traces-with-logs.md).
+
+## Troubleshooting
+
+See [troubleshooting.md](troubleshooting.md).
+
+## Contributing
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) before creating an issue or
+a pull request.
+
+## License
+
+The SignalFx Instrumentation for .NET is a redistribution of the
+[.NET Tracer for Datadog APM](https://github.com/DataDog/dd-trace-dotnet).
+It is licensed under the terms of the Apache Software License version 2.0.
+For more details, see [the license file](../LICENSE).
+
+The third-party dependencies list can be found [here](../LICENSE-3rdparty.csv).

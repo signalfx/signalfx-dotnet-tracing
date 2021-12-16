@@ -8,12 +8,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Datadog.Trace.Configuration;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.TestHelpers;
 using Xunit;
 using Xunit.Abstractions;
-
-#if !NET452
 
 namespace Datadog.Trace.ClrProfiler.IntegrationTests
 {
@@ -25,12 +24,12 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetServiceVersion("1.0.0");
         }
 
-        public static System.Collections.Generic.IEnumerable<object[]> GetElasticsearch()
+        public static IEnumerable<object[]> GetElasticsearch()
         {
             foreach (var item in PackageVersions.ElasticSearch6)
             {
-                yield return item.Concat(false);
                 yield return item.Concat(true);
+                yield return item.Concat(false);
             }
         }
 
@@ -38,9 +37,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [MemberData(nameof(GetElasticsearch))]
         [Trait("Category", "EndToEnd")]
         [Trait("Category", "ArmUnsupported")]
-        public void SubmitsTraces(string packageVersion, bool enableCallTarget)
+        public void SubmitsTraces(string packageVersion, bool tagQueries)
         {
-            SetCallTargetSettings(enableCallTarget);
+            SetEnvironmentVariable("SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES", tagQueries.ToString().ToLowerInvariant());
 
             int agentPort = TcpPortProvider.GetOpenPort();
 
@@ -80,6 +79,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                         "IndicesStats",
                         "DeleteIndex",
                         "GetAlias",
+                        "ReindexOnServer",
 
                         "CatAliases",
                         "CatAllocation",
@@ -153,6 +153,35 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                                  .OrderBy(s => s.Start)
                                  .ToList();
 
+                var statementNames = new List<string>
+                {
+                    "Bulk",
+                    "BulkAlias",
+                    "ChangePassword",
+                    "ClusterAllocationExplain",
+                    "ClusterPutSettings",
+                    "ClusterReroute",
+                    "Create",
+                    "CreateIndex",
+                    "DeleteByQuery",
+                    "FlushJob",
+                    "GetAnomalyRecords",
+                    "GetBuckets",
+                    "GetCategories",
+                    "GetInfluencers",
+                    "GetModelSnapshots",
+                    "PutAlias",
+                    "PutIndexTemplate",
+                    "PutJob",
+                    "PutRole",
+                    "PutUser",
+                    "PutRoleMapping",
+                    "ReindexOnServer",
+                    "Search",
+                    "UpdateIndexSettings",
+                    "ValidateJob",
+                };
+
                 foreach (var span in spans)
                 {
                     Assert.Equal("elasticsearch.query", span.LogicScope);
@@ -160,12 +189,37 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     Assert.Equal("elasticsearch", span.Type);
                     Assert.Equal("elasticsearch", DictionaryExtensions.GetValueOrDefault(span.Tags, "db.system"));
                     Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
+
+                    span.Tags.TryGetValue(Tags.DbStatement, out string statement);
+                    if (tagQueries && statementNames.Contains(span.Name))
+                    {
+                        Assert.NotNull(statement);
+                    }
+                    else
+                    {
+                        Assert.Null(statement);
+                    }
                 }
 
                 ValidateSpans(spans, (span) => span.Resource, expected);
             }
         }
+
+        [SkippableFact]
+        [Trait("Category", "EndToEnd")]
+        [Trait("Category", "ArmUnsupported")]
+        public void IntegrationDisabled()
+        {
+            int agentPort = TcpPortProvider.GetOpenPort();
+            string packageVersion = PackageVersions.ElasticSearch6.First()[0] as string;
+
+            SetEnvironmentVariable($"SIGNALFX_TRACE_{nameof(IntegrationId.ElasticsearchNet)}_ENABLED", "false");
+
+            using var agent = new MockTracerAgent(agentPort);
+            using var process = RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion);
+            var spans = agent.WaitForSpans(1).Where(s => s.Type == "elasticsearch").ToList();
+
+            Assert.Empty(spans);
+        }
     }
 }
-
-#endif

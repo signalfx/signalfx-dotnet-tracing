@@ -6,12 +6,8 @@
 // Modified by Splunk Inc.
 
 using System;
-using System.Data;
-using System.Linq;
 using Datadog.Trace.ClrProfiler.Helpers;
-using Datadog.Trace.ClrProfiler.Integrations.AdoNet;
 using Datadog.Trace.Configuration;
-using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Tagging;
 using Datadog.Trace.Util;
@@ -56,7 +52,7 @@ namespace Datadog.Trace.ClrProfiler
         /// <param name="spanId">The span id</param>
         /// <param name="startTime">The start time that should be applied to the span</param>
         /// <returns>A new pre-populated scope.</returns>
-        internal static Scope CreateOutboundHttpScope(Tracer tracer, string httpMethod, Uri requestUri, IntegrationInfo integrationId, out HttpTags tags, TraceId? traceId = null, ulong? spanId = null, DateTimeOffset? startTime = null)
+        internal static Scope CreateOutboundHttpScope(Tracer tracer, string httpMethod, Uri requestUri, IntegrationId integrationId, out HttpTags tags, TraceId? traceId = null, ulong? spanId = null, DateTimeOffset? startTime = null)
         {
             var span = CreateInactiveOutboundHttpSpan(tracer, httpMethod, requestUri, integrationId, out tags, traceId, spanId, startTime, addToTraceContext: true);
 
@@ -81,7 +77,7 @@ namespace Datadog.Trace.ClrProfiler
         /// <param name="startTime">The start time that should be applied to the span</param>
         /// <param name="addToTraceContext">Set to false if the span is meant to be discarded. In that case, the span won't be added to the TraceContext.</param>
         /// <returns>A new pre-populated scope.</returns>
-        internal static Span CreateInactiveOutboundHttpSpan(Tracer tracer, string httpMethod, Uri requestUri, IntegrationInfo integrationId, out HttpTags tags, TraceId? traceId, ulong? spanId, DateTimeOffset? startTime, bool addToTraceContext)
+        internal static Span CreateInactiveOutboundHttpSpan(Tracer tracer, string httpMethod, Uri requestUri, IntegrationId integrationId, out HttpTags tags, TraceId? traceId, ulong? spanId, DateTimeOffset? startTime, bool addToTraceContext)
         {
             tags = null;
 
@@ -128,7 +124,7 @@ namespace Datadog.Trace.ClrProfiler
                 if (!addToTraceContext && span.Context.TraceContext.SamplingPriority == null)
                 {
                     // If we don't add the span to the trace context, then we need to manually call the sampler
-                    span.Context.TraceContext.SamplingPriority = tracer.Sampler?.GetSamplingPriority(span);
+                    span.Context.TraceContext.SamplingPriority = tracer.TracerManager.Sampler?.GetSamplingPriority(span);
                 }
             }
             catch (Exception ex)
@@ -139,115 +135,6 @@ namespace Datadog.Trace.ClrProfiler
             // always returns the span, even if it's null because we couldn't create it,
             // or we couldn't populate it completely (some tags is better than no tags)
             return span;
-        }
-
-        public static Scope CreateDbCommandScope(Tracer tracer, IDbCommand command)
-        {
-            if (!tracer.Settings.IsIntegrationEnabled(AdoNetConstants.IntegrationId))
-            {
-                // integration disabled, don't create a scope, skip this trace
-                return null;
-            }
-
-            var commandType = command.GetType();
-            if (tracer.Settings.AdoNetExcludedTypes.Count > 0 && tracer.Settings.AdoNetExcludedTypes.Contains(commandType.FullName))
-            {
-                // AdoNet type disabled, don't create a scope, skip this trace
-                return null;
-            }
-
-            Scope scope = null;
-
-            try
-            {
-                string dbType = GetDbType(commandType.Namespace, commandType.Name);
-
-                if (dbType == null)
-                {
-                    // don't create a scope, skip this trace
-                    return null;
-                }
-
-                Span parent = tracer.ActiveScope?.Span;
-
-                if (IsDbAlreadyInstrumented(parent, dbType, command.CommandText))
-                {
-                    // we are already instrumenting this,
-                    // don't instrument nested methods that belong to the same stacktrace
-                    // e.g. ExecuteReader() -> ExecuteReader(commandBehavior)
-                    return null;
-                }
-
-                string serviceName = tracer.Settings.GetServiceName(tracer, dbType);
-                string operationName = $"{dbType}.query";
-
-                var tags = new SqlTags();
-                scope = tracer.StartActiveWithTags(operationName, tags: tags, serviceName: serviceName);
-                var span = scope.Span;
-
-                tags.DbType = dbType;
-
-                span.AddTagsFromDbCommand(command);
-
-                tags.SetAnalyticsSampleRate(AdoNetConstants.IntegrationId, tracer.Settings, enabledWithGlobalSetting: false);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Error creating or populating scope.");
-            }
-
-            return scope;
-        }
-
-        internal static bool IsDbAlreadyInstrumented(Span parent, string dbType, string commandText)
-        {
-            return parent != null &&
-                   parent.Type == SpanTypes.Sql &&
-                   parent.GetTag(Tags.DbType) == dbType &&
-                   parent.ResourceName == commandText;
-        }
-
-        public static string GetDbType(string namespaceName, string commandTypeName)
-        {
-            // First we try with the most commons ones. Avoiding the ComputeStringHash
-            var result =
-                commandTypeName switch
-                {
-                    // upstream uses "sql-server"
-                    "SqlCommand" => "mssql",
-                    // upstream uses "postgres"
-                    "NpgsqlCommand" => "postgresql",
-                    "MySqlCommand" => "mysql",
-                    "SqliteCommand" => "sqlite",
-                    "SQLiteCommand" => "sqlite",
-                    _ => null,
-                };
-
-            // If we add these cases to the previous switch the JIT will apply the ComputeStringHash codegen
-            if (result != null ||
-                commandTypeName == "InterceptableDbCommand" ||
-                commandTypeName == "ProfiledDbCommand")
-            {
-                return result;
-            }
-
-            const string commandSuffix = "Command";
-
-            // Now the uncommon cases
-            return
-                commandTypeName switch
-                {
-                    _ when namespaceName.Length == 0 && commandTypeName == commandSuffix => "command",
-                    _ when namespaceName.Contains('.') && commandTypeName == commandSuffix =>
-                        // the + 1 could be dangerous and cause IndexOutOfRangeException, but this shouldn't happen
-                        // a period should never be the last character in a namespace
-                        namespaceName.Substring(namespaceName.LastIndexOf('.') + 1).ToLowerInvariant(),
-                    _ when commandTypeName == commandSuffix =>
-                        namespaceName.ToLowerInvariant(),
-                    _ when commandTypeName.EndsWith(commandSuffix) =>
-                        commandTypeName.Substring(0, commandTypeName.Length - commandSuffix.Length).ToLowerInvariant(),
-                    _ => commandTypeName.ToLowerInvariant()
-                };
         }
     }
 }

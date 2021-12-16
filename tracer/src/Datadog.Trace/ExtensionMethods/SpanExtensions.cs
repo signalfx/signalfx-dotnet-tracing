@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using Datadog.Trace.Configuration;
 using Datadog.Trace.Headers;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Propagation;
@@ -85,14 +86,7 @@ namespace Datadog.Trace.ExtensionMethods
             }
         }
 
-        // Added to avoid a breaking change
-        [Obsolete("Use SetHeaderTags<T> instead")]
-        internal static void SetHeaderTags(this Span span, IHeadersCollection headers, IDictionary<string, string> headerTags, string defaultTagPrefix)
-        {
-            SetHeaderTags<IHeadersCollection>(span, headers, headerTags, defaultTagPrefix);
-        }
-
-        internal static void SetHeaderTags<T>(this Span span, T headers, IDictionary<string, string> headerTags, string defaultTagPrefix)
+        internal static void SetHeaderTags<T>(this Span span, T headers, IReadOnlyDictionary<string, string> headerTags, string defaultTagPrefix)
             where T : IHeadersCollection
         {
             if (headerTags is not null && !headerTags.IsEmpty())
@@ -112,7 +106,7 @@ namespace Datadog.Trace.ExtensionMethods
             }
         }
 
-        internal static void SetHttpStatusCode(this Span span, int statusCode, bool isServer)
+        internal static void SetHttpStatusCode(this Span span, int statusCode, bool isServer, ImmutableTracerSettings tracerSettings)
         {
             string statusCodeString = ConvertStatusCodeToString(statusCode);
 
@@ -126,7 +120,7 @@ namespace Datadog.Trace.ExtensionMethods
             }
 
             // Check the customers http statuses that should be marked as errors
-            if (Tracer.Instance.Settings.IsErrorStatusCode(statusCode, isServer))
+            if (tracerSettings.IsErrorStatusCode(statusCode, isServer))
             {
                 // if an error message already exists (e.g. from a previous exception), don't replace it
                 if (string.IsNullOrEmpty(span.GetTag(Tags.ErrorMsg)))

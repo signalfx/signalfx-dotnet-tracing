@@ -97,7 +97,6 @@ partial class Build
             envVars["COR_PROFILER"] = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}";
             envVars["COR_PROFILER_PATH_64"] = TracerHomeDirectory / "win-x64" / "SignalFx.Tracing.ClrProfiler.Native.dll";
             envVars["COR_PROFILER_PATH_32"] = TracerHomeDirectory / "win-x86" / "SignalFx.Tracing.ClrProfiler.Native.dll";
-            envVars["SIGNALFX_INTEGRATIONS"] = TracerHomeDirectory / "integrations.json";
             envVars["SIGNALFX_DOTNET_TRACER_HOME"] = TracerHomeDirectory;
 
             if (ExtraEnvVars?.Length > 0)
@@ -129,7 +128,6 @@ partial class Build
                 {"COR_PROFILER_PATH_64", TracerHomeDirectory / "win-x64" / "SignalFx.Tracing.ClrProfiler.Native.dll"},
                 {"CORECLR_ENABLE_PROFILING", "1"},
                 {"CORECLR_PROFILER", "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"},
-                {"SIGNALFX_INTEGRATIONS", TracerHomeDirectory / "integrations.json" },
                 {"SIGNALFX_DOTNET_TRACER_HOME", TracerHomeDirectory },
                 {"ASPNETCORE_URLS", "https://*:5003" },
             };
@@ -196,12 +194,12 @@ partial class Build
            var testDir = Solution.GetProject(Projects.ClrProfilerIntegrationTests).Directory;
 
            var versionGenerator = new PackageVersionGenerator(TracerDirectory, testDir);
-           await versionGenerator.GenerateVersions();
+           await versionGenerator.GenerateVersions(Solution);
        });
 
     Target UpdateVendoredCode => _ => _
        .Description("Updates the vendored dependency code and dependabot template")
-       .Executes(() =>
+       .Executes(async () =>
        {
             var dependabotProj = TracerDirectory / "dependabot"  /  "Datadog.Dependabot.Vendors.csproj";
             DependabotFileManager.UpdateVendors(dependabotProj);
@@ -209,13 +207,12 @@ partial class Build
             var vendorDirectory = Solution.GetProject(Projects.DatadogTrace).Directory / "Vendors";
             var downloadDirectory = TemporaryDirectory / "Downloads";
             EnsureCleanDirectory(downloadDirectory);
-            UpdateVendorsTool.UpdateVendors(downloadDirectory, vendorDirectory);
+            await UpdateVendorsTool.UpdateVendors(downloadDirectory, vendorDirectory);
        });
 
     Target UpdateIntegrationsJson => _ => _
-       .Description("Update the integrations.json file")
+       .Description("Update the integration definitions file")
        .DependsOn(Clean, Restore, CreateRequiredDirectories, CompileManagedSrc, PublishManagedProfiler) // We load the dlls from the output, so need to do a clean build
-       .Before(CopyIntegrationsJson)
        .Executes(async () =>
         {
             var assemblies = TracerHomeDirectory
@@ -248,40 +245,4 @@ partial class Build
         {
             SyncMsiContent.Run(TracerDirectory, TracerHomeDirectory);
         });
-
-    Target CiAppFeatureTracking => _ => _
-       .Description("Generate the CIApp FeatureTracking JSON")
-       .DependsOn(Clean, Restore, CreateRequiredDirectories, CompileManagedSrc, PublishManagedProfiler) // We load the dlls from the output, so need to do a clean build
-       .Executes(() =>
-        {
-            // Just grab the first one for now
-            var assemblyPath = TracerHomeDirectory
-                            .GlobFiles("**/netcoreapp*/Datadog.Trace.dll")
-                            .Select(x => x.ToString())
-                            .First();
-
-            var assembly = Assembly.LoadFrom(assemblyPath);
-            var featureTrackingAttribute = assembly.GetType("Datadog.Trace.Ci.FeatureTrackingAttribute");
-            var types = new[] { "Datadog.Trace.Ci.Tags.CommonTags", "Datadog.Trace.Ci.Tags.TestTags" }
-                       .Select(type => assembly.GetType(type))
-                       .ToArray();
-
-            var values = GetFeatureTrackingValueFromType(types);
-
-            var json = Newtonsoft.Json.JsonConvert.SerializeObject(values);
-            var output = OutputDirectory / "ci-app-spec.json";
-
-            Logger.Info($"Writing spec to '{output}'");
-            File.WriteAllText(output, json);
-
-            IEnumerable<string> GetFeatureTrackingValueFromType(params Type[] types)
-            {
-                return types
-                      .SelectMany(type => type.GetFields())
-                      .Where(f => f.GetCustomAttributes(featureTrackingAttribute, true).Length > 0)
-                      .Select(f => f.GetValue(null).ToString())
-                      .OrderBy(v => v);
-            }
-        });
-
 }

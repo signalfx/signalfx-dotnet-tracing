@@ -2,8 +2,7 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: GET bad-request,
-    LogicScope: aspnet_core.request,
+    Name: aspnet_core.request,
     Resource: GET bad-request,
     Service: Samples.AspNetCoreMvc30,
     Type: web,

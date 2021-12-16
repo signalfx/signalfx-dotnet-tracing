@@ -50,7 +50,6 @@ namespace Datadog.Trace.TestHelpers
             _requiresProfiling = requiresProfiling;
             TracerHome = GetTracerHomePath();
             ProfilerPath = GetProfilerPath();
-            IntegrationsJsonPath = GetIntegrationsJsonFilePath();
 
             var parts = _targetFramework.FrameworkName.Split(',');
             _runtime = parts[0];
@@ -79,8 +78,6 @@ namespace Datadog.Trace.TestHelpers
         public string ProfilerPath { get; }
 
         public string TracerHome { get; }
-
-        public string IntegrationsJsonPath { get; }
 
         public string FullSampleName => $"{_appNamePrepend}{SampleName}";
 
@@ -152,18 +149,6 @@ namespace Datadog.Trace.TestHelpers
             return path;
         }
 
-        public static string GetIntegrationsJsonFilePath()
-        {
-            string fileName = "integrations.json";
-            var path = Path.Combine(GetTracerHomePath(), fileName);
-            if (!File.Exists(path))
-            {
-                throw new Exception($"Attempt 3: Unable to find integrations at {path}");
-            }
-
-            return path;
-        }
-
         public static void ClearProfilerEnvironmentVariables()
         {
             var environmentVariables = new[]
@@ -183,14 +168,13 @@ namespace Datadog.Trace.TestHelpers
                 // SignalFx
                 "SIGNALFX_PROFILER_PROCESSES",
                 "SIGNALFX_DOTNET_TRACER_HOME",
-                "SIGNALFX_INTEGRATIONS",
                 "SIGNALFX_DISABLED_INTEGRATIONS",
-                "SIGNALFX_SERVICE",
+                "SIGNALFX_SERVICE_NAME",
                 "SIGNALFX_VERSION",
                 "SIGNALFX_TAGS",
                 "SIGNALFX_APPSEC_ENABLED",
-                "SIGNALFX_TRACE_CALLTARGET_ENABLED",
                 "SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS",
+                "SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES",
                 "SIGNALFX_CONVENTION",
                 "SIGNALFX_PROPAGATORS"
             };
@@ -208,8 +192,7 @@ namespace Datadog.Trace.TestHelpers
             StringDictionary environmentVariables,
             string processToProfile = null,
             bool enableSecurity = false,
-            bool enableBlocking = false,
-            bool callTargetEnabled = false)
+            bool enableBlocking = false)
         {
             string profilerEnabled = _requiresProfiling ? "1" : "0";
             environmentVariables["SIGNALFX_DOTNET_TRACER_HOME"] = TracerHome;
@@ -232,17 +215,11 @@ namespace Datadog.Trace.TestHelpers
                 environmentVariables["SIGNALFX_TRACE_DEBUG"] = "1";
             }
 
-            if (callTargetEnabled)
-            {
-                environmentVariables["SIGNALFX_TRACE_CALLTARGET_ENABLED"] = "1";
-            }
-
             if (!string.IsNullOrEmpty(processToProfile))
             {
                 environmentVariables["SIGNALFX_PROFILER_PROCESSES"] = Path.GetFileName(processToProfile);
             }
 
-            environmentVariables["SIGNALFX_INTEGRATIONS"] = IntegrationsJsonPath;
             environmentVariables["SIGNALFX_TRACE_AGENT_HOSTNAME"] = "127.0.0.1";
             environmentVariables["SIGNALFX_TRACE_AGENT_PORT"] = agentPort.ToString();
 

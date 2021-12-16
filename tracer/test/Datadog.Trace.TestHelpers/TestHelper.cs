@@ -343,11 +343,6 @@ namespace Datadog.Trace.TestHelpers
             SetEnvironmentVariable("SIGNALFX_VERSION", serviceVersion);
         }
 
-        protected void SetCallTargetSettings(bool enableCallTarget)
-        {
-            SetEnvironmentVariable("SIGNALFX_TRACE_CALLTARGET_ENABLED", enableCallTarget ? "true" : "false");
-        }
-
         protected void SetSecurity(bool security)
         {
             SetEnvironmentVariable(Configuration.ConfigurationKeys.AppSecEnabled, security ? "true" : "false");
@@ -358,7 +353,6 @@ namespace Datadog.Trace.TestHelpers
             SetEnvironmentVariable(Configuration.ConfigurationKeys.AppSecBlockingEnabled, appSecBlockingEnabled ? "true" : "false");
         }
 
-#if !NET452
         protected async Task<IImmutableList<MockTracerAgent.Span>> GetWebServerSpans(
             string path,
             MockTracerAgent agent,
@@ -387,7 +381,6 @@ namespace Datadog.Trace.TestHelpers
                 minDateTime: testStart,
                 returnAllOperations: true);
         }
-#endif
 
         protected async Task AssertWebServerSpan(
             string path,

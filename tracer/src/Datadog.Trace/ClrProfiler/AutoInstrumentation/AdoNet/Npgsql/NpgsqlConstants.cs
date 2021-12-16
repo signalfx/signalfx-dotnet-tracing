@@ -11,13 +11,15 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AdoNet.Npgsql
     {
         internal struct NpgsqlClientData : IAdoNetClientData
         {
+            public string IntegrationName => nameof(IntegrationId.Npgsql);
+
             public string AssemblyName => "Npgsql";
 
             public string SqlCommandType => "Npgsql.NpgsqlCommand";
 
             public string MinimumVersion => "4.0.0";
 
-            public string MaximumVersion => "5.*.*";
+            public string MaximumVersion => "6.*.*";
 
             public string DataReaderType => "Npgsql.NpgsqlDataReader";
 

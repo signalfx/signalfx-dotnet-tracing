@@ -8,7 +8,6 @@
         "CORECLR_PROFILER_PATH": "$(SolutionDir)tracer\\bin\\tracer-home\\win-$(Platform)\\SignalFx.Tracing.ClrProfiler.Native.dll",
 
         "SIGNALFX_DOTNET_TRACER_HOME": "$(SolutionDir)tracer\\bin\\tracer-home",
-        "SIGNALFX_INTEGRATIONS": "$(SolutionDir)tracer\\bin\\tracer-home\\integrations.json",
         "SIGNALFX_VERSION": "1.0.0",
 
         // local.settings.json only applies to the function script, not the host, so this needs to exist here

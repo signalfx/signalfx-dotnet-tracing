@@ -3,7 +3,6 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-#if !NET452
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -52,10 +51,12 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             {
                 _.IgnoreMember<MockTracerAgent.Span>(s => s.Duration);
                 _.IgnoreMember<MockTracerAgent.Span>(s => s.Start);
-                _.MemberConverter<MockTracerAgent.Span, Dictionary<string, string>>(x => x.Tags, ScrubStackTraceForErrors);
+                _.MemberConverter<MockTracerAgent.Span, Dictionary<string, string>>(x => x.Tags, ScrubTags);
             });
+
             settings.AddScrubber(builder => ReplaceRegex(builder, LocalhostRegex, "localhost:00000"));
             settings.AddScrubber(builder => ReplaceRegex(builder, KeepRateRegex, "_dd.tracer_kr: 1.0"));
+
             return settings;
         }
 
@@ -73,7 +74,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             builder.Append(result);
         }
 
-        private static Dictionary<string, string> ScrubStackTraceForErrors(
+        private static Dictionary<string, string> ScrubTags(
             MockTracerAgent.Span span, Dictionary<string, string> tags)
         {
             return tags
@@ -81,6 +82,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                        kvp => kvp.Key switch
                        {
                            Tags.ErrorStack => new KeyValuePair<string, string>(kvp.Key, ScrubStackTrace(kvp.Value)),
+                           Tags.SignalFxVersion => new KeyValuePair<string, string>(kvp.Key, "x.y.z"),
                            _ => kvp
                        })
                   .OrderBy(x => x.Key)
@@ -111,4 +113,3 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         }
     }
 }
-#endif

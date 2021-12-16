@@ -8,11 +8,16 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
+using Datadog.Trace.Ci.Agent;
+using Datadog.Trace.Ci.Sampling;
+using Datadog.Trace.Configuration;
 
 namespace Datadog.Trace.Tools.Runner
 {
@@ -40,7 +45,6 @@ namespace Datadog.Trace.Tools.Runner
 
             tracerHome ??= DirectoryExists("Home", Path.Combine(runnerFolder, "..", "..", "..", "home"), Path.Combine(runnerFolder, "home"));
             string tracerMsBuild = FileExists(Path.Combine(tracerHome, "netstandard2.0", "SignalFx.Tracing.MSBuild.dll"));
-            string tracerIntegrations = FileExists(Path.Combine(tracerHome, "integrations.json"));
             string tracerProfiler32 = string.Empty;
             string tracerProfiler64 = string.Empty;
 
@@ -100,7 +104,6 @@ namespace Datadog.Trace.Tools.Runner
             {
                 ["SIGNALFX_DOTNET_TRACER_HOME"] = tracerHome,
                 ["SIGNALFX_DOTNET_TRACER_MSBUILD"] = tracerMsBuild,
-                ["SIGNALFX_INTEGRATIONS"] = tracerIntegrations,
                 ["CORECLR_ENABLE_PROFILING"] = "1",
                 ["CORECLR_PROFILER"] = PROFILERID,
                 ["CORECLR_PROFILER_PATH_32"] = tracerProfiler32,
@@ -118,7 +121,7 @@ namespace Datadog.Trace.Tools.Runner
 
             if (!string.IsNullOrWhiteSpace(options.Service))
             {
-                envVars["SIGNALFX_SERVICE"] = options.Service;
+                envVars["SIGNALFX_SERVICE_NAME"] = options.Service;
             }
 
             if (!string.IsNullOrWhiteSpace(options.Version))
@@ -293,6 +296,41 @@ namespace Datadog.Trace.Tools.Runner
             }
 
             return defaultValue;
+        }
+
+        public static async Task<bool> CheckAgentConnectionAsync(string agentUrl)
+        {
+            var env = new NameValueCollection();
+            if (!string.IsNullOrWhiteSpace(agentUrl))
+            {
+                env["SIGNALFX_TRACE_AGENT_URL"] = agentUrl;
+            }
+
+            var globalSettings = GlobalSettings.CreateDefaultConfigurationSource();
+            globalSettings.Add(new NameValueConfigurationSource(env));
+            var tracerSettings = new TracerSettings(globalSettings);
+            var agentWriter = new CIAgentWriter(tracerSettings.Build(), new CISampler());
+
+            try
+            {
+                if (!await agentWriter.Ping().ConfigureAwait(false))
+                {
+                    Console.WriteLine($"Error connecting to the Datadog Agent at {tracerSettings.AgentUri}.");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error connecting to the Datadog Agent at {tracerSettings.AgentUri}.");
+                Console.WriteLine(ex);
+                return false;
+            }
+            finally
+            {
+                await agentWriter.FlushAndCloseAsync().ConfigureAwait(false);
+            }
+
+            return true;
         }
     }
 }

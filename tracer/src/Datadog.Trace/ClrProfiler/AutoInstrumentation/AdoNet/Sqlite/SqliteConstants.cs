@@ -11,13 +11,15 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AdoNet.Sqlite
     {
         internal struct MicrosoftDataSqliteClientData : IAdoNetClientData
         {
+            public string IntegrationName => nameof(IntegrationId.Sqlite);
+
             public string AssemblyName => "Microsoft.Data.Sqlite";
 
             public string SqlCommandType => "Microsoft.Data.Sqlite.SqliteCommand";
 
             public string MinimumVersion => "2.0.0";
 
-            public string MaximumVersion => "5.*.*";
+            public string MaximumVersion => "6.*.*";
 
             public string DataReaderType => "Microsoft.Data.Sqlite.SqliteDataReader";
 
@@ -26,6 +28,8 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AdoNet.Sqlite
 
         internal struct SystemDataSqliteClientData : IAdoNetClientData
         {
+            public string IntegrationName => nameof(IntegrationId.Sqlite);
+
             public string AssemblyName => "System.Data.SQLite";
 
             public string SqlCommandType => "System.Data.SQLite.SQLiteCommand";

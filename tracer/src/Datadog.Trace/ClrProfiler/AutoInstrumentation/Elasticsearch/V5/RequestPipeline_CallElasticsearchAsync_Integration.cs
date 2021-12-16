@@ -7,7 +7,6 @@ using System;
 using System.ComponentModel;
 using System.Threading;
 using Datadog.Trace.ClrProfiler.CallTarget;
-using Datadog.Trace.ClrProfiler.Integrations;
 using Datadog.Trace.DuckTyping;
 
 namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch.V5
@@ -42,7 +41,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch.V5
         {
             var scope = ElasticsearchNetCommon.CreateScope(Tracer.Instance, ElasticsearchV5Constants.IntegrationId, instance.DuckCast<RequestPipelineStruct>(), new RequestDataV5(requestData));
 
-            return new CallTargetState(scope);
+            return new CallTargetState(scope, requestData);
         }
 
         /// <summary>
@@ -57,6 +56,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch.V5
         /// <returns>A response value, in an async scenario will be T of Task of T</returns>
         public static TExecutionResult OnAsyncMethodEnd<TTarget, TExecutionResult>(TTarget instance, TExecutionResult executionResult, Exception exception, CallTargetState state)
         {
+            state.Scope.SetDbStatementFromRequestData(state.State);
             state.Scope.DisposeWithException(exception);
 
             return executionResult;

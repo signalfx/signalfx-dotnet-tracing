@@ -26,6 +26,7 @@ class CallTargetTokens
 {
 private:
     ModuleMetadata* module_metadata_ptr = nullptr;
+    const bool enable_by_ref_instrumentation = false;
 
     // CorLib tokens
     mdAssemblyRef corLibAssemblyRef = mdAssemblyRefNil;
@@ -73,7 +74,7 @@ private:
                                                const TypeInfo* currentType, ILInstr** instruction);
 
 public:
-    CallTargetTokens(ModuleMetadata* module_metadata_ptr);
+    CallTargetTokens(ModuleMetadata* module_metadata_ptr, const bool enableByRefInstrumentation);
 
     mdTypeRef GetObjectTypeRef();
     mdTypeRef GetExceptionTypeRef();
@@ -86,8 +87,7 @@ public:
                                         mdToken* callTargetReturnToken, ILInstr** firstInstruction);
 
     HRESULT WriteBeginMethod(void* rewriterWrapperPtr, mdTypeRef integrationTypeRef, const TypeInfo* currentType,
-                             const std::vector<FunctionMethodArgument>& methodArguments, const std::vector<USHORT>& argsToLoad,
-                             ILInstr** instruction);
+                             const std::vector<FunctionMethodArgument>& methodArguments, ILInstr** instruction);
 
     HRESULT WriteEndVoidReturnMemberRef(void* rewriterWrapperPtr, mdTypeRef integrationTypeRef,
                                         const TypeInfo* currentType, ILInstr** instruction);

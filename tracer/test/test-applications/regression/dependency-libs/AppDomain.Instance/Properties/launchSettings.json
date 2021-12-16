@@ -12,7 +12,6 @@
         "CORECLR_PROFILER_PATH": "$(SolutionDir)tracer\\bin\\tracer-home\\win-$(Platform)\\SignalFx.Tracing.ClrProfiler.Native.dll",
 
         "SIGNALFX_DOTNET_TRACER_HOME": "$(SolutionDir)tracer\\bin\\tracer-home",
-        "SIGNALFX_INTEGRATIONS": "$(SolutionDir)tracer\\bin\\tracer-home\\integrations.json"
       },
       "nativeDebugging": true
     }

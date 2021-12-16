@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <!-- override to only build/run net452 -->
-    <TargetFramework Condition="'$(OS)' == 'Windows_NT'">net452</TargetFramework>
+    <!-- override to only build/run net461 -->
+    <TargetFramework Condition="'$(OS)' == 'Windows_NT'">net461</TargetFramework>
     <TargetFramework Condition="'$(OS)' != 'Windows_NT'">netcoreapp3.1</TargetFramework>
 
     <!-- Required to build multiple projects with the same Configuration|Platform -->

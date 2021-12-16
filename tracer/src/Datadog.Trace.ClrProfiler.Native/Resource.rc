@@ -49,8 +49,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,0,1,0
- PRODUCTVERSION 0,0,1,0
+ FILEVERSION 0,2,0,0
+ PRODUCTVERSION 0,2,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -67,12 +67,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "SignalFx"
             VALUE "FileDescription", "SignalFx CLR Profiler"
-            VALUE "FileVersion", "0.0.1.0"
+            VALUE "FileVersion", "0.2.0.0"
             VALUE "InternalName", "SignalFx.Tracing.ClrProfiler.Native.DLL"
             VALUE "LegalCopyright", "Copyright (C) 2021-2023"
             VALUE "OriginalFilename", "SignalFx.Tracing.ClrProfiler.Native.DLL"
             VALUE "ProductName", "SignalFx .NET Tracing"
-            VALUE "ProductVersion", "0.0.1"
+            VALUE "ProductVersion", "0.2.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -91,8 +91,8 @@ END
 
 NETCOREAPP20_MANAGED_ENTRYPOINT_DLL ASSEMBLY "..\\bin\\ProfilerResources\\netcoreapp2.0\\SignalFx.Tracing.ClrProfiler.Managed.Loader.dll"
 NETCOREAPP20_MANAGED_ENTRYPOINT_SYMBOLS SYMBOLS "..\\bin\\ProfilerResources\\netcoreapp2.0\\SignalFx.Tracing.ClrProfiler.Managed.Loader.pdb"
-NET45_MANAGED_ENTRYPOINT_DLL ASSEMBLY "..\\bin\\ProfilerResources\\net45\\SignalFx.Tracing.ClrProfiler.Managed.Loader.dll"
-NET45_MANAGED_ENTRYPOINT_SYMBOLS SYMBOLS "..\\bin\\ProfilerResources\\net45\\SignalFx.Tracing.ClrProfiler.Managed.Loader.pdb"
+NET461_MANAGED_ENTRYPOINT_DLL ASSEMBLY "..\\bin\\ProfilerResources\\net461\\SignalFx.Tracing.ClrProfiler.Managed.Loader.dll"
+NET461_MANAGED_ENTRYPOINT_SYMBOLS SYMBOLS "..\\bin\\ProfilerResources\\net461\\SignalFx.Tracing.ClrProfiler.Managed.Loader.pdb"
 
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////

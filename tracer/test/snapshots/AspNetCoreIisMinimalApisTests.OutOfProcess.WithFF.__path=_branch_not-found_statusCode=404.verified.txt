@@ -1,0 +1,31 @@
+﻿[
+  {
+    TraceId: Id_1,
+    SpanId: Id_2,
+    Name: HTTP GET,
+    LogicScope: aspnet_core.request,
+    Resource: GET /branch/not-found,
+    Service: Samples.AspNetCoreMinimalApis,
+    Type: web,
+    Tags: {
+      component: aspnet_core,
+      deployment.environment: integration_tests,
+      http.method: GET,
+      http.request.headers.host: localhost:00000,
+      http.status_code: 404,
+      http.url: http://localhost:00000/branch/not-found,
+      language: dotnet,
+      net.peer.ip: 127.0.0.1,
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: server,
+      version: 1.0.0
+    },
+    Metrics: {
+      _sampling_priority_v1: 1.0,
+      _dd.tracer_kr: 1.0,
+      _dd.top_level: 1.0
+    }
+  }
+]

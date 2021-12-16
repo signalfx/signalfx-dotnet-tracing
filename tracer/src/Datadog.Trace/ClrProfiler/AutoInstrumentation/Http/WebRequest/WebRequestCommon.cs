@@ -24,10 +24,10 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Http.WebRequest
 
         internal const string Major2 = "2";
         internal const string Major4 = "4";
-        internal const string Major5 = "5";
+        internal const string Major6 = "6";
 
-        internal const string IntegrationName = nameof(IntegrationIds.WebRequest);
-        internal static readonly IntegrationInfo IntegrationId = IntegrationRegistry.GetIntegrationInfo(IntegrationName);
+        internal const string IntegrationName = nameof(Configuration.IntegrationId.WebRequest);
+        internal const IntegrationId IntegrationId = Configuration.IntegrationId.WebRequest;
 
         /// <summary>
         /// OnMethodBegin callback
@@ -42,7 +42,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Http.WebRequest
                 Tracer tracer = Tracer.Instance;
 
                 // Check if any headers were injected by a previous call to GetRequestStream
-                var spanContext = tracer.Propagator.Extract(request.Headers.Wrap());
+                var spanContext = tracer.TracerManager.Propagator.Extract(request.Headers.Wrap());
 
                 // If this operation creates the trace, then we need to re-apply the sampling priority
                 bool setSamplingPriority = spanContext?.SamplingPriority != null && Tracer.Instance.ActiveScope == null;
@@ -62,7 +62,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Http.WebRequest
                         }
 
                         // add distributed tracing headers to the HTTP request
-                        tracer.Propagator.Inject(scope.Span.Context, request.Headers.Wrap());
+                        tracer.TracerManager.Propagator.Inject(scope.Span.Context, request.Headers.Wrap());
 
                         return new CallTargetState(scope);
                     }
