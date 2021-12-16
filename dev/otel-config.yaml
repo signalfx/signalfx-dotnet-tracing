@@ -28,6 +28,9 @@ exporters:
   sapm:
     access_token: "${SPLUNK_ACCESS_TOKEN}"
     endpoint: "https://ingest.${SPLUNK_REALM}.signalfx.com/v2/trace"
+  splunk_hec:
+    token: "${SPLUNK_ACCESS_TOKEN}"
+    endpoint: "https://ingest.${SPLUNK_REALM}.signalfx.com/v1/log"
   jaeger:
     endpoint: "${JAEGER_ENDPOINT}"
     tls:
@@ -49,5 +52,9 @@ service:
       processors: [batch]
       exporters: [prometheus]
       #exporters: [logging]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging, splunk_hec]
 
   extensions: [health_check, pprof, zpages]
