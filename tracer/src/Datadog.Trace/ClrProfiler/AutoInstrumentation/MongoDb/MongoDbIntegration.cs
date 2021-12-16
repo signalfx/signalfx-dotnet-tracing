@@ -11,6 +11,7 @@ using System.Net;
 using Datadog.Trace.ClrProfiler.Emit;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Logging;
+using Datadog.Trace.Util;
 
 namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
 {
@@ -27,7 +28,8 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
         internal const string Major2Minor1 = "2.1";
         internal const string Major2Minor2 = "2.2"; // Synchronous methods added in 2.2
         internal const string MongoDbClientAssembly = "MongoDB.Driver.Core";
-
+        
+        private const string IWireProtocolGeneric = "MongoDB.Driver.Core.WireProtocol.IWireProtocol`1";
         private const string DefaultOperationName = "mongodb.query";
         private const string ServiceName = "mongodb";
 
@@ -195,6 +197,36 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
             }
 
             return null;
+        }
+
+        private static Type[] GetGenericsFromWireProtocol(Type wireProtocolType)
+        {
+            var interfaces = wireProtocolType.GetInterfaces();
+            Type typeWeInstrument = null;
+
+            for (var i = 0; i < interfaces.Length; i++)
+            {
+                if (string.Equals($"{interfaces[i].Namespace}.{interfaces[i].Name}", IWireProtocolGeneric))
+                {
+                    typeWeInstrument = interfaces[i];
+                    break;
+                }
+            }
+
+            if (typeWeInstrument == null)
+            {
+                // We're likely in a non-generic context
+                return null;
+            }
+
+            var genericArgs = typeWeInstrument.GetGenericArguments();
+
+            if (genericArgs.Length == 0)
+            {
+                ThrowHelper.ThrowArgumentException($"Expected generics to determine TaskResult from {wireProtocolType.AssemblyQualifiedName}");
+            }
+
+            return genericArgs;
         }
     }
 }

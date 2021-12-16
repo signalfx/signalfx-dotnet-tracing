@@ -55,8 +55,12 @@ namespace Datadog.Trace.AspNet
         /// <param name="operationName">The operation name to be used for the trace/span data generated</param>
         public TracingHttpModule(string operationName)
         {
-            _requestOperationName = operationName ?? throw new ArgumentNullException(nameof(operationName));
+            if (operationName is null)
+            {
+                ThrowHelper.ThrowArgumentNullException(nameof(operationName));
+            }
 
+            _requestOperationName = operationName;
             _httpContextScopeKey = string.Concat("__SignalFx.Tracing.AspNet.TracingHttpModule-", _requestOperationName);
         }
 
