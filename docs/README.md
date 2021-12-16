@@ -77,10 +77,10 @@ On Linux, after the installation, you need to additionally run:
 ### Instrument a .NET application on Windows
 
 ```powershell
-$Env:COR_PROFILER = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"      # Select the .NET Framework Profiler
 $Env:COR_ENABLE_PROFILING = "1"                                   # Enable the .NET Framework Profiler
-$Env:CORECLR_PROFILER = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"  # Select the .NET (Core) Profiler
+$Env:COR_PROFILER = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"      # Select the .NET Framework Profiler
 $Env:CORECLR_ENABLE_PROFILING = "1"                               # Enable the .NET (Core) Profiler
+$Env:CORECLR_PROFILER = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"  # Select the .NET (Core) Profiler
 # Now the autoinstrumentation is configured in this shell session.
 # You can set additional settings and run your application, for example:
 $Env:SIGNALFX_SERVICE_NAME = "my-service-name"                    # Set the service name
@@ -90,7 +90,10 @@ dotnet run                                                        # Run your app
 ### Instrument a .NET application on Linux
 
 ```bash
-source /opt/signalfx/defaults.env               # Enable the .NET (Core) Profiler
+export CORECLR_ENABLE_PROFILING="1"                                                 # Enable the .NET (Core) Profiler
+export CORECLR_PROFILER="{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"                    # Select the .NET (Core) Profiler
+export CORECLR_PROFILER_PATH="/opt/signalfx/SignalFx.Tracing.ClrProfiler.Native.so" # Select the .NET (Core) Profiler file path
+export SIGNALFX_DOTNET_TRACER_HOME="/opt/signalfx"                                  # Select the SignalFx Instrumentation for .NET home folder
 # Now the autoinstrumentation is configured in this shell session.
 # You can set additional settings and run your application, for example:
 export SIGNALFX_SERVICE_NAME="my-service-name"  # Set the service name
