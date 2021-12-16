@@ -59,8 +59,10 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.ILogger
 
         public override string ToString()
         {
-            var span = _tracer.ActiveScope?.Span;
-            if (span is null)
+            var spanContext = _tracer.DistributedSpanContext;
+            if (spanContext is null
+                || !spanContext.TryGetValue(HttpHeaderNames.TraceId, out string traceId)
+                || !spanContext.TryGetValue(HttpHeaderNames.ParentId, out string spanId))
             {
                 return _cachedFormat;
             }
@@ -69,21 +71,23 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.ILogger
                 CultureInfo.InvariantCulture,
                 "{0}, trace_id:\"{1}\", span_id:\"{2}\"",
                 _cachedFormat,
-                span.TraceId.ToString(),
-                span.SpanId);
+                traceId,
+                spanId);
         }
 
         public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
         {
-            var span = _tracer.ActiveScope?.Span;
-            yield return new KeyValuePair<string, object>(CorrelationIdentifier.ServiceKey, _service);
-            yield return new KeyValuePair<string, object>(CorrelationIdentifier.EnvKey, _env);
-            yield return new KeyValuePair<string, object>(CorrelationIdentifier.VersionKey, _version);
+            var spanContext = _tracer.DistributedSpanContext;
+            yield return new KeyValuePair<string, object>("dd_service", _service);
+            yield return new KeyValuePair<string, object>("dd_env", _env);
+            yield return new KeyValuePair<string, object>("dd_version", _version);
 
-            if (span is not null)
+            if (spanContext is not null
+                && spanContext.TryGetValue(HttpHeaderNames.TraceId, out string traceId)
+                && spanContext.TryGetValue(HttpHeaderNames.ParentId, out string spanId))
             {
-                yield return new KeyValuePair<string, object>(CorrelationIdentifier.TraceIdKey, span.TraceId.ToString());
-                yield return new KeyValuePair<string, object>(CorrelationIdentifier.SpanIdKey, span.SpanId.ToString());
+                yield return new KeyValuePair<string, object>(CorrelationIdentifier.TraceIdKey, traceId);
+                yield return new KeyValuePair<string, object>(CorrelationIdentifier.SpanIdKey, spanId);
             }
         }
 

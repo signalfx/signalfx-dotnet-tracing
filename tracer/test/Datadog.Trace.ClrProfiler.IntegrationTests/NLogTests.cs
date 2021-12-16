@@ -37,6 +37,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         {
             SetEnvironmentVariable("SIGNALFX_LOGS_INJECTION", "true");
 
+            var expectedCorrelatedTraceCount = 1;
+            var expectedCorrelatedSpanCount = 1;
+
             using (var agent = EnvironmentHelper.GetMockAgent())
             using (RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion))
             {
@@ -44,7 +47,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 Assert.True(spans.Count >= 1, $"Expecting at least 1 span, only received {spans.Count}");
 
                 var testFiles = GetTestFiles(packageVersion);
-                ValidateLogCorrelation(spans, testFiles, packageVersion);
+                ValidateLogCorrelation(spans, testFiles, expectedCorrelatedTraceCount, expectedCorrelatedSpanCount, packageVersion);
             }
         }
 
@@ -56,6 +59,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         {
             SetEnvironmentVariable("SIGNALFX_LOGS_INJECTION", "false");
 
+            var expectedCorrelatedTraceCount = 0;
+            var expectedCorrelatedSpanCount = 0;
+
             using (var agent = EnvironmentHelper.GetMockAgent())
             using (RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion))
             {
@@ -63,7 +69,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 Assert.True(spans.Count >= 1, $"Expecting at least 1 span, only received {spans.Count}");
 
                 var testFiles = GetTestFiles(packageVersion, logsInjectionEnabled: false);
-                ValidateLogCorrelation(spans, testFiles, packageVersion, disableLogCorrelation: true);
+                ValidateLogCorrelation(spans, testFiles, expectedCorrelatedTraceCount, expectedCorrelatedSpanCount, packageVersion, disableLogCorrelation: true);
             }
         }
 
@@ -72,7 +78,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             if (packageVersion is null or "")
             {
 #if NETFRAMEWORK
-                packageVersion = "4.1.2";
+                packageVersion = "1.0.0.505";
 #else
                 packageVersion = "4.5.0";
 #endif
