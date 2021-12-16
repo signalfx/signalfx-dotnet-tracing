@@ -271,10 +271,14 @@ partial class Build
             var libDdwafUri = new Uri($"https://www.nuget.org/api/v2/package/libddwaf/{LibDdwafVersion}");
             var libDdwafZip = TempDirectory / "libddwaf.zip";
 
-            using (var httpClient = new HttpClient())
+            using (var client = new HttpClient())
             {
-                await using var stream = await httpClient.GetStreamAsync(libDdwafUri);
+                var response = await client.GetAsync(libDdwafUri);
+
+                response.EnsureSuccessStatusCode();
+
                 await using var file = File.Create(libDdwafZip);
+                await using var stream = await response.Content.ReadAsStreamAsync();
                 await stream.CopyToAsync(file);
             }
 
