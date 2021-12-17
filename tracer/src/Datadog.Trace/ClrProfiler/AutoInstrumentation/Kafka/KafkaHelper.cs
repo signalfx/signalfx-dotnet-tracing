@@ -6,7 +6,6 @@
 // Modified by Splunk Inc.
 
 using System;
-using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Propagation;
 using Datadog.Trace.Tagging;

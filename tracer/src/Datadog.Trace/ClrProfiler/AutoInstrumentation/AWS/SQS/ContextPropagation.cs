@@ -5,10 +5,7 @@
 
 // Modified by Splunk Inc.
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AWS.SQS
