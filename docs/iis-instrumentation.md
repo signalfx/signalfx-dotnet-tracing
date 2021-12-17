@@ -4,7 +4,7 @@ By default, the installer enables IIS instrumentation by setting the `Environmen
 
 ## Additional local configuration
 
-Additional local configuration is necessary if you are running multiple applications on a single server (such as IIS server with multiple web apps). This helps to set application specific behavior (such as setting service name via `SIGNALFX_SERVICE_NAME`). Local configuration has higher precedence than global (machine level) configuration and will overwrite global values. Please note that machine level environment values are affecting every .NET application on that server.
+Additional local configuration is necessary if you are running multiple applications on a single server (such as IIS server with multiple web apps). This helps set application specific behavior (such as setting service name via `SIGNALFX_SERVICE_NAME`). Local configuration has higher precedence than global (machine level) configuration and will overwrite global values. Note that machine-level environment values affect every .NET application on that server.
 
 ### .NET Framework
 
