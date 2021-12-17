@@ -1,6 +1,6 @@
 # IIS instrumentation
 
-By default Windows installer enables IIS instrumentation by setting `Environment` registry key for W3SVC and WAS services located in `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services` folder.
+By default, the installer enables IIS instrumentation by setting the `Environment` registry key for W3SVC and WAS services located in the `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services` folder.
 
 ## Additional local configuration
 
