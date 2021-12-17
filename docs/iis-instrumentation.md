@@ -12,4 +12,4 @@ Local configuration for .NET Framework apps can be done by updating the `web.con
 
 ### .NET Core
 
-Please follow [Microsoft guide](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/environments?view=aspnetcore-3.1#set-the-environment) how to set additional local environment variables for .NET Core apps.
+See the [Microsoft guide](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/environments?view=aspnetcore-3.1#set-the-environment) on how to set additional local environment variables for .NET Core apps.
