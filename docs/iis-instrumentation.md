@@ -8,7 +8,7 @@ Additional local configuration is necessary if you are running multiple applicat
 
 ### .NET Framework
 
-Local configuration for .NET Framework apps can be done via updating `web.config`. See [advanced-config.md](advanced-config.md#configuration-methods) for syntax.
+Local configuration for .NET Framework apps can be done by updating the `web.config` file. See [advanced-config.md](advanced-config.md#configuration-methods) for more information.
 
 ### .NET Core
 
