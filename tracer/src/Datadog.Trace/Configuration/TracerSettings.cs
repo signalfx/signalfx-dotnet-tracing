@@ -23,19 +23,7 @@ namespace Datadog.Trace.Configuration
     /// </summary>
     public class TracerSettings
     {
-        /// <summary>
-        /// The default host value for <see cref="ExporterSettings.AgentUri"/>.
-        /// </summary>
-        public const string DefaultAgentHost = "localhost";
-
-        /// <summary>
-        /// The default port value for <see cref="ExporterSettings.AgentUri"/>.
-        /// </summary>
-        public const int DefaultAgentPort = 9411;
-
         private const int DefaultRecordedValueMaxLength = 12000;
-
-        private int _partialFlushMinSpans;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TracerSettings"/> class with default values.
@@ -173,19 +161,6 @@ namespace Datadog.Trace.Configuration
 
             RouteTemplateResourceNamesEnabled = source?.GetBool(ConfigurationKeys.FeatureFlags.RouteTemplateResourceNamesEnabled)
                                                    ?? true;
-
-            TraceResponseHeaderEnabled = source?.GetBool(ConfigurationKeys.TraceResponseHeaderEnabled) ?? true;
-
-            PartialFlushEnabled = source?.GetBool(ConfigurationKeys.PartialFlushEnabled)
-                // default value
-                ?? false;
-
-            var partialFlushMinSpans = source?.GetInt32(ConfigurationKeys.PartialFlushMinSpans);
-
-            if ((partialFlushMinSpans ?? 0) <= 0)
-            {
-                PartialFlushMinSpans = 500;
-            }
 
             KafkaCreateConsumerScopeEnabled = source?.GetBool(ConfigurationKeys.KafkaCreateConsumerScopeEnabled)
                                            ?? true; // default
@@ -350,28 +325,6 @@ namespace Datadog.Trace.Configuration
         {
             get => GlobalSettings.Source.DiagnosticSourceEnabled;
             set { }
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether partial flush is enabled
-        /// </summary>
-        public bool PartialFlushEnabled { get; set; }
-
-        /// <summary>
-        /// Gets or sets the minimum number of closed spans in a trace before it's partially flushed
-        /// </summary>
-        public int PartialFlushMinSpans
-        {
-            get => _partialFlushMinSpans;
-            set
-            {
-                if (value <= 0)
-                {
-                    ThrowHelper.ThrowArgumentException("The value must be strictly greater than 0", nameof(PartialFlushMinSpans));
-                }
-
-                _partialFlushMinSpans = value;
-            }
         }
 
         /// <summary>

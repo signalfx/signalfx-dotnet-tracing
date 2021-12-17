@@ -72,7 +72,7 @@ namespace Datadog.Trace
             var traceIdConvention = GetTraceIdConvention(settings.Convention);
 
             statsd = settings.TracerMetricsEnabled
-                         ? (statsd ?? CreateDogStatsdClient(settings, defaultServiceName, settings.DogStatsdPort))
+                         ? (statsd ?? CreateDogStatsdClient(settings, defaultServiceName, settings.ExporterSettings.DogStatsdPort))
                          : null;
             sampler ??= GetSampler(settings);
             var propagator = CreateCompositePropagator(settings, traceIdConvention);
@@ -81,7 +81,7 @@ namespace Datadog.Trace
 
             if (settings.RuntimeMetricsEnabled && !DistributedTracer.Instance.IsChildTracer)
             {
-                runtimeMetrics ??= new RuntimeMetricsWriter(statsd ?? CreateDogStatsdClient(settings, defaultServiceName, settings.DogStatsdPort), TimeSpan.FromSeconds(10));
+                runtimeMetrics ??= new RuntimeMetricsWriter(statsd ?? CreateDogStatsdClient(settings, defaultServiceName, settings.ExporterSettings.DogStatsdPort), TimeSpan.FromSeconds(10));
             }
 
             if (settings.LogsInjectionEnabled)
@@ -150,7 +150,7 @@ namespace Datadog.Trace
                     return new ExporterWriter(new ZipkinExporter(settings), metrics);
                 default:
                     var apiRequestFactory = TransportStrategy.Get(settings.ExporterSettings);
-                    var api = new Api(settings.ExporterSettings.AgentUri, apiRequestFactory, statsd, rates => sampler.SetDefaultSampleRates(rates), settings.PartialFlushEnabled);
+                    var api = new Api(settings.ExporterSettings.AgentUri, apiRequestFactory, statsd, rates => sampler.SetDefaultSampleRates(rates), settings.ExporterSettings.PartialFlushEnabled);
                     return new AgentWriter(api, metrics, maxBufferSize: settings.TraceBufferSize);
             }
         }

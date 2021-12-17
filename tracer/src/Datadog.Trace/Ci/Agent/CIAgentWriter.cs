@@ -4,7 +4,6 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Datadog.Trace.Agent;
 using Datadog.Trace.Ci.Tags;
@@ -20,7 +19,7 @@ namespace Datadog.Trace.Ci.Agent
 
         public CIAgentWriter(ImmutableTracerSettings settings, ISampler sampler)
         {
-            _isPartialFlushEnabled = settings.PartialFlushEnabled;
+            _isPartialFlushEnabled = settings.ExporterSettings.PartialFlushEnabled;
             var api = new Api(settings.ExporterSettings.AgentUri, TransportStrategy.Get(settings.ExporterSettings), null, rates => sampler.SetDefaultSampleRates(rates), _isPartialFlushEnabled);
             _agentWriter = new AgentWriter(api, null, maxBufferSize: settings.TraceBufferSize);
         }

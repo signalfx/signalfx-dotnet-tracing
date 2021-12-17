@@ -14,6 +14,7 @@ namespace Datadog.Trace.Configuration
         public string GetString(string key) { }
         public void Insert(int index, Datadog.Trace.Configuration.IConfigurationSource item) { }
     }
+<<<<<<< HEAD
     public static class ConfigurationKeys
     {
         public const string AgentHost = "SIGNALFX_AGENT_HOST";
@@ -81,6 +82,8 @@ namespace Datadog.Trace.Configuration
             public const string Enabled = "SIGNALFX_TRACE_{0}_ENABLED";
         }
     }
+=======
+>>>>>>> 7dd7adde5 (Include missing properties on Exporter Settings (#2179))
     public class EnvironmentConfigurationSource : Datadog.Trace.Configuration.StringConfigurationSource
     {
         public EnvironmentConfigurationSource() { }
@@ -95,9 +98,10 @@ namespace Datadog.Trace.Configuration
         public System.Uri AgentUri { get; set; }
         public int DogStatsdPort { get; set; }
         public string MetricsPipeName { get; set; }
+        public bool PartialFlushEnabled { get; set; }
+        public int PartialFlushMinSpans { get; set; }
         public string TracesPipeName { get; set; }
         public int TracesPipeTimeoutMs { get; set; }
-        public Datadog.Trace.Configuration.TracesTransportType TracesTransport { get; set; }
     }
     public class GlobalSettings
     {
@@ -120,8 +124,10 @@ namespace Datadog.Trace.Configuration
         public ImmutableExporterSettings(Datadog.Trace.Configuration.ExporterSettings settings) { }
         public ImmutableExporterSettings(Datadog.Trace.Configuration.IConfigurationSource source) { }
         public System.Uri AgentUri { get; }
+        public int DogStatsdPort { get; }
         public string MetricsPipeName { get; }
-        public Datadog.Trace.Configuration.TracesTransportType TraceTransport { get; }
+        public bool PartialFlushEnabled { get; }
+        public int PartialFlushMinSpans { get; }
         public string TracesPipeName { get; }
         public int TracesPipeTimeoutMs { get; }
     }
@@ -144,7 +150,6 @@ namespace Datadog.Trace.Configuration
             "ee https://docs.datadoghq.com/tracing/legacy_app_analytics/")]
         public bool AnalyticsEnabled { get; }
         public string CustomSamplingRules { get; }
-        public int DogStatsdPort { get; }
         public string Environment { get; }
         public Datadog.Trace.Configuration.ImmutableExporterSettings Exporter { get; }
         public double? GlobalSamplingRate { get; }
@@ -154,8 +159,6 @@ namespace Datadog.Trace.Configuration
         public bool KafkaCreateConsumerScopeEnabled { get; }
         public bool LogsInjectionEnabled { get; }
         public int MaxTracesSubmittedPerSecond { get; }
-        public bool PartialFlushEnabled { get; }
-        public int PartialFlushMinSpans { get; }
         public string ServiceName { get; }
         public string ServiceVersion { get; }
         public bool StartupDiagnosticLogEnabled { get; }
@@ -220,8 +223,6 @@ namespace Datadog.Trace.Configuration
         public bool KafkaCreateConsumerScopeEnabled { get; set; }
         public bool LogsInjectionEnabled { get; set; }
         public int MaxTracesSubmittedPerSecond { get; set; }
-        public bool PartialFlushEnabled { get; set; }
-        public int PartialFlushMinSpans { get; set; }
         public string ServiceName { get; set; }
         public string ServiceVersion { get; set; }
         public bool StartupDiagnosticLogEnabled { get; set; }
@@ -233,12 +234,6 @@ namespace Datadog.Trace.Configuration
         public void SetServiceNameMappings(System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, string>> mappings) { }
         public static Datadog.Trace.Configuration.CompositeConfigurationSource CreateDefaultConfigurationSource() { }
         public static Datadog.Trace.Configuration.TracerSettings FromDefaultSources() { }
-    }
-    public enum TracesTransportType
-    {
-        Default = 0,
-        CustomTcpProvider = 1,
-        WindowsNamedPipe = 2,
     }
 }
 namespace Datadog.Trace

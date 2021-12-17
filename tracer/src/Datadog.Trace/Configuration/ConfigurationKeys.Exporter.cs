@@ -8,7 +8,7 @@ namespace Datadog.Trace.Configuration
     /// <summary>
     /// String constants for standard Datadog configuration keys.
     /// </summary>
-    public static partial class ConfigurationKeys
+    internal static partial class ConfigurationKeys
     {
         /// <summary>
         /// Configuration key for the Agent host where the Tracer can send traces.
@@ -73,6 +73,7 @@ namespace Datadog.Trace.Configuration
         /// Configuration key for the DogStatsd port where the Tracer can send metrics.
         /// Default value is 8125.
         /// </summary>
+        /// <seealso cref="ExporterSettings.DogStatsdPort"/>
         public const string DogStatsdPort = "SINGALFX_DOGSTATSD_PORT";
     }
 }
