@@ -313,7 +313,7 @@ namespace Datadog.Trace.OpenTracing.Tests
         }
 
         [Fact]
-        public void InheritParentServiceName_WithTag()
+        public void DoesNotInheritParentServiceName_WithTag()
         {
             var parentScope = _tracer.BuildSpan("ParentOperation")
                                      .WithTag(DatadogTags.ServiceName, "MyAwesomeService")
@@ -323,14 +323,13 @@ namespace Datadog.Trace.OpenTracing.Tests
                                     .AsChildOf(parentScope.Span)
                                     .StartActive();
 
-            var otSpan = (OpenTracingSpan)childScope.Span;
-            var ddSpan = otSpan.Span;
-
-            Assert.Equal("MyAwesomeService", ddSpan.ServiceName);
+            Assert.Equal("MyAwesomeService", ((OpenTracingSpan)parentScope.Span).Span.ServiceName);
+            Assert.NotEqual("MyAwesomeService", ((OpenTracingSpan)childScope.Span).Span.ServiceName);
+            Assert.Equal(_tracer.DefaultServiceName, ((OpenTracingSpan)childScope.Span).Span.ServiceName);
         }
 
         [Fact]
-        public void InheritParentServiceName_SetTag()
+        public void DoesNotInheritParentServiceName_SetTag()
         {
             var parentScope = _tracer.BuildSpan("ParentOperation")
                                      .StartActive();
@@ -341,16 +340,16 @@ namespace Datadog.Trace.OpenTracing.Tests
                                     .AsChildOf(parentScope.Span)
                                     .StartActive();
 
-            var otSpan = (OpenTracingSpan)childScope.Span;
-            var ddSpan = otSpan.Span;
-
-            Assert.Equal("MyAwesomeService", ddSpan.ServiceName);
+            Assert.Equal("MyAwesomeService", ((OpenTracingSpan)parentScope.Span).Span.ServiceName);
+            Assert.NotEqual("MyAwesomeService", ((OpenTracingSpan)childScope.Span).Span.ServiceName);
+            Assert.Equal(_tracer.DefaultServiceName, ((OpenTracingSpan)childScope.Span).Span.ServiceName);
         }
 
         [Fact]
         public void Parent_OverrideDefaultServiceName_WithTag()
         {
-            var tracer = OpenTracingTracerFactory.CreateTracer(defaultServiceName: "DefaultServiceName");
+            const string defaultServiceName = "DefaultServiceName";
+            var tracer = OpenTracingTracerFactory.CreateTracer(defaultServiceName: defaultServiceName);
 
             var parentScope = tracer.BuildSpan("ParentOperation")
                                     .WithTag(DatadogTags.ServiceName, "MyAwesomeService")
@@ -360,16 +359,16 @@ namespace Datadog.Trace.OpenTracing.Tests
                                    .AsChildOf(parentScope.Span)
                                    .StartActive();
 
-            var otSpan = (OpenTracingSpan)childScope.Span;
-            var ddSpan = otSpan.Span;
-
-            Assert.Equal("MyAwesomeService", ddSpan.ServiceName);
+            Assert.Equal("MyAwesomeService", ((OpenTracingSpan)parentScope.Span).Span.ServiceName);
+            Assert.NotEqual("MyAwesomeService", ((OpenTracingSpan)childScope.Span).Span.ServiceName);
+            Assert.Equal(defaultServiceName, ((OpenTracingSpan)childScope.Span).Span.ServiceName);
         }
 
         [Fact]
         public void Parent_OverrideDefaultServiceName_SetTag()
         {
-            var tracer = OpenTracingTracerFactory.CreateTracer(defaultServiceName: "DefaultServiceName");
+            const string defaultServiceName = "DefaultServiceName";
+            var tracer = OpenTracingTracerFactory.CreateTracer(defaultServiceName: defaultServiceName);
 
             var parentScope = tracer.BuildSpan("ParentOperation")
                                     .StartActive();
@@ -380,10 +379,9 @@ namespace Datadog.Trace.OpenTracing.Tests
                                    .AsChildOf(parentScope.Span)
                                    .StartActive();
 
-            var otSpan = (OpenTracingSpan)childScope.Span;
-            var ddSpan = otSpan.Span;
-
-            Assert.Equal("MyAwesomeService", ddSpan.ServiceName);
+            Assert.Equal("MyAwesomeService", ((OpenTracingSpan)parentScope.Span).Span.ServiceName);
+            Assert.NotEqual("MyAwesomeService", ((OpenTracingSpan)childScope.Span).Span.ServiceName);
+            Assert.Equal(defaultServiceName, ((OpenTracingSpan)childScope.Span).Span.ServiceName);
         }
     }
 }
