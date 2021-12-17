@@ -127,7 +127,7 @@ Enable instrumentation for a specific Windows service:
 
 ### Instrument an ASP.NET application deployed on IIS
 
-<!-- TODO -->
+See [iis-instrumentation.md](iis-instrumentation.md).
 
 ## Advanced configuration
 
