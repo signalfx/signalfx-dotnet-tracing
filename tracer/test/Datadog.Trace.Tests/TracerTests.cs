@@ -39,7 +39,7 @@ namespace Datadog.Trace.Tests
         [Fact]
         public void StartActive_SetOperationName_OperationNameIsSet()
         {
-            var scope = _tracer.StartActive("Operation", null);
+            var scope = _tracer.StartActive("Operation");
 
             Assert.Equal("Operation", scope.Span.OperationName);
         }
@@ -47,7 +47,7 @@ namespace Datadog.Trace.Tests
         [Fact]
         public void StartActive_SetOperationName_ActiveScopeIsSet()
         {
-            var scope = _tracer.StartActive("Operation", null);
+            var scope = _tracer.StartActive("Operation");
 
             var activeScope = _tracer.ActiveScope;
             Assert.Equal(scope, activeScope);
@@ -56,7 +56,7 @@ namespace Datadog.Trace.Tests
         [Fact]
         public void StartActive_NoActiveScope_RootSpan()
         {
-            var scope = (Scope)_tracer.StartActive("Operation", null);
+            var scope = (Scope)_tracer.StartActive("Operation");
             var span = scope.Span;
 
             Assert.True(span.IsRootSpan);
@@ -115,7 +115,8 @@ namespace Datadog.Trace.Tests
         [Fact]
         public void StartActive_NoFinishOnClose_SpanIsNotFinishedWhenScopeIsClosed()
         {
-            var scope = (Scope)_tracer.StartActive("Operation", finishOnClose: false);
+            var spanCreationSettings = new SpanCreationSettings() { FinishOnClose = false };
+            var scope = (Scope)_tracer.StartActive("Operation", spanCreationSettings);
             var span = scope.Span;
             Assert.False(span.IsFinished);
 
@@ -129,7 +130,9 @@ namespace Datadog.Trace.Tests
         public void StartActive_SetParentManually_ParentIsSet()
         {
             var parent = _tracer.StartSpan("Parent");
-            var childScope = (Scope)_tracer.StartActive("Child", parent.Context);
+
+            var spanCreationSettings = new SpanCreationSettings() { Parent = parent.Context };
+            var childScope = (Scope)_tracer.StartActive("Child", spanCreationSettings);
             var childSpan = childScope.Span;
 
             Assert.Equal(parent.Context, childSpan.Context.Parent);
@@ -143,7 +146,8 @@ namespace Datadog.Trace.Tests
             const SamplingPriority samplingPriority = SamplingPriority.UserKeep;
 
             var parent = new SpanContext(traceId, parentId, samplingPriority);
-            var child = (Scope)_tracer.StartActive("Child", parent);
+            var spanCreationSettings = new SpanCreationSettings() { Parent = parent };
+            var child = (Scope)_tracer.StartActive("Child", spanCreationSettings);
             var childSpan = child.Span;
 
             Assert.True(childSpan.IsRootSpan);
@@ -167,7 +171,8 @@ namespace Datadog.Trace.Tests
         [Fact]
         public void StartActive_SetServiceName_ServiceNameIsSet()
         {
-            var scope = _tracer.StartActive("Operation", serviceName: "MyAwesomeService");
+            var scope = _tracer.StartActive("Operation");
+            scope.Span.ServiceName = "MyAwesomeService";
 
             Assert.Equal("MyAwesomeService", scope.Span.ServiceName);
         }
@@ -175,7 +180,8 @@ namespace Datadog.Trace.Tests
         [Fact]
         public void StartActive_SetParentServiceName_ChildServiceNameIsDefaultServiceName()
         {
-            var parent = _tracer.StartActive("Parent", serviceName: "MyAwesomeService");
+            var parent = _tracer.StartActive("Parent");
+            parent.Span.ServiceName = "MyAwesomeService";
             var child = _tracer.StartActive("Child");
 
             Assert.NotEqual("MyAwesomeService", child.Span.ServiceName);
@@ -186,7 +192,8 @@ namespace Datadog.Trace.Tests
         public void StartActive_SetStartTime_StartTimeIsProperlySet()
         {
             var startTime = new DateTimeOffset(2017, 01, 01, 0, 0, 0, TimeSpan.Zero);
-            var scope = _tracer.StartActive("Operation", startTime: startTime);
+            var spanCreationSettings = new SpanCreationSettings() { StartTime = startTime };
+            var scope = _tracer.StartActive("Operation", spanCreationSettings);
             var span = (Span)scope.Span;
 
             Assert.Equal(startTime, span.StartTime);
@@ -362,14 +369,16 @@ namespace Datadog.Trace.Tests
             var propagatedContext = new SpanContext(traceId, spanId, samplingPriority, null, origin);
             Assert.Equal(origin, propagatedContext.Origin);
 
-            using var firstScope = (Scope)_tracer.StartActive("First Span", propagatedContext);
+            var spanCreationSettings = new SpanCreationSettings() { Parent = propagatedContext };
+            using var firstScope = (Scope)_tracer.StartActive("First Span", spanCreationSettings);
             var firstSpan = (Span)firstScope.Span;
 
             Assert.True(firstSpan.IsRootSpan);
             Assert.Equal(origin, firstSpan.Context.Origin);
             Assert.Equal(origin, firstSpan.GetTag(Tags.Origin));
 
-            using var secondScope = (Scope)_tracer.StartActive("Child", firstSpan.Context);
+            var spanCreationSettings2 = new SpanCreationSettings() { Parent = firstSpan.Context };
+            using var secondScope = (Scope)_tracer.StartActive("Child", spanCreationSettings2);
             var secondSpan = (Span)secondScope.Span;
 
             Assert.False(secondSpan.IsRootSpan);
@@ -388,10 +397,12 @@ namespace Datadog.Trace.Tests
             var propagatedContext = new SpanContext(traceId, spanId, samplingPriority, null, origin);
             var propagator = new DDSpanContextPropagator(new DatadogTraceIdConvention());
 
-            using var firstScope = (Scope)_tracer.StartActive("First Span", propagatedContext);
+            var spanCreationSettings = new SpanCreationSettings() { Parent = propagatedContext };
+            using var firstScope = (Scope)_tracer.StartActive("First Span", spanCreationSettings);
             var firstSpan = firstScope.Span;
 
-            using var secondScope = (Scope)_tracer.StartActive("Child", firstSpan.Context);
+            var spanCreationSettings2 = new SpanCreationSettings() { Parent = firstSpan.Context };
+            using var secondScope = (Scope)_tracer.StartActive("Child", spanCreationSettings2);
             var secondSpan = secondScope.Span;
 
             IHeadersCollection headers = WebRequest.CreateHttp("http://localhost").Headers.Wrap();
