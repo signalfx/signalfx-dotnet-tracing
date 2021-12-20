@@ -47,6 +47,23 @@ namespace Datadog.Trace.ClrProfiler
             }
         }
 
+        public static int SignalFxReadThreadSamples(int len, byte[] buf)
+        {
+            return IsWindows ? Windows.SignalFxReadThreadSamples(len, buf) : NonWindows.SignalFxReadThreadSamples(len, buf);
+        }
+
+        public static void SignalFxSetNativeContext(ulong traceIdHigh, ulong traceIdLow, ulong spanId)
+        {
+            if (IsWindows)
+            {
+                Windows.SignalFxSetNativeContext(traceIdHigh, traceIdLow, spanId);
+            }
+            else
+            {
+                NonWindows.SignalFxSetNativeContext(traceIdHigh, traceIdLow, spanId);
+            }
+        }
+
         // the "dll" extension is required on .NET Framework
         // and optional on .NET Core
         private static class Windows
@@ -57,8 +74,14 @@ namespace Datadog.Trace.ClrProfiler
             [DllImport("SignalFx.Tracing.ClrProfiler.Native.dll")]
             public static extern void InitializeProfiler([MarshalAs(UnmanagedType.LPWStr)] string id, [In] NativeCallTargetDefinition[] methodArrays, int size);
 
-            [DllImport("Datadog.Trace.ClrProfiler.Native.dll")]
+            [DllImport("SignalFx.Trace.ClrProfiler.Native.dll")]
             public static extern void EnableByRefInstrumentation();
+
+            [DllImport("SignalFx.Tracing.ClrProfiler.Native.dll")]
+            public static extern int SignalFxReadThreadSamples(int len, byte[] buf);
+
+            [DllImport("SignalFx.Tracing.ClrProfiler.Native.dll")]
+            public static extern void SignalFxSetNativeContext(ulong traceIdHigh, ulong traceIdLow, ulong spanId);
         }
 
         // assume .NET Core if not running on Windows
@@ -70,8 +93,14 @@ namespace Datadog.Trace.ClrProfiler
             [DllImport("SignalFx.Tracing.ClrProfiler.Native")]
             public static extern void InitializeProfiler([MarshalAs(UnmanagedType.LPWStr)] string id, [In] NativeCallTargetDefinition[] methodArrays, int size);
 
-            [DllImport("Datadog.Trace.ClrProfiler.Native")]
+            [DllImport("SignalFx.Trace.ClrProfiler.Native")]
             public static extern void EnableByRefInstrumentation();
+
+            [DllImport("SignalFx.Tracing.ClrProfiler.Native")]
+            public static extern int SignalFxReadThreadSamples(int len, byte[] buf);
+
+            [DllImport("SignalFx.Tracing.ClrProfiler.Native")]
+            public static extern void SignalFxSetNativeContext(ulong traceIdHigh, ulong traceIdLow, ulong spanId);
         }
     }
 }
