@@ -51,7 +51,7 @@ namespace Datadog.Trace
         }
 
         /// <inheritdoc />
-        ulong ISpan.TraceId => TraceId;
+        TraceId ISpan.TraceId => TraceId;
 
         /// <inheritdoc />
         ulong ISpan.SpanId => SpanId;

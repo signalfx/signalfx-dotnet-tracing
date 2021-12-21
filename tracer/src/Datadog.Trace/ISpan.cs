@@ -4,7 +4,6 @@
 // </copyright>
 
 using System;
-using Datadog.Trace.Tagging;
 
 namespace Datadog.Trace
 {
