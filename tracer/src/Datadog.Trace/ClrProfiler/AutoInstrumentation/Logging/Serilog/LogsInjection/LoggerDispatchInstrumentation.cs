@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System.Collections;
 using System.ComponentModel;
 using Datadog.Trace.ClrProfiler.CallTarget;
@@ -55,13 +57,11 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.Serilog.LogsInje
                 AddPropertyIfAbsent(dict, CorrelationIdentifier.SerilogVersionKey, tracer.Settings.ServiceVersion);
                 AddPropertyIfAbsent(dict, CorrelationIdentifier.SerilogEnvKey, tracer.Settings.Environment);
 
-                var spanContext = tracer.DistributedSpanContext;
-                if (spanContext is not null
-                    && spanContext.TryGetValue(HttpHeaderNames.TraceId, out string traceId)
-                    && spanContext.TryGetValue(HttpHeaderNames.ParentId, out string spanId))
+                var span = tracer.ActiveScope?.Span;
+                if (span is not null)
                 {
-                    AddPropertyIfAbsent(dict, CorrelationIdentifier.TraceIdKey, traceId);
-                    AddPropertyIfAbsent(dict, CorrelationIdentifier.SpanIdKey, spanId);
+                    AddPropertyIfAbsent(dict, CorrelationIdentifier.TraceIdKey, span.TraceId.ToString());
+                    AddPropertyIfAbsent(dict, CorrelationIdentifier.SpanIdKey, span.SpanId.ToString());
                 }
             }
 

@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -66,14 +68,12 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.NLog.LogsInjecti
             mdc.Set(CorrelationIdentifier.VersionKey, tracer.Settings.ServiceVersion ?? string.Empty);
             mdc.Set(CorrelationIdentifier.EnvKey, tracer.Settings.Environment ?? string.Empty);
 
-            var spanContext = tracer.DistributedSpanContext;
-            if (spanContext is not null
-                && spanContext.TryGetValue(HttpHeaderNames.TraceId, out string traceId)
-                && spanContext.TryGetValue(HttpHeaderNames.ParentId, out string spanId))
+            var span = tracer.ActiveScope?.Span;
+            if (span is not null)
             {
                 removeSpanId = true;
-                mdc.Set(CorrelationIdentifier.TraceIdKey, traceId);
-                mdc.Set(CorrelationIdentifier.SpanIdKey, spanId);
+                mdc.Set(CorrelationIdentifier.TraceIdKey, span.TraceId.ToString());
+                mdc.Set(CorrelationIdentifier.SpanIdKey, span.SpanId.ToString());
             }
 
             return removeSpanId;
@@ -90,12 +90,11 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.NLog.LogsInjecti
             array[1] = new KeyValuePair<string, object>(CorrelationIdentifier.VersionKey, tracer.Settings.ServiceVersion ?? string.Empty);
             array[2] = new KeyValuePair<string, object>(CorrelationIdentifier.EnvKey, tracer.Settings.Environment ?? string.Empty);
 
-            if (spanContext is not null
-                && spanContext.TryGetValue(HttpHeaderNames.TraceId, out string traceId)
-                && spanContext.TryGetValue(HttpHeaderNames.ParentId, out string spanId))
+            var span = tracer.ActiveScope?.Span;
+            if (span is not null)
             {
-                array[3] = new KeyValuePair<string, object>(CorrelationIdentifier.TraceIdKey, traceId);
-                array[4] = new KeyValuePair<string, object>(CorrelationIdentifier.SpanIdKey, spanId);
+                array[3] = new KeyValuePair<string, object>(CorrelationIdentifier.TraceIdKey, span.TraceId.ToString());
+                array[4] = new KeyValuePair<string, object>(CorrelationIdentifier.SpanIdKey, span.SpanId.ToString());
             }
 
             var state = mdlc.SetScoped(array);

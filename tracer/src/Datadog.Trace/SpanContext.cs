@@ -14,10 +14,8 @@ namespace Datadog.Trace
     /// <summary>
     /// The SpanContext contains all the information needed to express relationships between spans inside or outside the process boundaries.
     /// </summary>
-    public class SpanContext : ISpanContext, IReadOnlyDictionary<string, string>
+    public class SpanContext : ISpanContext
     {
-        private static readonly string[] KeyNames = { HttpHeaderNames.TraceId, HttpHeaderNames.ParentId, HttpHeaderNames.SamplingPriority, HttpHeaderNames.Origin };
-
         /// <summary>
         /// Initializes a new instance of the <see cref="SpanContext"/> class
         /// from a propagated context. <see cref="Parent"/> will be null
@@ -141,97 +139,5 @@ namespace Datadog.Trace
         /// Returns null for local contexts.
         /// </summary>
         internal SamplingPriority? SamplingPriority { get; }
-
-        /// <inheritdoc/>
-        int IReadOnlyCollection<KeyValuePair<string, string>>.Count => KeyNames.Length;
-
-        /// <inheritdoc />
-        IEnumerable<string> IReadOnlyDictionary<string, string>.Keys => KeyNames;
-
-        /// <inheritdoc/>
-        IEnumerable<string> IReadOnlyDictionary<string, string>.Values
-        {
-            get
-            {
-                foreach (var key in KeyNames)
-                {
-                    yield return ((IReadOnlyDictionary<string, string>)this)[key];
-                }
-            }
-        }
-
-        /// <inheritdoc/>
-        string IReadOnlyDictionary<string, string>.this[string key]
-        {
-            get
-            {
-                if (((IReadOnlyDictionary<string, string>)this).TryGetValue(key, out var value))
-                {
-                    return value;
-                }
-
-                ThrowHelper.ThrowKeyNotFoundException($"Key not found: {key}");
-                return default;
-            }
-        }
-
-        /// <inheritdoc/>
-        IEnumerator<KeyValuePair<string, string>> IEnumerable<KeyValuePair<string, string>>.GetEnumerator()
-        {
-            var dictionary = (IReadOnlyDictionary<string, string>)this;
-
-            foreach (var key in KeyNames)
-            {
-                yield return new KeyValuePair<string, string>(key, dictionary[key]);
-            }
-        }
-
-        /// <inheritdoc/>
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return ((IReadOnlyDictionary<string, string>)this).GetEnumerator();
-        }
-
-        /// <inheritdoc/>
-        bool IReadOnlyDictionary<string, string>.ContainsKey(string key)
-        {
-            foreach (var k in KeyNames)
-            {
-                if (k == key)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        /// <inheritdoc/>
-        bool IReadOnlyDictionary<string, string>.TryGetValue(string key, out string value)
-        {
-            switch (key)
-            {
-                case HttpHeaderNames.TraceId:
-                    value = TraceId.ToString();
-                    return true;
-
-                case HttpHeaderNames.ParentId:
-                    value = SpanId.ToString();
-                    return true;
-
-                case HttpHeaderNames.SamplingPriority:
-                    var samplingPriority = SamplingPriority;
-
-                    value = samplingPriority != null ? ((int)samplingPriority.Value).ToString() : null;
-                    return true;
-
-                case HttpHeaderNames.Origin:
-                    value = Origin;
-                    return true;
-            }
-
-            value = null;
-            return false;
-        }
     }
 }

@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System.Collections.Generic;
 using System.Globalization;
 using Datadog.Trace.Conventions;
@@ -128,36 +130,6 @@ namespace Datadog.Trace.Tests.Headers
             // Assert
             Assert.NotNull(tagsFromHeader);
             Assert.Equal(expectedResults, tagsFromHeader);
-        }
-
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        internal void Extract_HeadersWithUserAgent(bool provideUserAgent)
-        {
-            // Initialize constants
-            const string uaInHeaders = "A wonderful useragent";
-            const string uaInParameter = "A wonderful useragent truncated in the headers";
-            const string tagName = "user-agent-tag";
-
-            var headers = new NameValueCollection().Wrap();
-
-            // Add headers
-            headers.Add(HttpHeaderNames.UserAgent, uaInHeaders);
-
-            // Initialize header-tag arguments and expectations
-            var headerTags = new Dictionary<string, string>();
-            headerTags.Add(HttpHeaderNames.UserAgent, tagName);
-
-            // Test no user agent
-            var tagsFromHeader = provideUserAgent ? SpanContextPropagator.Instance.ExtractHeaderTags(headers, headerTags, TestPrefix, uaInParameter) :
-                SpanContextPropagator.Instance.ExtractHeaderTags(headers, headerTags, TestPrefix);
-
-            // Assert
-            Assert.Single(tagsFromHeader);
-            var normalizedHeader = tagsFromHeader.First();
-            Assert.Equal(tagName, normalizedHeader.Key);
-            Assert.Equal(provideUserAgent ? uaInParameter : uaInHeaders, normalizedHeader.Value);
         }
 
         [Theory]

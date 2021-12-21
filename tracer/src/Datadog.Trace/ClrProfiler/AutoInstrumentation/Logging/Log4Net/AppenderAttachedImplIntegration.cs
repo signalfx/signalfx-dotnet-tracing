@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.ComponentModel;
 using Datadog.Trace.ClrProfiler.CallTarget;
@@ -45,13 +47,11 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Log4Net
                 loggingEvent.Properties[CorrelationIdentifier.VersionKey] = tracer.Settings.ServiceVersion ?? string.Empty;
                 loggingEvent.Properties[CorrelationIdentifier.EnvKey] = tracer.Settings.Environment ?? string.Empty;
 
-                var spanContext = tracer.DistributedSpanContext;
-                if (spanContext is not null
-                    && spanContext.TryGetValue(HttpHeaderNames.TraceId, out string traceId)
-                    && spanContext.TryGetValue(HttpHeaderNames.ParentId, out string spanId))
+                var span = tracer.ActiveScope?.Span;
+                if (span is not null)
                 {
-                    loggingEvent.Properties[CorrelationIdentifier.TraceIdKey] = traceId;
-                    loggingEvent.Properties[CorrelationIdentifier.SpanIdKey] = spanId;
+                    loggingEvent.Properties[CorrelationIdentifier.TraceIdKey] = span.TraceId.ToString();
+                    loggingEvent.Properties[CorrelationIdentifier.SpanIdKey] = span.SpanId;
                 }
             }
 
