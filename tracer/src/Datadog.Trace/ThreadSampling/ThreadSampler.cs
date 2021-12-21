@@ -1,6 +1,6 @@
 using System;
-using System.Runtime.InteropServices;
 using System.Threading;
+using Datadog.Trace.ClrProfiler;
 
 namespace Datadog.Trace.ThreadSampling
 {
@@ -41,7 +41,7 @@ namespace Datadog.Trace.ThreadSampling
         private static void ReadOneSample(byte[] buf)
         {
             var start = DateTime.Now;
-            int read = SignalFx_read_thread_samples(buf.Length, buf);
+            int read = NativeMethods.SignalFxReadThreadSamples(buf.Length, buf);
             if (read > 0)
             {
                 var parser = new ThreadSampleNativeFormatParser(buf, read);
@@ -77,15 +77,11 @@ namespace Datadog.Trace.ThreadSampling
         /// </summary>
         public static void Initialize()
         {
-            var thread = new Thread(new ThreadStart(SampleReadingThread));
-            thread.IsBackground = true;
+            var thread = new Thread(SampleReadingThread)
+            {
+                IsBackground = true
+            };
             thread.Start();
         }
-
-        [DllImport("SignalFx.Tracing.ClrProfiler.Native")]
-#pragma warning disable SA1400 // Access modifier should be declared
-        static extern int SignalFx_read_thread_samples(int len, byte[] buf);
-#pragma warning restore SA1400 // Access modifier should be declared
-
     }
 }
