@@ -4,6 +4,7 @@
 // </copyright>
 
 using System;
+using Datadog.Trace.Propagation;
 
 namespace Datadog.Trace
 {
@@ -13,6 +14,8 @@ namespace Datadog.Trace
     internal interface IDatadogOpenTracingTracer
     {
         string DefaultServiceName { get; }
+
+        IPropagator Propagator { get; }
 
         ISpan StartSpan(string operationName, ISpanContext parent, string serviceName, DateTimeOffset? startTime, bool ignoreActiveScope);
     }

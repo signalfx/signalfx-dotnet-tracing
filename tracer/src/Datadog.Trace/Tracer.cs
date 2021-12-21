@@ -211,7 +211,7 @@ namespace Datadog.Trace
         /// <summary>
         /// Gets the <see cref="IPropagator"/> instance used by this <see cref="IDatadogTracer"/> instance.
         /// </summary>
-        IPropagator IDatadogTracer.Propagator => TracerManager.Propagator;
+        IPropagator IDatadogOpenTracingTracer.Propagator => TracerManager.Propagator;
 
         internal TracerManager TracerManager => _tracerManager ?? TracerManager.Instance;
 
