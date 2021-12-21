@@ -1,4 +1,4 @@
-﻿// <copyright file="CITracerManagerFactory.cs" company="Datadog">
+// <copyright file="CITracerManagerFactory.cs" company="Datadog">
 // Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
@@ -10,7 +10,6 @@ using Datadog.Trace.Ci.Agent;
 using Datadog.Trace.Ci.Sampling;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Conventions;
-using Datadog.Trace.Logging;
 using Datadog.Trace.Propagation;
 using Datadog.Trace.RuntimeMetrics;
 using Datadog.Trace.Sampling;
@@ -28,11 +27,10 @@ namespace Datadog.Trace.Ci
             IScopeManager scopeManager,
             IDogStatsd statsd,
             RuntimeMetricsWriter runtimeMetrics,
-            LibLogScopeEventSubscriber libLogSubscriber,
             ITraceIdConvention traceIdConvention,
             string defaultServiceName)
         {
-            return new CITracerManager(settings, agentWriter, sampler, propagator, scopeManager, statsd, runtimeMetrics, libLogSubscriber, traceIdConvention, defaultServiceName);
+            return new CITracerManager(settings, agentWriter, sampler, propagator, scopeManager, statsd, runtimeMetrics, traceIdConvention, defaultServiceName);
         }
 
         protected override ISampler GetSampler(ImmutableTracerSettings settings)
