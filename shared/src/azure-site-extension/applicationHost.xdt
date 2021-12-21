@@ -17,7 +17,7 @@
         <add name="CORECLR_PROFILER_PATH_64" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
 
         <add name="SIGNALFX_DOTNET_TRACER_HOME" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
-        <add name="SIGNALFX_TRACE_LOG_PATH" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
+        <add name="SIGNALFX_TRACE_LOG_DIRECTORY" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
         <add name="SIGNALFX_AZURE_APP_SERVICES" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
         <add name="SIGNALFX_PROFILER_EXCLUDE_PROCESSES" xdt:Locator="Match(name)" xdt:Transform="RemoveAll"/>
 
@@ -35,7 +35,7 @@
         <add name="CORECLR_PROFILER_PATH_64" value="%HOME%\signalfx\tracing\v0.2.0\x64\SignalFx.Tracing.ClrProfiler.Native.dll" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
 
         <add name="SIGNALFX_DOTNET_TRACER_HOME" value="%HOME%\signalfx\tracing\v0.2.0" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
-        <add name="SIGNALFX_TRACE_LOG_PATH" value="%HOME%\LogFiles\signalfx\tracing\v0.2.0\dotnet-profiler.log" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
+        <add name="SIGNALFX_TRACE_LOG_DIRECTORY" value="%HOME%\LogFiles\signalfx\tracing\v0.2.0\" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
         <add name="SIGNALFX_AZURE_APP_SERVICES" value="1" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
         <add name="SIGNALFX_PROFILER_EXCLUDE_PROCESSES" value="SnapshotUploader.exe;workerforwarder.exe" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
       </environmentVariables>
