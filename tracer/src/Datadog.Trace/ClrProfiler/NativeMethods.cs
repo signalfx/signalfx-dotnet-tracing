@@ -52,6 +52,18 @@ namespace Datadog.Trace.ClrProfiler
             }
         }
 
+        public static void EnableCallTargetStateByRef()
+        {
+            if (IsWindows)
+            {
+                Windows.EnableCallTargetStateByRef();
+            }
+            else
+            {
+                NonWindows.EnableCallTargetStateByRef();
+            }
+        }
+
         public static void AddDerivedInstrumentations(string id, NativeCallTargetDefinition[] methodArrays)
         {
             if (methodArrays is null || methodArrays.Length == 0)
@@ -100,6 +112,9 @@ namespace Datadog.Trace.ClrProfiler
             public static extern void EnableByRefInstrumentation();
 
             [DllImport("SignalFx.Trace.ClrProfiler.Native.dll")]
+            public static extern void EnableCallTargetStateByRef();
+
+            [DllImport("SignalFx.Trace.ClrProfiler.Native.dll")]
             public static extern void AddDerivedInstrumentations([MarshalAs(UnmanagedType.LPWStr)] string id, [In] NativeCallTargetDefinition[] methodArrays, int size);
 
             [DllImport("SignalFx.Tracing.ClrProfiler.Native.dll")]
@@ -120,6 +135,9 @@ namespace Datadog.Trace.ClrProfiler
 
             [DllImport("SignalFx.Trace.ClrProfiler.Native")]
             public static extern void EnableByRefInstrumentation();
+
+            [DllImport("SignalFx.Trace.ClrProfiler.Native")]
+            public static extern void EnableCallTargetStateByRef();
 
             [DllImport("SignalFx.Trace.ClrProfiler.Native")]
             public static extern void AddDerivedInstrumentations([MarshalAs(UnmanagedType.LPWStr)] string id, [In] NativeCallTargetDefinition[] methodArrays, int size);

@@ -608,7 +608,8 @@ HRESULT STDMETHODCALLTYPE CorProfiler::ModuleLoadFinished(ModuleID module_id, HR
 
         const auto& module_metadata =
             ModuleMetadata(metadata_import, metadata_emit, assembly_import, assembly_emit, module_info.assembly.name,
-                           module_info.assembly.app_domain_id, &corAssemblyProperty, enable_by_ref_instrumentation);
+                           module_info.assembly.app_domain_id, &corAssemblyProperty, enable_by_ref_instrumentation,
+                           enable_calltarget_state_by_ref);
 
         const auto& assemblyImport = GetAssemblyImportMetadata(assembly_import);
         const auto& assemblyVersion = assemblyImport.version.str();
@@ -829,7 +830,8 @@ HRESULT STDMETHODCALLTYPE CorProfiler::JITCompilationStarted(FunctionID function
 
     std::unique_ptr<ModuleMetadata> module_metadata = std::make_unique<ModuleMetadata>(
         metadataImport, metadataEmit, assemblyImport, assemblyEmit, module_info.assembly.name,
-        module_info.assembly.app_domain_id, &corAssemblyProperty, enable_by_ref_instrumentation);
+        module_info.assembly.app_domain_id, &corAssemblyProperty, enable_by_ref_instrumentation,
+        enable_calltarget_state_by_ref);
 
     // get function info
     const auto& caller = GetFunctionInfo(module_metadata->metadata_import, function_token);
@@ -986,6 +988,17 @@ void CorProfiler::EnableByRefInstrumentation()
     }
 
     Logger::Info("ByRef Instrumentation enabled.");
+}
+
+void CorProfiler::EnableCallTargetStateByRef()
+{
+    enable_calltarget_state_by_ref = true;
+    if (rejit_handler != nullptr)
+    {
+        rejit_handler->SetEnableCallTargetStateByRef(true);
+    }
+
+    Logger::Info("CallTargetState ByRef enabled.");
 }
 
 void CorProfiler::AddDerivedInstrumentations(WCHAR* id, CallTargetDefinition* items, int size)
@@ -2991,7 +3004,14 @@ HRESULT CorProfiler::CallTarget_RewriterCallback(RejitHandlerModule* moduleHandl
     }
 
     reWriterWrapper.LoadLocal(exceptionIndex);
-    reWriterWrapper.LoadLocal(callTargetStateIndex);
+    if (enable_calltarget_state_by_ref)
+    {
+        reWriterWrapper.LoadLocalAddress(callTargetStateIndex);
+    }
+    else
+    {
+        reWriterWrapper.LoadLocal(callTargetStateIndex);
+    }
 
     ILInstr* endMethodCallInstr;
     if (isVoid)

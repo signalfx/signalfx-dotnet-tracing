@@ -48,6 +48,7 @@ private:
     //
     std::unique_ptr<RejitHandler> rejit_handler = nullptr;
     bool enable_by_ref_instrumentation = false;
+    bool enable_calltarget_state_by_ref = false;
 
     // Cor assembly properties
     AssemblyProperty corAssemblyProperty{};
@@ -155,6 +156,7 @@ public:
     HRESULT STDMETHODCALLTYPE ThreadNameChanged(ThreadID threadId, ULONG cchName, WCHAR name[]) override;
 
     void EnableByRefInstrumentation();
+    void EnableCallTargetStateByRef();
     void AddDerivedInstrumentations(WCHAR* id, CallTargetDefinition* items, int size);
 };
 
