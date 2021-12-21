@@ -275,6 +275,9 @@ namespace Datadog.Trace
                     writer.WritePropertyName("agent_url");
                     writer.WriteValue(instanceSettings.ExporterSettings.AgentUri);
 
+                    writer.WritePropertyName("metrics_agent_url");
+                    writer.WriteValue(instanceSettings.MetricsEndpointUrl);
+
                     writer.WritePropertyName("debug");
                     writer.WriteValue(GlobalSettings.Source.DebugEnabled);
 

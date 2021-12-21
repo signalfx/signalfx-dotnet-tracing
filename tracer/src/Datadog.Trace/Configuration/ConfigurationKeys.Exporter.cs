@@ -44,7 +44,7 @@ namespace Datadog.Trace.Configuration
         /// Default value is <c>null</c>.
         /// </summary>
         /// <seealso cref="ExporterSettings.MetricsPipeName"/>
-        public const string MetricsPipeName = "SINGALFX_DOGSTATSD_PIPE_NAME";
+        public const string MetricsPipeName = "SIGNALFX_DOGSTATSD_PIPE_NAME";
 
         /// <summary>
         /// Sibling setting for <see cref="AgentPort"/>.
@@ -55,12 +55,18 @@ namespace Datadog.Trace.Configuration
         public const string TraceAgentPortKey = "SINGALFX_APM_RECEIVER_PORT";
 
         /// <summary>
+        /// Configuration key for the URL where the Tracer can send metrics.
+        /// </summary>
+        /// <seealso cref="ExporterSettings.MetricsEndpointUrl"/>
+        public const string MetricsEndpointUrl = "SIGNALFX_METRICS_ENDPOINT_URL";
+
+        /// <summary>
         /// Configuration key for the Agent URL where the Tracer can send traces.
         /// Overrides values in <see cref="AgentHost"/> and <see cref="AgentPort"/> if present.
         /// Default value is "http://localhost:8126".
         /// </summary>
         /// <seealso cref="ExporterSettings.AgentUri"/>
-        public const string AgentUri = "SINGALFX_TRACE_AGENT_URL";
+        public const string AgentUri = "SINGNALFX_TRACE_AGENT_URL";
 
         /// <summary>
         /// Configuration key for the trace endpoint. Same as <see creg="AgentUri"/> created

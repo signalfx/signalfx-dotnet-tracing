@@ -4,8 +4,8 @@
 // </copyright>
 
 using System;
-using System.Runtime.InteropServices;
 using System.Threading;
+using Datadog.Trace.ClrProfiler;
 
 namespace Datadog.Trace
 {
@@ -43,19 +43,14 @@ namespace Datadog.Trace
                     // nop
                     if (value == null)
                     {
-                        SignalFx_set_native_context(0, 0, 0);
+                        NativeMethods.SignalFxSetNativeContext(traceIdHigh: 0, traceIdLow: 0, spanId: 0);
                     }
                     else
                     {
-                        SignalFx_set_native_context(value.Span.TraceId.Higher, value.Span.TraceId.Lower, value.Span.SpanId);
+                        NativeMethods.SignalFxSetNativeContext(value.Span.TraceId.Higher, value.Span.TraceId.Lower, value.Span.SpanId);
                     }
                 }
             }
         }
-
-        [DllImport("SignalFx.Tracing.ClrProfiler.Native")]
-#pragma warning disable SA1400 // Access modifier should be declared
-        static extern void SignalFx_set_native_context(ulong traceIdHigh, ulong traceIdLow, ulong spanId);
-#pragma warning restore SA1400 // Access modifier should be declared
     }
 }

@@ -35,6 +35,7 @@ namespace Datadog.Trace.Configuration
             TracesPipeName = settings.TracesPipeName;
             TracesPipeTimeoutMs = settings.TracesPipeTimeoutMs;
 
+            MetricsEndpointUrl = settings.MetricsEndpointUrl;
             MetricsTransport = settings.MetricsTransport;
             MetricsPipeName = settings.MetricsPipeName;
             DogStatsdPort = settings.DogStatsdPort;
@@ -51,6 +52,12 @@ namespace Datadog.Trace.Configuration
         /// <seealso cref="ConfigurationKeys.AgentHost"/>
         /// <seealso cref="ConfigurationKeys.AgentPort"/>
         public Uri AgentUri { get; }
+
+        /// <summary>
+        /// Gets the Uri where the Tracer can connect to the metrics Agent.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.MetricsEndpointUrl"/>
+        public Uri MetricsEndpointUrl { get; }
 
         /// <summary>
         /// Gets the windows pipe name where the Tracer can connect to the Agent.

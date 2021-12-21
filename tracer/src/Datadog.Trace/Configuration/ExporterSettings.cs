@@ -78,6 +78,12 @@ namespace Datadog.Trace.Configuration
         public string TracesPipeName { get; set; }
 
         /// <summary>
+        /// Gets or sets the Uri where the Tracer can send metrics.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.MetricsEndpointUrl"/>
+        public Uri MetricsEndpointUrl { get; set; }
+
+        /// <summary>
         /// Gets or sets the timeout in milliseconds for the windows named pipe requests.
         /// Default is <c>100</c>.
         /// </summary>
@@ -154,6 +160,11 @@ namespace Datadog.Trace.Configuration
             }
 
             MetricsTransport = metricsTransport;
+            
+            var metricsEndpointUrl = source?.GetString(ConfigurationKeys.MetricsEndpointUrl) ??
+                             // default value
+                             "http://localhost:9943/v2/datapoint";
+            MetricsEndpointUrl = new Uri(metricsEndpointUrl);
         }
 
         private void ConfigureTraceTransport(IConfigurationSource source, bool isWindows)

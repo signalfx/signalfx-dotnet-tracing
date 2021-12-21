@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Datadog.Trace.SignalFx.Metrics;
 using Datadog.Trace.Util;
 
 namespace Datadog.Trace.Configuration
@@ -41,6 +42,7 @@ namespace Datadog.Trace.Configuration
             ServiceVersion = settings.ServiceVersion;
             TraceEnabled = settings.TraceEnabled;
             ExporterSettings = new ImmutableExporterSettings(settings.ExporterSettings);
+            MetricsExporter = settings.MetricsExporter;
 #pragma warning disable 618 // App analytics is deprecated, but still used
             AnalyticsEnabled = settings.AnalyticsEnabled;
 #pragma warning restore 618
@@ -277,6 +279,12 @@ namespace Datadog.Trace.Configuration
         /// <seealso cref="ConfigurationKeys.Exporter"/>
         /// </summary>
         public ExporterType Exporter { get; }
+
+        /// <summary>
+        /// Gets the type of metrics exporter.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.MetricsExporter"/>
+        public MetricsExporterType MetricsExporter { get; }
 
         /// <summary>
         /// Gets the propagators be used.

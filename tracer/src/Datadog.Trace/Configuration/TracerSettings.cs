@@ -13,7 +13,7 @@ using System.Text.RegularExpressions;
 using Datadog.Trace.Configuration.Types;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.PlatformHelpers;
-using Datadog.Trace.Util;
+using Datadog.Trace.SignalFx.Metrics;
 using Datadog.Trace.Vendors.Serilog;
 
 namespace Datadog.Trace.Configuration
@@ -102,6 +102,8 @@ namespace Datadog.Trace.Configuration
 
             ServiceNameMappings = new ServiceNames(serviceNameMappings);
 
+            MetricsExporter = source.GetTypedValue<MetricsExporterType>(ConfigurationKeys.MetricsExporter);
+            
             TracerMetricsEnabled = source?.GetBool(ConfigurationKeys.TracerMetricsEnabled) ??
                                    // default value
                                    false;
@@ -217,6 +219,13 @@ namespace Datadog.Trace.Configuration
         public ExporterSettings ExporterSettings { get; set; }
 
         /// <summary>
+        /// Gets or sets the key used to determine the transport for sending traces.
+        /// Default is <c>null</c>, which will use the default path decided in <see cref="Agent.Api"/>.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.TracesTransport"/>
+        public string TracesTransport { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether default Analytics are enabled.
         /// Settings this value is a shortcut for setting
         /// <see cref="Configuration.IntegrationSettings.AnalyticsEnabled"/> on some predetermined integrations.
@@ -289,6 +298,13 @@ namespace Datadog.Trace.Configuration
         /// <seealso cref="ConfigurationKeys.Exporter"/>
         /// </summary>
         public ExporterType Exporter { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the metrics exporter to be used. The Tracer uses it to encode and
+        /// dispatch metrics.
+        /// <seealso cref="ConfigurationKeys.MetricsExporter"/>
+        /// </summary>
+        public MetricsExporterType MetricsExporter { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the semantic convention to be used.
