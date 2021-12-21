@@ -25,5 +25,6 @@ services:
       - "4318:4318"  # OTLP HTTP receiver
       - "55679:55679" # zpages extension
       - "9411:9411"  # zipkin receiver
+      - "9943:9943"  # signalfx receiver
     depends_on:
       - jaeger
