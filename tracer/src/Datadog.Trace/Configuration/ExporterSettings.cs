@@ -160,7 +160,7 @@ namespace Datadog.Trace.Configuration
             }
 
             MetricsTransport = metricsTransport;
-            
+
             var metricsEndpointUrl = source?.GetString(ConfigurationKeys.MetricsEndpointUrl) ??
                              // default value
                              "http://localhost:9943/v2/datapoint";

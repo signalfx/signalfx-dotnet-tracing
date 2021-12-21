@@ -276,7 +276,7 @@ namespace Datadog.Trace
                     writer.WriteValue(instanceSettings.ExporterSettings.AgentUri);
 
                     writer.WritePropertyName("metrics_agent_url");
-                    writer.WriteValue(instanceSettings.MetricsEndpointUrl);
+                    writer.WriteValue(instanceSettings.ExporterSettings.MetricsEndpointUrl);
 
                     writer.WritePropertyName("debug");
                     writer.WriteValue(GlobalSettings.Source.DebugEnabled);
@@ -333,10 +333,10 @@ namespace Datadog.Trace
                     writer.WriteValue(instanceSettings.RouteTemplateResourceNamesEnabled);
 
                     writer.WritePropertyName("partialflush_enabled");
-                    writer.WriteValue(instanceSettings.Exporter.PartialFlushEnabled);
+                    writer.WriteValue(instanceSettings.ExporterSettings.PartialFlushEnabled);
 
                     writer.WritePropertyName("partialflush_minspans");
-                    writer.WriteValue(instanceSettings.Exporter.PartialFlushMinSpans);
+                    writer.WriteValue(instanceSettings.ExporterSettings.PartialFlushMinSpans);
 
                     writer.WritePropertyName("runtime_id");
                     writer.WriteValue(Tracer.RuntimeId);

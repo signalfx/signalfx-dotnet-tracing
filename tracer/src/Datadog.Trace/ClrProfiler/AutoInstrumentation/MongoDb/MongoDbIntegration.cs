@@ -25,7 +25,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
         internal const string Major2Minor1 = "2.1";
         internal const string Major2Minor2 = "2.2"; // Synchronous methods added in 2.2
         internal const string MongoDbClientAssembly = "MongoDB.Driver.Core";
-        
+
         private const string IWireProtocolGeneric = "MongoDB.Driver.Core.WireProtocol.IWireProtocol`1";
         private const string DefaultOperationName = "mongodb.query";
         private const string ServiceName = "mongodb";

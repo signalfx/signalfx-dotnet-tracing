@@ -60,8 +60,8 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.Serilog.LogsInje
                     && spanContext.TryGetValue(HttpHeaderNames.TraceId, out string traceId)
                     && spanContext.TryGetValue(HttpHeaderNames.ParentId, out string spanId))
                 {
-                    AddPropertyIfAbsent(dict, CorrelationIdentifier.SerilogTraceIdKey, traceId);
-                    AddPropertyIfAbsent(dict, CorrelationIdentifier.SerilogSpanIdKey, spanId);
+                    AddPropertyIfAbsent(dict, CorrelationIdentifier.TraceIdKey, traceId);
+                    AddPropertyIfAbsent(dict, CorrelationIdentifier.SpanIdKey, spanId);
                 }
             }
 

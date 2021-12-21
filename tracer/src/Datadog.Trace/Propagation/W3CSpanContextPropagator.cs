@@ -53,9 +53,6 @@ namespace Datadog.Trace.Propagation
         /// <inheritdoc cref="IPropagator"/>
         public virtual void Inject<T>(SpanContext context, T carrier, Action<T, string, string> setter)
         {
-            // lock sampling priority when span propagates.
-            context.TraceContext?.LockSamplingPriority();
-
             setter(carrier, W3CHeaderNames.TraceParent, GetFormattedTraceParent(context));
             if (!string.IsNullOrEmpty(context.TraceState))
             {

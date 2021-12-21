@@ -103,7 +103,7 @@ namespace Datadog.Trace.Configuration
             ServiceNameMappings = new ServiceNames(serviceNameMappings);
 
             MetricsExporter = source.GetTypedValue<MetricsExporterType>(ConfigurationKeys.MetricsExporter);
-            
+
             TracerMetricsEnabled = source?.GetBool(ConfigurationKeys.TracerMetricsEnabled) ??
                                    // default value
                                    false;

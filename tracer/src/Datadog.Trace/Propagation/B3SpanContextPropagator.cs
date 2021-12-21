@@ -38,9 +38,6 @@ namespace Datadog.Trace.Propagation
 
             if (setter == null) { throw new ArgumentNullException(nameof(setter)); }
 
-            // lock sampling priority when span propagates.
-            context.TraceContext?.LockSamplingPriority();
-
             setter(carrier, B3HttpHeaderNames.B3TraceId, context.TraceId.ToString());
             setter(carrier, B3HttpHeaderNames.B3SpanId, context.SpanId.ToString("x16", InvariantCulture));
 

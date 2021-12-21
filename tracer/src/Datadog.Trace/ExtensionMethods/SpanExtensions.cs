@@ -37,7 +37,7 @@ namespace Datadog.Trace.ExtensionMethods
             span.SetTag(Tags.DbStatement, commandText);
 
             var tag = DbCommandCache.GetTagsFromDbCommand(command);
-            
+
             span.SetTag(Tags.DbName, tag.DbName);
             span.SetTag(Tags.DbUser, tag.DbUser);
             span.SetTag(Tags.OutHost, tag.OutHost);

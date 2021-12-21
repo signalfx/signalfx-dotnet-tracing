@@ -195,7 +195,7 @@ namespace Datadog.Trace
 
                 if (settings.MetricsExporter == MetricsExporterType.SignalFx)
                 {
-                    var reporter = new SignalFxReporter(settings.MetricsEndpointUrl, settings.SignalFxAccessToken);
+                    var reporter = new SignalFxReporter(settings.ExporterSettings.MetricsEndpointUrl, settings.SignalFxAccessToken);
                     var metricSender = new SignalFxMetricSender(reporter, constantTags.ToArray());
                     return new SignalFxStats(metricSender);
                 }

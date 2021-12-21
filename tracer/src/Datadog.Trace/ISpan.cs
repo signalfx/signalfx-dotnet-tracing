@@ -66,7 +66,7 @@ namespace Datadog.Trace
         /// logic being tested.
         /// </remarks>
         string LogicScope { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the span's execution status
         /// </summary>
