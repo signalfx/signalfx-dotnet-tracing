@@ -86,6 +86,11 @@ private:
     //
     HRESULT CallTarget_RewriterCallback(RejitHandlerModule* moduleHandler, RejitHandlerModuleMethod* methodHandler);
 
+    //
+    // Initialization methods
+    //
+    void InternalAddInstrumentation(WCHAR* id, CallTargetDefinition* items, int size, bool isDerived);
+
 public:
     CorProfiler() = default;
 
@@ -150,6 +155,7 @@ public:
     HRESULT STDMETHODCALLTYPE ThreadNameChanged(ThreadID threadId, ULONG cchName, WCHAR name[]) override;
 
     void EnableByRefInstrumentation();
+    void AddDerivedInstrumentations(WCHAR* id, CallTargetDefinition* items, int size);
 };
 
 // Note: Generally you should not have a single, global callback implementation,

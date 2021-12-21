@@ -7,3 +7,6 @@ EXPORTS
     GetAssemblyAndSymbolsBytes
     InitializeProfiler
     EnableByRefInstrumentation
+    AddDerivedInstrumentations
+    SignalFxReadThreadSamples
+    SignalFxSetNativeContext
