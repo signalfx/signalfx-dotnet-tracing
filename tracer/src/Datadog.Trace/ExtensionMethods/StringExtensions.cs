@@ -122,7 +122,8 @@ namespace Datadog.Trace.ExtensionMethods
                 return false;
             }
 
-            var sb = new StringBuilder(trimmedValue.ToLowerInvariant());
+            var sb = StringBuilderCache.Acquire(trimmedValue.Length);
+            sb.Append(trimmedValue.ToLowerInvariant());
 
             for (int x = 0; x < sb.Length; x++)
             {
@@ -136,7 +137,7 @@ namespace Datadog.Trace.ExtensionMethods
                 }
             }
 
-            normalizedTagName = sb.ToString();
+            normalizedTagName = StringBuilderCache.GetStringAndRelease(sb);
             return true;
         }
 
@@ -165,7 +166,8 @@ namespace Datadog.Trace.ExtensionMethods
                 return false;
             }
 
-            var sb = new StringBuilder(trimmedValue.ToLowerInvariant());
+            var sb = StringBuilderCache.Acquire(trimmedValue.Length);
+            sb.Append(trimmedValue.ToLowerInvariant());
 
             for (int x = 0; x < sb.Length; x++)
             {
@@ -180,7 +182,7 @@ namespace Datadog.Trace.ExtensionMethods
                 }
             }
 
-            normalizedTagName = sb.ToString();
+            normalizedTagName = StringBuilderCache.GetStringAndRelease(sb);
             return true;
         }
     }
