@@ -94,10 +94,10 @@ namespace Datadog.Trace.PlatformHelpers
 
                 if (IsRelevant)
                 {
-                    var apiKey = GetVariableIfExists(Configuration.ConfigurationKeys.ApiKey, environmentVariables);
+                    var apiKey = GetVariableIfExists(Configuration.ConfigurationKeys.SignalFxAccessToken, environmentVariables);
                     if (apiKey == null)
                     {
-                        Log.Error("The Azure Site Extension will not work if you have not configured SIGNALFX_API_KEY.");
+                        Log.Error($"The Azure Site Extension will not work if you have not configured {Configuration.ConfigurationKeys.SignalFxAccessToken}.");
                         IsUnsafeToTrace = true;
                         return;
                     }

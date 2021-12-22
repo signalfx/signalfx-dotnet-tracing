@@ -396,12 +396,6 @@ namespace Datadog.Trace.Configuration
         public const string Propagators = "SIGNALFX_PROPAGATORS";
 
         /// <summary>
-        /// Configuration key for setting the API key, used by the Agent.
-        /// This key is here for troubleshooting purposes.
-        /// </summary>
-        public const string ApiKey = "SIGNALFX_API_KEY";
-
-        /// <summary>
         /// Configuration key for overriding the transport to use for communicating with the trace agent.
         /// Default value is <c>null</c>.
         /// Override options available: <c>datadog-tcp</c>, <c>datadog-named-pipes</c>

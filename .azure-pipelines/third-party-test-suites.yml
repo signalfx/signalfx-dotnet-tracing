@@ -13,7 +13,7 @@ schedules:
 variables:
   buildConfiguration: Release
   dotnetCoreSdk5Version: 5.0.103
-  ddApiKey: $(SIGNALFX_API_KEY)
+  ddApiKey: $(SIGNALFX_ACCESS_TOKEN)
   SIGNALFX_DOTNET_TRACER_MSBUILD:
   NugetPackageDirectory: $(System.DefaultWorkingDirectory)/packages
   relativeNugetPackageDirectory: packages
@@ -28,7 +28,7 @@ resources:
     ports:
     - 8126:8126
     env:
-      SIGNALFX_API_KEY: $(ddApiKey)
+      SIGNALFX_ACCESS_TOKEN: $(ddApiKey)
       SIGNALFX_INSIDE_CI: true
 
 stages:
