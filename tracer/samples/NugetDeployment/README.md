@@ -1,6 +1,6 @@
 # Agent configuration
 The `docker-compose.yml` file automatically starts the Datadog agent container image when running the applications.
-- `SIGNALFX_API_KEY` (required)
+- `SIGNALFX_ACCESS_TOKEN` (required)
 - `SIGNALFX_ENV` (optional)
 
 # Running samples
