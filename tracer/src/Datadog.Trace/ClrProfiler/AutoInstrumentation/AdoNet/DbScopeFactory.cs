@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using Datadog.Trace.Configuration;
+using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Tagging;
 using Datadog.Trace.Util;
@@ -43,17 +44,13 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AdoNet
                 var tags = new SqlTags
                            {
                                DbType = dbType,
-                               InstrumentationName = IntegrationRegistry.GetName(integrationId),
-                               DbName = tagsFromConnectionString.DbName,
-                               DbUser = tagsFromConnectionString.DbUser,
-                               OutHost = tagsFromConnectionString.OutHost,
+                               InstrumentationName = IntegrationRegistry.GetName(integrationId)
                            };
 
                 tags.SetAnalyticsSampleRate(integrationId, tracer.Settings, enabledWithGlobalSetting: false);
 
                 scope = tracer.StartActiveInternal(operationName, tags: tags, serviceName: serviceName);
-                scope.Span.ResourceName = command.CommandText;
-                scope.Span.Type = SpanTypes.Sql;
+                scope.Span.AddTagsFromDbCommand(command);
             }
             catch (Exception ex)
             {
