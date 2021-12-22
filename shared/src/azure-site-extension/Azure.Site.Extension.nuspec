@@ -21,7 +21,7 @@
     <file src=".\applicationHost.xdt" target="content" />
     <file src=".\install.cmd" target="content" />
     <file src=".\scmApplicationHost.xdt" target="content" />
-    <file src="..\..\..\tracer\bin\tracer-home\**\*.*" target="content\tracer" />
+    <file src="$TracerHomeDirectory$\**\*.*" target="content\tracer" />
     <file src="..\..\..\signalfx-logo-64x64.png" target="icon.png" />
   </files>
 </package>
