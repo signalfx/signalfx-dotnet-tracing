@@ -19,7 +19,6 @@ namespace Datadog.Trace.Configuration
         public const string AgentHost = "SIGNALFX_AGENT_HOST";
         public const string AgentPort = "SIGNALFX_TRACE_AGENT_PORT";
         public const string AgentUri = "SIGNALFX_TRACE_AGENT_URL";
-        public const string ApiKey = "SIGNALFX_API_KEY";
         public const string AppSecBlockingEnabled = "SIGNALFX_APPSEC_BLOCKING_ENABLED";
         public const string AppSecCustomIpHeader = "SIGNALFX_APPSEC_IPHEADER";
         public const string AppSecEnabled = "SIGNALFX_APPSEC_ENABLED";
