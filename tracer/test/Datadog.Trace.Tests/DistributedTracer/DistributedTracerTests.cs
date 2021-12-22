@@ -3,7 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-using System;
+// Modified by Splunk Inc.
+
 using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.TestHelpers;
 using FluentAssertions;
@@ -22,7 +23,7 @@ namespace Datadog.Trace.Tests.DistributedTracer
         {
             var distributedTracer = new Mock<IDistributedTracer>();
 
-            var spanContext = new SpanContext(1, 2, SamplingPriority.UserKeep);
+            var spanContext = new SpanContext(TraceId.CreateFromInt(1), 2, SamplingPriority.UserKeep);
 
             distributedTracer.Setup(t => t.GetSpanContext()).Returns(spanContext);
 

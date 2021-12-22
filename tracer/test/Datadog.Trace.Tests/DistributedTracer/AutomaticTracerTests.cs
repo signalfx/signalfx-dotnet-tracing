@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.TestHelpers;
@@ -23,7 +25,7 @@ namespace Datadog.Trace.Tests.DistributedTracer
 
             automaticTracer.GetDistributedTrace().Should().BeNull();
 
-            automaticTracer.SetDistributedTrace(new SpanContext(1, 2));
+            automaticTracer.SetDistributedTrace(new SpanContext(TraceId.CreateFromInt(1), 2));
 
             ((IDistributedTracer)automaticTracer).GetSpanContext().Should().BeNull("automatic tracer shouldn't read the distributed trace unless there is a child tracer");
         }
@@ -36,7 +38,7 @@ namespace Datadog.Trace.Tests.DistributedTracer
 
             automaticTracer.GetDistributedTrace().Should().BeNull();
 
-            var expectedSpanContext = new SpanContext(1, 2, SamplingPriority.UserKeep, "Service", "Origin");
+            var expectedSpanContext = new SpanContext(TraceId.CreateFromInt(1), 2, SamplingPriority.UserKeep, "Service", "Origin");
 
             automaticTracer.SetDistributedTrace(expectedSpanContext);
 
@@ -52,7 +54,7 @@ namespace Datadog.Trace.Tests.DistributedTracer
             automaticTracer.Register(Mock.Of<ICommonTracer>());
 
             var distributedTracer = (IDistributedTracer)automaticTracer;
-            var expectedSpanContext = new SpanContext(1, 2);
+            var expectedSpanContext = new SpanContext(TraceId.CreateFromInt(1), 2);
 
             distributedTracer.SetSpanContext(expectedSpanContext);
             distributedTracer.GetSpanContext().Should().BeEquivalentTo(expectedSpanContext);
@@ -86,13 +88,14 @@ namespace Datadog.Trace.Tests.DistributedTracer
 
             automaticTracer.GetDistributedTrace().Should().BeNull();
 
-            using (var scope = Tracer.Instance.StartActive("Test"))
+            var tracer = Tracer.Instance;
+            using (var scope = tracer.StartActive("Test"))
             {
-                var spanContext = SpanContextPropagator.Instance.Extract(automaticTracer.GetDistributedTrace());
+                var traceId = automaticTracer.GetDistributedTrace()["trace-id"];
+                var spanId = automaticTracer.GetDistributedTrace()["span-id"];
 
-                spanContext.Should().NotBeNull();
-                spanContext.TraceId.Should().Be(scope.Span.TraceId);
-                spanContext.SpanId.Should().Be(scope.Span.SpanId);
+                traceId.Should().Be(scope.Span.TraceId.ToString());
+                spanId.Should().Be(scope.Span.SpanId.ToString());
             }
 
             automaticTracer.GetDistributedTrace().Should().BeNull();

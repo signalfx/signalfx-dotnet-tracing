@@ -108,7 +108,7 @@ namespace Datadog.Trace.Tests
             {
                 var settings = new TracerSettings
                 {
-                    Exporter = new ExporterSettings()
+                    ExporterSettings = new ExporterSettings()
                     {
                         AgentUri = new Uri($"http://127.0.0.1:{agent.Port}"),
                     },

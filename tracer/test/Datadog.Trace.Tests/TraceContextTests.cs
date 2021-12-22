@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using Datadog.Trace.Util;
 using FluentAssertions;
@@ -46,7 +48,7 @@ namespace Datadog.Trace.Tests
 
             tracer.Setup(t => t.Settings).Returns(new Trace.Configuration.TracerSettings
             {
-                Exporter = new Trace.Configuration.ExporterSettings()
+                ExporterSettings = new Trace.Configuration.ExporterSettings()
                 {
                     PartialFlushEnabled = partialFlush,
                     PartialFlushMinSpans = 5
@@ -126,7 +128,7 @@ namespace Datadog.Trace.Tests
 
             tracer.Setup(t => t.Settings).Returns(new Trace.Configuration.TracerSettings
             {
-                Exporter = new Trace.Configuration.ExporterSettings()
+                ExporterSettings = new Trace.Configuration.ExporterSettings()
                 {
                     PartialFlushEnabled = true,
                     PartialFlushMinSpans = partialFlushThreshold
@@ -179,7 +181,7 @@ namespace Datadog.Trace.Tests
 
             tracer.Setup(t => t.Settings).Returns(new Trace.Configuration.TracerSettings
             {
-                Exporter = new Trace.Configuration.ExporterSettings()
+                ExporterSettings = new Trace.Configuration.ExporterSettings()
                 {
                     PartialFlushEnabled = true,
                     PartialFlushMinSpans = partialFlushThreshold

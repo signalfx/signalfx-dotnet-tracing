@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using Datadog.Trace.ClrProfiler;
 using FluentAssertions;
@@ -16,7 +18,7 @@ namespace Datadog.Trace.Tests.DistributedTracer
         [Fact]
         public void GetSpanContext()
         {
-            var expectedSpanContext = new SpanContext(1, 2, SamplingPriority.UserKeep, "Service", "Origin");
+            var expectedSpanContext = new SpanContext(TraceId.CreateFromInt(1), 2, SamplingPriority.UserKeep, "Service", "Origin");
 
             var automaticTracer = new Mock<IAutomaticTracer>();
             automaticTracer.Setup(t => t.GetDistributedTrace()).Returns(expectedSpanContext);
@@ -34,7 +36,7 @@ namespace Datadog.Trace.Tests.DistributedTracer
             var automaticTracer = new Mock<IAutomaticTracer>();
             var manualTracer = new ManualTracer(automaticTracer.Object);
 
-            var expectedSpanContext = new SpanContext(1, 2, SamplingPriority.UserKeep, "Service", "Origin");
+            var expectedSpanContext = new SpanContext(TraceId.CreateFromInt(1), 2, SamplingPriority.UserKeep, "Service", "Origin");
 
             ((IDistributedTracer)manualTracer).SetSpanContext(expectedSpanContext);
 
