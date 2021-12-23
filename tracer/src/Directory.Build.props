@@ -10,7 +10,7 @@
 
     <!-- NuGet packages -->
     <IsPackable>true</IsPackable>
-    <PackageIconUrl>https://github.com/signalfx/signalfx-dotnet-tracing/raw/master/signalfx-logo-64x64.png</PackageIconUrl>
+    <PackageIconUrl>https://github.com/signalfx/signalfx-dotnet-tracing/raw/main/signalfx-logo-64x64.png</PackageIconUrl>
     <PackageIcon>packageIcon.png</PackageIcon>
     <PackageProjectUrl>https://docs.signalfx.com/en/latest/apm/apm-instrument/apm-dotnet.html</PackageProjectUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
