@@ -1,4 +1,4 @@
-# Manually instrument an application
+# Manually instrument a .NET application
 
 You can build upon the provided tracing functionality by modifying and adding
 to automatically generated traces. The OpenTelemetry Tracing library for .NET
