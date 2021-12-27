@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.TestHelpers;
+using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -53,14 +54,14 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 expectedNames.UnionWith(mongoNames);
 
                 var spans = agent.WaitForSpans(expectedNames.Count, 500);
-                Assert.True(spans.Count >= expectedNames.Count, $"Expecting at least {expectedNames.Count} spans, only received {spans.Count}");
+                spans.Count.Should().BeGreaterOrEqualTo(expectedNames.Count);
 
                 var rootSpan = spans.Single(s => s.ParentId == null);
 
                 // Check for manual trace
-                Assert.Equal("Main()", rootSpan.Name);
-                Assert.Equal("Samples.MongoDB", rootSpan.Service);
-                Assert.Null(rootSpan.Type);
+                rootSpan.Name.Should().Be("Main()");
+                rootSpan.Service.Should().Be("Samples.MongoDB");
+                rootSpan.Type.Should().BeNull();
 
                 var foundNames = new HashSet<string>();
 
@@ -77,35 +78,36 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     if (span.Service == "Samples.MongoDB" &&
                         span.LogicScope == "mongodb.query")
                     {
-                        Assert.Equal(SpanTypes.MongoDb, span.Type);
-                        Assert.Equal(SpanTypes.MongoDb, span.Tags.GetValueOrDefault(Tags.DbType));
-                        Assert.Equal("MongoDb", span.Tags.GetValueOrDefault("component"));
+                        span.Type.Should().Be(SpanTypes.MongoDb);
+                        span.Tags.GetValueOrDefault(Tags.DbType).Should().Be(SpanTypes.MongoDb);
+                        span.Tags.GetValueOrDefault("component").Should().Be("MongoDb");
+
 
                         span.Tags.TryGetValue(Tags.DbStatement, out string statement);
 
                         if (tagCommands && !name.Equals("mongodb.query"))
                         {
-                            Assert.NotNull(statement);
+                            statement.Should().NotBeNull();
                         }
                         else
                         {
-                            Assert.Null(statement);
+                            statement.Should().BeNull();
                         }
 
                         if (!name.Equals("mongodb.query"))
                         {
-                            Assert.NotNull(span.Tags.GetValueOrDefault(Tags.DbName));
+                            span.Tags.GetValueOrDefault(Tags.DbName).Should().NotBeNull();
                         }
                     }
                     else
                     {
                         // These are manual traces
-                        Assert.Equal("Samples.MongoDB", span.Service);
-                        Assert.True("1.0.0" == span.Tags?.GetValueOrDefault(Tags.Version), span.ToString());
+                        span.Service.Should().Be("Samples.MongoDB");
+                        span.Tags?.GetValueOrDefault(Tags.Version).Should().Be("1.0.0");
                     }
                 }
 
-                Assert.True(expectedNames.SetEquals(foundNames));
+                expectedNames.Should().BeEquivalentTo(foundNames);
             }
         }
     }

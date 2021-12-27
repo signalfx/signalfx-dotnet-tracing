@@ -10,7 +10,6 @@ using System.Net;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.DuckTyping;
 using Datadog.Trace.Logging;
-using Datadog.Trace.Util;
 
 namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
 {
@@ -26,7 +25,6 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
         internal const string Major2Minor2 = "2.2"; // Synchronous methods added in 2.2
         internal const string MongoDbClientAssembly = "MongoDB.Driver.Core";
 
-        private const string IWireProtocolGeneric = "MongoDB.Driver.Core.WireProtocol.IWireProtocol`1";
         private const string DefaultOperationName = "mongodb.query";
         private const string ServiceName = "mongodb";
 
@@ -62,14 +60,44 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
                 return null;
             }
 
+            string statement = null;
+            string operationName = null;
+            string collectionName = null;
+            string query = null;
+            string resourceName = null;
             string databaseName = null;
-            string host = null;
-            string port = null;
 
             if (wireProtocol.TryDuckCast<IWireProtocolWithDatabaseNamespaceStruct>(out var protocolWithDatabaseNamespace))
             {
                 databaseName = protocolWithDatabaseNamespace.DatabaseNamespace.DatabaseName;
             }
+
+            if (wireProtocol.TryDuckCast<IWireProtocolWithCommandStruct>(out var protocolWithCommand)
+                && protocolWithCommand.Command != null)
+            {
+                // the name of the first element in the command BsonDocument will be the operation type (insert, delete, find, etc)
+                // and its value is the collection name
+                var firstElement = protocolWithCommand.Command.GetElement(0);
+                operationName = firstElement.Name;
+
+                if (operationName == IsMasterOperation || operationName == "hello" || databaseName == AdminDatabaseName)
+                {
+                    // Assume that this is the driver doing "Heartbeat" or hello or "RoundTripTimeMonitor", don't create an activity for it.
+                    return null;
+                }
+
+                if (tracer.Settings.TagMongoCommands)
+                {
+                    statement = protocolWithCommand.Command.ToString();
+                }
+
+                collectionName = firstElement.Value?.ToString();
+                query = protocolWithCommand.Command.ToString();
+                resourceName = $"{operationName ?? "operation"} {databaseName ?? "database"}";
+            }
+
+            string host = null;
+            string port = null;
 
             if (connection.EndPoint is IPEndPoint ipEndPoint)
             {
@@ -80,36 +108,6 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
             {
                 host = dnsEndPoint.Host;
                 port = dnsEndPoint.Port.ToString();
-            }
-
-            string statement = null; // our variable
-            string operationName = null; // removed on UPSTREAM
-            string collectionName = null;
-            string query = null;
-            string resourceName = null;
-
-            if (wireProtocol.TryDuckCast<IWireProtocolWithCommandStruct>(out var protocolWithCommand)
-             && protocolWithCommand.Command != null)
-            {
-                if (tracer.Settings.TagMongoCommands)
-                {
-                    statement = protocolWithCommand.Command.ToString();
-                }
-
-                // the name of the first element in the command BsonDocument will be the operation type (insert, delete, find, etc)
-                // and its value is the collection name
-                var firstElement = protocolWithCommand.Command.GetElement(0);
-                operationName = firstElement.Name;
-
-                if (operationName == IsMasterOperation || databaseName == AdminDatabaseName)
-                {
-                    // Assume that this is the driver doing "Heartbeat" or "RoundTripTimeMonitor", don't create an activity for it.
-                    return null;
-                }
-
-                collectionName = firstElement.Value?.ToString();
-                query = protocolWithCommand.Command.ToString();
-                resourceName = $"{operationName ?? "operation"} {databaseName ?? "database"}";
             }
 
             string serviceName = tracer.Settings.GetServiceName(tracer, ServiceName);
