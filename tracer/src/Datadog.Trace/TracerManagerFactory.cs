@@ -20,6 +20,7 @@ using Datadog.Trace.PlatformHelpers;
 using Datadog.Trace.Propagation;
 using Datadog.Trace.RuntimeMetrics;
 using Datadog.Trace.Sampling;
+using Datadog.Trace.SignalFx.Metrics;
 using Datadog.Trace.Util;
 using Datadog.Trace.Vendors.StatsdClient;
 
@@ -170,6 +171,7 @@ namespace Datadog.Trace
         {
             try
             {
+                // TODO: replace with key-value pairs so split is not needed later in case of SignalFx metric exporter
                 var constantTags = new List<string>
                                    {
                                        "lang:.NET",
@@ -188,6 +190,13 @@ namespace Datadog.Trace
                 if (settings.ServiceVersion != null)
                 {
                     constantTags.Add($"version:{settings.ServiceVersion}");
+                }
+
+                if (settings.MetricsExporter == MetricsExporterType.SignalFx)
+                {
+                    var reporter = new SignalFxReporter(settings.MetricsEndpointUrl, settings.SignalFxAccessToken);
+                    var metricSender = new SignalFxMetricSender(reporter, constantTags.ToArray());
+                    return new SignalFxStats(metricSender);
                 }
 
                 var statsd = new DogStatsdService();

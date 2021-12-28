@@ -180,6 +180,12 @@ namespace Datadog.Trace.Configuration
         public const string AgentUri = "SIGNALFX_TRACE_AGENT_URL";
 
         /// <summary>
+        /// Configuration key for the URL where the Tracer can send metrics.
+        /// </summary>
+        /// <seealso cref="TracerSettings.MetricsEndpointUrl"/>
+        public const string MetricsEndpointUrl = "SIGNALFX_METRICS_ENDPOINT_URL";
+
+        /// <summary>
         /// Configuration key for the trace endpoint. Same as <see creg="AgentUri"/> created
         /// for compatibility of previous version of SignalFx .NET Tracing.
         /// </summary>
@@ -367,6 +373,13 @@ namespace Datadog.Trace.Configuration
         public const string Exporter = "SIGNALFX_EXPORTER";
 
         /// <summary>
+        /// Configuration key for the exporter to be used. The Tracer uses it to encode and
+        /// dispatch metrics.
+        /// </summary>
+        /// <seealso cref="TracerSettings.MetricsExporter"/>
+        public const string MetricsExporter = "SIGNALFX_METRICS_EXPORTER";
+
+        /// <summary>
         /// Configuration key for the semantic convention to be used.
         /// The Tracer uses it to define operation names, span tags, statuses etc.
         /// Default is <c>"Default"</c>.
@@ -381,12 +394,6 @@ namespace Datadog.Trace.Configuration
         /// <seealso cref="TracerSettings.Propagators"/>
         /// </summary>
         public const string Propagators = "SIGNALFX_PROPAGATORS";
-
-        /// <summary>
-        /// Configuration key for setting the API key, used by the Agent.
-        /// This key is here for troubleshooting purposes.
-        /// </summary>
-        public const string ApiKey = "SIGNALFX_API_KEY";
 
         /// <summary>
         /// Configuration key for overriding the transport to use for communicating with the trace agent.

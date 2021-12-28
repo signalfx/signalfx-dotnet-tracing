@@ -639,11 +639,11 @@ void NameCache::put(FunctionID key, WSTRING* val)
 
 extern "C"
 {
-    __declspec(dllexport) int SignalFx_read_thread_samples(int len, unsigned char* buf)
+    __declspec(dllexport) int SignalFxReadThreadSamples(int len, unsigned char* buf)
     {
         return ThreadSampling_ConsumeOneThreadSample(len, buf);
     }
-    __declspec(dllexport) void SignalFx_set_native_context(uint64_t traceIdHigh, uint64_t traceIdLow, uint64_t spanId)
+    __declspec(dllexport) void SignalFxSetNativeContext(uint64_t traceIdHigh, uint64_t traceIdLow, uint64_t spanId)
     {
         ThreadID threadId;
         HRESULT hr = profilerInfo->GetCurrentThreadID(&threadId);
