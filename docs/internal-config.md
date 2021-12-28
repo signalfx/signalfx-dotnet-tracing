@@ -36,6 +36,7 @@ These settings should be never used by the users.
 | `SIGNALFX_TRACE_PARTIAL_FLUSH_MIN_SPANS` | The minimum number of closed spans in a trace before it's partially flushed. `SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED` has to be enabled for this to take effect. | `500` |
 
 ## Unpublished settings
+
 | `SIGNALFX_METRICS_ENDPOINT_URL` | The URL to where metric exporters send metrics. | `http://localhost:9943/v2/datapoint` |
 | `SIGNALFX_RUNTIME_METRICS_ENABLED` | Enable to activate internal runtime metrics sent to SignalFx. | `false` |
 | `SIGNALFX_METRICS_EXPORTER` | Metrics exporter to be used. It is used to encode and dispatch metrics. Available values are: `SignalFx`, `StatsD`. | `SignalFx` |

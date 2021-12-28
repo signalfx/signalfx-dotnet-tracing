@@ -130,7 +130,7 @@ See [windows-service-instrumentation.md](windows-service-instrumentation.md).
 
 ### Instrument an ASP.NET application deployed on IIS
 
-<!-- TODO -->
+See [iis-instrumentation.md](iis-instrumentation.md).
 
 ## Advanced configuration
 
