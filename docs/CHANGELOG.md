@@ -22,6 +22,14 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 ### Breaking changes
 
 - There is no support for .NET older than .NET 4.6.2.
+- Rename `SIGNALFX_DOTNET_TRACER_CONFIG_FILE` configuration to `SIGNALFX_TRACE_CONFIG_FILE`.
+- Rename `SIGNALFX_PROPAGATOR` configuration to `SIGNALFX_PROPAGATORS`.
+- Rename `SIGNALFX_TRACE_GLOBAL_TAGS` configuration to `SIGNALFX_TAGS`.
+- Rename `SIGNALFX_TRACING_ENABLED` configuration to `SIGNALFX_TRACE_ENABLED`
+- Rename `SIGNALFX_ASPNET_TEMPLATE_NAMES_ENABLED` configuration to `SIGNALFX_TRACE_ROUTE_TEMPLATE_RESOURCE_NAMES_ENABLED`.
+- Remove `SIGNALFX_ADD_CLIENT_IP_TO_SERVER_SPANS` configuration.
+  New, fixed behavior is equivalent to flag enabled.
+- Remove `SIGNALFX_SYNC_SEND` configuration.
 - Remove `SIGNALFX_APPEND_URL_PATH_TO_NAME` configuration as it was against the
   [OpenTelemetry Semantic conventions for HTTP spans](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md#name).
   Take notice that the URL is available via `http.url` tag.
@@ -43,13 +51,28 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
   requires that the resources (such us as [service](https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/resource/semantic_conventions#service))
   have to be immutable.
 - Remove `SIGNALFX_INTEGRATIONS`. This configuration is not needed.
-  The insrtumenation called `CallSite` was removed.
+  The instrumentation called `CallSite` was removed.
 - Deprecate `SIGNALFX_TRACE_LOG_PATH`. Please use `SIGNALFX_TRACE_LOG_DIRECTORY`.
 
 ### Enhancements
 
 - Adopt [OpenTelemetry Trace Semantic Conventions](https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions)
   in most of the instrumentations.
+- Add `SIGNALFX_HTTP_SERVER_ERROR_STATUSES` configuration that controls server http statuses to set spans as errors by.
+- Add `SIGNALFX_HTTP_CLIENT_ERROR_STATUSES` configuration that controls client http statuses to set spans as errors by.
+- Add `SIGNALFX_MAX_TRACES_PER_SECOND` configuration that limits max number of traces sent per second.
+- Add `SIGNALFX_STDOUT_LOG_TEMPLATE` configuration that configures `stdout` template.
+- Add `SIGNALFX_TRACE_DELAY_WCF_INSTRUMENTATION_ENABLED` configuration that enables the updated WCF instrumentation that delays execution until later in the WCF pipeline when the WCF server exception handling is established.
+- Add `SIGNALFX_TRACE_HEADER_TAGS` configuration that sets a map of header keys to tag names.
+- Add `SIGNALFX_TRACE_KAFKA_CREATE_CONSUMER_SCOPE_ENABLED` configuration that closes consumer scope on method enter, and starts a new one on method exit.
+- Add `SIGNALFX_TRACE_LOG_DIRECTORY` configuration that sets directory for logs and overrides the value in `SIGNALFX_TRACE_LOG_PATH` if present.
+- Add `SIGNALFX_TRACE_LOGGING_RATE` configuration that sets number of seconds between identical log messages for tracer log files.
+- Add `SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED` that enables partial flush of traces.
+- Add `SIGNALFX_VERSION` configuration that sets application's version that will populate `version` tag on spans.
+- Add `SIGNALFX_TRACE_STARTUP_LOGS` configuration that enables diagnostic log at startup.
+- Add `SIGNALFX_TRACE_SAMPLE_RATE` configuration that sets the global rate for the sampler.
+- Add `SIGNALFX_TRACE_SAMPLING_RULES` configuration that is a comma separated list of sampling rules that enable custom sampling rules based on regular expressions.
+- Add `SIGNALFX_TRACE_{0}_ENABLED` configuration pattern that enables/disables specific integration.
 
 ---
 
