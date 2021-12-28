@@ -34,7 +34,7 @@ the [OpenTelemetry Trace Semantic Conventions](https://github.com/open-telemetry
 
 ## Partially supported
 
-The libraries below are instrumented, yet the instrumentation, may not
+The libraries below are instrumented, though the instrumentation might not
 produce appropriate spans.
 
 | ID | Library |
