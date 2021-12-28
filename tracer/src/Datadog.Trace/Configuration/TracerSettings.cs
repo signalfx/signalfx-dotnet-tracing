@@ -13,7 +13,7 @@ using System.Text.RegularExpressions;
 using Datadog.Trace.Configuration.Types;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.PlatformHelpers;
-using Datadog.Trace.Util;
+using Datadog.Trace.SignalFx.Metrics;
 using Datadog.Trace.Vendors.Serilog;
 
 namespace Datadog.Trace.Configuration
@@ -156,6 +156,13 @@ namespace Datadog.Trace.Configuration
                             // default value
                             8125;
 
+            var metricsEndpointUrl = source?.GetString(ConfigurationKeys.MetricsEndpointUrl) ??
+                             // default value
+                             "http://localhost:9943/v2/datapoint";
+            MetricsEndpointUrl = new Uri(metricsEndpointUrl);
+
+            MetricsExporter = source.GetTypedValue<MetricsExporterType>(ConfigurationKeys.MetricsExporter);
+
             TracerMetricsEnabled = source?.GetBool(ConfigurationKeys.TracerMetricsEnabled) ??
                                    // default value
                                    false;
@@ -288,6 +295,12 @@ namespace Datadog.Trace.Configuration
         public Uri AgentUri { get; set; }
 
         /// <summary>
+        /// Gets or sets the Uri where the Tracer can send metrics.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.MetricsEndpointUrl"/>
+        public Uri MetricsEndpointUrl { get; set; }
+
+        /// <summary>
         /// Gets or sets the key used to determine the transport for sending traces.
         /// Default is <c>null</c>, which will use the default path decided in <see cref="Agent.Api"/>.
         /// </summary>
@@ -395,6 +408,13 @@ namespace Datadog.Trace.Configuration
         /// <seealso cref="ConfigurationKeys.Exporter"/>
         /// </summary>
         public ExporterType Exporter { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the metrics exporter to be used. The Tracer uses it to encode and
+        /// dispatch metrics.
+        /// <seealso cref="ConfigurationKeys.MetricsExporter"/>
+        /// </summary>
+        public MetricsExporterType MetricsExporter { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the semantic convention to be used.

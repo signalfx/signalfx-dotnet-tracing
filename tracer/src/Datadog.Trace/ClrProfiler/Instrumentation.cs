@@ -13,6 +13,7 @@ using Datadog.Trace.Configuration;
 using Datadog.Trace.DiagnosticListeners;
 using Datadog.Trace.Logging;
 using Datadog.Trace.ServiceFabric;
+using Datadog.Trace.Util;
 
 namespace Datadog.Trace.ClrProfiler
 {
@@ -176,6 +177,20 @@ namespace Datadog.Trace.ClrProfiler
                 }
             }
 #endif
+            // Thread Sampling ("profiling") feature
+            try
+            {
+                // If you change this, change environment_variables.h too
+                var enabled = EnvironmentHelpers.GetEnvironmentVariable("SIGNALFX_THREAD_SAMPLING_ENABLED", "false");
+                if (enabled != null && (enabled.ToLower() == "1" || enabled.ToLower() == "true"))
+                {
+                    ThreadSampling.ThreadSampler.Initialize();
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "Cannot initialize thread sampling ");
+            }
 
             Log.Debug("Initialization finished.");
         }

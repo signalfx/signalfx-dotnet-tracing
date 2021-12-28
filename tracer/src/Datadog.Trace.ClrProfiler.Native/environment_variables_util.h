@@ -86,6 +86,11 @@ bool IsAzureFunctionsEnabled()
     CheckIfTrue(GetEnvironmentValue(environment::azure_functions_enabled));
 }
 
+bool IsThreadSamplingEnabled()
+{
+    CheckIfTrue(GetEnvironmentValue(environment::thread_sampling_enabled));
+}
+
 } // namespace trace
 
 #endif // DD_CLR_PROFILER_ENVIRONMENT_VARIABLES_UTIL_H_

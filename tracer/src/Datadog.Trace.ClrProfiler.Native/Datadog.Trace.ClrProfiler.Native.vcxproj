@@ -202,6 +202,7 @@
     <ClInclude Include="rejit_handler.h" />
     <ClInclude Include="stats.h" />
     <ClInclude Include="string.h" />
+    <ClInclude Include="ThreadSampler.h" />
     <ClInclude Include="util.h" />
     <ClInclude Include="version.h" />
   </ItemGroup>
@@ -219,6 +220,7 @@
     <ClCompile Include="miniutf.cpp" />
     <ClCompile Include="rejit_handler.cpp" />
     <ClCompile Include="string.cpp" />
+    <ClCompile Include="ThreadSampler.cpp" />
     <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>

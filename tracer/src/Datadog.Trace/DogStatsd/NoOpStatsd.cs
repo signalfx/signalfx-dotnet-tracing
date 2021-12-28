@@ -77,14 +77,5 @@ namespace Datadog.Trace.DogStatsd
         public void Dispose()
         {
         }
-
-        private class NoOpTimer : IDisposable
-        {
-            internal static readonly NoOpTimer Instance = new NoOpTimer();
-
-            public void Dispose()
-            {
-            }
-        }
     }
 }

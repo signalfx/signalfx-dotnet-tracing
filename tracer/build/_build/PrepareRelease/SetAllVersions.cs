@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.IO;
 using System.Text;
@@ -139,6 +141,19 @@ namespace PrepareRelease
                 "src/Datadog.Trace/TracerConstants.cs",
                 FourPartVersionReplace);
 
+            // Four-part Sfx tag version update (Tests)
+            SynchronizeVersion(
+                "test/Datadog.Trace.ClrProfiler.IntegrationTests/CI/MsTestV2Tests.cs",
+                FourPartAssertVersionReplace);
+
+            SynchronizeVersion(
+                "test/Datadog.Trace.ClrProfiler.IntegrationTests/CI/NUnitTests.cs",
+                FourPartAssertVersionReplace);
+
+            SynchronizeVersion(
+                "test/Datadog.Trace.ClrProfiler.IntegrationTests/CI/XUnitTests.cs",
+                FourPartAssertVersionReplace);
+
             // Native profiler updates
             SynchronizeVersion(
                 "src/Datadog.Trace.ClrProfiler.Native/CMakeLists.txt",
@@ -162,7 +177,26 @@ namespace PrepareRelease
                 "src/WindowsInstaller/WindowsInstaller.wixproj",
                 WixProjReplace);
 
+            // Azure Site Extension updates
+            SynchronizeVersion(
+                "../shared/src/azure-site-extension/applicationHost.xdt",
+                text => Regex.Replace(text, VersionPattern(), VersionString()));
+            SynchronizeVersion(
+                "../shared/src/azure-site-extension/Azure.Site.Extension.nuspec",
+                text => Regex.Replace(text, VersionPattern(), VersionString()));
+            SynchronizeVersion(
+                "../shared/src/azure-site-extension/install.cmd",
+                text => Regex.Replace(text, VersionPattern(), VersionString()));
+
             Console.WriteLine($"Completed synchronizing versions to {VersionString()}");
+        }
+
+        private string FourPartAssertVersionReplace(string text)
+        {
+            const string patternPrefix = "signalfx\\.tracing\\.version\", \"";
+            const string versionPrefix = "signalfx.tracing.version\", \"";
+
+            return Regex.Replace(text, patternPrefix + VersionPattern(fourPartVersion: true), versionPrefix + FourPartVersionString(), RegexOptions.Singleline);
         }
 
         private string FourPartVersionReplace(string text)
@@ -204,8 +238,8 @@ namespace PrepareRelease
         {
             text = Regex.Replace(
                 text,
-                $"<OutputName>opentelemetry-dotnet-autoinstrumentation-{VersionPattern(withPrereleasePostfix: true)}-\\$\\(Platform\\)</OutputName>",
-                $"<OutputName>opentelemetry-dotnet-autoinstrumentation-{VersionString(withPrereleasePostfix: true)}-$(Platform)</OutputName>",
+                $"<OutputName>signalfx-dotnet-tracing-{VersionPattern(withPrereleasePostfix: true)}-\\$\\(Platform\\)</OutputName>",
+                $"<OutputName>signalfx-dotnet-tracing-{VersionString(withPrereleasePostfix: true)}-$(Platform)</OutputName>",
                 RegexOptions.Singleline);
 
             text = Regex.Replace(

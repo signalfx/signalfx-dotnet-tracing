@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Datadog.Trace.SignalFx.Metrics;
 using Datadog.Trace.Util;
 
 namespace Datadog.Trace.Configuration
@@ -41,6 +42,8 @@ namespace Datadog.Trace.Configuration
             ServiceVersion = settings.ServiceVersion;
             TraceEnabled = settings.TraceEnabled;
             AgentUri = settings.AgentUri;
+            MetricsEndpointUrl = settings.MetricsEndpointUrl;
+            MetricsExporter = settings.MetricsExporter;
             TracesTransport = settings.TracesTransport;
             TracesPipeName = settings.TracesPipeName;
             TracesPipeTimeoutMs = settings.TracesPipeTimeoutMs;
@@ -119,6 +122,12 @@ namespace Datadog.Trace.Configuration
         /// <seealso cref="ConfigurationKeys.AgentHost"/>
         /// <seealso cref="ConfigurationKeys.AgentPort"/>
         public Uri AgentUri { get; }
+
+        /// <summary>
+        /// Gets the Uri where the Tracer can connect to the metrics Agent.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.MetricsEndpointUrl"/>
+        public Uri MetricsEndpointUrl { get; }
 
         /// <summary>
         /// Gets the key used to determine the transport for sending traces.
@@ -333,6 +342,12 @@ namespace Datadog.Trace.Configuration
         /// <seealso cref="ConfigurationKeys.Exporter"/>
         /// </summary>
         public ExporterType Exporter { get; }
+
+        /// <summary>
+        /// Gets the type of metrics exporter.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.MetricsExporter"/>
+        public MetricsExporterType MetricsExporter { get; }
 
         /// <summary>
         /// Gets the propagators be used.

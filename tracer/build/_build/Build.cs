@@ -7,10 +7,12 @@ using Nuke.Common.IO;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.MSBuild;
+using Nuke.Common.Tools.NuGet;
 using Nuke.Common.Utilities.Collections;
 using static Nuke.Common.EnvironmentInfo;
 using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
+using static Nuke.Common.Tools.NuGet.NuGetTasks;
 
 // #pragma warning disable SA1306
 // #pragma warning disable SA1134
@@ -258,6 +260,17 @@ partial class Build : NukeBuild
                     .CombineWith(ProjectsToPack, (x, project) => x
                         .SetProject(project)),
                 degreeOfParallelism: 2);
+        })
+        .Executes(() =>
+        {
+            NuGetPack(s => s
+                    .SetTargetPath(SharedDirectory / "src" / "azure-site-extension" / "Azure.Site.Extension.nuspec")
+                    .SetOutputDirectory(ArtifactsDirectory / "nuget")
+                    .SetProperty("TracerHomeDirectory", TracerHomeDirectory)
+                    .SetProperty("NoWarn", "NU5100")
+                    .SetProperty("NoBuild", true)
+                    .SetProperty("NoDefaultExcludes", true)
+            );
         });
 
     Target BuildDistributionNuget => _ => _
