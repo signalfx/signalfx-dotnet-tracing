@@ -3,7 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-using System;
+// Modified by Splunk Inc.
+
 using System.Threading;
 using Datadog.Trace.ClrProfiler;
 
@@ -11,21 +12,13 @@ namespace Datadog.Trace
 {
     internal class AsyncLocalScopeManager : ScopeManagerBase
     {
-        private static readonly bool PushScopeToNative;
+        private readonly bool _pushScopeToNative;
+
         private readonly AsyncLocal<Scope> _activeScope = new();
 
-        static AsyncLocalScopeManager()
+        public AsyncLocalScopeManager(bool pushScopeToNative)
         {
-            // FIXME JBLEY share logic or at least constants somewhere
-            var enabled = Environment.GetEnvironmentVariable("SIGNALFX_THREAD_SAMPLING_ENABLED");
-            if (enabled != null && (enabled.ToLower() == "1" || enabled.ToLower() == "true"))
-            {
-                PushScopeToNative = true;
-            }
-            else
-            {
-                PushScopeToNative = false;
-            }
+            _pushScopeToNative = pushScopeToNative;
         }
 
         public override Scope Active
@@ -38,7 +31,7 @@ namespace Datadog.Trace
             protected set
             {
                 _activeScope.Value = value;
-                if (PushScopeToNative)
+                if (_pushScopeToNative)
                 {
                     // nop
                     if (value == null)

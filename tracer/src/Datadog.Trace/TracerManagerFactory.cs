@@ -77,7 +77,7 @@ namespace Datadog.Trace
             sampler ??= GetSampler(settings);
             var propagator = CreateCompositePropagator(settings, traceIdConvention);
             agentWriter ??= GetAgentWriter(settings, statsd, sampler);
-            scopeManager ??= new AsyncLocalScopeManager();
+            scopeManager ??= new AsyncLocalScopeManager(settings.ThreadSamplingEnabled);
 
             if (settings.RuntimeMetricsEnabled)
             {
