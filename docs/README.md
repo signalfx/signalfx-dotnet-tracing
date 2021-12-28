@@ -20,7 +20,7 @@ The SignalFx Instrumentationy for .NET registers an OpenTracing `GlobalTracer`
 so you can support existing custom instrumentation or add custom
 instrumentation to your application later.
 
-Conventions used by SignalFx Instrumentation for .NET are inspired by
+The conventions used by SignalFx Instrumentation for .NET are inspired by
 the [OpenTelemetry Trace Semantic Conventions](https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions).
 [OpenTelemetry Collector Contrib](https://github.com/open-telemetry/opentelemetry-collector-contrib)
 with its [Zipkin Receiver](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/zipkinreceiver)
