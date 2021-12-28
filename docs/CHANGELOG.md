@@ -10,6 +10,14 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 ## Unreleased
 
 ### General
+### Breaking changes
+### Enhancements
+
+---
+
+## [Release 0.2.0](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.2.0)
+
+### General
 
 - The release contains significant changes as it is based on the latest
   [.NET Tracer for Datadog APM](https://github.com/DataDog/dd-trace-dotnet)
@@ -73,6 +81,15 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 - Add `SIGNALFX_TRACE_SAMPLE_RATE` configuration that sets the global rate for the sampler.
 - Add `SIGNALFX_TRACE_SAMPLING_RULES` configuration that is a comma separated list of sampling rules that enable custom sampling rules based on regular expressions.
 - Add `SIGNALFX_TRACE_{0}_ENABLED` configuration pattern that enables/disables specific integration.
+- `SIGNALFX_ENDPOINT_URL` now defaults to `http://localhost:9411/api/v2/spans`.
+
+---
+
+## [Release 0.1.16](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.1.16)
+
+### Bugfixes
+
+- Fix NLog integration when using ILogger.
 
 ---
 
