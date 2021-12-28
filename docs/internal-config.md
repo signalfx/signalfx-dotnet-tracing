@@ -44,6 +44,7 @@ These settings should be never used by the users.
 | `SIGNALFX_CIVISIBILITY_ENABLED` | Enable to activate CI Visibility. | `false` |
 
 ## Unpublished settings
+
 | `SIGNALFX_METRICS_ENDPOINT_URL` | The URL to where metric exporters send metrics. | `http://localhost:9943/v2/datapoint` |
 | `SIGNALFX_RUNTIME_METRICS_ENABLED` | Enable to activate internal runtime metrics sent to SignalFx. | `false` |
 | `SIGNALFX_METRICS_EXPORTER` | Metrics exporter to be used. It is used to encode and dispatch metrics. Available values are: `SignalFx`, `StatsD`. | `SignalFx` |
