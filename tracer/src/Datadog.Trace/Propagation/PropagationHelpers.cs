@@ -11,19 +11,25 @@ namespace Datadog.Trace.Propagation
         public static TraceId ParseTraceId<T>(T carrier, Func<T, string, IEnumerable<string>> getter, string headerName, ITraceIdConvention traceIdConvention, IDatadogLogger logger)
         {
             var headerValues = getter(carrier, headerName) ?? Enumerable.Empty<string>();
+            var hasValue = false;
 
             foreach (var headerValue in headerValues)
             {
                 var traceId = traceIdConvention.CreateFromString(headerValue);
                 if (traceId == TraceId.Zero)
                 {
+                    hasValue = true;
                     continue;
                 }
 
                 return traceId;
             }
 
-            logger.Warning("Could not parse {HeaderName} headers: {HeaderValues}", headerName, string.Join(",", headerValues));
+            if (hasValue)
+            {
+                logger.Warning("Could not parse {HeaderName} headers: {HeaderValues}", headerName, string.Join(",", headerValues));
+            }
+
             return TraceId.Zero;
         }
 

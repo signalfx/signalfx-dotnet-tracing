@@ -71,7 +71,7 @@ variables:
   profilerHome: $(System.DefaultWorkingDirectory)/profiler/bin/profiler-home # Important, put the profiler assets into the working directory so it can be saved across build stages more easily
   monitoringHome: $(System.DefaultWorkingDirectory)/shared/bin/monitoring-home
   artifacts: $(System.DefaultWorkingDirectory)/tracer/src/bin/artifacts
-  ddApiKey: $(SIGNALFX_API_KEY)
+  ddApiKey: $(SIGNALFX_ACCESS_TOKEN)
   isMainBranch: $[in(variables['Build.SourceBranch'], 'refs/heads/master', 'refs/heads/main')]
   isMainOrReleaseBranch: $[or(in(variables['Build.SourceBranch'], 'refs/heads/master', 'refs/heads/main'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'))]
   isPullRequest: $[eq(variables['Build.Reason'], 'PullRequest')]
@@ -93,7 +93,7 @@ resources:
     ports:
     - 8126:8126
     env:
-      SIGNALFX_API_KEY: $(ddApiKey)
+      SIGNALFX_ACCESS_TOKEN: $(ddApiKey)
       SIGNALFX_INSIDE_CI: true
   repositories:
   - repository: dd-continuous-profiler-dotnet
@@ -1518,7 +1518,7 @@ stages:
         workingDirectory: system-tests
         displayName: Run tests
         env:
-          SIGNALFX_API_KEY: $(SYSTEM_TESTS_SIGNALFX_API_KEY)
+          SIGNALFX_ACCESS_TOKEN: $(SYSTEM_TESTS_SIGNALFX_ACCESS_TOKEN)
 
       - publish: system-tests/logs
         condition: always()

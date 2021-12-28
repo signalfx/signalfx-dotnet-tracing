@@ -57,7 +57,7 @@ variables:
   ddTracerHome: $(System.DefaultWorkingDirectory)/tracer/src/bin/dd-tracer-home
   tracerHome: $(System.DefaultWorkingDirectory)/tracer/src/bin/windows-tracer-home
   artifacts: $(System.DefaultWorkingDirectory)/tracer/src/bin/artifacts
-  ddApiKey: $(SIGNALFX_API_KEY)
+  ddApiKey: $(SIGNALFX_ACCESS_TOKEN)
   isMainBranch: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
   isPullRequest: $[eq(variables['Build.Reason'], 'PullRequest')]
   SIGNALFX_DOTNET_TRACER_MSBUILD:
@@ -78,7 +78,7 @@ resources:
     ports:
     - 8126:8126
     env:
-      SIGNALFX_API_KEY: $(ddApiKey)
+      SIGNALFX_ACCESS_TOKEN: $(ddApiKey)
       SIGNALFX_INSIDE_CI: true
 
 # Stages

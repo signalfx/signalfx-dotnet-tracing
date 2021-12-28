@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -217,10 +219,10 @@ namespace Datadog.Trace.Tests.PlatformHelpers
                 vars.Remove(AzureAppServices.InstanceNameKey);
             }
 
-            if (!vars.Contains(Datadog.Trace.Configuration.ConfigurationKeys.ApiKey))
+            if (!vars.Contains(Datadog.Trace.Configuration.ConfigurationKeys.SignalFxAccessToken))
             {
                 // This is a needed configuration for the AAS extension
-                vars.Add(Datadog.Trace.Configuration.ConfigurationKeys.ApiKey, "1");
+                vars.Add(Datadog.Trace.Configuration.ConfigurationKeys.SignalFxAccessToken, "1");
             }
 
             vars.Add(AzureAppServices.AzureAppServicesContextKey, "1");

@@ -181,6 +181,17 @@ namespace PrepareRelease
                 "src/WindowsInstaller/WindowsInstaller.wixproj",
                 WixProjReplace);
 
+            // Azure Site Extension updates
+            SynchronizeVersion(
+                "../shared/src/azure-site-extension/applicationHost.xdt",
+                text => Regex.Replace(text, VersionPattern(), VersionString()));
+            SynchronizeVersion(
+                "../shared/src/azure-site-extension/Azure.Site.Extension.nuspec",
+                text => Regex.Replace(text, VersionPattern(), VersionString()));
+            SynchronizeVersion(
+                "../shared/src/azure-site-extension/install.cmd",
+                text => Regex.Replace(text, VersionPattern(), VersionString()));
+
             Console.WriteLine($"Completed synchronizing versions to {VersionString()}");
         }
 
@@ -240,8 +251,8 @@ namespace PrepareRelease
         {
             text = Regex.Replace(
                 text,
-                $"<OutputName>opentelemetry-dotnet-autoinstrumentation-{VersionPattern(withPrereleasePostfix: true)}-\\$\\(Platform\\)</OutputName>",
-                $"<OutputName>opentelemetry-dotnet-autoinstrumentation-{VersionString(withPrereleasePostfix: true)}-$(Platform)</OutputName>",
+                $"<OutputName>signalfx-dotnet-tracing-{VersionPattern(withPrereleasePostfix: true)}-\\$\\(Platform\\)</OutputName>",
+                $"<OutputName>signalfx-dotnet-tracing-{VersionString(withPrereleasePostfix: true)}-$(Platform)</OutputName>",
                 RegexOptions.Singleline);
 
             text = Regex.Replace(
