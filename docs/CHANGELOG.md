@@ -10,6 +10,14 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 ## Unreleased
 
 ### General
+### Breaking changes
+### Enhancements
+
+---
+
+## [Release 0.2.0](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.2.0)
+
+### General
 
 - The release contains significant changes as it is based on the latest
   [.NET Tracer for Datadog APM](https://github.com/DataDog/dd-trace-dotnet)
@@ -50,6 +58,15 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 - Adopt [OpenTelemetry Trace Semantic Conventions](https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions)
   in most of the instrumentations.
+- `SIGNALFX_ENDPOINT_URL` now defaults to `http://localhost:9411/api/v2/spans`.
+
+---
+
+## [Release 0.1.16](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.1.16)
+
+### Bugfixes
+
+- Fix NLog integration when using ILogger.
 
 ---
 
