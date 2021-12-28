@@ -52,7 +52,7 @@ produce appropriate spans.
 
 ## Details
 
-You can get exact information on the instrumented code [here](../tracer/src/Datadog.Trace/ClrProfiler/InstrumentationDefinitions.Generated.cs).
+You can find out which methods and assemblies are being instrumented by inspecting the [InstrumentationDefinitions](../tracer/src/Datadog.Trace/ClrProfiler/InstrumentationDefinitions.Generated.cs) file. This is useful to check, for example, the version range of the library you're instrumenting.
 
 Each line contains following information (in order):
 
