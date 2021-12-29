@@ -9,7 +9,7 @@ These settings should be never used by the users.
 |-|-|-|
 | `SIGNALFX_EXPORTER` | The exporter to be used. The Tracer uses it to encode and dispatch traces. Available values are: `DatadogAgent`, `Zipkin`. | `Zipkin` |
 | `SIGNALFX_CONVENTION` | Sets the semantic and trace id conventions for the tracer. Available values are: `Datadog` (64bit trace id), `OpenTelemetry` (128 bit trace id). | `OpenTelemetry` |
-| `SIGNALFX_DUMP_ILREWRITE_ENABLED` | Enable the profiler to dump the IL original code and modification to the log. | `false` |
+| `SIGNALFX_DUMP_ILREWRITE_ENABLED` | Allows the profiler to dump the IL original code and modification to the log. | `false` |
 | `SIGNALFX_CLR_DISABLE_OPTIMIZATIONS` | Set to disable all JIT optimizations. | `false` |
 | `SIGNALFX_CLR_ENABLE_INLINING` | Set to `false` to disable JIT inlining. | `true` |
 | `SIGNALFX_CLR_ENABLE_NGEN` | Set to `false` to disable NGEN images. | `true` |
@@ -53,4 +53,4 @@ These settings should be never used by the users.
 | `SIGNALFX_METRICS_EXPORTER` | Metrics exporter to be used. It is used to encode and dispatch metrics. Available values are: `SignalFx`, `StatsD`. | `SignalFx` |
 | `SIGNALFX_THREAD_SAMPLING_ENABLED` | Enable to activate thread sampling. | `false` |
 | `SIGNALFX_THREAD_SAMPLING_PERIOD` | Sampling period. It defines how often the threads are stopped in order to fetch all stack traces. This value cannot be lower than `1000` milliseconds. | `1000` |
-| `SIGNALFX_TRACE_AZURE_FUNCTIONS_ENABLED` | Set to instrument within azure functions. | `false` |
+| `SIGNALFX_TRACE_AZURE_FUNCTIONS_ENABLED` | Set to instrument within Azure functions. | `false` |

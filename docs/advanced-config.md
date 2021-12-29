@@ -84,5 +84,5 @@ Use these environment variables to configure the tracing library:
 | `SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES` | Enable the tagging of a Elasticsearch command PostData as `db.statement`. It may introduce overhead for direct streaming users. | `true` |
 | `SIGNALFX_TRACE_DELAY_WCF_INSTRUMENTATION_ENABLED` | Enable the updated WCF instrumentation that delays execution until later in the WCF pipeline when the WCF server exception handling is established. | `false` |
 | `SIGNALFX_TRACE_KAFKA_CREATE_CONSUMER_SCOPE_ENABLED` | Enable to close consumer scope on method enter, and start a new one on method exit. | `true` |
-| `SIGNALFX_TRACE_{0}_ENABLED` | Configuration pattern for enabling/disabling a specific library instrumentation, e.g in order to disable Kafka instrumentation, set `SIGNALFX_TRACE_Kafka_ENABLED=false` | `true` |
-| `SIGNALFX_AZURE_APP_SERVICES` | Set to indicate the profiler is running in the context of Azure App Services. | `false` |
+| `SIGNALFX_TRACE_{0}_ENABLED` | Configuration pattern for enabling or disabling a specific library instrumentation. For example, in order to disable Kafka instrumentation, set `SIGNALFX_TRACE_Kafka_ENABLED=false` | `true` |
+| `SIGNALFX_AZURE_APP_SERVICES` | Set to indicate that the profiler is running in the context of Azure App Services. | `false` |
