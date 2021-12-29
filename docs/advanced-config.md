@@ -58,7 +58,7 @@ configure the following settings:
 | Setting | Value | Notes |
 |-|-|-|
 | `SIGNALFX_ACCESS_TOKEN` | *organization access tokens* | See [here](https://docs.splunk.com/Observability/admin/authentication-tokens/org-tokens.html) to learn how to obtain one. |
-| `SIGNALFX_ENDPOINT_URL` | `https://ingest.<REALM>.signalfx.com/v2/trace` | Replace `<REALM>` with your realm name. To find your real, open Splunk Observability Cloud, click Settings, and click on your user name. |
+| `SIGNALFX_ENDPOINT_URL` | `https://ingest.<REALM>.signalfx.com/v2/trace` | Replace `<REALM>` with your realm name. To find your realm, open Splunk Observability Cloud, click Settings, and click on your user name. |
 
 ## Additional settings
 
