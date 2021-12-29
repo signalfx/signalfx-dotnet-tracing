@@ -38,29 +38,29 @@ You can apply configuration settings in the following ways
     }
     ```
 
-## Expoter settings
+## Exporter settings
 
 Use following settings to configure where the telemetry data is being exported.
 
 | Setting | Description | Default |
 |-|-|-|
-| `SIGNALFX_ACCESS_TOKEN` | Your Splunk Observabilty Cloud organization access token for your organization. It enables sending traces directly to the Splunk Observabilty Cloud ingestion endpoint. |  |
+| `SIGNALFX_ACCESS_TOKEN` | Your Splunk Observabilty Cloud access token for your organization. It enables sending traces directly to the Splunk Observabilty Cloud ingest endpoint. |  |
 | `SIGNALFX_ENDPOINT_URL` | The URL to where trace exporters send traces. | `http://localhost:9411/api/v2/spans` |
 | `SIGNALFX_MAX_TRACES_PER_SECOND` | The number of traces allowed to be submitted per second. | `100` |
 | `SIGNALFX_TRACE_SAMPLE_RATE` | The global rate for the sampler. By default, all traces are sampled. |  |
-| `SIGNALFX_TRACE_SAMPLING_RULES` | Comma separated list of sampling rules that enable custom sampling rules based on regular expressions. The rule is matched in order of specification. The first match in a list is used. The item "sample_rate" is required in decimal format. The item "service" is optional in regular expression format, to match on service name. The item "name" is optional in regular expression format, to match on operation name. | `'[{"sample_rate":0.5, "service":"cart.*"}],[{"sample_rate":0.2, "name":"http.request"}]'` |
+| `SIGNALFX_TRACE_SAMPLING_RULES` | Comma-separated list of sampling rules that enable custom sampling rules based on regular expressions. Rule are matched by order of specification. Only the first match is used. The item "sample_rate" must be in decimal format. Both `service` and `name` accept regular expressions. | `'[{"sample_rate":0.5, "service":"cart.*"}],[{"sample_rate":0.2, "name":"http.request"}]'` |
 
 ### Exporting directly to Splunk Observabilty Cloud
 
 In order to export telemetry directly to Splunk Observability Cloud,
-you need to configure the following settings:
+configure the following settings:
 
 | Setting | Value | Notes |
 |-|-|-|
-| `SIGNALFX_ACCESS_TOKEN` | *organization access tokens* | See [here](https://docs.splunk.com/Observability/admin/authentication-tokens/org-tokens.html) to find out how to get one. |
-| `SIGNALFX_ENDPOINT_URL` | `https://ingest.<REALM>.signalfx.com/v2/trace` | Replace `<REALM` with your realm name. To find it, open the application navigation menu, select your name, select Account Settings, and see the Realm field. |
+| `SIGNALFX_ACCESS_TOKEN` | *organization access tokens* | See [here](https://docs.splunk.com/Observability/admin/authentication-tokens/org-tokens.html) to learn how to obtain one. |
+| `SIGNALFX_ENDPOINT_URL` | `https://ingest.<REALM>.signalfx.com/v2/trace` | Replace `<REALM>` with your realm name. To find your real, open Splunk Observability Cloud, click Settings, and click on your user name. |
 
-## Other settings
+## Additional settings
 
 | Setting | Description | Default |
 |-|-|-|
