@@ -20,8 +20,8 @@ The SignalFx Instrumentationy for .NET registers an OpenTracing `GlobalTracer`
 so you can support existing custom instrumentation or add custom
 instrumentation to your application later.
 
-Whenever possible, SignalFx Instrumentation for .NET complies
-to the [OpenTelemetry Trace Semantic Conventions](https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions).
+The conventions used by SignalFx Instrumentation for .NET are inspired by
+the [OpenTelemetry Trace Semantic Conventions](https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions).
 [OpenTelemetry Collector Contrib](https://github.com/open-telemetry/opentelemetry-collector-contrib)
 with its [Zipkin Receiver](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/zipkinreceiver)
 can be used to receive, process and export telemetry data.
@@ -34,21 +34,13 @@ and [`ActivitySource`](https://docs.microsoft.com/en-us/dotnet/core/diagnostics/
 
 ## Requirements
 
-### Supported .NET versions
-
 - .NET Core 3.1, .NET 5.0 and higher on Windows and Linux (except Alpine Linux)
 - .NET Framework 4.6.2 and higher on Windows
 
-## Supported libraries and frameworks
+## Instrumented libraries and frameworks
 
-| Library | Versions Supported | Notes |
-| ---     | ---                | ---   |
-| Elasticsearch.Net | `Elasticsearch.Net` NuGet 5.3 - 7.x | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES=false` (`true` by default, which may introduce overhead for direct streaming users). |
-| HttpClient | Supported .NET versions | by way of `System.Net.Http.HttpClientHandler` and `HttpMessageHandler` instrumentations |
-| Npgsql | `Npqsql` NuGet 4.0+ | Provided via enhanced ADO.NET instrumentation |
-| ServiceStack.Redis | `ServiceStack.Redis` NuGet 4.0+ | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS=false` (`true` by default). |
-| StackExchange.Redis | `StackExchange.Redis` NuGet 1.0+ | Disable `db.statement` tagging with `SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS=false` (`true` by default). |
-| WebClient | Supported .NET versions | by way of `System.Net.WebRequest` instrumentation |
+See [instrumented-libraries.md](instrumented-libraries.md)
+to know for which libraries and frameworks are instrumented.
 
 ## Get started
 
@@ -130,7 +122,7 @@ See [windows-service-instrumentation.md](windows-service-instrumentation.md).
 
 ### Instrument an ASP.NET application deployed on IIS
 
-<!-- TODO -->
+See [iis-instrumentation.md](iis-instrumentation.md).
 
 ## Advanced configuration
 

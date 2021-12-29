@@ -517,7 +517,6 @@ DWORD WINAPI SamplingThreadMain(_In_ LPVOID param)
     int sleepMillis = GetSamplingPeriod();
     ThreadSampler* ts = (ThreadSampler*) param;
     ICorProfilerInfo10* info10 = ts->info10;
-    HRESULT hr;
     SamplingHelper helper;
     helper.info10 = info10;
 

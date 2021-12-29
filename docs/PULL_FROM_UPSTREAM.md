@@ -25,6 +25,12 @@
     * `git rebase -i <squash_sha>^`
     * Select top one as "pick" all coming from upstream as "squash" and let the ones that you made to fix build and test as "pick" so it is easier to review them separately.
 
+7. Make sure to update the documentation. Especially:
+    * [advanced-config.md](advanced-config.md)
+    * [internal-config.md](internal-config.md)
+    * [instrumented-libraries.md](instrumented-libraries.md)
+    * [CHANGELOG.md](CHANGELOG.md)
+
 ## Regenerating snapshot files
 
 Windows in Git Bash:

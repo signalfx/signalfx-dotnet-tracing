@@ -433,22 +433,6 @@ namespace Datadog.Trace.Configuration
             public const string AnalyticsSampleRate = "SIGNALFX_TRACE_{0}_ANALYTICS_SAMPLE_RATE";
         }
 
-        /// <summary>
-        /// String constants for debug configuration keys.
-        /// </summary>
-        internal static class Debug
-        {
-            /// <summary>
-            /// Configuration key for forcing the automatic instrumentation to only use the mdToken method lookup mechanism.
-            /// </summary>
-            public const string ForceMdTokenLookup = "SIGNALFX_TRACE_DEBUG_LOOKUP_MDTOKEN";
-
-            /// <summary>
-            /// Configuration key for forcing the automatic instrumentation to only use the fallback method lookup mechanism.
-            /// </summary>
-            public const string ForceFallbackLookup = "SIGNALFX_TRACE_DEBUG_LOOKUP_FALLBACK";
-        }
-
         internal static class FeatureFlags
         {
             /// <summary>
