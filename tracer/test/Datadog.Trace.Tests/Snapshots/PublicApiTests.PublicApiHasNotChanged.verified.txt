@@ -14,7 +14,6 @@ namespace Datadog.Trace.Configuration
         public string GetString(string key) { }
         public void Insert(int index, Datadog.Trace.Configuration.IConfigurationSource item) { }
     }
-<<<<<<< HEAD
     public static class ConfigurationKeys
     {
         public const string AgentHost = "SIGNALFX_AGENT_HOST";
@@ -81,8 +80,6 @@ namespace Datadog.Trace.Configuration
             public const string Enabled = "SIGNALFX_TRACE_{0}_ENABLED";
         }
     }
-=======
->>>>>>> 7dd7adde5 (Include missing properties on Exporter Settings (#2179))
     public class EnvironmentConfigurationSource : Datadog.Trace.Configuration.StringConfigurationSource
     {
         public EnvironmentConfigurationSource() { }
@@ -150,7 +147,7 @@ namespace Datadog.Trace.Configuration
         public bool AnalyticsEnabled { get; }
         public string CustomSamplingRules { get; }
         public string Environment { get; }
-        public Datadog.Trace.Configuration.ImmutableExporterSettings Exporter { get; }
+        public Datadog.Trace.Configuration.ImmutableExporterSettings ExporterSettings { get; }
         public double? GlobalSamplingRate { get; }
         public System.Collections.Generic.IReadOnlyDictionary<string, string> GlobalTags { get; }
         public System.Collections.Generic.IReadOnlyDictionary<string, string> HeaderTags { get; }
@@ -214,7 +211,7 @@ namespace Datadog.Trace.Configuration
         public bool DiagnosticSourceEnabled { get; set; }
         public System.Collections.Generic.HashSet<string> DisabledIntegrationNames { get; set; }
         public string Environment { get; set; }
-        public Datadog.Trace.Configuration.ExporterSettings Exporter { get; set; }
+        public Datadog.Trace.Configuration.ExporterSettings ExporterSettings { get; set; }
         public double? GlobalSamplingRate { get; set; }
         public System.Collections.Generic.IDictionary<string, string> GlobalTags { get; set; }
         public System.Collections.Generic.IDictionary<string, string> HeaderTags { get; set; }
