@@ -105,8 +105,8 @@ partial class Build
                 throw new ArgumentOutOfRangeException(nameof(usecase), usecase, null);
         }
 
-        envVariables["DD_SERVICE"]="exploration_tests";
-        envVariables["DD_VERSION"]=Version;
+        envVariables["SIGNALFX_SERVICE"]="exploration_tests";
+        envVariables["SIGNALFX_VERSION"]=Version;
 
         envVariables.AddExtraEnvVariables(ExtraEnvVars);
         return envVariables;
