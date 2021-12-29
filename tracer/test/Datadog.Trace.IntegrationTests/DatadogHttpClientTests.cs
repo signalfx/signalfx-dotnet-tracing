@@ -32,7 +32,7 @@ namespace Datadog.Trace.IntegrationTests
             {
                 var settings = new TracerSettings
                 {
-                    Exporter = new ExporterSettings()
+                    ExporterSettings = new ExporterSettings()
                     {
                         AgentUri = new Uri($"http://localhost:{agent.Port}"),
                         TracesTransport = TracesTransportType.CustomTcpProvider,

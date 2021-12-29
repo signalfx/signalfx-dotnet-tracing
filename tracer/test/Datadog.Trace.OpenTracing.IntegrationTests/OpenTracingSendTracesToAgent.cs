@@ -131,7 +131,7 @@ namespace Datadog.Trace.OpenTracing.IntegrationTests
                 // TODO investigate if tags should be checked here
                 // Tags = span.Tags,
             });
-            
+
             // config => config.Excluding(span => span.Tags.Metrics));
         }
     }
