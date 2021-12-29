@@ -113,11 +113,11 @@ namespace Datadog.Trace.Configuration
         public ImmutableExporterSettings ExporterSettings { get; }
 
         /// <summary>
-        /// Gets or sets the key used to determine the transport for sending traces.
+        /// Gets the key used to determine the transport for sending traces.
         /// Default is <c>null</c>, which will use the default path decided in <see cref="Agent.Api"/>.
         /// </summary>
         /// <seealso cref="ConfigurationKeys.TracesTransport"/>
-        public string TracesTransport { get; set; }
+        public string TracesTransport { get; }
 
         /// <summary>
         /// Gets a value indicating whether default Analytics are enabled.
