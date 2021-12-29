@@ -38,21 +38,37 @@ You can apply configuration settings in the following ways
     }
     ```
 
-## Settings
+## Expoter settings
 
-Use these environment variables to configure the tracing library:
+Use following settings to configure where the telemetry data is being exported.
 
 | Setting | Description | Default |
 |-|-|-|
-| `SIGNALFX_ACCESS_TOKEN` | The access token for your SignalFx organization. It enables sending traces directly to the SignalFx ingestion endpoint. To do so, the `SIGNALFX_ENDPOINT_URL` must be set with: `https://ingest.<REALM>.signalfx.com/v2/trace`. |  |
+| `SIGNALFX_ACCESS_TOKEN` | Your Splunk Observabilty Cloud organization access token for your organization. It enables sending traces directly to the Splunk Observabilty Cloud ingestion endpoint. |  |
+| `SIGNALFX_ENDPOINT_URL` | The URL to where trace exporters send traces. | `http://localhost:9411/api/v2/spans` |
+| `SIGNALFX_MAX_TRACES_PER_SECOND` | The number of traces allowed to be submitted per second. | `100` |
+| `SIGNALFX_TRACE_SAMPLE_RATE` | The global rate for the sampler. By default, all traces are sampled. |  |
+| `SIGNALFX_TRACE_SAMPLING_RULES` | Comma separated list of sampling rules that enable custom sampling rules based on regular expressions. The rule is matched in order of specification. The first match in a list is used. The item "sample_rate" is required in decimal format. The item "service" is optional in regular expression format, to match on service name. The item "name" is optional in regular expression format, to match on operation name. | `'[{"sample_rate":0.5, "service":"cart.*"}],[{"sample_rate":0.2, "name":"http.request"}]'` |
+
+### Exporting directly to Splunk Observabilty Cloud
+
+In order to export telemetry directly to Splunk Observability Cloud,
+you need to configure the following settings:
+
+| Setting | Value | Notes |
+|-|-|-|
+| `SIGNALFX_ACCESS_TOKEN` | *organization access tokens* | See [here](https://docs.splunk.com/Observability/admin/authentication-tokens/org-tokens.html) to find out how to get one. |
+| `SIGNALFX_ENDPOINT_URL` | `https://ingest.<REALM>.signalfx.com/v2/trace` | Replace `<REALM` with your realm name. To find it, open the application navigation menu, select your name, select Account Settings, and see the Realm field. |
+
+## Other settings
+
+| Setting | Description | Default |
+|-|-|-|
 | `SIGNALFX_TRACE_CONFIG_FILE` | The file path of a JSON configuration file that will be loaded. |  |
 | `SIGNALFX_VERSION` | The application's version that will populate `version` tag on spans. |  |
 | `SIGNALFX_TRACE_HEADER_TAGS` | Comma-separated map of header keys to tag name, that will be automatically applied as tags on traces. | `"key1:val1,key2:val2"` |
-| `SIGNALFX_MAX_TRACES_PER_SECOND` | The number of traces allowed to be submitted per second. | `100` |
 | `SIGNALFX_TRACE_RESPONSE_HEADER_ENABLED` | Enable to add server trace information to HTTP response headers. | `true` |
 | `SIGNALFX_TRACE_STARTUP_LOGS` | Enable to activate diagnostic log at startup. | `true` |
-| `SIGNALFX_TRACE_SAMPLING_RULES` | Comma separated list of sampling rules that enable custom sampling rules based on regular expressions. The rule is matched in order of specification. The first match in a list is used. The item "sample_rate" is required in decimal format. The item "service" is optional in regular expression format, to match on service name. The item "name" is optional in regular expression format, to match on operation name. | `'[{"sample_rate":0.5, "service":"cart.*"}],[{"sample_rate":0.2, "name":"http.request"}]'` |
-| `SIGNALFX_TRACE_SAMPLE_RATE` | The global rate for the sampler. By default, all traces are sampled. |  |
 | `SIGNALFX_TRACE_LOGGING_RATE` | The number of seconds between identical log messages for tracer log files. Setting to 0 disables rate limiting. | `60` |
 | `SIGNALFX_TRACE_LOG_DIRECTORY` | The directory of the .NET Tracer logs. Overrides the value in `SIGNALFX_TRACE_LOG_PATH` if present. | Linux: `/var/log/signalfx/dotnet/`<br>Windows: `%ProgramData%\SignalFx .NET Tracing\logs\` |
 | `SIGNALFX_HTTP_SERVER_ERROR_STATUSES` | The application's server http statuses to set spans as errors by. | `500-599` |
@@ -63,7 +79,6 @@ Use these environment variables to configure the tracing library:
 | `SIGNALFX_ENV` | The value for the `deployment.environment` tag added to every span. |  |
 | `SIGNALFX_TRACE_ENABLED` | Enable to activate the tracer. | `true` |
 | `SIGNALFX_TRACE_DEBUG` | Enable to activate debugging mode for the tracer. | `false` |
-| `SIGNALFX_ENDPOINT_URL` | The URL to where trace exporters send traces. | `http://localhost:9411/api/v2/spans` |
 | `SIGNALFX_TAGS` | Comma-separated list of key-value pairs to specify global span tags. For example: `"key1:val1,key2:val2"` |  |
 | `SIGNALFX_LOGS_INJECTION` | Enable to inject trace IDs, span IDs, service name and environment into logs. This requires a compatible logger or manual configuration. | `false` |
 | `SIGNALFX_STDOUT_LOG_ENABLED` | Enables `stdout` logging. This is disabled by default. | `false` |
