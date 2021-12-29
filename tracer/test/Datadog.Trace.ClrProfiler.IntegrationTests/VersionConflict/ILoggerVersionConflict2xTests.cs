@@ -28,7 +28,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.VersionConflict
             : base(output, "LogsInjection.ILogger.VersionConflict.2x")
         {
             SetServiceVersion("1.0.0");
-            SetEnvironmentVariable("DD_LOGS_INJECTION", "true");
+            SetEnvironmentVariable("SIGNALFX_LOGS_INJECTION", "true");
         }
 
         [SkippableFact]

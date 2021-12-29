@@ -60,7 +60,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             var expectedSpanCount = isVersion4 ? 91 : 147;
             const string dbType = "mssql";
             const string expectedOperationName = dbType + ".query";
-            const string expectedServiceName = "Samples.Microsoft.Data.SqlClient";
+            const string expectedServiceName = "Samples.Microsoft.Data.SqlClient-mssql";
 
             using var agent = EnvironmentHelper.GetMockAgent();
             using var process = RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion);

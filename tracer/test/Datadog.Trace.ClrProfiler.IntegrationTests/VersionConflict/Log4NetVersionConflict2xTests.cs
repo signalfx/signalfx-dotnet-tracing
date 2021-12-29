@@ -41,7 +41,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.VersionConflict
         [Trait("RunOnWindows", "True")]
         public void InjectsLogsWhenEnabled()
         {
-            SetEnvironmentVariable("DD_LOGS_INJECTION", "true");
+            SetEnvironmentVariable("SIGNALFX_LOGS_INJECTION", "true");
 
             var expectedCorrelatedTraceCount = 1;
             var expectedCorrelatedSpanCount = 8;
