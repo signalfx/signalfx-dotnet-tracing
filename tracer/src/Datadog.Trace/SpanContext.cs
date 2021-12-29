@@ -16,7 +16,7 @@ namespace Datadog.Trace
     /// </summary>
     public class SpanContext : ISpanContext, IReadOnlyDictionary<string, string>
     {
-        private static readonly string[] KeyNames = { "trace-id, parent-id, sampling-priority, origin" };
+        private static readonly string[] KeyNames = { "trace-id", "parent-id", "sampling-priority", "origin" };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SpanContext"/> class
