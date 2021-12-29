@@ -42,6 +42,7 @@ namespace Datadog.Trace.Configuration
             ServiceVersion = settings.ServiceVersion;
             TraceEnabled = settings.TraceEnabled;
             ExporterSettings = new ImmutableExporterSettings(settings.ExporterSettings);
+            TracesTransport = settings.TracesTransport;
             MetricsExporter = settings.MetricsExporter;
 #pragma warning disable 618 // App analytics is deprecated, but still used
             AnalyticsEnabled = settings.AnalyticsEnabled;
@@ -110,6 +111,13 @@ namespace Datadog.Trace.Configuration
         /// Gets the exporter settings that dictate how the tracer exports data.
         /// </summary>
         public ImmutableExporterSettings ExporterSettings { get; }
+
+        /// <summary>
+        /// Gets or sets the key used to determine the transport for sending traces.
+        /// Default is <c>null</c>, which will use the default path decided in <see cref="Agent.Api"/>.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.TracesTransport"/>
+        public string TracesTransport { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether default Analytics are enabled.

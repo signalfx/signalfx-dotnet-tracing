@@ -68,6 +68,7 @@ namespace Datadog.Trace.Tests.Configuration
                 (e, i) => e.TracesPipeName == i.TracesPipeName,
                 (e, i) => e.DogStatsdPort == i.DogStatsdPort,
                 (e, i) => e.MetricsTransport == i.MetricsTransport,
+                (e, i) => e.MetricsEndpointUrl == i.MetricsEndpointUrl,
                 (e, i) => e.TracesTransport == i.TracesTransport,
                 (e, i) => e.TracesPipeTimeoutMs == i.TracesPipeTimeoutMs,
                 (e, i) => e.AgentUri == i.AgentUri,

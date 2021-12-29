@@ -92,7 +92,7 @@ namespace Datadog.Trace.Tests.DistributedTracer
             using (var scope = tracer.StartActive("Test"))
             {
                 var traceId = automaticTracer.GetDistributedTrace()["trace-id"];
-                var spanId = automaticTracer.GetDistributedTrace()["span-id"];
+                var spanId = automaticTracer.GetDistributedTrace()["parent-id"];
 
                 traceId.Should().Be(scope.Span.TraceId.ToString());
                 spanId.Should().Be(scope.Span.SpanId.ToString());
