@@ -23,7 +23,7 @@ namespace Datadog.Trace.Configuration
         /// <summary>
         /// The default port value for <see cref="AgentUri"/>.
         /// </summary>
-        public const int DefaultAgentPort = 8126;
+        public const int DefaultAgentPort = 9411;
 
         /// <summary>
         /// The default port value for dogstatsd.
