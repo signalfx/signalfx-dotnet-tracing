@@ -117,6 +117,7 @@ namespace Datadog.Trace.Configuration
         public bool TagRedisCommands { get; }
         public bool TraceEnabled { get; }
         public bool TracerMetricsEnabled { get; }
+        public string TracesTransport { get; }
         public static Datadog.Trace.Configuration.ImmutableTracerSettings FromDefaultSources() { }
     }
     public class IntegrationSettings
