@@ -11,8 +11,8 @@ These settings should be never used by the users.
 | `SIGNALFX_CONVENTION` | Sets the semantic and trace id conventions for the tracer. Available values are: `Datadog` (64bit trace id), `OpenTelemetry` (128 bit trace id). | `OpenTelemetry` |
 | `SIGNALFX_DUMP_ILREWRITE_ENABLED` | Enable the profiler to dump the IL original code and modification to the log. | `false` |
 | `SIGNALFX_CLR_DISABLE_OPTIMIZATIONS` | Set to disable all JIT optimizations. | `false` |
-| `SIGNALFX_CLR_ENABLE_INLINING` | Set to enable JIT inlining. | `true` |
-| `SIGNALFX_CLR_ENABLE_NGEN` | Set to enable NGEN images. | `true` |
+| `SIGNALFX_CLR_ENABLE_INLINING` | Set to `false` to disable JIT inlining. | `true` |
+| `SIGNALFX_CLR_ENABLE_NGEN` | Set to `false` to disable NGEN images. | `true` |
 
 ## Unsupported upstream settings
 
