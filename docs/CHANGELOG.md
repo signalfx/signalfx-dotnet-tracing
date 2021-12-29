@@ -38,6 +38,7 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 - Remove `SIGNALFX_ADD_CLIENT_IP_TO_SERVER_SPANS` configuration.
   New, fixed behavior is equivalent to flag enabled.
 - Remove `SIGNALFX_SYNC_SEND` configuration.
+- Remove `SIGNALFX_TRACE_DOMAIN_NEUTRAL_INSTRUMENTATION` configuration.
 - Remove `SIGNALFX_APPEND_URL_PATH_TO_NAME` configuration as it was against the
   [OpenTelemetry Semantic conventions for HTTP spans](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md#name).
   Take notice that the URL is available via `http.url` tag.
@@ -75,12 +76,15 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 - Add `SIGNALFX_TRACE_KAFKA_CREATE_CONSUMER_SCOPE_ENABLED` configuration that closes consumer scope on method enter, and starts a new one on method exit.
 - Add `SIGNALFX_TRACE_LOG_DIRECTORY` configuration that sets directory for logs and overrides the value in `SIGNALFX_TRACE_LOG_PATH` if present.
 - Add `SIGNALFX_TRACE_LOGGING_RATE` configuration that sets number of seconds between identical log messages for tracer log files.
-- Add `SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED` that enables partial flush of traces.
+- Add `SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED` configuration that enables partial flush of traces.
+- Add `SIGNALFX_TRACE_PARTIAL_FLUSH_MIN_SPANS` configuration that sets minimum number of closed spans in a trace before it's partially flushed.
 - Add `SIGNALFX_VERSION` configuration that sets application's version that will populate `version` tag on spans.
 - Add `SIGNALFX_TRACE_STARTUP_LOGS` configuration that enables diagnostic log at startup.
 - Add `SIGNALFX_TRACE_SAMPLE_RATE` configuration that sets the global rate for the sampler.
 - Add `SIGNALFX_TRACE_SAMPLING_RULES` configuration that is a comma separated list of sampling rules that enable custom sampling rules based on regular expressions.
 - Add `SIGNALFX_TRACE_{0}_ENABLED` configuration pattern that enables/disables specific integration.
+- Add `SIGNALFX_TRACE_HTTP_CLIENT_EXCLUDED_URL_SUBSTRINGS` configuration that sets URLs skipped by the tracer.
+- Add `SIGNALFX_AZURE_APP_SERVICES` configuration that indicates the profiler is running in the context of Azure App Services.
 - `SIGNALFX_ENDPOINT_URL` now defaults to `http://localhost:9411/api/v2/spans`.
 
 ---
