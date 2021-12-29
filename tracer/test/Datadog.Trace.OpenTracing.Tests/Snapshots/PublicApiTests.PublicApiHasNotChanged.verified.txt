@@ -1,4 +1,4 @@
-[assembly: System.Reflection.AssemblyMetadata("RepositoryUrl", "https://github.com/DataDog/dd-trace-dotnet.git")]
+[assembly: System.Reflection.AssemblyMetadata("RepositoryUrl", "https://github.com/signalfx/signalfx-dotnet-tracing.git")]
 
 namespace Datadog.Trace.OpenTracing
 {
