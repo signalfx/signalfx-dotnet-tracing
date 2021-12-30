@@ -140,13 +140,6 @@ export SIGNALFX_ENDPOINT_URL=https://ingest.us0.signalfx.com/v2/trace
 
 - [Requirements](https://github.com/dotnet/runtime/blob/main/docs/workflow/requirements/linux-requirements.md)
 
-  ```bash
-  sudo apt-get install -y cmake llvm-9 clang-9 \
-  build-essential python curl git lldb-6.0 liblldb-6.0-dev \
-  libunwind8 libunwind8-dev gettext libicu-dev liblttng-ust-dev \
-  libssl-dev libnuma-dev libkrb5-dev zlib1g-dev ninja-build
-  ```
-
 - [Building .NET Runtime](https://github.com/dotnet/runtime/blob/main/docs/workflow/building/libraries/README.md)
 
   ```bash
