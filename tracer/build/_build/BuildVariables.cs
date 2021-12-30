@@ -23,7 +23,7 @@ public static class BuildVariables
         envVars.Add("COR_PROFILER_PATH_64", tracerHomeDirectory / "win-x64" / "SignalFx.Tracing.ClrProfiler.Native.dll");
         envVars.Add("CORECLR_ENABLE_PROFILING", "1");
         envVars.Add("CORECLR_PROFILER", "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}");
-        envVars.Add("DD_DOTNET_TRACER_HOME", tracerHomeDirectory);
+        envVars.Add("SIGNALFX_DOTNET_TRACER_HOME", tracerHomeDirectory);
 
 
         if (EnvironmentInfo.IsWin)
