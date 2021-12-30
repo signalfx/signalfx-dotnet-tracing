@@ -2,9 +2,9 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: GET api/environment,
+    Name: GET /api/environment,
     LogicScope: aspnet-webapi.request,
-    Resource: GET api/environment,
+    Resource: GET /api/environment,
     Service: sample,
     Type: web,
     ParentId: Id_3,
@@ -24,9 +24,9 @@
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: GET api/environment,
+    Name: GET /api/environment,
     LogicScope: aspnet.request,
-    Resource: GET api/environment,
+    Resource: GET /api/environment,
     Service: sample,
     Type: web,
     Tags: {

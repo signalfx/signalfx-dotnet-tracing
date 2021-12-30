@@ -2,9 +2,9 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: GET /home/identifier/{id},
+    Name: GET home.identifier,
     LogicScope: aspnet-mvc.request,
-    Resource: GET /home/identifier/{id},
+    Resource: GET home.identifier,
     Service: sample,
     Type: web,
     ParentId: Id_3,
@@ -26,9 +26,9 @@
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: GET /home/identifier/{id},
+    Name: GET home.identifier,
     LogicScope: aspnet.request,
-    Resource: GET /home/identifier/{id},
+    Resource: GET home.identifier,
     Service: sample,
     Type: web,
     Tags: {
