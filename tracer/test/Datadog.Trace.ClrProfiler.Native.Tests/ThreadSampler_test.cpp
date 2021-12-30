@@ -52,7 +52,7 @@ TEST(ThreadSamplerTest, BasicBufferBehavior)
     tsb.EndSample();
     tsb.EndBatch();
     tsb.WriteFinalStats(100);
-    ASSERT_EQ(1284, tsb.buffer->size()); // not manually calculated but does depend on thread name limiting and not repeating frame strings
+    ASSERT_EQ(1278, tsb.buffer->size()); // not manually calculated but does depend on thread name limiting and not repeating frame strings
     ASSERT_EQ(2, tsb.codes.size());
 }
 
@@ -85,7 +85,7 @@ TEST(ThreadSamplerTest, BufferOverrunBehavior)
         tsb.WriteFinalStats(100);
     }
     // 200k buffer plus one more thread entry before it stops adding more
-    ASSERT_EQ(buf.size(), 205814); 
+    ASSERT_EQ(buf.size(), 205432);
 }
 
 TEST(ThreadSamplerTest, StaticBufferManagement)
