@@ -159,9 +159,9 @@ export SIGNALFX_ENDPOINT_URL=https://ingest.us0.signalfx.com/v2/trace
   Example showing how you can debug if the profiler is attached properly:
 
   ```bash
-  rpajak@LAPTOP-K6FOL8LO:~/repos/signalfx-dotnet-tracing$ source dev/envvars.sh 
-  rpajak@LAPTOP-K6FOL8LO:~/repos/signalfx-dotnet-tracing$ cd ../runtime/
-  rpajak@LAPTOP-K6FOL8LO:~/repos/runtime$ lldb -- ./artifacts/bin/coreclr/Linux.x64.Debug/corerun ~/repos/signalfx-dotnet-tracing/tracer/samples/ConsoleApp/bin/Debug/net5.0/ConsoleApp.dll
+  ~/repos/signalfx-dotnet-tracing$ source dev/envvars.sh 
+  ~/repos/signalfx-dotnet-tracing$ cd ../runtime/
+  ~/repos/runtime$ lldb -- ./artifacts/bin/coreclr/Linux.x64.Debug/corerun ~/repos/signalfx-dotnet-tracing/tracer/samples/ConsoleApp/bin/Debug/net5.0/ConsoleApp.dll
   (lldb) target create "./artifacts/bin/coreclr/Linux.x64.Debug/corerun"
   Current executable set to '/home/rpajak/repos/runtime/artifacts/bin/coreclr/Linux.x64.Debug/corerun' (x86_64).
   (lldb) settings set -- target.run-args  "/home/rpajak/repos/signalfx-dotnet-tracing/tracer/samples/ConsoleApp/bin/Debug/net5.0/ConsoleApp.dll"
