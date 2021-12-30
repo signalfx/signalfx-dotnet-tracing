@@ -23,6 +23,7 @@ These settings should be never used by the users.
 | `SIGNALFX_APPSEC_RULES` | Overrides the default rules file provided. Must be a path to a valid JSON rules file. |  |
 | `SIGNALFX_APPSEC_IPHEADER` | Optional name of the custom header to take into account for the ip address. |  |
 | `SIGNALFX_APPSEC_EXTRA_HEADERS` | Optional custom headers the user wants to send. |  |
+| `SIGNALFX_APPSEC_KEEP_TRACES` | Specifies if the AppSec traces should be explicitly kept or droped. | `true` |
 | `SIGNALFX_AGENT_HOST` | The Agent host where the tracer can send traces. |  |
 | `SIGNALFX_TRACE_AGENT_URL` | Alias for `SIGNALFX_ENDPOINT_URL`. The URL to where trace exporters send traces. | `http://localhost:9411/api/v2/spans` |
 | `SIGNALFX_TRACE_AGENT_HOSTNAME` | The Agent host where the tracer can send traces | `localhost` |
@@ -45,6 +46,7 @@ These settings should be never used by the users.
 | `SIGNALFX_DOGSTATSD_ARGS` | Comma-separated list of arguments to be passed to the DogStatsD process. |  |
 | `SIGNALFX_TRACE_TRANSPORT` | Overrides the transport to use for communicating with the trace agent. Available values are: `datagod-tcp`, `datadog-named-pipes`. |  |
 | `SIGNALFX_CIVISIBILITY_ENABLED` | Enable to activate CI Visibility. | `false` |
+| `SIGNALFX_INTERNAL_TRACE_VERSION_COMPATIBILITY` | Enables the compatibility with other versions of tracer. | `false` |
 
 ## Unpublished settings
 
