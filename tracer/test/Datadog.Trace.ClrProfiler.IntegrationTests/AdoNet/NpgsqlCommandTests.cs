@@ -44,7 +44,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             const int expectedSpanCount = 147;
             const string dbType = "postgresql";
             const string expectedOperationName = dbType + ".query";
-            const string expectedServiceName = "Samples.Npgsql-" + dbType;
+            const string expectedServiceName = "Samples.Npgsql";
             using var agent = EnvironmentHelper.GetMockAgent();
             using var process = RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion);
             var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);

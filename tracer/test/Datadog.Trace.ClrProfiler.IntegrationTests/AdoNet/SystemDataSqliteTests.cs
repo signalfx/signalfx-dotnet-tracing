@@ -31,7 +31,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             const int expectedSpanCount = 91;
             const string dbType = "sqlite";
             const string expectedOperationName = dbType + ".query";
-            const string expectedServiceName = "Samples.SQLite.Core-" + dbType;
+            const string expectedServiceName = "Samples.SQLite.Core";
             using var agent = EnvironmentHelper.GetMockAgent();
             using var process = RunSampleAndWaitForExit(agent.Port);
             var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
