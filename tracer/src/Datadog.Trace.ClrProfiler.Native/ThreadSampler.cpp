@@ -631,7 +631,7 @@ void ThreadSampler::ThreadNameChanged(ThreadID threadId, ULONG cchName, WCHAR _n
     state->threadName.append(_name, cchName);
 }
 
-NameCache::NameCache(int maximumSize) : maxSize(maximumSize)
+NameCache::NameCache(size_t maximumSize) : maxSize(maximumSize)
 {
 }
 
