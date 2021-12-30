@@ -490,7 +490,7 @@ void CaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, SamplingHelpe
 
 int GetSamplingPeriod()
 {
-    WSTRING val = GetEnvironmentValue(environment::thread_sampling_period);
+    const WSTRING val = GetEnvironmentValue(environment::thread_sampling_period);
     if (val.empty())
     {
         return DEFAULT_SAMPLE_PERIOD;

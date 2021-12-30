@@ -514,5 +514,22 @@ namespace Datadog.Trace.Configuration
             /// <seealso cref="TracerSettings.DelayWcfInstrumentationEnabled"/>
             public const string DelayWcfInstrumentationEnabled = "SIGNALFX_TRACE_DELAY_WCF_INSTRUMENTATION_ENABLED";
         }
+
+        internal static class ThreadSampling
+        {
+            /// <summary>
+            /// Configuration key for enabling or disabling the thread sampling.
+            /// The default value is false (disabled)
+            /// </summary>
+            /// <seealso cref="TracerSettings.ThreadSamplingEnabled"/>
+            public const string Enabled = "SIGNALFX_THREAD_SAMPLING_ENABLED";
+
+            /// <summary>
+            /// Configuration key to set default thread sampling period.
+            /// The default value is 1000 milliseconds.
+            /// </summary>
+            /// <seealso cref="TracerSettings.ThreadSamplingPeriod"/>
+            public const string Period = "SIGNALFX_THREAD_SAMPLING_PERIOD";
+        }
     }
 }

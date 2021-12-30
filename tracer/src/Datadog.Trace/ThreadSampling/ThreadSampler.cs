@@ -7,57 +7,32 @@ namespace Datadog.Trace.ThreadSampling
     /// <summary>
     ///  Provides the managed-side thread sample reader
     /// </summary>
-    public class ThreadSampler
+    public static class ThreadSampler
     {
         // If you change any of these constants, check with ThreadSampler.cpp first
-        private static int bufferSize = 200 * 1024;
-        private static int defaultSamplePeriod = 1000;
-        private static int minimumSamplePeriod = 1000;
+        private const int BufferSize = 200 * 1024;
 
-        private static int GetThreadSamplingPeriod()
-        {
-            string period = Environment.GetEnvironmentVariable("SIGNALFX_THREAD_SAMPLING_PERIOD");
-            if (period == null)
-            {
-                return defaultSamplePeriod;
-            }
-
-            period = period.Trim();
-            if (period.Length == 0)
-            {
-                return defaultSamplePeriod;
-            }
-
-            try
-            {
-                return Math.Max(int.Parse(period), minimumSamplePeriod);
-            }
-            catch
-            {
-                return defaultSamplePeriod;
-            }
-        }
+        private static TimeSpan _threadSamplingPeriod;
 
         private static void ReadOneSample(byte[] buf)
         {
-            var start = DateTime.Now;
+            var start = DateTime.UtcNow;
             int read = NativeMethods.SignalFxReadThreadSamples(buf.Length, buf);
             if (read > 0)
             {
                 var parser = new ThreadSampleNativeFormatParser(buf, read);
                 parser.Parse();
-                var end = DateTime.Now;
+                var end = DateTime.UtcNow;
                 Console.WriteLine("Parsed stack samples in " + ((end.Ticks - start.Ticks) / TimeSpan.TicksPerMillisecond) + " millis from " + read + " bytes");
             }
         }
 
         private static void SampleReadingThread()
         {
-            int period = GetThreadSamplingPeriod();
-            byte[] buf = new byte[bufferSize];
+            byte[] buf = new byte[BufferSize];
             while (true)
             {
-                Thread.Sleep(period);
+                Thread.Sleep(_threadSamplingPeriod);
                 try
                 {
                     // Call twice in quick succession to catch up any blips; the second will likely return 0 (no buffer)
@@ -75,8 +50,11 @@ namespace Datadog.Trace.ThreadSampling
         /// <summary>
         ///  Initializes the managed-side thread sample reader
         /// </summary>
-        public static void Initialize()
+        /// <param name="threadSamplingPeriod">Thread sampling period</param>
+        public static void Initialize(TimeSpan threadSamplingPeriod)
         {
+            _threadSamplingPeriod = threadSamplingPeriod;
+
             var thread = new Thread(SampleReadingThread)
             {
                 IsBackground = true

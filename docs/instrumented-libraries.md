@@ -32,6 +32,14 @@ the [OpenTelemetry Trace Semantic Conventions](https://github.com/open-telemetry
 | WebRequest | [`System.Net.WebRequest`](https://docs.microsoft.com/en-us/dotnet/api/system.net.webreques) |
 | WinHttpHandler | [`System.Net.Http.WinHttpHandler`](https://docs.microsoft.com/en-us/dotnet/api/system.net.http.winhttphandler) |
 
+[`System.Net.Http.HttpClient`](https://docs.microsoft.com/en-us/dotnet/api/system.net.http.httpclient)
+is instrumented by instrumenting:
+
+- [`System.Net.Http.CurlHandler`](https://docs.microsoft.com/en-us/dotnet/api/system.net.http.httpclienthandler#httpclienthandler-in-net-core)
+- [`System.Net.Http.MessageHandler`](https://docs.microsoft.com/en-us/dotnet/api/system.net.http.httpmessagehandler)
+- [`System.Net.Http.SocketsHandler`](https://docs.microsoft.com/en-us/dotnet/api/system.net.http.socketshttphandler)
+- [`System.Net.Http.WinHttpHandler`](https://docs.microsoft.com/en-us/dotnet/api/system.net.http.winhttphandler)
+
 ## Partially supported
 
 The libraries below are instrumented, though the instrumentation might not
@@ -52,7 +60,10 @@ produce appropriate spans.
 
 ## Details
 
-You can find out which methods and assemblies are being instrumented by inspecting the [InstrumentationDefinitions](../tracer/src/Datadog.Trace/ClrProfiler/InstrumentationDefinitions.Generated.cs) file. This is useful to check, for example, the version range of the library you're instrumenting.
+You can find out which methods and assemblies are being instrumented by inspecting
+the [InstrumentationDefinitions](../tracer/src/Datadog.Trace/ClrProfiler/InstrumentationDefinitions.Generated.cs)
+file. This is useful to check, for example, the version range of the library
+you are instrumenting.
 
 Each line contains following information (in order):
 

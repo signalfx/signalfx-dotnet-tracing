@@ -245,6 +245,10 @@ namespace Datadog.Trace.Configuration
                                             ?? false;
 
             TagElasticsearchQueries = source?.GetBool(ConfigurationKeys.TagElasticsearchQueries) ?? true;
+
+            // If you change this, change environment_variables.h too
+            ThreadSamplingEnabled = source?.GetBool(ConfigurationKeys.ThreadSampling.Enabled) ?? false;
+            ThreadSamplingPeriod = GetThreadSamplingPeriod(source);
         }
 
         /// <summary>
@@ -556,6 +560,20 @@ namespace Datadog.Trace.Configuration
         internal int TraceBatchInterval { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the thread sampling is enabled.
+        /// The default value is false (disabled)
+        /// </summary>
+        /// <seealso cref="TracerSettings.ThreadSamplingEnabled"/>
+        internal bool ThreadSamplingEnabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value for the thread sampling period.
+        /// The default value is 1000 milliseconds.
+        /// </summary>
+        /// <seealso cref="TracerSettings.ThreadSamplingPeriod"/>
+        internal TimeSpan ThreadSamplingPeriod { get; set; }
+
+        /// <summary>
         /// Gets a value indicating whether the feature flag to enable the updated ASP.NET resource names is enabled
         /// </summary>
         /// <seealso cref="ConfigurationKeys.FeatureFlags.RouteTemplateResourceNamesEnabled"/>
@@ -716,6 +734,21 @@ namespace Datadog.Trace.Configuration
             }
 
             return new HashSet<string>(propagators);
+        }
+
+        private static TimeSpan GetThreadSamplingPeriod(IConfigurationSource source)
+        {
+            // If you change any of these constants, check with ThreadSampler.cpp first
+            var defaultSamplePeriod = TimeSpan.FromMilliseconds(value: 1000);
+            const int minimumSamplePeriod = 1000;
+
+            var period = source?.GetInt32(ConfigurationKeys.ThreadSampling.Period);
+            if (!period.HasValue || period.Value < minimumSamplePeriod)
+            {
+                return defaultSamplePeriod;
+            }
+
+            return TimeSpan.FromMilliseconds(period.Value);
         }
     }
 }
