@@ -89,12 +89,12 @@ private:
 class NameCache
 {
 public:
-    NameCache(int maximumSize);
+    NameCache(size_t maximumSize);
     WSTRING* get(UINT_PTR key);
     void put(UINT_PTR key, WSTRING* val);
 
 private:
-    int maxSize;
+    size_t maxSize;
     std::list<std::pair<FunctionID, WSTRING*>> list;
     std::unordered_map<FunctionID, std::list<std::pair<FunctionID, WSTRING*>>::iterator> map;
 };
