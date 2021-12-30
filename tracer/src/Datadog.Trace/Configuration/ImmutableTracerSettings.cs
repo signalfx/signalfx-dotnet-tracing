@@ -77,6 +77,9 @@ namespace Datadog.Trace.Configuration
             Exporter = settings.Exporter;
             Propagators = settings.Propagators;
 
+            ThreadSamplingEnabled = settings.ThreadSamplingEnabled;
+            ThreadSamplingPeriod = settings.ThreadSamplingPeriod;
+
             // we cached the static instance here, because is being used in the hotpath
             // by IsIntegrationEnabled method (called from all integrations)
             _domainMetadata = DomainMetadata.Instance;
@@ -299,6 +302,16 @@ namespace Datadog.Trace.Configuration
         /// <seealso cref="ConfigurationKeys.Propagators"/>
         /// </summary>
         public HashSet<string> Propagators { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the thread sampling is enabled.
+        /// </summary>
+        public bool ThreadSamplingEnabled { get; }
+
+        /// <summary>
+        /// Gets a value for the thread sampling period.
+        /// </summary>
+        public TimeSpan ThreadSamplingPeriod { get; }
 
         /// <summary>
         /// Gets a value indicating whether to enable the updated WCF instrumentation that delays execution

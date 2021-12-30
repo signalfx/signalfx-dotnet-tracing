@@ -67,26 +67,49 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 ### Enhancements
 
+- Add [Aerospike.Client](https://www.nuget.org/packages/Aerospike.Client/)
+  library instrumentation.
+- Add [Microsoft.Data.SqlClient](https://www.nuget.org/packages/Microsoft.Data.SqlClient/)
+  and [`System.Data.SqlClient`](https://docs.microsoft.com/en-us/dotnet/api/system.data.sqlclient)
+  library instrumentation.
 - Adopt [OpenTelemetry Trace Semantic Conventions](https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions)
   in most of the instrumentations.
-- Add `SIGNALFX_HTTP_SERVER_ERROR_STATUSES` configuration that controls server http statuses to set spans as errors by.
-- Add `SIGNALFX_HTTP_CLIENT_ERROR_STATUSES` configuration that controls client http statuses to set spans as errors by.
-- Add `SIGNALFX_MAX_TRACES_PER_SECOND` configuration that limits max number of traces sent per second.
+- Add `SIGNALFX_HTTP_SERVER_ERROR_STATUSES` configuration that controls server
+  HTTP statuses to set spans as errors.
+- Add `SIGNALFX_HTTP_CLIENT_ERROR_STATUSES` configuration that controls client
+  HTTP statuses to set spans as errors.
+- Add `SIGNALFX_MAX_TRACES_PER_SECOND` configuration that limits max number
+  of traces sent per second.
 - Add `SIGNALFX_STDOUT_LOG_TEMPLATE` configuration that configures `stdout` template.
-- Add `SIGNALFX_TRACE_DELAY_WCF_INSTRUMENTATION_ENABLED` configuration that enables the updated WCF instrumentation that delays execution until later in the WCF pipeline when the WCF server exception handling is established.
-- Add `SIGNALFX_TRACE_HEADER_TAGS` configuration that sets a map of header keys to tag names.
-- Add `SIGNALFX_TRACE_KAFKA_CREATE_CONSUMER_SCOPE_ENABLED` configuration that closes consumer scope on method enter, and starts a new one on method exit.
-- Add `SIGNALFX_TRACE_LOG_DIRECTORY` configuration that sets directory for logs and overrides the value in `SIGNALFX_TRACE_LOG_PATH` if present.
-- Add `SIGNALFX_TRACE_LOGGING_RATE` configuration that sets number of seconds between identical log messages for tracer log files.
-- Add `SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED` configuration that enables partial flush of traces.
-- Add `SIGNALFX_TRACE_PARTIAL_FLUSH_MIN_SPANS` configuration that sets minimum number of closed spans in a trace before it's partially flushed.
-- Add `SIGNALFX_VERSION` configuration that sets application's version that will populate `version` tag on spans.
-- Add `SIGNALFX_TRACE_STARTUP_LOGS` configuration that enables diagnostic log at startup.
-- Add `SIGNALFX_TRACE_SAMPLE_RATE` configuration that sets the global rate for the sampler.
-- Add `SIGNALFX_TRACE_SAMPLING_RULES` configuration that is a comma separated list of sampling rules that enable custom sampling rules based on regular expressions.
-- Add `SIGNALFX_TRACE_{0}_ENABLED` configuration pattern that enables/disables specific integration.
-- Add `SIGNALFX_TRACE_HTTP_CLIENT_EXCLUDED_URL_SUBSTRINGS` configuration that sets URLs skipped by the tracer.
-- Add `SIGNALFX_AZURE_APP_SERVICES` configuration that indicates the profiler is running in the context of Azure App Services.
+- Add `SIGNALFX_TRACE_DELAY_WCF_INSTRUMENTATION_ENABLED` configuration that
+  enables the updated WCF instrumentation that delays execution until later in
+  the WCF pipeline when the WCF server exception handling is established.
+- Add `SIGNALFX_TRACE_HEADER_TAGS` configuration that sets a map of header keys
+  to tag names.
+- Add `SIGNALFX_TRACE_KAFKA_CREATE_CONSUMER_SCOPE_ENABLED` configuration that
+  closes consumer scope on method enter, and starts a new one on method exit.
+- Add `SIGNALFX_TRACE_LOG_DIRECTORY` configuration that sets directory for logs
+  and overrides the value in `SIGNALFX_TRACE_LOG_PATH` if present.
+- Add `SIGNALFX_TRACE_LOGGING_RATE` configuration that sets number of seconds
+  between identical log messages for tracer log files.
+- Add `SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED` configuration that enables partial
+  flush of traces.
+- Add `SIGNALFX_TRACE_PARTIAL_FLUSH_MIN_SPANS` configuration that sets minimum
+  number of closed spans in a trace before it's partially flushed.
+- Add `SIGNALFX_VERSION` configuration that sets application's version that
+  will populate `version` tag on spans.
+- Add `SIGNALFX_TRACE_STARTUP_LOGS` configuration that enables diagnostic log
+  at startup.
+- Add `SIGNALFX_TRACE_SAMPLE_RATE` configuration that sets the global rate for
+  the sampler.
+- Add `SIGNALFX_TRACE_SAMPLING_RULES` configuration that is a comma-separated
+  list of sampling rules that enable custom sampling rules based on regular expressions.
+- Add `SIGNALFX_TRACE_{0}_ENABLED` configuration pattern that enables/disables
+  specific integration.
+- Add `SIGNALFX_TRACE_HTTP_CLIENT_EXCLUDED_URL_SUBSTRINGS` configuration that
+  sets URLs skipped by the tracer.
+- Add `SIGNALFX_AZURE_APP_SERVICES` configuration that indicates the profiler
+  is running in the context of Azure App Services.
 - `SIGNALFX_ENDPOINT_URL` now defaults to `http://localhost:9411/api/v2/spans`.
 
 ---
