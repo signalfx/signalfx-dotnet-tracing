@@ -42,7 +42,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
 
             if (File.Exists(path))
             {
-                if (args.Name.StartsWith("Datadog.Trace, Version=") && args.Name != AssemblyName)
+                if (args.Name.StartsWith("SignalFx.Tracing, Version=") && args.Name != AssemblyName)
                 {
                     StartupLogger.Debug("Trying to load {0} which does not match the expected version ({1})", args.Name, AssemblyName);
                     return null;
