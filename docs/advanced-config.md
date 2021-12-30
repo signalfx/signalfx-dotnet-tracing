@@ -111,7 +111,7 @@ configure the following settings:
 | `SIGNALFX_TRACE_HEADER_TAGS` | Comma-separated map of HTTP header keys to tag names, automatically applied as tags on traces. | `"x-my-header:my-tag,header2:tag2"` |
 | `SIGNALFX_TRACE_HTTP_CLIENT_EXCLUDED_URL_SUBSTRINGS` | Sets URLs that are skipped by the tracer. |  |
 | `SIGNALFX_TRACE_KAFKA_CREATE_CONSUMER_SCOPE_ENABLED` | Enable to close consumer scope on method enter, and start a new one on method exit. | `true` |
-| `SIGNALFX_TRACE_RESPONSE_HEADER_ENABLED` | Enable to add server trace information to HTTP response headers. | `true` |
+| `SIGNALFX_TRACE_RESPONSE_HEADER_ENABLED` | Enable to add server trace information to HTTP response headers. It enables [Splunk Real User Monitoring (RUM)](https://docs.splunk.com/Observability/rum/intro-to-rum.html) integration when using ASP.NET and ASP.NET Core. | `true` |
 | `SIGNALFX_TRACE_ROUTE_TEMPLATE_RESOURCE_NAMES_ENABLED` | ASP.NET span and resource names are based on routing configuration if applicable. | `true` |
 
 ## Logging settings
