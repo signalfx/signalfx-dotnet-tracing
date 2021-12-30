@@ -41,7 +41,6 @@ namespace Datadog.Trace.ThreadSampling
                 pos++;
                 if (op == 0x01)
                 {
-                    // start batch, nothing here
                     int version = ReadInt();
                     if (version != 1)
                     {
@@ -107,7 +106,7 @@ namespace Datadog.Trace.ThreadSampling
 
         private string ReadString()
         {
-            int len = ReadInt();
+            short len = ReadShort();
             string s = new UnicodeEncoding().GetString(buf, pos, len * 2);
             pos += 2 * len;
             return s;

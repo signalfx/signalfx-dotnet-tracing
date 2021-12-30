@@ -75,7 +75,7 @@ int ThreadSampling_ConsumeOneThreadSample(int len, unsigned char* buf)
     {
         return 0;
     }
-    int toUseLen = min(toUse->size(), len);
+    int toUseLen = (int) min(toUse->size(), len);
     memcpy(buf, toUse->data(), toUseLen);
     delete toUse;
     return toUseLen;
@@ -130,19 +130,44 @@ private:
     MetaInterface* m_ptr;
 };
 
+/*
+* The thread samples buffer format is optimized for single-pass and efficient writing by the native sampling thread (which
+* has paused the CLR)
+*
+* It uses a simple byte-opcode format with fairly standard binary encoding of values.  It is entirely positional but is at least versioned
+* so that mismatched components (native writer and managed reader) will not emit nonsense.
+*
+* ints, shorts, and 64-bit longs are written in big-endian format; strings are written as 2-byte-length-prefixed standard windows utf-16 strings
+*
+* I would write out the "spec" for this format here, but it essentially maps to the code
+* (e.g., 0x01 is StartSample, which is followed by an int versionNumber and a long captureStartTimeInMillis)
+*
+* The bulk of the data is an (unknown length) array of frame strings, which are represented as coded strings in each buffer.
+* Each used string is given a code (starting at 1) - using an old old inline trick, codes are introduced by writing the code as a
+* negative number followed by the definition of the string (length-prefixed) that maps to that code.  Later uses of the code
+* simply use the 2-byte (positive) code, meaning frequently used strings will take only 2 bytes apiece.  0 is reserved for "end of list"
+* since the number of frames is not known up-front.
+*/
+
+// defined opcodes
+#define THREAD_SAMPLES_START_BATCH  0x01
+#define THREAD_SAMPLES_START_SAMPLE 0x02
+#define THREAD_SAMPLES_END_BATCH    0x06
+#define THREAD_SAMPLES_FINAL_STATS  0x07
+
 ThreadSamplesBuffer::ThreadSamplesBuffer(std::vector<unsigned char>* buf) : buffer(buf)
 {
 }
 ThreadSamplesBuffer ::~ThreadSamplesBuffer()
 {
-    buffer = NULL; // specifically don't delete[] as ownership/lifecycle is complicated
+    buffer = NULL; // specifically don't delete as ownership/lifecycle is complicated
 }
 
 #define CHECK_SAMPLES_BUFFER_LENGTH() {  if (buffer->size() >= SAMPLES_BUFFER_MAXIMUM_SIZE) { return; } }
 void ThreadSamplesBuffer::StartBatch()
 {
     CHECK_SAMPLES_BUFFER_LENGTH();
-    writeByte(0x01);
+    writeByte(THREAD_SAMPLES_START_BATCH);
     writeInt(1); // version number
     std::chrono::milliseconds ms =
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
@@ -152,8 +177,8 @@ void ThreadSamplesBuffer::StartBatch()
 void ThreadSamplesBuffer::StartSample(ThreadID id, ThreadState* state, ThreadSpanContext context)
 {
     CHECK_SAMPLES_BUFFER_LENGTH();
-    writeByte(0x02);
-    writeInt(id);
+    writeByte(THREAD_SAMPLES_START_SAMPLE);
+    writeInt((int)id); // FIXME not really sure how to map this to anything; needs more research
     writeInt(state->nativeId);
     writeString(state->threadName);
     writeInt64(context.traceIdHigh);
@@ -174,12 +199,12 @@ void ThreadSamplesBuffer::EndSample()
 void ThreadSamplesBuffer::EndBatch()
 {
     CHECK_SAMPLES_BUFFER_LENGTH();
-    writeByte(0x06);
+    writeByte(THREAD_SAMPLES_END_BATCH);
 }
 void ThreadSamplesBuffer::WriteFinalStats(int microsSuspended)
 {
     CHECK_SAMPLES_BUFFER_LENGTH();
-    writeByte(0x07);
+    writeByte(THREAD_SAMPLES_FINAL_STATS);
     writeInt(microsSuspended);
 }
 
@@ -192,7 +217,7 @@ void ThreadSamplesBuffer::writeCodedFrameString(FunctionID fid, WSTRING& str)
     }
     else
     {
-        int code = codes.size() + 1;
+        int code = (int) codes.size() + 1;
         if (codes.size() + 1 < MAX_CODES_PER_BUFFER)
         {
             codes[fid] = code;
@@ -217,8 +242,8 @@ void ThreadSamplesBuffer::writeString(WSTRING& str)
 {
     // limit strings to a max length overall; this prevents (e.g.) thread names or
     // any other miscellaneous strings that come along from blowing things out
-    size_t usedLen = min(str.length(), MAX_STRING_LENGTH);
-    writeInt(usedLen);
+    short usedLen = (short) min(str.length(), MAX_STRING_LENGTH);
+    writeShort(usedLen);
     // odd bit of casting since we're copying bytes, not wchars
     unsigned char* strBegin = (unsigned char*)(&str.c_str()[0]);
     buffer->insert(buffer->end(), strBegin, strBegin + usedLen * 2);
@@ -496,7 +521,13 @@ void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, Sa
     }
     else
     {
-        CaptureSamples(ts, info10, helper);
+        try {
+            CaptureSamples(ts, info10, helper);
+        } catch (const std::exception& e) {
+            Logger::Warn("Could not capture thread samples: ", e.what());
+        } catch (...) {
+            Logger::Warn("Could not capture thread sample for unknown reasons");
+        }
     }
     // I don't have any proof but I sure hope that if suspending fails then it's still ok to ask to resume, with no
     // ill effects
@@ -604,8 +635,7 @@ NameCache::NameCache(int maximumSize) : maxSize(maximumSize)
 {
 }
 
-// FIXME these should be UINT_PTR
-WSTRING* NameCache::get(FunctionID key)
+WSTRING* NameCache::get(UINT_PTR key)
 {
     auto found = map.find(key);
     if (found == map.end())
@@ -618,7 +648,7 @@ WSTRING* NameCache::get(FunctionID key)
     return found->second->second;
 }
 
-void NameCache::put(FunctionID key, WSTRING* val)
+void NameCache::put(UINT_PTR key, WSTRING* val)
 {
     auto pair = std::pair<FunctionID, WSTRING*>(key, val);
     list.push_front(pair);
