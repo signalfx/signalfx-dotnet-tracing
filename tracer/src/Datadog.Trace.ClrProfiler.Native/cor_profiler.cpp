@@ -123,7 +123,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
         if (app_pool_id_value.size() > 1 && app_pool_id_value.at(0) == '~')
         {
             Logger::Info(
-                "DATADOG TRACER DIAGNOSTICS - Profiler disabled: ", environment::azure_app_services_app_pool_id, " ",
+                "TRACER DIAGNOSTICS - Profiler disabled: ", environment::azure_app_services_app_pool_id, " ",
                 app_pool_id_value, " is recognized as an Azure App Services infrastructure process.");
             return E_FAIL;
         }
@@ -143,7 +143,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
 
         if (!functions_worker_runtime_value.empty() && !IsAzureFunctionsEnabled())
         {
-            Logger::Info("DATADOG TRACER DIAGNOSTICS - Profiler disabled: Azure Functions are not officially "
+            Logger::Info("TRACER DIAGNOSTICS - Profiler disabled: Azure Functions are not officially "
                          "supported. Enable instrumentation with DD_TRACE_AZURE_FUNCTIONS_ENABLED.");
             return E_FAIL;
         }
