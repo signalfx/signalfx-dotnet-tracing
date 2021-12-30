@@ -136,6 +136,96 @@ export SIGNALFX_ACCESS_TOKEN=secret
 export SIGNALFX_ENDPOINT_URL=https://ingest.us0.signalfx.com/v2/trace
 ```
 
+## Debug .NET Runtime on Linux
+
+- [Requirements](https://github.com/dotnet/runtime/blob/main/docs/workflow/requirements/linux-requirements.md)
+
+  ```bash
+  sudo apt-get install -y cmake llvm-9 clang-9 \
+  build-essential python curl git lldb-6.0 liblldb-6.0-dev \
+  libunwind8 libunwind8-dev gettext libicu-dev liblttng-ust-dev \
+  libssl-dev libnuma-dev libkrb5-dev zlib1g-dev ninja-build
+  ```
+
+- [Building .NET Runtime](https://github.com/dotnet/runtime/blob/main/docs/workflow/building/libraries/README.md)
+
+  ```bash
+  ./build.sh clr+libs
+  ```
+
+- [Using `corerun`](https://github.com/dotnet/runtime/blob/main/docs/workflow/testing/using-corerun.md)
+
+  ```bash
+  PATH="$PATH:$PWD/artifacts/bin/coreclr/Linux.x64.Debug/corerun"
+  export CORE_LIBRARIES="$PWD/artifacts/bin/runtime/net5.0-Linux-Debug-x64"
+  corerun ~/repos/signalfx-dotnet-tracing/tracer/samples/ConsoleApp/bin/Debug/net5.0/ConsoleApp.dll
+  ```
+
+- [Debugging](https://github.com/dotnet/runtime/blob/main/docs/workflow/debugging/coreclr/debugging.md)
+
+  Example showing how you can debug if the profiler is attached properly:
+
+  ```bash
+  rpajak@LAPTOP-K6FOL8LO:~/repos/signalfx-dotnet-tracing$ source dev/envvars.sh 
+  rpajak@LAPTOP-K6FOL8LO:~/repos/signalfx-dotnet-tracing$ cd ../runtime/
+  rpajak@LAPTOP-K6FOL8LO:~/repos/runtime$ lldb -- ./artifacts/bin/coreclr/Linux.x64.Debug/corerun ~/repos/signalfx-dotnet-tracing/tracer/samples/ConsoleApp/bin/Debug/net5.0/ConsoleApp.dll
+  (lldb) target create "./artifacts/bin/coreclr/Linux.x64.Debug/corerun"
+  Current executable set to '/home/rpajak/repos/runtime/artifacts/bin/coreclr/Linux.x64.Debug/corerun' (x86_64).
+  (lldb) settings set -- target.run-args  "/home/rpajak/repos/signalfx-dotnet-tracing/tracer/samples/ConsoleApp/bin/Debug/net5.0/ConsoleApp.dll"
+  (lldb) process launch -s
+  Process 1905 launched: '/home/rpajak/repos/runtime/artifacts/bin/coreclr/Linux.x64.Debug/corerun' (x86_64)
+  (lldb) process handle -s false SIGUSR1 SIGUSR2
+  NAME         PASS   STOP   NOTIFY
+  ===========  =====  =====  ======
+  SIGUSR1      true   false  true 
+  SIGUSR2      true   false  true 
+  (lldb) b EEToProfInterfaceImpl::CreateProfiler
+  Breakpoint 1: no locations (pending).
+  WARNING:  Unable to resolve breakpoint to any actual locations.
+  (lldb) s
+  Process 1905 stopped
+  * thread #1, name = 'corerun', stop reason = instruction step into
+      frame #0: 0x00007ffff7fd0103 ld-2.31.so
+  ->  0x7ffff7fd0103: callq  0x7ffff7fd0df0            ; ___lldb_unnamed_symbol18$$ld-2.31.so
+      0x7ffff7fd0108: movq   %rax, %r12
+      0x7ffff7fd010b: movl   0x2c4e7(%rip), %eax
+      0x7ffff7fd0111: popq   %rdx
+  (lldb) c
+  Process 1905 resuming
+  1 location added to breakpoint 1
+  Process 1905 stopped
+  * thread #1, name = 'corerun', stop reason = breakpoint 1.1
+      frame #0: 0x00007ffff7050ed2 libcoreclr.so`EEToProfInterfaceImpl::CreateProfiler(this=0x00005555555f7690, pClsid=0x00007fffffffce88, wszClsid=u"{918728DD-259F-4A6A-AC2B-B85E1B658318}", wszProfileDLL=u"/home/rpajak/repos/signalfx-dotnet-tracing/tracer/bin/tracer-home/OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.so") at eetoprofinterfaceimpl.cpp:633:5
+    630      CONTRACTL_END;
+    631 
+    632      // Always called before Thread created.
+  -> 633      _ASSERTE(GetThreadNULLOk() == NULL);
+    634 
+    635      // Try and CoCreate the registered profiler
+    636      ReleaseHolder<ICorProfilerCallback2> pCallback2;
+  (lldb) 
+  ```
+
+  You may need to add a [`dlerror()`](https://linux.die.net/man/3/dlerror) call
+  in order to get the error message. Example:
+
+  ```bash
+  Process 20148 stopped
+  * thread #1, name = 'corerun', stop reason = instruction step over
+      frame #0: 0x00007ffff76166f8 libcoreclr.so`LOADLoadLibraryDirect(libraryNameOrPath="/home/rpajak/repos/signalfx-dotnet-tracing/tracer/bin/tracer-home/OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.so") at module.cpp:1477:9
+    1474     if (dl_handle == nullptr)
+    1475     {
+    1476         LPCSTR err_msg = dlerror();
+  -> 1477         TRACE("dlopen() failed %s\n", err_msg);
+    1478         SetLastError(ERROR_MOD_NOT_FOUND);
+    1479     }
+    1480     else
+  (lldb) var
+  (LPCSTR) libraryNameOrPath = 0x00005555555f84c0 "/home/rpajak/repos/signalfx-dotnet-tracing/tracer/bin/tracer-home/OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.so"
+  (NATIVE_LIBRARY_HANDLE) dl_handle = 0x0000000000000000
+  (LPCSTR) err_msg = 0x00005555555f8740 "/home/rpajak/repos/signalfx-dotnet-tracing/tracer/bin/tracer-home/OpenTelemetry.AutoInstrumentation.ClrProfiler.Native.so: undefined symbol: _binary_Datadog_Trace_ClrProfiler_Managed_Loader_pdb_end"  
+  ```
+
 ## Further Reading
 
 - [Profiling API](https://docs.microsoft.com/en-us/dotnet/framework/unmanaged-api/profiling/)
