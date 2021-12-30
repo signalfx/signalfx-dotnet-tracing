@@ -83,5 +83,17 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="ExporterSettings.DogStatsdPort"/>
         public const string DogStatsdPort = "SINGALFX_DOGSTATSD_PORT";
+
+        /// <summary>
+        /// Configuration key to enable sending partial traces to the agent
+        /// </summary>
+        /// <seealso cref="ExporterSettings.PartialFlushEnabled"/>
+        public const string PartialFlushEnabled = "SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED";
+
+        /// <summary>
+        /// Configuration key to set the minimum number of closed spans in a trace before it's partially flushed
+        /// </summary>
+        /// <seealso cref="ExporterSettings.PartialFlushMinSpans"/>
+        public const string PartialFlushMinSpans = "SIGNALFX_TRACE_PARTIAL_FLUSH_MIN_SPANS";
     }
 }
