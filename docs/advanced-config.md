@@ -101,8 +101,8 @@ configure the following settings:
 
 | Setting | Description | Default |
 |-|-|-|
-| `SIGNALFX_HTTP_CLIENT_ERROR_STATUSES` | The application's client http statuses to set spans as errors by. | `400-599` |
-| `SIGNALFX_HTTP_SERVER_ERROR_STATUSES` | The application's server http statuses to set spans as errors by. | `500-599` |
+| `SIGNALFX_HTTP_CLIENT_ERROR_STATUSES` | Comma-separated list of HTTP client response statuses for which the spans are set as errors, for example: `300, 400-499`.  | `400-599` |
+| `SIGNALFX_HTTP_SERVER_ERROR_STATUSES` | Comma-separated list of HTTP server response statuses for which the spans are set as errors, for example: `300, 400-599`. | `500-599` |
 | `SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES` | Enable the tagging of an Elasticsearch command PostData as `db.statement`. It might introduce overhead for direct streaming users. | `true` |
 | `SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS` | Enable the tagging of a Mongo command BsonDocument as `db.statement`. | `true` |
 | `SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS` | Enable the tagging of a Redis command as `db.statement`. | `true` |
@@ -123,7 +123,7 @@ of SignalFx Instrumentation for .NET.
 |-|-|-|
 | `SIGNALFX_DIAGNOSTIC_SOURCE_ENABLED` | Enable to generate troubleshooting logs with the `System.Diagnostics.DiagnosticSource` class. | `true` |
 | `SIGNALFX_FILE_LOG_ENABLED` | Enable file logging. | `true` |
-| `SIGNALFX_MAX_LOGFILE_SIZE` | The maximum size for tracer log files, in bytes. | `10 MB` |
+| `SIGNALFX_MAX_LOGFILE_SIZE` | The maximum size for tracer log files, in bytes. | `245760` (10 MB) |
 | `SIGNALFX_STDOUT_LOG_ENABLED` | Enables `stdout` logging. | `false` |
 | `SIGNALFX_STDOUT_LOG_TEMPLATE` | Configures `stdout` log template. See more about Serilog formatting options [here](https://github.com/serilog/serilog/wiki/Configuration-Basics#output-templates). | `"[{Level:u3}] {Message:lj} {NewLine}{Exception}{NewLine}"` |
 | `SIGNALFX_TRACE_DEBUG` | Enable to activate debugging mode for the tracer. | `false` |
