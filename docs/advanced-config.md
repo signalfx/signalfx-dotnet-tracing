@@ -40,22 +40,22 @@ You can apply configuration settings in the following ways
 
 ## Main settings
 
-We highly suggest to configure the settings below.
+The following settings are common to most instrumentation scenarios:
 
 | Setting | Description | Default |
 |-|-|-|
 | `SIGNALFX_ENV` | The value for the `deployment.environment` tag added to every span. |  |
-| `SIGNALFX_SERVICE_NAME` | Application's default service name. |  |
-| `SIGNALFX_VERSION` | The application's version that will populate `version` tag on spans. |  |
+| `SIGNALFX_SERVICE_NAME` | The name of the application or service. |  |
+| `SIGNALFX_VERSION` | The version of the application. When set, it populates the `version` tag on spans. |  |
 
 ## Global management settings
 
 | Setting | Description | Default |
 |-|-|-|
 | `SIGNALFX_AZURE_APP_SERVICES` | Set to indicate that the profiler is running in the context of Azure App Services. | `false` |
-| `SIGNALFX_PROFILER_EXCLUDE_PROCESSES` | Sets the filename of executables the profiler cannot attach to. If not defined (default), the profiler will attach to any process. Supports multiple values separated with comma, for example: `MyApp.exe,dotnet.exe` |  |
-| `SIGNALFX_PROFILER_PROCESSES` | Sets the filename of executables the profiler can attach to. If not defined (default), the profiler will attach to any process. Supports multiple values separated with comma, for example: `MyApp.exe,dotnet.exe` |  |
-| `SIGNALFX_TRACE_CONFIG_FILE` | The file path of a JSON configuration file that will be loaded. |  |
+| `SIGNALFX_PROFILER_EXCLUDE_PROCESSES` | Sets the filename of executables the profiler cannot attach to. Supports multiple comma-separated values, for example: `MyApp.exe,dotnet.exe` |  |
+| `SIGNALFX_PROFILER_PROCESSES` | Sets the filename of executables the profiler can attach to. Supports multiple comma-separated values, for example: `MyApp.exe,dotnet.exe` |  |
+| `SIGNALFX_TRACE_CONFIG_FILE` | Path of the JSON configuration file. |  |
 | `SIGNALFX_TRACE_ENABLED` | Enable to activate the tracer. | `true` |
 
 ## Global instrumentation settings
@@ -63,9 +63,9 @@ We highly suggest to configure the settings below.
 | Setting | Description | Default |
 |-|-|-|
 | `SIGNALFX_DISABLED_INTEGRATIONS` | Comma-separated list of disabled library instrumentations. The available integration ID values can be found [here](instrumented-libraries.md). |  |
-| `SIGNALFX_RECORDED_VALUE_MAX_LENGTH` | The maximum length an attribute value can have. Values longer than this are truncated. Values are completely truncated when set to 0, and ignored when set to a negative value. | `12000` |
-| `SIGNALFX_TAGS` | Comma-separated list of key-value pairs to specify global span tags. For example: `"key1:val1,key2:val2"` |  |
-| `SIGNALFX_TRACE_{0}_ENABLED` | Configuration pattern for enabling or disabling a specific library instrumentation. For example, in order to disable Kafka instrumentation, set `SIGNALFX_TRACE_Kafka_ENABLED=false` | `true` |
+| `SIGNALFX_RECORDED_VALUE_MAX_LENGTH` | The maximum length an attribute value can have. Values longer than this are truncated. Values are discarded entirely when set to 0, and ignored when set to a negative value. | `12000` |
+| `SIGNALFX_TAGS` | Comma-separated list of key-value pairs that specify global span tags. For example: `"key1:val1,key2:val2"` |  |
+| `SIGNALFX_TRACE_{0}_ENABLED` | Configuration pattern for enabling or disabling a specific [library instrumentation](instrumented-libraries.md). For example, in order to disable Kafka instrumentation, set `SIGNALFX_TRACE_Kafka_ENABLED=false` | `true` |
 
 ## Exporter settings
 
@@ -103,12 +103,12 @@ configure the following settings:
 |-|-|-|
 | `SIGNALFX_HTTP_CLIENT_ERROR_STATUSES` | The application's client http statuses to set spans as errors by. | `400-599` |
 | `SIGNALFX_HTTP_SERVER_ERROR_STATUSES` | The application's server http statuses to set spans as errors by. | `500-599` |
-| `SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES` | Enable the tagging of a Elasticsearch command PostData as `db.statement`. It may introduce overhead for direct streaming users. | `true` |
+| `SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES` | Enable the tagging of an Elasticsearch command PostData as `db.statement`. It might introduce overhead for direct streaming users. | `true` |
 | `SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS` | Enable the tagging of a Mongo command BsonDocument as `db.statement`. | `true` |
 | `SIGNALFX_INSTRUMENTATION_REDIS_TAG_COMMANDS` | Enable the tagging of a Redis command as `db.statement`. | `true` |
-| `SIGNALFX_LOGS_INJECTION` | Enable to inject trace IDs, span IDs, service name and environment into logs. This requires a compatible logger or manual configuration. | `false` |
+| `SIGNALFX_LOGS_INJECTION` | Enable to inject trace IDs, span IDs, service name, and environment into logs. See more details [here](correlating-traces-with-logs.md). | `false` |
 | `SIGNALFX_TRACE_DELAY_WCF_INSTRUMENTATION_ENABLED` | Enable the updated WCF instrumentation that delays execution until later in the WCF pipeline when the WCF server exception handling is established. | `false` |
-| `SIGNALFX_TRACE_HEADER_TAGS` | Comma-separated map of HTTP header keys to tag name, that will be automatically applied as tags on traces. | `"x-my-header:my-tag,header2:tag2"` |
+| `SIGNALFX_TRACE_HEADER_TAGS` | Comma-separated map of HTTP header keys to tag names, automatically applied as tags on traces. | `"x-my-header:my-tag,header2:tag2"` |
 | `SIGNALFX_TRACE_HTTP_CLIENT_EXCLUDED_URL_SUBSTRINGS` | Sets URLs that are skipped by the tracer. |  |
 | `SIGNALFX_TRACE_KAFKA_CREATE_CONSUMER_SCOPE_ENABLED` | Enable to close consumer scope on method enter, and start a new one on method exit. | `true` |
 | `SIGNALFX_TRACE_RESPONSE_HEADER_ENABLED` | Enable to add server trace information to HTTP response headers. | `true` |
@@ -122,9 +122,9 @@ of SignalFx Instrumentation for .NET.
 | Setting | Description | Default |
 |-|-|-|
 | `SIGNALFX_DIAGNOSTIC_SOURCE_ENABLED` | Enable to generate troubleshooting logs with the `System.Diagnostics.DiagnosticSource` class. | `true` |
-| `SIGNALFX_FILE_LOG_ENABLED` | Enable file logging. This is enabled by default. | `true` |
+| `SIGNALFX_FILE_LOG_ENABLED` | Enable file logging. | `true` |
 | `SIGNALFX_MAX_LOGFILE_SIZE` | The maximum size for tracer log files, in bytes. | `10 MB` |
-| `SIGNALFX_STDOUT_LOG_ENABLED` | Enables `stdout` logging. This is disabled by default. | `false` |
+| `SIGNALFX_STDOUT_LOG_ENABLED` | Enables `stdout` logging. | `false` |
 | `SIGNALFX_STDOUT_LOG_TEMPLATE` | Configures `stdout` log template. See more about Serilog formatting options [here](https://github.com/serilog/serilog/wiki/Configuration-Basics#output-templates). | `"[{Level:u3}] {Message:lj} {NewLine}{Exception}{NewLine}"` |
 | `SIGNALFX_TRACE_DEBUG` | Enable to activate debugging mode for the tracer. | `false` |
 | `SIGNALFX_TRACE_LOG_DIRECTORY` | The directory of the .NET Tracer logs. Overrides the value in `SIGNALFX_TRACE_LOG_PATH` if present. | Linux: `/var/log/signalfx/dotnet/`<br>Windows: `%ProgramData%\SignalFx .NET Tracing\logs\` |
