@@ -355,6 +355,7 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="TracerSettings.HttpClientErrorStatusCodes"/>
         public const string HttpClientErrorStatusCodes = "SIGNALFX_HTTP_CLIENT_ERROR_STATUSES";
+
         /// <summary>
         /// Configuration key to enable or disable the creation of a span context on exiting a successful Kafka
         /// Consumer.Consume() call, and closing the scope on entering Consumer.Consume().
