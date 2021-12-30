@@ -90,7 +90,7 @@ namespace Datadog.Trace.Configuration
         /// Default is true, to keep all traces, false will drop all traces.
         /// For internal testing only.
         /// </summary>
-        internal const string AppSecKeepTraces = "DD_APPSEC_KEEP_TRACES";
+        internal const string AppSecKeepTraces = "SIGNALFX_APPSEC_KEEP_TRACES";
 
         /// <summary>
         /// Configuration key for enabling or disabling the Tracer's debug mode.
