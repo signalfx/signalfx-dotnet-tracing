@@ -126,7 +126,7 @@ namespace LogsInjection.NLog
 
         public static IEnumerable<KeyValuePair<string,string>> GetDatadogEnvironmentVariables()
         {
-            var prefixes = new[] { "COR_", "CORECLR_", "DD_", "DATADOG_" };
+            var prefixes = new[] { "COR_", "CORECLR_", "SIGNALFX_" };
 
             var envVars = from envVar in Environment.GetEnvironmentVariables().Cast<DictionaryEntry>()
                           from prefix in prefixes
