@@ -18,28 +18,28 @@ namespace Datadog.Trace.Configuration
         /// Default value is "localhost".
         /// </summary>
         /// <seealso cref="ExporterSettings.AgentUri"/>
-        public const string AgentHost = "SINGALFX_AGENT_HOST";
+        public const string AgentHost = "SIGNALFX_AGENT_HOST";
 
         /// <summary>
         /// Configuration key for the Agent port where the Tracer can send traces.
         /// Default value is 8126.
         /// </summary>
         /// <seealso cref="ExporterSettings.AgentUri"/>
-        public const string AgentPort = "SINGALFX_TRACE_AGENT_PORT";
+        public const string AgentPort = "SIGNALFX_TRACE_AGENT_PORT";
 
         /// <summary>
         /// Configuration key for the named pipe where the Tracer can send traces.
         /// Default value is <c>null</c>.
         /// </summary>
         /// <seealso cref="ExporterSettings.TracesPipeName"/>
-        public const string TracesPipeName = "SINGALFX_TRACE_PIPE_NAME";
+        public const string TracesPipeName = "SIGNALFX_TRACE_PIPE_NAME";
 
         /// <summary>
         /// Configuration key for setting the timeout in milliseconds for named pipes communication.
         /// Default value is <c>0</c>.
         /// </summary>
         /// <seealso cref="ExporterSettings.TracesPipeTimeoutMs"/>
-        public const string TracesPipeTimeoutMs = "SINGALFX_TRACE_PIPE_TIMEOUT_MS";
+        public const string TracesPipeTimeoutMs = "SIGNALFX_TRACE_PIPE_TIMEOUT_MS";
 
         /// <summary>
         /// Configuration key for the named pipe that DogStatsD binds to.
@@ -54,7 +54,7 @@ namespace Datadog.Trace.Configuration
         /// Default value is 8126.
         /// </summary>
         /// <seealso cref="ExporterSettings.AgentUri"/>
-        public const string TraceAgentPortKey = "SINGALFX_APM_RECEIVER_PORT";
+        public const string TraceAgentPortKey = "SIGNALFX_APM_RECEIVER_PORT";
 
         /// <summary>
         /// Configuration key for the URL where the Tracer can send metrics.
@@ -68,7 +68,7 @@ namespace Datadog.Trace.Configuration
         /// Default value is "http://localhost:8126".
         /// </summary>
         /// <seealso cref="ExporterSettings.AgentUri"/>
-        public const string AgentUri = "SINGNALFX_TRACE_AGENT_URL";
+        public const string AgentUri = "SIGNALFX_TRACE_AGENT_URL";
 
         /// <summary>
         /// Configuration key for the trace endpoint. Same as <see creg="AgentUri"/> created
@@ -82,7 +82,7 @@ namespace Datadog.Trace.Configuration
         /// Default value is 8125.
         /// </summary>
         /// <seealso cref="ExporterSettings.DogStatsdPort"/>
-        public const string DogStatsdPort = "SINGALFX_DOGSTATSD_PORT";
+        public const string DogStatsdPort = "SIGNALFX_DOGSTATSD_PORT";
 
         /// <summary>
         /// Configuration key to enable sending partial traces to the agent
