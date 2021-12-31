@@ -560,12 +560,13 @@ partial class Build
         .After(CompileManagedSrc)
         .After(CompileDependencyLibs)
         .After(CompileManagedTestHelpers)
+        .After(BuildRunnerTool)
         .Executes(() =>
         {
             // create junction for each directory
             var directories = TracerDirectory.GlobDirectories(
                 $"src/**/bin/{BuildConfiguration}",
-                $"tools/**/bin/{BuildConfiguration}",
+                $"src/Datadog.Trace.Tools.Runner/obj/{BuildConfiguration}",
                 $"test/Datadog.Trace.TestHelpers/**/bin/{BuildConfiguration}",
                 $"test/test-applications/integrations/dependency-libs/**/bin/{BuildConfiguration}"
             );
@@ -854,6 +855,7 @@ partial class Build
         .After(CompileRegressionSamples)
         .After(CompileFrameworkReproductions)
         .After(PublishIisSamples)
+        .After(BuildRunnerTool)
         .Requires(() => Framework)
         .Requires(() => TracerHomeDirectory != null)
         .Executes(() =>
@@ -1226,6 +1228,7 @@ partial class Build
         .After(CompileManagedTestHelpers)
         .After(CompileSamplesLinux)
         .After(CompileMultiApiPackageVersionSamples)
+        .After(BuildRunnerTool)
         .Requires(() => TracerHomeDirectory != null)
         .Requires(() => Framework)
         .Executes(() =>
