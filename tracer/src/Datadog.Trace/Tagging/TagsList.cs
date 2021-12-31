@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -24,7 +26,11 @@ namespace Datadog.Trace.Tagging
         private List<KeyValuePair<string, double>> _metrics;
         private List<KeyValuePair<string, string>> _tags;
 
+        protected static IProperty<string>[] TagsListProperties => Array.Empty<IProperty<string>>();
+
         public List<KeyValuePair<string, double>> Metrics => Volatile.Read(ref _metrics);
+
+        protected virtual IList<KeyValuePair<string, string>> GetCustomTags() => Volatile.Read(ref _tags);
 
         public List<KeyValuePair<string, string>> GetAllTags()
         {
@@ -61,159 +67,15 @@ namespace Datadog.Trace.Tagging
             return allTags;
         }
 
-        public string GetTag(string key)
-        {
-            foreach (var property in GetAdditionalTags())
-            {
-                if (property.Key == key)
-                {
-                    return property.Getter(this);
-                }
-            }
+        protected virtual IProperty<string>[] GetAdditionalTags() => TagsListProperties;
 
-            var tags = GetCustomTags();
+        public virtual string GetTag(string key) => GetTagFromDictionary(key);
 
-            if (tags == null)
-            {
-                return null;
-            }
+        public virtual double? GetMetric(string key) => GetMetricFromDictionary(key);
 
-            lock (tags)
-            {
-                for (int i = 0; i < tags.Count; i++)
-                {
-                    if (tags[i].Key == key)
-                    {
-                        return tags[i].Value;
-                    }
-                }
-            }
+        public virtual void SetTag(string key, string value) => SetTagInDictionary(key, value);
 
-            return null;
-        }
-
-        public double? GetMetric(string key)
-        {
-            foreach (var property in GetAdditionalMetrics())
-            {
-                if (property.Key == key)
-                {
-                    return property.Getter(this);
-                }
-            }
-
-            var metrics = Metrics;
-
-            if (metrics == null)
-            {
-                return null;
-            }
-
-            lock (metrics)
-            {
-                for (int i = 0; i < metrics.Count; i++)
-                {
-                    if (metrics[i].Key == key)
-                    {
-                        return metrics[i].Value;
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        public void SetTag(string key, string value)
-        {
-            foreach (var property in GetAdditionalTags())
-            {
-                if (property.Key == key)
-                {
-                    property.Setter(this, value);
-                    return;
-                }
-            }
-
-            var tags = GetCustomTags();
-
-            if (tags == null)
-            {
-                var newTags = new List<KeyValuePair<string, string>>();
-                tags = Interlocked.CompareExchange(ref _tags, newTags, null) ?? newTags;
-            }
-
-            lock (tags)
-            {
-                for (int i = 0; i < tags.Count; i++)
-                {
-                    if (tags[i].Key == key)
-                    {
-                        if (value == null)
-                        {
-                            tags.RemoveAt(i);
-                        }
-                        else
-                        {
-                            tags[i] = new KeyValuePair<string, string>(key, value);
-                        }
-
-                        return;
-                    }
-                }
-
-                // If we get there, the tag wasn't in the collection
-                if (value != null)
-                {
-                    tags.Add(new KeyValuePair<string, string>(key, value));
-                }
-            }
-        }
-
-        public void SetMetric(string key, double? value)
-        {
-            foreach (var property in GetAdditionalMetrics())
-            {
-                if (property.Key == key)
-                {
-                    property.Setter(this, value);
-                    return;
-                }
-            }
-
-            var metrics = Metrics;
-
-            if (metrics == null)
-            {
-                var newMetrics = new List<KeyValuePair<string, double>>();
-                metrics = Interlocked.CompareExchange(ref _metrics, newMetrics, null) ?? newMetrics;
-            }
-
-            lock (metrics)
-            {
-                for (int i = 0; i < metrics.Count; i++)
-                {
-                    if (metrics[i].Key == key)
-                    {
-                        if (value == null)
-                        {
-                            metrics.RemoveAt(i);
-                        }
-                        else
-                        {
-                            metrics[i] = new KeyValuePair<string, double>(key, value.Value);
-                        }
-
-                        return;
-                    }
-                }
-
-                // If we get there, the tag wasn't in the collection
-                if (value != null)
-                {
-                    metrics.Add(new KeyValuePair<string, double>(key, value.Value));
-                }
-            }
-        }
+        public virtual void SetMetric(string key, double? value) => SetMetricInDictionary(key, value);
 
         public int SerializeTo(ref byte[] bytes, int offset, Span span)
         {
@@ -255,46 +117,37 @@ namespace Datadog.Trace.Tagging
                 }
             }
 
-            foreach (var property in GetAdditionalTags())
-            {
-                var value = property.Getter(this);
-
-                if (value != null)
-                {
-                    sb.Append($"{property.Key} (tag):{value},");
-                }
-            }
-
-            foreach (var property in GetAdditionalMetrics())
-            {
-                var value = property.Getter(this);
-
-                if (value != null)
-                {
-                    sb.Append($"{property.Key} (metric):{value.Value},");
-                }
-            }
+            WriteAdditionalTags(sb);
+            WriteAdditionalMetrics(sb);
 
             return StringBuilderCache.GetStringAndRelease(sb);
         }
 
-        protected virtual IProperty<string>[] GetAdditionalTags() => Array.Empty<IProperty<string>>();
-
-        protected virtual IProperty<double?>[] GetAdditionalMetrics() => Array.Empty<IProperty<double?>>();
-
-        protected virtual IList<KeyValuePair<string, string>> GetCustomTags() => Volatile.Read(ref _tags);
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void WriteTag(ref byte[] bytes, ref int offset, string key, string value)
+        protected static void WriteTag(ref byte[] bytes, ref int offset, string key, string value)
         {
             offset += MessagePackBinary.WriteString(ref bytes, offset, key);
             offset += MessagePackBinary.WriteString(ref bytes, offset, value);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void WriteMetric(ref byte[] bytes, ref int offset, string key, double value)
+        protected static void WriteMetric(ref byte[] bytes, ref int offset, string key, double value)
         {
             offset += MessagePackBinary.WriteString(ref bytes, offset, key);
+            offset += MessagePackBinary.WriteDouble(ref bytes, offset, value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected static void WriteTag(ref byte[] bytes, ref int offset, byte[] keyBytes, string value)
+        {
+            offset += MessagePackBinary.WriteStringBytes(ref bytes, offset, keyBytes);
+            offset += MessagePackBinary.WriteString(ref bytes, offset, value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected static void WriteMetric(ref byte[] bytes, ref int offset, byte[] keyBytes, double value)
+        {
+            offset += MessagePackBinary.WriteStringBytes(ref bytes, offset, keyBytes);
             offset += MessagePackBinary.WriteDouble(ref bytes, offset, value);
         }
 
@@ -312,8 +165,6 @@ namespace Datadog.Trace.Tagging
 
             var tags = GetCustomTags();
 
-            bool isOriginWritten = false;
-
             if (tags != null)
             {
                 lock (tags)
@@ -327,21 +178,7 @@ namespace Datadog.Trace.Tagging
                 }
             }
 
-            foreach (var property in GetAdditionalTags())
-            {
-                var value = property.Getter(this);
-
-                if (value != null)
-                {
-                    if (property.Key == Trace.Tags.Origin)
-                    {
-                        isOriginWritten = true;
-                    }
-
-                    count++;
-                    WriteTag(ref bytes, ref offset, property.Key, value);
-                }
-            }
+            count += WriteAdditionalTags(ref bytes, ref offset);
 
             if (span.IsTopLevel)
             {
@@ -351,7 +188,7 @@ namespace Datadog.Trace.Tagging
             }
 
             string origin = span.Context.Origin;
-            if (!isOriginWritten && !string.IsNullOrEmpty(origin))
+            if (!string.IsNullOrEmpty(origin))
             {
                 count++;
                 offset += MessagePackBinary.WriteStringBytes(ref bytes, offset, _originBytes);
@@ -365,6 +202,18 @@ namespace Datadog.Trace.Tagging
             }
 
             return offset - originalOffset;
+        }
+
+        protected virtual int WriteAdditionalTags(ref byte[] bytes, ref int offset) => 0;
+
+        protected virtual int WriteAdditionalMetrics(ref byte[] bytes, ref int offset) => 0;
+
+        protected virtual void WriteAdditionalTags(StringBuilder builder)
+        {
+        }
+
+        protected virtual void WriteAdditionalMetrics(StringBuilder builder)
+        {
         }
 
         private int WriteMetrics(ref byte[] bytes, int offset, Span span)
@@ -394,16 +243,7 @@ namespace Datadog.Trace.Tagging
                 }
             }
 
-            foreach (var property in GetAdditionalMetrics())
-            {
-                var value = property.Getter(this);
-
-                if (value != null)
-                {
-                    count++;
-                    WriteMetric(ref bytes, ref offset, property.Key, value.Value);
-                }
-            }
+            count += WriteAdditionalMetrics(ref bytes, ref offset);
 
             if (span.IsTopLevel)
             {
@@ -418,6 +258,126 @@ namespace Datadog.Trace.Tagging
             }
 
             return offset - originalOffset;
+        }
+
+        private string GetTagFromDictionary(string key)
+        {
+            var tags = GetCustomTags();
+
+            if (tags == null)
+            {
+                return null;
+            }
+
+            lock (tags)
+            {
+                for (int i = 0; i < tags.Count; i++)
+                {
+                    if (tags[i].Key == key)
+                    {
+                        return tags[i].Value;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private void SetTagInDictionary(string key, string value)
+        {
+            var tags = GetCustomTags();
+
+            if (tags == null)
+            {
+                var newTags = new List<KeyValuePair<string, string>>();
+                tags = Interlocked.CompareExchange(ref _tags, newTags, null) ?? newTags;
+            }
+
+            lock (tags)
+            {
+                for (int i = 0; i < tags.Count; i++)
+                {
+                    if (tags[i].Key == key)
+                    {
+                        if (value == null)
+                        {
+                            tags.RemoveAt(i);
+                        }
+                        else
+                        {
+                            tags[i] = new KeyValuePair<string, string>(key, value);
+                        }
+
+                        return;
+                    }
+                }
+
+                // If we get there, the tag wasn't in the collection
+                if (value != null)
+                {
+                    tags.Add(new KeyValuePair<string, string>(key, value));
+                }
+            }
+        }
+
+        private double? GetMetricFromDictionary(string key)
+        {
+            var metrics = Metrics;
+
+            if (metrics == null)
+            {
+                return null;
+            }
+
+            lock (metrics)
+            {
+                for (int i = 0; i < metrics.Count; i++)
+                {
+                    if (metrics[i].Key == key)
+                    {
+                        return metrics[i].Value;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private void SetMetricInDictionary(string key, double? value)
+        {
+            var metrics = Metrics;
+
+            if (metrics == null)
+            {
+                var newMetrics = new List<KeyValuePair<string, double>>();
+                metrics = Interlocked.CompareExchange(ref _metrics, newMetrics, null) ?? newMetrics;
+            }
+
+            lock (metrics)
+            {
+                for (int i = 0; i < metrics.Count; i++)
+                {
+                    if (metrics[i].Key == key)
+                    {
+                        if (value == null)
+                        {
+                            metrics.RemoveAt(i);
+                        }
+                        else
+                        {
+                            metrics[i] = new KeyValuePair<string, double>(key, value.Value);
+                        }
+
+                        return;
+                    }
+                }
+
+                // If we get there, the tag wasn't in the collection
+                if (value != null)
+                {
+                    metrics.Add(new KeyValuePair<string, double>(key, value.Value));
+                }
+            }
         }
     }
 }

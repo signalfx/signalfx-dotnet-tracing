@@ -3,36 +3,32 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-using Datadog.Trace.ExtensionMethods;
+using Datadog.Trace.SourceGenerators;
 using Datadog.Trace.Tagging;
 
 namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch
 {
-    internal class ElasticsearchTags : InstrumentationTags
+    internal partial class ElasticsearchTags : InstrumentationTags
     {
-        protected static readonly IProperty<string>[] ElasticsearchTagsProperties =
-            InstrumentationTagsProperties.Concat(
-                new ReadOnlyProperty<ElasticsearchTags, string>(Trace.Tags.InstrumentationName, t => t.InstrumentationName),
-                new ReadOnlyProperty<ElasticsearchTags, string>(Trace.Tags.DbType, t => t.DbType),
-                new Property<ElasticsearchTags, string>(Trace.Tags.ElasticsearchAction, t => t.Action, (t, v) => t.Action = v),
-                new Property<ElasticsearchTags, string>(Trace.Tags.ElasticsearchMethod, t => t.Method, (t, v) => t.Method = v),
-                new Property<ElasticsearchTags, string>(Trace.Tags.ElasticsearchUrl, t => t.Url, (t, v) => t.Url = v),
-                new Property<ElasticsearchTags, string>(Trace.Tags.DbStatement, t => t.DbStatement, (t, v) => t.DbStatement = v));
-
+        [Tag(Trace.Tags.SpanKind)]
         public override string SpanKind => SpanKinds.Client;
 
+        [Tag(Trace.Tags.InstrumentationName)]
         public string InstrumentationName => ElasticsearchNetCommon.ComponentValue;
 
+        [Tag(Trace.Tags.DbType)]
         public string DbType => ElasticsearchNetCommon.SpanType;
 
+        [Tag(Trace.Tags.ElasticsearchAction)]
         public string Action { get; set; }
 
+        [Tag(Trace.Tags.ElasticsearchMethod)]
         public string Method { get; set; }
 
+        [Tag(Trace.Tags.ElasticsearchUrl)]
         public string Url { get; set; }
 
+        [Tag(Trace.Tags.DbStatement)]
         public string DbStatement { get; set; }
-
-        protected override IProperty<string>[] GetAdditionalTags() => ElasticsearchTagsProperties;
     }
 }

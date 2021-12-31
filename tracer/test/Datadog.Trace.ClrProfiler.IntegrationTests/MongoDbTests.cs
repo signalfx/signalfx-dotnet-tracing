@@ -82,7 +82,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                         span.Tags.GetValueOrDefault(Tags.DbType).Should().Be(SpanTypes.MongoDb);
                         span.Tags.GetValueOrDefault("component").Should().Be("MongoDb");
 
-
                         span.Tags.TryGetValue(Tags.DbStatement, out string statement);
 
                         if (tagCommands && !name.Equals("mongodb.query"))

@@ -95,7 +95,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
                     ? $"{DefaultOperationName} {operationNameSuffix}"
                     : DefaultOperationName;
 
-                var tags = new WebTags();
+                var tags = new WcfTags();
                 scope = tracer.StartActiveInternal(operationName, propagatedContext, tags: tags);
                 var span = scope.Span;
                 span.LogicScope = DefaultOperationName;

@@ -5,41 +5,31 @@
 
 // Modified by Splunk Inc.
 
+using Datadog.Trace.SourceGenerators;
+
 namespace Datadog.Trace.Tagging
 {
-    internal class CommonTags : TagsList
+    internal partial class CommonTags : TagsList
     {
-        protected static readonly IProperty<double?>[] CommonMetricsProperties =
-        {
-            new Property<CommonTags, double?>(Trace.Metrics.SamplingLimitDecision, t => t.SamplingLimitDecision, (t, v) => t.SamplingLimitDecision = v),
-            new Property<CommonTags, double?>(Trace.Metrics.SamplingPriority, t => t.SamplingPriority, (t, v) => t.SamplingPriority = v),
-            new Property<CommonTags, double?>(Trace.Metrics.TracesKeepRate, t => t.TracesKeepRate, (t, v) => t.TracesKeepRate = v)
-        };
-
-        protected static readonly IProperty<string>[] CommonTagsProperties =
-        {
-            new Property<CommonTags, string>(Trace.Tags.Env, t => t.Environment, (t, v) => t.Environment = v),
-            new Property<CommonTags, string>(Trace.Tags.Version, t => t.Version, (t, v) => t.Version = v),
-            new Property<CommonTags, string>(Trace.Tags.SignalFxVersion, t => t.SignalFxVersion, (t, v) => t.SignalFxVersion = v),
-            new Property<CommonTags, string>(Trace.Tags.SignalFxLibrary, t => t.SignalFxLibrary, (t, v) => t.SignalFxLibrary = v),
-        };
-
+        [Tag(Trace.Tags.Env)]
         public string Environment { get; set; }
 
+        [Tag(Trace.Tags.Version)]
         public string Version { get; set; }
 
+        [Tag(Trace.Tags.SignalFxVersion)]
         public string SignalFxVersion { get; set; }
 
+        [Tag(Trace.Tags.SignalFxLibrary)]
         public string SignalFxLibrary { get; set; }
 
+        [Metric(Trace.Metrics.SamplingPriority)]
         public double? SamplingPriority { get; set; }
 
+        [Metric(Trace.Metrics.SamplingLimitDecision)]
         public double? SamplingLimitDecision { get; set; }
 
+        [Metric(Trace.Metrics.TracesKeepRate)]
         public double? TracesKeepRate { get; set; }
-
-        protected override IProperty<double?>[] GetAdditionalMetrics() => CommonMetricsProperties;
-
-        protected override IProperty<string>[] GetAdditionalTags() => CommonTagsProperties;
     }
 }

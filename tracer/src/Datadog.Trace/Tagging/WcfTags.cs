@@ -1,18 +1,13 @@
 // Modified by Splunk Inc.
 
 using System.Linq;
-using Datadog.Trace.ExtensionMethods;
+using Datadog.Trace.SourceGenerators;
 
 namespace Datadog.Trace.Tagging
 {
-    internal class WcfTags : WebTags
+    internal partial class WcfTags : WebTags
     {
-        protected static readonly IProperty<string>[] WcfTagsProperties =
-            WebTagsProperties.Concat(
-                new ReadOnlyProperty<WcfTags, string>(Tags.InstrumentationName, t => t.InstrumentationName));
-
+        [Tag(Trace.Tags.InstrumentationName)]
         public string InstrumentationName => "Wcf";
-
-        protected override IProperty<string>[] GetAdditionalTags() => WcfTagsProperties;
     }
 }

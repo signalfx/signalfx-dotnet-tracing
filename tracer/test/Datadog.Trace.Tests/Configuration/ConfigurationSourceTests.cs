@@ -121,7 +121,7 @@ namespace Datadog.Trace.Tests.Configuration
             yield return new object[] { ConfigurationKeys.Convention, "unknown", CreateFunc(s => s.Convention), ConventionType.Default };
 
             yield return new object[] { ConfigurationKeys.RecordedValueMaxLength, "100", CreateFunc(s => s.RecordedValueMaxLength), 100 };
-            
+
             yield return new object[] { ConfigurationKeys.HeaderTags, "header3:my.header.with.dot,my.new.header.with.dot", CreateFunc(s => s.HeaderTags), HeaderTagsWithDots };
         }
 
