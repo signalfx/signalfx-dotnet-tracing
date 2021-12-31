@@ -535,12 +535,12 @@ HRESULT STDMETHODCALLTYPE CorProfiler::ModuleLoadFinished(ModuleID module_id, HR
     }
 
     // In IIS, the startup hook will be inserted into a method in System.Web (which is domain-neutral)
-    // but the Datadog.Trace.ClrProfiler.Managed.Loader assembly that the startup hook loads from a
+    // but the SignalFx.Tracing.ClrProfiler.Managed.Loader assembly that the startup hook loads from a
     // byte array will be loaded into a non-shared AppDomain.
     // In this case, do not insert another startup hook into that non-shared AppDomain
     if (module_info.assembly.name == datadog_trace_clrprofiler_managed_loader_assemblyName)
     {
-        Logger::Info("ModuleLoadFinished: Datadog.Trace.ClrProfiler.Managed.Loader loaded into AppDomain ",
+        Logger::Info("ModuleLoadFinished: SignalFx.Tracing.ClrProfiler.Managed.Loader loaded into AppDomain ",
                      app_domain_id, " ", module_info.assembly.app_domain_name);
         first_jit_compilation_app_domains.insert(app_domain_id);
         return S_OK;
