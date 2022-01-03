@@ -15,7 +15,7 @@ namespace Datadog.Trace.TestHelpers.Factories
 
         internal static Span CreateSpan(ISpanContext parentContext)
         {
-            var spanContext = new SpanContext(parentContext, Mock.Of<ITraceContext>(), serviceName: null);
+            var spanContext = new SpanContext(parentContext, new TraceContext(Mock.Of<IDatadogTracer>()), serviceName: null);
 
             var additionalTags = new CommonTags()
             {
@@ -29,7 +29,7 @@ namespace Datadog.Trace.TestHelpers.Factories
             span.OperationName = "TestOperation";
             span.SetTag("k0", "v0");
             span.SetTag("k1", "v1");
-            span.Finish(TimeSpan.FromSeconds(1.5));
+            span.SetDuration(TimeSpan.FromSeconds(1.5));
 
             return span;
         }
