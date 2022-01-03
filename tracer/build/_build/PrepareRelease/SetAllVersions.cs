@@ -177,6 +177,10 @@ namespace PrepareRelease
                 "src/WindowsInstaller/WindowsInstaller.wixproj",
                 WixProjReplace);
 
+            SynchronizeVersion(
+                "../shared/src/msi-installer/WindowsInstaller.wixproj",
+                WixProjReplace);
+
             // Azure Site Extension updates
             SynchronizeVersion(
                 "../shared/src/azure-site-extension/applicationHost.xdt",
