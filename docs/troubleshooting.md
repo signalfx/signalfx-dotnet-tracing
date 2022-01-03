@@ -36,7 +36,8 @@ like [Process Explorer](https://docs.microsoft.com/en-us/sysinternals/downloads/
 On Linux, run: `cat /proc/<pid>/environ`
 where `<pid>` is the Process ID.
 
-Enable debug logging If none of the suggestions solved your issue. Follow these steps to enable debug logging for .NET instrumentation:
+Enable debug logging if none of the suggestions solved your issue.
+Follow these steps to enable debug logging for .NET instrumentation:
 
 Set the environment variable `SIGNALFX_TRACE_DEBUG` to `true` before
 the instrumented process starts.
