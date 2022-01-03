@@ -36,7 +36,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.VersionConflict
             _iisFixture.TryStartIis(this, IisAppType.AspNetClassic);
         }
 
-        [SkippableFact]
+        [Fact(Skip = "VersionConflict tests are not ready to work without official next ver release")]
+        // [SkippableFact]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         [Trait("LoadFromGAC", "True")]
@@ -96,7 +97,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.VersionConflict
             httpSpan.Tags[Tags.RuntimeId].Should().Be(runtimeId);
         }
 
-        [SkippableTheory]
+        [Theory(Skip = "VersionConflict tests are not ready to work without official next ver release")]
+        // [SkippableTheory]
         [InlineData(true)]
         [InlineData(false)]
         [Trait("Category", "EndToEnd")]
@@ -181,7 +183,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.VersionConflict
             rootTrace.Metrics[Metrics.SamplingPriority].Should().Be((double)SamplingPriority.UserReject);
         }
 
-        [SkippableFact]
+        [Fact(Skip = "VersionConflict tests are not ready to work without official next ver release")]
+        // [SkippableFact]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         [Trait("LoadFromGAC", "True")]

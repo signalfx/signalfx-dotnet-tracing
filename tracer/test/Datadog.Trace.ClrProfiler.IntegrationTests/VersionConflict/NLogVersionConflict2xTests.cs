@@ -36,7 +36,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.VersionConflict
             SetServiceVersion("1.0.0");
         }
 
-        [SkippableFact]
+        [Fact(Skip = "VersionConflict tests are not ready to work without official next ver release")]
+        // [SkippableFact]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         public void InjectsLogsWhenEnabled()
