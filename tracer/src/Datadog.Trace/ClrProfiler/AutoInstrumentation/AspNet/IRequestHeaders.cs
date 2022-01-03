@@ -5,21 +5,24 @@
 
 #if NETFRAMEWORK
 using System.Collections.Generic;
-using System.ComponentModel;
 
 namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
 {
     /// <summary>
     /// RequestHeaders interface for ducktyping
     /// </summary>
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public interface IRequestHeaders
+    internal interface IRequestHeaders
     {
         /// <summary>
         /// Gets the host from the HTTP request
         /// </summary>
         string Host { get; }
+
+        /// <summary>
+        /// Gets the useragent from the HTTP request.
+        /// Cast it as object as we only need to call ToString
+        /// </summary>
+        object UserAgent { get; }
 
         /// <summary>
         /// Try get values from the headers

@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using Datadog.Trace.Util;
 using FluentAssertions;
@@ -46,8 +48,11 @@ namespace Datadog.Trace.Tests
 
             tracer.Setup(t => t.Settings).Returns(new Trace.Configuration.TracerSettings
             {
-                PartialFlushEnabled = partialFlush,
-                PartialFlushMinSpans = 5
+                ExporterSettings = new Trace.Configuration.ExporterSettings()
+                {
+                    PartialFlushEnabled = partialFlush,
+                    PartialFlushMinSpans = 5
+                }
             }.Build());
 
             var traceContext = new TraceContext(tracer.Object);
@@ -123,8 +128,11 @@ namespace Datadog.Trace.Tests
 
             tracer.Setup(t => t.Settings).Returns(new Trace.Configuration.TracerSettings
             {
-                PartialFlushEnabled = true,
-                PartialFlushMinSpans = partialFlushThreshold
+                ExporterSettings = new Trace.Configuration.ExporterSettings()
+                {
+                    PartialFlushEnabled = true,
+                    PartialFlushMinSpans = partialFlushThreshold
+                }
             }.Build());
 
             ArraySegment<Span>? spans = null;
@@ -173,8 +181,11 @@ namespace Datadog.Trace.Tests
 
             tracer.Setup(t => t.Settings).Returns(new Trace.Configuration.TracerSettings
             {
-                PartialFlushEnabled = true,
-                PartialFlushMinSpans = partialFlushThreshold
+                ExporterSettings = new Trace.Configuration.ExporterSettings()
+                {
+                    PartialFlushEnabled = true,
+                    PartialFlushMinSpans = partialFlushThreshold
+                }
             }.Build());
 
             ArraySegment<Span>? spans = null;

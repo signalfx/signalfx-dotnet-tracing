@@ -12,7 +12,7 @@ namespace Datadog.Trace.Configuration
     /// <summary>
     /// String constants for standard Datadog configuration keys.
     /// </summary>
-    public static class ConfigurationKeys
+    internal static partial class ConfigurationKeys
     {
         /// <summary>
         /// Configuration key for the path to the configuration file.
@@ -86,6 +86,13 @@ namespace Datadog.Trace.Configuration
         public const string AppSecExtraHeaders = "SIGNALFX_APPSEC_EXTRA_HEADERS";
 
         /// <summary>
+        /// Specifies if the AppSec traces should be explicitly kept or droped.
+        /// Default is true, to keep all traces, false will drop all traces.
+        /// For internal testing only.
+        /// </summary>
+        internal const string AppSecKeepTraces = "SIGNALFX_APPSEC_KEEP_TRACES";
+
+        /// <summary>
         /// Configuration key for enabling or disabling the Tracer's debug mode.
         /// Default is value is false (disabled).
         /// </summary>
@@ -126,71 +133,6 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="TracerSettings.DisabledIntegrationNames"/>
         public const string DisabledIntegrations = "SIGNALFX_DISABLED_INTEGRATIONS";
-
-        /// <summary>
-        /// Configuration key for the Agent host where the Tracer can send traces.
-        /// Overridden by <see cref="AgentUri"/> if present.
-        /// Default value is "localhost".
-        /// </summary>
-        /// <seealso cref="TracerSettings.AgentUri"/>
-        public const string AgentHost = "SIGNALFX_AGENT_HOST";
-
-        /// <summary>
-        /// Configuration key for the Agent port where the Tracer can send traces.
-        /// Default value is 8126.
-        /// </summary>
-        /// <seealso cref="TracerSettings.AgentUri"/>
-        public const string AgentPort = "SIGNALFX_TRACE_AGENT_PORT";
-
-        /// <summary>
-        /// Configuration key for the named pipe where the Tracer can send traces.
-        /// Default value is <c>null</c>.
-        /// </summary>
-        /// <seealso cref="TracerSettings.TracesPipeName"/>
-        public const string TracesPipeName = "SIGNALFX_TRACE_PIPE_NAME";
-
-        /// <summary>
-        /// Configuration key for setting the timeout in milliseconds for named pipes communication.
-        /// Default value is <c>0</c>.
-        /// </summary>
-        /// <seealso cref="TracerSettings.TracesPipeTimeoutMs"/>
-        public const string TracesPipeTimeoutMs = "SIGNALFX_TRACE_PIPE_TIMEOUT_MS";
-
-        /// <summary>
-        /// Configuration key for the named pipe that DogStatsD binds to.
-        /// Default value is <c>null</c>.
-        /// </summary>
-        /// <seealso cref="TracerSettings.MetricsPipeName"/>
-        public const string MetricsPipeName = "SIGNALFX_DOGSTATSD_PIPE_NAME";
-
-        /// <summary>
-        /// Sibling setting for <see cref="AgentPort"/>.
-        /// Used to force a specific port binding for the Trace Agent.
-        /// Default value is 8126.
-        /// </summary>
-        /// <seealso cref="TracerSettings.AgentUri"/>
-        public const string TraceAgentPortKey = "SIGNALFX_APM_RECEIVER_PORT";
-
-        /// <summary>
-        /// Configuration key for the Agent URL where the Tracer can send traces.
-        /// Overrides values in <see cref="AgentHost"/> and <see cref="AgentPort"/> if present.
-        /// Default value is "http://localhost:8126".
-        /// </summary>
-        /// <seealso cref="TracerSettings.AgentUri"/>
-        public const string AgentUri = "SIGNALFX_TRACE_AGENT_URL";
-
-        /// <summary>
-        /// Configuration key for the URL where the Tracer can send metrics.
-        /// </summary>
-        /// <seealso cref="TracerSettings.MetricsEndpointUrl"/>
-        public const string MetricsEndpointUrl = "SIGNALFX_METRICS_ENDPOINT_URL";
-
-        /// <summary>
-        /// Configuration key for the trace endpoint. Same as <see creg="AgentUri"/> created
-        /// for compatibility of previous version of SignalFx .NET Tracing.
-        /// </summary>
-        /// <seealso cref="TracerSettings.AgentUri"/>
-        public const string EndpointUrl = "SIGNALFX_ENDPOINT_URL";
 
         /// <summary>
         /// Configuration key for enabling or disabling default Analytics.
@@ -282,12 +224,6 @@ namespace Datadog.Trace.Configuration
         /// Configuration key for setting the global rate for the sampler.
         /// </summary>
         public const string GlobalSamplingRate = "SIGNALFX_TRACE_SAMPLE_RATE";
-
-        /// <summary>
-        /// Configuration key for the DogStatsd port where the Tracer can send metrics.
-        /// Default value is 8125.
-        /// </summary>
-        public const string DogStatsdPort = "SIGNALFX_DOGSTATSD_PORT";
 
         /// <summary>
         /// Configuration key for enabling or disabling internal metrics sent to DogStatsD.
@@ -419,18 +355,6 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="TracerSettings.HttpClientErrorStatusCodes"/>
         public const string HttpClientErrorStatusCodes = "SIGNALFX_HTTP_CLIENT_ERROR_STATUSES";
-
-        /// <summary>
-        /// Configuration key to enable sending partial traces to the agent
-        /// </summary>
-        /// <seealso cref="TracerSettings.PartialFlushEnabled"/>
-        public const string PartialFlushEnabled = "SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED";
-
-        /// <summary>
-        /// Configuration key to set the minimum number of closed spans in a trace before it's partially flushed
-        /// </summary>
-        /// <seealso cref="TracerSettings.PartialFlushMinSpans"/>
-        public const string PartialFlushMinSpans = "SIGNALFX_TRACE_PARTIAL_FLUSH_MIN_SPANS";
 
         /// <summary>
         /// Configuration key to enable or disable the creation of a span context on exiting a successful Kafka

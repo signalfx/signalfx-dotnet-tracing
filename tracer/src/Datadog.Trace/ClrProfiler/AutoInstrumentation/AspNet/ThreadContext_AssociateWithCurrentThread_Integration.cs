@@ -35,11 +35,11 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
         /// <param name="instance">Instance value, aka `this` of the instrumented method.</param>
         /// <param name="setImpersonationContext">A flag to set the impersonation context</param>
         /// <returns>Calltarget state value</returns>
-        public static CallTargetState OnMethodBegin<TTarget>(TTarget instance, bool setImpersonationContext)
+        internal static CallTargetState OnMethodBegin<TTarget>(TTarget instance, bool setImpersonationContext)
             where TTarget : IThreadContext
         {
             var httpContext = instance.HttpContext;
-            if (httpContext.Items[HttpContextScopeKey] is Scope scope && ((IDatadogTracer)Tracer.Instance).ScopeManager is IScopeRawAccess rawAccess)
+            if (httpContext.Items[HttpContextScopeKey] is Scope scope && Tracer.Instance.ScopeManager is IScopeRawAccess rawAccess)
             {
                 rawAccess.Active = scope;
             }

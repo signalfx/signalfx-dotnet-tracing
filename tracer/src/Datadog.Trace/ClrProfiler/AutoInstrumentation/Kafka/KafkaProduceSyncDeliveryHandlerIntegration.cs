@@ -1,4 +1,4 @@
-﻿// <copyright file="KafkaProduceSyncDeliveryHandlerIntegration.cs" company="Datadog">
+// <copyright file="KafkaProduceSyncDeliveryHandlerIntegration.cs" company="Datadog">
 // Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
@@ -44,7 +44,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
         /// <param name="value">The message value</param>
         /// <param name="handler">The delivery handler instance</param>
         /// <returns>Calltarget state value</returns>
-        public static CallTargetState OnMethodBegin<TTarget, TKey, TValue, TActionOfDeliveryReport>(TTarget instance, string topic, TKey key, TValue value, TActionOfDeliveryReport handler)
+        internal static CallTargetState OnMethodBegin<TTarget, TKey, TValue, TActionOfDeliveryReport>(TTarget instance, string topic, TKey key, TValue value, TActionOfDeliveryReport handler)
         {
             if (handler is null)
             {
@@ -57,7 +57,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
                 // The current span should be started in KafkaProduceSyncIntegration.OnMethodBegin
                 // The OnMethodBegin and OnMethodEnd of this integration happens between KafkaProduceSyncIntegration.OnMethodBegin
                 // and KafkaProduceSyncIntegration.OnMethodEnd, so the consumer span is active for the duration of this integration
-                var activeScope = Tracer.Instance?.ActiveScope;
+                var activeScope = Tracer.Instance?.InternalActiveScope;
                 var span = activeScope?.Span;
                 if (span is null)
                 {
@@ -88,7 +88,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
         /// <param name="exception">Exception instance in case the original code threw an exception.</param>
         /// <param name="state">Calltarget state value</param>
         /// <returns>A response value, in an async scenario will be T of Task of T</returns>
-        public static CallTargetReturn OnMethodEnd<TTarget>(TTarget instance, Exception exception, CallTargetState state)
+        internal static CallTargetReturn OnMethodEnd<TTarget>(TTarget instance, Exception exception, CallTargetState state)
         {
             if (state.State is Action<ITypedDeliveryHandlerShimAction> updateHandlerAction
              && instance.TryDuckCast<ITypedDeliveryHandlerShimAction>(out var shim))
@@ -116,7 +116,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
         /// <param name="span">A <see cref="Span"/> that can be manipulated when the action is invoked</param>
         /// <typeparam name="TDeliveryReport">Type of the delivery report</typeparam>
         /// <returns>The wrapped action</returns>
-        public static Action<TDeliveryReport> WrapAction<TDeliveryReport>(Action<TDeliveryReport> originalHandler, Span span)
+        internal static Action<TDeliveryReport> WrapAction<TDeliveryReport>(Action<TDeliveryReport> originalHandler, Span span)
         {
             return new Action<TDeliveryReport>(
                 value =>
@@ -170,7 +170,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
 
                 // Get the Action<T> WrapHelper.WrapAction<T>(Action<T> value) methodinfo
                 var wrapActionMethod = typeof(KafkaProduceSyncDeliveryHandlerIntegration)
-                   .GetMethod(nameof(WrapAction), BindingFlags.Public | BindingFlags.Static);
+                   .GetMethod(nameof(WrapAction), BindingFlags.NonPublic | BindingFlags.Static);
 
                 // Create the generic method using the inner generic types of TActionDelegate => TParam
                 wrapActionMethod = wrapActionMethod.MakeGenericMethod(typeof(TActionDelegate).GetGenericArguments());

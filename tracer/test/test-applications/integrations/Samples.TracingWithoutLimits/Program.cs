@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using Datadog.Trace;
+using Datadog.Trace.Configuration;
 
 namespace Samples.TracingWithoutLimits
 {
@@ -102,24 +103,28 @@ namespace Samples.TracingWithoutLimits
 
         private static void RunStuff(string serviceName, string operationName)
         {
+            var settings = TracerSettings.FromDefaultSources();
+            settings.ServiceName = serviceName;
+            Tracer.Configure(settings);
+
             Counts[Key(serviceName, operationName)]++;
 
-            Scope root;
+            IScope root;
 
-            using (root = Tracer.Instance.StartActive(operationName: operationName, serviceName: serviceName))
+            using (root = Tracer.Instance.StartActive(operationName: operationName))
             {
                 Thread.Sleep(3);
 
-                using (var sub = Tracer.Instance.StartActive(operationName: SubOperation, serviceName: serviceName))
+                using (var sub = Tracer.Instance.StartActive(operationName: SubOperation))
                 {
                     Thread.Sleep(2);
 
-                    using (var open = Tracer.Instance.StartActive(operationName: OpenOperation, serviceName: serviceName))
+                    using (var open = Tracer.Instance.StartActive(operationName: OpenOperation))
                     {
                         Thread.Sleep(2);
                     }
 
-                    using (var close = Tracer.Instance.StartActive(operationName: CloseOperation, serviceName: serviceName))
+                    using (var close = Tracer.Instance.StartActive(operationName: CloseOperation))
                     {
                         Thread.Sleep(1);
                     }
@@ -166,11 +171,11 @@ namespace Samples.TracingWithoutLimits
             return $"{service}_{operation}_{priority}";
         }
 
-        private static ConcurrentDictionary<string, double> GetMetrics(Scope root)
+        private static ConcurrentDictionary<string, double> GetMetrics(IScope root)
         {
             ConcurrentDictionary<string, double> metrics = null;
 
-            foreach (var property in typeof(Span)
+            foreach (var property in root.Span.GetType()
                .GetProperties(
                     BindingFlags.Instance |
                     BindingFlags.NonPublic))

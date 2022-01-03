@@ -30,12 +30,12 @@ namespace Datadog.Trace
         public const string Version = "version";
 
         /// <summary>
-        /// SingalFx Language tag, applied to root spans.
+        /// SignalFx Language tag, applied to root spans.
         /// </summary>
         public const string SignalFxLibrary = "signalfx.tracing.library";
 
         /// <summary>
-        /// SingalFx Version tag, applied to root spans.
+        /// SignalFx Version tag, applied to root spans.
         /// </summary>
         public const string SignalFxVersion = "signalfx.tracing.version";
 

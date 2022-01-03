@@ -22,7 +22,7 @@ namespace Datadog.Trace
     /// tracks the duration of an operation as well as associated metadata in
     /// the form of a resource name, a service name, and user defined tags.
     /// </summary>
-    public class Span : IDisposable
+    internal partial class Span : ISpan
     {
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<Span>();
         private static readonly bool IsLogLevelDebugEnabled = Log.IsEnabled(LogEventLevel.Debug);
@@ -60,29 +60,31 @@ namespace Datadog.Trace
         /// <summary>
         /// Gets or sets operation name
         /// </summary>
-        public string OperationName { get; set; }
+        internal string OperationName { get; set; }
 
         /// <summary>
         /// Gets or sets the resource name
         /// </summary>
-        public string ResourceName { get; set; }
+        internal string ResourceName { get; set; }
 
         /// <summary>
         /// Gets or sets the type of request this span represents (ex: web, db).
         /// Not to be confused with span kind.
         /// </summary>
         /// <seealso cref="SpanTypes"/>
-        public string Type { get; set; }
+        internal string Type { get; set; }
 
         /// <summary>
         /// Gets or sets the span's execution status
         /// </summary>
         public SpanStatus Status { get; set; }
 
+        internal bool Error { get; set; }
+
         /// <summary>
         /// Gets or sets the service name.
         /// </summary>
-        public string ServiceName
+        internal string ServiceName
         {
             get => Context.ServiceName;
             set => Context.ServiceName = value;
@@ -96,7 +98,7 @@ namespace Datadog.Trace
         /// <summary>
         /// Gets the span's unique identifier.
         /// </summary>
-        public ulong SpanId => Context.SpanId;
+        internal ulong SpanId => Context.SpanId;
 
         /// <summary>
         /// Gets <i>local root span id</i>, i.e. the <c>SpanId</c> of the span that is the root of the local, non-reentrant
@@ -131,6 +133,15 @@ namespace Datadog.Trace
         internal bool IsTopLevel => Context.Parent == null || Context.Parent.ServiceName != ServiceName;
 
         /// <summary>
+        /// Record the end time of the span and flushes it to the backend.
+        /// After the span has been finished all modifications will be ignored.
+        /// </summary>
+        public void Dispose()
+        {
+            Finish();
+        }
+
+        /// <summary>
         /// Returns a <see cref="string" /> that represents this instance.
         /// </summary>
         /// <returns>
@@ -162,7 +173,7 @@ namespace Datadog.Trace
         /// <param name="key">The tag's key.</param>
         /// <param name="value">The tag's value.</param>
         /// <returns>This span to allow method chaining.</returns>
-        public Span SetTag(string key, string value)
+        internal ISpan SetTag(string key, string value)
         {
             if (IsFinished)
             {
@@ -276,7 +287,7 @@ namespace Datadog.Trace
         /// Record the end time of the span and flushes it to the backend.
         /// After the span has been finished all modifications will be ignored.
         /// </summary>
-        public void Finish()
+        internal void Finish()
         {
             Finish(Context.TraceContext.ElapsedSince(StartTime));
         }
@@ -286,25 +297,16 @@ namespace Datadog.Trace
         /// After the span has been finished all modifications will be ignored.
         /// </summary>
         /// <param name="finishTimestamp">Explicit value for the end time of the Span</param>
-        public void Finish(DateTimeOffset finishTimestamp)
+        internal void Finish(DateTimeOffset finishTimestamp)
         {
             Finish(finishTimestamp - StartTime);
-        }
-
-        /// <summary>
-        /// Record the end time of the span and flushes it to the backend.
-        /// After the span has been finished all modifications will be ignored.
-        /// </summary>
-        public void Dispose()
-        {
-            Finish();
         }
 
         /// <summary>
         /// Add the StackTrace and other exception metadata to the span
         /// </summary>
         /// <param name="exception">The exception.</param>
-        public void SetException(Exception exception)
+        internal void SetException(Exception exception)
         {
             if (exception != null)
             {
@@ -332,7 +334,7 @@ namespace Datadog.Trace
         /// </summary>
         /// <param name="key">The tag's key</param>
         /// <returns> The value for the tag with the key specified, or null if the tag does not exist</returns>
-        public string GetTag(string key)
+        internal string GetTag(string key)
         {
             switch (key)
             {

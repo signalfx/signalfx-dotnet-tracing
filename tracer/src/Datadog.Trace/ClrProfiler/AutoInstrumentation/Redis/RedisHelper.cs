@@ -53,7 +53,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Redis
                     command = rawCommand;
                 }
 
-                scope = tracer.StartActiveWithTags(command ?? OperationName, serviceName: tracer.DefaultServiceName, tags: tags);
+                scope = tracer.StartActiveInternal(command ?? OperationName, serviceName: tracer.DefaultServiceName, tags: tags);
 
                 var span = scope.Span;
                 span.Type = SpanTypes.Redis;

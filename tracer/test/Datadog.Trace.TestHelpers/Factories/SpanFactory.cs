@@ -1,3 +1,5 @@
+// Modified by Splunk Inc.
+
 using System;
 using Datadog.Trace.Tagging;
 using Moq;
@@ -6,12 +8,12 @@ namespace Datadog.Trace.TestHelpers.Factories
 {
     public static class SpanFactory
     {
-        public static Span CreateSpan()
+        internal static Span CreateSpan()
         {
             return CreateSpan(Mock.Of<ISpanContext>());
         }
 
-        public static Span CreateSpan(ISpanContext parentContext)
+        internal static Span CreateSpan(ISpanContext parentContext)
         {
             var spanContext = new SpanContext(parentContext, Mock.Of<ITraceContext>(), serviceName: null);
 

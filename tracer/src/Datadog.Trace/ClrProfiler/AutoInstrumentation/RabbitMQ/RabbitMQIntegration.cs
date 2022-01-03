@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.DuckTyping;
 using Datadog.Trace.Logging;
@@ -16,9 +15,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
     /// <summary>
     /// Tracing integration for RabbitMQ.Client
     /// </summary>
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public static class RabbitMQIntegration
+    internal static class RabbitMQIntegration
     {
         internal const string IntegrationName = nameof(Configuration.IntegrationId.RabbitMQ);
 
@@ -53,8 +50,6 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
 
             try
             {
-                Span parent = tracer.ActiveScope?.Span;
-
                 tags = new RabbitMQTags(spanKind);
                 string operation = CommandToOperation(command);
                 string operationName = string.IsNullOrWhiteSpace(exchange)
@@ -62,7 +57,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
                     : $"{exchange} {operation}";
 
                 string serviceName = tracer.Settings.GetServiceName(tracer, ServiceName);
-                scope = tracer.StartActiveWithTags(operationName, parent: parentContext, tags: tags, serviceName: serviceName, startTime: startTime);
+                scope = tracer.StartActiveInternal(operationName, parent: parentContext, tags: tags, serviceName: serviceName, startTime: startTime);
                 var span = scope.Span;
 
                 span.Type = SpanTypes.Queue;
@@ -142,7 +137,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
 #pragma warning disable SA1201 // Elements must appear in the correct order
 #pragma warning disable SA1600 // Elements must be documented
         [DuckCopy]
-        public struct BasicGetResultStruct
+        internal struct BasicGetResultStruct
         {
             /// <summary>
             /// Gets the message body of the result
@@ -156,7 +151,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
         }
 
         [DuckCopy]
-        public struct BodyStruct
+        internal struct BodyStruct
         {
             /// <summary>
             /// Gets the length of the message body

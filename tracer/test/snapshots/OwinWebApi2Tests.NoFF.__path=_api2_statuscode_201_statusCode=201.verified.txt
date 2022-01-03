@@ -2,9 +2,9 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: GET /api2/statuscode/{value},
+    Name: GET api2/statuscode/{value},
     LogicScope: aspnet-webapi.request,
-    Resource: GET /api2/statuscode/{value},
+    Resource: GET api2/statuscode/{value},
     Service: Samples.Owin.WebApi2,
     Type: web,
     Tags: {
@@ -16,6 +16,7 @@
       http.request.headers.host: localhost:00000,
       http.status_code: 201,
       http.url: http://localhost:00000/api2/statuscode/201,
+      http_useragent: Mozilla/5.0,
       language: dotnet,
       runtime-id: Guid_1,
       signalfx.tracing.library: dotnet-tracing,

@@ -19,7 +19,7 @@ namespace Datadog.Trace
 
         void CloseSpan(Span span);
 
-        void LockSamplingPriority();
+        void SetSamplingPriority(SamplingPriority? samplingPriority, bool notifyDistributedTracer = true);
 
         TimeSpan ElapsedSince(DateTimeOffset date);
     }

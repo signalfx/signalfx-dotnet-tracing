@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -101,7 +103,7 @@ namespace Datadog.Trace.Tests
 
             var tracerSettings = new TracerSettings(new NameValueConfigurationSource(settings));
 
-            Assert.Equal(expected, tracerSettings.AgentUri.ToString());
+            Assert.Equal(expected, tracerSettings.ExporterSettings.AgentUri.ToString());
         }
 
         [Theory]

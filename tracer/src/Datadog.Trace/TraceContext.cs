@@ -5,6 +5,7 @@
 
 using System;
 using System.Diagnostics;
+using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.Logging;
 using Datadog.Trace.PlatformHelpers;
 using Datadog.Trace.Tagging;
@@ -22,7 +23,6 @@ namespace Datadog.Trace
 
         private int _openSpans;
         private SamplingPriority? _samplingPriority;
-        private bool _samplingPriorityLocked;
 
         public TraceContext(IDatadogTracer tracer)
         {
@@ -37,18 +37,13 @@ namespace Datadog.Trace
 
         /// <summary>
         /// Gets or sets sampling priority.
-        /// Once the sampling priority is locked with <see cref="LockSamplingPriority"/>,
-        /// further attempts to set this are ignored.
         /// </summary>
         public SamplingPriority? SamplingPriority
         {
             get => _samplingPriority;
             set
             {
-                if (!_samplingPriorityLocked)
-                {
-                    _samplingPriority = value;
-                }
+                SetSamplingPriority(value);
             }
         }
 
@@ -71,7 +66,6 @@ namespace Datadog.Trace
                             // this is a root span created from a propagated context that contains a sampling priority.
                             // lock sampling priority when a span is started from a propagated trace.
                             _samplingPriority = context.SamplingPriority;
-                            LockSamplingPriority();
                         }
                         else
                         {
@@ -89,13 +83,10 @@ namespace Datadog.Trace
 
         public void CloseSpan(Span span)
         {
-            bool ShouldTriggerPartialFlush() => Tracer.Settings.PartialFlushEnabled && _spans.Count >= Tracer.Settings.PartialFlushMinSpans;
+            bool ShouldTriggerPartialFlush() => Tracer.Settings.ExporterSettings.PartialFlushEnabled && _spans.Count >= Tracer.Settings.ExporterSettings.PartialFlushMinSpans;
 
             if (span == RootSpan)
             {
-                // lock sampling priority and set metric when root span finishes
-                LockSamplingPriority();
-
                 if (_samplingPriority == null)
                 {
                     Log.Warning("Cannot set span metric for sampling priority before it has been set.");
@@ -152,15 +143,13 @@ namespace Datadog.Trace
             }
         }
 
-        public void LockSamplingPriority()
+        public void SetSamplingPriority(SamplingPriority? samplingPriority, bool notifyDistributedTracer = true)
         {
-            if (_samplingPriority == null)
+            _samplingPriority = samplingPriority;
+
+            if (notifyDistributedTracer)
             {
-                Log.Warning("Cannot lock sampling priority before it has been set.");
-            }
-            else
-            {
-                _samplingPriorityLocked = true;
+                DistributedTracer.Instance.SetSamplingPriority(samplingPriority);
             }
         }
 

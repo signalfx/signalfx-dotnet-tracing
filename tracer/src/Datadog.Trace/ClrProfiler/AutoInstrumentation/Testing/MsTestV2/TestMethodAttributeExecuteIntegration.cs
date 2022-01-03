@@ -25,7 +25,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Testing.MsTestV2
         IntegrationName = MsTestIntegration.IntegrationName)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public class TestMethodAttributeExecuteIntegration
+    public static class TestMethodAttributeExecuteIntegration
     {
         /// <summary>
         /// OnMethodBegin callback
@@ -35,7 +35,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Testing.MsTestV2
         /// <param name="instance">Instance value, aka `this` of the instrumented method.</param>
         /// <param name="testMethod">Test method instance</param>
         /// <returns>Calltarget state value</returns>
-        public static CallTargetState OnMethodBegin<TTarget, TTestMethod>(TTarget instance, TTestMethod testMethod)
+        internal static CallTargetState OnMethodBegin<TTarget, TTestMethod>(TTarget instance, TTestMethod testMethod)
             where TTestMethod : ITestMethod, IDuckType
         {
             if (!MsTestIntegration.IsEnabled)
@@ -48,7 +48,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Testing.MsTestV2
         }
 
         /// <summary>
-        /// OnAsyncMethodEnd callback
+        /// OnMethodEnd callback
         /// </summary>
         /// <typeparam name="TTarget">Type of the target</typeparam>
         /// <typeparam name="TReturn">Type of the return value</typeparam>
@@ -57,7 +57,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Testing.MsTestV2
         /// <param name="exception">Exception instance in case the original code threw an exception.</param>
         /// <param name="state">Calltarget state value</param>
         /// <returns>A response value, in an async scenario will be T of Task of T</returns>
-        public static CallTargetReturn<TReturn> OnMethodEnd<TTarget, TReturn>(TTarget instance, TReturn returnValue, Exception exception, CallTargetState state)
+        internal static CallTargetReturn<TReturn> OnMethodEnd<TTarget, TReturn>(TTarget instance, TReturn returnValue, Exception exception, CallTargetState state)
         {
             if (MsTestIntegration.IsEnabled)
             {
@@ -68,6 +68,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Testing.MsTestV2
                     if (returnValueArray.Length == 1)
                     {
                         object testResultObject = returnValueArray.GetValue(0);
+
                         if (testResultObject != null &&
                             testResultObject.TryDuckCast<TestResultStruct>(out var testResult))
                         {

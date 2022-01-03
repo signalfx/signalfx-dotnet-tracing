@@ -20,10 +20,14 @@ namespace Samples.RateLimiter
         {
             var numberOfSeconds = 5;
             var maxMilliseconds = numberOfSeconds * 1000;
-            var configuredLimitPerSecond = int.Parse(Environment.GetEnvironmentVariables()[ConfigurationKeys.MaxTracesSubmittedPerSecond].ToString());
+            var configuredLimitPerSecond = int.Parse(Environment.GetEnvironmentVariables()["SIGNALFX_MAX_TRACES_PER_SECOND"].ToString());
 
             Console.WriteLine($"Ready to run for {numberOfSeconds} seconds.");
             Console.WriteLine($"Configured rate limit of {configuredLimitPerSecond}");
+
+            var settings = TracerSettings.FromDefaultSources();
+            settings.ServiceName = ServiceDogWalker;
+            Tracer.Configure(settings);
 
             PrepKeys(ServiceDogWalker, RootWalkOperation, configuredLimitPerSecond * numberOfSeconds);
 
@@ -66,13 +70,13 @@ namespace Samples.RateLimiter
 
             Counts[Key(serviceName, operationName)]++;
 
-            Scope root;
+            IScope root;
 
-            using (root = Tracer.Instance.StartActive(operationName: operationName, serviceName: serviceName))
+            using (root = Tracer.Instance.StartActive(operationName: operationName))
             {
                 Thread.Sleep(3);
 
-                using (var sub = Tracer.Instance.StartActive(operationName: "sub", serviceName: serviceName))
+                using (var sub = Tracer.Instance.StartActive(operationName: "sub"))
                 {
                     Thread.Sleep(2);
                 }
@@ -104,11 +108,11 @@ namespace Samples.RateLimiter
             return $"{service}_{operation}_{priority}";
         }
 
-        private static ConcurrentDictionary<string, double> GetMetrics(Scope root)
+        private static ConcurrentDictionary<string, double> GetMetrics(IScope root)
         {
             ConcurrentDictionary<string, double> metrics = null;
 
-            foreach (var property in typeof(Span)
+            foreach (var property in root.Span.GetType()
                .GetProperties(
                     BindingFlags.Instance |
                     BindingFlags.NonPublic))

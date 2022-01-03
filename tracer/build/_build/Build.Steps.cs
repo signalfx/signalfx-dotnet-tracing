@@ -271,10 +271,14 @@ partial class Build
             var libDdwafUri = new Uri($"https://www.nuget.org/api/v2/package/libddwaf/{LibDdwafVersion}");
             var libDdwafZip = TempDirectory / "libddwaf.zip";
 
-            using (var httpClient = new HttpClient())
+            using (var client = new HttpClient())
             {
-                await using var stream = await httpClient.GetStreamAsync(libDdwafUri);
+                var response = await client.GetAsync(libDdwafUri);
+
+                response.EnsureSuccessStatusCode();
+
                 await using var file = File.Create(libDdwafZip);
+                await using var stream = await response.Content.ReadAsStreamAsync();
                 await stream.CopyToAsync(file);
             }
 
@@ -1128,6 +1132,12 @@ partial class Build
                     var project = Solution.GetProject(path);
                     return project?.Name switch
                     {
+                        "LogsInjection.Log4Net.VersionConflict.2x" => Framework != TargetFramework.NETCOREAPP2_1,
+                        "LogsInjection.NLog.VersionConflict.2x" => Framework != TargetFramework.NETCOREAPP2_1,
+                        "LogsInjection.NLog10.VersionConflict.2x" => Framework == TargetFramework.NET461,
+                        "LogsInjection.NLog20.VersionConflict.2x" => Framework == TargetFramework.NET461,
+                        "LogsInjection.Serilog.VersionConflict.2x" => Framework != TargetFramework.NETCOREAPP2_1,
+                        "LogsInjection.Serilog14.VersionConflict.2x" => Framework == TargetFramework.NET461,
                         "Samples.AspNetCoreMvc21" => Framework == TargetFramework.NETCOREAPP2_1,
                         "Samples.AspNetCoreMvc30" => Framework == TargetFramework.NETCOREAPP3_0,
                         "Samples.AspNetCoreMvc31" => Framework == TargetFramework.NETCOREAPP3_1,

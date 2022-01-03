@@ -2,9 +2,9 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: GET doghouse.woof,
+    Name: GET /datadog/doghouse/woof,
     LogicScope: aspnet-mvc.request,
-    Resource: GET doghouse.woof,
+    Resource: GET /datadog/doghouse/woof,
     Service: sample,
     Type: web,
     ParentId: Id_3,
@@ -27,9 +27,9 @@
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: GET doghouse.woof,
+    Name: GET /datadog/doghouse/woof,
     LogicScope: aspnet.request,
-    Resource: GET doghouse.woof,
+    Resource: GET /datadog/doghouse/woof,
     Service: sample,
     Type: web,
     Tags: {

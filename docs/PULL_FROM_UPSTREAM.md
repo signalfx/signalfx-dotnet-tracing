@@ -18,7 +18,7 @@
     * Run unit tests, commit any needed fixes, repeat until passing unit tests
     * Update version in `tracer\src\Datadog.Trace.ClrProfiler.Native\version.h` if the upstream bumped it.
     * Update `launchSettings.json` files: change `Datadog.Trace.ClrProfiler.Native.dll` to `SignalFx.Tracing.ClrProfiler.Native.dll` for `CORECLR_PROFILER_PATH` and `COR_PROFILER_PATH`
-    * Update versions and integrations json by running: `nuke UpdateIntegrationsJson` (remember to revert wcf and other windows-only frameworks if you are using different platform)
+    * Update versions and integrations json by running: `nuke UpdateIntegrationDefinitions` (remember to revert wcf and other windows-only frameworks if you are using different platform)
     * Run build via nuke and commit any needed fixes, until it passes:
 
 6. If squashing cherry-pick from upstream to pass CLA check:

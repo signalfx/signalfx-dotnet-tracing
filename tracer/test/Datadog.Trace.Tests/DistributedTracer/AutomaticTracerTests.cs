@@ -1,0 +1,125 @@
+// <copyright file="AutomaticTracerTests.cs" company="Datadog">
+// Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
+// This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
+// </copyright>
+
+// Modified by Splunk Inc.
+
+using System;
+using Datadog.Trace.ClrProfiler;
+using Datadog.Trace.TestHelpers;
+using FluentAssertions;
+using Moq;
+using Xunit;
+
+namespace Datadog.Trace.Tests.DistributedTracer
+{
+    [Collection(nameof(TracerInstanceTestCollection))]
+    [TracerRestorer]
+    public class AutomaticTracerTests
+    {
+        [Fact]
+        public void GetSpanContext_NoChild()
+        {
+            var automaticTracer = new AutomaticTracer();
+
+            automaticTracer.GetDistributedTrace().Should().BeNull();
+
+            automaticTracer.SetDistributedTrace(new SpanContext(TraceId.CreateFromInt(1), 2));
+
+            ((IDistributedTracer)automaticTracer).GetSpanContext().Should().BeNull("automatic tracer shouldn't read the distributed trace unless there is a child tracer");
+        }
+
+        [Fact]
+        public void GetSpanContext()
+        {
+            var automaticTracer = new AutomaticTracer();
+            automaticTracer.Register(Mock.Of<ICommonTracer>());
+
+            automaticTracer.GetDistributedTrace().Should().BeNull();
+
+            var expectedSpanContext = new SpanContext(TraceId.CreateFromInt(1), 2, SamplingPriority.UserKeep, "Service", "Origin");
+
+            automaticTracer.SetDistributedTrace(expectedSpanContext);
+
+            var actualSpanContext = ((IDistributedTracer)automaticTracer).GetSpanContext();
+
+            actualSpanContext.Should().BeEquivalentTo(expectedSpanContext);
+        }
+
+        [Fact]
+        public void SetSpanContext()
+        {
+            var automaticTracer = new AutomaticTracer();
+            automaticTracer.Register(Mock.Of<ICommonTracer>());
+
+            var distributedTracer = (IDistributedTracer)automaticTracer;
+            var expectedSpanContext = new SpanContext(TraceId.CreateFromInt(1), 2);
+
+            distributedTracer.SetSpanContext(expectedSpanContext);
+            distributedTracer.GetSpanContext().Should().BeEquivalentTo(expectedSpanContext);
+        }
+
+        [Fact]
+        public void SetSamplingPriority_NoChild()
+        {
+            var automaticTracer = new AutomaticTracer();
+
+            ((IDistributedTracer)automaticTracer).SetSamplingPriority(SamplingPriority.UserKeep);
+        }
+
+        [Fact]
+        public void SetSamplingPriority()
+        {
+            var manualTracer = new Mock<ICommonTracer>();
+
+            var automaticTracer = new AutomaticTracer();
+            automaticTracer.Register(manualTracer.Object);
+
+            ((IDistributedTracer)automaticTracer).SetSamplingPriority(SamplingPriority.UserKeep);
+
+            manualTracer.Verify(t => t.SetSamplingPriority((int?)SamplingPriority.UserKeep), Times.Once);
+        }
+
+        [Fact]
+        public void GetDistributedTrace()
+        {
+            var automaticTracer = new AutomaticTracer();
+
+            automaticTracer.GetDistributedTrace().Should().BeNull();
+
+            var tracer = Tracer.Instance;
+            using (var scope = tracer.StartActive("Test"))
+            {
+                var traceId = automaticTracer.GetDistributedTrace()["trace-id"];
+                var spanId = automaticTracer.GetDistributedTrace()["parent-id"];
+
+                traceId.Should().Be(scope.Span.TraceId.ToString());
+                spanId.Should().Be(scope.Span.SpanId.ToString());
+            }
+
+            automaticTracer.GetDistributedTrace().Should().BeNull();
+        }
+
+        [Fact]
+        public void RuntimeId()
+        {
+            var automaticTracer = new AutomaticTracer();
+
+            var runtimeId = automaticTracer.GetAutomaticRuntimeId();
+
+            Guid.TryParse(runtimeId, out _).Should().BeTrue();
+
+            automaticTracer.GetAutomaticRuntimeId().Should().Be(runtimeId, "runtime id should remain the same");
+
+            ((IDistributedTracer)automaticTracer).GetRuntimeId().Should().Be(runtimeId, "distributed tracer API should return the same runtime id");
+        }
+
+        [Fact]
+        public void IsChildTracer()
+        {
+            var automaticTracer = new AutomaticTracer();
+            ((IDistributedTracer)automaticTracer).IsChildTracer.Should().BeFalse();
+        }
+    }
+}

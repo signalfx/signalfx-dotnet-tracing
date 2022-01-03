@@ -18,9 +18,12 @@ using Xunit.Sdk;
 namespace Datadog.Trace.Tests.PlatformHelpers
 {
     [CollectionDefinition(nameof(AzureAppServicesMetadataTests), DisableParallelization = true)]
+    [Collection(nameof(AzureAppServicesMetadataTests))]
     [AzureAppServicesRestorer]
     public class AzureAppServicesMetadataTests
     {
+        internal static readonly string DeploymentId = "AzureExampleSiteName";
+
         private const string AppServiceKind = "app";
         private const string AppServiceType = "app";
         private const string FunctionKind = "functionapp";
@@ -36,7 +39,6 @@ namespace Datadog.Trace.Tests.PlatformHelpers
 
         private static readonly string SubscriptionId = "8c500027-5f00-400e-8f00-60000000000f";
         private static readonly string PlanResourceGroup = "apm-dotnet";
-        private static readonly string DeploymentId = "AzureExampleSiteName";
         private static readonly string SiteResourceGroup = "apm-dotnet-site-resource-group";
         private static readonly string ExpectedResourceId =
             $"/subscriptions/{SubscriptionId}/resourcegroups/{SiteResourceGroup}/providers/microsoft.web/sites/{DeploymentId}".ToLowerInvariant();
@@ -151,8 +153,8 @@ namespace Datadog.Trace.Tests.PlatformHelpers
             var vars = GetMockVariables(SubscriptionId, DeploymentId, PlanResourceGroup, SiteResourceGroup);
             AzureAppServices.Metadata = new AzureAppServices(vars);
             var tracer = TracerHelper.Create();
-            var rootSpans = new List<Span>();
-            var nonRootSpans = new List<Span>();
+            var rootSpans = new List<ISpan>();
+            var nonRootSpans = new List<ISpan>();
             var iterations = 5;
             var remaining = iterations;
 

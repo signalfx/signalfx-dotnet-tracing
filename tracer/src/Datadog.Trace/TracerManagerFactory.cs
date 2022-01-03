@@ -12,6 +12,7 @@ using System.Reflection;
 using Datadog.Trace.Abstractions;
 using Datadog.Trace.Agent;
 using Datadog.Trace.Agent.Zipkin;
+using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Conventions;
 using Datadog.Trace.DogStatsd;
@@ -72,16 +73,16 @@ namespace Datadog.Trace
             var traceIdConvention = GetTraceIdConvention(settings.Convention);
 
             statsd = settings.TracerMetricsEnabled
-                         ? (statsd ?? CreateDogStatsdClient(settings, defaultServiceName, settings.DogStatsdPort))
+                         ? (statsd ?? CreateDogStatsdClient(settings, defaultServiceName, settings.ExporterSettings.DogStatsdPort))
                          : null;
             sampler ??= GetSampler(settings);
             var propagator = CreateCompositePropagator(settings, traceIdConvention);
             agentWriter ??= GetAgentWriter(settings, statsd, sampler);
             scopeManager ??= new AsyncLocalScopeManager(settings.ThreadSamplingEnabled);
 
-            if (settings.RuntimeMetricsEnabled)
+            if (settings.RuntimeMetricsEnabled && !DistributedTracer.Instance.IsChildTracer)
             {
-                runtimeMetrics ??= new RuntimeMetricsWriter(statsd ?? CreateDogStatsdClient(settings, defaultServiceName, settings.DogStatsdPort), TimeSpan.FromSeconds(10));
+                runtimeMetrics ??= new RuntimeMetricsWriter(statsd ?? CreateDogStatsdClient(settings, defaultServiceName, settings.ExporterSettings.DogStatsdPort), TimeSpan.FromSeconds(10));
             }
 
             if (settings.LogsInjectionEnabled)
@@ -149,8 +150,8 @@ namespace Datadog.Trace
                 case ExporterType.Zipkin:
                     return new ExporterWriter(new ZipkinExporter(settings), metrics);
                 default:
-                    var apiRequestFactory = TransportStrategy.Get(settings);
-                    var api = new Api(settings.AgentUri, apiRequestFactory, statsd, rates => sampler.SetDefaultSampleRates(rates), settings.PartialFlushEnabled);
+                    var apiRequestFactory = TransportStrategy.Get(settings.ExporterSettings);
+                    var api = new Api(settings.ExporterSettings.AgentUri, apiRequestFactory, statsd, rates => sampler.SetDefaultSampleRates(rates), settings.ExporterSettings.PartialFlushEnabled);
                     return new AgentWriter(api, metrics, maxBufferSize: settings.TraceBufferSize);
             }
         }
@@ -194,7 +195,7 @@ namespace Datadog.Trace
 
                 if (settings.MetricsExporter == MetricsExporterType.SignalFx)
                 {
-                    var reporter = new SignalFxReporter(settings.MetricsEndpointUrl, settings.SignalFxAccessToken);
+                    var reporter = new SignalFxReporter(settings.ExporterSettings.MetricsEndpointUrl, settings.SignalFxAccessToken);
                     var metricSender = new SignalFxMetricSender(reporter, constantTags.ToArray());
                     return new SignalFxStats(metricSender);
                 }
@@ -213,7 +214,7 @@ namespace Datadog.Trace
                 {
                     statsd.Configure(new StatsdConfig
                     {
-                        StatsdServerName = settings.AgentUri.DnsSafeHost,
+                        StatsdServerName = settings.ExporterSettings.AgentUri.DnsSafeHost,
                         StatsdPort = port,
                         ConstantTags = constantTags.ToArray()
                     });

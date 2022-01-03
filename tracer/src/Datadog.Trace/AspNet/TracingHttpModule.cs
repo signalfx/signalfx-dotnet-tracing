@@ -55,8 +55,12 @@ namespace Datadog.Trace.AspNet
         /// <param name="operationName">The operation name to be used for the trace/span data generated</param>
         public TracingHttpModule(string operationName)
         {
-            _requestOperationName = operationName ?? throw new ArgumentNullException(nameof(operationName));
+            if (operationName is null)
+            {
+                ThrowHelper.ThrowArgumentNullException(nameof(operationName));
+            }
 
+            _requestOperationName = operationName;
             _httpContextScopeKey = string.Concat("__SignalFx.Tracing.AspNet.TracingHttpModule-", _requestOperationName);
         }
 
@@ -106,7 +110,7 @@ namespace Datadog.Trace.AspNet
                 var tagsFromHeaders = Enumerable.Empty<KeyValuePair<string, string>>();
                 var propagator = tracer.TracerManager.Propagator;
 
-                if (tracer.ActiveScope == null)
+                if (tracer.InternalActiveScope == null)
                 {
                     try
                     {
@@ -126,7 +130,7 @@ namespace Datadog.Trace.AspNet
                 string url = httpRequest.Url.ToString(); // Upstream uses RawUrl, ie. the part of the URL following the domain information.
 
                 var tags = new WebTags();
-                scope = tracer.StartActiveWithTags(httpMethod, propagatedContext, tags: tags);
+                scope = tracer.StartActiveInternal(httpMethod, propagatedContext, tags: tags);
                 // Leave resourceName blank for now - we'll update it in OnEndRequest
                 scope.Span.DecorateWebServerSpan(resourceName: null, httpMethod, host, url, tags, tagsFromHeaders, httpRequest.UserHostAddress);
                 scope.Span.LogicScope = _requestOperationName;

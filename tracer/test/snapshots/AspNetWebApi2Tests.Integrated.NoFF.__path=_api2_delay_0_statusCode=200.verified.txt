@@ -2,9 +2,9 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: GET /api2/delay/{value},
+    Name: GET api2/delay/{value},
     LogicScope: aspnet-webapi.request,
-    Resource: GET /api2/delay/{value},
+    Resource: GET api2/delay/{value},
     Service: sample,
     Type: web,
     ParentId: Id_3,
@@ -26,9 +26,9 @@
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: GET /api2/delay/{value},
+    Name: GET api2/delay/{value},
     LogicScope: aspnet.request,
-    Resource: GET /api2/delay/{value},
+    Resource: GET api2/delay/{value},
     Service: sample,
     Type: web,
     Tags: {

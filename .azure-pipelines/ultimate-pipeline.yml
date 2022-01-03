@@ -28,7 +28,7 @@ trigger:
 #     - Managed utility APIs (may be used transitively):
       - shared/src/managed-src/Datadog.Collections/*
       - shared/src/managed-src/Datadog.Util/*
-#     - Managed Logging APIs (may be used transitively):      
+#     - Managed Logging APIs (may be used transitively):
       - shared/src/managed-src/Datadog.Logging.Emission/*
       - shared/src/managed-src/Datadog.Logging.Composition/*
       - shared/src/managed-src/Datadog.Logging/*
@@ -509,7 +509,7 @@ stages:
         Start-CosmosDbEmulator -Timeout 300
       displayName: 'Start CosmosDB Emulator'
       workingDirectory: $(Pipeline.Workspace)
-      
+
     - powershell: |
         Write-Host "Initializing LocalDB"
         sqllocaldb.exe start
@@ -781,7 +781,7 @@ stages:
             build: true
             baseImage: $(baseImage)
             command: "CleanObjFiles"
-      
+
         - template: steps/restore-working-directory.yml
           parameters:
             artifact: build-linux-arm64-working-directory
@@ -840,6 +840,64 @@ stages:
           parameters:
             baseImage: $(baseImage)
             command: "CheckBuildLogsForErrors"
+
+- stage: exploration_tests_windows
+  condition: and(succeeded(), eq(variables['isScheduledBuild'], 'False'), eq(variables['runExplorationTests'], 'True'))
+  dependsOn: build_windows
+
+  jobs:
+  - template: steps/update-github-status-jobs.yml
+    parameters:
+      jobs: [ExplorationTest]
+
+  - job: generator
+    pool:
+      vmImage: ubuntu-18.04
+    steps:
+      - bash: |
+          matrix="{"
+          for explorationTestUseCase in "debugger" "continuousProfiler"; do
+            for explorationTestName in "eshoponweb" "protobuf" "cake" "swashbuckle" "paket" ; do
+              name="${explorationTestUseCase//./_}_${explorationTestName}"
+              matrix="${matrix} '${name}':"
+              matrix="${matrix} { 'explorationTestUseCase': '${explorationTestUseCase}', "
+              matrix="${matrix} 'explorationTestName': '${explorationTestName}' },"
+            done
+          done
+          matrix="${matrix::-1} }"
+          echo "##vso[task.setVariable variable=values;isOutput=true]${matrix}"
+        name: mtrx
+
+  - job: ExplorationTest
+    timeoutInMinutes: 100
+    dependsOn: generator
+    strategy:
+      matrix: $[ dependencies.generator.outputs['mtrx.values'] ]
+    pool:
+      vmImage: windows-2019
+
+    # Enable the Datadog Agent service for this job
+    services:
+      dd_agent: dd_agent
+
+    steps:
+    - template: steps/install-dotnet-sdks.yml
+      parameters:
+        includeX86: true
+    - template: steps/restore-working-directory.yml
+
+    - script: tracer\build.cmd RunExplorationTests_$(explorationTestUseCase) -ExplorationTestName $(explorationTestName)
+      displayName: RunExplorationTest
+
+    - publish: tracer/build_data
+      displayName: Uploading exploration_tests_windows tracer logs
+      artifact: exploration_tests_windows_tracer_logs_$(explorationTestUseCase)_$(explorationTestName)
+      condition: succeededOrFailed()
+      continueOnError: true
+
+    - script: tracer\build.cmd CheckBuildLogsForErrors
+      displayName: Check logs for errors
+
 
 - stage: benchmarks
   condition: and(succeeded(), ne(variables['isNgenTestBuild'], 'True'))
@@ -1282,6 +1340,37 @@ stages:
       env:
         SIGNALFX_SERVICE_NAME: dd-trace-dotnet
         SIGNALFX_ENV: CI
+
+- stage: throughput_appsec
+  condition: and(succeeded(), ne(variables['isNgenTestBuild'], 'True'))
+  dependsOn: [build_linux]
+  pool: Throughput-AppSec
+  jobs:
+  - template: steps/update-github-status-jobs.yml
+    parameters:
+      jobs: [Linux64]
+  #### Throughput-AppSec Linux 64
+
+  - job: Linux64
+    timeoutInMinutes: 60
+
+    steps:
+    - task: DownloadPipelineArtifact@2
+      displayName: Download linux native binary
+      inputs:
+        artifact: linux-tracer-home-debian
+        path: $(System.DefaultWorkingDirectory)/tracer/tracer-home-linux
+
+    - script: |
+        test ! -s "tracer/tracer-home-linux/Datadog.Trace.ClrProfiler.Native.so" && echo "tracer/tracer-home-linux/Datadog.Trace.ClrProfiler.Native.so does not exist" && exit 1
+        test ! -s "tracer/tracer-home-linux/libddwaf.so" && echo "tracer/tracer-home-linux/libddwaf.so does not exist" && exit 1
+        cd $(System.DefaultWorkingDirectory)/tracer/build/crank
+        chmod +x ./run-appsec.sh
+        ./run-appsec.sh "linux"
+      displayName: Crank
+      env:
+        DD_SERVICE: dd-trace-dotnet-appsec
+
 
 - stage: coverage
   condition: and(succeeded(), eq(variables['isScheduledBuild'], 'False'), ne(variables['isNgenTestBuild'], 'True'))

@@ -6,16 +6,13 @@
 // Modified by Splunk Inc.
 
 using System.Collections.Generic;
-using System.ComponentModel;
 
 namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
 {
     /// <summary>
     /// BasicProperties interface for ducktyping
     /// </summary>
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public interface IBasicProperties
+    internal interface IBasicProperties
     {
         /// <summary>
         /// Gets or sets the headers of the message

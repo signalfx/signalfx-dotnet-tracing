@@ -180,9 +180,9 @@ namespace Datadog.Trace.AppSec
             }
         }
 
-        private static void AddHeaderTags(Span span, IHeadersCollection headers, Dictionary<string, string> headersToCollect)
+        private static void AddHeaderTags(Span span, IHeadersCollection headers, Dictionary<string, string> headersToCollect, string prefix)
         {
-            var tags = PropagationExtensions.ExtractHeaderTags(headers, headersToCollect, defaultTagPrefix: PropagationExtensions.HttpResponseHeadersTagPrefix);
+            var tags = PropagationExtensions.ExtractHeaderTags(headers, headersToCollect, defaultTagPrefix: prefix);
             foreach (var tag in tags)
             {
                 span.SetTag(tag.Key, tag.Value);
@@ -212,7 +212,9 @@ namespace Datadog.Trace.AppSec
         private void Report(ITransport transport, Span span, WafMatch[] results, bool blocked)
         {
             span.SetTag(Tags.AppSecEvent, "true");
-            span.SetTraceSamplingPriority(SamplingPriority.UserKeep);
+            var samplingPirority = _settings.KeepTraces
+                ? SamplingPriority.UserKeep : SamplingPriority.AutoReject;
+            span.SetTraceSamplingPriority(samplingPirority);
 
             LogMatchesIfDebugEnabled(results, blocked);
 
@@ -221,7 +223,7 @@ namespace Datadog.Trace.AppSec
 
             span.SetTag(Tags.Origin, "appsec");
 
-            span.SetTag(Tags.HttpUserAgent, transport.GetUserAget());
+            span.SetTag(Tags.HttpUserAgent, transport.GetUserAgent());
 
             var reportedIpInfo = transport.GetReportedIpInfo();
             span.SetTag(Tags.NetworkClientIp, reportedIpInfo.IpAddress);
@@ -230,14 +232,14 @@ namespace Datadog.Trace.AppSec
             span.SetTag(Tags.ActorIp, ipInfo.IpAddress);
 
             var headers = transport.GetRequestHeaders();
-            AddHeaderTags(span, headers, RequestHeaders);
+            AddHeaderTags(span, headers, RequestHeaders, PropagationExtensions.HttpRequestHeadersTagPrefix);
 
             transport.OnCompleted(() =>
             {
                 TryAddEndPoint(span);
 
                 var headers = transport.GetResponseHeaders();
-                AddHeaderTags(span, headers, ResponseHeaders);
+                AddHeaderTags(span, headers, ResponseHeaders, PropagationExtensions.HttpResponseHeadersTagPrefix);
             });
         }
 

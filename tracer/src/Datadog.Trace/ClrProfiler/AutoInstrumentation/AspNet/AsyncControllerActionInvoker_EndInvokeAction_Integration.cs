@@ -49,7 +49,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
         /// <param name="exception">Exception instance in case the original code threw an exception.</param>
         /// <param name="state">Calltarget state value</param>
         /// <returns>Return value of the method</returns>
-        public static CallTargetReturn<TResult> OnMethodEnd<TTarget, TResult>(TTarget instance, TResult returnValue, Exception exception, CallTargetState state)
+        internal static CallTargetReturn<TResult> OnMethodEnd<TTarget, TResult>(TTarget instance, TResult returnValue, Exception exception, CallTargetState state)
         {
             Scope scope = null;
             var httpContext = HttpContext.Current;
@@ -74,6 +74,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
                     // We don't know how long it'll take for ASP.NET to invoke the callback,
                     // so we store the real finish time.
                     var now = scope.Span.Context.TraceContext.UtcNow;
+
                     httpContext.AddOnRequestCompleted(h => OnRequestCompleted(h, scope, now));
                 }
                 else

@@ -1,4 +1,4 @@
-[assembly: System.Reflection.AssemblyMetadata("RepositoryUrl", "https://github.com/DataDog/dd-trace-dotnet.git")]
+[assembly: System.Reflection.AssemblyMetadata("RepositoryUrl", "https://github.com/signalfx/signalfx-dotnet-tracing.git")]
 
 namespace Datadog.Trace.Configuration
 {
@@ -14,80 +14,43 @@ namespace Datadog.Trace.Configuration
         public string GetString(string key) { }
         public void Insert(int index, Datadog.Trace.Configuration.IConfigurationSource item) { }
     }
-    public static class ConfigurationKeys
+    public enum ConventionType
     {
-        public const string AgentHost = "SIGNALFX_AGENT_HOST";
-        public const string AgentPort = "SIGNALFX_TRACE_AGENT_PORT";
-        public const string AgentUri = "SIGNALFX_TRACE_AGENT_URL";
-        public const string AppSecBlockingEnabled = "SIGNALFX_APPSEC_BLOCKING_ENABLED";
-        public const string AppSecCustomIpHeader = "SIGNALFX_APPSEC_IPHEADER";
-        public const string AppSecEnabled = "SIGNALFX_APPSEC_ENABLED";
-        public const string AppSecExtraHeaders = "SIGNALFX_APPSEC_EXTRA_HEADERS";
-        public const string AppSecRules = "SIGNALFX_APPSEC_RULES";
-        public const string BufferSize = "SIGNALFX_TRACE_BUFFER_SIZE";
-        public const string CIVisibilityEnabled = "SIGNALFX_CIVISIBILITY_ENABLED";
-        public const string ConfigurationFileName = "SIGNALFX_TRACE_CONFIG_FILE";
-        public const string CustomSamplingRules = "SIGNALFX_TRACE_SAMPLING_RULES";
-        public const string DebugEnabled = "SIGNALFX_TRACE_DEBUG";
-        public const string DiagnosticSourceEnabled = "SIGNALFX_DIAGNOSTIC_SOURCE_ENABLED";
-        public const string DisabledIntegrations = "SIGNALFX_DISABLED_INTEGRATIONS";
-        public const string DogStatsDArgs = "SIGNALFX_DOGSTATSD_ARGS";
-        public const string DogStatsDPath = "SIGNALFX_DOGSTATSD_PATH";
-        public const string DogStatsdPort = "SIGNALFX_DOGSTATSD_PORT";
-        public const string Environment = "SIGNALFX_ENV";
-        [System.Obsolete("App Analytics has been replaced by Tracing without Limits. For more information s" +
-            "ee https://docs.datadoghq.com/tracing/legacy_app_analytics/")]
-        public const string GlobalAnalyticsEnabled = "SIGNALFX_TRACE_ANALYTICS_ENABLED";
-        public const string GlobalSamplingRate = "SIGNALFX_TRACE_SAMPLE_RATE";
-        public const string GlobalTags = "SIGNALFX_TAGS";
-        public const string HeaderTags = "SIGNALFX_TRACE_HEADER_TAGS";
-        public const string HttpClientErrorStatusCodes = "SIGNALFX_HTTP_CLIENT_ERROR_STATUSES";
-        public const string HttpClientExcludedUrlSubstrings = "SIGNALFX_TRACE_HTTP_CLIENT_EXCLUDED_URL_SUBSTRINGS";
-        public const string HttpServerErrorStatusCodes = "SIGNALFX_HTTP_SERVER_ERROR_STATUSES";
-        public const string KafkaCreateConsumerScopeEnabled = "SIGNALFX_TRACE_KAFKA_CREATE_CONSUMER_SCOPE_ENABLED";
-        public const string LogDirectory = "SIGNALFX_TRACE_LOG_DIRECTORY";
-        public const string LogRateLimit = "SIGNALFX_TRACE_LOGGING_RATE";
-        public const string LogsInjectionEnabled = "SIGNALFX_LOGS_INJECTION";
-        public const string MaxLogFileSize = "SIGNALFX_MAX_LOGFILE_SIZE";
-        public const string MaxTracesSubmittedPerSecond = "SIGNALFX_MAX_TRACES_PER_SECOND";
-        public const string MetricsPipeName = "SIGNALFX_DOGSTATSD_PIPE_NAME";
-        public const string PartialFlushEnabled = "SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED";
-        public const string PartialFlushMinSpans = "SIGNALFX_TRACE_PARTIAL_FLUSH_MIN_SPANS";
-        [System.Obsolete("SIGNALFX_TRACE_LOG_PATH is deprecated. Use SIGNALFX_TRACE_LOG_DIRECTORY instead")]
-        public const string ProfilerLogPath = "SIGNALFX_TRACE_LOG_PATH";
-        public const string RuntimeMetricsEnabled = "SIGNALFX_RUNTIME_METRICS_ENABLED";
-        public const string SerializationBatchInterval = "SIGNALFX_TRACE_BATCH_INTERVAL";
-        public const string ServiceName = "SIGNALFX_SERVICE_NAME";
-        public const string ServiceNameMappings = "SIGNALFX_TRACE_SERVICE_MAPPING";
-        public const string ServiceVersion = "SIGNALFX_VERSION";
-        public const string StartupDiagnosticLogEnabled = "SIGNALFX_TRACE_STARTUP_LOGS";
-        public const string TraceAgentArgs = "SIGNALFX_TRACE_AGENT_ARGS";
-        public const string TraceAgentPath = "SIGNALFX_TRACE_AGENT_PATH";
-        public const string TraceAgentPortKey = "SIGNALFX_APM_RECEIVER_PORT";
-        public const string TraceEnabled = "SIGNALFX_TRACE_ENABLED";
-        public const string TracerMetricsEnabled = "SIGNALFX_TRACE_METRICS_ENABLED";
-        public const string TracesPipeName = "SIGNALFX_TRACE_PIPE_NAME";
-        public const string TracesPipeTimeoutMs = "SIGNALFX_TRACE_PIPE_TIMEOUT_MS";
-        public const string TracesTransport = "SIGNALFX_TRACE_TRANSPORT";
-        public static class Integrations
-        {
-            [System.Obsolete("App Analytics has been replaced by Tracing without Limits. For more information s" +
-                "ee https://docs.datadoghq.com/tracing/legacy_app_analytics/")]
-            public const string AnalyticsEnabled = "SIGNALFX_TRACE_{0}_ANALYTICS_ENABLED";
-            [System.Obsolete("App Analytics has been replaced by Tracing without Limits. For more information s" +
-                "ee https://docs.datadoghq.com/tracing/legacy_app_analytics/")]
-            public const string AnalyticsSampleRate = "SIGNALFX_TRACE_{0}_ANALYTICS_SAMPLE_RATE";
-            public const string Enabled = "SIGNALFX_TRACE_{0}_ENABLED";
-        }
+        Default = 0,
+        OpenTelemetry = 1,
+        Datadog = 2,
     }
     public class EnvironmentConfigurationSource : Datadog.Trace.Configuration.StringConfigurationSource
     {
         public EnvironmentConfigurationSource() { }
         public override string GetString(string key) { }
     }
+    public class ExporterSettings
+    {
+        public const string DefaultAgentHost = "localhost";
+        public const int DefaultAgentPort = 9411;
+        public ExporterSettings() { }
+        public ExporterSettings(Datadog.Trace.Configuration.IConfigurationSource source) { }
+        public System.Uri AgentUri { get; set; }
+        public int DogStatsdPort { get; set; }
+        public System.Uri MetricsEndpointUrl { get; set; }
+        public string MetricsPipeName { get; set; }
+        public bool PartialFlushEnabled { get; set; }
+        public int PartialFlushMinSpans { get; set; }
+        public string TracesPipeName { get; set; }
+        public int TracesPipeTimeoutMs { get; set; }
+    }
+    public enum ExporterType
+    {
+        Default = 0,
+        DatadogAgent = 1,
+        Zipkin = 0,
+    }
     public class GlobalSettings
     {
         public bool DebugEnabled { get; }
+        public bool FileLogEnabled { get; }
+        public bool StdoutLogEnabled { get; }
         public static Datadog.Trace.Configuration.GlobalSettings FromDefaultSources() { }
         public static void Reload() { }
         public static void SetDebugEnabled(bool enabled) { }
@@ -100,6 +63,19 @@ namespace Datadog.Trace.Configuration
         double? GetDouble(string key);
         int? GetInt32(string key);
         string GetString(string key);
+    }
+    public class ImmutableExporterSettings
+    {
+        public ImmutableExporterSettings(Datadog.Trace.Configuration.ExporterSettings settings) { }
+        public ImmutableExporterSettings(Datadog.Trace.Configuration.IConfigurationSource source) { }
+        public System.Uri AgentUri { get; }
+        public int DogStatsdPort { get; }
+        public System.Uri MetricsEndpointUrl { get; }
+        public string MetricsPipeName { get; }
+        public bool PartialFlushEnabled { get; }
+        public int PartialFlushMinSpans { get; }
+        public string TracesPipeName { get; }
+        public int TracesPipeTimeoutMs { get; }
     }
     public class ImmutableIntegrationSettings
     {
@@ -116,13 +92,14 @@ namespace Datadog.Trace.Configuration
     {
         public ImmutableTracerSettings(Datadog.Trace.Configuration.IConfigurationSource source) { }
         public ImmutableTracerSettings(Datadog.Trace.Configuration.TracerSettings settings) { }
-        public System.Uri AgentUri { get; }
         [System.Obsolete("App Analytics has been replaced by Tracing without Limits. For more information s" +
             "ee https://docs.datadoghq.com/tracing/legacy_app_analytics/")]
         public bool AnalyticsEnabled { get; }
+        public Datadog.Trace.Configuration.ConventionType Convention { get; }
         public string CustomSamplingRules { get; }
-        public int DogStatsdPort { get; }
         public string Environment { get; }
+        public Datadog.Trace.Configuration.ExporterType Exporter { get; }
+        public Datadog.Trace.Configuration.ImmutableExporterSettings ExporterSettings { get; }
         public double? GlobalSamplingRate { get; }
         public System.Collections.Generic.IReadOnlyDictionary<string, string> GlobalTags { get; }
         public System.Collections.Generic.IReadOnlyDictionary<string, string> HeaderTags { get; }
@@ -130,17 +107,18 @@ namespace Datadog.Trace.Configuration
         public bool KafkaCreateConsumerScopeEnabled { get; }
         public bool LogsInjectionEnabled { get; }
         public int MaxTracesSubmittedPerSecond { get; }
-        public string MetricsPipeName { get; }
-        public bool PartialFlushEnabled { get; }
-        public int PartialFlushMinSpans { get; }
-        public bool RuntimeMetricsEnabled { get; }
+        public Datadog.Trace.SignalFx.Metrics.MetricsExporterType MetricsExporter { get; }
+        public System.Collections.Generic.HashSet<string> Propagators { get; }
+        public int RecordedValueMaxLength { get; }
         public string ServiceName { get; }
         public string ServiceVersion { get; }
         public bool StartupDiagnosticLogEnabled { get; }
+        public bool TagElasticsearchQueries { get; }
+        public bool TagRedisCommands { get; }
+        public bool ThreadSamplingEnabled { get; }
+        public System.TimeSpan ThreadSamplingPeriod { get; }
         public bool TraceEnabled { get; }
         public bool TracerMetricsEnabled { get; }
-        public string TracesPipeName { get; }
-        public int TracesPipeTimeoutMs { get; }
         public string TracesTransport { get; }
         public static Datadog.Trace.Configuration.ImmutableTracerSettings FromDefaultSources() { }
     }
@@ -163,6 +141,7 @@ namespace Datadog.Trace.Configuration
         public System.Collections.Generic.IDictionary<string, string> GetDictionary(string key) { }
         public System.Collections.Generic.IDictionary<string, string> GetDictionary(string key, bool allowOptionalMappings) { }
         public T GetValue<T>(string key) { }
+        public override string ToString() { }
         public static Datadog.Trace.Configuration.JsonConfigurationSource FromFile(string filename) { }
     }
     public class NameValueConfigurationSource : Datadog.Trace.Configuration.StringConfigurationSource
@@ -184,19 +163,18 @@ namespace Datadog.Trace.Configuration
     }
     public class TracerSettings
     {
-        public const string DefaultAgentHost = "localhost";
-        public const int DefaultAgentPort = 8126;
         public TracerSettings() { }
         public TracerSettings(Datadog.Trace.Configuration.IConfigurationSource source) { }
-        public System.Uri AgentUri { get; set; }
         [System.Obsolete("App Analytics has been replaced by Tracing without Limits. For more information s" +
             "ee https://docs.datadoghq.com/tracing/legacy_app_analytics/")]
         public bool AnalyticsEnabled { get; set; }
+        public Datadog.Trace.Configuration.ConventionType Convention { get; set; }
         public string CustomSamplingRules { get; set; }
         public bool DiagnosticSourceEnabled { get; set; }
         public System.Collections.Generic.HashSet<string> DisabledIntegrationNames { get; set; }
-        public int DogStatsdPort { get; set; }
         public string Environment { get; set; }
+        public Datadog.Trace.Configuration.ExporterType Exporter { get; set; }
+        public Datadog.Trace.Configuration.ExporterSettings ExporterSettings { get; set; }
         public double? GlobalSamplingRate { get; set; }
         public System.Collections.Generic.IDictionary<string, string> GlobalTags { get; set; }
         public System.Collections.Generic.IDictionary<string, string> HeaderTags { get; set; }
@@ -204,17 +182,20 @@ namespace Datadog.Trace.Configuration
         public bool KafkaCreateConsumerScopeEnabled { get; set; }
         public bool LogsInjectionEnabled { get; set; }
         public int MaxTracesSubmittedPerSecond { get; set; }
-        public string MetricsPipeName { get; set; }
-        public bool PartialFlushEnabled { get; set; }
-        public int PartialFlushMinSpans { get; set; }
+        public Datadog.Trace.SignalFx.Metrics.MetricsExporterType MetricsExporter { get; set; }
+        public System.Collections.Generic.HashSet<string> Propagators { get; set; }
+        public int RecordedValueMaxLength { get; set; }
         public bool RuntimeMetricsEnabled { get; set; }
         public string ServiceName { get; set; }
         public string ServiceVersion { get; set; }
+        public string SignalFxAccessToken { get; set; }
         public bool StartupDiagnosticLogEnabled { get; set; }
+        public bool TagElasticsearchQueries { get; set; }
+        public bool TagMongoCommands { get; set; }
+        public bool TagRedisCommands { get; set; }
         public bool TraceEnabled { get; set; }
+        public bool TraceResponseHeaderEnabled { get; set; }
         public bool TracerMetricsEnabled { get; set; }
-        public string TracesPipeName { get; set; }
-        public int TracesPipeTimeoutMs { get; set; }
         public string TracesTransport { get; set; }
         public Datadog.Trace.Configuration.ImmutableTracerSettings Build() { }
         public void SetHttpClientErrorStatusCodes(System.Collections.Generic.IEnumerable<int> statusCodes) { }
@@ -224,6 +205,23 @@ namespace Datadog.Trace.Configuration
         public static Datadog.Trace.Configuration.TracerSettings FromDefaultSources() { }
     }
 }
+namespace Datadog.Trace.Configuration.Types
+{
+    public static class PropagatorTypes
+    {
+        public const string B3 = "B3";
+        public const string Datadog = "Datadog";
+        public const string W3C = "W3C";
+    }
+}
+namespace Datadog.Trace.Conventions
+{
+    public interface ITraceIdConvention
+    {
+        Datadog.Trace.TraceId CreateFromString(string id);
+        Datadog.Trace.TraceId GenerateNewTraceId();
+    }
+}
 namespace Datadog.Trace
 {
     public static class CorrelationIdentifier
@@ -231,22 +229,44 @@ namespace Datadog.Trace
         public static string Env { get; }
         public static string Service { get; }
         public static ulong SpanId { get; }
-        public static ulong TraceId { get; }
+        public static Datadog.Trace.TraceId TraceId { get; }
         public static string Version { get; }
     }
-    public static class HttpHeaderNames
+    public interface IScope : System.IDisposable
     {
-        public const string Origin = "x-datadog-origin";
-        public const string ParentId = "x-datadog-parent-id";
-        public const string SamplingPriority = "x-datadog-sampling-priority";
-        public const string TraceId = "x-datadog-trace-id";
-        public const string TracingEnabled = "x-datadog-tracing-enabled";
+        Datadog.Trace.ISpan Span { get; }
+        void Close();
+    }
+    public interface ISpan : System.IDisposable
+    {
+        Datadog.Trace.ISpanContext Context { get; }
+        bool Error { get; set; }
+        string LogicScope { get; set; }
+        string OperationName { get; set; }
+        string ResourceName { get; set; }
+        string ServiceName { get; set; }
+        ulong SpanId { get; }
+        Datadog.Trace.SpanStatus Status { get; set; }
+        Datadog.Trace.TraceId TraceId { get; }
+        string Type { get; set; }
+        void Finish();
+        void Finish(System.DateTimeOffset finishTimestamp);
+        string GetTag(string key);
+        void SetException(System.Exception exception);
+        Datadog.Trace.ISpan SetTag(string key, string value);
     }
     public interface ISpanContext
     {
         string ServiceName { get; }
         ulong SpanId { get; }
-        ulong TraceId { get; }
+        Datadog.Trace.TraceId TraceId { get; }
+    }
+    public interface ITracer
+    {
+        Datadog.Trace.IScope ActiveScope { get; }
+        Datadog.Trace.Configuration.ImmutableTracerSettings Settings { get; }
+        Datadog.Trace.IScope StartActive(string operationName);
+        Datadog.Trace.IScope StartActive(string operationName, Datadog.Trace.SpanCreationSettings settings);
     }
     public enum SamplingPriority
     {
@@ -255,37 +275,26 @@ namespace Datadog.Trace
         AutoKeep = 1,
         UserKeep = 2,
     }
-    public class Scope : System.IDisposable
+    public static class ServerTimingHeader
     {
-        public Datadog.Trace.Span Span { get; }
-        public void Close() { }
-        public void Dispose() { }
+        public const string Key = "Server-Timing";
+        public static void SetHeaders<T>(Datadog.Trace.SpanContext context, T carrier, System.Action<T, string, string> setter) { }
     }
-    public class Span : System.IDisposable
+    public class SpanContext : Datadog.Trace.ISpanContext, System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, string>>, System.Collections.Generic.IReadOnlyCollection<System.Collections.Generic.KeyValuePair<string, string>>, System.Collections.Generic.IReadOnlyDictionary<string, string>, System.Collections.IEnumerable
     {
-        public bool Error { get; set; }
-        public string OperationName { get; set; }
-        public string ResourceName { get; set; }
-        public string ServiceName { get; set; }
-        public ulong SpanId { get; }
-        public ulong TraceId { get; }
-        public string Type { get; set; }
-        public void Dispose() { }
-        public void Finish() { }
-        public void Finish(System.DateTimeOffset finishTimestamp) { }
-        public string GetTag(string key) { }
-        public void SetException(System.Exception exception) { }
-        public Datadog.Trace.Span SetTag(string key, string value) { }
-        public override string ToString() { }
-    }
-    public class SpanContext : Datadog.Trace.ISpanContext
-    {
-        public SpanContext(ulong? traceId, ulong spanId, Datadog.Trace.SamplingPriority? samplingPriority = default, string serviceName = null) { }
+        public SpanContext(Datadog.Trace.TraceId? traceId, ulong spanId, string traceState) { }
+        public SpanContext(Datadog.Trace.TraceId? traceId, ulong spanId, Datadog.Trace.SamplingPriority? samplingPriority = default, string serviceName = null) { }
         public Datadog.Trace.ISpanContext Parent { get; }
         public ulong? ParentId { get; }
         public string ServiceName { get; set; }
         public ulong SpanId { get; }
-        public ulong TraceId { get; }
+        public Datadog.Trace.TraceId TraceId { get; }
+    }
+    public struct SpanCreationSettings
+    {
+        public bool? FinishOnClose { get; set; }
+        public Datadog.Trace.ISpanContext Parent { get; set; }
+        public System.DateTimeOffset? StartTime { get; set; }
     }
     public static class SpanKinds
     {
@@ -293,6 +302,19 @@ namespace Datadog.Trace
         public const string Consumer = "consumer";
         public const string Producer = "producer";
         public const string Server = "server";
+    }
+    public readonly struct SpanStatus : System.IEquatable<Datadog.Trace.SpanStatus>
+    {
+        public static readonly Datadog.Trace.SpanStatus Error;
+        public static readonly Datadog.Trace.SpanStatus Ok;
+        public static readonly Datadog.Trace.SpanStatus Unset;
+        public Datadog.Trace.StatusCode StatusCode { get; }
+        public bool Equals(Datadog.Trace.SpanStatus other) { }
+        public override bool Equals(object obj) { }
+        public override int GetHashCode() { }
+        public override string ToString() { }
+        public static bool operator !=(Datadog.Trace.SpanStatus status1, Datadog.Trace.SpanStatus status2) { }
+        public static bool operator ==(Datadog.Trace.SpanStatus status1, Datadog.Trace.SpanStatus status2) { }
     }
     public static class SpanTypes
     {
@@ -305,19 +327,29 @@ namespace Datadog.Trace
         public const string Serverless = "serverless";
         public const string Sql = "sql";
         public const string Test = "test";
+        public const string Topic = "topic";
         public const string Web = "web";
+    }
+    public enum StatusCode
+    {
+        Unset = 0,
+        Ok = 1,
+        Error = 2,
     }
     public static class Tags
     {
         public const string DbName = "db.name";
+        public const string DbOperation = "db.operation";
+        public const string DbStatement = "db.statement";
         public const string DbType = "db.system";
         public const string DbUser = "db.user";
         public const string Env = "deployment.environment";
-        public const string ErrorMsg = "error.msg";
-        public const string ErrorStack = "error.stack";
-        public const string ErrorType = "error.type";
+        public const string Error = "error";
+        public const string ErrorMsg = "sfx.error.message";
+        public const string ErrorStack = "sfx.error.stack";
+        public const string ErrorType = "sfx.error.kind";
         public const string HttpMethod = "http.method";
-        public const string HttpRequestHeadersHost = "http.request.headers.host";
+        public const string HttpRequestHeadersHost = "http.host";
         public const string HttpStatusCode = "http.status_code";
         public const string HttpUrl = "http.url";
         public const string InstrumentationName = "component";
@@ -326,31 +358,76 @@ namespace Datadog.Trace
         public const string ManualDrop = "manual.drop";
         public const string ManualKeep = "manual.keep";
         public const string MessageSize = "message.size";
-        public const string OutHost = "out.host";
-        public const string OutPort = "out.port";
+        public const string OutHost = "net.peer.name";
+        public const string OutPort = "net.peer.port";
         public const string SamplingPriority = "sampling.priority";
+        public const string SignalFxLibrary = "signalfx.tracing.library";
+        public const string SignalFxVersion = "signalfx.tracing.version";
         public const string SpanKind = "span.kind";
         public const string SqlQuery = "sql.query";
         public const string SqlRows = "sql.rows";
         public const string Version = "version";
+        public static class Messaging
+        {
+            public const string ConsumerId = "messaging.consumer_id\t";
+            public const string ConversationId = "messaging.conversation_id";
+            public const string Destination = "messaging.destination";
+            public const string DestinationKind = "messaging.destination_kind";
+            public const string MessageId = "messaging.message_id";
+            public const string MessageSize = "messaging.message_payload_size_bytes";
+            public const string MessageSizeCompressed = "messaging.message_payload_compressed_size_bytes";
+            public const string Operation = "messaging.operation";
+            public const string Protocol = "messaging.protocol";
+            public const string ProtocolVersion = "messaging.protocol_version";
+            public const string System = "messaging.system";
+            public const string TempDestination = "messaging.temp_destination";
+            public const string Url = "messaging.url";
+        }
+        public static class Net
+        {
+            public const string PeerIP = "net.peer.ip";
+            public const string PeerName = "net.peer.name";
+            public const string PeerPort = "net.peer.port";
+        }
+        public static class RabbitMq
+        {
+            public const string RoutingKey = "messaging.rabbitmq.routing_key";
+        }
     }
-    public class Tracer
+    public readonly struct TraceId : System.IEquatable<Datadog.Trace.TraceId>
+    {
+        public ulong Higher { get; }
+        public ulong Lower { get; }
+        public static Datadog.Trace.TraceId Zero { get; }
+        public bool Equals(Datadog.Trace.TraceId other) { }
+        public override bool Equals(object obj) { }
+        public override int GetHashCode() { }
+        public override string ToString() { }
+        public static Datadog.Trace.TraceId CreateDataDogCompatibleFromDecimalString(string id) { }
+        public static Datadog.Trace.TraceId CreateFromInt(int id) { }
+        public static Datadog.Trace.TraceId CreateFromString(string id) { }
+        public static Datadog.Trace.TraceId CreateFromUlong(ulong id) { }
+        public static Datadog.Trace.TraceId CreateRandom() { }
+        public static Datadog.Trace.TraceId CreateRandomDataDogCompatible() { }
+        public static bool operator !=(Datadog.Trace.TraceId traceId1, Datadog.Trace.TraceId traceId2) { }
+        public static bool operator ==(Datadog.Trace.TraceId traceId1, Datadog.Trace.TraceId traceId2) { }
+    }
+    public class Tracer : Datadog.Trace.ITracer
     {
         [System.Obsolete("This API is deprecated. Use Tracer.Instance to obtain a Tracer instance to create" +
             " spans.")]
         public Tracer() { }
         [System.Obsolete(@"This API is deprecated, as it replaces the global settings for all Tracer instances in the application. If you were using this API to configure the global Tracer.Instance in code, use the static Tracer.Configure() to replace the global Tracer settings for the application")]
         public Tracer(Datadog.Trace.Configuration.TracerSettings settings) { }
-        public Datadog.Trace.Scope ActiveScope { get; }
+        public Datadog.Trace.IScope ActiveScope { get; }
         public string DefaultServiceName { get; }
         public Datadog.Trace.Configuration.ImmutableTracerSettings Settings { get; }
         [set: System.Obsolete("Use Tracer.Configure to configure the global Tracer instance in code.")]
         public static Datadog.Trace.Tracer Instance { get; set; }
-        public Datadog.Trace.Scope ActivateSpan(Datadog.Trace.Span span, bool finishOnClose = true) { }
         protected override void Finalize() { }
         public System.Threading.Tasks.Task ForceFlushAsync() { }
-        public Datadog.Trace.Scope StartActive(string operationName, Datadog.Trace.ISpanContext parent = null, string serviceName = null, System.DateTimeOffset? startTime = default, bool ignoreActiveScope = false, bool finishOnClose = true) { }
-        public Datadog.Trace.Span StartSpan(string operationName, Datadog.Trace.ISpanContext parent = null, string serviceName = null, System.DateTimeOffset? startTime = default, bool ignoreActiveScope = false) { }
+        public Datadog.Trace.IScope StartActive(string operationName) { }
+        public Datadog.Trace.IScope StartActive(string operationName, Datadog.Trace.SpanCreationSettings settings) { }
         public static void Configure(Datadog.Trace.Configuration.TracerSettings settings) { }
     }
 }
@@ -358,8 +435,8 @@ namespace Datadog.Trace.ExtensionMethods
 {
     public static class SpanExtensions
     {
-        public static void AddTagsFromDbCommand(this Datadog.Trace.Span span, System.Data.IDbCommand command) { }
-        public static void SetTraceSamplingPriority(this Datadog.Trace.Span span, Datadog.Trace.SamplingPriority samplingPriority) { }
+        public static void AddTagsFromDbCommand(this Datadog.Trace.ISpan span, System.Data.IDbCommand command) { }
+        public static void SetTraceSamplingPriority(this Datadog.Trace.ISpan span, Datadog.Trace.SamplingPriority samplingPriority) { }
     }
 }
 namespace Datadog.Trace.Logging
@@ -392,5 +469,433 @@ namespace Datadog.Trace.Logging.LogProviders
     {
         public LibLogException(string message) { }
         public LibLogException(string message, System.Exception inner) { }
+    }
+}
+namespace Datadog.Trace.Propagation
+{
+    public static class B3HttpHeaderNames
+    {
+        public const string B3Flags = "x-b3-flags";
+        public const string B3ParentId = "x-b3-parentspanid";
+        public const string B3Sampled = "x-b3-sampled";
+        public const string B3SpanId = "x-b3-spanid";
+        public const string B3TraceId = "x-b3-traceid";
+    }
+    public class B3SpanContextPropagator : Datadog.Trace.Propagation.IPropagator
+    {
+        public B3SpanContextPropagator(Datadog.Trace.Conventions.ITraceIdConvention traceIdConvention) { }
+        public virtual Datadog.Trace.SpanContext Extract<T>(T carrier, System.Func<T, string, System.Collections.Generic.IEnumerable<string>> getter) { }
+        public virtual void Inject<T>(Datadog.Trace.SpanContext context, T carrier, System.Action<T, string, string> setter) { }
+    }
+    public class CommonHttpHeaderNames
+    {
+        public const string TracingEnabled = "x-datadog-tracing-enabled";
+        public const string UserAgent = "User-Agent";
+        public CommonHttpHeaderNames() { }
+    }
+    public static class DDHttpHeaderNames
+    {
+        public const string Origin = "x-datadog-origin";
+        public const string ParentId = "x-datadog-parent-id";
+        public const string SamplingPriority = "x-datadog-sampling-priority";
+        public const string TraceId = "x-datadog-trace-id";
+        public const string TracingEnabled = "x-datadog-tracing-enabled";
+    }
+    public interface IPropagator
+    {
+        Datadog.Trace.SpanContext Extract<T>(T carrier, System.Func<T, string, System.Collections.Generic.IEnumerable<string>> getter);
+        void Inject<T>(Datadog.Trace.SpanContext context, T carrier, System.Action<T, string, string> setter);
+    }
+    public interface IPropagatorsProvider
+    {
+        bool CanProvide(string propagatorId, Datadog.Trace.Conventions.ITraceIdConvention traceIdConvention);
+        Datadog.Trace.Propagation.IPropagator GetPropagator(string propagatorId, Datadog.Trace.Conventions.ITraceIdConvention traceIdConvention);
+    }
+    public static class W3CHeaderNames
+    {
+        public const string TraceParent = "traceparent";
+        public const string TraceState = "tracestate";
+    }
+    public class W3CSpanContextPropagator : Datadog.Trace.Propagation.IPropagator
+    {
+        public W3CSpanContextPropagator(Datadog.Trace.Conventions.ITraceIdConvention traceIdConvention) { }
+        public virtual Datadog.Trace.SpanContext Extract<T>(T carrier, System.Func<T, string, System.Collections.Generic.IEnumerable<string>> getter) { }
+        public virtual void Inject<T>(Datadog.Trace.SpanContext context, T carrier, System.Action<T, string, string> setter) { }
+        public static string GetFormattedTraceParent(Datadog.Trace.SpanContext context) { }
+    }
+}
+namespace Datadog.Trace.SignalFx.Metrics
+{
+    public enum MetricsExporterType
+    {
+        Default = 0,
+        StatsD = 1,
+        SignalFx = 0,
+    }
+}
+namespace Datadog.Trace.ThreadSampling
+{
+    public static class ThreadSampler
+    {
+        public static void Initialize(System.TimeSpan threadSamplingPeriod) { }
+    }
+}
+namespace Datadog.Trace.Vendors.ProtoBuf
+{
+    public readonly struct DiscriminatedUnion128
+    {
+        public readonly bool Boolean;
+        public readonly System.DateTime DateTime;
+        public readonly double Double;
+        public readonly System.Guid Guid;
+        public readonly int Int32;
+        public readonly long Int64;
+        public readonly float Single;
+        public readonly System.TimeSpan TimeSpan;
+        public readonly uint UInt32;
+        public readonly ulong UInt64;
+        public DiscriminatedUnion128(int discriminator, bool value) { }
+        public DiscriminatedUnion128(int discriminator, System.DateTime? value) { }
+        public DiscriminatedUnion128(int discriminator, double value) { }
+        public DiscriminatedUnion128(int discriminator, System.Guid? value) { }
+        public DiscriminatedUnion128(int discriminator, int value) { }
+        public DiscriminatedUnion128(int discriminator, long value) { }
+        public DiscriminatedUnion128(int discriminator, float value) { }
+        public DiscriminatedUnion128(int discriminator, System.TimeSpan? value) { }
+        public DiscriminatedUnion128(int discriminator, uint value) { }
+        public DiscriminatedUnion128(int discriminator, ulong value) { }
+        public int Discriminator { get; }
+        public bool Is(int discriminator) { }
+        public static void Reset(ref Datadog.Trace.Vendors.ProtoBuf.DiscriminatedUnion128 value, int discriminator) { }
+    }
+    public readonly struct DiscriminatedUnion128Object
+    {
+        public readonly bool Boolean;
+        public readonly System.DateTime DateTime;
+        public readonly double Double;
+        public readonly System.Guid Guid;
+        public readonly int Int32;
+        public readonly long Int64;
+        public readonly object Object;
+        public readonly float Single;
+        public readonly System.TimeSpan TimeSpan;
+        public readonly uint UInt32;
+        public readonly ulong UInt64;
+        public DiscriminatedUnion128Object(int discriminator, bool value) { }
+        public DiscriminatedUnion128Object(int discriminator, System.DateTime? value) { }
+        public DiscriminatedUnion128Object(int discriminator, double value) { }
+        public DiscriminatedUnion128Object(int discriminator, System.Guid? value) { }
+        public DiscriminatedUnion128Object(int discriminator, int value) { }
+        public DiscriminatedUnion128Object(int discriminator, long value) { }
+        public DiscriminatedUnion128Object(int discriminator, object value) { }
+        public DiscriminatedUnion128Object(int discriminator, float value) { }
+        public DiscriminatedUnion128Object(int discriminator, System.TimeSpan? value) { }
+        public DiscriminatedUnion128Object(int discriminator, uint value) { }
+        public DiscriminatedUnion128Object(int discriminator, ulong value) { }
+        public int Discriminator { get; }
+        public bool Is(int discriminator) { }
+        public static void Reset(ref Datadog.Trace.Vendors.ProtoBuf.DiscriminatedUnion128Object value, int discriminator) { }
+    }
+    public readonly struct DiscriminatedUnion32
+    {
+        public readonly bool Boolean;
+        public readonly int Int32;
+        public readonly float Single;
+        public readonly uint UInt32;
+        public DiscriminatedUnion32(int discriminator, bool value) { }
+        public DiscriminatedUnion32(int discriminator, int value) { }
+        public DiscriminatedUnion32(int discriminator, float value) { }
+        public DiscriminatedUnion32(int discriminator, uint value) { }
+        public int Discriminator { get; }
+        public bool Is(int discriminator) { }
+        public static void Reset(ref Datadog.Trace.Vendors.ProtoBuf.DiscriminatedUnion32 value, int discriminator) { }
+    }
+    public readonly struct DiscriminatedUnion32Object
+    {
+        public readonly bool Boolean;
+        public readonly int Int32;
+        public readonly object Object;
+        public readonly float Single;
+        public readonly uint UInt32;
+        public DiscriminatedUnion32Object(int discriminator, bool value) { }
+        public DiscriminatedUnion32Object(int discriminator, int value) { }
+        public DiscriminatedUnion32Object(int discriminator, object value) { }
+        public DiscriminatedUnion32Object(int discriminator, float value) { }
+        public DiscriminatedUnion32Object(int discriminator, uint value) { }
+        public int Discriminator { get; }
+        public bool Is(int discriminator) { }
+        public static void Reset(ref Datadog.Trace.Vendors.ProtoBuf.DiscriminatedUnion32Object value, int discriminator) { }
+    }
+    public readonly struct DiscriminatedUnion64
+    {
+        public readonly bool Boolean;
+        public readonly System.DateTime DateTime;
+        public readonly double Double;
+        public readonly int Int32;
+        public readonly long Int64;
+        public readonly float Single;
+        public readonly System.TimeSpan TimeSpan;
+        public readonly uint UInt32;
+        public readonly ulong UInt64;
+        public DiscriminatedUnion64(int discriminator, bool value) { }
+        public DiscriminatedUnion64(int discriminator, System.DateTime? value) { }
+        public DiscriminatedUnion64(int discriminator, double value) { }
+        public DiscriminatedUnion64(int discriminator, int value) { }
+        public DiscriminatedUnion64(int discriminator, long value) { }
+        public DiscriminatedUnion64(int discriminator, float value) { }
+        public DiscriminatedUnion64(int discriminator, System.TimeSpan? value) { }
+        public DiscriminatedUnion64(int discriminator, uint value) { }
+        public DiscriminatedUnion64(int discriminator, ulong value) { }
+        public int Discriminator { get; }
+        public bool Is(int discriminator) { }
+        public static void Reset(ref Datadog.Trace.Vendors.ProtoBuf.DiscriminatedUnion64 value, int discriminator) { }
+    }
+    public readonly struct DiscriminatedUnion64Object
+    {
+        public readonly bool Boolean;
+        public readonly System.DateTime DateTime;
+        public readonly double Double;
+        public readonly int Int32;
+        public readonly long Int64;
+        public readonly object Object;
+        public readonly float Single;
+        public readonly System.TimeSpan TimeSpan;
+        public readonly uint UInt32;
+        public readonly ulong UInt64;
+        public DiscriminatedUnion64Object(int discriminator, bool value) { }
+        public DiscriminatedUnion64Object(int discriminator, System.DateTime? value) { }
+        public DiscriminatedUnion64Object(int discriminator, double value) { }
+        public DiscriminatedUnion64Object(int discriminator, int value) { }
+        public DiscriminatedUnion64Object(int discriminator, long value) { }
+        public DiscriminatedUnion64Object(int discriminator, object value) { }
+        public DiscriminatedUnion64Object(int discriminator, float value) { }
+        public DiscriminatedUnion64Object(int discriminator, System.TimeSpan? value) { }
+        public DiscriminatedUnion64Object(int discriminator, uint value) { }
+        public DiscriminatedUnion64Object(int discriminator, ulong value) { }
+        public int Discriminator { get; }
+        public bool Is(int discriminator) { }
+        public static void Reset(ref Datadog.Trace.Vendors.ProtoBuf.DiscriminatedUnion64Object value, int discriminator) { }
+    }
+    public readonly struct DiscriminatedUnionObject
+    {
+        public readonly object Object;
+        public DiscriminatedUnionObject(int discriminator, object value) { }
+        public int Discriminator { get; }
+        public bool Is(int discriminator) { }
+        public static void Reset(ref Datadog.Trace.Vendors.ProtoBuf.DiscriminatedUnionObject value, int discriminator) { }
+    }
+}
+namespace Datadog.Tracer.OpenTelemetry.Proto.Common.V1
+{
+    public class AnyValue
+    {
+        public AnyValue() { }
+        public Datadog.Tracer.OpenTelemetry.Proto.Common.V1.ArrayValue ArrayValue { get; set; }
+        public bool BoolValue { get; set; }
+        public byte[] BytesValue { get; set; }
+        public double DoubleValue { get; set; }
+        public long IntValue { get; set; }
+        public Datadog.Tracer.OpenTelemetry.Proto.Common.V1.KeyValueList KvlistValue { get; set; }
+        [System.ComponentModel.DefaultValue("")]
+        public string StringValue { get; set; }
+        public void ResetArrayValue() { }
+        public void ResetBoolValue() { }
+        public void ResetBytesValue() { }
+        public void ResetDoubleValue() { }
+        public void ResetIntValue() { }
+        public void ResetKvlistValue() { }
+        public void ResetStringValue() { }
+        public bool ShouldSerializeArrayValue() { }
+        public bool ShouldSerializeBoolValue() { }
+        public bool ShouldSerializeBytesValue() { }
+        public bool ShouldSerializeDoubleValue() { }
+        public bool ShouldSerializeIntValue() { }
+        public bool ShouldSerializeKvlistValue() { }
+        public bool ShouldSerializeStringValue() { }
+    }
+    public class ArrayValue
+    {
+        public ArrayValue() { }
+        public System.Collections.Generic.List<Datadog.Tracer.OpenTelemetry.Proto.Common.V1.AnyValue> Values { get; }
+    }
+    public class InstrumentationLibrary
+    {
+        public InstrumentationLibrary() { }
+        [System.ComponentModel.DefaultValue("")]
+        public string Name { get; set; }
+        [System.ComponentModel.DefaultValue("")]
+        public string Version { get; set; }
+    }
+    public class KeyValue
+    {
+        public KeyValue() { }
+        [System.ComponentModel.DefaultValue("")]
+        public string Key { get; set; }
+        public Datadog.Tracer.OpenTelemetry.Proto.Common.V1.AnyValue Value { get; set; }
+    }
+    public class KeyValueList
+    {
+        public KeyValueList() { }
+        public System.Collections.Generic.List<Datadog.Tracer.OpenTelemetry.Proto.Common.V1.KeyValue> Values { get; }
+    }
+    [System.Obsolete]
+    public class StringKeyValue
+    {
+        public StringKeyValue() { }
+        [System.ComponentModel.DefaultValue("")]
+        public string Key { get; set; }
+        [System.ComponentModel.DefaultValue("")]
+        public string Value { get; set; }
+    }
+}
+namespace Datadog.Tracer.OpenTelemetry.Proto.Logs.V1
+{
+    public class InstrumentationLibraryLogs
+    {
+        public InstrumentationLibraryLogs() { }
+        public Datadog.Tracer.OpenTelemetry.Proto.Common.V1.InstrumentationLibrary InstrumentationLibrary { get; set; }
+        public System.Collections.Generic.List<Datadog.Tracer.OpenTelemetry.Proto.Logs.V1.LogRecord> Logs { get; }
+        [System.ComponentModel.DefaultValue("")]
+        public string SchemaUrl { get; set; }
+    }
+    public class LogRecord
+    {
+        public LogRecord() { }
+        public System.Collections.Generic.List<Datadog.Tracer.OpenTelemetry.Proto.Common.V1.KeyValue> Attributes { get; }
+        public Datadog.Tracer.OpenTelemetry.Proto.Common.V1.AnyValue Body { get; set; }
+        public uint DroppedAttributesCount { get; set; }
+        public uint Flags { get; set; }
+        [System.ComponentModel.DefaultValue("")]
+        public string Name { get; set; }
+        public Datadog.Tracer.OpenTelemetry.Proto.Logs.V1.SeverityNumber SeverityNumber { get; set; }
+        [System.ComponentModel.DefaultValue("")]
+        public string SeverityText { get; set; }
+        public byte[] SpanId { get; set; }
+        public ulong TimeUnixNano { get; set; }
+        public byte[] TraceId { get; set; }
+    }
+    public enum LogRecordFlags
+    {
+        LogRecordFlagUnspecified = 0,
+        LogRecordFlagTraceFlagsMask = 255,
+    }
+    public class LogsData
+    {
+        public LogsData() { }
+        public System.Collections.Generic.List<Datadog.Tracer.OpenTelemetry.Proto.Logs.V1.ResourceLogs> ResourceLogs { get; }
+    }
+    public class ResourceLogs
+    {
+        public ResourceLogs() { }
+        public System.Collections.Generic.List<Datadog.Tracer.OpenTelemetry.Proto.Logs.V1.InstrumentationLibraryLogs> InstrumentationLibraryLogs { get; }
+        public Datadog.Tracer.OpenTelemetry.Proto.Resource.V1.Resource Resource { get; set; }
+        [System.ComponentModel.DefaultValue("")]
+        public string SchemaUrl { get; set; }
+    }
+    public enum SeverityNumber
+    {
+        SeverityNumberUnspecified = 0,
+        SeverityNumberTrace = 1,
+        SeverityNumberTrace2 = 2,
+        SeverityNumberTrace3 = 3,
+        SeverityNumberTrace4 = 4,
+        SeverityNumberDebug = 5,
+        SeverityNumberDebug2 = 6,
+        SeverityNumberDebug3 = 7,
+        SeverityNumberDebug4 = 8,
+        SeverityNumberInfo = 9,
+        SeverityNumberInfo2 = 10,
+        SeverityNumberInfo3 = 11,
+        SeverityNumberInfo4 = 12,
+        SeverityNumberWarn = 13,
+        SeverityNumberWarn2 = 14,
+        SeverityNumberWarn3 = 15,
+        SeverityNumberWarn4 = 16,
+        SeverityNumberError = 17,
+        SeverityNumberError2 = 18,
+        SeverityNumberError3 = 19,
+        SeverityNumberError4 = 20,
+        SeverityNumberFatal = 21,
+        SeverityNumberFatal2 = 22,
+        SeverityNumberFatal3 = 23,
+        SeverityNumberFatal4 = 24,
+    }
+}
+namespace Datadog.Tracer.OpenTelemetry.Proto.Resource.V1
+{
+    public class Resource
+    {
+        public Resource() { }
+        public System.Collections.Generic.List<Datadog.Tracer.OpenTelemetry.Proto.Common.V1.KeyValue> Attributes { get; }
+        public uint DroppedAttributesCount { get; set; }
+    }
+}
+namespace Datadog.Tracer.SignalFx.Metrics.Protobuf
+{
+    public class DataPoint
+    {
+        public DataPoint() { }
+        public System.Collections.Generic.List<Datadog.Tracer.SignalFx.Metrics.Protobuf.Dimension> dimensions { get; }
+        [System.ComponentModel.DefaultValue("")]
+        public string metric { get; set; }
+        public Datadog.Tracer.SignalFx.Metrics.Protobuf.MetricType metricType { get; set; }
+        [System.ComponentModel.DefaultValue("")]
+        public string source { get; set; }
+        public long timestamp { get; set; }
+        public Datadog.Tracer.SignalFx.Metrics.Protobuf.Datum value { get; set; }
+        public void Resetmetric() { }
+        public void ResetmetricType() { }
+        public void Resetsource() { }
+        public void Resettimestamp() { }
+        public bool ShouldSerializemetric() { }
+        public bool ShouldSerializemetricType() { }
+        public bool ShouldSerializesource() { }
+        public bool ShouldSerializetimestamp() { }
+    }
+    public class DataPointUploadMessage
+    {
+        public DataPointUploadMessage() { }
+        public System.Collections.Generic.List<Datadog.Tracer.SignalFx.Metrics.Protobuf.DataPoint> datapoints { get; }
+    }
+    public class Datum
+    {
+        public Datum() { }
+        public double doubleValue { get; set; }
+        public long intValue { get; set; }
+        [System.ComponentModel.DefaultValue("")]
+        public string strValue { get; set; }
+        public void ResetdoubleValue() { }
+        public void ResetintValue() { }
+        public void ResetstrValue() { }
+        public bool ShouldSerializedoubleValue() { }
+        public bool ShouldSerializeintValue() { }
+        public bool ShouldSerializestrValue() { }
+    }
+    public class Dimension
+    {
+        public Dimension() { }
+        [System.ComponentModel.DefaultValue("")]
+        public string key { get; set; }
+        [System.ComponentModel.DefaultValue("")]
+        public string value { get; set; }
+        public void Resetkey() { }
+        public void Resetvalue() { }
+        public bool ShouldSerializekey() { }
+        public bool ShouldSerializevalue() { }
+    }
+    public enum MetricType
+    {
+        GAUGE = 0,
+        COUNTER = 1,
+        ENUM = 2,
+        CUMULATIVE_COUNTER = 3,
+    }
+    public class PointValue
+    {
+        public PointValue() { }
+        public long timestamp { get; set; }
+        public Datadog.Tracer.SignalFx.Metrics.Protobuf.Datum value { get; set; }
+        public void Resettimestamp() { }
+        public bool ShouldSerializetimestamp() { }
     }
 }

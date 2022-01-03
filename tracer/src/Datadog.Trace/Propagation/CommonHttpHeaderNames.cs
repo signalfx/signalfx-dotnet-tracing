@@ -10,5 +10,10 @@ namespace Datadog.Trace.Propagation
         /// Tracing is enabled by default.
         /// </summary>
         public const string TracingEnabled = "x-datadog-tracing-enabled";
+
+        /// <summary>
+        /// Origin of the distributed trace.
+        /// </summary>
+        public const string UserAgent = "User-Agent";
     }
 }

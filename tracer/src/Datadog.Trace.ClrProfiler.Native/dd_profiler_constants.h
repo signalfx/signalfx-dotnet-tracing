@@ -99,6 +99,19 @@ const WSTRING native_dll_filename = WStr("SignalFx.Tracing.ClrProfiler.Native.dy
 const WSTRING native_dll_filename = WStr("SignalFx.Tracing.ClrProfiler.Native.so");
 #endif
 
+const AssemblyProperty managed_profiler_assembly_property = AssemblyProperty(
+    managed_profiler_name,
+    new BYTE[160]{0,   36,  0,   0,   4,   128, 0,   0,   148, 0,   0,   0,   6,   2,   0,   0,   0,   36,  0,   0,
+                  82,  83,  65,  49,  0,   4,   0,   0,   1,   0,   1,   0,   113, 25,  157, 139, 5,   140, 14,  183,
+                  143, 206, 5,   141, 85,  31,  218, 167, 100, 218, 115, 54,  243, 178, 58,  94,  113, 205, 1,   61,
+                  202, 244, 182, 105, 61,  229, 163, 152, 162, 242, 205, 220, 5,   72,  75,  181, 86,  34,  3,   77,
+                  214, 74,  215, 90,  162, 58,  218, 216, 253, 227, 176, 27,  110, 33,  34,  84,  150, 63,  8,   30,
+                  168, 108, 125, 174, 108, 72,  0,   80,  13,  222, 89,  226, 104, 231, 249, 228, 238, 194, 224, 67,
+                  123, 102, 42,  57,  219, 122, 95,  191, 59,  10,  120, 157, 167, 170, 1,   81,  183, 182, 51,  111,
+                  204, 130, 205, 122, 20,  157, 247, 246, 102, 245, 57,  108, 141, 233, 44,  166, 68,  215, 162, 209},
+    160, 32772, 1)
+        .WithVersion(0, 2, 0, 0);
+
 } // namespace trace
 
 #endif // DD_PROFILER_CONSTANTS_H

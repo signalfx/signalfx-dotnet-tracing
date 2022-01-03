@@ -33,7 +33,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.CI
         [Trait("Category", "TestIntegrations")]
         public void SubmitTraces(string packageVersion)
         {
-            var version = string.IsNullOrEmpty(packageVersion) ? new Version("2.0.0") : new Version(packageVersion);
+            var version = string.IsNullOrEmpty(packageVersion) ? new Version("2.2.8") : new Version(packageVersion);
             List<MockTracerAgent.Span> spans = null;
             var expectedSpanCount = version.CompareTo(new Version("2.2.5")) < 0 ? 13 : 15;
 
@@ -43,9 +43,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.CI
                 SetEnvironmentVariable("SIGNALFX_TRACE_DEBUG", "1");
                 SetEnvironmentVariable("SIGNALFX_DUMP_ILREWRITE_ENABLED", "1");
 
-                int agentPort = TcpPortProvider.GetOpenPort();
-
-                using (var agent = new MockTracerAgent(agentPort))
+                using (var agent = EnvironmentHelper.GetMockAgent())
                 using (ProcessResult processResult = RunDotnetTestSampleAndWaitForExit(agent.Port, packageVersion: packageVersion))
                 {
                     spans = agent.WaitForSpans(expectedSpanCount)
@@ -79,10 +77,10 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.CI
                         // check the version
                         AssertTargetSpanEqual(targetSpan, "version", "1.0.0");
 
-                        // check the SingalFx library name
+                        // check the SignalFx library name
                         AssertTargetSpanEqual(targetSpan, "signalfx.tracing.library", "dotnet-tracing");
 
-                        // check the SingalFx library version
+                        // check the SignalFx library version
                         AssertTargetSpanEqual(targetSpan, "signalfx.tracing.version", "0.2.0.0");
 
                         // checks the runtime id tag

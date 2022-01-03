@@ -6,7 +6,6 @@
 // Modified by Splunk Inc.
 
 using System;
-using System.Text;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.DuckTyping;
 using Datadog.Trace.Logging;
@@ -38,7 +37,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Aerospike
             {
                 var tags = new AerospikeTags();
                 var serviceName = tracer.Settings.GetServiceName(tracer, ServiceName);
-                scope = tracer.StartActiveWithTags(OperationName, tags: tags, serviceName: serviceName);
+                scope = tracer.StartActiveInternal(OperationName, tags: tags, serviceName: serviceName);
                 var span = scope.Span;
                 span.LogicScope = OperationName;
 

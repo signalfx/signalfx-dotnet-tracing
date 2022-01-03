@@ -5,7 +5,6 @@
 
 #if !NETFRAMEWORK
 using System;
-using Datadog.Trace.AppSec;
 using Datadog.Trace.ClrProfiler.CallTarget;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Logging;
@@ -126,15 +125,15 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Azure.Functions
                     BindingSource = bindingSourceType.FullName
                 };
 
-                if (tracer.ActiveScope == null)
+                if (tracer.InternalActiveScope == null)
                 {
                     // This is the root scope
                     tags.SetAnalyticsSampleRate(IntegrationId, tracer.Settings, enabledWithGlobalSetting: false);
-                    scope = tracer.StartActiveWithTags(OperationName, tags: tags);
+                    scope = tracer.StartActiveInternal(OperationName, tags: tags);
                 }
                 else
                 {
-                    scope = tracer.StartActive(OperationName);
+                    scope = tracer.StartActiveInternal(OperationName);
                     foreach (var tagProperty in AzureFunctionsTags.AzureFunctionsExtraTags)
                     {
                         scope.Root.Span.SetTag(tagProperty.Key, tagProperty.Getter(tags));

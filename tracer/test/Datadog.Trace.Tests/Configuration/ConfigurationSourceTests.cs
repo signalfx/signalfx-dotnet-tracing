@@ -54,7 +54,7 @@ namespace Datadog.Trace.Tests.Configuration
         public static IEnumerable<object[]> GetDefaultTestData()
         {
             yield return new object[] { CreateFunc(s => s.TraceEnabled), true };
-            yield return new object[] { CreateFunc(s => s.AgentUri), new Uri("http://127.0.0.1:9411/api/v2/spans") };
+            yield return new object[] { CreateFunc(s => s.ExporterSettings.AgentUri), new Uri("http://127.0.0.1:9411/api/v2/spans") };
             yield return new object[] { CreateFunc(s => s.Environment), null };
             yield return new object[] { CreateFunc(s => s.ServiceName), null };
             yield return new object[] { CreateFunc(s => s.SignalFxAccessToken), null };
@@ -67,7 +67,7 @@ namespace Datadog.Trace.Tests.Configuration
             yield return new object[] { CreateFunc(s => s.CustomSamplingRules), null };
             yield return new object[] { CreateFunc(s => s.MaxTracesSubmittedPerSecond), 100 };
             yield return new object[] { CreateFunc(s => s.TracerMetricsEnabled), false };
-            yield return new object[] { CreateFunc(s => s.DogStatsdPort), 8125 };
+            yield return new object[] { CreateFunc(s => s.ExporterSettings.DogStatsdPort), 8125 };
             yield return new object[] { CreateFunc(s => s.RecordedValueMaxLength), 12000 };
         }
 
@@ -76,11 +76,11 @@ namespace Datadog.Trace.Tests.Configuration
             yield return new object[] { ConfigurationKeys.TraceEnabled, "true", CreateFunc(s => s.TraceEnabled), true };
             yield return new object[] { ConfigurationKeys.TraceEnabled, "false", CreateFunc(s => s.TraceEnabled), false };
 
-            yield return new object[] { ConfigurationKeys.AgentHost, "test-host", CreateFunc(s => s.AgentUri), new Uri("http://test-host:9411/api/v2/spans") };
-            yield return new object[] { ConfigurationKeys.AgentPort, "9000", CreateFunc(s => s.AgentUri), new Uri("http://127.0.0.1:9000/api/v2/spans") };
+            yield return new object[] { ConfigurationKeys.AgentHost, "test-host", CreateFunc(s => s.ExporterSettings.AgentUri), new Uri("http://test-host:9411/api/v2/spans") };
+            yield return new object[] { ConfigurationKeys.AgentPort, "9000", CreateFunc(s => s.ExporterSettings.AgentUri), new Uri("http://127.0.0.1:9000/api/v2/spans") };
 
-            yield return new object[] { ConfigurationKeys.EndpointUrl, "http://localhost:9411/api/v2/spans", CreateFunc(s => s.AgentUri), new Uri("http://127.0.0.1:9411/api/v2/spans") };
-            yield return new object[] { ConfigurationKeys.EndpointUrl, "https://ingest.realm.sfx.com/v2/trace", CreateFunc(s => s.AgentUri), new Uri("https://ingest.realm.sfx.com/v2/trace") };
+            yield return new object[] { ConfigurationKeys.EndpointUrl, "http://localhost:9411/api/v2/spans", CreateFunc(s => s.ExporterSettings.AgentUri), new Uri("http://127.0.0.1:9411/api/v2/spans") };
+            yield return new object[] { ConfigurationKeys.EndpointUrl, "https://ingest.realm.sfx.com/v2/trace", CreateFunc(s => s.ExporterSettings.AgentUri), new Uri("https://ingest.realm.sfx.com/v2/trace") };
 
             yield return new object[] { ConfigurationKeys.Environment, "staging", CreateFunc(s => s.Environment), "staging" };
 

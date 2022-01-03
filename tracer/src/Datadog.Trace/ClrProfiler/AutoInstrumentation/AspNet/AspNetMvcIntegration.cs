@@ -8,7 +8,6 @@
 #if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Web.Routing;
 using Datadog.Trace.AspNet;
@@ -23,9 +22,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
     /// <summary>
     /// The ASP.NET MVC integration.
     /// </summary>
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public static class AspNetMvcIntegration
+    internal static class AspNetMvcIntegration
     {
         internal const string HttpContextKey = "__SignalFx.Tracing.ClrProfiler.Integrations.AspNetMvcIntegration";
 
@@ -41,7 +38,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
         /// </summary>
         /// <param name="controllerContext">The System.Web.Mvc.ControllerContext that was passed as an argument to the instrumented method.</param>
         /// <returns>A new scope used to instrument an MVC action.</returns>
-        public static Scope CreateScope(ControllerContextStruct controllerContext)
+        internal static Scope CreateScope(ControllerContextStruct controllerContext)
         {
             Scope scope = null;
 
@@ -138,7 +135,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
                     var tracer = Tracer.Instance;
                     var tagsFromHeaders = Enumerable.Empty<KeyValuePair<string, string>>();
 
-                    if (tracer.ActiveScope == null)
+                    if (tracer.InternalActiveScope == null)
                     {
                         try
                         {
@@ -155,7 +152,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
                     }
 
                     var tags = new AspNetTags();
-                    scope = Tracer.Instance.StartActiveWithTags(resourceName, propagatedContext, tags: tags);
+                    scope = Tracer.Instance.StartActiveInternal(resourceName, propagatedContext, tags: tags);
                     span = scope.Span;
 
                     span.DecorateWebServerSpan(

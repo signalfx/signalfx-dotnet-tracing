@@ -8,7 +8,6 @@
 #if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Web;
 using Datadog.Trace.AspNet;
@@ -23,9 +22,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
     /// <summary>
     /// Contains instrumentation wrappers for ASP.NET Web API 5.
     /// </summary>
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public static class AspNetWebApi2Integration
+    internal static class AspNetWebApi2Integration
     {
         private const string OperationName = "aspnet-webapi.request";
 
@@ -50,7 +47,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
                 SpanContext propagatedContext = null;
                 var tagsFromHeaders = Enumerable.Empty<KeyValuePair<string, string>>();
 
-                if (request != null && tracer.ActiveScope == null)
+                if (request != null && tracer.InternalActiveScope == null)
                 {
                     try
                     {
@@ -68,7 +65,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
                 }
 
                 tags = new AspNetTags();
-                scope = tracer.StartActiveWithTags(OperationName, propagatedContext, tags: tags);
+                scope = tracer.StartActiveInternal(OperationName, propagatedContext, tags: tags);
                 UpdateSpan(controllerContext, scope.Span, tags, tagsFromHeaders);
 
                 tags.SetAnalyticsSampleRate(IntegrationId, tracer.Settings, enabledWithGlobalSetting: true);
@@ -147,10 +144,13 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
                 span.LogicScope = OperationName;
                 span.OperationName = resourceName;
 
-                tags.AspNetAction = action;
-                tags.AspNetController = controller;
-                tags.AspNetArea = area;
-                tags.AspNetRoute = route;
+                if (tags is not null)
+                {
+                    tags.AspNetAction = action;
+                    tags.AspNetController = controller;
+                    tags.AspNetArea = area;
+                    tags.AspNetRoute = route;
+                }
 
                 // set the resource name in the HttpContext so TracingHttpModule can update root span
                 var httpContext = System.Web.HttpContext.Current;

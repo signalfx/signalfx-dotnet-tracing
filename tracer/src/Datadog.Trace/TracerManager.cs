@@ -20,6 +20,7 @@ using Datadog.Trace.PlatformHelpers;
 using Datadog.Trace.Propagation;
 using Datadog.Trace.RuntimeMetrics;
 using Datadog.Trace.Sampling;
+using Datadog.Trace.Util;
 using Datadog.Trace.Vendors.Newtonsoft.Json;
 using Datadog.Trace.Vendors.StatsdClient;
 
@@ -272,10 +273,10 @@ namespace Datadog.Trace
                     writer.WriteValue(instance.DefaultServiceName);
 
                     writer.WritePropertyName("agent_url");
-                    writer.WriteValue(instanceSettings.AgentUri);
+                    writer.WriteValue(instanceSettings.ExporterSettings.AgentUri);
 
                     writer.WritePropertyName("metrics_agent_url");
-                    writer.WriteValue(instanceSettings.MetricsEndpointUrl);
+                    writer.WriteValue(instanceSettings.ExporterSettings.MetricsEndpointUrl);
 
                     writer.WritePropertyName("debug");
                     writer.WriteValue(GlobalSettings.Source.DebugEnabled);
@@ -332,10 +333,10 @@ namespace Datadog.Trace
                     writer.WriteValue(instanceSettings.RouteTemplateResourceNamesEnabled);
 
                     writer.WritePropertyName("partialflush_enabled");
-                    writer.WriteValue(instanceSettings.PartialFlushEnabled);
+                    writer.WriteValue(instanceSettings.ExporterSettings.PartialFlushEnabled);
 
                     writer.WritePropertyName("partialflush_minspans");
-                    writer.WriteValue(instanceSettings.PartialFlushMinSpans);
+                    writer.WriteValue(instanceSettings.ExporterSettings.PartialFlushMinSpans);
 
                     writer.WritePropertyName("runtime_id");
                     writer.WriteValue(Tracer.RuntimeId);
@@ -375,7 +376,7 @@ namespace Datadog.Trace
         {
             if (_instance is ILockedTracer)
             {
-                throw new InvalidOperationException("The current tracer instance cannot be replaced.");
+                ThrowHelper.ThrowInvalidOperationException("The current tracer instance cannot be replaced.");
             }
 
             var newManager = factory.CreateTracerManager(settings, _instance);

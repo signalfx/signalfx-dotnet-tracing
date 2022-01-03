@@ -39,9 +39,16 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
             }
 
             var path = Path.Combine(ManagedProfilerDirectory, $"{assemblyName}.dll");
+
             if (File.Exists(path))
             {
-                StartupLogger.Debug("Loading {0}", path);
+                if (args.Name.StartsWith("SignalFx.Tracing, Version=") && args.Name != AssemblyName)
+                {
+                    StartupLogger.Debug("Trying to load {0} which does not match the expected version ({1})", args.Name, AssemblyName);
+                    return null;
+                }
+
+                StartupLogger.Debug("Resolving {0}, loading {1}", args.Name, path);
                 return Assembly.LoadFrom(path);
             }
 

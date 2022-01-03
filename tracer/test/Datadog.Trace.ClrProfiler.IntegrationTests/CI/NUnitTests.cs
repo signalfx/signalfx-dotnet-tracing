@@ -58,9 +58,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.CI
                 SetEnvironmentVariable("SIGNALFX_TRACE_DEBUG", "1");
                 SetEnvironmentVariable("SIGNALFX_DUMP_ILREWRITE_ENABLED", "1");
 
-                int agentPort = TcpPortProvider.GetOpenPort();
-
-                using (var agent = new MockTracerAgent(agentPort))
+                using (var agent = EnvironmentHelper.GetMockAgent())
                 using (ProcessResult processResult = RunDotnetTestSampleAndWaitForExit(agent.Port, packageVersion: packageVersion))
                 {
                     spans = agent.WaitForSpans(ExpectedSpanCount)
@@ -94,10 +92,10 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.CI
                         // check the version
                         AssertTargetSpanEqual(targetSpan, "version", "1.0.0");
 
-                        // check the SingalFx library name
+                        // check the SignalFx library name
                         AssertTargetSpanEqual(targetSpan, "signalfx.tracing.library", "dotnet-tracing");
 
-                        // check the SingalFx library version
+                        // check the SignalFx library version
                         AssertTargetSpanEqual(targetSpan, "signalfx.tracing.version", "0.2.0.0");
 
                         // checks the runtime id tag

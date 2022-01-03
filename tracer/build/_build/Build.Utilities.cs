@@ -99,14 +99,7 @@ partial class Build
             envVars["COR_PROFILER_PATH_32"] = TracerHomeDirectory / "win-x86" / "SignalFx.Tracing.ClrProfiler.Native.dll";
             envVars["SIGNALFX_DOTNET_TRACER_HOME"] = TracerHomeDirectory;
 
-            if (ExtraEnvVars?.Length > 0)
-            {
-                foreach (var envVar in ExtraEnvVars)
-                {
-                    var kvp = envVar.Split('=');
-                    envVars[kvp[0]] = kvp[1];
-                }
-            }
+            envVars.AddExtraEnvVariables(ExtraEnvVars);
 
             Logger.Info($"Running sample '{SampleName}' in IIS Express");
             IisExpress.Value(
@@ -118,45 +111,18 @@ partial class Build
         .Description("Builds and runs a sample app using dotnet run, enabling profiling.")
         .Requires(() => SampleName)
         .Requires(() => Framework)
-        .Executes(() =>
-        {
-            var envVars = new Dictionary<string,string>()
-            {
-                {"COR_ENABLE_PROFILING", "1"},
-                {"COR_PROFILER", "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"},
-                {"COR_PROFILER_PATH_32", TracerHomeDirectory / "win-x86" / "SignalFx.Tracing.ClrProfiler.Native.dll"},
-                {"COR_PROFILER_PATH_64", TracerHomeDirectory / "win-x64" / "SignalFx.Tracing.ClrProfiler.Native.dll"},
-                {"CORECLR_ENABLE_PROFILING", "1"},
-                {"CORECLR_PROFILER", "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"},
-                {"SIGNALFX_DOTNET_TRACER_HOME", TracerHomeDirectory },
-                {"ASPNETCORE_URLS", "https://*:5003" },
-            };
+        .Executes(() => {
 
-            if (IsWin)
-            {
-                envVars.Add("CORECLR_PROFILER_PATH_32", TracerHomeDirectory / "win-x86" / "SignalFx.Tracing.ClrProfiler.Native.dll");
-                envVars.Add("CORECLR_PROFILER_PATH_64", TracerHomeDirectory / "win-x64" / "SignalFx.Tracing.ClrProfiler.Native.dll");
-            }
-            else
-            {
-                envVars.Add("CORECLR_PROFILER_PATH", TracerHomeDirectory / "SignalFx.Tracing.ClrProfiler.Native.so");
-            }
-
-            if (ExtraEnvVars?.Length > 0)
-            {
-                foreach (var envVar in ExtraEnvVars)
-                {
-                    var kvp = envVar.Split('=');
-                    envVars[kvp[0]] = kvp[1];
-                }
-            }
+            var envVars = new Dictionary<string, string> { { "ASPNETCORE_URLS", "http://*:5003" } };
+            envVars.AddTracerEnvironmentVariables(TracerHomeDirectory);
+            envVars.AddExtraEnvVariables(ExtraEnvVars);
 
             string project = Solution.GetProject(SampleName)?.Path;
             if (project is not null)
             {
                 Logger.Info($"Running sample '{SampleName}'");
             }
-            else if(System.IO.File.Exists(SampleName))
+            else if (System.IO.File.Exists(SampleName))
             {
                 project = SampleName;
                 Logger.Info($"Running project '{SampleName}'");
@@ -188,13 +154,23 @@ partial class Build
 
     Target GeneratePackageVersions => _ => _
        .Description("Regenerate the PackageVersions props and .cs files")
-       .After(UpdateIntegrationsJson)
+       .After(UpdateIntegrationDefinitions)
        .Executes(async () =>
        {
            var testDir = Solution.GetProject(Projects.ClrProfilerIntegrationTests).Directory;
 
            var versionGenerator = new PackageVersionGenerator(TracerDirectory, testDir);
            await versionGenerator.GenerateVersions(Solution);
+
+           var assemblies = TracerHomeDirectory
+                           .GlobFiles("**/Datadog.Trace.dll")
+                           .Select(x => x.ToString())
+                           .ToList();
+
+           var integrations = GenerateIntegrationDefinitions.GetAllIntegrations(assemblies);
+
+           var dependabotProj = TracerDirectory / "dependabot" / "Datadog.Dependabot.Integrations.csproj";
+           await DependabotFileManager.UpdateIntegrations(dependabotProj, integrations);
        });
 
     Target UpdateVendoredCode => _ => _
@@ -210,23 +186,19 @@ partial class Build
             await UpdateVendorsTool.UpdateVendors(downloadDirectory, vendorDirectory);
        });
 
-    Target UpdateIntegrationsJson => _ => _
+    Target UpdateIntegrationDefinitions => _ => _
        .Description("Update the integration definitions file")
        .DependsOn(Clean, Restore, CreateRequiredDirectories, CompileManagedSrc, PublishManagedProfiler) // We load the dlls from the output, so need to do a clean build
-       .Executes(async () =>
+       .Executes(() =>
         {
             var assemblies = TracerHomeDirectory
                             .GlobFiles("**/SignalFx.Tracing.dll")
                             .Select(x => x.ToString())
                             .ToList();
 
-
             var integrations = GenerateIntegrationDefinitions.GetAllIntegrations(assemblies);
 
             GenerateIntegrationDefinitions.Run(integrations, TracerDirectory);
-
-            var dependabotProj = TracerDirectory / "dependabot" / "Datadog.Dependabot.Integrations.csproj";
-            await DependabotFileManager.UpdateIntegrations(dependabotProj, integrations);
         });
 
     Target UpdateVersion => _ => _

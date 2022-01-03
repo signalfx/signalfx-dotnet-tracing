@@ -21,7 +21,7 @@ namespace Datadog.Trace.Agent.Zipkin
             Log.Debug("Creating new Zipkin exporter");
 
             _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-            _tracesEndpoint = _settings.AgentUri;
+            _tracesEndpoint = _settings.ExporterSettings.AgentUri;
         }
 
         public async Task<bool> SendTracesAsync(Span[][] traces)

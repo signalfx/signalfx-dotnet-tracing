@@ -11,9 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using Datadog.Trace.AppSec;
-using Datadog.Trace.AppSec.Transport.Http;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.DuckTyping;
 using Datadog.Trace.ExtensionMethods;
@@ -23,7 +21,6 @@ using Datadog.Trace.PlatformHelpers;
 using Datadog.Trace.Propagation;
 using Datadog.Trace.Tagging;
 using Datadog.Trace.Util;
-using Datadog.Trace.Util.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Routing;
@@ -489,10 +486,7 @@ namespace Datadog.Trace.DiagnosticListeners
         {
             // Create a child span for the MVC action
             var mvcSpanTags = new AspNetCoreMvcTags();
-
-            // Upstream sets a good value for span name later when filling up the resource name, the name
-            // will be updated at that time.
-            var mvcScope = tracer.StartActiveWithTags(MvcOperationName, parentSpan.Context, tags: mvcSpanTags);
+            var mvcScope = tracer.StartActiveInternal(MvcOperationName, parentSpan.Context, tags: mvcSpanTags);
             var span = mvcScope.Span;
             span.Type = SpanTypes.Web;
             span.LogicScope = MvcOperationName;
@@ -567,7 +561,7 @@ namespace Datadog.Trace.DiagnosticListeners
                         controllerName: controllerName,
                         actionName: actionName);
 
-                    resourceName = $"{parentTags.HttpMethod} {request.PathBase.Value}{resourcePathName}";
+                    resourceName = $"{parentTags.HttpMethod} {request.PathBase.ToUriComponent()}{resourcePathName}";
                     aspNetRoute = routeTemplate?.TemplateText.ToLowerInvariant();
                 }
             }
@@ -650,7 +644,7 @@ namespace Datadog.Trace.DiagnosticListeners
                 return;
             }
 
-            Span span = tracer.ActiveScope?.Span;
+            Span span = tracer.InternalActiveScope?.Span;
 
             if (span != null)
             {
@@ -743,7 +737,7 @@ namespace Datadog.Trace.DiagnosticListeners
                     controllerName: controllerName,
                     actionName: actionName);
 
-                var resourceName = $"{tags.HttpMethod} {request.PathBase}{resourcePathName}";
+                var resourceName = $"{tags.HttpMethod} {request.PathBase.ToUriComponent()}{resourcePathName}";
 
                 // NOTE: We could set the controller/action/area tags on the parent span
                 // But instead we re-extract them in the MVC endpoint as these are MVC
@@ -776,7 +770,7 @@ namespace Datadog.Trace.DiagnosticListeners
                 return;
             }
 
-            Span parentSpan = tracer.ActiveScope?.Span;
+            Span parentSpan = tracer.InternalActiveScope?.Span;
 
             if (parentSpan != null && arg.TryDuckCast<BeforeActionStruct>(out var typedArg))
             {
@@ -815,7 +809,7 @@ namespace Datadog.Trace.DiagnosticListeners
                 return;
             }
 
-            var scope = tracer.ActiveScope;
+            var scope = tracer.InternalActiveScope;
 
             if (scope is not null && ReferenceEquals(scope.Span.LogicScope, MvcOperationName))
             {
@@ -832,7 +826,7 @@ namespace Datadog.Trace.DiagnosticListeners
                 return;
             }
 
-            var scope = tracer.ActiveScope;
+            var scope = tracer.InternalActiveScope;
 
             if (scope != null)
             {
@@ -869,7 +863,7 @@ namespace Datadog.Trace.DiagnosticListeners
                 return;
             }
 
-            var span = tracer.ActiveScope?.Span;
+            var span = tracer.InternalActiveScope?.Span;
 
             if (span != null && arg.TryDuckCast<UnhandledExceptionStruct>(out var unhandledStruct))
             {
@@ -887,28 +881,28 @@ namespace Datadog.Trace.DiagnosticListeners
         }
 
         [DuckCopy]
-        public struct HttpRequestInStartStruct
+        internal struct HttpRequestInStartStruct
         {
             [Duck(BindingFlags = DuckAttribute.DefaultFlags | BindingFlags.IgnoreCase)]
             public HttpContext HttpContext;
         }
 
         [DuckCopy]
-        public struct HttpRequestInStopStruct
+        internal struct HttpRequestInStopStruct
         {
             [Duck(BindingFlags = DuckAttribute.DefaultFlags | BindingFlags.IgnoreCase)]
             public HttpContext HttpContext;
         }
 
         [DuckCopy]
-        public struct UnhandledExceptionStruct
+        internal struct UnhandledExceptionStruct
         {
             [Duck(BindingFlags = DuckAttribute.DefaultFlags | BindingFlags.IgnoreCase)]
             public Exception Exception;
         }
 
         [DuckCopy]
-        public struct BeforeActionStruct
+        internal struct BeforeActionStruct
         {
             [Duck(BindingFlags = DuckAttribute.DefaultFlags | BindingFlags.IgnoreCase)]
             public HttpContext HttpContext;
@@ -921,14 +915,14 @@ namespace Datadog.Trace.DiagnosticListeners
         }
 
         [DuckCopy]
-        public struct BadHttpRequestExceptionStruct
+        internal struct BadHttpRequestExceptionStruct
         {
             [Duck(BindingFlags = DuckAttribute.DefaultFlags | BindingFlags.IgnoreCase | BindingFlags.NonPublic)]
             public int StatusCode;
         }
 
         [DuckCopy]
-        public struct HttpRequestInEndpointMatchedStruct
+        internal struct HttpRequestInEndpointMatchedStruct
         {
             [Duck(BindingFlags = DuckAttribute.DefaultFlags | BindingFlags.IgnoreCase)]
             public HttpContext HttpContext;
@@ -939,13 +933,13 @@ namespace Datadog.Trace.DiagnosticListeners
         /// </summary>
         /// <seealso cref="EndpointFeatureProxy"/>
         [DuckCopy]
-        public struct EndpointFeatureStruct
+        internal struct EndpointFeatureStruct
         {
             public RouteEndpoint Endpoint;
         }
 
         [DuckCopy]
-        public struct HttpRequestStruct
+        internal struct HttpRequestStruct
         {
             public string Method;
             public RouteValueDictionary RouteValues;
@@ -956,7 +950,7 @@ namespace Datadog.Trace.DiagnosticListeners
         /// Proxy for https://github1s.com/dotnet/aspnetcore/blob/v3.0.3/src/Http/Routing/src/Patterns/RoutePatternPathSegment.cs
         /// </summary>
         [DuckCopy]
-        public struct RoutePatternPathSegmentStruct
+        internal struct RoutePatternPathSegmentStruct
         {
             public IEnumerable Parts;
         }
@@ -966,7 +960,7 @@ namespace Datadog.Trace.DiagnosticListeners
         /// and https://github1s.com/dotnet/aspnetcore/blob/v3.0.3/src/Http/Routing/src/Patterns/RoutePatternSeparatorPart.cs
         /// </summary>
         [DuckCopy]
-        public struct RoutePatternContentPartStruct
+        internal struct RoutePatternContentPartStruct
         {
             public string Content;
         }
@@ -975,7 +969,7 @@ namespace Datadog.Trace.DiagnosticListeners
         /// Proxy for https://github1s.com/dotnet/aspnetcore/blob/v3.0.3/src/Http/Routing/src/Patterns/RoutePatternParameterPart.cs
         /// </summary>
         [DuckCopy]
-        public struct RoutePatternParameterPartStruct
+        internal struct RoutePatternParameterPartStruct
         {
             public string Name;
             public bool IsOptional;

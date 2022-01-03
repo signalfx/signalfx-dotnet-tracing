@@ -4,8 +4,6 @@
 // </copyright>
 
 using System;
-using System.Text;
-using Datadog.Trace.Configuration;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Tagging;
 
@@ -41,7 +39,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Msmq
 
                 var serviceName = tracer.Settings.GetServiceName(tracer, MsmqConstants.ServiceName);
 
-                scope = tracer.StartActiveWithTags(MsmqConstants.OperationName, serviceName: serviceName, tags: tags);
+                scope = tracer.StartActiveInternal(MsmqConstants.OperationName, serviceName: serviceName, tags: tags);
 
                 var span = scope.Span;
                 span.Type = SpanTypes.Queue;

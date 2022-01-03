@@ -15,9 +15,9 @@
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: GET /api2/transientfailure/{value},
+    Name: GET api2/transientfailure/{value},
     LogicScope: aspnet.request,
-    Resource: GET /api2/transientfailure/{value},
+    Resource: GET api2/transientfailure/{value},
     Service: sample,
     Type: web,
     Error: 1,
@@ -49,9 +49,9 @@ at Samples.AspNetMvc5.Controllers.ConventionsController.TransientFailure(String 
   {
     TraceId: Id_1,
     SpanId: Id_4,
-    Name: GET /api2/transientfailure/{value},
+    Name: GET api2/transientfailure/{value},
     LogicScope: aspnet-webapi.request,
-    Resource: GET /api2/transientfailure/{value},
+    Resource: GET api2/transientfailure/{value},
     Service: sample,
     Type: web,
     ParentId: Id_3,

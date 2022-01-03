@@ -4,6 +4,7 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -21,16 +22,19 @@ namespace Datadog.Trace.ClrProfiler.CallTarget
         private readonly object _state;
         private readonly DateTimeOffset? _startTime;
 
+        private readonly IReadOnlyDictionary<string, string> _previousDistributedSpanContext;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CallTargetState"/> struct.
         /// </summary>
         /// <param name="scope">Scope instance</param>
-        public CallTargetState(Scope scope)
+        internal CallTargetState(Scope scope)
         {
             _previousScope = null;
             _scope = scope;
             _state = null;
             _startTime = null;
+            _previousDistributedSpanContext = null;
         }
 
         /// <summary>
@@ -38,12 +42,13 @@ namespace Datadog.Trace.ClrProfiler.CallTarget
         /// </summary>
         /// <param name="scope">Scope instance</param>
         /// <param name="state">Object state instance</param>
-        public CallTargetState(Scope scope, object state)
+        internal CallTargetState(Scope scope, object state)
         {
             _previousScope = null;
             _scope = scope;
             _state = state;
             _startTime = null;
+            _previousDistributedSpanContext = null;
         }
 
         /// <summary>
@@ -52,26 +57,28 @@ namespace Datadog.Trace.ClrProfiler.CallTarget
         /// <param name="scope">Scope instance</param>
         /// <param name="state">Object state instance</param>
         /// <param name="startTime">The intended start time of the scope, intended for scopes created in the OnMethodEnd handler</param>
-        public CallTargetState(Scope scope, object state, DateTimeOffset? startTime)
+        internal CallTargetState(Scope scope, object state, DateTimeOffset? startTime)
         {
             _previousScope = null;
             _scope = scope;
             _state = state;
             _startTime = startTime;
+            _previousDistributedSpanContext = null;
         }
 
-        internal CallTargetState(Scope previousScope, CallTargetState state)
+        internal CallTargetState(Scope previousScope, IReadOnlyDictionary<string, string> previousDistributedSpanContext, CallTargetState state)
         {
             _previousScope = previousScope;
             _scope = state._scope;
             _state = state._state;
             _startTime = state._startTime;
+            _previousDistributedSpanContext = previousDistributedSpanContext;
         }
 
         /// <summary>
         /// Gets the CallTarget BeginMethod scope
         /// </summary>
-        public Scope Scope => _scope;
+        internal Scope Scope => _scope;
 
         /// <summary>
         /// Gets the CallTarget BeginMethod state
@@ -84,6 +91,8 @@ namespace Datadog.Trace.ClrProfiler.CallTarget
         public DateTimeOffset? StartTime => _startTime;
 
         internal Scope PreviousScope => _previousScope;
+
+        internal IReadOnlyDictionary<string, string> PreviousDistributedSpanContext => _previousDistributedSpanContext;
 
         /// <summary>
         /// Gets the default call target state (used by the native side to initialize the locals)

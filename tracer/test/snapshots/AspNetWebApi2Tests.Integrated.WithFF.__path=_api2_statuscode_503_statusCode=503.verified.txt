@@ -2,9 +2,9 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: GET api2/statuscode/{value},
+    Name: GET /api2/statuscode/{value},
     LogicScope: aspnet-webapi.request,
-    Resource: GET api2/statuscode/{value},
+    Resource: GET /api2/statuscode/{value},
     Service: sample,
     Type: web,
     ParentId: Id_3,
@@ -28,9 +28,9 @@
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: GET api2/statuscode/{value},
+    Name: GET /api2/statuscode/{value},
     LogicScope: aspnet.request,
-    Resource: GET api2/statuscode/{value},
+    Resource: GET /api2/statuscode/{value},
     Service: sample,
     Type: web,
     Error: 1,

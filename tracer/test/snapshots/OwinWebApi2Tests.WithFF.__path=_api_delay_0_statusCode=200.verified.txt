@@ -2,9 +2,9 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: GET api/delay/{seconds},
+    Name: GET /api/delay/{seconds},
     LogicScope: aspnet-webapi.request,
-    Resource: GET api/delay/{seconds},
+    Resource: GET /api/delay/{seconds},
     Service: Samples.Owin.WebApi2,
     Type: web,
     Tags: {
@@ -14,6 +14,7 @@
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
       http.url: http://localhost:00000/api/delay/0,
+      http_useragent: Mozilla/5.0,
       language: dotnet,
       runtime-id: Guid_1,
       signalfx.tracing.library: dotnet-tracing,
