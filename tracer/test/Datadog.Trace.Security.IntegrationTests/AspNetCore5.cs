@@ -42,8 +42,6 @@ namespace Datadog.Trace.Security.IntegrationTests
              s  => Assert.Equal("Samples.AspNetCore5", s.Service),
              s  =>  Assert.Equal("web", s.Type),
              s => Assert.Equal(enableSecurity ? "GET /health" : "aspnet_core.request", s.Name),
-             s  => Assert.Equal("Samples.AspNetCore5", s.Service),
-             s  =>  Assert.Equal("web", s.Type),
              s =>
                  {
                     var securityTags = new Dictionary<string, string>
