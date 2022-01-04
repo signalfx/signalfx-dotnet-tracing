@@ -90,6 +90,10 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
   and overrides the value in `SIGNALFX_TRACE_LOG_PATH` if present.
 - Add `SIGNALFX_TRACE_LOGGING_RATE` configuration that sets number of seconds
   between identical log messages for tracer log files.
+- Add `SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED` configuration that enables partial
+  flush of traces.
+- Add `SIGNALFX_TRACE_PARTIAL_FLUSH_MIN_SPANS` configuration that sets minimum
+  number of closed spans in a trace before it's partially flushed.
 - Add `SIGNALFX_VERSION` configuration that sets application's version that
   will populate `version` tag on spans.
 - Add `SIGNALFX_TRACE_STARTUP_LOGS` configuration that enables diagnostic log
