@@ -148,9 +148,9 @@ namespace Datadog.Trace.ClrProfiler.Managed.Tests
         }
 
         [Theory]
-        [InlineData("System.Data.SqlClient.SqlCommand", "SqlClient", "sql-server")]
+        [InlineData("System.Data.SqlClient.SqlCommand", "SqlClient", "mssql")]
         [InlineData("MySql.Data.MySqlClient.MySqlCommand", "MySql", "mysql")]
-        [InlineData("Npgsql.NpgsqlCommand", "Npgsql", "postgres")]
+        [InlineData("Npgsql.NpgsqlCommand", "Npgsql", "postgresql")]
         [InlineData("ProfiledDbCommand", null, null)]
         [InlineData("ExampleCommand", "AdoNet", "example")]
         [InlineData("Example", "AdoNet", "example")]
