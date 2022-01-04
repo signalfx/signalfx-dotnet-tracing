@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Reflection;
 using FluentAssertions;
@@ -21,7 +23,7 @@ namespace Datadog.Trace.Tests
         [Fact]
         public void ExposesTracingHttpModule()
         {
-            var httpModuleType = Type.GetType("Datadog.Trace.AspNet.TracingHttpModule, Datadog.Trace.AspNet");
+            var httpModuleType = Type.GetType("Datadog.Trace.AspNet.TracingHttpModule, SignalFx.Tracing.AspNet");
             Assert.NotNull(httpModuleType);
         }
 #endif
