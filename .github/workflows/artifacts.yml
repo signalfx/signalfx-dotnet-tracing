@@ -37,7 +37,8 @@ jobs:
           --env artifacts=/project/tracer/src/bin/artifacts \
           dd-trace-dotnet/${baseImage}-builder \
           dotnet /build/bin/Debug/_build.dll Clean BuildTracerHome ZipTracerHome
-    - uses: actions/upload-artifact@v2
+    - name: Publish Linux x64 packages
+      uses: actions/upload-artifact@v2
       with:
         name: artifacts
         path: ./tracer/src/bin/artifacts/linux-x64
@@ -51,10 +52,17 @@ jobs:
       - uses: microsoft/setup-msbuild@v1.0.2
       - run: tracer\build.cmd Clean BuildTracerHome PackageTracerHome
         shell: cmd
-      - uses: actions/upload-artifact@v2
+      - name: Publish Windows MSI
+        uses: actions/upload-artifact@v2
         with:
           name: artifacts
           path: tracer/bin/artifacts/*/en-us
+      - name: Publish NuGet packages
+        uses: actions/upload-artifact@v2
+        with:
+          name: nuget-packages
+          path: ${{ env.artifacts }}/nuget
+          
 
   create_release:
     runs-on: ubuntu-20.04
