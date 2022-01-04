@@ -54,6 +54,16 @@ namespace MyTests.TestListNameSpace
             }
         }
 
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] TestListProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(Properties,
+                new Datadog.Trace.Tagging.Property<TestList, string?>(""TestId"", t => t.Id)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return TestListProperties;
+        }
+
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset)
         {
             var count = 0;
@@ -106,6 +116,13 @@ namespace MyTests.TestListNameSpace
     partial class TestList
     {
         private static readonly byte[] IdBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes(""TestId"");
+
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] TestListProperties => Properties;
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return TestListProperties;
+        }
 
         public override double? GetMetric(string key)
         {
@@ -212,6 +229,17 @@ namespace MyTests.TestListNameSpace
             }
         }
 
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] TestListProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(Properties,
+                new Datadog.Trace.Tagging.Property<TestList, string?>(""IdTag"", t => t.Id),
+                new Datadog.Trace.Tagging.Property<TestList, string?>(""NameTag"", t => t.Name)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return TestListProperties;
+        }
+
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset)
         {
             var count = 0;
@@ -280,6 +308,13 @@ namespace MyTests.TestListNameSpace
     {
         private static readonly byte[] IdBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes(""IdMetric"");
         private static readonly byte[] NameBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes(""NameMetric"");
+
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] TestListProperties => Properties;
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return TestListProperties;
+        }
 
         public override double? GetMetric(string key)
         {
@@ -396,6 +431,17 @@ namespace MyTests.TestListNameSpace
             }
         }
 
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] TestListProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(Properties,
+                new Datadog.Trace.Tagging.Property<TestList, string?>(""IdTag"", t => t.Id),
+                new Datadog.Trace.Tagging.Property<TestList, string?>(""NameTag"", t => t.Name)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return TestListProperties;
+        }
+
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset)
         {
             var count = 0;
@@ -464,6 +510,13 @@ namespace MyTests.TestListNameSpace
     {
         private static readonly byte[] IdBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes(""IdMetric"");
         private static readonly byte[] NameBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes(""NameMetric"");
+
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] TestListProperties => Properties;
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return TestListProperties;
+        }
 
         public override double? GetMetric(string key)
         {
