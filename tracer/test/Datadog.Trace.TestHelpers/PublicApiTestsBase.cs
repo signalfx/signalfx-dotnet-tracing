@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -62,7 +64,7 @@ namespace Datadog.Trace.Tests
                 // Exclusions
                 // Datadog.Trace: This dependency is fine and the version will change over time
                 // netstandard: This dependency is fine and there's a discrepancy between local builds and CI builds containing/not containing a reference to it
-                if (!referencedAssembly.Name.StartsWith("Datadog.Trace")
+                if (!referencedAssembly.Name.StartsWith("SignalFx.Tracing")
                     && !referencedAssembly.Name.Equals("netstandard"))
                 {
                     sb.AppendLine(referencedAssembly.FullName);
