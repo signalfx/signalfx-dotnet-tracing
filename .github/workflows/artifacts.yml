@@ -37,7 +37,8 @@ jobs:
           --env artifacts=/project/tracer/src/bin/artifacts \
           dd-trace-dotnet/${baseImage}-builder \
           dotnet /build/bin/Debug/_build.dll Clean BuildTracerHome ZipTracerHome
-    - uses: actions/upload-artifact@v2
+    - name: Publish Linux x64 packages
+      uses: actions/upload-artifact@v2
       with:
         name: artifacts
         path: ./tracer/src/bin/artifacts/linux-x64
@@ -48,13 +49,26 @@ jobs:
     steps:
       - run: git config --system core.longpaths true
       - uses: actions/checkout@v2
-      - uses: microsoft/setup-msbuild@v1.0.2
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: | 
+            2.1.x
+            3.1.x
+            5.0.x
+            6.0.x
       - run: tracer\build.cmd Clean BuildTracerHome PackageTracerHome
         shell: cmd
-      - uses: actions/upload-artifact@v2
+      - name: Publish Windows MSI
+        uses: actions/upload-artifact@v2
         with:
           name: artifacts
           path: tracer/bin/artifacts/*/en-us
+      - name: Publish NuGet packages
+        uses: actions/upload-artifact@v2
+        with:
+          name: nuget
+          path: tracer/bin/artifacts/nuget
+          
 
   create_release:
     runs-on: ubuntu-20.04
@@ -72,7 +86,7 @@ jobs:
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\/v}
       # TODO: Extract release notes
       - name: Create Release
-        run: gh release create v${{ steps.get_version.outputs.VERSION }} --draft --prerelease artifacts/signalfx* artifacts/x64/en-us/*.msi  artifacts/x86/en-us/*.msi
+        run: gh release create v${{ steps.get_version.outputs.VERSION }} --draft --prerelease artifacts/signalfx* artifacts/x64/en-us/*.msi  artifacts/x86/en-us/*.msi nuget/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

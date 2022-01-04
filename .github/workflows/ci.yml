@@ -101,6 +101,12 @@ jobs:
       with:
         path: ${{ env.artifacts }}/linux-x64
         name: linux-x64-packages
+    - name: Publish NuGet packages
+      if: ${{ runner.os == 'Windows' }}
+      uses: actions/upload-artifact@v2
+      with:
+        path: ${{ env.artifacts }}/nuget
+        name: nuget-packages
 
   managed-unit-tests:
     name: Managed unit tests
