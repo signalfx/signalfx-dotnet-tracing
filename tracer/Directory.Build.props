@@ -9,6 +9,7 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)..\SignalFx.Tracing.snk</AssemblyOriginatorKeyFile>
     <DelaySign>false</DelaySign>
+
     <!-- WebClient is obsolete -->
     <NoWarn>SYSLIB0014</NoWarn>
   </PropertyGroup>
@@ -24,7 +25,7 @@
   <PropertyGroup Condition="'$(TF_BUILD)' == 'true' OR '$(GITLAB_CI)' == 'true'">
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
-  
+
   <!-- Not set when building outside of IDE or not using sln -->
   <PropertyGroup>
     <SolutionDir Condition="'$(SolutionDir)'==''">$(MSBuildThisFileDirectory)..\</SolutionDir>
