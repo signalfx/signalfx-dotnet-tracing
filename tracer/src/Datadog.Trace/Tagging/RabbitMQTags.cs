@@ -41,7 +41,7 @@ namespace Datadog.Trace.Tagging
         [Tag(Trace.Tags.AmqpExchange)]
         public string Exchange { get; set; }
 
-        [Tag(Trace.Tags.AmqpRoutingKey)]
+        [Tag(Trace.Tags.RabbitMq.RoutingKey)]
         public string RoutingKey { get; set; }
 
         [Tag(Trace.Tags.AmqpQueue)]
