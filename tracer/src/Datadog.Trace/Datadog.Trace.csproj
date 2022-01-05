@@ -11,7 +11,6 @@
     <IncludeSymbols>true</IncludeSymbols>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -21,7 +20,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\..\docs\Datadog.Trace\README.md" Pack="true" PackagePath="\" />
     <!-- Don't include source generator output in the compilation - this is implicitly included anyway.
     the */** trick here ensures that there's at least one subdirectory, which indicates the files comes
     from a source generator as opposed to something that is coming from some other tool. -->
