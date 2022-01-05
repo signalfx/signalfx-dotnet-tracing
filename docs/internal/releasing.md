@@ -22,7 +22,7 @@
    ```bash
    TAG='v{new-version-here}'
    COMMIT='{commit-sha-here}'
-   git tag -s $TAG $COMMIT
+   git tag -s -m $TAG $TAG $COMMIT
    git push {remote-to-the-main-repo} $TAG
    ```
 
