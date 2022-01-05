@@ -3,7 +3,7 @@
     TraceId: Id_1,
     SpanId: Id_2,
     Name: GET /datadog/doghouse/index,
-    LogicScope: aspnet-mvc.request,
+    LogicScope: aspnet-mvc.request.child-action,
     Resource: GET /datadog/doghouse/index,
     Service: sample,
     Type: web,
@@ -12,12 +12,13 @@
       aspnet.action: hellofromchild,
       aspnet.controller: doghouse,
       aspnet.route: Datadog/{controller}/{action}/{id},
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
-      http.url: /datadog,
+      http.url: http://localhost:00000/DataDog,
       language: dotnet,
+      net.peer.ip: ::1,
       span.kind: server,
       version: 1.0.0
     }
@@ -25,7 +26,8 @@
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: aspnet-mvc.request,
+    Name: GET /datadog/doghouse/index,
+    LogicScope: aspnet-mvc.request,
     Resource: GET /datadog/doghouse/index,
     Service: sample,
     Type: web,
@@ -48,7 +50,7 @@
   },
   {
     TraceId: Id_1,
-    SpanId: Id_3,
+    SpanId: Id_4,
     Name: GET /datadog/doghouse/index,
     LogicScope: aspnet.request,
     Resource: GET /datadog/doghouse/index,
