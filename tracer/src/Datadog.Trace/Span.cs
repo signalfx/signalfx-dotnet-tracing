@@ -12,6 +12,7 @@ using System.Text;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Tagging;
+using Datadog.Trace.Util;
 using Datadog.Trace.Vendors.Serilog.Events;
 
 namespace Datadog.Trace
@@ -149,7 +150,7 @@ namespace Datadog.Trace
         /// </returns>
         public override string ToString()
         {
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Acquire(StringBuilderCache.MaxBuilderSize);
             sb.AppendLine($"TraceId: {Context.TraceId}");
             sb.AppendLine($"ParentId: {Context.ParentId}");
             sb.AppendLine($"SpanId: {Context.SpanId}");
@@ -164,7 +165,7 @@ namespace Datadog.Trace
             sb.AppendLine($"Status: {Status}");
             sb.AppendLine($"Meta: {Tags}");
 
-            return sb.ToString();
+            return StringBuilderCache.GetStringAndRelease(sb);
         }
 
         /// <summary>

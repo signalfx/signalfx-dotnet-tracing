@@ -26,12 +26,18 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch.V6
 
         public string Method => _data.Method.ToString();
 
+        public object ConnectionSettings => _data.ConnectionSettings;
+
+        public IPostData PostData => _data.PostData;
+
         [DuckCopy]
         public struct Proxy
         {
             public string PathAndQuery;
             public HttpMethod Method;
             public Uri Uri;
+            public object ConnectionSettings;
+            public IPostData PostData;
         }
     }
 }

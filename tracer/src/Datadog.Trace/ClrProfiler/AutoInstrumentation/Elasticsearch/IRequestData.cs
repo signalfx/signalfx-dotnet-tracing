@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 
 namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch
@@ -26,5 +28,15 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch
         /// Gets the HTTP method of the request
         /// </summary>
         string Method { get; }
+
+        /// <summary>
+        /// Gets the ConnectionSettings of the request
+        /// </summary>
+        object ConnectionSettings { get; }
+
+        /// <summary>
+        /// Gets the data to post of the request
+        /// </summary>
+        public IPostData PostData { get; }
     }
 }

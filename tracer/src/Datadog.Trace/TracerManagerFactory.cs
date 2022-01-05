@@ -47,8 +47,7 @@ namespace Datadog.Trace
                 sampler: null,
                 scopeManager: previous?.ScopeManager, // no configuration, so can always use the same one
                 statsd: null,
-                runtimeMetrics: null,
-                libLogSubscriber: null);
+                runtimeMetrics: null);
         }
 
         /// <summary>
@@ -61,8 +60,7 @@ namespace Datadog.Trace
             ISampler sampler,
             IScopeManager scopeManager,
             IDogStatsd statsd,
-            RuntimeMetricsWriter runtimeMetrics,
-            LibLogScopeEventSubscriber libLogSubscriber)
+            RuntimeMetricsWriter runtimeMetrics)
         {
             settings ??= ImmutableTracerSettings.FromDefaultSources();
 
@@ -85,12 +83,7 @@ namespace Datadog.Trace
                 runtimeMetrics ??= new RuntimeMetricsWriter(statsd ?? CreateDogStatsdClient(settings, defaultServiceName, settings.ExporterSettings.DogStatsdPort), TimeSpan.FromSeconds(10));
             }
 
-            if (settings.LogsInjectionEnabled)
-            {
-                libLogSubscriber ??= new LibLogScopeEventSubscriber(scopeManager, defaultServiceName, settings.ServiceVersion ?? string.Empty, settings.Environment ?? string.Empty);
-            }
-
-            var tracerManager = CreateTracerManagerFrom(settings, agentWriter, sampler, propagator, scopeManager, statsd, runtimeMetrics, libLogSubscriber, traceIdConvention, defaultServiceName);
+            var tracerManager = CreateTracerManagerFrom(settings, agentWriter, sampler, propagator, scopeManager, statsd, runtimeMetrics, traceIdConvention, defaultServiceName);
             return tracerManager;
         }
 
@@ -105,10 +98,9 @@ namespace Datadog.Trace
             IScopeManager scopeManager,
             IDogStatsd statsd,
             RuntimeMetricsWriter runtimeMetrics,
-            LibLogScopeEventSubscriber libLogSubscriber,
             ITraceIdConvention traceIdConvention,
             string defaultServiceName)
-            => new TracerManager(settings, agentWriter, sampler, propagator, scopeManager, statsd, runtimeMetrics, libLogSubscriber, traceIdConvention, defaultServiceName);
+            => new TracerManager(settings, agentWriter, sampler, propagator, scopeManager, statsd, runtimeMetrics, traceIdConvention, defaultServiceName);
 
         protected virtual ISampler GetSampler(ImmutableTracerSettings settings)
         {

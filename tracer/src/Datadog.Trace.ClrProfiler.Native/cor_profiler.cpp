@@ -608,7 +608,8 @@ HRESULT STDMETHODCALLTYPE CorProfiler::ModuleLoadFinished(ModuleID module_id, HR
 
         const auto& module_metadata =
             ModuleMetadata(metadata_import, metadata_emit, assembly_import, assembly_emit, module_info.assembly.name,
-                           module_info.assembly.app_domain_id, &corAssemblyProperty, enable_by_ref_instrumentation);
+                           module_info.assembly.app_domain_id, &corAssemblyProperty, enable_by_ref_instrumentation,
+                           enable_calltarget_state_by_ref);
 
         const auto& assemblyImport = GetAssemblyImportMetadata(assembly_import);
         const auto& assemblyVersion = assemblyImport.version.str();
@@ -635,7 +636,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::ModuleLoadFinished(ModuleID module_id, HR
                 else
                 {
                     RewriteForDistributedTracing(module_metadata, module_id);
-                }                
+                }
             }
             else
             {
@@ -829,7 +830,8 @@ HRESULT STDMETHODCALLTYPE CorProfiler::JITCompilationStarted(FunctionID function
 
     std::unique_ptr<ModuleMetadata> module_metadata = std::make_unique<ModuleMetadata>(
         metadataImport, metadataEmit, assemblyImport, assemblyEmit, module_info.assembly.name,
-        module_info.assembly.app_domain_id, &corAssemblyProperty, enable_by_ref_instrumentation);
+        module_info.assembly.app_domain_id, &corAssemblyProperty, enable_by_ref_instrumentation,
+        enable_calltarget_state_by_ref);
 
     // get function info
     const auto& caller = GetFunctionInfo(module_metadata->metadata_import, function_token);
@@ -967,11 +969,54 @@ HRESULT STDMETHODCALLTYPE CorProfiler::JITInlining(FunctionID callerId, Function
 void CorProfiler::InitializeProfiler(WCHAR* id, CallTargetDefinition* items, int size)
 {
     auto _ = trace::Stats::Instance()->InitializeProfilerMeasure();
-
     WSTRING definitionsId = WSTRING(id);
     Logger::Info("InitializeProfiler: received id: ", definitionsId, " from managed side with ", size,
                  " integrations.");
 
+    if (size > 0)
+    {
+        InternalAddInstrumentation(id, items, size, false);
+    }
+}
+
+void CorProfiler::EnableByRefInstrumentation()
+{
+    enable_by_ref_instrumentation = true;
+    if (rejit_handler != nullptr)
+    {
+        rejit_handler->SetEnableByRefInstrumentation(true);
+    }
+
+    Logger::Info("ByRef Instrumentation enabled.");
+}
+
+void CorProfiler::EnableCallTargetStateByRef()
+{
+    enable_calltarget_state_by_ref = true;
+    if (rejit_handler != nullptr)
+    {
+        rejit_handler->SetEnableCallTargetStateByRef(true);
+    }
+
+    Logger::Info("CallTargetState ByRef enabled.");
+}
+
+void CorProfiler::AddDerivedInstrumentations(WCHAR* id, CallTargetDefinition* items, int size)
+{
+    auto _ = trace::Stats::Instance()->InitializeProfilerMeasure();
+    WSTRING definitionsId = WSTRING(id);
+    Logger::Info("AddDerivedInstrumentations: received id: ", definitionsId, " from managed side with ", size,
+                 " integrations.");
+
+    if (size > 0)
+    {
+        InternalAddInstrumentation(id, items, size, true);
+    }
+}
+
+void CorProfiler::InternalAddInstrumentation(WCHAR* id, CallTargetDefinition* items, int size, bool isDerived)
+{
+    WSTRING definitionsId = WSTRING(id);
     std::scoped_lock<std::mutex> definitionsLock(definitions_ids_lock_);
 
     if (definitions_ids_.find(definitionsId) != definitions_ids_.end())
@@ -1012,7 +1057,7 @@ void CorProfiler::InitializeProfiler(WCHAR* id, CallTargetDefinition* items, int
 
             const auto& integration = IntegrationDefinition(
                 MethodReference(targetAssembly, targetType, targetMethod, minVersion, maxVersion, signatureTypes),
-                TypeReference(integrationAssembly, integrationType, {}, {}));
+                TypeReference(integrationAssembly, integrationType, {}, {}), isDerived);
 
             if (Logger::IsDebugEnabled())
             {
@@ -1048,17 +1093,6 @@ void CorProfiler::InitializeProfiler(WCHAR* id, CallTargetDefinition* items, int
 
         Logger::Info("InitializeProfiler: Total integrations in profiler: ", integration_definitions_.size());
     }
-}
-
-void CorProfiler::EnableByRefInstrumentation()
-{
-    enable_by_ref_instrumentation = true;
-    if (rejit_handler != nullptr)
-    {
-        rejit_handler->SetEnableByRefInstrumentation(true);
-    }
-
-    Logger::Info("ByRef Instrumentation enabled.");
 }
 
 //
@@ -1244,7 +1278,7 @@ HRESULT CorProfiler::RewriteForDistributedTracing(const ModuleMetadata& module_m
                                               managed_profiler_assembly_property.pcbPublicKey));
         Logger::Info("pcbPublicKey: ");
         const auto ppbPublicKey = (BYTE*) managed_profiler_assembly_property.ppbPublicKey;
-        for (auto i = 0; i < managed_profiler_assembly_property.pcbPublicKey; i++)
+        for (ULONG i = 0; i < managed_profiler_assembly_property.pcbPublicKey; i++)
         {
             Logger::Info(" -> ", (int) ppbPublicKey[i]);
         }
@@ -2970,7 +3004,14 @@ HRESULT CorProfiler::CallTarget_RewriterCallback(RejitHandlerModule* moduleHandl
     }
 
     reWriterWrapper.LoadLocal(exceptionIndex);
-    reWriterWrapper.LoadLocal(callTargetStateIndex);
+    if (enable_calltarget_state_by_ref)
+    {
+        reWriterWrapper.LoadLocalAddress(callTargetStateIndex);
+    }
+    else
+    {
+        reWriterWrapper.LoadLocal(callTargetStateIndex);
+    }
 
     ILInstr* endMethodCallInstr;
     if (isVoid)

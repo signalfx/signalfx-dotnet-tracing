@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using Datadog.Trace.DuckTyping;
 
@@ -26,12 +28,18 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch.V5
 
         public string Method => _data.Method.ToString();
 
+        public object ConnectionSettings => _data.ConnectionSettings;
+
+        public IPostData PostData => _data.PostData;
+
         [DuckCopy]
         public struct Proxy
         {
             public string Path;
             public HttpMethod Method;
             public Uri Uri;
+            public object ConnectionSettings;
+            public IPostData PostData;
         }
     }
 }

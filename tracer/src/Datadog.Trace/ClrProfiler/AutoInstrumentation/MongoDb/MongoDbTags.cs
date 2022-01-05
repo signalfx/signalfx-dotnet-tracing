@@ -5,42 +5,38 @@
 
 // Modified by Splunk Inc.
 
-using Datadog.Trace.ExtensionMethods;
+using Datadog.Trace.SourceGenerators;
 using Datadog.Trace.Tagging;
 
 namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
 {
-    internal class MongoDbTags : InstrumentationTags
+    internal partial class MongoDbTags : InstrumentationTags
     {
-        protected static readonly IProperty<string>[] MongoDbTagsProperties =
-            InstrumentationTagsProperties.Concat(
-                new ReadOnlyProperty<MongoDbTags, string>(Tags.InstrumentationName, t => t.InstrumentationName),
-                new Property<MongoDbTags, string>(Tags.DbType, t => t.DbType, (t, v) => t.DbType = v),
-                new Property<MongoDbTags, string>(Tags.DbName, t => t.DbName, (t, v) => t.DbName = v),
-                new Property<MongoDbTags, string>(Tags.DbStatement, t => t.DbStatement, (t, v) => t.DbStatement = v),
-                new Property<MongoDbTags, string>(Tags.MongoDbQuery, t => t.Query, (t, v) => t.Query = v),
-                new Property<MongoDbTags, string>(Tags.MongoDbCollection, t => t.Collection, (t, v) => t.Collection = v),
-                new Property<MongoDbTags, string>(Tags.OutHost, t => t.Host, (t, v) => t.Host = v),
-                new Property<MongoDbTags, string>(Tags.OutPort, t => t.Port, (t, v) => t.Port = v));
-
+        [Tag(Trace.Tags.SpanKind)]
         public override string SpanKind => SpanKinds.Client;
 
+        [Tag(Trace.Tags.InstrumentationName)]
         public string InstrumentationName => MongoDbIntegration.IntegrationName;
 
+        [Tag(Trace.Tags.DbType)]
         public string DbType { get; set; }
 
-        public string DbName { get; set; }
-
+        [Tag(Trace.Tags.DbStatement)]
         public string DbStatement { get; set; }
 
+        [Tag(Trace.Tags.DbName)]
+        public string DbName { get; set; }
+
+        [Tag(Trace.Tags.MongoDbQuery)]
         public string Query { get; set; }
 
+        [Tag(Trace.Tags.MongoDbCollection)]
         public string Collection { get; set; }
 
+        [Tag(Trace.Tags.OutHost)]
         public string Host { get; set; }
 
+        [Tag(Trace.Tags.OutPort)]
         public string Port { get; set; }
-
-        protected override IProperty<string>[] GetAdditionalTags() => MongoDbTagsProperties;
     }
 }

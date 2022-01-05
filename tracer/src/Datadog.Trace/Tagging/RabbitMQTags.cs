@@ -5,51 +5,46 @@
 
 // Modified by Splunk Inc.
 
-using System.Linq;
-using Datadog.Trace.ExtensionMethods;
+using System.Text;
+using System.Threading.Tasks;
+using Datadog.Trace.SourceGenerators;
 
 namespace Datadog.Trace.Tagging
 {
-    internal class RabbitMQTags : MessagingTags
+    internal partial class RabbitMQTags : MessagingTags
     {
-        protected static readonly IProperty<string>[] RabbitMQTagsProperties =
-            MessagingTagsProperties.Concat(
-                new Property<RabbitMQTags, string>(Tags.InstrumentationName, t => t.InstrumentationName, (t, v) => t.InstrumentationName = v), // Non OTel compliant tag
-                new Property<RabbitMQTags, string>(Tags.AmqpCommand, t => t.Command, (t, v) => t.Command = v), // Non OTel compliant tag
-                new Property<RabbitMQTags, string>(Tags.AmqpDeliveryMode, t => t.DeliveryMode, (t, v) => t.DeliveryMode = v), // Non OTel compliant tag
-                new Property<RabbitMQTags, string>(Tags.AmqpExchange, t => t.Exchange, (t, v) => t.Exchange = v), // Non OTel compliant tag
-                new Property<RabbitMQTags, string>(Tags.AmqpQueue, t => t.Queue, (t, v) => t.Queue = v), // Non OTel compliant tag
-                new Property<RabbitMQTags, string>(Tags.RabbitMq.RoutingKey, t => t.RoutingKey, (t, v) => t.RoutingKey = v));
-
-        private string _spanKind;
-
         // For the sake of unit tests, define a default constructor with the default behavior,
         // though the RabbitMQ integration should use the constructor that takes a spanKind
         // so the setter is only invoked once
         public RabbitMQTags()
+            : this(SpanKinds.Client)
         {
-            _spanKind = SpanKinds.Client;
         }
 
         public RabbitMQTags(string spanKind)
         {
-            _spanKind = spanKind;
+            SpanKind = spanKind;
         }
 
-        public override string SpanKind => _spanKind;
+        [Tag(Trace.Tags.SpanKind)]
+        public override string SpanKind { get; }
 
+        [Tag(Trace.Tags.InstrumentationName)]
         public string InstrumentationName { get; set; }
 
+        [Tag(Trace.Tags.AmqpCommand)]
         public string Command { get; set; }
 
+        [Tag(Trace.Tags.AmqpDeliveryMode)]
         public string DeliveryMode { get; set; }
 
+        [Tag(Trace.Tags.AmqpExchange)]
         public string Exchange { get; set; }
 
+        [Tag(Trace.Tags.RabbitMq.RoutingKey)]
         public string RoutingKey { get; set; }
 
+        [Tag(Trace.Tags.AmqpQueue)]
         public string Queue { get; set; }
-
-        protected override IProperty<string>[] GetAdditionalTags() => RabbitMQTagsProperties;
     }
 }

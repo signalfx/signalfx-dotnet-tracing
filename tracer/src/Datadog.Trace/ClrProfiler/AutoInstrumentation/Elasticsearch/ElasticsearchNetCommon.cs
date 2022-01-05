@@ -7,10 +7,9 @@
 
 using System;
 using System.IO;
-using System.Reflection;
 using System.Threading;
-using Datadog.Trace.ClrProfiler.Emit;
 using Datadog.Trace.Configuration;
+using Datadog.Trace.DuckTyping;
 using Datadog.Trace.Logging;
 
 namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch
@@ -88,55 +87,31 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch
         /// </summary>
         /// <param name="scope">The scope to tag.</param>
         /// <param name="requestData">The RequestData from which to retrieve the desired PostData content.</param>
-        public static void SetDbStatementFromRequestData(this Scope scope, object requestData)
+        public static void SetDbStatementFromRequestData(this Scope scope, IRequestData requestData)
         {
             if (!Tracer.Instance.Settings.TagElasticsearchQueries || scope?.Span == null)
             {
                 return;
             }
 
-            if (!ShouldAttemptWrittenBytes(requestData, out var postData, out var writtenBytes))
+            var postData = requestData?.PostData;
+            if (postData == null)
             {
                 return;
             }
 
+            var writtenBytes = postData.WrittenBytes;
+
             if (writtenBytes == null)
             {
-                var methodInfo = GetWriteMethodInfo(postData, requestData, out var connectionSettings);
                 using (var stream = new MemoryStream())
                 {
-                    var args = new object[] { stream, connectionSettings };
-                    methodInfo.Invoke(postData, args);
+                    postData.Write(stream, requestData.ConnectionSettings);
                     writtenBytes = stream.ToArray();
                 }
             }
 
             SetDbStatement(scope.Span, writtenBytes);
-        }
-
-        /// <summary>
-        /// Attempts to load the PostData.WrittenBytes property from Elasticsearch.Net.RequestData.
-        /// This will return false if tagging Elasticsearch queries is disabled or if data isn't applicable
-        /// for the http method (no PostData was supplied to the request), and true otherwise. It will
-        /// also obtain the PostData object in case manually writing the data is necessary (direct streaming enabled).
-        /// </summary>
-        /// <param name="requestData">The request data.</param>
-        /// <param name="postData">The PostData property the request data.</param>
-        /// <param name="writtenBytes">The WrittenBytes property of the PostData.</param>
-        /// <returns>Whether the request is appplicable for retrieving PostData content.</returns>
-        private static bool ShouldAttemptWrittenBytes(object requestData, out object postData, out byte[] writtenBytes)
-        {
-            writtenBytes = null;
-
-            postData = requestData.GetProperty("PostData")
-                                  .GetValueOrDefault();
-            if (postData == null)
-            {
-                return false;
-            }
-
-            writtenBytes = (byte[])postData.GetProperty("WrittenBytes").GetValueOrDefault();
-            return true;
         }
 
         /// <summary>
@@ -165,22 +140,6 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch
             }
 
             span.SetTag(Tags.DbStatement, postData);
-        }
-
-        /// <summary>
-        /// Will get the Write MethodInfo used to obtain the PostData's content when
-        /// WrittenBytes property is null (direct streaming enabled). Also obtains the RequestData
-        /// ConnectionSettings used by these methods.
-        /// </summary>
-        /// <param name="postData">The PostData from which to retrieve the desired MethodInfo.</param>
-        /// <param name="requestData">The RequestData from which to retrieve the ConnectionSettings used by the write method.</param>
-        /// <param name="connectionSettings">The RequestData.ConnectionSettings property.</param>
-        /// <returns>The Write or WriteAsync MethodInfo.</returns>
-        private static MethodInfo GetWriteMethodInfo(object postData, object requestData, out object connectionSettings)
-        {
-            connectionSettings = requestData.GetProperty("ConnectionSettings").GetValueOrDefault();
-            var postDataType = postData.GetType();
-            return postDataType.GetMethod("Write");
         }
     }
 }
