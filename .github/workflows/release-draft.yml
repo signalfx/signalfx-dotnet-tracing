@@ -68,7 +68,6 @@ jobs:
         with:
           name: nuget
           path: tracer/bin/artifacts/nuget
-          
 
   create_release:
     name: Create GH release
@@ -89,5 +88,3 @@ jobs:
         run: gh release create v${{ steps.get_version.outputs.VERSION }} --draft artifacts/signalfx* artifacts/x64/en-us/*.msi  artifacts/x86/en-us/*.msi nuget/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
