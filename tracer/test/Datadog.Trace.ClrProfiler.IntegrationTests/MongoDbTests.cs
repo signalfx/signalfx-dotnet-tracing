@@ -48,7 +48,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             using (RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion))
             {
                 var manualNames = new HashSet<string>() { "sync-calls", "sync-calls-execute", "async-calls", "async-calls-execute" };
-                var mongoNames = new HashSet<string>() { "aggregate", "buildInfo", "delete", "find", "getLastError", "insert", "mongodb.query" };
+                var mongoNames = new HashSet<string>() { "aggregate", "delete", "find", "insert", "mongodb.query" };
                 var expectedNames = new HashSet<string>();
                 expectedNames.UnionWith(manualNames);
                 expectedNames.UnionWith(mongoNames);
@@ -106,7 +106,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     }
                 }
 
-                expectedNames.Should().BeEquivalentTo(foundNames);
+                foundNames.Should().BeEquivalentTo(expectedNames);
             }
         }
     }
