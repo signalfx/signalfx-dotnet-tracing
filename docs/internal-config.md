@@ -44,6 +44,7 @@ These settings should be never used by the users.
 | `SIGNALFX_TRACE_BATCH_INTERVAL` | The batch interval in milliseconds for the serialization queue. | `100` |
 | `SIGNALFX_TRACE_BUFFER_SIZE` | The size in bytes of the trace buffer. | `1024 * 1024 * 10 (10MB)` |
 | `SIGNALFX_TRACE_LOG_PATH` | (Deprecated) The path of the profiler log file. | Linux: `/var/log/signalfx/dotnet/dotnet-profiler.log`<br>Windows: `%ProgramData%\SignalFx .NET Tracing\logs\dotnet-profiler.log` |
+| `SIGNALFX_TRACE_HEADER_TAG_NORMALIZATION_FIX_ENABLED` | Enables a fix around header tags normalization. We used to normalize periods even if a tag was provided for a header, whereas we should not. | `true` |
 | `SIGNALFX_TRACE_METRICS_ENABLED` | Enable to activate internal metrics sent to DogStatsD. | `false` |
 | `SIGNALFX_TRACE_PIPE_NAME` | The named pipe where the tracer can send traces. |  |
 | `SIGNALFX_TRACE_PIPE_TIMEOUT_MS` | The timeout in milliseconds for named pipes communication. | `100` |
