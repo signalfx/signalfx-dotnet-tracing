@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -59,12 +61,12 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests
             arguments.Should().BeNullOrEmpty();
             environmentVariables.Should().NotBeNull();
 
-            environmentVariables["DD_ENV"].Should().Be("TestEnv");
-            environmentVariables["DD_SERVICE"].Should().Be("TestService");
-            environmentVariables["DD_VERSION"].Should().Be("TestVersion");
-            environmentVariables["DD_DOTNET_TRACER_HOME"].Should().Be("TestTracerHome");
-            environmentVariables["DD_TRACE_AGENT_URL"].Should().Be(agentUrl);
-            environmentVariables["DD_CIVISIBILITY_ENABLED"].Should().Be("1");
+            environmentVariables["SIGNALFX_ENV"].Should().Be("TestEnv");
+            environmentVariables["SIGNALFX_SERVICE"].Should().Be("TestService");
+            environmentVariables["SIGNALFX_VERSION"].Should().Be("TestVersion");
+            environmentVariables["SIGNALFX_DOTNET_TRACER_HOME"].Should().Be("TestTracerHome");
+            environmentVariables["SIGNALFX_TRACE_AGENT_URL"].Should().Be(agentUrl);
+            environmentVariables["SIGNALFX_CIVISIBILITY_ENABLED"].Should().Be("1");
             environmentVariables["VAR1"].Should().Be("A");
             environmentVariables["VAR2"].Should().Be("B");
         }
@@ -94,7 +96,7 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests
 
                 foreach (var line in output.ToString().Split(Environment.NewLine))
                 {
-                    // ##vso[task.setvariable variable=DD_DOTNET_TRACER_HOME]TestTracerHome
+                    // ##vso[task.setvariable variable=SIGNALFX_DOTNET_TRACER_HOME]TestTracerHome
                     var match = Regex.Match(line, @"##vso\[task.setvariable variable=(?<name>[A-Z1-9_]+)\](?<value>.*)");
 
                     if (match.Success)
@@ -103,11 +105,11 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests
                     }
                 }
 
-                environmentVariables["DD_ENV"].Should().Be("TestEnv");
-                environmentVariables["DD_SERVICE"].Should().Be("TestService");
-                environmentVariables["DD_VERSION"].Should().Be("TestVersion");
-                environmentVariables["DD_DOTNET_TRACER_HOME"].Should().Be("TestTracerHome");
-                environmentVariables["DD_TRACE_AGENT_URL"].Should().Be("TestAgentUrl");
+                environmentVariables["SIGNALFX_ENV"].Should().Be("TestEnv");
+                environmentVariables["SIGNALFX_SERVICE"].Should().Be("TestService");
+                environmentVariables["SIGNALFX_VERSION"].Should().Be("TestVersion");
+                environmentVariables["SIGNALFX_DOTNET_TRACER_HOME"].Should().Be("TestTracerHome");
+                environmentVariables["SIGNALFX_TRACE_AGENT_URL"].Should().Be("TestAgentUrl");
                 environmentVariables["VAR1"].Should().Be("A");
                 environmentVariables["VAR2"].Should().Be("B");
             }

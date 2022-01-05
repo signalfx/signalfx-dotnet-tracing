@@ -1369,7 +1369,7 @@ stages:
         ./run-appsec.sh "linux"
       displayName: Crank
       env:
-        DD_SERVICE: dd-trace-dotnet-appsec
+        SIGNALFX_SERVICE: dd-trace-dotnet-appsec
 
 
 - stage: coverage
