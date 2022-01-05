@@ -62,7 +62,7 @@ namespace Datadog.Trace.Tests
             foreach (var referencedAssembly in _assembly.GetReferencedAssemblies().OrderBy(asm => asm.FullName))
             {
                 // Exclusions
-                // Datadog.Trace: This dependency is fine and the version will change over time
+                // SignalFx.Tracing: This dependency is fine and the version will change over time
                 // netstandard: This dependency is fine and there's a discrepancy between local builds and CI builds containing/not containing a reference to it
                 if (!referencedAssembly.Name.StartsWith("SignalFx.Tracing")
                     && !referencedAssembly.Name.Equals("netstandard"))
