@@ -6,12 +6,12 @@
     - (for pre-releases)
       `nuke UpdateVersion --version {new-version-here} --is-prerelease true`
 
-2. Update the [CHANGELOG.md](../CHANGELOG.md) with new the new release.
+2. Update the [CHANGELOG.md](../CHANGELOG.md) with the new release.
 
 3. Push the changes to upstream and create a Pull Request on GitHub.
 
 4. Once the Pull Request with all the version changes has been approved and merged
-   it is time to create a signed for the merged commit.
+   it is time to create a signed tag for the merged commit.
 
    ***IMPORTANT***: It is critical you use the same tag
    that you used in the previous steps!
