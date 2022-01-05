@@ -5,6 +5,7 @@
 
 // Modified by Splunk Inc.
 
+using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.TestHelpers;
 using Xunit;
@@ -36,7 +37,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             const int expectedSpanCount = 91;
             const string dbType = "fake";
             const string expectedOperationName = dbType + ".query";
-            const string expectedServiceName = "Samples.FakeDbCommand-fake";
+            const string expectedServiceName = "Samples.FakeDbCommand";
 
             using var agent = EnvironmentHelper.GetMockAgent();
             using var process = RunSampleAndWaitForExit(agent.Port);
@@ -51,7 +52,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
                 Assert.Equal(expectedServiceName, span.Service);
                 Assert.Equal(SpanTypes.Sql, span.Type);
                 Assert.Equal(dbType, span.Tags[Tags.DbType]);
-                Assert.False(span.Tags?.ContainsKey(Tags.Version), "External service span should not have service version tag.");
+                Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
             }
         }
     }
