@@ -109,7 +109,7 @@ jobs:
       if: ${{ runner.os == 'Windows' }}
       uses: actions/upload-artifact@v2
       with:
-        path: ${{ env.artifacts }}/nuget
+        path: ${{ env.artifacts }}/nuget/SignalFx.NET.Tracing.Azure.Site.Extension.*.nupkg
         name: nuget-packages
 
   managed-unit-tests:
