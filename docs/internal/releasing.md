@@ -14,7 +14,7 @@
     it is time to create a signed for the merged commit.
 
     ***IMPORTANT***: It is critical you use the same tag
-    that you used in the Pre-Release step!
+    that you used in the previous steps!
     Failure to do so will leave things in a broken state.
 
     You can do this using the following Bash snippet.
