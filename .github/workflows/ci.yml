@@ -1,4 +1,5 @@
 name: ci
+
 on:
   push:
     branches:
@@ -38,6 +39,7 @@ on:
     - shared/src/native-src/*
   pull_request:
   workflow_dispatch:
+
 env:
   buildConfiguration: Release
   dotnetSdkVersion: 6.0.100
@@ -53,6 +55,7 @@ env:
   dotnetToolTag: build-dotnet-tool
   Verify_DisableClipboard: true
   DiffEngine_Disabled: true
+
 jobs:
   build:
     name: Build
@@ -61,6 +64,7 @@ jobs:
       matrix:
         machine: [ windows-2019, ubuntu-20.04 ]
     runs-on: ${{ matrix.machine }}
+    timeout-minutes: 30
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-dotnet@v1
@@ -115,6 +119,7 @@ jobs:
       matrix:
         machine: [ windows-2019, ubuntu-20.04 ]
     runs-on: ${{ matrix.machine }}
+    timeout-minutes: 30
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-dotnet@v1
@@ -139,6 +144,7 @@ jobs:
       matrix:
         machine: [ windows-2019, ubuntu-20.04 ]
     runs-on: ${{ matrix.machine }}
+    timeout-minutes: 30
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-dotnet@v1

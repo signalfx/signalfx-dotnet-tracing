@@ -1,4 +1,4 @@
-name: Publish Release Artifacts
+name: Release draft
 
 on:
   push:
@@ -9,12 +9,11 @@ jobs:
   linux_build:
     name: Linux Build
     runs-on: ubuntu-20.04
-    timeout-minutes: 30
     strategy:
       matrix:
         baseImage: [debian]
         # TODO: baseImage: [alpine, debian]
-
+    timeout-minutes: 30
     env:
       baseImage: ${{ matrix.baseImage }}
       dotnetSdkVersion: 6.0.100
@@ -37,7 +36,7 @@ jobs:
           --env artifacts=/project/tracer/src/bin/artifacts \
           dd-trace-dotnet/${baseImage}-builder \
           dotnet /build/bin/Debug/_build.dll Clean BuildTracerHome ZipTracerHome
-    - name: Publish Linux x64 packages
+    - name: Upload Linux x64 packages
       uses: actions/upload-artifact@v2
       with:
         name: artifacts
@@ -46,6 +45,7 @@ jobs:
   windows_build:
     name: Windows Build
     runs-on: windows-2019
+    timeout-minutes: 30
     steps:
       - run: git config --system core.longpaths true
       - uses: actions/checkout@v2
@@ -58,12 +58,12 @@ jobs:
             6.0.x
       - run: tracer\build.cmd Clean BuildTracerHome PackageTracerHome
         shell: cmd
-      - name: Publish Windows MSI
+      - name: Upload Windows MSI
         uses: actions/upload-artifact@v2
         with:
           name: artifacts
           path: tracer/bin/artifacts/*/en-us
-      - name: Publish NuGet packages
+      - name: Upload NuGet packages
         uses: actions/upload-artifact@v2
         with:
           name: nuget
@@ -71,11 +71,12 @@ jobs:
           
 
   create_release:
+    name: Create GH release
     runs-on: ubuntu-20.04
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') # only trigger if the current event is for a tag push
     needs: [linux_build, windows_build]
     permissions:
       contents: write
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
@@ -84,9 +85,8 @@ jobs:
       - name: Extract Version from Tag
         id: get_version
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\/v}
-      # TODO: Extract release notes
       - name: Create Release
-        run: gh release create v${{ steps.get_version.outputs.VERSION }} --draft --prerelease artifacts/signalfx* artifacts/x64/en-us/*.msi  artifacts/x86/en-us/*.msi nuget/*
+        run: gh release create v${{ steps.get_version.outputs.VERSION }} --draft artifacts/signalfx* artifacts/x64/en-us/*.msi  artifacts/x86/en-us/*.msi nuget/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
