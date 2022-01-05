@@ -37,9 +37,10 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch.V6
         /// <returns>Calltarget state value</returns>
         internal static CallTargetState OnMethodBegin<TTarget, TRequestData>(TTarget instance, TRequestData requestData)
         {
-            var scope = ElasticsearchNetCommon.CreateScope(Tracer.Instance, ElasticsearchV6Constants.IntegrationId, instance.DuckCast<RequestPipelineStruct>(), new RequestDataV6(requestData));
+            var requestDataV6 = new RequestDataV6(requestData);
+            var scope = ElasticsearchNetCommon.CreateScope(Tracer.Instance, ElasticsearchV6Constants.IntegrationId, instance.DuckCast<RequestPipelineStruct>(), requestDataV6);
 
-            return new CallTargetState(scope, requestData);
+            return new CallTargetState(scope, requestDataV6);
         }
 
         /// <summary>
@@ -54,7 +55,11 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch.V6
         /// <returns>A response value, in an async scenario will be T of Task of T</returns>
         internal static CallTargetReturn<TResponse> OnMethodEnd<TTarget, TResponse>(TTarget instance, TResponse response, Exception exception, in CallTargetState state)
         {
-            state.Scope.SetDbStatementFromRequestData(state.State);
+            if (state.State is IRequestData requestData)
+            {
+                state.Scope.SetDbStatementFromRequestData(requestData);
+            }
+
             state.Scope.DisposeWithException(exception);
             return new CallTargetReturn<TResponse>(response);
         }
