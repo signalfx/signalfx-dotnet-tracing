@@ -8,7 +8,7 @@
 
 2. Update the [CHANGELOG.md](../CHANGELOG.md) with the new release.
 
-3. Push the changes to upstream and create a Pull Request on GitHub.
+3. Create a Pull Request on GitHub with the changes above.
 
 4. Once the Pull Request with all the version changes has been approved and merged
    it is time to create a signed tag for the merged commit.
