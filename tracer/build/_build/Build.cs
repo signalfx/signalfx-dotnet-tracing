@@ -211,6 +211,7 @@ partial class Build : NukeBuild
         .DependsOn(CompileRegressionDependencyLibs)
         .DependsOn(CompileRegressionSamples)
         .DependsOn(CompileFrameworkReproductions)
+        .DependsOn(BuildRunnerTool)
         .DependsOn(CompileIntegrationTests);
 
     Target BuildAndRunWindowsIntegrationTests => _ => _
