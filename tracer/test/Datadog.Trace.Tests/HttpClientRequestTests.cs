@@ -9,7 +9,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Datadog.Trace.Agent.MessagePack;
 using Datadog.Trace.Agent.Transports;
 using Datadog.Trace.Propagation;
 using Xunit;
@@ -28,7 +27,7 @@ namespace Datadog.Trace.Tests
 
             request.AddHeader("Hello", "World");
 
-            await request.PostAsync(ArraySegment<byte>.Empty);
+            await request.PostAsync(ArraySegment<byte>.Empty, MimeTypes.MsgPack);
 
             var message = handler.Message;
 
@@ -47,7 +46,7 @@ namespace Datadog.Trace.Tests
             var factory = new HttpClientRequestFactory(handler);
             var request = factory.Create(new Uri("http://localhost/"));
 
-            await request.PostAsync(ArraySegment<byte>.Empty);
+            await request.PostAsync(ArraySegment<byte>.Empty, MimeTypes.MsgPack);
 
             var message = handler.Message;
 

@@ -21,28 +21,28 @@ TEST(guid_parse, make_guid)
     const GUID guid02Expected = {0xBD1A650D, 0xAC5D, 0x4896, {0xB6, 0x4F, 0xD6, 0xFA, 0x25, 0xD6, 0xB2, 0x6A}};
 
     // long version
-    GUID guid01 = guid_parse::make_guid("{846F5F1C-F9AE-4B07-969E-05C26BC060D8}");
+    GUID guid01 = guid_parse::make_guid("{B4C89B0F-9908-4F73-9F59-0D77C5A06874}");
     EXPECT_TRUE(compare_guids(guid01, guid01Expected));
 
     GUID guid02 = guid_parse::make_guid("{BD1A650D-AC5D-4896-B64F-D6FA25D6B26A}");
     EXPECT_TRUE(compare_guids(guid02, guid02Expected));
 
     // long version - std::string
-    guid01 = guid_parse::make_guid(std::string("{846F5F1C-F9AE-4B07-969E-05C26BC060D8}"));
+    guid01 = guid_parse::make_guid(std::string("{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"));
     EXPECT_TRUE(compare_guids(guid01, guid01Expected));
 
     guid02 = guid_parse::make_guid(std::string("{BD1A650D-AC5D-4896-B64F-D6FA25D6B26A}"));
     EXPECT_TRUE(compare_guids(guid02, guid02Expected));
 
     // short version
-    guid01 = guid_parse::make_guid("846F5F1C-F9AE-4B07-969E-05C26BC060D8");
+    guid01 = guid_parse::make_guid("B4C89B0F-9908-4F73-9F59-0D77C5A06874");
     EXPECT_TRUE(compare_guids(guid01, guid01Expected));
 
     guid02 = guid_parse::make_guid("BD1A650D-AC5D-4896-B64F-D6FA25D6B26A");
     EXPECT_TRUE(compare_guids(guid02, guid02Expected));
 
     // short version - std::string
-    guid01 = guid_parse::make_guid(std::string("846F5F1C-F9AE-4B07-969E-05C26BC060D8"));
+    guid01 = guid_parse::make_guid(std::string("B4C89B0F-9908-4F73-9F59-0D77C5A06874"));
     EXPECT_TRUE(compare_guids(guid01, guid01Expected));
 
     guid02 = guid_parse::make_guid(std::string("BD1A650D-AC5D-4896-B64F-D6FA25D6B26A"));

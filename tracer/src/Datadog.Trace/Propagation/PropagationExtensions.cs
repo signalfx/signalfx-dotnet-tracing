@@ -23,21 +23,6 @@ namespace Datadog.Trace.Propagation
             return propagator.Extract(headers, ExtractFromHeadersCollection);
         }
 
-        [Obsolete("This method is deprecated and will be removed. Use ExtractHeaderTags<T>(T, IEnumerable<KeyValuePair<string, string>>, string) instead. " +
-                  "Kept for backwards compatability where there is a version mismatch between manual and automatic instrumentation")]
-        public static IEnumerable<KeyValuePair<string, string>> ExtractHeaderTags(this IHeadersCollection headers, IEnumerable<KeyValuePair<string, string>> headerToTagMap)
-        {
-            foreach (KeyValuePair<string, string> headerNameToTagName in headerToTagMap)
-            {
-                string headerValue = ParseString(headers, headerNameToTagName.Key);
-
-                if (headerValue != null)
-                {
-                    yield return new KeyValuePair<string, string>(headerNameToTagName.Value, headerValue);
-                }
-            }
-        }
-
         public static IEnumerable<KeyValuePair<string, string>> ExtractHeaderTags(this IHeadersCollection headers, IEnumerable<KeyValuePair<string, string>> headerToTagMap, string defaultTagPrefix)
         {
             foreach (KeyValuePair<string, string> headerNameToTagName in headerToTagMap)
@@ -60,7 +45,7 @@ namespace Datadog.Trace.Propagation
                     var cacheKey = new Key(headerNameToTagName.Key, defaultTagPrefix);
                     string tagNameResult = DefaultTagMappingCache.GetOrAdd(cacheKey, key =>
                     {
-                        if (key.HeaderName.TryConvertToNormalizedHeaderTagName(out string normalizedHeaderTagName))
+                        if (key.HeaderName.TryConvertToNormalizedTagName(normalizePeriods: true, out var normalizedHeaderTagName))
                         {
                             return key.TagPrefix + "." + normalizedHeaderTagName;
                         }

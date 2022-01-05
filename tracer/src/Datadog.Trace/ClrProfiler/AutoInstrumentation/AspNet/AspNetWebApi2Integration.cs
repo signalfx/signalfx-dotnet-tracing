@@ -156,7 +156,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
                 var httpContext = System.Web.HttpContext.Current;
                 if (httpContext is not null)
                 {
-                    httpContext.Items[SharedConstants.HttpContextPropagatedResourceNameKey] = resourceName;
+                    httpContext.Items[SharedItems.HttpContextPropagatedResourceNameKey] = resourceName;
                 }
             }
             catch (Exception ex)

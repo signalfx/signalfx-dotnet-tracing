@@ -6,24 +6,13 @@
 // Modified by Splunk Inc.
 
 using System;
-using Datadog.Trace.ExtensionMethods;
+using Datadog.Trace.SourceGenerators;
 
 namespace Datadog.Trace.Tagging
 {
-    internal class KafkaTags : MessagingTags
+    internal partial class KafkaTags : MessagingTags
     {
         private const string ComponentName = "kafka";
-
-        private static readonly IProperty<string>[] KafkaTagsProperties =
-            MessagingTagsProperties.Concat(
-                new ReadOnlyProperty<KafkaTags, string>(Tags.InstrumentationName, t => t.InstrumentationName),
-                new Property<KafkaTags, string>(Tags.KafkaPartition, t => t.Partition, (t, v) => t.Partition = v),
-                new Property<KafkaTags, string>(Tags.KafkaOffset, t => t.Offset, (t, v) => t.Offset = v),
-                new Property<KafkaTags, string>(Tags.KafkaTombstone, t => t.Tombstone, (t, v) => t.Tombstone = v));
-
-        private static readonly IProperty<double?>[] KafkaTagsMetrics =
-            InstrumentationMetricsProperties.Concat(
-                new Property<KafkaTags, double?>(Trace.Metrics.MessageQueueTimeMs, t => t.MessageQueueTimeMs, (t, v) => t.MessageQueueTimeMs = v));
 
         // For the sake of unit tests, define a default constructor
         // though the Kafka integration should use the constructor that takes a spanKind
@@ -39,20 +28,22 @@ namespace Datadog.Trace.Tagging
             SpanKind = spanKind;
         }
 
+        [Tag(Trace.Tags.SpanKind)]
         public override string SpanKind { get; }
 
+        [Tag(Trace.Tags.InstrumentationName)]
         public string InstrumentationName => ComponentName;
 
+        [Tag(Trace.Tags.KafkaPartition)]
         public string Partition { get; set; }
 
+        [Tag(Trace.Tags.KafkaOffset)]
         public string Offset { get; set; }
 
+        [Tag(Trace.Tags.KafkaTombstone)]
         public string Tombstone { get; set; }
 
+        [Metric(Trace.Metrics.MessageQueueTimeMs)]
         public double? MessageQueueTimeMs { get; set; }
-
-        protected override IProperty<string>[] GetAdditionalTags() => KafkaTagsProperties;
-
-        protected override IProperty<double?>[] GetAdditionalMetrics() => KafkaTagsMetrics;
     }
 }
