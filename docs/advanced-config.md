@@ -75,9 +75,6 @@ Use following settings to configure where the telemetry data is being exported.
 |-|-|-|
 | `SIGNALFX_ACCESS_TOKEN` | Your Splunk Observabilty Cloud access token for your organization. It enables sending traces directly to the Splunk Observabilty Cloud ingest endpoint. |  |
 | `SIGNALFX_ENDPOINT_URL` | The URL to where trace exporters send traces. | `http://localhost:9411/api/v2/spans` |
-| `SIGNALFX_MAX_TRACES_PER_SECOND` | The number of traces allowed to be submitted per second. | `100` |
-| `SIGNALFX_TRACE_SAMPLE_RATE` | The global rate for the sampler. By default, all traces are sampled. |  |
-| `SIGNALFX_TRACE_SAMPLING_RULES` | Comma-separated list of sampling rules that enable custom sampling rules based on regular expressions. Rule are matched by order of specification. Only the first match is used. The item "sample_rate" must be in decimal format. Both `service` and `name` accept regular expressions. | `'[{"sample_rate":0.5, "service":"cart.*"}],[{"sample_rate":0.2, "name":"http.request"}]'` |
 | `SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED` | Enable to activate sending partial traces to the agent. | `false` |
 | `SIGNALFX_TRACE_PARTIAL_FLUSH_MIN_SPANS` | The minimum number of closed spans in a trace before it's partially flushed. `SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED` has to be enabled for this to take effect. | `500` |
 

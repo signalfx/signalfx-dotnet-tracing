@@ -78,8 +78,6 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
   HTTP statuses to set spans as errors.
 - Add `SIGNALFX_HTTP_CLIENT_ERROR_STATUSES` configuration that controls client
   HTTP statuses to set spans as errors.
-- Add `SIGNALFX_MAX_TRACES_PER_SECOND` configuration that limits max number
-  of traces sent per second.
 - Add `SIGNALFX_STDOUT_LOG_TEMPLATE` configuration that configures `stdout` template.
 - Add `SIGNALFX_TRACE_DELAY_WCF_INSTRUMENTATION_ENABLED` configuration that
   enables the updated WCF instrumentation that delays execution until later in
@@ -100,10 +98,6 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
   will populate `version` tag on spans.
 - Add `SIGNALFX_TRACE_STARTUP_LOGS` configuration that enables diagnostic log
   at startup.
-- Add `SIGNALFX_TRACE_SAMPLE_RATE` configuration that sets the global rate for
-  the sampler.
-- Add `SIGNALFX_TRACE_SAMPLING_RULES` configuration that is a comma-separated
-  list of sampling rules that enable custom sampling rules based on regular expressions.
 - Add `SIGNALFX_TRACE_{0}_ENABLED` configuration pattern that enables/disables
   specific integration.
 - Add `SIGNALFX_TRACE_HTTP_CLIENT_EXCLUDED_URL_SUBSTRINGS` configuration that
