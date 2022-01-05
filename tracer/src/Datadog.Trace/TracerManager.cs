@@ -52,7 +52,6 @@ namespace Datadog.Trace
             IScopeManager scopeManager,
             IDogStatsd statsd,
             RuntimeMetricsWriter runtimeMetricsWriter,
-            LibLogScopeEventSubscriber libLogSubscriber,
             ITraceIdConvention traceIdConvention,
             string defaultServiceName)
         {
@@ -64,7 +63,6 @@ namespace Datadog.Trace
             Statsd = statsd;
             RuntimeMetrics = runtimeMetricsWriter;
             DefaultServiceName = defaultServiceName;
-            LibLogSubscriber = libLogSubscriber;
             TraceIdConvention = traceIdConvention;
         }
 
@@ -118,8 +116,6 @@ namespace Datadog.Trace
         public IDogStatsd Statsd { get; }
 
         private RuntimeMetricsWriter RuntimeMetrics { get; }
-
-        private LibLogScopeEventSubscriber LibLogSubscriber { get; }
 
         /// <summary>
         /// Replaces the global <see cref="TracerManager"/> settings. This affects all <see cref="Tracer"/> instances
@@ -186,17 +182,10 @@ namespace Datadog.Trace
                     oldManager.RuntimeMetrics?.Dispose();
                 }
 
-                var libLogScopeManagerReplaced = false;
-                if (oldManager.LibLogSubscriber != newManager.LibLogSubscriber)
-                {
-                    libLogScopeManagerReplaced = true;
-                    oldManager.LibLogSubscriber.Dispose();
-                }
-
                 Log.Information(
                     exception: null,
-                    "Replaced global instances. AgentWriter: {AgentWriterReplaced}, StatsD: {StatsDReplaced}, RuntimeMetricsWriter: {RuntimeMetricsWriterReplaced} LibLogScopeManager: {LibLogScopeManagerReplaced}",
-                    new object[] { agentWriterReplaced, statsdReplaced, runtimeMetricsWriterReplaced, libLogScopeManagerReplaced });
+                    "Replaced global instances. AgentWriter: {AgentWriterReplaced}, StatsD: {StatsDReplaced}, RuntimeMetricsWriter: {RuntimeMetricsWriterReplaced}",
+                    new object[] { agentWriterReplaced, statsdReplaced, runtimeMetricsWriterReplaced });
             }
             catch (Exception ex)
             {

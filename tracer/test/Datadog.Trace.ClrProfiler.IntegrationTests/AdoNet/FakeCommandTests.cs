@@ -5,6 +5,8 @@
 
 // Modified by Splunk Inc.
 
+using System.Collections.Generic;
+using System.Linq;
 using Datadog.Trace.TestHelpers;
 using Xunit;
 using Xunit.Abstractions;
@@ -23,25 +25,34 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
         [Trait("Category", "EndToEnd")]
         public void SubmitsTraces()
         {
-            const int expectedSpanCount = 21;
+            // ALWAYS: 91 spans
+            // - FakeCommand: 21 spans (3 groups * 7 spans)
+            // - DbCommand: 21 spans (3 groups * 7 spans)
+            // - IDbCommand: 7 spans (1 groups * 7 spans)
+            // - IDbCommandGenericConstraint<FakeCommand>: 7 spans (1 group * 7 spans)
+            // - DbCommand-netstandard:  21 spans (3 groups * 7 spans)
+            // - IDbCommand-netstandard: 7 spans (1 groups * 7 spans)
+            // - IDbCommandGenericConstraint<SqlCommand>-netstandard: 7 spans (1 group * 7 spans)
+
+            const int expectedSpanCount = 91;
             const string dbType = "fake";
             const string expectedOperationName = dbType + ".query";
             const string expectedServiceName = "Samples.FakeDbCommand";
 
             using var agent = EnvironmentHelper.GetMockAgent();
             using var process = RunSampleAndWaitForExit(agent.Port);
-            var spans = agent.WaitForSpans(expectedSpanCount);
+            var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
+            int actualSpanCount = spans.Count(s => s.ParentId.HasValue); // Remove unexpected DB spans from the calculation
 
-            Assert.Equal(expectedSpanCount, spans.Count);
+            Assert.Equal(expectedSpanCount, actualSpanCount);
 
             foreach (var span in spans)
             {
+                Assert.Equal(expectedOperationName, span.Name);
                 Assert.Equal(expectedServiceName, span.Service);
-
-                // we do NOT expect any `fake.query` spans
-                Assert.NotEqual(expectedOperationName, span.Name);
-                Assert.NotEqual(SpanTypes.Sql, span.Type);
-                Assert.False(span.Tags?.ContainsKey(Tags.DbType));
+                Assert.Equal(SpanTypes.Sql, span.Type);
+                Assert.Equal(dbType, span.Tags[Tags.DbType]);
+                Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
             }
         }
     }

@@ -9,6 +9,7 @@
     Type: web,
     ParentId: Id_3,
     Tags: {
+      component: Wcf,
       deployment.environment: integration_tests,
       http.method: POST,
       http.request.headers.host: localhost:00000,
@@ -36,6 +37,7 @@
     Type: web,
     ParentId: Id_6,
     Tags: {
+      component: Wcf,
       deployment.environment: integration_tests,
       http.method: POST,
       http.request.headers.host: localhost:00000,
@@ -63,6 +65,7 @@
     Type: web,
     ParentId: Id_9,
     Tags: {
+      component: Wcf,
       deployment.environment: integration_tests,
       http.method: POST,
       http.request.headers.host: localhost:00000,
@@ -90,6 +93,7 @@
     Type: web,
     ParentId: Id_12,
     Tags: {
+      component: Wcf,
       deployment.environment: integration_tests,
       http.method: POST,
       http.request.headers.host: localhost:00000,
@@ -117,6 +121,7 @@
     Type: web,
     ParentId: Id_15,
     Tags: {
+      component: Wcf,
       deployment.environment: integration_tests,
       http.method: POST,
       http.request.headers.host: localhost:00000,
@@ -144,6 +149,7 @@
     Type: web,
     ParentId: Id_18,
     Tags: {
+      component: Wcf,
       deployment.environment: integration_tests,
       http.method: POST,
       http.request.headers.host: localhost:00000,

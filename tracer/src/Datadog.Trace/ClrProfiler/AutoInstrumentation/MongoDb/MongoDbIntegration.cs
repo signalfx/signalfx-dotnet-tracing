@@ -7,10 +7,9 @@
 
 using System;
 using System.Net;
-using Datadog.Trace.ClrProfiler.Emit;
 using Datadog.Trace.Configuration;
+using Datadog.Trace.DuckTyping;
 using Datadog.Trace.Logging;
-using Datadog.Trace.Util;
 
 namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
 {
@@ -26,7 +25,6 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
         internal const string Major2Minor2 = "2.2"; // Synchronous methods added in 2.2
         internal const string MongoDbClientAssembly = "MongoDB.Driver.Core";
 
-        private const string IWireProtocolGeneric = "MongoDB.Driver.Core.WireProtocol.IWireProtocol`1";
         private const string DefaultOperationName = "mongodb.query";
         private const string ServiceName = "mongodb";
 
@@ -45,7 +43,8 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(MongoDbIntegration));
 
-        internal static Scope CreateScope(object wireProtocol, object connection)
+        internal static Scope CreateScope<TConnection>(object wireProtocol, TConnection connection)
+            where TConnection : IConnection
         {
             var tracer = Tracer.Instance;
 
@@ -61,93 +60,54 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
                 return null;
             }
 
-            string databaseName = null;
-            string host = null;
-            string port = null;
-
-            try
-            {
-                if (wireProtocol.TryGetFieldValue("_databaseNamespace", out object databaseNamespace))
-                {
-                    databaseNamespace?.TryGetPropertyValue("DatabaseName", out databaseName);
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Warning(ex, "Unable to access DatabaseName property.");
-            }
-
-            try
-            {
-                if (connection != null && connection.TryGetPropertyValue("EndPoint", out object endpoint))
-                {
-                    if (endpoint is IPEndPoint ipEndPoint)
-                    {
-                        host = ipEndPoint.Address.ToString();
-                        port = ipEndPoint.Port.ToString();
-                    }
-                    else if (endpoint is DnsEndPoint dnsEndPoint)
-                    {
-                        host = dnsEndPoint.Host;
-                        port = dnsEndPoint.Port.ToString();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Warning(ex, "Unable to access EndPoint properties.");
-            }
-
             string statement = null;
             string operationName = null;
             string collectionName = null;
             string query = null;
             string resourceName = null;
+            string databaseName = null;
 
-            try
+            if (wireProtocol.TryDuckCast<IWireProtocolWithDatabaseNamespaceStruct>(out var protocolWithDatabaseNamespace))
             {
-                if (wireProtocol.TryGetFieldValue("_command", out object command) && command != null)
-                {
-                    if (tracer.Settings.TagMongoCommands)
-                    {
-                        statement = command.ToString();
-                    }
-
-                    // the name of the first element in the command BsonDocument will be the operation type (insert, delete, find, etc)
-                    // and its value is the collection name
-                    if (command.TryCallMethod("GetElement", 0, out object firstElement) && firstElement != null)
-                    {
-                        if (firstElement.TryGetPropertyValue("Name", out operationName) &&
-                            operationName == IsMasterOperation && databaseName == AdminDatabaseName)
-                        {
-                            // Assume that this is the driver doing "Heartbeat" or "RoundTripTimeMonitor", don't create an activity for it.
-                            return null;
-                        }
-
-                        if (firstElement.TryGetPropertyValue("Value", out object collectionNameObj) && collectionNameObj != null)
-                        {
-                            collectionName = collectionNameObj.ToString();
-                        }
-                    }
-
-                    // get the "query" element from the command BsonDocument, if it exists
-                    if (command.TryCallMethod("Contains", "query", out bool found) && found)
-                    {
-                        if (command.TryCallMethod("GetElement", "query", out object queryElement) && queryElement != null)
-                        {
-                            if (queryElement.TryGetPropertyValue("Value", out object queryValue) && queryValue != null)
-                            {
-                                query = queryValue.ToString();
-                            }
-                        }
-                    }
-
-                    resourceName = $"{operationName ?? "operation"} {databaseName ?? "database"}";
-                }
+                databaseName = protocolWithDatabaseNamespace.DatabaseNamespace.DatabaseName;
             }
-            catch (Exception ex)
+
+            if (wireProtocol.TryDuckCast<IWireProtocolWithCommandStruct>(out var protocolWithCommand)
+                && protocolWithCommand.Command != null)
             {
-                Log.Warning(ex, "Unable to access IWireProtocol.Command properties.");
+                // the name of the first element in the command BsonDocument will be the operation type (insert, delete, find, etc)
+                // and its value is the collection name
+                var firstElement = protocolWithCommand.Command.GetElement(0);
+                operationName = firstElement.Name;
+
+                if (operationName == IsMasterOperation || operationName == "hello" || databaseName == AdminDatabaseName)
+                {
+                    // Assume that this is the driver doing "Heartbeat" or hello or "RoundTripTimeMonitor", don't create an activity for it.
+                    return null;
+                }
+
+                if (tracer.Settings.TagMongoCommands)
+                {
+                    statement = protocolWithCommand.Command.ToString();
+                }
+
+                collectionName = firstElement.Value?.ToString();
+                query = protocolWithCommand.Command.ToString();
+                resourceName = $"{operationName ?? "operation"} {databaseName ?? "database"}";
+            }
+
+            string host = null;
+            string port = null;
+
+            if (connection.EndPoint is IPEndPoint ipEndPoint)
+            {
+                host = ipEndPoint.Address.ToString();
+                port = ipEndPoint.Port.ToString();
+            }
+            else if (connection.EndPoint is DnsEndPoint dnsEndPoint)
+            {
+                host = dnsEndPoint.Host;
+                port = dnsEndPoint.Port.ToString();
             }
 
             string serviceName = tracer.Settings.GetServiceName(tracer, ServiceName);
@@ -194,36 +154,6 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
             }
 
             return null;
-        }
-
-        private static Type[] GetGenericsFromWireProtocol(Type wireProtocolType)
-        {
-            var interfaces = wireProtocolType.GetInterfaces();
-            Type typeWeInstrument = null;
-
-            for (var i = 0; i < interfaces.Length; i++)
-            {
-                if (string.Equals($"{interfaces[i].Namespace}.{interfaces[i].Name}", IWireProtocolGeneric))
-                {
-                    typeWeInstrument = interfaces[i];
-                    break;
-                }
-            }
-
-            if (typeWeInstrument == null)
-            {
-                // We're likely in a non-generic context
-                return null;
-            }
-
-            var genericArgs = typeWeInstrument.GetGenericArguments();
-
-            if (genericArgs.Length == 0)
-            {
-                ThrowHelper.ThrowArgumentException($"Expected generics to determine TaskResult from {wireProtocolType.AssemblyQualifiedName}");
-            }
-
-            return genericArgs;
         }
     }
 }
