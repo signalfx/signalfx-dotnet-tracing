@@ -15,7 +15,7 @@ environment variable.
 3. For other applications the name of the [entry assembly](https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly.getentryassembly?view=net-6.0)
 is used as the default service name. Typically this is the name of your .NET project file.
 
-4. In the unlikely case that the [entry assembly is not available](https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly.getentryassembly?view=net-6.0#remarks).
+4. If the [entry assembly is not available](https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly.getentryassembly?view=net-6.0#remarks).
 The instrumentation tries to use the current process name.
 The process name can be `dotnet` if it is launched directly using an assembly, eg.: `dotnet InstrumentedApp.dll`.
 
