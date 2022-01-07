@@ -8,7 +8,7 @@ For ASP.NET applications, for example IIS applications running on the .NET Frame
 default service name is `ServiceName[\VirtualPath]`.
 For ASP.NET Core applications the default service name is the entry assembly name, typically
 the name of your .NET Core project.
-If the defaults above don't fit well with your usage or naming conventions configure `SIGNALFX_SERVICE_NAME` as described in [advanced-config.md](advanced-config.md#configuration-methods).
+If the defaults don't fit well with your usage or naming conventions configure `SIGNALFX_SERVICE_NAME` as described in [advanced-config.md](advanced-config.md#configuration-methods).
 
 Consider using `web.config` as the configuration method
 to avoid potential configuration conflicts between other applications.
