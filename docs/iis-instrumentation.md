@@ -4,7 +4,7 @@ By default, the installer enables IIS instrumentation for .NET Framework
 by setting the `Environment` registry key for W3SVC and WAS services
 located in the `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services` folder.
 
-For ASP.NET applications (ie.: those IIS applications running on the .NET Framework) the
+For ASP.NET applications, for example IIS applications running on the .NET Framework, the
 default service name is `ServiceName[\VirtualPath]`.
 For ASP.NET Core applications the default service name is the entry assembly name, typically
 the name of your .NET Core project.
