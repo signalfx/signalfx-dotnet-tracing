@@ -307,7 +307,7 @@ private:
         if (classId == NULL)
         {
             Logger::Debug("NULL classId passed to GetClassName");
-            result.append(L"Unknown");
+            result.append(WStr("Unknown"));
             return;
         }
 
@@ -315,25 +315,25 @@ private:
         if (CORPROF_E_CLASSID_IS_ARRAY == hr)
         {
             // We have a ClassID of an array.
-            result.append(L"ArrayClass");
+            result.append(WStr("ArrayClass"));
             return;
         }
         else if (CORPROF_E_CLASSID_IS_COMPOSITE == hr)
         {
             // We have a composite class
-            result.append(L"CompositeClass");
+            result.append(WStr("CompositeClass"));
             return;
         }
         else if (CORPROF_E_DATAINCOMPLETE == hr)
         {
             // type-loading is not yet complete. Cannot do anything about it.
-            result.append(L"DataIncomplete");
+            result.append(WStr("DataIncomplete"));
             return;
         }
         else if (FAILED(hr))
         {
             Logger::Debug("GetClassIDInfo failed: ", hr);
-            result.append(L"Unknown");
+            result.append(WStr("Unknown"));
             return;
         }
 
@@ -342,7 +342,7 @@ private:
         if (FAILED(hr))
         {
             Logger::Debug("GetModuleMetaData failed: ", hr);
-            result.append(L"Unknown");
+            result.append(WStr("Unknown"));
             return;
         }
 
@@ -352,7 +352,7 @@ private:
         if (FAILED(hr))
         {
             Logger::Debug("GetTypeDefProps failed: ", hr);
-            result.append(L"Unknown");
+            result.append(WStr("Unknown"));
             return;
         }
 
@@ -363,7 +363,7 @@ private:
     {
         if (funcID == NULL)
         {
-            result.append(L"Unknown_Native_Function");
+            result.append(WStr("Unknown_Native_Function"));
             return;
         }
 
@@ -400,10 +400,10 @@ private:
         }
         else
         {
-            result.append(L"SharedGenericFunction");
+            result.append(WStr("SharedGenericFunction"));
         }
 
-        result.append(L"::");
+        result.append(WStr("::"));
 
         result.append(funcName);
 
