@@ -497,9 +497,13 @@ int GetSamplingPeriod()
     }
     try
     {
+#ifdef _WIN32
+        int ival = std::stoi(val);
+#else
         std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
         std::string str = convert.to_bytes(val);
         int ival = std::stoi(str);
+#endif
         return (int) fmaxl(MINIMUM_SAMPLE_PERIOD, ival);
     }
     catch (...)
