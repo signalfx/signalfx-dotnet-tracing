@@ -569,16 +569,11 @@ DWORD WINAPI SamplingThreadMain(_In_ LPVOID param)
     return 0;
 }
 
-void ThreadSampler::StartSampling(ICorProfilerInfo3* info3)
+void ThreadSampler::StartSampling(ICorProfilerInfo10* info10)
 {
     Logger::Info("ThreadSampler::StartSampling");
-    profilerInfo = info3;
-    HRESULT hr = info3->QueryInterface<ICorProfilerInfo10>(&this->info10);
-    if (FAILED(hr))
-    {
-        Logger::Error("Can't get ICorProfilerInfo10; thread sampling will not run: ", hr);
-        return;
-    }
+    profilerInfo = info10;
+    this->info10 = info10;
     HANDLE bgThread = CreateThread(NULL, 0, &SamplingThreadMain, this, 0, NULL);
 }
 
