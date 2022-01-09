@@ -75,7 +75,7 @@ int ThreadSampling_ConsumeOneThreadSample(int len, unsigned char* buf)
     {
         return 0;
     }
-    int toUseLen = (int) min(toUse->size(), len);
+    int toUseLen = (int) fminl(toUse->size(), len);
     memcpy(buf, toUse->data(), toUseLen);
     delete toUse;
     return toUseLen;
@@ -242,7 +242,7 @@ void ThreadSamplesBuffer::writeString(WSTRING& str)
 {
     // limit strings to a max length overall; this prevents (e.g.) thread names or
     // any other miscellaneous strings that come along from blowing things out
-    short usedLen = (short) min(str.length(), MAX_STRING_LENGTH);
+    short usedLen = (short) fminl(str.length(), MAX_STRING_LENGTH);
     writeShort(usedLen);
     // odd bit of casting since we're copying bytes, not wchars
     unsigned char* strBegin = (unsigned char*)(&str.c_str()[0]);
@@ -497,7 +497,10 @@ int GetSamplingPeriod()
     }
     try
     {
-        return max(MINIMUM_SAMPLE_PERIOD, std::stoi(val));
+        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+        std::string str = convert.to_bytes(val);
+        int ival = std::stoi(str);
+        return (int) fmaxl(MINIMUM_SAMPLE_PERIOD, ival);
     }
     catch (...)
     {
