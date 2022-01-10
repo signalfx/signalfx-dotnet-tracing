@@ -1,3 +1,5 @@
+// We want to use std::min, not the windows.h macro
+#define NOMINMAX
 #include "ThreadSampler.h"
 #include "logger.h"
 #include <chrono>
@@ -76,7 +78,7 @@ int ThreadSampling_ConsumeOneThreadSample(int len, unsigned char* buf)
     {
         return 0;
     }
-    int toUseLen = (int) std::min(toUse->size(), (unsigned long) len);
+    int toUseLen = (int) std::min(toUse->size(), (size_t) len);
     memcpy(buf, toUse->data(), toUseLen);
     delete toUse;
     return toUseLen;
@@ -243,7 +245,7 @@ void ThreadSamplesBuffer::writeString(WSTRING& str)
 {
     // limit strings to a max length overall; this prevents (e.g.) thread names or
     // any other miscellaneous strings that come along from blowing things out
-    short usedLen = (short) std::min(str.length(), MAX_STRING_LENGTH);
+    short usedLen = (short) std::min(str.length(), (size_t)MAX_STRING_LENGTH);
     writeShort(usedLen);
     // odd bit of casting since we're copying bytes, not wchars
     unsigned char* strBegin = (unsigned char*)(&str.c_str()[0]);
