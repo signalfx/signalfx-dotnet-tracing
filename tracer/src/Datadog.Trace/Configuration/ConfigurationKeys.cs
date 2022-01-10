@@ -145,7 +145,7 @@ namespace Datadog.Trace.Configuration
         /// Configuration key for a list of tags to be applied globally to spans.
         /// </summary>
         /// <seealso cref="TracerSettings.GlobalTags"/>
-        public const string GlobalTags = "SIGNALFX_TAGS";
+        public const string GlobalTags = "SIGNALFX_TRACE_GLOBAL_TAGS";
 
         /// <summary>
         /// Configuration key for a map of header keys to tag names.
