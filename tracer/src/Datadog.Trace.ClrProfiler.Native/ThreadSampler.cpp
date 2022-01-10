@@ -1,11 +1,14 @@
+// We want to use std::min, not the windows.h macro
+#define NOMINMAX
 #include "ThreadSampler.h"
 #include "logger.h"
 #include <chrono>
 #include <map>
+#include <algorithm>
 
-#define MAX_FUNC_NAME_LEN 256
-#define MAX_CLASS_NAME_LEN 512
-#define MAX_STRING_LENGTH 512
+#define MAX_FUNC_NAME_LEN 256UL
+#define MAX_CLASS_NAME_LEN 512UL
+#define MAX_STRING_LENGTH 512UL
 
 #define MAX_CODES_PER_BUFFER (10 * 1000)
 
@@ -75,7 +78,7 @@ int ThreadSampling_ConsumeOneThreadSample(int len, unsigned char* buf)
     {
         return 0;
     }
-    int toUseLen = (int) min(toUse->size(), len);
+    int toUseLen = (int) std::min(toUse->size(), (size_t) len);
     memcpy(buf, toUse->data(), toUseLen);
     delete toUse;
     return toUseLen;
@@ -242,7 +245,7 @@ void ThreadSamplesBuffer::writeString(WSTRING& str)
 {
     // limit strings to a max length overall; this prevents (e.g.) thread names or
     // any other miscellaneous strings that come along from blowing things out
-    short usedLen = (short) min(str.length(), MAX_STRING_LENGTH);
+    short usedLen = (short) std::min(str.length(), (size_t)MAX_STRING_LENGTH);
     writeShort(usedLen);
     // odd bit of casting since we're copying bytes, not wchars
     unsigned char* strBegin = (unsigned char*)(&str.c_str()[0]);
@@ -307,7 +310,7 @@ private:
         if (classId == NULL)
         {
             Logger::Debug("NULL classId passed to GetClassName");
-            result.append(L"Unknown");
+            result.append(WStr("Unknown"));
             return;
         }
 
@@ -315,25 +318,25 @@ private:
         if (CORPROF_E_CLASSID_IS_ARRAY == hr)
         {
             // We have a ClassID of an array.
-            result.append(L"ArrayClass");
+            result.append(WStr("ArrayClass"));
             return;
         }
         else if (CORPROF_E_CLASSID_IS_COMPOSITE == hr)
         {
             // We have a composite class
-            result.append(L"CompositeClass");
+            result.append(WStr("CompositeClass"));
             return;
         }
         else if (CORPROF_E_DATAINCOMPLETE == hr)
         {
             // type-loading is not yet complete. Cannot do anything about it.
-            result.append(L"DataIncomplete");
+            result.append(WStr("DataIncomplete"));
             return;
         }
         else if (FAILED(hr))
         {
             Logger::Debug("GetClassIDInfo failed: ", hr);
-            result.append(L"Unknown");
+            result.append(WStr("Unknown"));
             return;
         }
 
@@ -342,7 +345,7 @@ private:
         if (FAILED(hr))
         {
             Logger::Debug("GetModuleMetaData failed: ", hr);
-            result.append(L"Unknown");
+            result.append(WStr("Unknown"));
             return;
         }
 
@@ -352,7 +355,7 @@ private:
         if (FAILED(hr))
         {
             Logger::Debug("GetTypeDefProps failed: ", hr);
-            result.append(L"Unknown");
+            result.append(WStr("Unknown"));
             return;
         }
 
@@ -363,7 +366,7 @@ private:
     {
         if (funcID == NULL)
         {
-            result.append(L"Unknown_Native_Function");
+            result.append(WStr("Unknown_Native_Function"));
             return;
         }
 
@@ -400,10 +403,10 @@ private:
         }
         else
         {
-            result.append(L"SharedGenericFunction");
+            result.append(WStr("SharedGenericFunction"));
         }
 
-        result.append(L"::");
+        result.append(WStr("::"));
 
         result.append(funcName);
 
@@ -497,7 +500,14 @@ int GetSamplingPeriod()
     }
     try
     {
-        return max(MINIMUM_SAMPLE_PERIOD, std::stoi(val));
+#ifdef _WIN32
+        int ival = std::stoi(val);
+#else
+        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+        std::string str = convert.to_bytes(val);
+        int ival = std::stoi(str);
+#endif
+        return (int) std::max(MINIMUM_SAMPLE_PERIOD, ival);
     }
     catch (...)
     {
@@ -566,16 +576,11 @@ DWORD WINAPI SamplingThreadMain(_In_ LPVOID param)
     return 0;
 }
 
-void ThreadSampler::StartSampling(ICorProfilerInfo3* info3)
+void ThreadSampler::StartSampling(ICorProfilerInfo10* info10)
 {
     Logger::Info("ThreadSampler::StartSampling");
-    profilerInfo = info3;
-    HRESULT hr = info3->QueryInterface<ICorProfilerInfo10>(&this->info10);
-    if (FAILED(hr))
-    {
-        Logger::Error("Can't get ICorProfilerInfo10; thread sampling will not run: ", hr);
-        return;
-    }
+    profilerInfo = info10;
+    this->info10 = info10;
     HANDLE bgThread = CreateThread(NULL, 0, &SamplingThreadMain, this, 0, NULL);
 }
 
