@@ -2,10 +2,11 @@
 #include "logger.h"
 #include <chrono>
 #include <map>
+#include <algorithm>
 
-#define MAX_FUNC_NAME_LEN 256
-#define MAX_CLASS_NAME_LEN 512
-#define MAX_STRING_LENGTH 512
+#define MAX_FUNC_NAME_LEN 256UL
+#define MAX_CLASS_NAME_LEN 512UL
+#define MAX_STRING_LENGTH 512UL
 
 #define MAX_CODES_PER_BUFFER (10 * 1000)
 
@@ -75,7 +76,7 @@ int ThreadSampling_ConsumeOneThreadSample(int len, unsigned char* buf)
     {
         return 0;
     }
-    int toUseLen = (int) fminl(toUse->size(), len);
+    int toUseLen = (int) std::min(toUse->size(), (unsigned long) len);
     memcpy(buf, toUse->data(), toUseLen);
     delete toUse;
     return toUseLen;
@@ -242,7 +243,7 @@ void ThreadSamplesBuffer::writeString(WSTRING& str)
 {
     // limit strings to a max length overall; this prevents (e.g.) thread names or
     // any other miscellaneous strings that come along from blowing things out
-    short usedLen = (short) fminl(str.length(), MAX_STRING_LENGTH);
+    short usedLen = (short) std::min(str.length(), MAX_STRING_LENGTH);
     writeShort(usedLen);
     // odd bit of casting since we're copying bytes, not wchars
     unsigned char* strBegin = (unsigned char*)(&str.c_str()[0]);
@@ -504,7 +505,7 @@ int GetSamplingPeriod()
         std::string str = convert.to_bytes(val);
         int ival = std::stoi(str);
 #endif
-        return (int) fmaxl(MINIMUM_SAMPLE_PERIOD, ival);
+        return (int) std::max(MINIMUM_SAMPLE_PERIOD, ival);
     }
     catch (...)
     {
