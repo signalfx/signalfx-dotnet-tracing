@@ -131,7 +131,7 @@ namespace Datadog.Trace.Tools.Runner
 
             if (!string.IsNullOrWhiteSpace(options.AgentUrl))
             {
-                envVars["SIGNALFX_TRACE_AGENT_URL"] = options.AgentUrl;
+                envVars["SIGNALFX_ENDPOINT_URL"] = options.AgentUrl;
             }
 
             if (!string.IsNullOrWhiteSpace(options.EnvironmentValues))
@@ -303,7 +303,7 @@ namespace Datadog.Trace.Tools.Runner
             var env = new NameValueCollection();
             if (!string.IsNullOrWhiteSpace(agentUrl))
             {
-                env["SIGNALFX_TRACE_AGENT_URL"] = agentUrl;
+                env["SIGNALFX_ENDPOINT_URL"] = agentUrl;
             }
 
             var globalSettings = GlobalSettings.CreateDefaultConfigurationSource();

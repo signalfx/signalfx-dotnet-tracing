@@ -98,7 +98,7 @@ namespace Datadog.Trace.Tests
         {
             var settings = new NameValueCollection
             {
-                { ConfigurationKeys.AgentUri, original }
+                { ConfigurationKeys.EndpointUrl, original }
             };
 
             var tracerSettings = new TracerSettings(new NameValueConfigurationSource(settings));

@@ -65,7 +65,7 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests
             environmentVariables["SIGNALFX_SERVICE_NAME"].Should().Be("TestService");
             environmentVariables["SIGNALFX_VERSION"].Should().Be("TestVersion");
             environmentVariables["SIGNALFX_DOTNET_TRACER_HOME"].Should().Be("TestTracerHome");
-            environmentVariables["SIGNALFX_TRACE_AGENT_URL"].Should().Be(agentUrl);
+            environmentVariables["SIGNALFX_ENDPOINT_URL"].Should().Be(agentUrl);
             environmentVariables["SIGNALFX_CIVISIBILITY_ENABLED"].Should().Be("1");
             environmentVariables["VAR1"].Should().Be("A");
             environmentVariables["VAR2"].Should().Be("B");
@@ -109,7 +109,7 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests
                 environmentVariables["SIGNALFX_SERVICE_NAME"].Should().Be("TestService");
                 environmentVariables["SIGNALFX_VERSION"].Should().Be("TestVersion");
                 environmentVariables["SIGNALFX_DOTNET_TRACER_HOME"].Should().Be("TestTracerHome");
-                environmentVariables["SIGNALFX_TRACE_AGENT_URL"].Should().Be("TestAgentUrl");
+                environmentVariables["SIGNALFX_ENDPOINT_URL"].Should().Be("TestAgentUrl");
                 environmentVariables["VAR1"].Should().Be("A");
                 environmentVariables["VAR2"].Should().Be("B");
             }

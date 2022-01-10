@@ -67,7 +67,6 @@ namespace Datadog.Trace.Configuration
         /// Gets or sets the Uri where the Tracer can connect to the Agent.
         /// Default is <c>"http://localhost:8126"</c>.
         /// </summary>
-        /// <seealso cref="ConfigurationKeys.AgentUri"/>
         /// <seealso cref="ConfigurationKeys.AgentHost"/>
         /// <seealso cref="ConfigurationKeys.AgentPort"/>
         public Uri AgentUri { get; set; }
@@ -185,8 +184,7 @@ namespace Datadog.Trace.Configuration
                             // default value
                             DefaultAgentPort;
 
-            var agentUri = source?.GetString(ConfigurationKeys.AgentUri) ??
-                           source?.GetString(ConfigurationKeys.EndpointUrl) ??
+            var agentUri = source?.GetString(ConfigurationKeys.EndpointUrl) ??
                            // default value
                            $"http://{agentHost}:{agentPort}/api/v2/spans";
 
