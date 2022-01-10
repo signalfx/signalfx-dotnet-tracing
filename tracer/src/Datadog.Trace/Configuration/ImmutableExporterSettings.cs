@@ -48,9 +48,8 @@ namespace Datadog.Trace.Configuration
 
         /// <summary>
         /// Gets the Uri where the Tracer can connect to the Agent.
-        /// Default is <c>"http://localhost:8126"</c>.
+        /// Default is <c>"http://localhost:9411/api/v2/spans"</c>.
         /// </summary>
-        /// <seealso cref="ConfigurationKeys.AgentUri"/>
         /// <seealso cref="ConfigurationKeys.AgentHost"/>
         /// <seealso cref="ConfigurationKeys.AgentPort"/>
         public Uri AgentUri { get; }
