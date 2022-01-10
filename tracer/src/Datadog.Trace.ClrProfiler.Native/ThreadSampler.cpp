@@ -5,6 +5,9 @@
 #include <chrono>
 #include <map>
 #include <algorithm>
+#ifndef _WIN32
+  #include <pthread.h>
+#endif
 
 #define MAX_FUNC_NAME_LEN 256UL
 #define MAX_CLASS_NAME_LEN 512UL
@@ -520,9 +523,15 @@ void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, Sa
     std::lock_guard<std::mutex> threadStateGuard(ts->threadStateLock);
     std::lock_guard<std::mutex> spanContextGuard(threadSpanContextLock);
 
-    LARGE_INTEGER start, end, elapsedMicros, frequency;
+    int elapsedMicros = 0;
+#ifdef _WIN32
+    LARGE_INTEGER start, end, elapsed, frequency;
     QueryPerformanceFrequency(&frequency);
     QueryPerformanceCounter(&start);
+#else
+    timespec start, end, elapsed;
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
+#endif
 
     HRESULT hr = info10->SuspendRuntime();
     if (FAILED(hr))
@@ -543,14 +552,36 @@ void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, Sa
     // ill effects
     hr = info10->ResumeRuntime();
 
+#ifdef _WIN32
     QueryPerformanceCounter(&end);
-    elapsedMicros.QuadPart = end.QuadPart - start.QuadPart;
-    elapsedMicros.QuadPart *= 1000000;
-    elapsedMicros.QuadPart /= frequency.QuadPart;
-    printf("Resuming runtime after %i micros\n", (int) elapsedMicros.QuadPart);
-    helper.curWriter->WriteFinalStats((int) (elapsedMicros.QuadPart));
+    elapsed.QuadPart = end.QuadPart - start.QuadPart;
+    elapsed.QuadPart *= 1000000;
+    elapsed.QuadPart /= frequency.QuadPart;
+    elapsedMicros = (int) elapsed.QuadPart;
+#else
+    // FLoating around several places as "microsecond timer on linux c"
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
+    if ((end.tv_nsec-start.tv_nsec)<0) {
+        elapsed.tv_sec = end.tv_sec-start.tv_sec-1;
+        elapsed.tv_nsec = 1000000000 + end.tv_nsec - start.tv_nsec;
+    } else {
+        elapsed.tv_sec = end.tv_sec-start.tv_sec;
+        elapsed.tv_nsec = end.tv_nsec-start.tv_nsec;
+    }
+    elapsedMicros = elapsed.tv_sec * 1000000 + elapsed.tv_nsec/1000;
+#endif
+    printf("Resuming runtime after %i micros\n", elapsedMicros);
+    helper.curWriter->WriteFinalStats(elapsedMicros);
 
     helper.PublishBuffer();
+}
+
+void SleepMillis(int millis) {
+#ifdef _WIN32
+    Sleep(millis);
+#else
+    usleep(millis * 1000); // micros
+#endif
 }
 
 DWORD WINAPI SamplingThreadMain(_In_ LPVOID param)
@@ -563,7 +594,7 @@ DWORD WINAPI SamplingThreadMain(_In_ LPVOID param)
 
     while (1)
     {
-        Sleep(sleepMillis);
+        SleepMillis(sleepMillis);
         bool shouldSample = helper.AllocateBuffer();
         if (!shouldSample) {
             Logger::Warn("Skipping a thread sample period, buffers are full");
@@ -581,7 +612,12 @@ void ThreadSampler::StartSampling(ICorProfilerInfo10* info10)
     Logger::Info("ThreadSampler::StartSampling");
     profilerInfo = info10;
     this->info10 = info10;
+#ifdef _WIN32
     HANDLE bgThread = CreateThread(NULL, 0, &SamplingThreadMain, this, 0, NULL);
+#else
+    pthread_t thr;
+    pthread_create(&thr, NULL, (void *(*)(void *)) &SamplingThreadMain, this);
+#endif
 }
 
 void ThreadSampler::ThreadCreated(ThreadID threadId)
