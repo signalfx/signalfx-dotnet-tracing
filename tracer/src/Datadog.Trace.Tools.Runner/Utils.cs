@@ -25,7 +25,7 @@ namespace Datadog.Trace.Tools.Runner
     {
         public const string PROFILERID = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}";
 
-        public static Dictionary<string, string> GetProfilerEnvironmentVariables(string runnerFolder, Platform platform, Options options)
+        public static Dictionary<string, string> GetProfilerEnvironmentVariables(string runnerFolder, Platform platform, LegacySettings options)
         {
             // In the current nuspec structure RunnerFolder has the following format:
             //  C:\Users\[user]\.dotnet\tools\.store\datadog.trace.tools.runner\[version]\datadog.trace.tools.runner\[version]\tools\netcoreapp3.1\any
