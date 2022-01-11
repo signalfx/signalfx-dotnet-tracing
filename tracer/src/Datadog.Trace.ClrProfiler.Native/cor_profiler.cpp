@@ -239,8 +239,12 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
         return E_FAIL;
     }
     if (IsThreadSamplingEnabled()) {
-        this->threadSampler = new ThreadSampler();
-        this->threadSampler->StartSampling(this->info_);
+        if (info10 == nullptr) {
+            Logger::Error("Could not enable thread sampling: CLR version not compatible");
+        } else {
+            this->threadSampler = new ThreadSampler();
+            this->threadSampler->StartSampling(info10);
+        }
     }
 
     // we're in!

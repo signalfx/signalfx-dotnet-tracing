@@ -228,6 +228,7 @@ add_library("SignalFx.Tracing.ClrProfiler.Native.static" STATIC
         util.cpp
         calltarget_tokens.cpp
         rejit_handler.cpp
+        ThreadSampler.cpp
         lib/coreclr/src/pal/prebuilt/idl/corprof_i.cpp
         ${GENERATED_OBJ_FILES}
 )
