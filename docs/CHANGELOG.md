@@ -32,6 +32,9 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 ### Breaking changes
 
 - There is no support for .NET older than .NET 4.6.2.
+- There is no new releases for [`SignalFx.Tracing`](https://www.nuget.org/packages/SignalFx.Tracing.OpenTracing/)
+nor [`SignalFx.Tracing.OpenTracing`](https://www.nuget.org/packages/SignalFx.Tracing.OpenTracing/)
+nugets, use [`OpenTracing`](https://www.nuget.org/packages/OpenTracing/).
 - Rename `SIGNALFX_DOTNET_TRACER_CONFIG_FILE` configuration to `SIGNALFX_TRACE_CONFIG_FILE`.
 - Rename `SIGNALFX_PROPAGATOR` configuration to `SIGNALFX_PROPAGATORS`.
 - Rename `SIGNALFX_TRACING_ENABLED` configuration to `SIGNALFX_TRACE_ENABLED`
