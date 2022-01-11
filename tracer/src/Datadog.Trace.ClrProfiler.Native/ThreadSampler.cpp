@@ -561,12 +561,12 @@ void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, Sa
 #else
     // FLoating around several places as "microsecond timer on linux c"
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
-    if ((end.tv_nsec-start.tv_nsec)<0) {
-        elapsed.tv_sec = end.tv_sec-start.tv_sec-1;
+    if ((end.tv_nsec - start.tv_nsec) < 0) {
+        elapsed.tv_sec = end.tv_sec - start.tv_sec - 1;
         elapsed.tv_nsec = 1000000000 + end.tv_nsec - start.tv_nsec;
     } else {
-        elapsed.tv_sec = end.tv_sec-start.tv_sec;
-        elapsed.tv_nsec = end.tv_nsec-start.tv_nsec;
+        elapsed.tv_sec = end.tv_sec - start.tv_sec;
+        elapsed.tv_nsec = end.tv_nsec - start.tv_nsec;
     }
     elapsedMicros = elapsed.tv_sec * 1000000 + elapsed.tv_nsec/1000;
 #endif
