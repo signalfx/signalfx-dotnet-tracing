@@ -149,8 +149,7 @@ namespace Datadog.Trace.Configuration
         private static bool TryLoadJsonConfigurationFile(IConfigurationSource configurationSource, out JsonConfigurationSource jsonConfigurationSource)
         {
             // if environment variable is not set, look for default file name in the current directory
-            var configurationFileName = configurationSource.GetString(ConfigurationKeys.ConfigurationFileName) ??
-                                        configurationSource.GetString("SIGNALFX_DOTNET_TRACER_CONFIG_FILE");
+            var configurationFileName = configurationSource.GetString(ConfigurationKeys.ConfigurationFileName);
 
             return TryLoadJsonConfigurationFile(configurationFileName, out jsonConfigurationSource);
         }

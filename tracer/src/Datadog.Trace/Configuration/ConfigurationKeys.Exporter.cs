@@ -14,7 +14,6 @@ namespace Datadog.Trace.Configuration
     {
         /// <summary>
         /// Configuration key for the Agent host where the Tracer can send traces.
-        /// Overridden by <see cref="AgentUri"/> if present.
         /// Default value is "localhost".
         /// </summary>
         /// <seealso cref="ExporterSettings.AgentUri"/>
@@ -63,18 +62,9 @@ namespace Datadog.Trace.Configuration
         public const string MetricsEndpointUrl = "SIGNALFX_METRICS_ENDPOINT_URL";
 
         /// <summary>
-        /// Configuration key for the Agent URL where the Tracer can send traces.
-        /// Overrides values in <see cref="AgentHost"/> and <see cref="AgentPort"/> if present.
-        /// Default value is "http://localhost:8126".
-        /// </summary>
-        /// <seealso cref="ExporterSettings.AgentUri"/>
-        public const string AgentUri = "SIGNALFX_TRACE_AGENT_URL";
-
-        /// <summary>
         /// Configuration key for the trace endpoint. Same as <see creg="AgentUri"/> created
         /// for compatibility of previous version of SignalFx .NET Tracing.
         /// </summary>
-        /// <seealso cref="AgentUri"/>
         public const string EndpointUrl = "SIGNALFX_ENDPOINT_URL";
 
         /// <summary>
