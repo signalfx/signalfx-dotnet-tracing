@@ -530,7 +530,7 @@ void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, Sa
     QueryPerformanceCounter(&start);
 #else
     timespec start, end, elapsed;
-    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
+    clock_gettime(CLOCK_MONOTONIC, &start);
 #endif
 
     HRESULT hr = info10->SuspendRuntime();
@@ -560,7 +560,7 @@ void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, Sa
     elapsedMicros = (int) elapsed.QuadPart;
 #else
     // FLoating around several places as "microsecond timer on linux c"
-    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
+    clock_gettime(CLOCK_MONOTONIC, &end);
     if ((end.tv_nsec - start.tv_nsec) < 0) {
         elapsed.tv_sec = end.tv_sec - start.tv_sec - 1;
         elapsed.tv_nsec = 1000000000 + end.tv_nsec - start.tv_nsec;
