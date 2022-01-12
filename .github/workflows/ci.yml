@@ -240,7 +240,7 @@ jobs:
       run: docker-compose run --rm StartDependencies
     - name: Run integration tests in container
       run: | 
-        framework=${{ matrix.framework }} docker-compose run --rm \
+        framework=${{ matrix.framework }} baseImage=${{ matrix.base-image }} docker-compose run --rm \
           -e baseImage=${{ matrix.base-image }} \
           -e framework=${{ matrix.framework }} \
           -e Verify_DisableClipboard=true \
