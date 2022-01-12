@@ -54,7 +54,7 @@ namespace Datadog.Trace
         public Scope Activate(ISpan span, bool finishOnClose)
         {
             var newParent = Active;
-            var scope = new Scope(newParent, span, this, finishOnClose);
+            var scope = new Scope(newParent, (Span)span, this, finishOnClose);
 
             Active = scope;
             DistributedTracer.Instance.SetSpanContext(scope.Span.Context);
