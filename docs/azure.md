@@ -16,4 +16,4 @@
     Value: (Your Collector or SignalFX ingest endpoint)
     ```
     (See [advanced-config.md](advanced-config.md) for more options.)
-6. Make sure that App Service was restarted.
+6. Restart the App Service.
