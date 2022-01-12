@@ -241,7 +241,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             Assert.Equal(4, queueDeclareCount);
         }
 
-        private void AssertSpanName(MockTracerAgent.Span span, string operation)
+        private void AssertSpanName(MockSpan span, string operation)
         {
             span.Tags.TryGetValue(Tags.Messaging.Destination, out string destination);
 
