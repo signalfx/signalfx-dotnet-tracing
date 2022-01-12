@@ -3,7 +3,7 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-using System;
+// Modified by SignalFx
 
 namespace Datadog.Trace
 {
@@ -14,7 +14,7 @@ namespace Datadog.Trace
     {
         Scope Active { get; }
 
-        Scope Activate(Span span, bool finishOnClose);
+        Scope Activate(ISpan span, bool finishOnClose);
 
         void Close(Scope scope);
     }
