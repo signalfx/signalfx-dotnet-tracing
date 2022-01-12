@@ -11,6 +11,7 @@ using Datadog.Trace.Ci.Sampling;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Conventions;
 using Datadog.Trace.Propagation;
+using Datadog.Trace.Logging.DirectSubmission;
 using Datadog.Trace.RuntimeMetrics;
 using Datadog.Trace.Sampling;
 using Datadog.Trace.Vendors.StatsdClient;
@@ -28,9 +29,10 @@ namespace Datadog.Trace.Ci
             IDogStatsd statsd,
             RuntimeMetricsWriter runtimeMetrics,
             ITraceIdConvention traceIdConvention,
+            DirectLogSubmissionManager logSubmissionManager,
             string defaultServiceName)
         {
-            return new CITracerManager(settings, agentWriter, sampler, propagator, scopeManager, statsd, runtimeMetrics, traceIdConvention, defaultServiceName);
+            return new CITracerManager(settings, agentWriter, sampler, propagator, scopeManager, statsd, runtimeMetrics, traceIdConvention, logSubmissionManager, defaultServiceName);
         }
 
         protected override ISampler GetSampler(ImmutableTracerSettings settings)

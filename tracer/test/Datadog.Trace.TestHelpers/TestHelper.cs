@@ -17,7 +17,7 @@ using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
 using Datadog.Trace.Propagation;
-using Datadog.Trace.TestHelpers;
+using Datadog.Trace.Configuration;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -351,6 +351,14 @@ namespace Datadog.Trace.TestHelpers
         protected void SetAppSecBlockingEnabled(bool appSecBlockingEnabled)
         {
             SetEnvironmentVariable(Configuration.ConfigurationKeys.AppSecBlockingEnabled, appSecBlockingEnabled ? "true" : "false");
+        }
+
+        protected void EnableDirectLogSubmission(int intakePort, string integrationName, string host = "integration_tests")
+        {
+            SetEnvironmentVariable(ConfigurationKeys.DirectLogSubmission.Host, host);
+            SetEnvironmentVariable(ConfigurationKeys.DirectLogSubmission.Url, $"http://127.0.0.1:{intakePort}");
+            SetEnvironmentVariable(ConfigurationKeys.DirectLogSubmission.EnabledIntegrations, integrationName);
+            SetEnvironmentVariable(ConfigurationKeys.ApiKey, "DUMMY_KEY_REQUIRED_FOR_DIRECT_SUBMISSION");
         }
 
         protected async Task<IImmutableList<MockSpan>> GetWebServerSpans(
