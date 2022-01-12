@@ -116,13 +116,17 @@ export SIGNALFX_SERVICE_NAME="my-service-name"  # Set the service name
 dotnet run                                      # Run your application 
 ```
 
-### Instrument a Windows Service running a .NET application
+## Instrument a Windows Service running a .NET application
 
 See [windows-service-instrumentation.md](windows-service-instrumentation.md).
 
-### Instrument an ASP.NET application deployed on IIS
+## Instrument an ASP.NET application deployed on IIS
 
 See [iis-instrumentation.md](iis-instrumentation.md).
+
+## Azure instrumentation guide
+
+See [azure.md](azure.md).
 
 ## Advanced configuration
 
