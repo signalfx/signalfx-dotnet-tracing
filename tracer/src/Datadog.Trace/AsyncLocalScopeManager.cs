@@ -32,14 +32,14 @@ namespace Datadog.Trace
                 _activeScope.Value = value;
                 if (_pushScopeToNative)
                 {
-                    // nop
+                    int managedThreadId = Thread.CurrentThread.ManagedThreadId;
                     if (value == null)
                     {
-                        NativeMethods.SignalFxSetNativeContext(traceIdHigh: 0, traceIdLow: 0, spanId: 0);
+                        NativeMethods.SignalFxSetNativeContext(0, 0, 0, managedThreadId);
                     }
                     else
                     {
-                        NativeMethods.SignalFxSetNativeContext(value.Span.TraceId.Higher, value.Span.TraceId.Lower, value.Span.SpanId);
+                        NativeMethods.SignalFxSetNativeContext(value.Span.TraceId.Higher, value.Span.TraceId.Lower, value.Span.SpanId, managedThreadId);
                     }
                 }
             }

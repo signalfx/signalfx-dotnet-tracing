@@ -10,7 +10,7 @@
 extern "C"
 {
     __declspec(dllexport) int SignalFxReadThreadSamples(int len, unsigned char* buf);
-    __declspec(dllexport) void SignalFxSetNativeContext(uint64_t traceIdHigh, uint64_t traceIdLow, uint64_t spanId);
+    __declspec(dllexport) void SignalFxSetNativeContext(uint64_t traceIdHigh, uint64_t traceIdLow, uint64_t spanId, int32_t managedThreadId);
 }
 
 namespace trace
@@ -21,16 +21,17 @@ public:
     uint64_t traceIdHigh;
     uint64_t traceIdLow;
     uint64_t spanId;
+    int32_t managedThreadId;
 
-    ThreadSpanContext() : traceIdHigh(0), traceIdLow(0), spanId(0)
+    ThreadSpanContext() : traceIdHigh(0), traceIdLow(0), spanId(0), managedThreadId(-1)
     {
     }
-    ThreadSpanContext(uint64_t _traceIdHigh, uint64_t _traceIdLow, uint64_t _spanId) :
-        traceIdHigh(_traceIdHigh), traceIdLow(_traceIdLow), spanId(_spanId)
+    ThreadSpanContext(uint64_t _traceIdHigh, uint64_t _traceIdLow, uint64_t _spanId, int32_t managedThreadId) :
+        traceIdHigh(_traceIdHigh), traceIdLow(_traceIdLow), spanId(_spanId), managedThreadId(managedThreadId)
     {
     }
     ThreadSpanContext(ThreadSpanContext const& other) :
-        traceIdHigh(other.traceIdHigh), traceIdLow(other.traceIdLow), spanId(other.spanId)
+        traceIdHigh(other.traceIdHigh), traceIdLow(other.traceIdLow), spanId(other.spanId), managedThreadId(other.managedThreadId)
     {
     }
 };
