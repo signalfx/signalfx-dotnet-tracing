@@ -1,4 +1,4 @@
-# Azure services instrumentation guide
+# Azure instrumentation guide
 
 ## App Service
 
