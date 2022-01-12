@@ -25,6 +25,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.GraphQL
         internal const string IntegrationName = nameof(Configuration.IntegrationId.GraphQL);
         internal const IntegrationId IntegrationId = Configuration.IntegrationId.GraphQL;
 
+        private const string ServiceName = "graphql";
         private const string ParseOperationName = "graphql.parse"; // Instrumentation not yet implemented
         private const string ValidateOperationName = "graphql.validate";
         private const string ExecuteOperationName = "graphql.execute";
@@ -45,7 +46,8 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.GraphQL
             try
             {
                 var tags = new GraphQLTags();
-                scope = tracer.StartActiveInternal(ValidateOperationName, tags: tags);
+                var serviceName = tracer.Settings.GetServiceName(tracer, ServiceName);
+                scope = tracer.StartActiveInternal(ValidateOperationName, serviceName: serviceName, tags: tags);
 
                 var span = scope.Span;
                 span.LogicScope = ValidateOperationName;
@@ -82,7 +84,8 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.GraphQL
                     : $"{operationType} {operationName}";
 
                 var tags = new GraphQLTags();
-                scope = tracer.StartActiveInternal(operation, tags: tags);
+                var serviceName = tracer.Settings.GetServiceName(tracer, ServiceName);
+                scope = tracer.StartActiveInternal(operation, serviceName: serviceName, tags: tags);
 
                 var span = scope.Span;
                 span.Type = SpanTypes.GraphQL;

@@ -42,9 +42,7 @@ namespace Datadog.Trace.Configuration
         {
             Environment = source?.GetString(ConfigurationKeys.Environment);
 
-            ServiceName = source?.GetString(ConfigurationKeys.ServiceName) ??
-                          // backwards compatibility for names used in the past
-                          source?.GetString("SIGNALFX_SERVICE_NAME");
+            ServiceName = source?.GetString(ConfigurationKeys.ServiceName);
 
             ServiceVersion = source?.GetString(ConfigurationKeys.ServiceVersion);
 
