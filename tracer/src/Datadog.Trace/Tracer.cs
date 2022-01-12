@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Datadog.Trace.Agent;
@@ -44,6 +45,7 @@ namespace Datadog.Trace
         static Tracer()
         {
             TracingProcessManager.Initialize();
+            RegisterGlobalTracer(Instance);
         }
 
         /// <summary>
@@ -181,7 +183,7 @@ namespace Datadog.Trace
         /// <summary>
         /// Gets the tracer's scope manager, which determines which span is currently active, if any.
         /// </summary>
-        internal IScopeManager ScopeManager => TracerManager.ScopeManager;
+        public IScopeManager ScopeManager => TracerManager.ScopeManager;
 
         /// <summary>
         /// Gets the default service name for traces where a service name is not specified.
@@ -424,6 +426,22 @@ namespace Datadog.Trace
         internal Task FlushAsync()
         {
             return TracerManager.AgentWriter.FlushTracesAsync();
+        }
+
+        private static void RegisterGlobalTracer(Tracer instance)
+        {
+            try
+            {
+                var signalFxOpenTracingAssembly = Assembly.Load(new AssemblyName("SignalFx.Tracing.OpenTracing, Version=0.2.0.0, Culture=neutral, PublicKeyToken=e43a27c2023d388a"));
+                var openTracingTracerFactoryType = signalFxOpenTracingAssembly.GetType("SignalFx.Tracing.OpenTracing.OpenTracingTracerFactory");
+                var methodInfo = openTracingTracerFactoryType.GetMethod("RegisterGlobalTracer");
+                object[] args = { instance };
+                methodInfo?.Invoke(obj: null, args);
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "Unable to load OpenTracing helper library.");
+            }
         }
     }
 }

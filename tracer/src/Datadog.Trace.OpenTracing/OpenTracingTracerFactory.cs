@@ -9,6 +9,7 @@ using System;
 using System.Net.Http;
 using Datadog.Trace.Configuration;
 using OpenTracing;
+using OpenTracing.Util;
 
 namespace Datadog.Trace.OpenTracing
 {
@@ -17,6 +18,8 @@ namespace Datadog.Trace.OpenTracing
     /// </summary>
     public static class OpenTracingTracerFactory
     {
+        private static readonly object Lock = new();
+
         /// <summary>
         /// Create a new Datadog compatible ITracer implementation with the given parameters
         /// </summary>
@@ -43,6 +46,30 @@ namespace Datadog.Trace.OpenTracing
 
             Tracer.Configure(configuration);
             return new OpenTracingTracer(Tracer.Instance);
+        }
+
+        /// <summary>
+        /// Registers a Tracer as the global tracer, if unregistered.
+        /// </summary>
+        /// <param name="tracer">Existing SignalFx Tracer instance.</param>
+        /// <returns>True if the Tracer was successfully registered by this call, otherwise false.</returns>
+        public static bool RegisterGlobalTracer(Tracer tracer)
+        {
+            if (GlobalTracer.IsRegistered())
+            {
+                return false;
+            }
+
+            lock (Lock)
+            {
+                if (GlobalTracer.IsRegistered())
+                {
+                    return false;
+                }
+
+                GlobalTracer.Register(WrapTracer(tracer));
+                return true;
+            }
         }
 
         /// <summary>
