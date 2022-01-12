@@ -45,7 +45,7 @@ The following settings are common to most instrumentation scenarios:
 | Setting | Description | Default |
 |-|-|-|
 | `SIGNALFX_ENV` | The value for the `deployment.environment` tag added to every span. |  |
-| `SIGNALFX_SERVICE_NAME` | The name of the application or service. |  |
+| `SIGNALFX_SERVICE_NAME` | Optional setting, overrides the [default service name](default-service-name.md) used by the instrumentation. |  |
 | `SIGNALFX_VERSION` | The version of the application. When set, it populates the `version` tag on spans. |  |
 
 ## Global management settings
