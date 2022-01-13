@@ -184,7 +184,7 @@ void ThreadSamplesBuffer::StartSample(ThreadID id, ThreadState* state, ThreadSpa
 {
     CHECK_SAMPLES_BUFFER_LENGTH();
     writeByte(THREAD_SAMPLES_START_SAMPLE);
-    writeInt((int)id); // FIXME not really sure how to map this to anything; needs more research
+    writeInt(context.managedThreadId);
     writeInt(state->nativeId);
     writeString(state->threadName);
     writeInt64(context.traceIdHigh);
@@ -713,7 +713,8 @@ extern "C"
     {
         return ThreadSampling_ConsumeOneThreadSample(len, buf);
     }
-    __declspec(dllexport) void SignalFxSetNativeContext(uint64_t traceIdHigh, uint64_t traceIdLow, uint64_t spanId)
+    __declspec(dllexport) void SignalFxSetNativeContext(uint64_t traceIdHigh, uint64_t traceIdLow, uint64_t spanId,
+                                                        int32_t managedThreadId)
     {
         ThreadID threadId;
         HRESULT hr = profilerInfo->GetCurrentThreadID(&threadId);
@@ -724,6 +725,6 @@ extern "C"
 
         std::lock_guard<std::mutex> guard(threadSpanContextLock);
 
-        threadSpanContextMap[threadId] = trace::ThreadSpanContext(traceIdHigh, traceIdLow, spanId);
+        threadSpanContextMap[threadId] = trace::ThreadSpanContext(traceIdHigh, traceIdLow, spanId, managedThreadId);
     }
 }

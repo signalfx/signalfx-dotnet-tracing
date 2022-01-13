@@ -86,15 +86,15 @@ namespace Datadog.Trace.ClrProfiler
             return IsWindows ? Windows.SignalFxReadThreadSamples(len, buf) : NonWindows.SignalFxReadThreadSamples(len, buf);
         }
 
-        public static void SignalFxSetNativeContext(ulong traceIdHigh, ulong traceIdLow, ulong spanId)
+        public static void SignalFxSetNativeContext(ulong traceIdHigh, ulong traceIdLow, ulong spanId, int managedThreadId)
         {
             if (IsWindows)
             {
-                Windows.SignalFxSetNativeContext(traceIdHigh, traceIdLow, spanId);
+                Windows.SignalFxSetNativeContext(traceIdHigh, traceIdLow, spanId, managedThreadId);
             }
             else
             {
-                NonWindows.SignalFxSetNativeContext(traceIdHigh, traceIdLow, spanId);
+                NonWindows.SignalFxSetNativeContext(traceIdHigh, traceIdLow, spanId, managedThreadId);
             }
         }
 
@@ -121,7 +121,7 @@ namespace Datadog.Trace.ClrProfiler
             public static extern int SignalFxReadThreadSamples(int len, byte[] buf);
 
             [DllImport("SignalFx.Tracing.ClrProfiler.Native.dll")]
-            public static extern void SignalFxSetNativeContext(ulong traceIdHigh, ulong traceIdLow, ulong spanId);
+            public static extern void SignalFxSetNativeContext(ulong traceIdHigh, ulong traceIdLow, ulong spanId, int managedThreadId);
         }
 
         // assume .NET Core if not running on Windows
@@ -146,7 +146,7 @@ namespace Datadog.Trace.ClrProfiler
             public static extern int SignalFxReadThreadSamples(int len, byte[] buf);
 
             [DllImport("SignalFx.Tracing.ClrProfiler.Native")]
-            public static extern void SignalFxSetNativeContext(ulong traceIdHigh, ulong traceIdLow, ulong spanId);
+            public static extern void SignalFxSetNativeContext(ulong traceIdHigh, ulong traceIdLow, ulong spanId, int managedThreadId);
         }
     }
 }
