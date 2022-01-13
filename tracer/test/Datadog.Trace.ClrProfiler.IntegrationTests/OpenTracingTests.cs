@@ -1,4 +1,5 @@
-using System;
+// Modified by Splunk Inc.
+
 using System.Linq;
 using Datadog.Trace.TestHelpers;
 using FluentAssertions;
@@ -18,7 +19,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [SkippableFact]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
-        public void Test()
+        public void SubmitTraces()
         {
             const int expectedSpanCount = 1;
 
