@@ -62,7 +62,8 @@ namespace Datadog.Trace.Configuration
         public const string MetricsEndpointUrl = "SIGNALFX_METRICS_ENDPOINT_URL";
 
         /// <summary>
-        /// Configuration key for the URL where the Thread Sampler can send stack traces.
+        /// Configuration key for the URL where the logs are exported.
+        /// Currently the Thread Sampler sends stack traces as logs.
         /// </summary>
         /// <seealso cref="ExporterSettings.LogsEndpointUrl"/>
         public const string LogsEndpointUrl = "SIGNALFX_LOGS_ENDPOINT_URL";

@@ -50,6 +50,7 @@ namespace Datadog.Trace.Configuration
             var isWindows = FrameworkDescription.Instance.OSPlatform == OSPlatform.Windows;
             ConfigureTraceTransport(source, isWindows);
             ConfigureMetricsTransport(source, isWindows);
+            ConfigureLogsTransport(source);
 
             PartialFlushEnabled = source?.GetBool(ConfigurationKeys.PartialFlushEnabled)
                 // default value
@@ -85,7 +86,7 @@ namespace Datadog.Trace.Configuration
         public Uri MetricsEndpointUrl { get; set; }
 
         /// <summary>
-        /// Gets or sets the Uri where the Thread Sampler can send stack traces.
+        /// Gets or sets the Uri where the logs are exported.
         /// </summary>
         /// <seealso cref="ConfigurationKeys.LogsEndpointUrl"/>
         public Uri LogsEndpointUrl { get; set; }
@@ -172,10 +173,13 @@ namespace Datadog.Trace.Configuration
                              // default value
                              "http://localhost:9943/v2/datapoint";
             MetricsEndpointUrl = new Uri(metricsEndpointUrl);
+        }
 
-            var logsEndpointUrl = source?.GetString(ConfigurationKeys.MetricsEndpointUrl) ??
-                             // default value
-                             "http://localhost:4318/v1/logs";
+        private void ConfigureLogsTransport(IConfigurationSource source)
+        {
+            var logsEndpointUrl = source?.GetString(ConfigurationKeys.LogsEndpointUrl) ??
+                                  // default value
+                                  "http://localhost:4318/v1/logs";
             LogsEndpointUrl = new Uri(logsEndpointUrl);
         }
 

@@ -62,10 +62,10 @@ namespace Datadog.Trace.Configuration
         public Uri MetricsEndpointUrl { get; }
 
         /// <summary>
-        /// Gets the Uri where the Thread Sampler can send stack traces.
+        /// Gets the Uri where the logs are exported.
         /// </summary>
         /// <seealso cref="ConfigurationKeys.LogsEndpointUrl"/>
-        public Uri LogsEndpointUrl { get; set; }
+        public Uri LogsEndpointUrl { get; }
 
         /// <summary>
         /// Gets the windows pipe name where the Tracer can connect to the Agent.
