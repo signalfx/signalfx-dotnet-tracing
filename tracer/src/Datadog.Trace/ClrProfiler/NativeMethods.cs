@@ -127,25 +127,25 @@ namespace Datadog.Trace.ClrProfiler
         // assume .NET Core if not running on Windows
         private static class NonWindows
         {
-            [DllImport("SignalFx.Tracing.ClrProfiler.Native.so")]
+            [DllImport("SignalFx.Tracing.ClrProfiler.Native")]
             public static extern bool IsProfilerAttached();
 
-            [DllImport("SignalFx.Tracing.ClrProfiler.Native.so")]
+            [DllImport("SignalFx.Tracing.ClrProfiler.Native")]
             public static extern void InitializeProfiler([MarshalAs(UnmanagedType.LPWStr)] string id, [In] NativeCallTargetDefinition[] methodArrays, int size);
 
-            [DllImport("SignalFx.Tracing.ClrProfiler.Native.so")]
+            [DllImport("SignalFx.Tracing.ClrProfiler.Native")]
             public static extern void EnableByRefInstrumentation();
 
-            [DllImport("SignalFx.Tracing.ClrProfiler.Native.so")]
+            [DllImport("SignalFx.Tracing.ClrProfiler.Native")]
             public static extern void EnableCallTargetStateByRef();
 
-            [DllImport("SignalFx.Tracing.ClrProfiler.Native.so")]
+            [DllImport("SignalFx.Tracing.ClrProfiler.Native")]
             public static extern void AddDerivedInstrumentations([MarshalAs(UnmanagedType.LPWStr)] string id, [In] NativeCallTargetDefinition[] methodArrays, int size);
 
-            [DllImport("SignalFx.Tracing.ClrProfiler.Native.so")]
+            [DllImport("SignalFx.Tracing.ClrProfiler.Native")]
             public static extern int SignalFxReadThreadSamples(int len, byte[] buf);
 
-            [DllImport("SignalFx.Tracing.ClrProfiler.Native.so")]
+            [DllImport("SignalFx.Tracing.ClrProfiler.Native")]
             public static extern void SignalFxSetNativeContext(ulong traceIdHigh, ulong traceIdLow, ulong spanId, int managedThreadId);
         }
     }

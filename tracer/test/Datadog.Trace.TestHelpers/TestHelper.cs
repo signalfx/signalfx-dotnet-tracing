@@ -289,7 +289,7 @@ namespace Datadog.Trace.TestHelpers
             return (process, newConfig);
         }
 
-        protected void ValidateSpans<T>(IEnumerable<MockTracerAgent.Span> spans, Func<MockTracerAgent.Span, T> mapper, IEnumerable<T> expected)
+        protected void ValidateSpans<T>(IEnumerable<MockSpan> spans, Func<MockSpan, T> mapper, IEnumerable<T> expected)
         {
             var spanLookup = new Dictionary<T, int>();
             foreach (var span in spans)
@@ -353,7 +353,7 @@ namespace Datadog.Trace.TestHelpers
             SetEnvironmentVariable(Configuration.ConfigurationKeys.AppSecBlockingEnabled, appSecBlockingEnabled ? "true" : "false");
         }
 
-        protected async Task<IImmutableList<MockTracerAgent.Span>> GetWebServerSpans(
+        protected async Task<IImmutableList<MockSpan>> GetWebServerSpans(
             string path,
             MockTracerAgent agent,
             int httpPort,
@@ -399,7 +399,7 @@ namespace Datadog.Trace.TestHelpers
             string expectedServiceVersion,
             SerializableDictionary expectedTags = null)
         {
-            IImmutableList<MockTracerAgent.Span> spans;
+            IImmutableList<MockSpan> spans;
 
             using (var httpClient = new HttpClient())
             {
@@ -421,8 +421,8 @@ namespace Datadog.Trace.TestHelpers
                 Assert.True(spans.Count == 2, $"expected two span, saw {spans.Count}");
             }
 
-            MockTracerAgent.Span aspnetSpan = spans.Where(s => s.Name == "aspnet.request").FirstOrDefault();
-            MockTracerAgent.Span innerSpan = spans.Where(s => s.Name == expectedOperationName).FirstOrDefault();
+            var aspnetSpan = spans.FirstOrDefault(s => s.Name == "aspnet.request");
+            var innerSpan = spans.FirstOrDefault(s => s.Name == expectedOperationName);
 
             Assert.NotNull(aspnetSpan);
             Assert.Equal(expectedAspNetResourceName, aspnetSpan.Resource);
@@ -430,7 +430,7 @@ namespace Datadog.Trace.TestHelpers
             Assert.NotNull(innerSpan);
             Assert.Equal(expectedResourceName, innerSpan.Resource);
 
-            foreach (MockTracerAgent.Span span in spans)
+            foreach (var span in spans)
             {
                 // base properties
                 Assert.Equal(expectedSpanType, span.Type);
@@ -474,7 +474,7 @@ namespace Datadog.Trace.TestHelpers
             string expectedResourceName,
             string expectedServiceVersion)
         {
-            IImmutableList<MockTracerAgent.Span> spans;
+            IImmutableList<MockSpan> spans;
 
             using (var httpClient = new HttpClient())
             {
@@ -495,7 +495,7 @@ namespace Datadog.Trace.TestHelpers
                 Assert.True(spans.Count == 1, $"expected two span, saw {spans.Count}");
             }
 
-            MockTracerAgent.Span span = spans[0];
+            var span = spans[0];
 
             // base properties
             Assert.Equal(expectedResourceName, span.Resource);
@@ -511,7 +511,7 @@ namespace Datadog.Trace.TestHelpers
             Assert.Equal(expectedServiceVersion, span.Tags.GetValueOrDefault(Tags.Version));
         }
 
-        private bool IsServerSpan(MockTracerAgent.Span span) =>
+        private bool IsServerSpan(MockSpan span) =>
             span.Tags.GetValueOrDefault(Tags.SpanKind) == SpanKinds.Server;
 
         protected internal class TupleList<T1, T2> : List<Tuple<T1, T2>>

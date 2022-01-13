@@ -7,7 +7,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.Helpers
 {
     public static class PropagationTestHelpers
     {
-        public static void AssertPropagationEnabled(MockTracerAgent.Span expectedSpan, ProcessResult processResult)
+        public static void AssertPropagationEnabled(MockSpan expectedSpan, ProcessResult processResult)
         {
             // Verify DD headers
             var ddTraceId = StringUtil.GetHeader(processResult.StandardOutput, DDHttpHeaderNames.TraceId);
