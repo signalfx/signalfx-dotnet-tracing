@@ -85,6 +85,12 @@ namespace Datadog.Trace.Configuration
         public Uri MetricsEndpointUrl { get; set; }
 
         /// <summary>
+        /// Gets or sets the Uri where the Thread Sampler can send stack traces.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.LogsEndpointUrl"/>
+        public Uri LogsEndpointUrl { get; set; }
+
+        /// <summary>
         /// Gets or sets the timeout in milliseconds for the windows named pipe requests.
         /// Default is <c>100</c>.
         /// </summary>
@@ -166,6 +172,11 @@ namespace Datadog.Trace.Configuration
                              // default value
                              "http://localhost:9943/v2/datapoint";
             MetricsEndpointUrl = new Uri(metricsEndpointUrl);
+
+            var logsEndpointUrl = source?.GetString(ConfigurationKeys.MetricsEndpointUrl) ??
+                             // default value
+                             "http://localhost:4318/v1/logs";
+            LogsEndpointUrl = new Uri(logsEndpointUrl);
         }
 
         private void ConfigureTraceTransport(IConfigurationSource source, bool isWindows)

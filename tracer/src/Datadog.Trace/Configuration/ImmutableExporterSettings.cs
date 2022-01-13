@@ -38,6 +38,7 @@ namespace Datadog.Trace.Configuration
             TracesPipeTimeoutMs = settings.TracesPipeTimeoutMs;
 
             MetricsEndpointUrl = settings.MetricsEndpointUrl;
+            LogsEndpointUrl = settings.LogsEndpointUrl;
             MetricsTransport = settings.MetricsTransport;
             MetricsPipeName = settings.MetricsPipeName;
             DogStatsdPort = settings.DogStatsdPort;
@@ -59,6 +60,12 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="ConfigurationKeys.MetricsEndpointUrl"/>
         public Uri MetricsEndpointUrl { get; }
+
+        /// <summary>
+        /// Gets the Uri where the Thread Sampler can send stack traces.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.LogsEndpointUrl"/>
+        public Uri LogsEndpointUrl { get; set; }
 
         /// <summary>
         /// Gets the windows pipe name where the Tracer can connect to the Agent.
