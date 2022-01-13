@@ -21,6 +21,11 @@
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
+        <File Id="net461_SignalFx.Tracing.OpenTracing.dll"
+              Source="$(var.TracerHomeDirectory)\net461\SignalFx.Tracing.OpenTracing.dll"
+              KeyPath="yes" Checksum="yes"/>
+      </Component>
+      <Component Win64="$(var.Win64)">
         <File Id="net461_SignalFx.Tracing.MSBuild.dll"
               Source="$(var.TracerHomeDirectory)\net461\SignalFx.Tracing.MSBuild.dll"
               KeyPath="yes" Checksum="yes"/>
@@ -33,6 +38,11 @@
       <Component Win64="$(var.Win64)">
         <File Id="net461_SignalFx.Tracing.pdb"
               Source="$(var.TracerHomeDirectory)\net461\SignalFx.Tracing.pdb"
+              KeyPath="yes" Checksum="yes"/>
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="net461_SignalFx.Tracing.OpenTracing.pdb"
+              Source="$(var.TracerHomeDirectory)\net461\SignalFx.Tracing.OpenTracing.pdb"
               KeyPath="yes" Checksum="yes"/>
       </Component>
     </ComponentGroup>
