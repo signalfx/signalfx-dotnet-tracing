@@ -3,6 +3,7 @@
 using System.Linq;
 using Datadog.Trace.TestHelpers;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -21,7 +22,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("RunOnWindows", "True")]
         public void SubmitTraces()
         {
-            const int expectedSpanCount = 1;
+            const int expectedSpanCount = 2;
 
             using var agent = EnvironmentHelper.GetMockAgent();
             using var exit = RunSampleAndWaitForExit(agent.Port, arguments: $"{TestPrefix}", packageVersion: string.Empty);
@@ -30,10 +31,17 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
             spans.Count.Should().BeGreaterOrEqualTo(expectedSpanCount);
 
-            var expectedSpan = spans.Where(span => span.Tags.ContainsKey("MyImportantTag") && span.Tags.ContainsKey("FunctionalityReturned")).ToList().FirstOrDefault();
-            expectedSpan.Should().NotBeNull();
-            expectedSpan.Tags["MyImportantTag"].Should().Be("MyImportantValue");
-            expectedSpan.Tags["FunctionalityReturned"].Should().Be("True");
+            var expectedOuterSpan = spans.Where(span => !span.ParentId.HasValue).ToList().FirstOrDefault();
+            var expectedInnerSpan = spans.Where(span => span.ParentId.HasValue).ToList().FirstOrDefault();
+
+            using var scope = new AssertionScope();
+            expectedOuterSpan.Should().NotBeNull();
+            expectedInnerSpan.Should().NotBeNull();
+            expectedOuterSpan.ParentId.HasValue.Should().BeFalse();
+            expectedInnerSpan.ParentId.Value.Should().Be(expectedOuterSpan.SpanId);
+            expectedOuterSpan.Tags["MyImportantTag"].Should().Be("MyImportantValue");
+            expectedOuterSpan.Tags["FunctionalityReturned"].Should().Be("True");
+            expectedInnerSpan.Tags["InnerSpanTag"].Should().Be("ImportantValue");
         }
     }
 }
