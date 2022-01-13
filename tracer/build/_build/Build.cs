@@ -145,6 +145,7 @@ partial class Build : NukeBuild
         .DependsOn(Restore)
         .DependsOn(CompileManagedSrc)
         .DependsOn(PublishManagedProfiler)
+        .DependsOn(PublishOpenTracing)
         .DependsOn(CompileNativeSrc)
         .DependsOn(PublishNativeProfiler)
         .DependsOn(DownloadLibDdwaf)
