@@ -348,6 +348,15 @@ namespace Datadog.Trace
                     writer.WritePropertyName("appsec_libddwaf_version");
                     writer.WriteValue(Security.Instance.DdlibWafVersion?.ToString() ?? "(none)");
 
+                    writer.WritePropertyName("thread_sampling_enabled");
+                    writer.WriteValue(instanceSettings.ThreadSamplingEnabled);
+
+                    writer.WritePropertyName("thread_sampling_period");
+                    writer.WriteValue(instanceSettings.ThreadSamplingPeriod);
+
+                    writer.WritePropertyName("logs_endpoint_url");
+                    writer.WriteValue(instanceSettings.ExporterSettings.LogsEndpointUrl);
+
                     writer.WriteEndObject();
                     // ReSharper restore MethodHasAsyncOverload
                 }
