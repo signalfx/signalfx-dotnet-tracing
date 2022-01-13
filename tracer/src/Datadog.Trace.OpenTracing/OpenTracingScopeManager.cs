@@ -24,8 +24,6 @@ namespace Datadog.Trace.OpenTracing
                 return null;
             }
 
-            var s = ((OpenTracingSpan)span).Span;
-
             return new OpenTracingScope(ScopeManager.Activate(((OpenTracingSpan)span).Span, finishSpanOnDispose));
         }
     }
