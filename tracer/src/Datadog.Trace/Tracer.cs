@@ -440,7 +440,7 @@ namespace Datadog.Trace
             }
             catch (Exception ex)
             {
-                Log.Warning(ex, "Unable to load OpenTracing helper library.");
+                Log.Information(ex, "OpenTracing integration was not loaded.");
             }
         }
     }
