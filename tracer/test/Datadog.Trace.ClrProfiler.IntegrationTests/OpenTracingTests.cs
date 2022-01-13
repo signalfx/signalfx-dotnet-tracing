@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Datadog.Trace.TestHelpers;
 using FluentAssertions;
@@ -27,11 +28,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             var spans = agent.WaitForSpans(expectedSpanCount);
 
             spans.Count.Should().BeGreaterOrEqualTo(expectedSpanCount);
-
+            
             var expectedSpan = spans.Where(span => span.Tags.ContainsKey("MyImportantTag") && span.Tags.ContainsKey("FunctionalityReturned")).ToList().FirstOrDefault();
             expectedSpan.Should().NotBeNull();
             expectedSpan.Tags["MyImportantTag"].Should().Be("MyImportantValue");
-            expectedSpan.Tags["FunctionalityReturned"].Should().Be("true");
+            expectedSpan.Tags["FunctionalityReturned"].Should().Be("True");
         }
     }
 }

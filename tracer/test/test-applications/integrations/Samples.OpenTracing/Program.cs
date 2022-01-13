@@ -9,16 +9,16 @@ namespace Samples.OpenTracing
         {
             // Obtain the automatically registered OpenTracing.Util.GlobalTracer instance
             var tracer = GlobalTracer.Instance;
-
+            
             // Create an active span that will be automatically parented by any existing span in this context
             using var scope = tracer.BuildSpan("MyTracedFunctionality").StartActive(finishSpanOnDispose: true);
             var span = scope.Span;
             span.SetTag("MyImportantTag", "MyImportantValue");
             span.Log("My Important Log Statement");
-
+            
             var ret = await MyAppFunctionality();
-
-            span.SetTag("FunctionalityReturned", ret.ToString());
+            
+            span.SetTag("FunctionalityReturned", ret.ToString());      
             span.Finish();
         }
 

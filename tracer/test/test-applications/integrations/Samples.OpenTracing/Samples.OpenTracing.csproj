@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <ApiVersion Condition="'$(ApiVersion)' == ''">0.12.1</ApiVersion>
     
     <!-- Required to build multiple projects with the same Configuration|Platform -->
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
@@ -12,5 +11,9 @@
 
   <ItemGroup>
     <PackageReference Include="OpenTracing" Version="0.12.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Datadog.Trace.OpenTracing\Datadog.Trace.OpenTracing.csproj" />
   </ItemGroup>
 </Project>
