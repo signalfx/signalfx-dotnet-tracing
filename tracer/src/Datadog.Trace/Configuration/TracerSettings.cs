@@ -633,7 +633,7 @@ namespace Datadog.Trace.Configuration
         private static TimeSpan GetThreadSamplingPeriod(IConfigurationSource source)
         {
             // If you change any of these constants, check with ThreadSampler.cpp first
-            var defaultSamplePeriod = TimeSpan.FromMilliseconds(value: 1000);
+            var defaultSamplePeriod = TimeSpan.FromMilliseconds(value: 10000);
             const int minimumSamplePeriod = 1000;
 
             var period = source?.GetInt32(ConfigurationKeys.ThreadSampling.Period);

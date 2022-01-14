@@ -61,5 +61,5 @@ These settings should be never used by the users.
 | `SIGNALFX_METRICS_EXPORTER` | Metrics exporter to be used. It is used to encode and dispatch metrics. Available values are: `SignalFx`, `StatsD`. | `SignalFx` |
 | `SIGNALFX_RUNTIME_METRICS_ENABLED` | Enable to activate internal runtime metrics sent to SignalFx. | `false` |
 | `SIGNALFX_THREAD_SAMPLING_ENABLED` | Enable to activate thread sampling. | `false` |
-| `SIGNALFX_THREAD_SAMPLING_PERIOD` | Sampling period. It defines how often the threads are stopped in order to fetch all stack traces. This value cannot be lower than `1000` milliseconds. | `1000` |
+| `SIGNALFX_THREAD_SAMPLING_PERIOD` | Sampling period. It defines how often the threads are stopped in order to fetch all stack traces. This value cannot be lower than `1000` milliseconds. | `10000` |
 | `SIGNALFX_TRACE_AZURE_FUNCTIONS_ENABLED` | Set to instrument within Azure functions. | `false` |

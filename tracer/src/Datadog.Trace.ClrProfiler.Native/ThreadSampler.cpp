@@ -21,7 +21,7 @@
 #define SAMPLES_BUFFER_DEFAULT_SIZE 20 * 1024
 
 // If you change these, change ThreadSampler.cs too
-#define DEFAULT_SAMPLE_PERIOD 1000
+#define DEFAULT_SAMPLE_PERIOD 10000
 #define MINIMUM_SAMPLE_PERIOD 1000
 
 // FIXME make configurable (hidden)?
