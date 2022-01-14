@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -69,6 +71,7 @@ namespace Datadog.Trace.Tests.Configuration
                 (e, i) => e.DogStatsdPort == i.DogStatsdPort,
                 (e, i) => e.MetricsTransport == i.MetricsTransport,
                 (e, i) => e.MetricsEndpointUrl == i.MetricsEndpointUrl,
+                (e, i) => e.LogsEndpointUrl == i.LogsEndpointUrl,
                 (e, i) => e.TracesTransport == i.TracesTransport,
                 (e, i) => e.TracesPipeTimeoutMs == i.TracesPipeTimeoutMs,
                 (e, i) => e.AgentUri == i.AgentUri,

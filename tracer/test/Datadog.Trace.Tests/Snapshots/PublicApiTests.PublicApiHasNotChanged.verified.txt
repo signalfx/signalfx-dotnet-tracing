@@ -33,6 +33,7 @@ namespace Datadog.Trace.Configuration
         public ExporterSettings(Datadog.Trace.Configuration.IConfigurationSource source) { }
         public System.Uri AgentUri { get; set; }
         public int DogStatsdPort { get; set; }
+        public System.Uri LogsEndpointUrl { get; set; }
         public System.Uri MetricsEndpointUrl { get; set; }
         public string MetricsPipeName { get; set; }
         public bool PartialFlushEnabled { get; set; }
@@ -70,6 +71,7 @@ namespace Datadog.Trace.Configuration
         public ImmutableExporterSettings(Datadog.Trace.Configuration.IConfigurationSource source) { }
         public System.Uri AgentUri { get; }
         public int DogStatsdPort { get; }
+        public System.Uri LogsEndpointUrl { get; }
         public System.Uri MetricsEndpointUrl { get; }
         public string MetricsPipeName { get; }
         public bool PartialFlushEnabled { get; }
