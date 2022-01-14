@@ -30,7 +30,9 @@ namespace Datadog.Trace.Configuration
         /// <summary>
         /// The default port value for dogstatsd.
         /// </summary>
-        internal const int DefaultDogstatsdPort = 8125;
+        internal const int DefaultDogstatsdPort = 9943;
+
+        private const string LocalIngestRealm = "none";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExporterSettings"/> class with default values.
@@ -48,8 +50,12 @@ namespace Datadog.Trace.Configuration
         public ExporterSettings(IConfigurationSource source)
         {
             var isWindows = FrameworkDescription.Instance.OSPlatform == OSPlatform.Windows;
-            ConfigureTraceTransport(source, isWindows);
-            ConfigureMetricsTransport(source, isWindows);
+
+            var ingestRealm = source?.GetString(ConfigurationKeys.IngestRealm) ??
+                              LocalIngestRealm;
+
+            ConfigureTraceTransport(source, isWindows, ingestRealm);
+            ConfigureMetricsTransport(source, ingestRealm);
             ConfigureLogsTransport(source);
 
             PartialFlushEnabled = source?.GetBool(ConfigurationKeys.PartialFlushEnabled)
@@ -107,7 +113,7 @@ namespace Datadog.Trace.Configuration
 
         /// <summary>
         /// Gets or sets the port where the DogStatsd server is listening for connections.
-        /// Default is <c>8125</c>.
+        /// Default is <c>9943</c>.
         /// </summary>
         /// <seealso cref="ConfigurationKeys.DogStatsdPort"/>
         public int DogStatsdPort { get; set; }
@@ -145,7 +151,30 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         internal TransportType MetricsTransport { get; set; }
 
-        private void ConfigureMetricsTransport(IConfigurationSource source, bool isWindows)
+        private static string GetConfiguredMetricsEndpoint(string ingestRealm)
+        {
+            return IsDefaultIngestRealm(ingestRealm) ?
+                       // local collector
+                       "http://localhost:9943/v2/datapoint" :
+                       // direct ingest
+                       $"https://ingest.{ingestRealm}.signalfx.com/v2/datapoint";
+        }
+
+        private static string GetConfiguredTracesEndpoint(string ingestRealm, int agentPort)
+        {
+            return IsDefaultIngestRealm(ingestRealm) ?
+                       // local collector
+                       $"http://localhost:{agentPort}/api/v2/spans" :
+                       // direct ingest
+                       $"https://ingest.{ingestRealm}.signalfx.com/v2/trace";
+        }
+
+        private static bool IsDefaultIngestRealm(string ingestRealm)
+        {
+            return string.Equals(ingestRealm, LocalIngestRealm, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private void ConfigureMetricsTransport(IConfigurationSource source, string ingestRealm)
         {
             var metricsTransport = TransportType.UDP; // default
 
@@ -170,8 +199,7 @@ namespace Datadog.Trace.Configuration
             MetricsTransport = metricsTransport;
 
             var metricsEndpointUrl = source?.GetString(ConfigurationKeys.MetricsEndpointUrl) ??
-                             // default value
-                             "http://localhost:9943/v2/datapoint";
+                                     GetConfiguredMetricsEndpoint(ingestRealm);
             MetricsEndpointUrl = new Uri(metricsEndpointUrl);
         }
 
@@ -183,25 +211,15 @@ namespace Datadog.Trace.Configuration
             LogsEndpointUrl = new Uri(logsEndpointUrl);
         }
 
-        private void ConfigureTraceTransport(IConfigurationSource source, bool isWindows)
+        private void ConfigureTraceTransport(IConfigurationSource source, bool isWindows, string ingestRealm)
         {
             TracesTransportType? traceTransport = null;
 
-            var agentHost = source?.GetString(ConfigurationKeys.AgentHost) ??
-                            // backwards compatibility for names used in the past
-                            source?.GetString("SIGNALFX_TRACE_AGENT_HOSTNAME") ??
-                            // default value
-                            DefaultAgentHost;
-
             var agentPort = source?.GetInt32(ConfigurationKeys.AgentPort) ??
-                            // backwards compatibility for names used in the past
-                            source?.GetInt32("SIGNALFX_TRACE_AGENT_PORT") ??
                             // default value
                             DefaultAgentPort;
 
-            var agentUri = source?.GetString(ConfigurationKeys.EndpointUrl) ??
-                           // default value
-                           $"http://{agentHost}:{agentPort}/api/v2/spans";
+            var agentUri = source?.GetString(ConfigurationKeys.EndpointUrl) ?? GetConfiguredTracesEndpoint(ingestRealm, agentPort);
 
             AgentUri = new Uri(agentUri);
 
@@ -217,7 +235,7 @@ namespace Datadog.Trace.Configuration
 
             // Agent port is set to zero in places like AAS where it's needed to prevent port conflict
             // The agent will fail to start if it can not bind a port
-            var hasExplicitTcpConfig = agentPort != 0 && agentHost != null;
+            var hasExplicitTcpConfig = agentPort != 0;
 
             if (hasExplicitTcpConfig)
             {
