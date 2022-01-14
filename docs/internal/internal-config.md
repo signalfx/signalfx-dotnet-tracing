@@ -56,6 +56,7 @@ These settings should be never used by the users.
 
 | Environment variable | Description | Default |
 |-|-|-|
+| `SIGNALFX_LOGS_ENDPOINT_URL` | The URL to where logs are exported using [OTLP/HTTP v1 log protocol](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md) | `http://localhost:4318/v1/logs` |
 | `SIGNALFX_METRICS_ENDPOINT_URL` | The URL to where metric exporters send metrics. | `http://localhost:9943/v2/datapoint` |
 | `SIGNALFX_METRICS_EXPORTER` | Metrics exporter to be used. It is used to encode and dispatch metrics. Available values are: `SignalFx`, `StatsD`. | `SignalFx` |
 | `SIGNALFX_RUNTIME_METRICS_ENABLED` | Enable to activate internal runtime metrics sent to SignalFx. | `false` |

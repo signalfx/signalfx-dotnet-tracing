@@ -50,6 +50,7 @@ namespace Datadog.Trace.Configuration
             var isWindows = FrameworkDescription.Instance.OSPlatform == OSPlatform.Windows;
             ConfigureTraceTransport(source, isWindows);
             ConfigureMetricsTransport(source, isWindows);
+            ConfigureLogsTransport(source);
 
             PartialFlushEnabled = source?.GetBool(ConfigurationKeys.PartialFlushEnabled)
                 // default value
@@ -83,6 +84,12 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="ConfigurationKeys.MetricsEndpointUrl"/>
         public Uri MetricsEndpointUrl { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Uri where the logs are exported.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.LogsEndpointUrl"/>
+        public Uri LogsEndpointUrl { get; set; }
 
         /// <summary>
         /// Gets or sets the timeout in milliseconds for the windows named pipe requests.
@@ -166,6 +173,14 @@ namespace Datadog.Trace.Configuration
                              // default value
                              "http://localhost:9943/v2/datapoint";
             MetricsEndpointUrl = new Uri(metricsEndpointUrl);
+        }
+
+        private void ConfigureLogsTransport(IConfigurationSource source)
+        {
+            var logsEndpointUrl = source?.GetString(ConfigurationKeys.LogsEndpointUrl) ??
+                                  // default value
+                                  "http://localhost:4318/v1/logs";
+            LogsEndpointUrl = new Uri(logsEndpointUrl);
         }
 
         private void ConfigureTraceTransport(IConfigurationSource source, bool isWindows)
