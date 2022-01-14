@@ -1,4 +1,4 @@
-// <copyright file="AzureAppServicesMetadataTests.cs" company="Datadog">
+// <copyright file="AzureAppServicesTests.cs" company="Datadog">
 // Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
@@ -10,6 +10,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Datadog.Trace.Configuration;
 using Datadog.Trace.PlatformHelpers;
 using Datadog.Trace.TestHelpers;
 using Xunit;
@@ -17,10 +18,10 @@ using Xunit.Sdk;
 
 namespace Datadog.Trace.Tests.PlatformHelpers
 {
-    [CollectionDefinition(nameof(AzureAppServicesMetadataTests), DisableParallelization = true)]
-    [Collection(nameof(AzureAppServicesMetadataTests))]
+    [CollectionDefinition(nameof(AzureAppServicesTests), DisableParallelization = true)]
+    [Collection(nameof(AzureAppServicesTests))]
     [AzureAppServicesRestorer]
-    public class AzureAppServicesMetadataTests
+    public class AzureAppServicesTests
     {
         internal static readonly string DeploymentId = "AzureExampleSiteName";
 
@@ -147,6 +148,24 @@ namespace Datadog.Trace.Tests.PlatformHelpers
             Assert.Null(metadata.ResourceId);
         }
 
+        [Theory]
+        [InlineData(null, false)]
+        [InlineData("0", false)]
+        [InlineData("false", false)]
+        [InlineData("f", false)]
+        [InlineData("F", false)]
+        [InlineData("1", true)]
+        [InlineData("t", true)]
+        [InlineData("true", true)]
+        [InlineData("T", true)]
+        public void DebugModeEnabled_Tests(string ddTraceDebug, bool expectation)
+        {
+            // plan resource group actually doesn't matter for the resource id we build
+            var vars = GetMockVariables("subscription", "deploymentId", "some-resource-group", "siteResourceGroup", ddTraceDebug: ddTraceDebug);
+            var metadata = new AzureAppServices(vars);
+            Assert.Equal(actual: metadata.DebugModeEnabled, expected: expectation);
+        }
+
         [Fact]
         public void PopulatesOnlyRootSpans()
         {
@@ -208,6 +227,7 @@ namespace Datadog.Trace.Tests.PlatformHelpers
             string deploymentId,
             string planResourceGroup,
             string siteResourceGroup,
+            string ddTraceDebug = null,
             string functionsVersion = null,
             string functionsRuntime = null)
         {
@@ -225,6 +245,17 @@ namespace Datadog.Trace.Tests.PlatformHelpers
                 vars.Add(Datadog.Trace.Configuration.ConfigurationKeys.SignalFxAccessToken, "1");
             }
 
+            if (vars.Contains(ConfigurationKeys.DebugEnabled))
+            {
+                vars.Remove(ConfigurationKeys.DebugEnabled);
+            }
+
+            if (!vars.Contains(ConfigurationKeys.ApiKey))
+            {
+                // This is a needed configuration for the AAS extension
+                vars.Add(ConfigurationKeys.ApiKey, "1");
+            }
+
             vars.Add(AzureAppServices.AzureAppServicesContextKey, "1");
             vars.Add(AzureAppServices.WebsiteOwnerNameKey, $"{subscriptionId}+{planResourceGroup}-EastUSwebspace");
             vars.Add(AzureAppServices.ResourceGroupKey, siteResourceGroup);
@@ -232,6 +263,7 @@ namespace Datadog.Trace.Tests.PlatformHelpers
             vars.Add(AzureAppServices.OperatingSystemKey, "windows");
             vars.Add(AzureAppServices.InstanceIdKey, "instance_id");
             vars.Add(AzureAppServices.InstanceNameKey, "instance_name");
+            vars.Add(ConfigurationKeys.DebugEnabled, ddTraceDebug);
 
             if (functionsVersion != null)
             {
