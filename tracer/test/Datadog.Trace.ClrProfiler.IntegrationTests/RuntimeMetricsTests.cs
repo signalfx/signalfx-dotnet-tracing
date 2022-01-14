@@ -13,6 +13,7 @@ using Xunit.Abstractions;
 
 namespace Datadog.Trace.ClrProfiler.IntegrationTests
 {
+    [CollectionDefinition(nameof(RuntimeMetricsTests), DisableParallelization = true)]
     public class RuntimeMetricsTests : TestHelper
     {
         public RuntimeMetricsTests(ITestOutputHelper output)
@@ -23,19 +24,49 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [SkippableFact]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
-        public void SubmitsMetrics()
+        public void MetricsDisabled()
+        {
+            SetEnvironmentVariable("DD_RUNTIME_METRICS_ENABLED", "0");
+            using var agent = EnvironmentHelper.GetMockAgent(useStatsD: true);
+
+            using var processResult = RunSampleAndWaitForExit(agent);
+            var requests = agent.StatsdRequests;
+
+            Assert.True(requests.Count == 0, "Received metrics despite being disabled. Metrics received: " + string.Join("\n", requests));
+        }
+
+        [SkippableFact]
+        [Trait("Category", "EndToEnd")]
+        [Trait("RunOnWindows", "True")]
+        public void UdpSubmitsMetrics()
+        {
+            EnvironmentHelper.EnableDefaultTransport();
+            RunTest();
+        }
+
+#if NETCOREAPP3_1_OR_GREATER
+        [SkippableFact]
+        [Trait("Category", "EndToEnd")]
+        [Trait("RunOnWindows", "False")]
+        public void UdsSubmitsMetrics()
+        {
+            EnvironmentHelper.EnableUnixDomainSockets();
+            RunTest();
+        }
+#endif
+
+        private void RunTest()
         {
             int agentPort = TcpPortProvider.GetOpenPort();
 
             Output.WriteLine($"Assigning port {agentPort} for the agentPort.");
-
             SetEnvironmentVariable("SIGNALFX_RUNTIME_METRICS_ENABLED", "1");
             SetEnvironmentVariable("SIGNALFX_METRICS_EXPORTER", "StatsD");
 
             using var agent = new MockTracerAgent(agentPort, useStatsd: true);
             Output.WriteLine($"Assigning port {agent.StatsdPort} for the statsdPort.");
 
-            using var processResult = RunSampleAndWaitForExit(agent.Port, agent.StatsdPort);
+            using var processResult = RunSampleAndWaitForExit(agent);
             var requests = agent.StatsdRequests;
 
             // Check if we receive 2 kinds of metrics:
@@ -55,20 +86,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 Assert.True(contentionRequestsCount > 0, "No contention metrics received. Metrics received: " + string.Join("\n", requests));
             }
-        }
 
-        [SkippableFact]
-        [Trait("Category", "EndToEnd")]
-        [Trait("RunOnWindows", "True")]
-        public void MetricsDisabled()
-        {
-            SetEnvironmentVariable("SIGNALFX_RUNTIME_METRICS_ENABLED", "0");
-            using var agent = EnvironmentHelper.GetMockAgent(useStatsD: true);
-
-            using var processResult = RunSampleAndWaitForExit(agent.Port, agent.StatsdPort);
-            var requests = agent.StatsdRequests;
-
-            Assert.True(requests.Count == 0, "Received metrics despite being disabled. Metrics received: " + string.Join("\n", requests));
+            Assert.Empty(agent.Exceptions);
         }
     }
 }

@@ -41,7 +41,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetEnvironmentVariable("SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES", tagQueries.ToString().ToLowerInvariant());
 
             using (var agent = EnvironmentHelper.GetMockAgent())
-            using (RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion))
+            using (RunSampleAndWaitForExit(agent, packageVersion: packageVersion))
             {
                 var expected = new List<string>();
 
@@ -196,7 +196,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetEnvironmentVariable($"SIGNALFX_TRACE_{nameof(IntegrationId.ElasticsearchNet)}_ENABLED", "false");
 
             using var agent = EnvironmentHelper.GetMockAgent();
-            using var process = RunSampleAndWaitForExit(agent.Port, packageVersion: packageVersion);
+            using var process = RunSampleAndWaitForExit(agent, packageVersion: packageVersion);
             var spans = agent.WaitForSpans(1).Where(s => s.Type == "elasticsearch").ToList();
 
             Assert.Empty(spans);
