@@ -597,7 +597,7 @@ DWORD WINAPI SamplingThreadMain(_In_ LPVOID param)
         SleepMillis(sleepMillis);
         bool shouldSample = helper.AllocateBuffer();
         if (!shouldSample) {
-            Logger::Warn("Skipping a thread sample period, buffers are full");
+            Logger::Warn("Skipping a thread sample period, buffers are full. ** THIS WILL RESULT IN LOSS OF PROFILING DATA **");
             continue;
         } else {
             PauseClrAndCaptureSamples(ts, info10, helper);

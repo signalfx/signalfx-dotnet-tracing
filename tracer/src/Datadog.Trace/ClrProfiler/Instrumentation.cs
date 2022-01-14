@@ -214,16 +214,18 @@ namespace Datadog.Trace.ClrProfiler
             }
 #endif
             // Thread Sampling ("profiling") feature
-            try
+            if (TracerManager.Instance.Settings.ThreadSamplingEnabled)
             {
-                if (TracerManager.Instance.Settings.ThreadSamplingEnabled)
+                try
                 {
+                    Log.Debug("Initializing thread sampling.");
                     ThreadSampling.ThreadSampler.Initialize(TracerManager.Instance.Settings.ThreadSamplingPeriod);
+                    Log.Information("Thread sampling initialized.");
                 }
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "Cannot initialize thread sampling ");
+                catch (Exception e)
+                {
+                    Log.Error(e, "Cannot initialize thread sampling.");
+                }
             }
 
             Log.Debug("Initialization finished.");
