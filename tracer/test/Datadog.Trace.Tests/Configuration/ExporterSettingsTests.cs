@@ -1,4 +1,6 @@
-﻿using System.Collections.Specialized;
+﻿// Modified by Splunk Inc.
+
+using System.Collections.Specialized;
 using Datadog.Trace.Configuration;
 using FluentAssertions;
 using Xunit;
@@ -32,23 +34,23 @@ public class ExporterSettingsTests
     [Fact]
     public void If_nondefault_signalfx_realm_is_configured_then_direct_ingest_endpoint_for_traces_is_used()
     {
-        var collection = new NameValueCollection { { "SIGNALFX_REALM", "realm" } };
+        var collection = new NameValueCollection { { "SIGNALFX_REALM", "test-realm" } };
         var configuration = new NameValueConfigurationSource(collection);
 
         var settings = new ExporterSettings(configuration);
 
-        settings.AgentUri.Should().Be("https://ingest.realm.signalfx.com/v2/trace");
+        settings.AgentUri.Should().Be("https://ingest.test-realm.signalfx.com/v2/trace");
     }
 
     [Fact]
     public void If_nondefault_signalfx_realm_is_configured_then_direct_ingest_endpoint_for_metrics_is_used()
     {
-        var collection = new NameValueCollection { { "SIGNALFX_REALM", "realm" } };
+        var collection = new NameValueCollection { { "SIGNALFX_REALM", "test-realm" } };
         var configuration = new NameValueConfigurationSource(collection);
 
         var settings = new ExporterSettings(configuration);
 
-        settings.MetricsEndpointUrl.Should().Be("https://ingest.realm.signalfx.com/v2/datapoint");
+        settings.MetricsEndpointUrl.Should().Be("https://ingest.test-realm.signalfx.com/v2/datapoint");
     }
 
     [Theory]
@@ -108,7 +110,7 @@ public class ExporterSettingsTests
     {
         var collection = new NameValueCollection
         {
-            { "SIGNALFX_REALM", "realm" },
+            { "SIGNALFX_REALM", "test-realm" },
             { "SIGNALFX_ENDPOINT_URL", "http://127.0.0.1:9411/api/v2/spans" }
         };
         var configuration = new NameValueConfigurationSource(collection);
@@ -123,7 +125,7 @@ public class ExporterSettingsTests
     {
         var collection = new NameValueCollection
         {
-            { "SIGNALFX_REALM", "realm" },
+            { "SIGNALFX_REALM", "test-realm" },
             { "SIGNALFX_METRICS_ENDPOINT_URL", "http://127.0.0.1:9943/v2/datapoint" }
         };
         var configuration = new NameValueConfigurationSource(collection);
