@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using Datadog.Trace.Configuration;
+using Datadog.Trace.SignalFx.Metrics;
 using Datadog.Trace.Vendors.Newtonsoft.Json;
 using Xunit;
 
@@ -68,7 +69,7 @@ namespace Datadog.Trace.Tests.Configuration
             yield return new object[] { CreateFunc(s => s.CustomSamplingRules), null };
             yield return new object[] { CreateFunc(s => s.MaxTracesSubmittedPerSecond), 100 };
             yield return new object[] { CreateFunc(s => s.TracerMetricsEnabled), false };
-            yield return new object[] { CreateFunc(s => s.ExporterSettings.DogStatsdPort), 8125 };
+            yield return new object[] { CreateFunc(s => s.ExporterSettings.DogStatsdPort), 9943 };
             yield return new object[] { CreateFunc(s => s.RecordedValueMaxLength), 12000 };
         }
 
@@ -77,7 +78,8 @@ namespace Datadog.Trace.Tests.Configuration
             yield return new object[] { ConfigurationKeys.TraceEnabled, "true", CreateFunc(s => s.TraceEnabled), true };
             yield return new object[] { ConfigurationKeys.TraceEnabled, "false", CreateFunc(s => s.TraceEnabled), false };
 
-            yield return new object[] { ConfigurationKeys.AgentHost, "test-host", CreateFunc(s => s.ExporterSettings.AgentUri), new Uri("http://test-host:9411/api/v2/spans") };
+            yield return new object[] { ConfigurationKeys.IngestRealm, "realm", CreateFunc(s => s.ExporterSettings.AgentUri), new Uri("https://ingest.realm.signalfx.com/v2/trace") };
+            yield return new object[] { ConfigurationKeys.IngestRealm, "realm", CreateFunc(s => s.ExporterSettings.MetricsEndpointUrl), new Uri("https://ingest.realm.signalfx.com/v2/datapoint") };
             yield return new object[] { ConfigurationKeys.AgentPort, "9000", CreateFunc(s => s.ExporterSettings.AgentUri), new Uri("http://127.0.0.1:9000/api/v2/spans") };
 
             yield return new object[] { ConfigurationKeys.EndpointUrl, "http://localhost:9411/api/v2/spans", CreateFunc(s => s.ExporterSettings.AgentUri), new Uri("http://127.0.0.1:9411/api/v2/spans") };
@@ -113,6 +115,12 @@ namespace Datadog.Trace.Tests.Configuration
             yield return new object[] { ConfigurationKeys.Exporter, "datadogagent", CreateFunc(s => s.Exporter), ExporterType.DatadogAgent };
             yield return new object[] { ConfigurationKeys.Exporter, "Zipkin", CreateFunc(s => s.Exporter), ExporterType.Zipkin };
             yield return new object[] { ConfigurationKeys.Exporter, "unknown", CreateFunc(s => s.Exporter), ExporterType.Default };
+
+            yield return new object[] { ConfigurationKeys.MetricsExporter, null, CreateFunc(s => s.MetricsExporter), MetricsExporterType.Default };
+            yield return new object[] { ConfigurationKeys.MetricsExporter, string.Empty, CreateFunc(s => s.MetricsExporter), MetricsExporterType.Default };
+            yield return new object[] { ConfigurationKeys.MetricsExporter, "StatsD", CreateFunc(s => s.MetricsExporter), MetricsExporterType.StatsD };
+            yield return new object[] { ConfigurationKeys.MetricsExporter, "SignalFx", CreateFunc(s => s.MetricsExporter), MetricsExporterType.SignalFx };
+            yield return new object[] { ConfigurationKeys.MetricsExporter, "unknown", CreateFunc(s => s.MetricsExporter), MetricsExporterType.Default };
 
             yield return new object[] { ConfigurationKeys.Convention, null, CreateFunc(s => s.Convention), ConventionType.Default };
             yield return new object[] { ConfigurationKeys.Convention, string.Empty, CreateFunc(s => s.Convention), ConventionType.Default };

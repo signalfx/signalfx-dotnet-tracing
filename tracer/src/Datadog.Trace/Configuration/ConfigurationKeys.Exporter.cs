@@ -20,6 +20,13 @@ namespace Datadog.Trace.Configuration
         public const string AgentHost = "SIGNALFX_AGENT_HOST";
 
         /// <summary>
+        /// Configuration key for the SignalFx ingest realm, where the Tracer can send telemetry signals.
+        /// </summary>
+        /// <seealso cref="ExporterSettings.MetricsEndpointUrl"/>
+        /// <seealso cref="ExporterSettings.AgentUri"/>
+        public const string IngestRealm = "SIGNALFX_REALM";
+
+        /// <summary>
         /// Configuration key for the Agent port where the Tracer can send traces.
         /// Default value is 8126.
         /// </summary>
