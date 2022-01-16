@@ -95,7 +95,10 @@ namespace Datadog.Trace.ThreadSampling
                 else if (op == 0x07)
                 {
                     int microsSuspended = ReadInt();
-                    Console.WriteLine("  clr was suspended for " + microsSuspended + " micros");
+                    int numThreads = ReadInt();
+                    int totalFrames = ReadInt();
+                    int nameCacheMisses = ReadInt();
+                    Console.WriteLine("  clr was suspended for " + microsSuspended + " micros threads=" + numThreads + " frames=" + totalFrames + " misses=" + nameCacheMisses);
                 }
                 else
                 {
