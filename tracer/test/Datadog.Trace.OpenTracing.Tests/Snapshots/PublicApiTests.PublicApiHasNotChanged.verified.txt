@@ -19,7 +19,7 @@ namespace Datadog.Trace.OpenTracing
     public static class OpenTracingTracerFactory
     {
         public static OpenTracing.ITracer CreateTracer(System.Uri agentEndpoint = null, string defaultServiceName = null, bool isDebugEnabled = false) { }
-        public static bool RegisterGlobalTracer(Datadog.Trace.Tracer tracer) { }
+        public static bool RegisterGlobalTracerIfAbsent(Datadog.Trace.Tracer tracer) { }
         public static OpenTracing.ITracer WrapTracer(Datadog.Trace.Tracer tracer) { }
     }
 }
