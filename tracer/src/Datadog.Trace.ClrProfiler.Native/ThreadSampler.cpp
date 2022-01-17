@@ -207,11 +207,14 @@ void ThreadSamplesBuffer::EndBatch()
     CHECK_SAMPLES_BUFFER_LENGTH();
     writeByte(THREAD_SAMPLES_END_BATCH);
 }
-void ThreadSamplesBuffer::WriteFinalStats(int microsSuspended)
+void ThreadSamplesBuffer::WriteFinalStats(SamplingStatistics stats)
 {
     CHECK_SAMPLES_BUFFER_LENGTH();
     writeByte(THREAD_SAMPLES_FINAL_STATS);
-    writeInt(microsSuspended);
+    writeInt(stats.microsSuspended);
+    writeInt(stats.numThreads);
+    writeInt(stats.totalFrames);
+    writeInt(stats.nameCacheMisses);
 }
 
 void ThreadSamplesBuffer::writeCodedFrameString(FunctionID fid, WSTRING& str)
@@ -273,12 +276,16 @@ void ThreadSamplesBuffer::writeInt64(int64_t val)
 class SamplingHelper
 {
 public:
+    // These are permanent parts of the helper object
     ICorProfilerInfo10* info10 = NULL;
-    ThreadSamplesBuffer* curWriter = NULL;
-    std::vector<unsigned char>* curBuffer = NULL;
     NameCache functionNameCache;
     NameCache classNameCache;
-    SamplingHelper() : functionNameCache(MAX_FUNCTION_NAME_CACHE_SIZE), classNameCache(MAX_CLASS_NAME_CACHE_SIZE)
+    // These cycle every sample and/or are owned externally
+    ThreadSamplesBuffer* curWriter = NULL;
+    std::vector<unsigned char>* curBuffer = NULL;
+    SamplingStatistics stats;
+
+    SamplingHelper() : functionNameCache(MAX_FUNCTION_NAME_CACHE_SIZE), classNameCache(MAX_CLASS_NAME_CACHE_SIZE), stats()
     {
     }
 
@@ -289,6 +296,7 @@ public:
         {
             return should;
         }
+        stats = SamplingStatistics();
         curBuffer = new std::vector<unsigned char>();
         curBuffer->reserve(SAMPLES_BUFFER_DEFAULT_SIZE);
         curWriter = new ThreadSamplesBuffer(curBuffer);
@@ -300,6 +308,7 @@ public:
         delete curWriter;
         curWriter = NULL;
         curBuffer = NULL;
+        stats = SamplingStatistics();
     }
 
 private:
@@ -424,6 +433,7 @@ public:
         {
             return answer;
         }
+        stats.nameCacheMisses++;
         answer = new WSTRING();
         this->GetFunctionName(fid, frame, *answer);
         functionNameCache.put(fid, answer);
@@ -449,6 +459,7 @@ HRESULT __stdcall FrameCallback(_In_ FunctionID funcId, _In_ UINT_PTR ip, _In_ C
                                 _In_ ULONG32 contextSize, _In_ BYTE context[], _In_ void* clientData)
 {
     SamplingHelper* helper = (SamplingHelper*) clientData;
+    helper->stats.totalFrames++;
     WSTRING* name = helper->Lookup(funcId, frameInfo);
     // This is where line numbers could be calculated
     helper->curWriter->RecordFrame(funcId, *name);
@@ -472,6 +483,7 @@ void CaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, SamplingHelpe
 
     while ((hr = threadEnum->Next(1, &threadID, &numReturned)) == S_OK)
     {
+        helper.stats.numThreads++;
         ThreadSpanContext spanContext = threadSpanContextMap[threadID];
         auto found = ts->managedTid2state.find(threadID);
         if (found != ts->managedTid2state.end() && found->second != NULL)
@@ -570,8 +582,10 @@ void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, Sa
     }
     elapsedMicros = elapsed.tv_sec * 1000000 + elapsed.tv_nsec/1000;
 #endif
-    printf("Resuming runtime after %i micros\n", elapsedMicros);
-    helper.curWriter->WriteFinalStats(elapsedMicros);
+    helper.stats.microsSuspended = elapsedMicros;
+    printf("Resuming runtime micros=%i threads=%i frames=%i misses=%i\n", helper.stats.microsSuspended, 
+        helper.stats.numThreads, helper.stats.totalFrames, helper.stats.nameCacheMisses);
+    helper.curWriter->WriteFinalStats(helper.stats);
 
     helper.PublishBuffer();
 }
