@@ -1,5 +1,4 @@
-// Modified by SignalFx
-using OpenTracing;
+// Modified by SignalFx Inc.
 
 namespace Datadog.Trace.OpenTracing
 {
