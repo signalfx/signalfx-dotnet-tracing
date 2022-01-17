@@ -9,7 +9,7 @@
 5. Click **New application setting** to add the following settings:
    * Name: `SIGNALFX_ACCESS_TOKEN`
    * Value: `[splunk-observability-cloud-access-token]`
-   * Name: SIGNALFX_ENDPOINT_URL
+   * Name: `SIGNALFX_ENDPOINT_URL`
    * Value: `https://ingest.[splunk-realm].signalfx.com/v2/trace`
 6. Restart the application in App Service.
 
