@@ -7,7 +7,7 @@
 3. Find and install the **SignalFx .NET Tracing** extension.
 4. Go to **Settings > Configuration**.
 5. Click **New application setting** to add the following settings:
-   * Name: SIGNALFX_ACCESS_TOKEN 
+   * Name: `SIGNALFX_ACCESS_TOKEN`
    * Value: `[splunk-observability-cloud-access-token]`
    * Name: SIGNALFX_ENDPOINT_URL
    * Value: `https://ingest.[splunk-realm].signalfx.com/v2/trace`
