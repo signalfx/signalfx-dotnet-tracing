@@ -15,6 +15,23 @@ extern "C"
 
 namespace trace
 {
+struct SamplingStatistics {
+    int microsSuspended;
+    int numThreads;
+    int totalFrames;
+    int nameCacheMisses;
+    SamplingStatistics() : microsSuspended(0), numThreads(0), totalFrames(0), nameCacheMisses(0)
+    {
+    }
+    SamplingStatistics(SamplingStatistics const& other) :
+        microsSuspended(other.microsSuspended),
+        numThreads(other.numThreads),
+        totalFrames(other.totalFrames),
+        nameCacheMisses(other.nameCacheMisses)
+    {
+    }
+};
+
 class ThreadSpanContext
 {
 public:
@@ -76,7 +93,7 @@ public:
     void RecordFrame(FunctionID fid, WSTRING& frame);
     void EndSample();
     void EndBatch();
-    void WriteFinalStats(int microsSuspended);
+    void WriteFinalStats(SamplingStatistics stats);
 
 private:
     void writeCodedFrameString(FunctionID fid, WSTRING& str);
