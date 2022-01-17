@@ -57,7 +57,7 @@ namespace Datadog.Trace.OpenTracing
             var registeredSuccessfully = GlobalTracer.RegisterIfAbsent(WrapTracer(tracer));
             if (!registeredSuccessfully)
             {
-                Log.Warning("There was an error registering the OpenTracing tracer.");
+                Log.Warning("An OpenTracing tracer was already registered.");
             }
 
             return registeredSuccessfully;
