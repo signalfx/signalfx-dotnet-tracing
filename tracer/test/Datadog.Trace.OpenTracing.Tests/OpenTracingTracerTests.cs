@@ -395,7 +395,7 @@ namespace Datadog.Trace.OpenTracing.Tests
         [Fact]
         public void RegisteredAsGlobalTracer_OnlyOnce()
         {
-            Assert.False(OpenTracingTracerFactory.RegisterGlobalTracer(_signalFxTracer));
+            Assert.False(OpenTracingTracerFactory.RegisterGlobalTracerIfAbsent(_signalFxTracer));
         }
     }
 }
