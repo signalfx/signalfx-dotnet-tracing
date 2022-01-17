@@ -240,12 +240,6 @@ namespace Datadog.Trace
         Datadog.Trace.ISpan Span { get; }
         void Close();
     }
-    public interface IScopeManager
-    {
-        Datadog.Trace.Scope Active { get; }
-        Datadog.Trace.Scope Activate(Datadog.Trace.ISpan span, bool finishOnClose);
-        void Close(Datadog.Trace.Scope scope);
-    }
     public interface ISpan : System.IDisposable
     {
         Datadog.Trace.ISpanContext Context { get; }
@@ -264,9 +258,8 @@ namespace Datadog.Trace
         void SetException(System.Exception exception);
         Datadog.Trace.ISpan SetTag(string key, string value);
     }
-    public interface ISpanContext : System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, string>>, System.Collections.Generic.IReadOnlyCollection<System.Collections.Generic.KeyValuePair<string, string>>, System.Collections.Generic.IReadOnlyDictionary<string, string>, System.Collections.IEnumerable
+    public interface ISpanContext
     {
-        Datadog.Trace.ISpanContext Parent { get; }
         string ServiceName { get; }
         ulong SpanId { get; }
         Datadog.Trace.TraceId TraceId { get; }
@@ -284,10 +277,6 @@ namespace Datadog.Trace
         AutoReject = 0,
         AutoKeep = 1,
         UserKeep = 2,
-    }
-    public class Scope : Datadog.Trace.IScope, System.IDisposable
-    {
-        public void Dispose() { }
     }
     public static class ServerTimingHeader
     {
@@ -435,7 +424,6 @@ namespace Datadog.Trace
         public Tracer(Datadog.Trace.Configuration.TracerSettings settings) { }
         public Datadog.Trace.IScope ActiveScope { get; }
         public string DefaultServiceName { get; }
-        public Datadog.Trace.IScopeManager ScopeManager { get; }
         public Datadog.Trace.Configuration.ImmutableTracerSettings Settings { get; }
         [set: System.Obsolete("Use Tracer.Configure to configure the global Tracer instance in code.")]
         public static Datadog.Trace.Tracer Instance { get; set; }
