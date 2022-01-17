@@ -183,7 +183,7 @@ namespace Datadog.Trace
         /// <summary>
         /// Gets the tracer's scope manager, which determines which span is currently active, if any.
         /// </summary>
-        public IScopeManager ScopeManager => TracerManager.ScopeManager;
+        internal IScopeManager ScopeManager => TracerManager.ScopeManager;
 
         /// <summary>
         /// Gets the default service name for traces where a service name is not specified.

@@ -3,7 +3,7 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-// Modified by SignalFx
+// Modified by Splunk Inc.
 
 using System;
 using Datadog.Trace.Propagation;
@@ -18,11 +18,6 @@ namespace Datadog.Trace
         string DefaultServiceName { get; }
 
         IPropagator Propagator { get; }
-
-        /// <summary>
-        /// Gets the tracer's scope manager, which determines which span is currently active, if any.
-        /// </summary>
-        IScopeManager ScopeManager { get; }
 
         ISpan StartSpan(string operationName, ISpanContext parent, string serviceName, DateTimeOffset? startTime, bool ignoreActiveScope);
     }

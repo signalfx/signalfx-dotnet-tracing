@@ -12,7 +12,7 @@ namespace Datadog.Trace
     /// <summary>
     /// Span context interface.
     /// </summary>
-    public interface ISpanContext : IReadOnlyDictionary<string, string>
+    public interface ISpanContext
     {
         /// <summary>
         /// Gets the trace identifier.
@@ -28,10 +28,5 @@ namespace Datadog.Trace
         /// Gets the service name to propagate to child spans.
         /// </summary>
         string ServiceName { get; }
-
-        /// <summary>
-        /// Gets the parent context.
-        /// </summary>
-        public ISpanContext Parent { get; }
     }
 }

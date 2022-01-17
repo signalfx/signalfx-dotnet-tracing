@@ -14,7 +14,7 @@ namespace Datadog.Trace
     /// <summary>
     /// The SpanContext contains all the information needed to express relationships between spans inside or outside the process boundaries.
     /// </summary>
-    public class SpanContext : ISpanContext
+    public class SpanContext : ISpanContext, IReadOnlyDictionary<string, string>
     {
         private static readonly string[] KeyNames = { "trace-id", "parent-id", "sampling-priority", "origin" };
 
