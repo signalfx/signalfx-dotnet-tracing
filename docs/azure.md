@@ -13,4 +13,6 @@
    * Value: `https://ingest.[splunk-realm].signalfx.com/v2/trace`
 6. Restart the application in App Service.
 
+In the endpoint URL, ``splunk-realm`` is the [O11y realm](https://dev.splunk.com/observability/docs/realms_in_endpoints). For example, ``us0``.
+
 > **Tip:** To reduce latency and benefit from OTel Collector features, you can set the endpoint URL setting to a Collector instance running in Azure VM over an Azure private network.
