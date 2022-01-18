@@ -23,9 +23,9 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 - The release contains significant changes as it is based on the latest
   [.NET Tracer for Datadog APM](https://github.com/DataDog/dd-trace-dotnet)
-  with modifications to make it working with the
+  with modifications to make it work with the
   [Splunk OpenTelemetry Collector](https://github.com/signalfx/splunk-otel-collector)
-  and directly with [Splunk Observabilty Cloud](https://www.splunk.com/en_us/observability.html).
+  and directly with [Splunk Observability Cloud](https://www.splunk.com/en_us/observability.html).
   Some of the changes are breaking. Please contact us if you miss any feature
   from the previous release.
 
@@ -33,7 +33,7 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 - There is no support for .NET Framework older than .NET Framework 4.6.1.
 - There is no support for Alpine Linux.
-- There is no new releases for [`SignalFx.Tracing`](https://www.nuget.org/packages/SignalFx.Tracing.OpenTracing/)
+- There are no new releases for [`SignalFx.Tracing`](https://www.nuget.org/packages/SignalFx.Tracing.OpenTracing/)
 nor [`SignalFx.Tracing.OpenTracing`](https://www.nuget.org/packages/SignalFx.Tracing.OpenTracing/)
 NuGet packages. For manual instrumentation use [`OpenTracing`](https://www.nuget.org/packages/OpenTracing/)
 instead. You can find more information in the documentation.
@@ -56,7 +56,7 @@ instead. You can find more information in the documentation.
 - Remove `SIGNALFX_OUTBOUND_HTTP_EXCLUDED_HOSTS` configuration as
   [Splunk OpenTelemetry Collector](https://docs.splunk.com/Observability/gdi/opentelemetry/opentelemetry.html)
   is the recommended place for spans filtering.
-  If you need span exclusion for specific url substrings, it can be configured
+  If you need span exclusion for specific URL substrings, it can be configured
   using `SIGNALFX_TRACE_HTTP_CLIENT_EXCLUDED_URL_SUBSTRINGS` environment variable.
 - Remove `SIGNALFX_INSTRUMENTATION_ASPNETCORE_DIAGNOSTIC_LISTENERS` configuration
   which is no longer needed. It provided a workaround for an issue in a specific
@@ -92,14 +92,14 @@ instead. You can find more information in the documentation.
   closes consumer scope on method enter, and starts a new one on method exit.
 - Add `SIGNALFX_TRACE_LOG_DIRECTORY` configuration that sets directory for logs
   and overrides the value in `SIGNALFX_TRACE_LOG_PATH` if present.
-- Add `SIGNALFX_TRACE_LOGGING_RATE` configuration that sets number of seconds
+- Add `SIGNALFX_TRACE_LOGGING_RATE` configuration that sets the number of seconds
   between identical log messages for tracer log files.
 - Add `SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED` configuration that enables partial
   flush of traces.
-- Add `SIGNALFX_TRACE_PARTIAL_FLUSH_MIN_SPANS` configuration that sets minimum
+- Add `SIGNALFX_TRACE_PARTIAL_FLUSH_MIN_SPANS` configuration that sets the minimum
   number of closed spans in a trace before it's partially flushed.
-- Add `SIGNALFX_VERSION` configuration that sets application's version that
-  will populate `version` tag on spans.
+- Add `SIGNALFX_VERSION` configuration that sets the application's version that
+  will populate the `version` tag on spans.
 - Add `SIGNALFX_TRACE_STARTUP_LOGS` configuration that enables diagnostic log
   at startup.
 - Add `SIGNALFX_TRACE_{0}_ENABLED` configuration pattern that enables/disables
