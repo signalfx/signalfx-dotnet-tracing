@@ -43,8 +43,6 @@ export CORECLR_PROFILER_PATH="${PWD}/tracer/bin/tracer-home/${OPT_DIR}SignalFx.T
 # Configure SFx .NET Tracer 
 export SIGNALFX_DOTNET_TRACER_HOME="${PWD}/tracer/bin/tracer-home"
 export SIGNALFX_VERSION="1.0.0"
-export SIGNALFX_ENDPOINT_URL=${SIGNALFX_ENDPOINT_URL:-"http://localhost:9411/api/v2/spans"}
-export SIGNALFX_METRICS_ENDPOINT_URL=${SIGNALFX_METRICS_ENDPOINT_URL:-"http://localhost:9943/v2/datapoint"}
 export SIGNALFX_TRACE_DEBUG="1"
 export SIGNALFX_DUMP_ILREWRITE_ENABLED="0"
 export SIGNALFX_CLR_ENABLE_INLINING="1"
