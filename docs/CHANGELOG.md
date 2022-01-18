@@ -31,7 +31,7 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 ### Breaking changes
 
-- There is no support for .NET older than .NET 4.6.2.
+- There is no support for .NET Framework older than .NET Framework 4.6.1.
 - There is no new releases for [`SignalFx.Tracing`](https://www.nuget.org/packages/SignalFx.Tracing.OpenTracing/)
 nor [`SignalFx.Tracing.OpenTracing`](https://www.nuget.org/packages/SignalFx.Tracing.OpenTracing/)
 NuGet packages. For manual instrumentation use [`OpenTracing`](https://www.nuget.org/packages/OpenTracing/)
