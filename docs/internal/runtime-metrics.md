@@ -19,7 +19,7 @@ which forwards telemetry to Splunk Observability Cloud. For instructions on how 
 
 ### Exporting directly to Splunk Observability Cloud
 
-If you prefer to send metrics directly to Splunk Observability Cloud, configure the following settings:
+If you prefer to send metrics to Splunk Observability Cloud without using the Collector, configure the following settings:
 
 | Setting | Value | Notes |
 |-|-|-|
