@@ -5,8 +5,6 @@
 
 // Modified by Splunk Inc.
 
-using System.Collections.Generic;
-
 namespace Datadog.Trace
 {
     /// <summary>
