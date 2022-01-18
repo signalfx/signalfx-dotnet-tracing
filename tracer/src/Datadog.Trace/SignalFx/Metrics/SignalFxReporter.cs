@@ -69,7 +69,7 @@ namespace Datadog.Trace.SignalFx.Metrics
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "An error occurred while sending metrics.");
+                Log.Error(ex, "Metric data could not be sent.");
             }
         }
 
