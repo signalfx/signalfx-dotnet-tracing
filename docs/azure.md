@@ -2,18 +2,15 @@
 
 ## App Service
 
-1. Choose your App Service.
-2. Navigate to `Development Tools` > `Extensions`.
-3. Find and install the `SignalFx .NET Tracing` extension.
-4. Navigate to `Settings` > `Configuration`.
-5. Add `New application setting`s to configure the receiver:
+1. Choose your app in Azure App Service.
+2. Go to **Development Tools > Extensions**.
+3. Find and install the **SignalFx .NET Tracing** extension.
+4. Go to **Settings > Configuration**.
+5. Click **New application setting** to add the following settings:
+   * Name: `SIGNALFX_ACCESS_TOKEN`
+   * Value: `[splunk-observability-cloud-access-token]`
+   * Name: `SIGNALFX_ENDPOINT_URL`
+   * Value: `https://ingest.[splunk-realm].signalfx.com/v2/trace`
+6. Restart the application in App Service.
 
-    ```
-    Name: SIGNALFX_ACCESS_TOKEN 
-    Value: (Your SIGNALFX access token)
-
-    Name: SIGNALFX_ENDPOINT_URL
-    Value: (Your Collector or SignalFX ingest endpoint)
-    ```
-    (See [advanced-config.md](advanced-config.md) for more options.)
-6. Restart the App Service.
+> **Tip:** To reduce latency and benefit from OTel Collector features, you can set the endpoint URL setting to a Collector instance running in Azure VM over an Azure private network.
