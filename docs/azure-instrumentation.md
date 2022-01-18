@@ -8,6 +8,11 @@
 4. Go to **Settings > Configuration**.
 5. Click **New application setting** to add the following settings:
 
+   Name of the instrumented service:
+   
+   * Name: `SIGNALFX_SERVICE_NAME`
+   * Value: `[my-service-name]`
+
    Access token: See [here](https://docs.splunk.com/Observability/admin/authentication-tokens/org-tokens.html) to learn how to obtain one. 
 
    * Name: `SIGNALFX_ACCESS_TOKEN`
