@@ -4,7 +4,6 @@ on:
   push:
     branches:
     - main
-    - next-ver
     tags:
     - 'v*'
     paths-ignore:
@@ -49,7 +48,7 @@ env:
   ddTracerHome: ${{ github.workspace }}/tracer/src/bin/dd-tracer-home
   tracerHome: ${{ github.workspace }}/tracer/src/bin/windows-tracer-home
   artifacts: ${{ github.workspace }}/tracer/src/bin/artifacts
-  isMainBranch: $[eq(github.ref, 'refs/heads/next-ver')]
+  isMainBranch: $[eq(github.ref, 'refs/heads/main')]
   NugetPackageDirectory: ${{ github.workspace }}/packages
   relativeNugetPackageDirectory: packages
   dotnetToolTag: build-dotnet-tool
