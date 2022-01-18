@@ -3,6 +3,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -14,7 +15,7 @@ namespace Samples
 
         public static bool IsProfilerAttached()
         {
-            if(NativeMethodsType is null)
+            if (NativeMethodsType is null)
             {
                 return false;
             }
@@ -43,18 +44,25 @@ namespace Samples
 
             foreach (var assembly in assemblies)
             {
-                foreach (var type in assembly.DefinedTypes)
+                foreach (var type in GetLoadableDefinedTypes(assembly))
                 {
-                    if (type.Namespace == "Coverlet.Core.Instrumentation.Tracker")
+                    try
                     {
-                        var unloadModuleMethod = type.GetMethod("UnloadModule", BindingFlags.Public | BindingFlags.Static);
-                        unloadModuleMethod.Invoke(null, new object[] { caller, EventArgs.Empty });
+                        if (type.Namespace == "Coverlet.Core.Instrumentation.Tracker")
+                        {
+                            var unloadModuleMethod = type.GetMethod("UnloadModule", BindingFlags.Public | BindingFlags.Static);
+                            unloadModuleMethod.Invoke(null, new object[] { caller, EventArgs.Empty });
+                        }
+                    }
+                    catch (System.IO.FileNotFoundException)
+                    {
+                        // catch exception when the file assemlby cannot be loaded. In this case it is related to OpenTracing library
                     }
                 }
             }
         }
 
-        public static IEnumerable<KeyValuePair<string,string>> GetDatadogEnvironmentVariables()
+        public static IEnumerable<KeyValuePair<string, string>> GetDatadogEnvironmentVariables()
         {
             var prefixes = new[] { "COR_", "CORECLR_", "SIGNALFX_" };
 
@@ -67,6 +75,20 @@ namespace Samples
                           select new KeyValuePair<string, string>(key, value);
 
             return envVars.ToList();
+        }
+
+        private static IEnumerable<Type> GetLoadableDefinedTypes(Assembly assembly)
+        {
+            try
+            {
+                return assembly.DefinedTypes;
+            }
+            catch (ReflectionTypeLoadException rtlex)
+            {
+                // return only loadable types, defined in really existing library
+                // it should prevent loading types in SignalFx.Tracing.OpenTracing existing in OpenTracing library
+                return rtlex.Types.Where(t => t != null);
+            }
         }
     }
 }

@@ -455,6 +455,33 @@ partial class Build
         .DependsOn(PublishNativeProfilerLinux)
         .DependsOn(PublishNativeProfilerMacOs);
 
+    Target PublishOpenTracing => _ => _
+        .Unlisted()
+        .After(CompileManagedSrc)
+        .Executes(() =>
+        {
+            var targetFrameworks = IsWin
+                                       ? TargetFrameworks
+                                       : TargetFrameworks.Where(framework => !framework.ToString().StartsWith("net4"));
+
+            // Publish Datadog.Trace.OpenTracing
+            DotNetPublish(s => s
+                              .SetProject(Solution.GetProject(Projects.DatadogTraceOpenTracing))
+                              .SetConfiguration(BuildConfiguration)
+                              .SetTargetPlatformAnyCPU()
+                              .EnableNoBuild()
+                              .EnableNoRestore()
+                              .CombineWith(targetFrameworks, (p, framework) => p
+                                                                              .SetFramework(framework)
+                                                                              .SetOutput(TracerHomeDirectory / framework)));
+
+            // OpenTracing.dll should not be a part of the profiler
+            foreach (var targetFramework in targetFrameworks)
+            {
+                DeleteFile(TracerHomeDirectory / targetFramework / "OpenTracing.dll");
+            }
+        });
+
     Target CreateDdTracerHome => _ => _
        .Unlisted()
        .After(PublishNativeProfiler, PublishManagedProfiler, DownloadLibDdwaf, CopyLibDdwaf)

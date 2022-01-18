@@ -15,8 +15,8 @@ using Datadog.Trace.Propagation;
 using Datadog.Trace.Sampling;
 using Datadog.Trace.TestHelpers;
 using Moq;
-using OpenTracing;
 using OpenTracing.Propagation;
+using OpenTracing.Util;
 using Xunit;
 
 namespace Datadog.Trace.OpenTracing.Tests
@@ -24,6 +24,7 @@ namespace Datadog.Trace.OpenTracing.Tests
     public class OpenTracingTracerTests
     {
         private readonly OpenTracingTracer _tracer;
+        private readonly Tracer _signalFxTracer;
 
         public OpenTracingTracerTests()
         {
@@ -37,9 +38,9 @@ namespace Datadog.Trace.OpenTracing.Tests
             var writerMock = new Mock<IAgentWriter>();
             var samplerMock = new Mock<ISampler>();
 
-            var datadogTracer = new Tracer(settings, writerMock.Object, samplerMock.Object, scopeManager: null, statsd: null);
+            _signalFxTracer = new Tracer(settings, writerMock.Object, samplerMock.Object, scopeManager: null, statsd: null);
 
-            _tracer = new OpenTracingTracer(datadogTracer);
+            _tracer = new OpenTracingTracer(_signalFxTracer);
         }
 
         [Fact]
@@ -382,6 +383,19 @@ namespace Datadog.Trace.OpenTracing.Tests
             Assert.Equal("MyAwesomeService", ((OpenTracingSpan)parentScope.Span).Span.ServiceName);
             Assert.NotEqual("MyAwesomeService", ((OpenTracingSpan)childScope.Span).Span.ServiceName);
             Assert.Equal(defaultServiceName, ((OpenTracingSpan)childScope.Span).Span.ServiceName);
+        }
+
+        [Fact]
+        public void RegisteredAsGlobalTracer_ByDefault()
+        {
+            var globalTracerRep = GlobalTracer.Instance.ToString();
+            Assert.Contains("Datadog.Trace.OpenTracing.OpenTracingTracer", globalTracerRep);
+        }
+
+        [Fact]
+        public void RegisteredAsGlobalTracer_OnlyOnce()
+        {
+            Assert.False(OpenTracingTracerFactory.RegisterGlobalTracerIfAbsent(_signalFxTracer));
         }
     }
 }
