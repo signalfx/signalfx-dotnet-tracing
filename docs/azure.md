@@ -7,12 +7,17 @@
 3. Find and install the **SignalFx .NET Tracing** extension.
 4. Go to **Settings > Configuration**.
 5. Click **New application setting** to add the following settings:
+
+   Access token: See [here](https://docs.splunk.com/Observability/admin/authentication-tokens/org-tokens.html) to learn how to obtain one. 
+
    * Name: `SIGNALFX_ACCESS_TOKEN`
    * Value: `[splunk-observability-cloud-access-token]`
+
+   In the endpoint URL, ``splunk-realm`` is the [O11y realm](https://dev.splunk.com/observability/docs/realms_in_endpoints). For example, ``us0``.
+
    * Name: `SIGNALFX_ENDPOINT_URL`
    * Value: `https://ingest.[splunk-realm].signalfx.com/v2/trace`
 6. Restart the application in App Service.
 
-In the endpoint URL, ``splunk-realm`` is the [O11y realm](https://dev.splunk.com/observability/docs/realms_in_endpoints). For example, ``us0``.
 
 > **Tip:** To reduce latency and benefit from OTel Collector features, you can set the endpoint URL setting to a Collector instance running in Azure VM over an Azure private network.
