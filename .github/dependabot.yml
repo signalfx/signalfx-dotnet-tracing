@@ -10,6 +10,8 @@ updates:
       - "area:dependabot"
     ignore:
       - dependency-name: "MessagePack" # Locked at a version that supports our net452 build target
+      - dependency-name: "*" # Ignore patches for all integrations
+        update-types: ["version-update:semver-patch"]
     open-pull-requests-limit: 0 # disable version updates
   # Src libraries
   - package-ecosystem: "nuget"
