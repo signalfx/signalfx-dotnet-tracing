@@ -50,8 +50,5 @@ exist, run `/opt/signalfx/createLogPath.sh` to create it with the required permi
 
 On Windows, the default log location is `%ProgramData%\SignalFx .NET Tracing\logs\`
 
-Compress the whole folder to capture the multiple log files and send
-the compressed folder to us.
-
 After obtaining the logs, remember to remove the environment variable
 `SIGNALFX_TRACE_DEBUG` to avoid unnecessary overhead.
