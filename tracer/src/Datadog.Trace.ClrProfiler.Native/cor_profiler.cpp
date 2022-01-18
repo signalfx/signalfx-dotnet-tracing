@@ -144,7 +144,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
         if (!functions_worker_runtime_value.empty() && !IsAzureFunctionsEnabled())
         {
             Logger::Info("TRACER DIAGNOSTICS - Profiler disabled: Azure Functions are not officially "
-                         "supported. Enable instrumentation with DD_TRACE_AZURE_FUNCTIONS_ENABLED.");
+                         "supported. Enable instrumentation with SIGNALFX_TRACE_AZURE_FUNCTIONS_ENABLED.");
             return E_FAIL;
         }
     }
