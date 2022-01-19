@@ -26,7 +26,7 @@
    to learn how to obtain one.
 
    * Name: `SIGNALFX_ACCESS_TOKEN`
-   * Value: `secret`
+   * Value: `[secret]`
 
    In the endpoint URL, ``splunk-realm`` is the [O11y realm](https://dev.splunk.com/observability/docs/realms_in_endpoints).
    For example, ``us0``.
