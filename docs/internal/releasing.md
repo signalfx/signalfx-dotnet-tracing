@@ -10,7 +10,7 @@
 
 3. Create a Pull Request on GitHub with the changes above.
 
-4. Consider performing a [bug bash](https://en.wikipedia.org/wiki/Bug_bash).
+4. _Optional_. Consider performing a [bug bash](https://en.wikipedia.org/wiki/Bug_bash).
    This could be useful especially when introducing significant changes.
    When testing, we should:
    
