@@ -8,7 +8,7 @@
 
 2. Update the [CHANGELOG.md](../CHANGELOG.md) with the new release.
 
-3. Create a Pull Request on GitHub with the changes above. 
+3. Create a Pull Request on GitHub with the changes above.
 
 4. Once the Pull Request with all the version changes has been approved and merged
    it is time to perform a [bug bash](https://en.wikipedia.org/wiki/Bug_bash).
