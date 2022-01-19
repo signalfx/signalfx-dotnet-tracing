@@ -14,7 +14,7 @@
    it is time to perform a [bug bash](https://en.wikipedia.org/wiki/Bug_bash).
    When testing, we should:
    
-   - use different testing environemnts,
+   - use different testing environments,
    - use different sample applications,
    - test different features,
    - follow the documentation (e.g. do not use the developer's build output,
