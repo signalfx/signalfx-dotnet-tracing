@@ -54,8 +54,7 @@ service:
     metrics:
       receivers: [signalfx]
       processors: [batch]
-      exporters: [signalfx]
-      #exporters: [logging]
+      exporters: [logging, signalfx]
     logs:
       receivers: [otlp]
       processors: [batch]
