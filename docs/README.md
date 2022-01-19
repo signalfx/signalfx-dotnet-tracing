@@ -114,7 +114,7 @@ export SIGNALFX_DOTNET_TRACER_HOME="/opt/signalfx"                              
 # Now the auto-instrumentation is configured in this shell session.
 # You can set additional settings and run your application, for example:
 export SIGNALFX_SERVICE_NAME="my-service-name"  # Set the service name
-export SIGNALFX_ENV="development"               # Set the environment name
+export SIGNALFX_ENV="production"                # Set the environment name
 dotnet run                                      # Run your application 
 ```
 
