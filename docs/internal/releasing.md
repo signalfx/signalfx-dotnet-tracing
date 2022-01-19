@@ -10,8 +10,8 @@
 
 3. Create a Pull Request on GitHub with the changes above.
 
-4. Once the Pull Request with all the version changes has been approved and merged
-   it is time to perform a [bug bash](https://en.wikipedia.org/wiki/Bug_bash).
+4. Consider performing a [bug bash](https://en.wikipedia.org/wiki/Bug_bash).
+   This could be useful especially when introducing significant changes.
    When testing, we should:
    
    - use different testing environments,
