@@ -13,7 +13,7 @@ Edit the `web.config` file of your application to add the required settings:
 <configuration>
   <appSettings>
     <add key="SIGNALFX_SERVICE_NAME" value="my-service-name" />
-    <add key="SIGNALFX_ENV" value="development" />
+    <add key="SIGNALFX_ENV" value="production" />
   </appSettings>
 </configuration>
 ```
@@ -32,7 +32,7 @@ to set the required settings:
         <environmentVariable name="CORECLR_ENABLE_PROFILING" value="1" />
         <environmentVariable name="CORECLR_PROFILER" value="{B4C89B0F-9908-4F73-9F59-0D77C5A06874}" />
         <environmentVariable name="SIGNALFX_SERVICE_NAME" value="my-service-name" />
-        <environmentVariable name="SIGNALFX_ENV" value="development" />
+        <environmentVariable name="SIGNALFX_ENV" value="production" />
       </environmentVariables>
     </aspNetCore>
   </system.webServer>
