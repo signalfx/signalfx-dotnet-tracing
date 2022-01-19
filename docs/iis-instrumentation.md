@@ -1,14 +1,40 @@
 # Instrument an ASP.NET application deployed on IIS
 
-By default, the installer enables IIS instrumentation for .NET Framework
+## Instrument an ASP.NET 4.x application
+
+By default, all ASP.NET 4.x application deployed to IIS are instrumented.
+The installer enables IIS instrumentation for .NET Framework
 by setting the `Environment` registry key for W3SVC and WAS services
 located in the `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services` folder.
 
-For ASP.NET applications, for example IIS applications running on the .NET Framework, the
-default service name is `ServiceName[/VirtualPath]`.
-For ASP.NET Core applications the default service name is the entry assembly name, typically
-the name of your .NET Core project.
-If the defaults don't fit well with your usage or naming conventions configure `SIGNALFX_SERVICE_NAME` as described in [advanced-config.md](advanced-config.md#configuration-methods).
+Edit the `web.config` file of your application to add the required settings:
 
-Consider using `web.config` as the configuration method
-to avoid potential configuration conflicts between other applications.
+```xml
+<configuration>
+  <appSettings>
+    <add key="SIGNALFX_SERVICE_NAME" value="my-service-name" />
+    <add key="SIGNALFX_ENV" value="production" />
+  </appSettings>
+</configuration>
+```
+
+## Instrument an ASP.NET Core application
+
+Add following [`environmentVariable`](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/iis/web-config#set-environment-variables)
+elements to the `web.config` file of your application
+to set the required settings:
+
+```xml
+<configuration>
+  <system.webServer>
+    <aspNetCore ... >
+      <environmentVariables>
+        <environmentVariable name="CORECLR_ENABLE_PROFILING" value="1" />
+        <environmentVariable name="CORECLR_PROFILER" value="{B4C89B0F-9908-4F73-9F59-0D77C5A06874}" />
+        <environmentVariable name="SIGNALFX_SERVICE_NAME" value="my-service-name" />
+        <environmentVariable name="SIGNALFX_ENV" value="production" />
+      </environmentVariables>
+    </aspNetCore>
+  </system.webServer>
+</configuration>
+```
