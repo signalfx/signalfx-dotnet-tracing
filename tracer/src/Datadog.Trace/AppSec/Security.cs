@@ -7,10 +7,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
-using Datadog.Trace.AppSec.EventModel;
-using Datadog.Trace.AppSec.Transport;
+using Datadog.Trace.AppSec.Transports;
 using Datadog.Trace.AppSec.Transports.Http;
 using Datadog.Trace.AppSec.Waf;
 using Datadog.Trace.AppSec.Waf.ReturnTypes.Managed;
@@ -43,7 +41,7 @@ namespace Datadog.Trace.AppSec
 
         static Security()
         {
-            RequestHeaders = new Dictionary<string, string>()
+            RequestHeaders = new()
             {
                 { "X-FORWARDED-FOR", string.Empty },
                 { "X-CLIENT-IP", string.Empty },
@@ -65,7 +63,7 @@ namespace Datadog.Trace.AppSec
                 { "Accept-Language", string.Empty },
             };
 
-            ResponseHeaders = new Dictionary<string, string>()
+            ResponseHeaders = new()
             {
                 { "content-length", string.Empty },
                 { "content-type", string.Empty },
@@ -96,7 +94,15 @@ namespace Datadog.Trace.AppSec
                     _waf = waf ?? Waf.Waf.Create(_settings.Rules);
                     if (_waf != null)
                     {
-                        _instrumentationGateway.InstrumentationGatewayEvent += InstrumentationGatewayInstrumentationGatewayEvent;
+                        _instrumentationGateway.RequestEnd += InstrumentationGatewayInstrumentationGatewayEvent;
+#if NETFRAMEWORK
+                        if (System.Web.HttpRuntime.UsingIntegratedPipeline)
+                        {
+                            _instrumentationGateway.LastChanceToWriteTags += InstrumentationGateway_AddHeadersResponseTags;
+                        }
+#else
+                        _instrumentationGateway.LastChanceToWriteTags += InstrumentationGateway_AddHeadersResponseTags;
+#endif
                     }
                     else
                     {
@@ -161,21 +167,15 @@ namespace Datadog.Trace.AppSec
             }
         }
 
-        private static void LogMatchesIfDebugEnabled(WafMatch[] results, bool blocked)
+        private static void LogMatchesIfDebugEnabled(string result, bool blocked)
         {
             if (Log.IsEnabled(LogEventLevel.Debug))
             {
+                var results = JsonConvert.DeserializeObject<WafMatch[]>(result);
                 for (var i = 0; i < results.Length; i++)
                 {
-                    var result = results[i];
-                    if (blocked)
-                    {
-                        Log.Debug("Blocking current transaction (rule: {RuleId})", result.Rule);
-                    }
-                    else
-                    {
-                        Log.Debug("Detecting an attack from rule {RuleId}", result.Rule);
-                    }
+                    var match = results[i];
+                    Log.Debug(blocked ? "Blocking current transaction (rule: {RuleId})" : "Detecting an attack from rule {RuleId}", match.Rule);
                 }
             }
         }
@@ -204,26 +204,61 @@ namespace Datadog.Trace.AppSec
             }
         }
 
+        private static bool AreArchitectureAndOsSupported()
+        {
+            var frameworkDescription = FrameworkDescription.Instance;
+            var osSupported = false;
+            var archSupported = false;
+
+            var currentOs = frameworkDescription.OSPlatform;
+            if (currentOs == OSPlatform.Linux || currentOs == OSPlatform.MacOS || currentOs == OSPlatform.Windows)
+            {
+                osSupported = true;
+            }
+
+            var currentArch = frameworkDescription.ProcessArchitecture;
+            if (currentArch == ProcessArchitecture.X64 || currentArch == ProcessArchitecture.X86)
+            {
+                archSupported = true;
+            }
+
+            if (!osSupported || !archSupported)
+            {
+                Log.Error(
+                    "AppSec could not start because the current environment is not supported. No security activities will be collected. Please contact support at https://docs.datadoghq.com/help/ for help. Host information: operating_system: {{ {OSPlatform} }}, arch: {{ {ProcessArchitecture} }}, runtime_infos: {{ {ProductVersion} }}",
+                    frameworkDescription.OSPlatform,
+                    frameworkDescription.ProcessArchitecture,
+                    frameworkDescription.ProductVersion);
+            }
+
+            return osSupported && archSupported;
+        }
+
         /// <summary>
-        /// Frees resouces
+        /// Frees resources
         /// </summary>
         public void Dispose() => _waf?.Dispose();
 
-        private void Report(ITransport transport, Span span, WafMatch[] results, bool blocked)
+        private void InstrumentationGateway_AddHeadersResponseTags(object sender, InstrumentationGatewayEventArgs e)
+        {
+            if (e.RelatedSpan.GetTag(Tags.AppSecEvent) == "true")
+            {
+                AddResponseHeaderTags(e.Transport, e.RelatedSpan);
+            }
+        }
+
+        private void Report(ITransport transport, Span span, string resultData, bool blocked)
         {
             span.SetTag(Tags.AppSecEvent, "true");
             var samplingPirority = _settings.KeepTraces
-                ? SamplingPriority.UserKeep : SamplingPriority.AutoReject;
+                                       ? SamplingPriority.UserKeep : SamplingPriority.AutoReject;
             span.SetTraceSamplingPriority(samplingPirority);
 
-            LogMatchesIfDebugEnabled(results, blocked);
+            LogMatchesIfDebugEnabled(resultData, blocked);
 
-            var json = JsonConvert.SerializeObject(new AppSecJson { Triggers = results });
-            span.SetTag(Tags.AppSecJson, json);
+            span.SetTag(Tags.AppSecJson, "{\"triggers\":" + resultData + "}");
 
             span.SetTag(Tags.Origin, "appsec");
-
-            span.SetTag(Tags.HttpUserAgent, transport.GetUserAgent());
 
             var reportedIpInfo = transport.GetReportedIpInfo();
             span.SetTag(Tags.NetworkClientIp, reportedIpInfo.IpAddress);
@@ -233,19 +268,18 @@ namespace Datadog.Trace.AppSec
 
             var headers = transport.GetRequestHeaders();
             AddHeaderTags(span, headers, RequestHeaders, PropagationExtensions.HttpRequestHeadersTagPrefix);
+        }
 
-            transport.OnCompleted(() =>
-            {
-                TryAddEndPoint(span);
-
-                var headers = transport.GetResponseHeaders();
-                AddHeaderTags(span, headers, ResponseHeaders, PropagationExtensions.HttpResponseHeadersTagPrefix);
-            });
+        private void AddResponseHeaderTags(ITransport transport, Span span)
+        {
+            TryAddEndPoint(span);
+            var headers = transport.GetResponseHeaders();
+            AddHeaderTags(span, headers, ResponseHeaders, PropagationExtensions.HttpResponseHeadersTagPrefix);
         }
 
         private void RunWafAndReact(IDictionary<string, object> args, ITransport transport, Span span)
         {
-            span = Security.GetLocalRootSpan(span);
+            span = GetLocalRootSpan(span);
 
             AnnotateSpan(span);
 
@@ -267,12 +301,11 @@ namespace Datadog.Trace.AppSec
                     // blocking has been removed, waiting a better implementation
                 }
 
-                var resultData = JsonConvert.DeserializeObject<WafMatch[]>(wafResult.Data);
-                Report(transport, span, resultData, block);
+                Report(transport, span, wafResult.Data, block);
             }
         }
 
-        private void InstrumentationGatewayInstrumentationGatewayEvent(object sender, InstrumentationGatewayEventArgs e)
+        private void InstrumentationGatewayInstrumentationGatewayEvent(object sender, InstrumentationGatewaySecurityEventArgs e)
         {
             try
             {
@@ -284,40 +317,19 @@ namespace Datadog.Trace.AppSec
             }
         }
 
-        private bool AreArchitectureAndOsSupported()
-        {
-            var frameworkDescription = FrameworkDescription.Instance;
-            var osSupported = false;
-            var supportedOs = new[] { OSPlatform.Linux, OSPlatform.MacOS, OSPlatform.Windows };
-            if (supportedOs.Contains(frameworkDescription.OSPlatform))
-            {
-                osSupported = true;
-            }
-
-            var archSupported = false;
-            var supportedArchs = new[] { ProcessArchitecture.Arm, ProcessArchitecture.X64, ProcessArchitecture.X86 };
-            if (supportedArchs.Contains(frameworkDescription.ProcessArchitecture))
-            {
-                archSupported = true;
-            }
-
-            if (!osSupported || !archSupported)
-            {
-                Log.Error(
-                    "AppSec could not start because the current environment is not supported. No security activities will be collected. Please contact support at https://docs.datadoghq.com/help/ for help. Host information: operating_system: {{ {OSPlatform} }}, arch: {{ {ProcessArchitecture} }}, runtime_infos: {{ {ProductVersion} }}",
-                    frameworkDescription.OSPlatform,
-                    frameworkDescription.ProcessArchitecture,
-                    frameworkDescription.ProductVersion);
-            }
-
-            return osSupported && archSupported;
-        }
-
         private void RunShutdown()
         {
             if (_instrumentationGateway != null)
             {
-                _instrumentationGateway.InstrumentationGatewayEvent -= InstrumentationGatewayInstrumentationGatewayEvent;
+                _instrumentationGateway.RequestEnd -= InstrumentationGatewayInstrumentationGatewayEvent;
+#if NETFRAMEWORK
+                if (System.Web.HttpRuntime.UsingIntegratedPipeline)
+                {
+                    _instrumentationGateway.LastChanceToWriteTags -= InstrumentationGateway_AddHeadersResponseTags;
+                }
+#else
+                _instrumentationGateway.LastChanceToWriteTags -= InstrumentationGateway_AddHeadersResponseTags;
+#endif
             }
 
             Dispose();
