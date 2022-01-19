@@ -100,7 +100,7 @@ Before running the application, set the following environment variables:
 CORECLR_ENABLE_PROFILING=1
 CORECLR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}
 CORECLR_PROFILER_PATH=/opt/signalfx/SignalFx.Tracing.ClrProfiler.Native.so
-SIGNALFX_DOTNET_TRACER_HOME=/opt/signalfx" 
+SIGNALFX_DOTNET_TRACER_HOME=/opt/signalfx
 ```
 
 Example in Bash:
