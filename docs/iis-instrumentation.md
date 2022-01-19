@@ -20,12 +20,14 @@ Edit the `web.config` file of your application to add the required settings:
 
 ## Instrument an ASP.NET Core application
 
-Edit the `web.config` file of your application to set the following environment variables:
+Add following [`environmentVariable`](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/iis/web-config#set-environment-variables)
+elements to the `web.config` file of your application
+to set the required settings:
 
 ```xml
 <configuration>
   <system.webServer>
-    <aspNetCore .....>
+    <aspNetCore ... >
       <environmentVariables>
         <environmentVariable name="CORECLR_ENABLE_PROFILING" value="1" />
         <environmentVariable name="CORECLR_PROFILER" value="{B4C89B0F-9908-4F73-9F59-0D77C5A06874}" />
