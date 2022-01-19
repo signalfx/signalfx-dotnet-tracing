@@ -20,7 +20,7 @@
    - follow the documentation (e.g. do not use the developer's build output,
      but use the installation packages instead). 
 
-5. Create a signed tag for the merged commit
+5. Create a signed tag for the merged commit.
 
    ***IMPORTANT***: It is critical you use the same tag
    that you used in the previous steps!
