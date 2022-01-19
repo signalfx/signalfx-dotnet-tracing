@@ -89,7 +89,7 @@ $Env:CORECLR_PROFILER = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"  # Select the .
 # Now the auto-instrumentation is configured in this shell session.
 # You can set additional settings and run your application, for example:
 $Env:SIGNALFX_SERVICE_NAME = "my-service-name"                    # Set the service name
-$Env:SIGNALFX_ENV = "development"                                 # Set the environment name
+$Env:SIGNALFX_ENV = "production"                                 # Set the environment name
 dotnet run                                                        # Run your application                                                     
 ```
 
