@@ -44,6 +44,19 @@ namespace Datadog.Trace.Tagging
             }
         }
 
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] AspNetCoreMvcTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(AspNetCoreTagsProperties,
+                new Datadog.Trace.Tagging.Property<AspNetCoreMvcTags, string?>("aspnet_core.controller", t => t.AspNetCoreController),
+                new Datadog.Trace.Tagging.Property<AspNetCoreMvcTags, string?>("aspnet_core.action", t => t.AspNetCoreAction),
+                new Datadog.Trace.Tagging.Property<AspNetCoreMvcTags, string?>("aspnet_core.area", t => t.AspNetCoreArea),
+                new Datadog.Trace.Tagging.Property<AspNetCoreMvcTags, string?>("aspnet_core.page", t => t.AspNetCorePage)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return AspNetCoreMvcTagsProperties;
+        }
+
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset)
         {
             var count = 0;

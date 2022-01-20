@@ -29,6 +29,16 @@ namespace Datadog.Trace.Tagging
             }
         }
 
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] AspNetCoreEndpointTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(AspNetCoreTagsProperties,
+                new Datadog.Trace.Tagging.Property<AspNetCoreEndpointTags, string?>("aspnet_core.endpoint", t => t.AspNetCoreEndpoint)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return AspNetCoreEndpointTagsProperties;
+        }
+
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset)
         {
             var count = 0;

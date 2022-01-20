@@ -45,6 +45,21 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.GraphQL
             }
         }
 
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] GraphQLTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(InstrumentationTagsProperties,
+                new Datadog.Trace.Tagging.Property<GraphQLTags, string?>("span.kind", t => t.SpanKind),
+                new Datadog.Trace.Tagging.Property<GraphQLTags, string?>("component", t => t.InstrumentationName),
+                new Datadog.Trace.Tagging.Property<GraphQLTags, string?>("language", t => t.Language),
+                new Datadog.Trace.Tagging.Property<GraphQLTags, string?>("graphql.source", t => t.Source),
+                new Datadog.Trace.Tagging.Property<GraphQLTags, string?>("graphql.operation.name", t => t.OperationName),
+                new Datadog.Trace.Tagging.Property<GraphQLTags, string?>("graphql.operation.type", t => t.OperationType)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return GraphQLTagsProperties;
+        }
+
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset)
         {
             var count = 0;

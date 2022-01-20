@@ -7,9 +7,10 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Redis
     {
         private static readonly byte[] SpanKindBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("span.kind");
         private static readonly byte[] InstrumentationNameBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("component");
-        private static readonly byte[] RawCommandBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("redis.raw_command");
-        private static readonly byte[] HostBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("out.host");
-        private static readonly byte[] PortBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("out.port");
+        private static readonly byte[] DbTypeBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("db.system");
+        private static readonly byte[] RawCommandBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("db.statement");
+        private static readonly byte[] HostBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("net.peer.name");
+        private static readonly byte[] PortBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("net.peer.port");
 
         public override string? GetTag(string key)
         {
@@ -17,9 +18,10 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Redis
             {
                 "span.kind" => SpanKind,
                 "component" => InstrumentationName,
-                "redis.raw_command" => RawCommand,
-                "out.host" => Host,
-                "out.port" => Port,
+                "db.system" => DbType,
+                "db.statement" => RawCommand,
+                "net.peer.name" => Host,
+                "net.peer.port" => Port,
                 _ => base.GetTag(key),
             };
         }
@@ -28,19 +30,34 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Redis
         {
             switch(key)
             {
-                case "redis.raw_command": 
+                case "db.statement": 
                     RawCommand = value;
                     break;
-                case "out.host": 
+                case "net.peer.name": 
                     Host = value;
                     break;
-                case "out.port": 
+                case "net.peer.port": 
                     Port = value;
                     break;
                 default: 
                     base.SetTag(key, value);
                     break;
             }
+        }
+
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] RedisTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(InstrumentationTagsProperties,
+                new Datadog.Trace.Tagging.Property<RedisTags, string?>("span.kind", t => t.SpanKind),
+                new Datadog.Trace.Tagging.Property<RedisTags, string?>("component", t => t.InstrumentationName),
+                new Datadog.Trace.Tagging.Property<RedisTags, string?>("db.system", t => t.DbType),
+                new Datadog.Trace.Tagging.Property<RedisTags, string?>("db.statement", t => t.RawCommand),
+                new Datadog.Trace.Tagging.Property<RedisTags, string?>("net.peer.name", t => t.Host),
+                new Datadog.Trace.Tagging.Property<RedisTags, string?>("net.peer.port", t => t.Port)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return RedisTagsProperties;
         }
 
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset)
@@ -56,6 +73,12 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Redis
             {
                 count++;
                 WriteTag(ref bytes, ref offset, InstrumentationNameBytes, InstrumentationName);
+            }
+
+            if (DbType != null)
+            {
+                count++;
+                WriteTag(ref bytes, ref offset, DbTypeBytes, DbType);
             }
 
             if (RawCommand != null)
@@ -95,23 +118,30 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Redis
                   .Append(',');
             }
 
+            if (DbType != null)
+            {
+                sb.Append("db.system (tag):")
+                  .Append(DbType)
+                  .Append(',');
+            }
+
             if (RawCommand != null)
             {
-                sb.Append("redis.raw_command (tag):")
+                sb.Append("db.statement (tag):")
                   .Append(RawCommand)
                   .Append(',');
             }
 
             if (Host != null)
             {
-                sb.Append("out.host (tag):")
+                sb.Append("net.peer.name (tag):")
                   .Append(Host)
                   .Append(',');
             }
 
             if (Port != null)
             {
-                sb.Append("out.port (tag):")
+                sb.Append("net.peer.port (tag):")
                   .Append(Port)
                   .Append(',');
             }

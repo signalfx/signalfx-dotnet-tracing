@@ -7,8 +7,9 @@ namespace Datadog.Trace.Tagging
     {
         private static readonly byte[] SpanKindBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("span.kind");
         private static readonly byte[] HttpMethodBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("http.method");
-        private static readonly byte[] HttpRequestHeadersHostBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("http.request.headers.host");
+        private static readonly byte[] HttpRequestHeadersHostBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("http.host");
         private static readonly byte[] HttpUrlBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("http.url");
+        private static readonly byte[] PeerIpBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("net.peer.ip");
         private static readonly byte[] LanguageBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("language");
         private static readonly byte[] HttpStatusCodeBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("http.status_code");
 
@@ -18,8 +19,9 @@ namespace Datadog.Trace.Tagging
             {
                 "span.kind" => SpanKind,
                 "http.method" => HttpMethod,
-                "http.request.headers.host" => HttpRequestHeadersHost,
+                "http.host" => HttpRequestHeadersHost,
                 "http.url" => HttpUrl,
+                "net.peer.ip" => PeerIp,
                 "language" => Language,
                 "http.status_code" => HttpStatusCode,
                 _ => base.GetTag(key),
@@ -33,11 +35,14 @@ namespace Datadog.Trace.Tagging
                 case "http.method": 
                     HttpMethod = value;
                     break;
-                case "http.request.headers.host": 
+                case "http.host": 
                     HttpRequestHeadersHost = value;
                     break;
                 case "http.url": 
                     HttpUrl = value;
+                    break;
+                case "net.peer.ip": 
+                    PeerIp = value;
                     break;
                 case "http.status_code": 
                     HttpStatusCode = value;
@@ -46,6 +51,22 @@ namespace Datadog.Trace.Tagging
                     base.SetTag(key, value);
                     break;
             }
+        }
+
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] WebTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(InstrumentationTagsProperties,
+                new Datadog.Trace.Tagging.Property<WebTags, string?>("span.kind", t => t.SpanKind),
+                new Datadog.Trace.Tagging.Property<WebTags, string?>("http.method", t => t.HttpMethod),
+                new Datadog.Trace.Tagging.Property<WebTags, string?>("http.host", t => t.HttpRequestHeadersHost),
+                new Datadog.Trace.Tagging.Property<WebTags, string?>("http.url", t => t.HttpUrl),
+                new Datadog.Trace.Tagging.Property<WebTags, string?>("net.peer.ip", t => t.PeerIp),
+                new Datadog.Trace.Tagging.Property<WebTags, string?>("language", t => t.Language),
+                new Datadog.Trace.Tagging.Property<WebTags, string?>("http.status_code", t => t.HttpStatusCode)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return WebTagsProperties;
         }
 
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset)
@@ -73,6 +94,12 @@ namespace Datadog.Trace.Tagging
             {
                 count++;
                 WriteTag(ref bytes, ref offset, HttpUrlBytes, HttpUrl);
+            }
+
+            if (PeerIp != null)
+            {
+                count++;
+                WriteTag(ref bytes, ref offset, PeerIpBytes, PeerIp);
             }
 
             if (Language != null)
@@ -108,7 +135,7 @@ namespace Datadog.Trace.Tagging
 
             if (HttpRequestHeadersHost != null)
             {
-                sb.Append("http.request.headers.host (tag):")
+                sb.Append("http.host (tag):")
                   .Append(HttpRequestHeadersHost)
                   .Append(',');
             }
@@ -117,6 +144,13 @@ namespace Datadog.Trace.Tagging
             {
                 sb.Append("http.url (tag):")
                   .Append(HttpUrl)
+                  .Append(',');
+            }
+
+            if (PeerIp != null)
+            {
+                sb.Append("net.peer.ip (tag):")
+                  .Append(PeerIp)
                   .Append(',');
             }
 

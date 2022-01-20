@@ -81,6 +81,27 @@ namespace Datadog.Trace.ServiceFabric
             }
         }
 
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] ServiceRemotingTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(InstrumentationTagsProperties,
+                new Datadog.Trace.Tagging.Property<ServiceRemotingTags, string?>("span.kind", t => t.SpanKind),
+                new Datadog.Trace.Tagging.Property<ServiceRemotingTags, string?>("service-fabric.application-id", t => t.ApplicationId),
+                new Datadog.Trace.Tagging.Property<ServiceRemotingTags, string?>("service-fabric.application-name", t => t.ApplicationName),
+                new Datadog.Trace.Tagging.Property<ServiceRemotingTags, string?>("service-fabric.partition-id", t => t.PartitionId),
+                new Datadog.Trace.Tagging.Property<ServiceRemotingTags, string?>("service-fabric.node-id", t => t.NodeId),
+                new Datadog.Trace.Tagging.Property<ServiceRemotingTags, string?>("service-fabric.node-name", t => t.NodeName),
+                new Datadog.Trace.Tagging.Property<ServiceRemotingTags, string?>("service-fabric.service-name", t => t.ServiceName),
+                new Datadog.Trace.Tagging.Property<ServiceRemotingTags, string?>("service-fabric.service-remoting.uri", t => t.RemotingUri),
+                new Datadog.Trace.Tagging.Property<ServiceRemotingTags, string?>("service-fabric.service-remoting.method-name", t => t.RemotingMethodName),
+                new Datadog.Trace.Tagging.Property<ServiceRemotingTags, string?>("service-fabric.service-remoting.method-id", t => t.RemotingMethodId),
+                new Datadog.Trace.Tagging.Property<ServiceRemotingTags, string?>("service-fabric.service-remoting.interface-id", t => t.RemotingInterfaceId),
+                new Datadog.Trace.Tagging.Property<ServiceRemotingTags, string?>("service-fabric.service-remoting.invocation-id", t => t.RemotingInvocationId)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return ServiceRemotingTagsProperties;
+        }
+
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset)
         {
             var count = 0;

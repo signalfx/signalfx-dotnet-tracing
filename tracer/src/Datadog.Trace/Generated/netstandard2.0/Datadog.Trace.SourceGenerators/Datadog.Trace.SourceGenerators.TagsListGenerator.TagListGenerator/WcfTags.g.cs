@@ -3,17 +3,15 @@
 
 namespace Datadog.Trace.Tagging
 {
-    partial class AspNetCoreTags
+    partial class WcfTags
     {
         private static readonly byte[] InstrumentationNameBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("component");
-        private static readonly byte[] AspNetCoreRouteBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("aspnet_core.route");
 
         public override string? GetTag(string key)
         {
             return key switch
             {
                 "component" => InstrumentationName,
-                "aspnet_core.route" => AspNetCoreRoute,
                 _ => base.GetTag(key),
             };
         }
@@ -22,24 +20,20 @@ namespace Datadog.Trace.Tagging
         {
             switch(key)
             {
-                case "aspnet_core.route": 
-                    AspNetCoreRoute = value;
-                    break;
                 default: 
                     base.SetTag(key, value);
                     break;
             }
         }
 
-        protected static Datadog.Trace.Tagging.IProperty<string?>[] AspNetCoreTagsProperties => 
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] WcfTagsProperties => 
              Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(WebTagsProperties,
-                new Datadog.Trace.Tagging.Property<AspNetCoreTags, string?>("component", t => t.InstrumentationName),
-                new Datadog.Trace.Tagging.Property<AspNetCoreTags, string?>("aspnet_core.route", t => t.AspNetCoreRoute)
+                new Datadog.Trace.Tagging.Property<WcfTags, string?>("component", t => t.InstrumentationName)
 );
 
         protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
         {
-             return AspNetCoreTagsProperties;
+             return WcfTagsProperties;
         }
 
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset)
@@ -51,12 +45,6 @@ namespace Datadog.Trace.Tagging
                 WriteTag(ref bytes, ref offset, InstrumentationNameBytes, InstrumentationName);
             }
 
-            if (AspNetCoreRoute != null)
-            {
-                count++;
-                WriteTag(ref bytes, ref offset, AspNetCoreRouteBytes, AspNetCoreRoute);
-            }
-
             return count + base.WriteAdditionalTags(ref bytes, ref offset);
         }
 
@@ -66,13 +54,6 @@ namespace Datadog.Trace.Tagging
             {
                 sb.Append("component (tag):")
                   .Append(InstrumentationName)
-                  .Append(',');
-            }
-
-            if (AspNetCoreRoute != null)
-            {
-                sb.Append("aspnet_core.route (tag):")
-                  .Append(AspNetCoreRoute)
                   .Append(',');
             }
 

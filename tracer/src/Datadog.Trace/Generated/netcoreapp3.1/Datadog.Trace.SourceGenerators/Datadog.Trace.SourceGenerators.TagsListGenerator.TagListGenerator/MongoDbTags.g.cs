@@ -7,11 +7,13 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
     {
         private static readonly byte[] SpanKindBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("span.kind");
         private static readonly byte[] InstrumentationNameBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("component");
+        private static readonly byte[] DbTypeBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("db.system");
+        private static readonly byte[] DbStatementBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("db.statement");
         private static readonly byte[] DbNameBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("db.name");
         private static readonly byte[] QueryBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("mongodb.query");
         private static readonly byte[] CollectionBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("mongodb.collection");
-        private static readonly byte[] HostBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("out.host");
-        private static readonly byte[] PortBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("out.port");
+        private static readonly byte[] HostBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("net.peer.name");
+        private static readonly byte[] PortBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("net.peer.port");
 
         public override string? GetTag(string key)
         {
@@ -19,11 +21,13 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
             {
                 "span.kind" => SpanKind,
                 "component" => InstrumentationName,
+                "db.system" => DbType,
+                "db.statement" => DbStatement,
                 "db.name" => DbName,
                 "mongodb.query" => Query,
                 "mongodb.collection" => Collection,
-                "out.host" => Host,
-                "out.port" => Port,
+                "net.peer.name" => Host,
+                "net.peer.port" => Port,
                 _ => base.GetTag(key),
             };
         }
@@ -32,6 +36,12 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
         {
             switch(key)
             {
+                case "db.system": 
+                    DbType = value;
+                    break;
+                case "db.statement": 
+                    DbStatement = value;
+                    break;
                 case "db.name": 
                     DbName = value;
                     break;
@@ -41,16 +51,34 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
                 case "mongodb.collection": 
                     Collection = value;
                     break;
-                case "out.host": 
+                case "net.peer.name": 
                     Host = value;
                     break;
-                case "out.port": 
+                case "net.peer.port": 
                     Port = value;
                     break;
                 default: 
                     base.SetTag(key, value);
                     break;
             }
+        }
+
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] MongoDbTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(InstrumentationTagsProperties,
+                new Datadog.Trace.Tagging.Property<MongoDbTags, string?>("span.kind", t => t.SpanKind),
+                new Datadog.Trace.Tagging.Property<MongoDbTags, string?>("component", t => t.InstrumentationName),
+                new Datadog.Trace.Tagging.Property<MongoDbTags, string?>("db.system", t => t.DbType),
+                new Datadog.Trace.Tagging.Property<MongoDbTags, string?>("db.statement", t => t.DbStatement),
+                new Datadog.Trace.Tagging.Property<MongoDbTags, string?>("db.name", t => t.DbName),
+                new Datadog.Trace.Tagging.Property<MongoDbTags, string?>("mongodb.query", t => t.Query),
+                new Datadog.Trace.Tagging.Property<MongoDbTags, string?>("mongodb.collection", t => t.Collection),
+                new Datadog.Trace.Tagging.Property<MongoDbTags, string?>("net.peer.name", t => t.Host),
+                new Datadog.Trace.Tagging.Property<MongoDbTags, string?>("net.peer.port", t => t.Port)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return MongoDbTagsProperties;
         }
 
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset)
@@ -66,6 +94,18 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
             {
                 count++;
                 WriteTag(ref bytes, ref offset, InstrumentationNameBytes, InstrumentationName);
+            }
+
+            if (DbType != null)
+            {
+                count++;
+                WriteTag(ref bytes, ref offset, DbTypeBytes, DbType);
+            }
+
+            if (DbStatement != null)
+            {
+                count++;
+                WriteTag(ref bytes, ref offset, DbStatementBytes, DbStatement);
             }
 
             if (DbName != null)
@@ -117,6 +157,20 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
                   .Append(',');
             }
 
+            if (DbType != null)
+            {
+                sb.Append("db.system (tag):")
+                  .Append(DbType)
+                  .Append(',');
+            }
+
+            if (DbStatement != null)
+            {
+                sb.Append("db.statement (tag):")
+                  .Append(DbStatement)
+                  .Append(',');
+            }
+
             if (DbName != null)
             {
                 sb.Append("db.name (tag):")
@@ -140,14 +194,14 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
 
             if (Host != null)
             {
-                sb.Append("out.host (tag):")
+                sb.Append("net.peer.name (tag):")
                   .Append(Host)
                   .Append(',');
             }
 
             if (Port != null)
             {
-                sb.Append("out.port (tag):")
+                sb.Append("net.peer.port (tag):")
                   .Append(Port)
                   .Append(',');
             }

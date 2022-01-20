@@ -7,9 +7,11 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch
     {
         private static readonly byte[] SpanKindBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("span.kind");
         private static readonly byte[] InstrumentationNameBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("component");
+        private static readonly byte[] DbTypeBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("db.system");
         private static readonly byte[] ActionBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("elasticsearch.action");
-        private static readonly byte[] MethodBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("elasticsearch.method");
+        private static readonly byte[] MethodBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("db.operation");
         private static readonly byte[] UrlBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("elasticsearch.url");
+        private static readonly byte[] DbStatementBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("db.statement");
 
         public override string? GetTag(string key)
         {
@@ -17,9 +19,11 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch
             {
                 "span.kind" => SpanKind,
                 "component" => InstrumentationName,
+                "db.system" => DbType,
                 "elasticsearch.action" => Action,
-                "elasticsearch.method" => Method,
+                "db.operation" => Method,
                 "elasticsearch.url" => Url,
+                "db.statement" => DbStatement,
                 _ => base.GetTag(key),
             };
         }
@@ -31,16 +35,35 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch
                 case "elasticsearch.action": 
                     Action = value;
                     break;
-                case "elasticsearch.method": 
+                case "db.operation": 
                     Method = value;
                     break;
                 case "elasticsearch.url": 
                     Url = value;
                     break;
+                case "db.statement": 
+                    DbStatement = value;
+                    break;
                 default: 
                     base.SetTag(key, value);
                     break;
             }
+        }
+
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] ElasticsearchTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(InstrumentationTagsProperties,
+                new Datadog.Trace.Tagging.Property<ElasticsearchTags, string?>("span.kind", t => t.SpanKind),
+                new Datadog.Trace.Tagging.Property<ElasticsearchTags, string?>("component", t => t.InstrumentationName),
+                new Datadog.Trace.Tagging.Property<ElasticsearchTags, string?>("db.system", t => t.DbType),
+                new Datadog.Trace.Tagging.Property<ElasticsearchTags, string?>("elasticsearch.action", t => t.Action),
+                new Datadog.Trace.Tagging.Property<ElasticsearchTags, string?>("db.operation", t => t.Method),
+                new Datadog.Trace.Tagging.Property<ElasticsearchTags, string?>("elasticsearch.url", t => t.Url),
+                new Datadog.Trace.Tagging.Property<ElasticsearchTags, string?>("db.statement", t => t.DbStatement)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return ElasticsearchTagsProperties;
         }
 
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset)
@@ -56,6 +79,12 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch
             {
                 count++;
                 WriteTag(ref bytes, ref offset, InstrumentationNameBytes, InstrumentationName);
+            }
+
+            if (DbType != null)
+            {
+                count++;
+                WriteTag(ref bytes, ref offset, DbTypeBytes, DbType);
             }
 
             if (Action != null)
@@ -74,6 +103,12 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch
             {
                 count++;
                 WriteTag(ref bytes, ref offset, UrlBytes, Url);
+            }
+
+            if (DbStatement != null)
+            {
+                count++;
+                WriteTag(ref bytes, ref offset, DbStatementBytes, DbStatement);
             }
 
             return count + base.WriteAdditionalTags(ref bytes, ref offset);
@@ -95,6 +130,13 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch
                   .Append(',');
             }
 
+            if (DbType != null)
+            {
+                sb.Append("db.system (tag):")
+                  .Append(DbType)
+                  .Append(',');
+            }
+
             if (Action != null)
             {
                 sb.Append("elasticsearch.action (tag):")
@@ -104,7 +146,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch
 
             if (Method != null)
             {
-                sb.Append("elasticsearch.method (tag):")
+                sb.Append("db.operation (tag):")
                   .Append(Method)
                   .Append(',');
             }
@@ -113,6 +155,13 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch
             {
                 sb.Append("elasticsearch.url (tag):")
                   .Append(Url)
+                  .Append(',');
+            }
+
+            if (DbStatement != null)
+            {
+                sb.Append("db.statement (tag):")
+                  .Append(DbStatement)
                   .Append(',');
             }
 

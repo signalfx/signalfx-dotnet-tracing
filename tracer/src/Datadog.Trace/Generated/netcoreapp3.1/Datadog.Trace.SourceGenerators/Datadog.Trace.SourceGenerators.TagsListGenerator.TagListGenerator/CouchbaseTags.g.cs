@@ -10,8 +10,8 @@ namespace Datadog.Trace.Tagging
         private static readonly byte[] OperationCodeBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("couchbase.operation.code");
         private static readonly byte[] BucketBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("couchbase.operation.bucket");
         private static readonly byte[] KeyBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("couchbase.operation.key");
-        private static readonly byte[] HostBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("out.host");
-        private static readonly byte[] PortBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("out.port");
+        private static readonly byte[] HostBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("net.peer.name");
+        private static readonly byte[] PortBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("net.peer.port");
 
         public override string? GetTag(string key)
         {
@@ -22,8 +22,8 @@ namespace Datadog.Trace.Tagging
                 "couchbase.operation.code" => OperationCode,
                 "couchbase.operation.bucket" => Bucket,
                 "couchbase.operation.key" => Key,
-                "out.host" => Host,
-                "out.port" => Port,
+                "net.peer.name" => Host,
+                "net.peer.port" => Port,
                 _ => base.GetTag(key),
             };
         }
@@ -41,16 +41,32 @@ namespace Datadog.Trace.Tagging
                 case "couchbase.operation.key": 
                     Key = value;
                     break;
-                case "out.host": 
+                case "net.peer.name": 
                     Host = value;
                     break;
-                case "out.port": 
+                case "net.peer.port": 
                     Port = value;
                     break;
                 default: 
                     base.SetTag(key, value);
                     break;
             }
+        }
+
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] CouchbaseTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(InstrumentationTagsProperties,
+                new Datadog.Trace.Tagging.Property<CouchbaseTags, string?>("span.kind", t => t.SpanKind),
+                new Datadog.Trace.Tagging.Property<CouchbaseTags, string?>("component", t => t.InstrumentationName),
+                new Datadog.Trace.Tagging.Property<CouchbaseTags, string?>("couchbase.operation.code", t => t.OperationCode),
+                new Datadog.Trace.Tagging.Property<CouchbaseTags, string?>("couchbase.operation.bucket", t => t.Bucket),
+                new Datadog.Trace.Tagging.Property<CouchbaseTags, string?>("couchbase.operation.key", t => t.Key),
+                new Datadog.Trace.Tagging.Property<CouchbaseTags, string?>("net.peer.name", t => t.Host),
+                new Datadog.Trace.Tagging.Property<CouchbaseTags, string?>("net.peer.port", t => t.Port)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return CouchbaseTagsProperties;
         }
 
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset)
@@ -140,14 +156,14 @@ namespace Datadog.Trace.Tagging
 
             if (Host != null)
             {
-                sb.Append("out.host (tag):")
+                sb.Append("net.peer.name (tag):")
                   .Append(Host)
                   .Append(',');
             }
 
             if (Port != null)
             {
-                sb.Append("out.port (tag):")
+                sb.Append("net.peer.port (tag):")
                   .Append(Port)
                   .Append(',');
             }

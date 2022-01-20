@@ -44,6 +44,19 @@ namespace Datadog.Trace.Tagging
             }
         }
 
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] AspNetTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(WebTagsProperties,
+                new Datadog.Trace.Tagging.Property<AspNetTags, string?>("aspnet.route", t => t.AspNetRoute),
+                new Datadog.Trace.Tagging.Property<AspNetTags, string?>("aspnet.controller", t => t.AspNetController),
+                new Datadog.Trace.Tagging.Property<AspNetTags, string?>("aspnet.action", t => t.AspNetAction),
+                new Datadog.Trace.Tagging.Property<AspNetTags, string?>("aspnet.area", t => t.AspNetArea)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return AspNetTagsProperties;
+        }
+
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset)
         {
             var count = 0;

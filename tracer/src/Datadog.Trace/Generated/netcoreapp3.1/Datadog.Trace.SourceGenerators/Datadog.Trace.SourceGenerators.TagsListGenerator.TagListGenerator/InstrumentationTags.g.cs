@@ -7,6 +7,13 @@ namespace Datadog.Trace.Tagging
     {
         private static readonly byte[] AnalyticsSampleRateBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("_dd1.sr.eausr");
 
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] InstrumentationTagsProperties => CommonTagsProperties;
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return InstrumentationTagsProperties;
+        }
+
         public override double? GetMetric(string key)
         {
             return key switch

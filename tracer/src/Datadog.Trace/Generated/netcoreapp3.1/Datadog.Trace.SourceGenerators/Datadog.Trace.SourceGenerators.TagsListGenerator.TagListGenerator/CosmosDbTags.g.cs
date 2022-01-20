@@ -7,10 +7,10 @@ namespace Datadog.Trace.Tagging
     {
         private static readonly byte[] SpanKindBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("span.kind");
         private static readonly byte[] InstrumentationNameBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("component");
-        private static readonly byte[] DbTypeBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("db.type");
+        private static readonly byte[] DbTypeBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("db.system");
         private static readonly byte[] ContainerIdBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("cosmosdb.container");
         private static readonly byte[] DatabaseIdBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("db.name");
-        private static readonly byte[] HostBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("out.host");
+        private static readonly byte[] HostBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("net.peer.name");
 
         public override string? GetTag(string key)
         {
@@ -18,10 +18,10 @@ namespace Datadog.Trace.Tagging
             {
                 "span.kind" => SpanKind,
                 "component" => InstrumentationName,
-                "db.type" => DbType,
+                "db.system" => DbType,
                 "cosmosdb.container" => ContainerId,
                 "db.name" => DatabaseId,
-                "out.host" => Host,
+                "net.peer.name" => Host,
                 _ => base.GetTag(key),
             };
         }
@@ -30,7 +30,7 @@ namespace Datadog.Trace.Tagging
         {
             switch(key)
             {
-                case "db.type": 
+                case "db.system": 
                     DbType = value;
                     break;
                 case "cosmosdb.container": 
@@ -39,13 +39,28 @@ namespace Datadog.Trace.Tagging
                 case "db.name": 
                     DatabaseId = value;
                     break;
-                case "out.host": 
+                case "net.peer.name": 
                     Host = value;
                     break;
                 default: 
                     base.SetTag(key, value);
                     break;
             }
+        }
+
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] CosmosDbTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(InstrumentationTagsProperties,
+                new Datadog.Trace.Tagging.Property<CosmosDbTags, string?>("span.kind", t => t.SpanKind),
+                new Datadog.Trace.Tagging.Property<CosmosDbTags, string?>("component", t => t.InstrumentationName),
+                new Datadog.Trace.Tagging.Property<CosmosDbTags, string?>("db.system", t => t.DbType),
+                new Datadog.Trace.Tagging.Property<CosmosDbTags, string?>("cosmosdb.container", t => t.ContainerId),
+                new Datadog.Trace.Tagging.Property<CosmosDbTags, string?>("db.name", t => t.DatabaseId),
+                new Datadog.Trace.Tagging.Property<CosmosDbTags, string?>("net.peer.name", t => t.Host)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return CosmosDbTagsProperties;
         }
 
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset)
@@ -108,7 +123,7 @@ namespace Datadog.Trace.Tagging
 
             if (DbType != null)
             {
-                sb.Append("db.type (tag):")
+                sb.Append("db.system (tag):")
                   .Append(DbType)
                   .Append(',');
             }
@@ -129,7 +144,7 @@ namespace Datadog.Trace.Tagging
 
             if (Host != null)
             {
-                sb.Append("out.host (tag):")
+                sb.Append("net.peer.name (tag):")
                   .Append(Host)
                   .Append(',');
             }
