@@ -15,7 +15,7 @@ namespace Datadog.Trace.ServiceFabric
     /// <summary>
     /// Provides tracing of ServiceRemotingClientEvents.
     /// </summary>
-    internal static unsafe class ServiceRemotingClient
+    internal static class ServiceRemotingClient
     {
         private static readonly Logging.IDatadogLogger Log = Logging.DatadogLogging.GetLoggerFor(typeof(ServiceRemotingClient));
 
@@ -69,7 +69,7 @@ namespace Datadog.Trace.ServiceFabric
                         tracer.TracerManager.Propagator.Inject(
                             span.Context,
                             messageHeaders,
-                            HeadersSetter);
+                            static (headers, headerName, headerValue) => headers.TryAddHeader(headerName, headerValue));
                     }
                 }
                 catch (Exception ex)
@@ -82,11 +82,6 @@ namespace Datadog.Trace.ServiceFabric
             catch (Exception ex)
             {
                 Log.Error(ex, "Error creating or activating Service Fabric Service Remoting client span.");
-            }
-
-            static void HeadersSetter(IServiceRemotingRequestMessageHeader headers, string headerName, string headerValue)
-            {
-                headers.TryAddHeader(headerName, headerValue);
             }
         }
 

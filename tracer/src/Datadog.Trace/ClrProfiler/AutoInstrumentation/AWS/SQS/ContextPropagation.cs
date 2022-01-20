@@ -6,10 +6,11 @@
 // Modified by Splunk Inc.
 
 using System.Collections;
+using System.Text;
 
 namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AWS.SQS
 {
-    internal static unsafe class ContextPropagation
+    internal static class ContextPropagation
     {
         private const string SqsKey = "_datadog";
 
@@ -19,7 +20,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AWS.SQS
             var sb = Util.StringBuilderCache.Acquire(Util.StringBuilderCache.MaxBuilderSize);
             sb.Append('{');
             var propagator = Tracer.Instance.TracerManager.Propagator;
-            propagator.Inject(context, sb, ((carrier, key, value) => carrier.AppendFormat("\"{0}\":\"{1}\",", key, value)));
+            propagator.Inject(context, sb, static (StringBuilder carrier, string key, string value) => carrier.AppendFormat("\"{0}\":\"{1}\",", key, value));
             sb.Remove(startIndex: sb.Length - 1, length: 1); // Remove trailing comma
             sb.Append('}');
 
