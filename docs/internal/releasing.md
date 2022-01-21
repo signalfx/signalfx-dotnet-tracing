@@ -31,6 +31,9 @@
 1. Monitor and check the [`Release draft` GitHub workflow](https://github.com/signalfx/signalfx-dotnet-tracing/actions/workflows/release-draft.yml)
    for any errors.
 
+1. Verify if [wizard](https://app.signalfx.com/#/integrations/dotnet-tracing/description)
+needs any adjustments. Contact documentation team if needed.
+
 1. Double-check and test the GitHub release artifacts.
 
 1. Update the GitHub release description using the [CHANGELOG.md](../CHANGELOG.md)
