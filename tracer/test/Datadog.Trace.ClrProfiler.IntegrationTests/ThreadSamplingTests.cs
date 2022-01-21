@@ -1,5 +1,6 @@
 // Modified by Splunk Inc.
 
+// Thread Sampling is not supported by .NET Framework
 #if !NETFRAMEWORK
 
 using Datadog.Trace.TestHelpers;
