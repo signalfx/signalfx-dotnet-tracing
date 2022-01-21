@@ -196,7 +196,7 @@ namespace Datadog.Trace.TestHelpers
             MockTracerAgent agent,
             int aspNetCorePort,
             int? logsCollectorPort,
-            StringDictionary environmentVariables,
+            IDictionary<string, string> environmentVariables,
             string processToProfile = null,
             bool enableSecurity = false,
             bool enableBlocking = false,
@@ -278,7 +278,7 @@ namespace Datadog.Trace.TestHelpers
             }
         }
 
-        public void ConfigureTransportVariables(StringDictionary environmentVariables, MockTracerAgent agent)
+        public void ConfigureTransportVariables(IDictionary<string, string> environmentVariables, MockTracerAgent agent)
         {
             // use DatadogAgent exporter instead of Zipkin, because most of the integration tests use MockTracerAgent instead of MockZipkinCollector
             environmentVariables["SIGNALFX_EXPORTER"] = "DatadogAgent";

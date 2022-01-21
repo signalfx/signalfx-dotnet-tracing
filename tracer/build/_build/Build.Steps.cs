@@ -712,6 +712,7 @@ partial class Build
         .Unlisted()
         .After(Restore)
         .After(CompileManagedSrc)
+        .After(BuildRunnerTool)
         .DependsOn(CopyLibDdwafForAppSecUnitTests)
         .Executes(() =>
         {
