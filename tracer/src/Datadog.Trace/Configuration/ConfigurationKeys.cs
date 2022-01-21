@@ -341,6 +341,12 @@ namespace Datadog.Trace.Configuration
         public const string TracesTransport = "SIGNALFX_TRACE_TRANSPORT";
 
         /// <summary>
+        /// Configuration key for setting the default Datadog destination site.
+        /// Defaults to "datadoghq.com".
+        /// </summary>
+        public const string Site = "DD_SITE";
+
+        /// <summary>
         /// Configuration key for overriding which URLs are skipped by the tracer.
         /// </summary>
         /// <seealso cref="TracerSettings.HttpClientExcludedUrlSubstrings"/>
