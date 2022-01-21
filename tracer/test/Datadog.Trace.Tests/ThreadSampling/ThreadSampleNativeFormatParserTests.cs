@@ -7,7 +7,7 @@ using VerifyTests;
 using VerifyXunit;
 using Xunit;
 
-namespace Datadog.Trace.Tests.ThreadSample
+namespace Datadog.Trace.Tests.ThreadSampling
 {
     [UsesVerify]
     public class ThreadSampleNativeFormatParserTests
@@ -28,7 +28,7 @@ namespace Datadog.Trace.Tests.ThreadSample
         [MemberData(nameof(GetBufferFiles))]
         public async Task ParseSampleBuffer(string fileName)
         {
-            var buf = File.ReadAllBytes($"../../../ThreadSample/Buffers/{fileName}.bin");
+            var buf = File.ReadAllBytes($"../../../ThreadSampling/Buffers/{fileName}.bin");
             var parser = new ThreadSampleNativeFormatParser(buf, buf.Length);
             var samples = parser.Parse();
 
