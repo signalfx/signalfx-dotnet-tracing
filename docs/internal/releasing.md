@@ -32,7 +32,7 @@
    for any errors.
 
 1. Verify if [wizard](https://app.signalfx.com/#/integrations/dotnet-tracing/description)
-needs any adjustments. Contact documentation team if needed.
+needs any adjustments. Contact @signalfx/gdi-docs team if needed.
 
 1. Double-check and test the GitHub release artifacts.
 
