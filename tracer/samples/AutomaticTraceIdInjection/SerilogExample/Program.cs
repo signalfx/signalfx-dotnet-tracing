@@ -1,5 +1,5 @@
-using System.IO;
-using Datadog.Trace;
+using OpenTracing;
+using OpenTracing.Util;
 using Serilog;
 using Serilog.Context;
 using Serilog.Formatting.Compact;
@@ -7,12 +7,12 @@ using Serilog.Formatting.Json;
 
 namespace SerilogExample
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             // Regardless of the output layout, your LoggerConfiguration must be
-            // enriched from the LogContext to extract the Datadog
+            // enriched from the LogContext to extract the SignalFX
             // properties that are automatically injected by the .NET tracer
             //
             // Additions to LoggerConfiguration:
@@ -21,9 +21,9 @@ namespace SerilogExample
                                           .Enrich.FromLogContext()
                                           .MinimumLevel.Is(Serilog.Events.LogEventLevel.Information);
 
-            // When using a message template, you must emit all properties using the {Properties} syntax in order to emit the Datadog properties (see: https://github.com/serilog/serilog/wiki/Formatting-Output#formatting-plain-text)
-            // This is because Serilog cannot look up these individual keys by name due to the '.' in the Datadog property names (see https://github.com/serilog/serilog/wiki/Writing-Log-Events#message-template-syntax)
-            // Additionally, Datadog will only parse log properties if they are in a JSON-like map, and the values for the Datadog properties must be surrounded by quotation marks
+            // When using a message template, you must emit all properties using the {Properties} syntax in order to emit the SignalFX properties (see: https://github.com/serilog/serilog/wiki/Formatting-Output#formatting-plain-text)
+            // This is because Serilog cannot look up these individual keys by name due to the '.' in the SignalFX property names (see https://github.com/serilog/serilog/wiki/Writing-Log-Events#message-template-syntax)
+            // Additionally, SignalFX will only parse log properties if they are in a JSON-like map, and the values for the SignalFX properties must be surrounded by quotation marks
             //
             // Additions to layout:
             // - {Properties}
@@ -33,7 +33,7 @@ namespace SerilogExample
                                           "log-Serilog-textFile.log",
                                           outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Properties} {Message:lj} {NewLine}{Exception}");
 
-            // The built-in JsonFormatter will display all properties by default, so no extra work is needed to emit the Datadog properties
+            // The built-in JsonFormatter will display all properties by default, so no extra work is needed to emit the SignalFX properties
             //
             // Additions to layout: none
             //
@@ -42,7 +42,7 @@ namespace SerilogExample
                                           new JsonFormatter(),
                                           "log-Serilog-jsonFile-allProperties.log");
 
-            // The CompactJsonFormatter from the Serilog.Formatting.Compact NuGet package will display all properties by default, so no extra work is needed to emit the Datadog properties
+            // The CompactJsonFormatter from the Serilog.Formatting.Compact NuGet package will display all properties by default, so no extra work is needed to emit the SignalFX properties
             //
             // Additions to layout: none
             //
@@ -57,7 +57,10 @@ namespace SerilogExample
             {
                 log.Information("Message before a trace.");
 
-                using (var scope = Tracer.Instance.StartActive("SerilogExample - Main()"))
+                // Obtain the automatically registered OpenTracing.Util.GlobalTracer instance
+                var tracer = GlobalTracer.Instance;
+
+                using (IScope scope = tracer.BuildSpan("SerilogExample - Main()").StartActive(finishSpanOnDispose: true))
                 {
                     log.Information("Message during a trace.");
                 }

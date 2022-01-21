@@ -4,9 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.29324.140
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AutomaticTraceIdInjection", "AutomaticTraceIdInjection", "{8AD58831-2198-4661-AC87-EFA754EDC4E9}"
-	ProjectSection(SolutionItems) = preProject
-		AutomaticTraceIdInjection\README.md = AutomaticTraceIdInjection\README.md
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Log4NetExample", "AutomaticTraceIdInjection\Log4NetExample\Log4NetExample.csproj", "{1115F7F9-B6A6-4E4C-8731-E3E875616DF7}"
 EndProject

@@ -1,19 +1,23 @@
-using Datadog.Trace;
 using NLog;
+using OpenTracing;
+using OpenTracing.Util;
 
 namespace NLog46Example
 {
-    class Program
+    public class Program
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
+            // Obtain the automatically registered OpenTracing.Util.GlobalTracer instance
+            var tracer = GlobalTracer.Instance;
+
             using (MappedDiagnosticsLogicalContext.SetScoped("order-number", 1024))
             {
                 Logger.Info("Message before a trace.");
 
-                using (var scope = Tracer.Instance.StartActive("NLog46Example - Main()"))
+                using (IScope scope = tracer.BuildSpan("NLog46Example - Main()").StartActive(finishSpanOnDispose: true))
                 {
                     Logger.Info("Message during a trace.");
                 }
