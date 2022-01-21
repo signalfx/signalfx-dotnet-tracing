@@ -6,11 +6,11 @@
     - (for pre-releases)
       `nuke UpdateVersion --version {new-version-here} --is-prerelease true`
 
-2. Update the [CHANGELOG.md](../CHANGELOG.md) with the new release.
+1. Update the [CHANGELOG.md](../CHANGELOG.md) with the new release.
 
-3. Create a Pull Request on GitHub with the changes above.
+1. Create a Pull Request on GitHub with the changes above.
 
-4. Once the Pull Request with all the version changes has been approved and merged
+1. Once the Pull Request with all the version changes has been approved and merged
    it is time to create a signed tag for the merged commit.
 
    ***IMPORTANT***: It is critical you use the same tag
@@ -28,13 +28,13 @@
 
    After you push the Git tag, a GitHub workflow should start creating a draft release.
 
-5. Monitor and check the [`Release draft` GitHub workflow](https://github.com/signalfx/signalfx-dotnet-tracing/actions/workflows/release-draft.yml)
+1. Monitor and check the [`Release draft` GitHub workflow](https://github.com/signalfx/signalfx-dotnet-tracing/actions/workflows/release-draft.yml)
    for any errors.
 
-6. Double-check and test the GitHub release artifacts.
+1. Double-check and test the GitHub release artifacts.
 
-7. Update the GitHub release description using the [CHANGELOG.md](../CHANGELOG.md)
+1. Update the GitHub release description using the [CHANGELOG.md](../CHANGELOG.md)
    and publish the release.
 
-8. [Publish](https://docs.microsoft.com/en-us/nuget/nuget-org/publish-a-package)
+1. [Publish](https://docs.microsoft.com/en-us/nuget/nuget-org/publish-a-package)
    the NuGet packages to the offical [nuget.org feed](https://www.nuget.org/).
