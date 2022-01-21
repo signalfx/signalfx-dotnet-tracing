@@ -27,7 +27,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetEnvironmentVariable($"SIGNALFX_THREAD_SAMPLING_PERIOD", "1000");
 
             using (var agent = EnvironmentHelper.GetMockAgent())
-            using (var processResult = RunSampleAndWaitForExit(agent.Port))
+            using (var processResult = RunSampleAndWaitForExit(agent))
             {
                 // at application works 5 seconds, we should expect at least 3 attempts of thread sampling
                 processResult.StandardOutput.Should().Contain("thread samples captured at", AtLeast.Times(expected: 3));
