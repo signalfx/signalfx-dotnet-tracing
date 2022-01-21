@@ -16,8 +16,8 @@ using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
-using Datadog.Trace.Propagation;
 using Datadog.Trace.Configuration;
+using Datadog.Trace.Propagation;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -361,7 +361,7 @@ namespace Datadog.Trace.TestHelpers
             SetEnvironmentVariable(ConfigurationKeys.DirectLogSubmission.Host, host);
             SetEnvironmentVariable(ConfigurationKeys.DirectLogSubmission.Url, $"http://127.0.0.1:{intakePort}");
             SetEnvironmentVariable(ConfigurationKeys.DirectLogSubmission.EnabledIntegrations, integrationName);
-            SetEnvironmentVariable(ConfigurationKeys.ApiKey, "DUMMY_KEY_REQUIRED_FOR_DIRECT_SUBMISSION");
+            SetEnvironmentVariable(ConfigurationKeys.SignalFxAccessToken, "DUMMY_KEY_REQUIRED_FOR_DIRECT_SUBMISSION");
         }
 
         protected async Task<IImmutableList<MockSpan>> GetWebServerSpans(

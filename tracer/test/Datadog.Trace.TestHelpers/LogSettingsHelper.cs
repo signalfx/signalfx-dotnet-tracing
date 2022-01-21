@@ -26,7 +26,7 @@ namespace Datadog.Trace.TestHelpers
                 host: "some_host",
                 source: "csharp",
                 intakeUrl: "https://localhost:1234",
-                apiKey: "abcdef",
+                accessToken: "abcdef",
                 minimumLevel: DirectSubmissionLogLevel.Debug,
                 globalTags: new Dictionary<string, string>(),
                 enabledLogShippingIntegrations: ImmutableDirectLogSubmissionSettings.SupportedIntegrations.Select(x => x.ToString()).ToList(),
