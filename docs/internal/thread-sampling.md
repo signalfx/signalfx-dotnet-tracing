@@ -95,7 +95,7 @@ between your process and the Collector.
 ## What if I'm on an unsupported .NET version?
 
 If you want to use the profiler and see this in your logs, you must upgrade
-your .NET version to .NET Core 3.0 or .NET 5.0 or higher.
+your .NET version to .NET Core 3.1 or .NET 5.0 or higher.
 None of the .NET Framework versions is supported.
 
 ## Why is the OTLP/logs exporter complaining?

@@ -92,7 +92,7 @@ configure the following settings:
 
 | Setting | Description | Default |
 |-|-|-|
-| `SIGNALFX_PROPAGATORS` | Comma-separated list of the propagators for the tracer. Available propagators are: `Datadog`, `B3`, `W3C`. The Tracer will try to execute extraction in the given order. | `B3` |
+| `SIGNALFX_PROPAGATORS` | Comma-separated list of the propagators for the tracer. Available propagators are: `B3`, `W3C`. The Tracer will try to execute extraction in the given order. | `B3` |
 
 ## Library-specific instrumentation settings
 
