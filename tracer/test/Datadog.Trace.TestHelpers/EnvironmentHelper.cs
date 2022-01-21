@@ -177,7 +177,12 @@ namespace Datadog.Trace.TestHelpers
                 "SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS",
                 "SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES",
                 "SIGNALFX_CONVENTION",
-                "SIGNALFX_PROPAGATORS"
+                "SIGNALFX_PROPAGATORS",
+
+                // thread sampling
+                "SIGNALFX_LOGS_ENDPOINT_URL",
+                "SIGNALFX_THREAD_SAMPLING_ENABLED",
+                "SIGNALFX_THREAD_SAMPLING_PERIOD"
             };
 
             foreach (string variable in environmentVariables)
