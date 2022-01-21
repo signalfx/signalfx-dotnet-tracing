@@ -8,8 +8,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Datadog.Trace.SignalFx.Metrics;
 using Datadog.Trace.Logging.DirectSubmission;
+using Datadog.Trace.SignalFx.Metrics;
 using Datadog.Trace.Util;
 
 namespace Datadog.Trace.Configuration

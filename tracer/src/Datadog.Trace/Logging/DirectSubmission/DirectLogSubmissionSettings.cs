@@ -64,7 +64,7 @@ namespace Datadog.Trace.Logging.DirectSubmission
                     ? DefaultBatchPeriodSeconds
                     : seconds.Value);
 
-            ApiKey = source?.GetString(ConfigurationKeys.ApiKey);
+            SignalFxAccessToken = source?.GetString(ConfigurationKeys.SignalFxAccessToken);
         }
 
         /// <summary>
@@ -122,8 +122,8 @@ namespace Datadog.Trace.Logging.DirectSubmission
         internal TimeSpan DirectLogSubmissionBatchPeriod { get; set; }
 
         /// <summary>
-        /// Gets or sets the Datadog API key
+        /// Gets or sets the SignalFx Access Token
         /// </summary>
-        internal string ApiKey { get; set; }
+        internal string SignalFxAccessToken { get; set; }
     }
 }

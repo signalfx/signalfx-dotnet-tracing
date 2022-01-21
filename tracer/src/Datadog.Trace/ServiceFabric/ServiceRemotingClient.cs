@@ -67,7 +67,7 @@ namespace Datadog.Trace.ServiceFabric
                         tracer.TracerManager.Propagator.Inject(
                             span.Context,
                             messageHeaders,
-                            &HeadersSetter);
+                            HeadersSetter);
                     }
                 }
                 catch (Exception ex)

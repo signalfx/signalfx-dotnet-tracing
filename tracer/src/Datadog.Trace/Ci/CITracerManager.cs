@@ -8,8 +8,8 @@
 using Datadog.Trace.Agent;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Conventions;
-using Datadog.Trace.Propagation;
 using Datadog.Trace.Logging.DirectSubmission;
+using Datadog.Trace.Propagation;
 using Datadog.Trace.RuntimeMetrics;
 using Datadog.Trace.Sampling;
 using Datadog.Trace.Vendors.StatsdClient;

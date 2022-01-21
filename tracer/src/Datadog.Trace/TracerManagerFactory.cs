@@ -222,7 +222,7 @@ namespace Datadog.Trace
                         Log.Information("Using unix domain sockets for metrics transport.");
                         statsd.Configure(new StatsdConfig
                         {
-                            StatsdServerName = $"{ExporterSettings.UnixDomainSocketPrefix}{settings.Exporter.MetricsUnixDomainSocketPath}",
+                            StatsdServerName = $"{ExporterSettings.UnixDomainSocketPrefix}{settings.ExporterSettings.MetricsUnixDomainSocketPath}",
                             ConstantTags = constantTags.ToArray()
                         });
                         break;

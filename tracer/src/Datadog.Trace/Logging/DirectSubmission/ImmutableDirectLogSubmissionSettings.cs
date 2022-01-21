@@ -82,7 +82,7 @@ namespace Datadog.Trace.Logging.DirectSubmission
                 host: settings.DirectLogSubmissionHost,
                 source: settings.DirectLogSubmissionSource,
                 intakeUrl: settings.DirectLogSubmissionUrl,
-                apiKey: settings.ApiKey,
+                accessToken: settings.SignalFxAccessToken,
                 minimumLevel: settings.DirectLogSubmissionMinimumLevel,
                 globalTags: settings.DirectLogSubmissionGlobalTags,
                 enabledLogShippingIntegrations: settings.DirectLogSubmissionEnabledIntegrations,
@@ -95,7 +95,7 @@ namespace Datadog.Trace.Logging.DirectSubmission
             string? host,
             string? source,
             string? intakeUrl,
-            string? apiKey,
+            string? accessToken,
             DirectSubmissionLogLevel minimumLevel,
             IDictionary<string, string> globalTags,
             ICollection<string> enabledLogShippingIntegrations,
@@ -128,10 +128,10 @@ namespace Datadog.Trace.Logging.DirectSubmission
                 validationErrors.Add($"The intake url '{intakeUrl}' was not a valid URL.");
             }
 
-            if (string.IsNullOrWhiteSpace(apiKey))
+            if (string.IsNullOrWhiteSpace(accessToken))
             {
                 isEnabled = false;
-                validationErrors.Add($"Missing required settings '{ConfigurationKeys.ApiKey}'.");
+                validationErrors.Add($"Missing required settings '{ConfigurationKeys.SignalFxAccessToken}'.");
             }
 
             var stringifiedTags = StringifyGlobalTags(globalTags);
@@ -166,7 +166,7 @@ namespace Datadog.Trace.Logging.DirectSubmission
                 source: source ?? string.Empty,
                 globalTags: stringifiedTags,
                 intakeUrl: intakeUri!,
-                apiKey: apiKey ?? string.Empty,
+                apiKey: accessToken ?? string.Empty,
                 isEnabled: isEnabled,
                 minimumLevel: minimumLevel,
                 enabledIntegrations: enabledIntegrations,

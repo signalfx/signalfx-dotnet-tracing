@@ -49,10 +49,10 @@ namespace Datadog.Trace.Tests.Logging.DirectSubmission
         [InlineData("")]
         [InlineData("  ")]
         [InlineData(null)]
-        public void InvalidApiKeyIsInvalid(string apiKey)
+        public void InvalidApiKeyIsInvalid(string accessToken)
         {
             var tracerSettings = new TracerSettings(new NameValueConfigurationSource(Defaults));
-            tracerSettings.LogSubmissionSettings.ApiKey = apiKey;
+            tracerSettings.LogSubmissionSettings.SignalFxAccessToken = accessToken;
             var logSettings = ImmutableDirectLogSubmissionSettings.Create(tracerSettings);
 
             logSettings.IsEnabled.Should().BeFalse();

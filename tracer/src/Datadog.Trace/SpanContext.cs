@@ -239,7 +239,6 @@ namespace Datadog.Trace
                     value = Origin;
                     return true;
 
-
                 case "tags":
                     value = DatadogTags;
                     return true;
