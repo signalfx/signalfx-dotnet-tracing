@@ -250,10 +250,10 @@ namespace Datadog.Trace.Tests.PlatformHelpers
                 vars.Remove(ConfigurationKeys.DebugEnabled);
             }
 
-            if (!vars.Contains(ConfigurationKeys.ApiKey))
+            if (!vars.Contains(ConfigurationKeys.SignalFxAccessToken))
             {
                 // This is a needed configuration for the AAS extension
-                vars.Add(ConfigurationKeys.ApiKey, "1");
+                vars.Add(ConfigurationKeys.SignalFxAccessToken, "1");
             }
 
             vars.Add(AzureAppServices.AzureAppServicesContextKey, "1");

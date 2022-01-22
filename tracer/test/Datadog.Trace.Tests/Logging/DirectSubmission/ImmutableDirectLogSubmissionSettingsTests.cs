@@ -23,7 +23,7 @@ namespace Datadog.Trace.Tests.Logging.DirectSubmission
         private static readonly NameValueCollection Defaults =  new()
         {
             { ConfigurationKeys.LogsInjectionEnabled, "1" },
-            { ConfigurationKeys.ApiKey, "some_key" },
+            { ConfigurationKeys.SignalFxAccessToken, "some_key" },
             { ConfigurationKeys.DirectLogSubmission.Host, "integration_tests" },
             { ConfigurationKeys.DirectLogSubmission.EnabledIntegrations, string.Join(";", AllIntegrations) },
         };
@@ -130,7 +130,7 @@ namespace Datadog.Trace.Tests.Logging.DirectSubmission
             var collection = new NameValueCollection
             {
                 { ConfigurationKeys.LogsInjectionEnabled, "1" },
-                { ConfigurationKeys.ApiKey, apiKey },
+                { ConfigurationKeys.SignalFxAccessToken, apiKey },
                 { ConfigurationKeys.DirectLogSubmission.Host, hostName },
                 { ConfigurationKeys.DirectLogSubmission.Url, intake },
                 { ConfigurationKeys.DirectLogSubmission.EnabledIntegrations, string.Join(";", enabledIntegrations) },

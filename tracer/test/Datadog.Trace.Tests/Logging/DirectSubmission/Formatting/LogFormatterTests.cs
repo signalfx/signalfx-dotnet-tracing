@@ -35,7 +35,7 @@ namespace Datadog.Trace.Tests.Logging.DirectSubmission.Formatting
                 host: Host,
                 source: Source,
                 intakeUrl: "http://localhost",
-                apiKey: "some_value",
+                accessToken: "some_value",
                 minimumLevel: DirectSubmissionLogLevel.Debug,
                 globalTags: new Dictionary<string, string> { { "Key1", "Value1" }, { "Key2", "Value2" } },
                 enabledLogShippingIntegrations: new List<string> { nameof(IntegrationId.ILogger) },

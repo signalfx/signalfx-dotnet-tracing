@@ -1,9 +1,13 @@
 ﻿// Modified by Splunk Inc.
 
+using System;
 using System.Collections.Specialized;
+using System.Linq;
+using Datadog.Trace.Agent;
 using Datadog.Trace.Configuration;
 using FluentAssertions;
 using Xunit;
+using MetricsTransportType = Datadog.Trace.Vendors.StatsdClient.Transport.TransportType;
 
 namespace Datadog.Trace.Tests.Configuration;
 
@@ -136,16 +140,16 @@ public class ExporterSettingsTests
     }
 
     [Fact]
-        public void NoSocketFiles_NoExplicitConfiguration_DefaultsMatchExpectation()
-        {
-            var config = Setup(FileExistsMock());
-            Assert.Equal(expected: TracesTransportType.Default, actual: config.TracesTransport);
-            Assert.Equal(expected: MetricsTransportType.UDP, actual: config.MetricsTransport);
-            Assert.Equal(expected: new Uri($"http://127.0.0.1:8126"), actual: config.AgentUri);
-            Assert.Equal(expected: 8125, actual: config.DogStatsdPort);
-            Assert.False(config.PartialFlushEnabled);
-            Assert.Equal(expected: 500, actual: config.PartialFlushMinSpans);
-        }
+    public void NoSocketFiles_NoExplicitConfiguration_DefaultsMatchExpectation()
+    {
+        var config = Setup(FileExistsMock());
+        Assert.Equal(expected: TracesTransportType.Default, actual: config.TracesTransport);
+        Assert.Equal(expected: MetricsTransportType.UDP, actual: config.MetricsTransport);
+        Assert.Equal(expected: new Uri($"http://127.0.0.1:8126"), actual: config.AgentUri);
+        Assert.Equal(expected: 8125, actual: config.DogStatsdPort);
+        Assert.False(config.PartialFlushEnabled);
+        Assert.Equal(expected: 500, actual: config.PartialFlushMinSpans);
+    }
 
     [Fact]
     public void PartialFlushVariables_Populated()

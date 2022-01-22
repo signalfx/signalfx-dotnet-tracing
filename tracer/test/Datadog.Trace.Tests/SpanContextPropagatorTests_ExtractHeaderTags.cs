@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Headers;
+using Datadog.Trace.Propagation;
 using Xunit;
 
 namespace Datadog.Trace.Tests
@@ -51,7 +52,7 @@ namespace Datadog.Trace.Tests
             expectedResults.Add(customHeader2TagName, customHeader2Value);
 
             // Test
-            var tagsFromHeader = SpanContextPropagator.Instance.ExtractHeaderTags(headers, headerTags, TestPrefix);
+            var tagsFromHeader = PropagationExtensions.ExtractHeaderTags(headers, headerTags, TestPrefix);
 
             // Assert
             Assert.NotNull(tagsFromHeader);
@@ -71,7 +72,7 @@ namespace Datadog.Trace.Tests
             var expectedResults = new Dictionary<string, string>();
 
             // Test
-            var tagsFromHeader = SpanContextPropagator.Instance.ExtractHeaderTags(headers, headerTags, TestPrefix);
+            var tagsFromHeader = PropagationExtensions.ExtractHeaderTags(headers, headerTags, TestPrefix);
 
             // Assert
             Assert.NotNull(tagsFromHeader);
@@ -90,7 +91,7 @@ namespace Datadog.Trace.Tests
             var expectedResults = new Dictionary<string, string>();
 
             // Test
-            var tagsFromHeader = SpanContextPropagator.Instance.ExtractHeaderTags(headers, headerToTagMap, TestPrefix);
+            var tagsFromHeader = PropagationExtensions.ExtractHeaderTags(headers, headerToTagMap, TestPrefix);
 
             // Assert
             Assert.NotNull(tagsFromHeader);
@@ -122,7 +123,7 @@ namespace Datadog.Trace.Tests
             };
 
             // Test
-            var tagsFromHeader = SpanContextPropagator.Instance.ExtractHeaderTags(headers, headerToTagMap, TestPrefix);
+            var tagsFromHeader = PropagationExtensions.ExtractHeaderTags(headers, headerToTagMap, TestPrefix);
 
             // Assert
             Assert.NotNull(tagsFromHeader);
@@ -142,15 +143,15 @@ namespace Datadog.Trace.Tests
             var headers = new NameValueCollection().Wrap();
 
             // Add headers
-            headers.Add(HttpHeaderNames.UserAgent, uaInHeaders);
+            headers.Add(CommonHttpHeaderNames.UserAgent, uaInHeaders);
 
             // Initialize header-tag arguments and expectations
             var headerTags = new Dictionary<string, string>();
-            headerTags.Add(HttpHeaderNames.UserAgent, tagName);
+            headerTags.Add(CommonHttpHeaderNames.UserAgent, tagName);
 
             // Test no user agent
-            var tagsFromHeader = provideUserAgent ? SpanContextPropagator.Instance.ExtractHeaderTags(headers, headerTags, TestPrefix, uaInParameter) :
-                SpanContextPropagator.Instance.ExtractHeaderTags(headers, headerTags, TestPrefix);
+            var tagsFromHeader = provideUserAgent ? PropagationExtensions.ExtractHeaderTags(headers, headerTags, TestPrefix, uaInParameter) :
+                PropagationExtensions.ExtractHeaderTags(headers, headerTags, TestPrefix);
 
             // Assert
             Assert.Single(tagsFromHeader);
