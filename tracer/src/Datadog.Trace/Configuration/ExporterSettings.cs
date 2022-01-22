@@ -282,13 +282,11 @@ namespace Datadog.Trace.Configuration
 
             TracesTransportType? traceTransport = null;
 
-            var agentPort = source?.GetInt32(ConfigurationKeys.AgentPort) ??
-                            // default value
-                            DefaultAgentPort;
+            var agentPort = source?.GetInt32(ConfigurationKeys.AgentPort);
 
-            var agentUri = source?.GetString(ConfigurationKeys.EndpointUrl) ?? GetConfiguredTracesEndpoint(ingestRealm, agentPort);
+            var agentUri = source?.GetString(ConfigurationKeys.EndpointUrl);
 
-            AgentUri = new Uri(agentUri);
+            AgentUri = new Uri(agentUri ?? GetConfiguredTracesEndpoint(ingestRealm, agentPort ?? DefaultAgentPort));
 
             if (string.Equals(AgentUri.Host, "localhost", StringComparison.OrdinalIgnoreCase))
             {
@@ -296,17 +294,7 @@ namespace Datadog.Trace.Configuration
                 // When ipv6 is enabled, localhost is first resolved to ::1, which fails
                 // because the trace agent is only bound to ipv4.
                 // This causes delays when sending traces.
-                var builder = new UriBuilder(agentUri) { Host = "127.0.0.1" };
-                AgentUri = builder.Uri;
-            }
-
-            if (string.Equals(AgentUri.Host, "localhost", StringComparison.OrdinalIgnoreCase))
-            {
-                // Replace localhost with 127.0.0.1 to avoid DNS resolution.
-                // When ipv6 is enabled, localhost is first resolved to ::1, which fails
-                // because the trace agent is only bound to ipv4.
-                // This causes delays when sending traces.
-                var builder = new UriBuilder(agentUri) { Host = "127.0.0.1" };
+                var builder = new UriBuilder(AgentUri) { Host = "127.0.0.1" };
                 AgentUri = builder.Uri;
             }
 
@@ -315,7 +303,7 @@ namespace Datadog.Trace.Configuration
             // Agent port is set to zero in places like AAS where it's needed to prevent port conflict
             // The agent will fail to start if it can not bind a port, so we need to override 8126 to prevent port conflict
             // Port 0 means it will pick some random available port
-            var hasExplicitHostOrPortSettings = (agentPort != 0) || AgentUri.Host != null;
+            var hasExplicitHostOrPortSettings = (agentPort != null && agentPort != 0) || agentUri != null;
 
             if (hasExplicitHostOrPortSettings)
             {
