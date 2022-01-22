@@ -1,0 +1,303 @@
+﻿[
+  {
+    StackTrace: 
+"" #0 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x1244
+
+	at System.Threading.WaitHandle.WaitOneNoCheck(unknown)
+	at System.Threading.WaitHandle.WaitOne(unknown)
+	at System.Diagnostics.Process.WaitForExitCore(unknown)
+	at System.Diagnostics.Process.WaitForExit(unknown)
+	at Microsoft.DotNet.Cli.Utils.Command.Execute(unknown)
+	at Microsoft.DotNet.Cli.Utils.Command.Execute(unknown)
+	at Microsoft.DotNet.Tools.Run.RunCommand.Execute(unknown)
+	at Microsoft.DotNet.Tools.Run.RunCommand.Run(unknown)
+	at Microsoft.DotNet.Cli.Program.ProcessArgs(unknown)
+	at Microsoft.DotNet.Cli.Program.Main(unknown)
+	at Unknown_Native_Function(unknown)
+
+  },
+  {
+    StackTrace: 
+".NET ThreadPool Worker" #3 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0x4 nid=0x5370
+
+	at Kernel32.GetQueuedCompletionStatus(unknown)
+	at System.Threading.LowLevelLifoSemaphore.WaitForSignal(unknown)
+	at System.Threading.LowLevelLifoSemaphore.Wait(unknown)
+	at WorkerThread.WorkerThreadStart(unknown)
+	at System.Threading.Thread.StartCallback(unknown)
+	at Unknown_Native_Function(unknown)
+
+  },
+  {
+    StackTrace: 
+".NET ThreadPool Gate" #4 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x317c
+
+	at System.Threading.WaitHandle.WaitOneNoCheck(unknown)
+	at GateThread.GateThreadStart(unknown)
+	at System.Threading.Thread.StartCallback(unknown)
+	at Unknown_Native_Function(unknown)
+
+  },
+  {
+    StackTrace: 
+".NET ThreadPool Worker" #5 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0x6 nid=0x94c
+
+	at Kernel32.GetQueuedCompletionStatus(unknown)
+	at System.Threading.LowLevelLifoSemaphore.WaitForSignal(unknown)
+	at System.Threading.LowLevelLifoSemaphore.Wait(unknown)
+	at WorkerThread.WorkerThreadStart(unknown)
+	at System.Threading.Thread.StartCallback(unknown)
+	at Unknown_Native_Function(unknown)
+
+  },
+  {
+    StackTrace: 
+".NET Long Running Task" #7 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x84b8
+
+	at System.Threading.WaitHandle.WaitOneNoCheck(unknown)
+	at System.Diagnostics.Tracing.EventPipeEventDispatcher.DispatchEventsToEventListeners(unknown)
+	at System.Threading.Tasks.Task.InnerInvoke(unknown)
+	at <>c.<.cctor>b__272_0(unknown)
+	at System.Threading.ExecutionContext.RunInternal(unknown)
+	at System.Threading.Tasks.Task.ExecuteWithThreadLocal(unknown)
+	at System.Threading.Tasks.Task.ExecuteEntryUnsafe(unknown)
+	at <>c.<.cctor>b__10_0(unknown)
+	at System.Threading.Thread.StartCallback(unknown)
+	at Unknown_Native_Function(unknown)
+
+  },
+  {
+    StackTrace: 
+".NET ThreadPool Worker" #8 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0x9 nid=0x75e8
+
+	at Kernel32.GetQueuedCompletionStatus(unknown)
+	at System.Threading.LowLevelLifoSemaphore.WaitForSignal(unknown)
+	at System.Threading.LowLevelLifoSemaphore.Wait(unknown)
+	at WorkerThread.WorkerThreadStart(unknown)
+	at System.Threading.Thread.StartCallback(unknown)
+	at Unknown_Native_Function(unknown)
+
+  },
+  {
+    StackTrace: 
+".NET ThreadPool Worker" #9 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x5ebc
+
+	at Kernel32.GetQueuedCompletionStatus(unknown)
+	at System.Threading.LowLevelLifoSemaphore.WaitForSignal(unknown)
+	at System.Threading.LowLevelLifoSemaphore.Wait(unknown)
+	at WorkerThread.WorkerThreadStart(unknown)
+	at System.Threading.Thread.StartCallback(unknown)
+	at Unknown_Native_Function(unknown)
+
+  },
+  {
+    StackTrace: 
+"" #10 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x63c8
+
+	at System.Threading.Thread.Sleep(unknown)
+	at Datadog.Trace.ThreadSampling.ThreadSampler.SampleReadingThread(unknown)
+	at System.Threading.Thread.StartCallback(unknown)
+	at Unknown_Native_Function(unknown)
+
+  },
+  {
+    StackTrace: 
+".NET Long Running Task" #12 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xd nid=0x60a8
+
+	at System.Threading.WaitHandle.WaitOneNoCheck(unknown)
+	at System.Threading.WaitHandle.WaitOne(unknown)
+	at Microsoft.DotNet.Cli.Telemetry.PersistenceChannel.Sender.SendLoop(unknown)
+	at System.Threading.Tasks.Task.InnerInvoke(unknown)
+	at <>c.<.cctor>b__272_0(unknown)
+	at System.Threading.ExecutionContext.RunInternal(unknown)
+	at System.Threading.Tasks.Task.ExecuteWithThreadLocal(unknown)
+	at System.Threading.Tasks.Task.ExecuteEntryUnsafe(unknown)
+	at <>c.<.cctor>b__10_0(unknown)
+	at System.Threading.Thread.StartCallback(unknown)
+	at Unknown_Native_Function(unknown)
+
+  },
+  {
+    StackTrace: 
+".NET Long Running Task" #13 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0xb68
+
+	at System.Threading.WaitHandle.WaitOneNoCheck(unknown)
+	at System.Threading.WaitHandle.WaitOne(unknown)
+	at Microsoft.DotNet.Cli.Telemetry.PersistenceChannel.Sender.SendLoop(unknown)
+	at System.Threading.Tasks.Task.InnerInvoke(unknown)
+	at <>c.<.cctor>b__272_0(unknown)
+	at System.Threading.ExecutionContext.RunInternal(unknown)
+	at System.Threading.Tasks.Task.ExecuteWithThreadLocal(unknown)
+	at System.Threading.Tasks.Task.ExecuteEntryUnsafe(unknown)
+	at <>c.<.cctor>b__10_0(unknown)
+	at System.Threading.Thread.StartCallback(unknown)
+	at Unknown_Native_Function(unknown)
+
+  },
+  {
+    StackTrace: 
+".NET Long Running Task" #14 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xf nid=0x808
+
+	at System.Threading.WaitHandle.WaitOneNoCheck(unknown)
+	at System.Threading.WaitHandle.WaitOne(unknown)
+	at Microsoft.DotNet.Cli.Telemetry.PersistenceChannel.Sender.SendLoop(unknown)
+	at System.Threading.Tasks.Task.InnerInvoke(unknown)
+	at <>c.<.cctor>b__272_0(unknown)
+	at System.Threading.ExecutionContext.RunInternal(unknown)
+	at System.Threading.Tasks.Task.ExecuteWithThreadLocal(unknown)
+	at System.Threading.Tasks.Task.ExecuteEntryUnsafe(unknown)
+	at <>c.<.cctor>b__10_0(unknown)
+	at System.Threading.Thread.StartCallback(unknown)
+	at Unknown_Native_Function(unknown)
+
+  },
+  {
+    StackTrace: 
+".NET Long Running Task" #15 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x272c
+
+	at System.Threading.WaitHandle.WaitOneNoCheck(unknown)
+	at System.Threading.WaitHandle.WaitOne(unknown)
+	at Microsoft.ApplicationInsights.Channel.InMemoryTransmitter.Runner(unknown)
+	at System.Threading.Tasks.Task.InnerInvoke(unknown)
+	at <>c.<.cctor>b__272_0(unknown)
+	at System.Threading.ExecutionContext.RunInternal(unknown)
+	at System.Threading.Tasks.Task.ExecuteWithThreadLocal(unknown)
+	at System.Threading.Tasks.Task.ExecuteEntryUnsafe(unknown)
+	at <>c.<.cctor>b__10_0(unknown)
+	at System.Threading.Thread.StartCallback(unknown)
+	at Unknown_Native_Function(unknown)
+
+  },
+  {
+    StackTrace: 
+".NET ThreadPool Worker" #16 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x6f08
+
+	at Kernel32.GetQueuedCompletionStatus(unknown)
+	at System.Threading.LowLevelLifoSemaphore.WaitForSignal(unknown)
+	at System.Threading.LowLevelLifoSemaphore.Wait(unknown)
+	at WorkerThread.WorkerThreadStart(unknown)
+	at System.Threading.Thread.StartCallback(unknown)
+	at Unknown_Native_Function(unknown)
+
+  },
+  {
+    StackTrace: 
+".NET ThreadPool Worker" #17 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x4914
+
+	at Kernel32.GetQueuedCompletionStatus(unknown)
+	at System.Threading.LowLevelLifoSemaphore.WaitForSignal(unknown)
+	at System.Threading.LowLevelLifoSemaphore.Wait(unknown)
+	at WorkerThread.WorkerThreadStart(unknown)
+	at System.Threading.Thread.StartCallback(unknown)
+	at Unknown_Native_Function(unknown)
+
+  },
+  {
+    StackTrace: 
+"In-proc Node (Default)" #18 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x7dbc
+
+	at System.Threading.WaitHandle.WaitMultiple(unknown)
+	at System.Threading.WaitHandle.WaitMultiple(unknown)
+	at System.Threading.WaitHandle.WaitAny(unknown)
+	at Microsoft.Build.BackEnd.InProcNode.Run(unknown)
+	at <>c__DisplayClass29_0.<InstantiateNode>b__0(unknown)
+	at System.Threading.Thread.StartCallback(unknown)
+	at Unknown_Native_Function(unknown)
+
+  },
+  {
+    StackTrace: 
+"RequestBuilder thread" #19 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x1f2c
+
+	at System.Threading.Monitor.Wait(unknown)
+	at System.Threading.SemaphoreSlim.WaitUntilCountOrTimeout(unknown)
+	at System.Threading.SemaphoreSlim.Wait(unknown)
+	at SharedGenericFunction.TryTakeWithNoTimeValidation(unknown)
+	at SharedGenericFunction.MoveNext(unknown)
+	at DedicatedThreadsTaskScheduler.<InjectThread>b__6_0(unknown)
+	at StartHelper.Callback(unknown)
+	at System.Threading.ExecutionContext.RunInternal(unknown)
+	at System.Threading.Thread.StartCallback(unknown)
+	at Unknown_Native_Function(unknown)
+
+  },
+  {
+    StackTrace: 
+".NET ThreadPool Wait" #20 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x5398
+
+	at System.Threading.WaitHandle.WaitAnyMultiple(unknown)
+	at WaitThread.WaitThreadStart(unknown)
+	at System.Threading.Thread.StartCallback(unknown)
+	at Unknown_Native_Function(unknown)
+
+  },
+  {
+    StackTrace: 
+"RequestBuilder thread" #21 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x19fc
+
+	at System.Threading.Monitor.Wait(unknown)
+	at System.Threading.SemaphoreSlim.WaitUntilCountOrTimeout(unknown)
+	at System.Threading.SemaphoreSlim.Wait(unknown)
+	at SharedGenericFunction.TryTakeWithNoTimeValidation(unknown)
+	at SharedGenericFunction.MoveNext(unknown)
+	at DedicatedThreadsTaskScheduler.<InjectThread>b__6_0(unknown)
+	at StartHelper.Callback(unknown)
+	at System.Threading.ExecutionContext.RunInternal(unknown)
+	at System.Threading.Thread.StartCallback(unknown)
+	at Unknown_Native_Function(unknown)
+
+  },
+  {
+    StackTrace: 
+".NET ThreadPool Worker" #22 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x4008
+
+	at Kernel32.GetQueuedCompletionStatus(unknown)
+	at System.Threading.LowLevelLifoSemaphore.WaitForSignal(unknown)
+	at System.Threading.LowLevelLifoSemaphore.Wait(unknown)
+	at WorkerThread.WorkerThreadStart(unknown)
+	at System.Threading.Thread.StartCallback(unknown)
+	at Unknown_Native_Function(unknown)
+
+  },
+  {
+    StackTrace: 
+".NET ThreadPool Worker" #23 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x105c
+
+	at Kernel32.GetQueuedCompletionStatus(unknown)
+	at System.Threading.LowLevelLifoSemaphore.WaitForSignal(unknown)
+	at System.Threading.LowLevelLifoSemaphore.Wait(unknown)
+	at WorkerThread.WorkerThreadStart(unknown)
+	at System.Threading.Thread.StartCallback(unknown)
+	at Unknown_Native_Function(unknown)
+
+  },
+  {
+    StackTrace: 
+"RequestBuilder thread" #24 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x79b8
+
+	at System.Threading.Monitor.Wait(unknown)
+	at System.Threading.SemaphoreSlim.WaitUntilCountOrTimeout(unknown)
+	at System.Threading.SemaphoreSlim.Wait(unknown)
+	at SharedGenericFunction.TryTakeWithNoTimeValidation(unknown)
+	at SharedGenericFunction.MoveNext(unknown)
+	at DedicatedThreadsTaskScheduler.<InjectThread>b__6_0(unknown)
+	at StartHelper.Callback(unknown)
+	at System.Threading.ExecutionContext.RunInternal(unknown)
+	at System.Threading.Thread.StartCallback(unknown)
+	at Unknown_Native_Function(unknown)
+
+  },
+  {
+    StackTrace: 
+"In-proc Node (Default)" #25 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x67c4
+
+	at System.Threading.WaitHandle.WaitMultiple(unknown)
+	at System.Threading.WaitHandle.WaitMultiple(unknown)
+	at System.Threading.WaitHandle.WaitAny(unknown)
+	at Microsoft.Build.BackEnd.InProcNode.Run(unknown)
+	at <>c__DisplayClass29_0.<InstantiateNode>b__0(unknown)
+	at System.Threading.Thread.StartCallback(unknown)
+	at Unknown_Native_Function(unknown)
+
+  }
+]

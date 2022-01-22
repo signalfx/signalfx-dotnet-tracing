@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace Datadog.Trace.ThreadSampling
@@ -11,10 +12,10 @@ namespace Datadog.Trace.ThreadSampling
     {
         private static bool printStackTraces = false;
 
-        private byte[] buf;
-        private int len;
+        private readonly byte[] buf;
+        private readonly int len;
+        private readonly Dictionary<int, string> codes;
         private int pos;
-        private Dictionary<int, string> codes;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ThreadSampleNativeFormatParser"/> class.
@@ -30,30 +31,31 @@ namespace Datadog.Trace.ThreadSampling
         }
 
         /// <summary>
-        /// Parses the data.  Currently does nothing but print it out
+        /// Parses the thread sample batch.
         /// </summary>
-        internal void Parse()
+        internal List<ThreadSample> Parse()
         {
+            uint batchThreadIndex = 0;
+            var samples = new List<ThreadSample>();
+
             // FIXME actually have this go somewhere in the future
             while (pos < len)
             {
                 byte op = buf[pos];
                 pos++;
-                if (op == 0x01)
+                if (op == OpCodes.StartBatch)
                 {
                     int version = ReadInt();
                     if (version != 1)
                     {
-                        return; // not able to parse
+                        return null; // not able to parse
                     }
 
                     long sampleStartMillis = ReadInt64();
-                    // Would like to use DateTimeOffset.FromUnixTimeMilliseconds here but version compatibility won't allow it
-                    // A tick is 100 nanos and the big constant there is the unix epoch compared to the windows one, in ticks
-                    var sampleStart = new DateTime((sampleStartMillis * 10000) + 621_355_968_000_000_000).ToLocalTime();
+                    var sampleStart = new DateTime((sampleStartMillis * TimeSpan.TicksPerMillisecond) + TimeConstants.UnixEpochInTicks).ToLocalTime();
                     Console.WriteLine("thread samples captured at " + sampleStart.ToLongDateString() + " " + sampleStart.ToLongTimeString());
                 }
-                else if (op == 0x02)
+                else if (op == OpCodes.StartSample)
                 {
                     int managedId = ReadInt();
                     int nativeId = ReadInt();
@@ -61,12 +63,35 @@ namespace Datadog.Trace.ThreadSampling
                     long traceIdHigh = ReadInt64();
                     long traceIdLow = ReadInt64();
                     long spanId = ReadInt64();
-                    if (printStackTraces)
+
+                    var threadIndex = batchThreadIndex++;
+
+                    var code = ReadShort();
+                    if (code == 0)
                     {
-                        Console.WriteLine("thread mid=" + managedId + " nid=" + nativeId + " name=[" + threadName + "] traceHigh=" + traceIdHigh + " traceLow=" + traceIdLow + " span=" + spanId);
+                        // Empty stack, skip this sample.
+                        continue;
                     }
 
-                    short code = ReadShort();
+                    var threadSample = new ThreadSample();
+                    threadSample.TraceIdHigh = traceIdHigh;
+                    threadSample.TraceIdLow = traceIdLow;
+                    threadSample.SpanId = spanId;
+
+                    // The stack follows the experimental GDI conventions described at
+                    // https://github.com/signalfx/gdi-specification/blob/29cbcbc969531d50ccfd0b6a4198bb8a89cedebb/specification/semantic_conventions.md#logrecord-message-fields
+                    var stackTraceBuilder = new StringBuilder();
+                    stackTraceBuilder.AppendFormat(
+                        CultureInfo.InvariantCulture,
+                        "\"{0}\" #{1} prio=0 os_prio=0 cpu=0 elapsed=0 tid=0x{2:x} nid=0x{3:x}\n",
+                        threadName,
+                        threadIndex,
+                        managedId,
+                        nativeId);
+
+                    // FIXME: here should go Thread state, equivalent of"    java.lang.Thread.State: TIMED_WAITING (sleeping)"
+                    stackTraceBuilder.Append("\n");
+
                     while (code != 0)
                     {
                         string value = null;
@@ -80,24 +105,35 @@ namespace Datadog.Trace.ThreadSampling
                             value = codes[code];
                         }
 
-                        if (printStackTraces)
+                        if (value != null)
                         {
-                            Console.WriteLine("      " + value);
+                            stackTraceBuilder.Append("\tat ");
+                            stackTraceBuilder.Append(value.Replace("::", "."));
+                            stackTraceBuilder.Append("(unknown)\n"); // TODO placeholder for file name and lines numbers
                         }
 
                         code = ReadShort();
                     }
+
+                    threadSample.StackTrace = stackTraceBuilder.ToString();
+                    samples.Add(threadSample);
+
+                    if (printStackTraces)
+                    {
+                        Console.WriteLine(threadSample.StackTrace);
+                    }
                 }
-                else if (op == 0x06)
+                else if (op == OpCodes.EndBatch)
                 {
                     // end batch, nothing here
                 }
-                else if (op == 0x07)
+                else if (op == OpCodes.BatchStats)
                 {
                     int microsSuspended = ReadInt();
                     int numThreads = ReadInt();
                     int totalFrames = ReadInt();
                     int nameCacheMisses = ReadInt();
+
                     Console.WriteLine("  clr was suspended for " + microsSuspended + " micros threads=" + numThreads + " frames=" + totalFrames + " misses=" + nameCacheMisses);
                 }
                 else
@@ -105,6 +141,8 @@ namespace Datadog.Trace.ThreadSampling
                     pos = len + 1; // FIXME improve error handling here
                 }
             }
+
+            return samples;
         }
 
         private string ReadString()
@@ -156,6 +194,29 @@ namespace Datadog.Trace.ThreadSampling
             long l8 = buf[pos + 7] & 0xFF;
             pos += 8;
             return l1 + l2 + l3 + l4 + l5 + l6 + l7 + l8;
+        }
+
+        private static class OpCodes
+        {
+            /// <summary>
+            /// Marks the start of a batch of thread samples, see THREAD_SAMPLES_START_BATCH on native code.
+            /// </summary>
+            public const byte StartBatch = 0x01;
+
+            /// <summary>
+            /// Marks the start of a thread sample, see THREAD_SAMPLES_START_SAMPLE on native code.
+            /// </summary>
+            public const byte StartSample = 0x02;
+
+            /// <summary>
+            /// Marks the end of a batch of thread samples, see THREAD_SAMPLES_END_BATCH on native code.
+            /// </summary>
+            public const byte EndBatch = 0x06;
+
+            /// <summary>
+            /// Marks the begining of a section with statistics, see THREAD_SAMPLES_FINAL_STATS on native code.
+            /// </summary>
+            public const byte BatchStats = 0x07;
         }
     }
 }
