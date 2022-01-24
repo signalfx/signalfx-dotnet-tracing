@@ -110,8 +110,8 @@ namespace Datadog.Trace.Tools.Runner
 
             var envVars = new Dictionary<string, string>
             {
-                ["DD_DOTNET_TRACER_HOME"] = tracerHome,
-                ["DD_DOTNET_TRACER_MSBUILD"] = tracerMsBuild,
+                ["SIGNALFX_DOTNET_TRACER_HOME"] = tracerHome,
+                ["SIGNALFX_DOTNET_TRACER_MSBUILD"] = tracerMsBuild,
                 ["CORECLR_ENABLE_PROFILING"] = "1",
                 ["CORECLR_PROFILER"] = PROFILERID,
                 ["CORECLR_PROFILER_PATH_32"] = tracerProfiler32,
@@ -124,22 +124,22 @@ namespace Datadog.Trace.Tools.Runner
 
             if (!string.IsNullOrWhiteSpace(options.Environment))
             {
-                envVars["DD_ENV"] = options.Environment;
+                envVars["SIGNALFX_ENV"] = options.Environment;
             }
 
             if (!string.IsNullOrWhiteSpace(options.Service))
             {
-                envVars["DD_SERVICE"] = options.Service;
+                envVars["SIGNALFX_SERVICE_NAME"] = options.Service;
             }
 
             if (!string.IsNullOrWhiteSpace(options.Version))
             {
-                envVars["DD_VERSION"] = options.Version;
+                envVars["SIGNALFX_VERSION"] = options.Version;
             }
 
             if (!string.IsNullOrWhiteSpace(options.AgentUrl))
             {
-                envVars["DD_TRACE_AGENT_URL"] = options.AgentUrl;
+                envVars["SIGNALFX_ENDPOINT_URL"] = options.AgentUrl;
             }
 
             return envVars;

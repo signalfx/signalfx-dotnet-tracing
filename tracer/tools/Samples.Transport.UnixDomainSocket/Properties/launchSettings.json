@@ -26,8 +26,8 @@
       "httpPort": 29080,
       "sslPort": 29443,
       "environmentVariables": {
-        "DD_APM_RECEIVER_SOCKET": "/var/run/datadog/mockapm.socket",
-        "DD_DOGSTATSD_SOCKET": "/var/run/datadog/mockdsd.socket"
+        "SIGNALFX_APM_RECEIVER_SOCKET": "/var/run/datadog/mockapm.socket",
+        "SIGNALFX_DOGSTATSD_SOCKET": "/var/run/datadog/mockdsd.socket"
       }
     }
   }

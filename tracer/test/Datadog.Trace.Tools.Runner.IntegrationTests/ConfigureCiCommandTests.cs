@@ -29,7 +29,7 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests
 
             foreach (var line in console.ReadLines())
             {
-                // ##vso[task.setvariable variable=DD_DOTNET_TRACER_HOME]TestTracerHome
+                // ##vso[task.setvariable variable=SIGNALFX_DOTNET_TRACER_HOME]TestTracerHome
                 var match = Regex.Match(line, @"##vso\[task.setvariable variable=(?<name>[A-Z1-9_]+)\](?<value>.*)");
 
                 if (match.Success)
@@ -38,11 +38,11 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests
                 }
             }
 
-            environmentVariables.Should().Contain("DD_ENV", "TestEnv");
-            environmentVariables.Should().Contain("DD_SERVICE", "TestService");
-            environmentVariables.Should().Contain("DD_VERSION", "TestVersion");
-            environmentVariables.Should().Contain("DD_DOTNET_TRACER_HOME", "TestTracerHome");
-            environmentVariables.Should().Contain("DD_TRACE_AGENT_URL", "TestAgentUrl");
+            environmentVariables.Should().Contain("SIGNALFX_ENV", "TestEnv");
+            environmentVariables.Should().Contain("SIGNALFX_SERVICE_NAME", "TestService");
+            environmentVariables.Should().Contain("SIGNALFX_VERSION", "TestVersion");
+            environmentVariables.Should().Contain("SIGNALFX_DOTNET_TRACER_HOME", "TestTracerHome");
+            environmentVariables.Should().Contain("SIGNALFX_DOTNET_TRACER_HOME", "TestAgentUrl");
         }
 
         [Theory]

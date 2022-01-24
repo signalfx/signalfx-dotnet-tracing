@@ -108,7 +108,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             var hostName = "integration_serilog_tests";
             using var logsIntake = new MockLogsIntake();
 
-            SetEnvironmentVariable("DD_LOGS_INJECTION", "true");
+            SetEnvironmentVariable("SIGNALFX_LOGS_INJECTION", "true");
             EnableDirectLogSubmission(logsIntake.Port, nameof(IntegrationId.Serilog), hostName);
 
             var agentPort = TcpPortProvider.GetOpenPort();

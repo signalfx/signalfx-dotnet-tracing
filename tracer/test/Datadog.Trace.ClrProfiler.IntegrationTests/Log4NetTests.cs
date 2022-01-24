@@ -147,7 +147,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             var hostName = "integration_log4net_tests";
             using var logsIntake = new MockLogsIntake();
 
-            SetEnvironmentVariable("DD_LOGS_INJECTION", "true");
+            SetEnvironmentVariable("SIGNALFX_LOGS_INJECTION", "true");
             EnableDirectLogSubmission(logsIntake.Port, nameof(IntegrationId.Log4Net), hostName);
 
             var agentPort = TcpPortProvider.GetOpenPort();

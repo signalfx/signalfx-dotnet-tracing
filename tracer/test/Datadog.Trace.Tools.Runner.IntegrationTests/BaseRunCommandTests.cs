@@ -61,21 +61,21 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests
             arguments.Should().BeNullOrEmpty();
             environmentVariables.Should().NotBeNull();
 
-            environmentVariables.Should().Contain("DD_ENV", "TestEnv");
-            environmentVariables.Should().Contain("DD_SERVICE", "TestService");
-            environmentVariables.Should().Contain("DD_VERSION", "TestVersion");
-            environmentVariables.Should().Contain("DD_DOTNET_TRACER_HOME", "TestTracerHome");
-            environmentVariables.Should().Contain("DD_TRACE_AGENT_URL", agentUrl);
+            environmentVariables.Should().Contain("SIGNALFX_ENV", "TestEnv");
+            environmentVariables.Should().Contain("SIGNALFX_SERVICE_NAME", "TestService");
+            environmentVariables.Should().Contain("SIGNALFX_VERSION", "TestVersion");
+            environmentVariables.Should().Contain("SIGNALFX_DOTNET_TRACER_HOME", "TestTracerHome");
+            environmentVariables.Should().Contain("SIGNALFX_ENDPOINT_URL", agentUrl);
             environmentVariables.Should().Contain("VAR1", "A");
             environmentVariables.Should().Contain("VAR2", "B");
 
             if (EnableCiVisibilityMode)
             {
-                environmentVariables.Should().Contain("DD_CIVISIBILITY_ENABLED", "1");
+                environmentVariables.Should().Contain("SIGNALFX_CIVISIBILITY_ENABLED", "1");
             }
             else
             {
-                environmentVariables.Should().NotContainKey("DD_CIVISIBILITY_ENABLED");
+                environmentVariables.Should().NotContainKey("SIGNALFX_CIVISIBILITY_ENABLED");
             }
         }
 
@@ -100,7 +100,7 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests
 
             var agentUrl = $"http://localhost:{agent?.Port ?? 1111}";
 
-            // dd-env is an argument for the target application and therefore shouldn't set the DD_ENV variable
+            // dd-env is an argument for the target application and therefore shouldn't set the SIGNALFX_ENV variable
             var commandLine = $"{CommandPrefix} --tracer-home dummyFolder --agent-url {agentUrl} -- test.exe --dd-env test";
 
             using var console = ConsoleHelper.Redirect();
@@ -116,7 +116,7 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests
 
             command.Should().Be("test.exe");
             arguments.Should().Be("--dd-env test");
-            environmentVariables.Should().NotContainKey("DD_ENV");
+            environmentVariables.Should().NotContainKey("SIGNALFX_ENV");
         }
 
         [Fact]
@@ -134,7 +134,7 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests
 
             var agentUrl = $"http://localhost:{agent?.Port ?? 1111}";
 
-            // dd-env is an argument for the target application and therefore shouldn't set the DD_ENV variable
+            // dd-env is an argument for the target application and therefore shouldn't set the SIGNALFX_ENV variable
             var commandLine = $"{CommandPrefix} --tracer-home dummyFolder --agent-url {agentUrl}";
 
             using var console = ConsoleHelper.Redirect();
