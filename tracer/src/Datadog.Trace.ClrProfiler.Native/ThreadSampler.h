@@ -7,9 +7,11 @@
 #include <utility>
 #include <unordered_map>
 
+#define UNKNOWN_MANAGED_THREADID -1
+
 extern "C"
 {
-    __declspec(dllexport) int SignalFxReadThreadSamples(int len, unsigned char* buf);
+    __declspec(dllexport) int32_t SignalFxReadThreadSamples(int32_t len, unsigned char* buf);
     __declspec(dllexport) void SignalFxSetNativeContext(uint64_t traceIdHigh, uint64_t traceIdLow, uint64_t spanId, int32_t managedThreadId);
 }
 
@@ -40,7 +42,7 @@ public:
     uint64_t spanId;
     int32_t managedThreadId;
 
-    ThreadSpanContext() : traceIdHigh(0), traceIdLow(0), spanId(0), managedThreadId(-1)
+    ThreadSpanContext() : traceIdHigh(0), traceIdLow(0), spanId(0), managedThreadId(UNKNOWN_MANAGED_THREADID)
     {
     }
     ThreadSpanContext(uint64_t _traceIdHigh, uint64_t _traceIdLow, uint64_t _spanId, int32_t managedThreadId) :
