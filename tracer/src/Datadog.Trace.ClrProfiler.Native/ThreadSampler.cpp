@@ -90,7 +90,7 @@ int32_t ThreadSampling_ConsumeOneThreadSample(int32_t len, unsigned char* buf)
     size_t toUseLen = (int) std::min(toUse->size(), (size_t) len);
     memcpy(buf, toUse->data(), toUseLen);
     delete toUse;
-    return toUseLen;
+    return (int32_t) toUseLen;
 }
 
 namespace trace
