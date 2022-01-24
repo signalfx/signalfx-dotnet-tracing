@@ -61,9 +61,9 @@ profiles:
         endpoints:
           - "{{ linuxEndpoint }}"
         environmentVariables:
-          COR_PROFILER: "{846F5F1C-F9AE-4B07-969E-05C26BC060D8}"
+          COR_PROFILER: "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"
           COR_PROFILER_PATH: "{{ linuxProfilerPath }}/tracer-home-linux/Datadog.Trace.ClrProfiler.Native.so"
-          CORECLR_PROFILER: "{846F5F1C-F9AE-4B07-969E-05C26BC060D8}"
+          CORECLR_PROFILER: "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"
           CORECLR_PROFILER_PATH: "{{ linuxProfilerPath }}/tracer-home-linux/Datadog.Trace.ClrProfiler.Native.so"
           DD_DOTNET_TRACER_HOME: "{{ linuxProfilerPath }}/tracer-home-linux"
           DD_AGENT_HOST: "{{ controllerIp }}"
@@ -87,9 +87,9 @@ profiles:
         endpoints:
           - "{{ linuxEndpoint }}"
         environmentVariables:
-          COR_PROFILER: "{846F5F1C-F9AE-4B07-969E-05C26BC060D8}"
+          COR_PROFILER: "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"
           COR_PROFILER_PATH: "{{ linuxProfilerPath }}/monitoring-home-linux/Datadog.AutoInstrumentation.NativeLoader.so"
-          CORECLR_PROFILER: "{846F5F1C-F9AE-4B07-969E-05C26BC060D8}"
+          CORECLR_PROFILER: "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"
           CORECLR_PROFILER_PATH: "{{ linuxProfilerPath }}/monitoring-home-linux/Datadog.AutoInstrumentation.NativeLoader.so"
           DD_DOTNET_TRACER_HOME: "{{ linuxProfilerPath }}/tracer-home-linux"
           DD_DOTNET_PROFILER_HOME: "{{ linuxProfilerPath }}/profiler-home-linux"

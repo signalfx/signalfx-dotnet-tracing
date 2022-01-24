@@ -1,7 +1,7 @@
 #See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
 FROM mcr.microsoft.com/dotnet/aspnet:3.1 AS appbase
-ARG DD_API_KEY
-ENV DD_API_KEY=$DD_API_KEY
+ARG SIGNALFX_ACCESS_TOKEN
+ENV SIGNALFX_ACCESS_TOKEN=$SIGNALFX_ACCESS_TOKEN
 
 EXPOSE 80
 EXPOSE 443
@@ -79,44 +79,44 @@ FROM appbase AS final
 COPY --from=builder /app/publish /app
 
 # Set datadog variables
-ENV DD_ENV=uds-container
+ENV SIGNALFX_ENV=uds-container
 
 # Sometimes the trace agent fails to start
 # These variables make sure the tracer uses the sockets even if they aren't ready in the container at start
-ENV DD_APM_RECEIVER_SOCKET=/var/run/datadog/apm.socket
-ENV DD_DOGSTATSD_SOCKET=/var/run/datadog/dsd.socket
+ENV SIGNALFX_APM_RECEIVER_SOCKET=/var/run/datadog/apm.socket
+ENV SIGNALFX_DOGSTATSD_SOCKET=/var/run/datadog/dsd.socket
 
 # Configure the transport
 # TODO: None of these work... This is apparently due to a difference in how services are started... need to set those variables differently.
-# DD_APM_RECEIVER_SOCKET as an environment variable is not respected by the agent when installing in a container (https://s3.amazonaws.com/dd-agent/scripts/install_script.sh)
-# Using "service datadog-agent start" does not pick up the environment variable but calling the trace-agent binary directly does work (/opt/datadog-agent/embedded/bin/trace-agent). The DD_APM_RECEIVER_SOCKET is picked up and used per the logs.
+# SIGNALFX_APM_RECEIVER_SOCKET as an environment variable is not respected by the agent when installing in a container (https://s3.amazonaws.com/dd-agent/scripts/install_script.sh)
+# Using "service datadog-agent start" does not pick up the environment variable but calling the trace-agent binary directly does work (/opt/datadog-agent/embedded/bin/trace-agent). The SIGNALFX_APM_RECEIVER_SOCKET is picked up and used per the logs.
 # Using "service datadog-agent start" works when datadog.yaml has the pipe configured: setting `apm_config.receiver_socket: /var/run/datadog/apm.socket` in the yaml is picked up and used per the logs.
-#ENV DD_TRACE_AGENT_URL=/var/run/datadog/apm.socket
-# ENV DD_APM_RECEIVER_SOCKET=/var/run/datadog/apm.socket
-# ENV DD_APM_CONFIG_RECEIVER_SOCKET=/var/run/datadog/apm.socket
-# ENV DD_TRACE_AGENT_UNIX_DOMAIN_SOCKET=/var/run/datadog/apm.socket
+#ENV SIGNALFX_ENDPOINT_URL=/var/run/datadog/apm.socket
+# ENV SIGNALFX_APM_RECEIVER_SOCKET=/var/run/datadog/apm.socket
+# ENV SIGNALFX_APM_CONFIG_RECEIVER_SOCKET=/var/run/datadog/apm.socket
+# ENV SIGNALFX_TRACE_AGENT_UNIX_DOMAIN_SOCKET=/var/run/datadog/apm.socket
 
 # Install the automatic instrumentation tracer
 #ENV CORECLR_ENABLE_PROFILING=1
-#ENV CORECLR_PROFILER={846F5F1C-F9AE-4B07-969E-05C26BC060D8}
+#ENV CORECLR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}
 #ENV CORECLR_PROFILER_PATH=/opt/datadog/Datadog.Trace.ClrProfiler.Native.so
-#ENV DD_DOTNET_TRACER_HOME=/opt/datadog
+#ENV SIGNALFX_DOTNET_TRACER_HOME=/opt/datadog
 #RUN mkdir -p /opt/datadog
 #COPY --from=builder /repo/tracer/bin/tracer-home /opt/datadog
 #RUN mkdir -p /var/log/datadog
 
 # Install the agent
-ENV DD_RUNTIME_METRICS_ENABLED=true
-ENV DD_SITE=datadoghq.com
+ENV SIGNALFX_RUNTIME_METRICS_ENABLED=true
+ENV SIGNALFX_SITE=datadoghq.com
 RUN mkdir /var/run/datadog; \
     chmod -R a+rwX /var/run/datadog
 # RUN chown dd-agent -R /var/run/datadog
-RUN DD_AGENT_MAJOR_VERSION=7 bash -c "$(curl -L https://s3.amazonaws.com/dd-agent/scripts/install_script.sh)"
+RUN SIGNALFX_AGENT_MAJOR_VERSION=7 bash -c "$(curl -L https://s3.amazonaws.com/dd-agent/scripts/install_script.sh)"
 
 # The environment variables in this dockerfile are only applied to PID 1, whereas the agent runs as a service... 
 # TODO: Set service variables, for now, work around this by modifying the datadog.yaml
 RUN > /etc/datadog-agent/datadog.yaml
-RUN printf "api_key: $DD_API_KEY\n" >> /etc/datadog-agent/datadog.yaml
+RUN printf "access_token: $SIGNALFX_ACCESS_TOKEN\n" >> /etc/datadog-agent/datadog.yaml
 RUN printf "site: datadoghq.com\n" >> /etc/datadog-agent/datadog.yaml
 RUN printf "env: uds-container\n" >> /etc/datadog-agent/datadog.yaml
 RUN printf "use_dogstatsd: true\n" >> /etc/datadog-agent/datadog.yaml

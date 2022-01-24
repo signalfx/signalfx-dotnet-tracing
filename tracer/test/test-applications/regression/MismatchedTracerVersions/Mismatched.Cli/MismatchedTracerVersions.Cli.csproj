@@ -8,7 +8,7 @@
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
 
     <!-- default nuget version to make IDEs happy -->
-    <DatadogTraceNuGetVersion Condition="$(DatadogTraceNuGetVersion) == ''">1.28.0</DatadogTraceNuGetVersion>
+    <DatadogTraceNuGetVersion Condition="$(DatadogTraceNuGetVersion) == ''">0.2.0</DatadogTraceNuGetVersion>
   </PropertyGroup>
 
   <ItemGroup>
