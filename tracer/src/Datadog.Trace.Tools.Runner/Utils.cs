@@ -20,7 +20,7 @@ using Datadog.Trace.Ci.Sampling;
 using Datadog.Trace.Configuration;
 using Spectre.Console;
 
-namespace Signalfx.Tracing.Tools.Runner
+namespace Datadog.Trace.Tools.Runner
 {
     internal class Utils
     {
