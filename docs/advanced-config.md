@@ -75,6 +75,8 @@ Use following settings to configure where the telemetry data is being exported.
 |-|-|-|
 | `SIGNALFX_ACCESS_TOKEN` | Your Splunk Observabilty Cloud access token for your organization. It enables sending traces directly to the Splunk Observabilty Cloud ingest endpoint. |  |
 | `SIGNALFX_ENDPOINT_URL` | The URL to where trace exporters send traces. | `http://localhost:9411/api/v2/spans` |
+| `SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED` | Enable to export traces that contain a minimum number of closed spans, as defined by `SIGNALFX_TRACE_PARTIAL_FLUSH_MIN_SPANS`. | `false` |
+| `SIGNALFX_TRACE_PARTIAL_FLUSH_MIN_SPANS` | Minimum number of closed spans in a trace before it's exported. The default value is ``500``. Requires the value of the ``SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED`` environment variable to be ``true``. | `500` |
 
 ### Exporting directly to Splunk Observabilty Cloud
 
