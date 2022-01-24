@@ -11,8 +11,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        baseImage: [debian]
-        # TODO: baseImage: [alpine, debian]
+        baseImage: [alpine, debian]
     timeout-minutes: 30
     env:
       baseImage: ${{ matrix.baseImage }}
