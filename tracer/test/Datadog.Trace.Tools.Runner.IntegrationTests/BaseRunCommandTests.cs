@@ -23,7 +23,7 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests
 
         protected bool EnableCiVisibilityMode { get; }
 
-        [Fact]
+        [Fact(Skip = "We are not using this tool in SingalFx")]
         public void Run()
         {
             string command = null;
@@ -79,7 +79,7 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests
             }
         }
 
-        [Fact]
+        [Fact(Skip = "We are not using this tool in SingalFx")]
         public void AdditionalArguments()
         {
             string command = null;
@@ -119,7 +119,7 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests
             environmentVariables.Should().NotContainKey("SIGNALFX_ENV");
         }
 
-        [Fact]
+        [Fact(Skip = "We are not using this tool in SingalFx")]
         public void EmptyCommand()
         {
             bool callbackInvoked = false;
