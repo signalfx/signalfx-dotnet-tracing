@@ -24,3 +24,27 @@
 > **Tip:** To reduce latency and benefit from OTel Collector features,
 > you can set the endpoint URL setting to a Collector instance running
 > in Azure VM over an Azure private network.
+
+## WebJobs (Experimental)
+
+Currently environment configuration must be done manually. Specially notice that `SIGNALFX_AZURE_APP_SERVICES` must be disabled. It is strongly adviced to have a separate App Service for the Webjobs.
+
+NB! Paths that contain SignalFX extension version number, must match with the actual installed extension version! For example version format `v0.2.0`
+
+   | Name | Value | Description |
+   | - | - | - |
+   | `COR_ENABLE_PROFILING` | `1` | Enables .NET Framework instrumentation. |
+   | `COR_PROFILER` | `{B4C89B0F-9908-4F73-9F59-0D77C5A06874}` | |
+   | `COR_PROFILER_PATH` | `C:\home\signalfx\tracing\[extension-version]\win-x64\SignalFx.Tracing.ClrProfiler.Native.dll` | |
+   | `COR_PROFILER_PATH_32` |  `C:\home\signalfx\tracing\[extension-version]\win-x86\SignalFx.Tracing.ClrProfiler.Native.dll` | |
+   | `COR_PROFILER_PATH_64` |  `C:\home\signalfx\tracing\[extension-version]\win-x64\SignalFx.Tracing.ClrProfiler.Native.dll` | |
+   | `CORECLR_ENABLE_PROFILING` | `1` | Enables .NET Core instrumentation. |
+   | `CORECLR_PROFILER` | `{B4C89B0F-9908-4F73-9F59-0D77C5A06874}` | |
+   | `CORECLR_PROFILER_PATH_32` | `C:\home\signalfx\tracing\[extension-version]\win-x86\SignalFx.Tracing.ClrProfiler.Native.dll` | |
+   | `CORECLR_PROFILER_PATH_64` | `C:\home\signalfx\tracing\[extension-version]\win-x64\SignalFx.Tracing.ClrProfiler.Native.dll` | |
+   | `SIGNALFX_DOTNET_TRACER_HOME` | `C:\home\signalfx\tracing\[extension-version]` | SignalFX extension install location. |
+   | `SIGNALFX_PROFILER_EXCLUDE_PROCESSES` | `SnapshotUploader.exe;workerforwarder.exe` | Azure internal services to exclude. |
+   | `SIGNALFX_TRACE_LOG_PATH` | `C:\home\LogFiles\signalfx\tracing\[extension-version]\dotnet-profiler.log` | Path for log files. |
+   | `SIGNALFX_AZURE_APP_SERVICES` | `0` | Necessary to enable background services instrumentation. |
+   | `SIGNALFX_ACCESS_TOKEN` | `[splunk-access-token]` | Access token. See [here](https://docs.splunk.com/Observability/admin/authentication-tokens/org-tokens.html) to learn how to obtain one. |
+   | `SIGNALFX_ENDPOINT_URL` | `https://ingest.[splunk-realm].signalfx.com/v2/trace` | In the endpoint URL, `splunk-realm` is the [O11y realm](https://dev.splunk.com/observability/docs/realms_in_endpoints). For example, `us0`. |
