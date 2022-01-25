@@ -18,7 +18,7 @@
 // If you change this, consider ThreadSampler.cs too
 #define SAMPLES_BUFFER_MAXIMUM_SIZE (200 * 1024)
 
-#define SAMPLES_BUFFER_DEFAULT_SIZE 20 * 1024
+#define SAMPLES_BUFFER_DEFAULT_SIZE (20 * 1024)
 
 // If you change these, change ThreadSampler.cs too
 #define DEFAULT_SAMPLE_PERIOD 10000
@@ -732,7 +732,7 @@ void NameCache::put(UINT_PTR key, WSTRING* val)
 
     if (map.size() > maxSize)
     {
-        auto lru = list.back();
+        auto &lru = list.back();
         delete lru.second; // FIXME consider using WSTRING directly instead of WSTRING*
         list.pop_back();
         map.erase(lru.first);
