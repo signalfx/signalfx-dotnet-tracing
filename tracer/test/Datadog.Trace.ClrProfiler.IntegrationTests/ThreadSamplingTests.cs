@@ -34,8 +34,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             using (var agent = EnvironmentHelper.GetMockAgent())
             using (var processResult = RunSampleAndWaitForExit(agent.Port))
             {
-                // at application works 5 seconds, we should expect at least 3 attempts of thread sampling
-                processResult.StandardOutput.Should().Contain("thread samples captured at", AtLeast.Times(expected: 3));
+                // The application works for 5 seconds with debug logging enabled we expect at least 2 attempts of thread sampling in CI.
+                // On a dev box it is typical to get at least 3 but the CI machines seem slower, using 2 until the test is improved.
+                processResult.StandardOutput.Should().Contain("thread samples captured at", AtLeast.Times(expected: 2));
             }
         }
     }

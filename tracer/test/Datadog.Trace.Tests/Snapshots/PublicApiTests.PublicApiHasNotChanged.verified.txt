@@ -504,13 +504,6 @@ namespace Datadog.Trace.SignalFx.Metrics
         SignalFx = 0,
     }
 }
-namespace Datadog.Trace.ThreadSampling
-{
-    public static class ThreadSampler
-    {
-        public static void Initialize(System.TimeSpan threadSamplingPeriod) { }
-    }
-}
 namespace Datadog.Trace.Vendors.ProtoBuf
 {
     public readonly struct DiscriminatedUnion128
