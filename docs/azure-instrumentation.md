@@ -28,7 +28,11 @@
 ## WebJobs (Experimental)
 
 To instrument a WebJob, follow these steps:
-
+1. Choose your application in Azure App Service.
+2. Go to **Development Tools > Extensions**.
+3. Find and install the **SignalFx .NET Tracing** extension.
+4. Go to **Settings > Configuration**.
+5. Click **New application setting** to add the following settings, replacing `[extension-version]` with the version of the .NET instrumentation (for example,`v0.2.0`):
    | Name | Value | Description |
    | - | - | - |
    | `COR_ENABLE_PROFILING` | `1` | Enables .NET Framework instrumentation. |
