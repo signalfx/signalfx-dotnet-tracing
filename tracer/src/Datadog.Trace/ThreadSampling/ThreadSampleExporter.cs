@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Net;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Logging;
@@ -16,21 +17,21 @@ namespace Datadog.Trace.ThreadSampling
     {
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(ThreadSampleExporter));
 
-        private readonly List<KeyValue> _fixedLogRecordAttributes;
+        private readonly ReadOnlyCollection<KeyValue> _fixedLogRecordAttributes;
         private readonly Uri _logsEndpointUrl;
         private readonly LogsData _logsData;
 
         internal ThreadSampleExporter(ImmutableTracerSettings tracerSettings)
         {
-            _fixedLogRecordAttributes = new List<KeyValue>
+            _fixedLogRecordAttributes = new ReadOnlyCollection<KeyValue>(new List<KeyValue>
             {
                 GdiProfilingConventions.LogRecord.Attributes.Source,
                 GdiProfilingConventions.LogRecord.Attributes.Period((long)tracerSettings.ThreadSamplingPeriod.TotalMilliseconds)
-            };
+            });
 
             _logsEndpointUrl = tracerSettings.ExporterSettings.LogsEndpointUrl;
 
-            _logsData = GdiProfilingConventions.CreateLogsData();
+            _logsData = GdiProfilingConventions.CreateLogsData(tracerSettings.GlobalTags);
         }
 
         public void ExportThreadSamples(List<ThreadSample> threadSamples)
@@ -40,9 +41,10 @@ namespace Datadog.Trace.ThreadSampling
                 return;
             }
 
-            // Populate the actual log records.
+            // The same _logsData instance is used on all export messages. With the exception of the list of
+            // LogRecords, the Logs property, all other fields are prepopulated. At this point the code just
+            // need to create a LogRecord for each thread sample and add it to the Logs list.
             List<LogRecord> logRecords = _logsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs;
-            logRecords.Clear();
 
             for (int i = 0; i < threadSamples.Count; i++)
             {
@@ -76,7 +78,8 @@ namespace Datadog.Trace.ThreadSampling
                 stream.Flush();
             }
 
-            // Release the log records as soon as possible.
+            // The exporter reuses the _logsData object, but the actual log records are not
+            // needed after serialization, release the log records so they can be garbage collected.
             _logsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs.Clear();
 
             try
@@ -105,8 +108,14 @@ namespace Datadog.Trace.ThreadSampling
             public const string OpenTelemetryProfiling = "otel.profiling";
             public const string Version = "0.1.0";
 
-            public static LogsData CreateLogsData()
+            public static LogsData CreateLogsData(IEnumerable<KeyValuePair<string, string>> additionalResources)
             {
+                var resource = OpenTelemetry.Resource;
+                foreach (var kvp in additionalResources)
+                {
+                    resource.Attributes.Add(new KeyValue { Key = kvp.Key, Value = new AnyValue { StringValue = kvp.Value } });
+                }
+
                 return new LogsData
                 {
                     ResourceLogs =
