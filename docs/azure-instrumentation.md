@@ -27,9 +27,7 @@
 
 ## WebJobs (Experimental)
 
-Currently environment configuration must be done manually. Specially notice that `SIGNALFX_AZURE_APP_SERVICES` must be disabled. It is strongly adviced to have a separate App Service for the Webjobs.
-
-NB! Paths that contain SignalFX extension version number, must match with the actual installed extension version! For example version format `v0.2.0`
+To instrument a WebJob, follow these steps:
 
    | Name | Value | Description |
    | - | - | - |
