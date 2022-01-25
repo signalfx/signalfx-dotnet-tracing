@@ -47,11 +47,19 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
 
     CorProfilerBase::Initialize(cor_profiler_info_unknown);
 
-    // check if tracing is completely disabled
+    // check if tracing is completely disabled.
     if (IsTracingDisabled())
     {
-        Logger::Info("TRACER DIAGNOSTICS - Profiler disabled in ", environment::tracing_enabled);
-        return E_FAIL;
+        if (IsAzureAppServices() && (NeedsAgentInAAS() || NeedsDogstatsdInAAS()))
+        {
+            // In AAS, the profiler is used to load other processes, so we bypass this check. If the tracer is disabled, the managed loader won't initialize instrumentation
+            Logger::Info("TRACER DIAGNOSTICS - In AAS, automatic tracing is disabled but keeping the profiler up to start child processes.");
+        }
+        else
+        {
+            Logger::Info("TRACER DIAGNOSTICS - Profiler disabled in ", environment::tracing_enabled);
+            return E_FAIL;
+        }
     }
 
 #if defined(ARM64) || defined(ARM)

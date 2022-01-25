@@ -14,6 +14,7 @@ using Datadog.Trace.Agent;
 using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Logging;
+using Datadog.Trace.PlatformHelpers;
 using Datadog.Trace.Propagation;
 using Datadog.Trace.Sampling;
 using Datadog.Trace.Tagging;
@@ -44,7 +45,7 @@ namespace Datadog.Trace
 
         static Tracer()
         {
-            TracingProcessManager.Initialize();
+            AgentProcessManager.Initialize();
             RegisterGlobalTracer(Instance);
         }
 
@@ -317,7 +318,7 @@ namespace Datadog.Trace
         /// <param name="trace">The <see cref="Span"/> collection to write.</param>
         void IDatadogTracer.Write(ArraySegment<Span> trace)
         {
-            if (Settings.TraceEnabled)
+            if (Settings.TraceEnabled || AzureAppServices.Metadata.CustomTracingEnabled)
             {
                 TracerManager.AgentWriter.WriteTrace(trace);
             }
