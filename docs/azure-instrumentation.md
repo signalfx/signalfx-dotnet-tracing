@@ -43,6 +43,6 @@ To instrument a WebJob, follow these steps:
    | `SIGNALFX_DOTNET_TRACER_HOME` | `C:\home\signalfx\tracing\[extension-version]` | SignalFX extension install location. |
    | `SIGNALFX_PROFILER_EXCLUDE_PROCESSES` | `SnapshotUploader.exe;workerforwarder.exe` | Azure internal services to exclude. |
    | `SIGNALFX_TRACE_LOG_PATH` | `C:\home\LogFiles\signalfx\tracing\[extension-version]\dotnet-profiler.log` | Path for log files. |
-   | `SIGNALFX_AZURE_APP_SERVICES` | `0` | Necessary to enable background services instrumentation. |
+   | `SIGNALFX_AZURE_APP_SERVICES` | `0` | Must be set to `0` to enable background services instrumentation. |
    | `SIGNALFX_ACCESS_TOKEN` | `[splunk-access-token]` | Access token. See [here](https://docs.splunk.com/Observability/admin/authentication-tokens/org-tokens.html) to learn how to obtain one. |
    | `SIGNALFX_ENDPOINT_URL` | `https://ingest.[splunk-realm].signalfx.com/v2/trace` | In the endpoint URL, `splunk-realm` is the [O11y realm](https://dev.splunk.com/observability/docs/realms_in_endpoints). For example, `us0`. |
