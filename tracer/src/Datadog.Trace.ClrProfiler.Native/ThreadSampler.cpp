@@ -151,7 +151,7 @@ private:
 * ints, shorts, and 64-bit longs are written in big-endian format; strings are written as 2-byte-length-prefixed standard windows utf-16 strings
 *
 * I would write out the "spec" for this format here, but it essentially maps to the code
-* (e.g., 0x01 is StartSample, which is followed by an int versionNumber and a long captureStartTimeInMillis)
+* (e.g., 0x01 is StartBatch, which is followed by an int versionNumber and a long captureStartTimeInMillis)
 *
 * The bulk of the data is an (unknown length) array of frame strings, which are represented as coded strings in each buffer.
 * Each used string is given a code (starting at 1) - using an old old inline trick, codes are introduced by writing the code as a
@@ -189,7 +189,7 @@ void ThreadSamplesBuffer::StartBatch()
     writeInt64((int64_t) ms.count());
 }
 
-void ThreadSamplesBuffer::StartSample(ThreadID id, ThreadState* state, ThreadSpanContext context)
+void ThreadSamplesBuffer::StartSample(ThreadID id, ThreadState* state, const ThreadSpanContext& context)
 {
     CHECK_SAMPLES_BUFFER_LENGTH();
     writeByte(THREAD_SAMPLES_START_SAMPLE);
@@ -216,7 +216,7 @@ void ThreadSamplesBuffer::EndBatch()
     CHECK_SAMPLES_BUFFER_LENGTH();
     writeByte(THREAD_SAMPLES_END_BATCH);
 }
-void ThreadSamplesBuffer::WriteFinalStats(SamplingStatistics stats)
+void ThreadSamplesBuffer::WriteFinalStats(const SamplingStatistics& stats)
 {
     CHECK_SAMPLES_BUFFER_LENGTH();
     writeByte(THREAD_SAMPLES_FINAL_STATS);
@@ -256,7 +256,7 @@ void ThreadSamplesBuffer::writeInt(int32_t val)
     buffer->push_back(((val >> 8) & 0xFF));
     buffer->push_back(val & 0xFF);
 }
-void ThreadSamplesBuffer::writeString(WSTRING& str)
+void ThreadSamplesBuffer::writeString(const WSTRING& str)
 {
     // limit strings to a max length overall; this prevents (e.g.) thread names or
     // any other miscellaneous strings that come along from blowing things out
@@ -732,11 +732,10 @@ void NameCache::put(UINT_PTR key, WSTRING* val)
 
     if (map.size() > maxSize)
     {
-        auto lru = list.end();
-        lru--;
-        delete lru->second; // FIXME consider using WSTRING directly instead of WSTRING*
+        auto lru = list.back();
+        delete lru.second; // FIXME consider using WSTRING directly instead of WSTRING*
         list.pop_back();
-        map.erase(lru->first);
+        map.erase(lru.first);
     }
 }
 
