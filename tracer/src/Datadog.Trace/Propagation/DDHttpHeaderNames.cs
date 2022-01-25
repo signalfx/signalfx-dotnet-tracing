@@ -49,5 +49,10 @@ namespace Datadog.Trace.Propagation
         /// begin with "_dd.p.*" will be propagated using this header.
         /// </summary>
         public const string DatadogTags = "x-datadog-tags";
+
+        /// <summary>
+        /// ID of a span.
+        /// </summary>
+        public const string SpanId = "x-datadog-span-id";
     }
 }

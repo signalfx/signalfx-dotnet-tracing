@@ -19,6 +19,7 @@ using System.Threading;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.HttpOverStreams;
 using Datadog.Tracer.SignalFx.Metrics.Protobuf;
+using Datadog.Trace.Util;
 using MessagePack; // use nuget MessagePack to deserialize
 
 namespace Datadog.Trace.TestHelpers
@@ -112,6 +113,12 @@ namespace Datadog.Trace.TestHelpers
                 var listener = new HttpListener();
                 listener.Prefixes.Add($"http://127.0.0.1:{port}/");
                 listener.Prefixes.Add($"http://localhost:{port}/");
+
+                var containerHostname = EnvironmentHelpers.GetEnvironmentVariable("CONTAINER_HOSTNAME");
+                if (containerHostname != null)
+                {
+                    listener.Prefixes.Add($"{containerHostname}:{port}/");
+                }
 
                 try
                 {

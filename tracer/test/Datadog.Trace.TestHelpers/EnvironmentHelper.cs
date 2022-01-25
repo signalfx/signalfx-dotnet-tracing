@@ -480,7 +480,17 @@ namespace Datadog.Trace.TestHelpers
             TransportType = TestTransports.Tcp;
         }
 
-        public MockTracerAgent GetMockAgent(bool useStatsD = false)
+        public void EnableUnixDomainSockets()
+        {
+#if NETCOREAPP
+            TransportType = TestTransports.Uds;
+#else
+            // Unsupported
+            throw new NotSupportedException("UDS is not supported in non-netcore applications");
+#endif
+        }
+
+        public MockTracerAgent GetMockAgent(bool useStatsD = false, int? fixedPort = null)
         {
             MockTracerAgent agent = null;
 
@@ -493,7 +503,7 @@ namespace Datadog.Trace.TestHelpers
             else
             {
                 // Default
-                var agentPort = TcpPortProvider.GetOpenPort();
+                var agentPort = fixedPort ?? TcpPortProvider.GetOpenPort();
                 agent = new MockTracerAgent(agentPort, useSfxMetrics: useStatsD);
             }
 #else
@@ -504,7 +514,7 @@ namespace Datadog.Trace.TestHelpers
             else
             {
                 // Default
-                var agentPort = TcpPortProvider.GetOpenPort();
+                var agentPort = fixedPort ?? TcpPortProvider.GetOpenPort();
                 agent = new MockTracerAgent(agentPort, useSfxMetrics: useStatsD);
             }
 #endif
