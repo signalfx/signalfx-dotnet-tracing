@@ -1,43 +1,55 @@
+// Modified by Splunk Inc.
+
 using System;
 using System.Threading;
 using Datadog.Trace.ClrProfiler;
+using Datadog.Trace.Configuration;
 
 namespace Datadog.Trace.ThreadSampling
 {
     /// <summary>
     ///  Provides the managed-side thread sample reader
     /// </summary>
-    public static class ThreadSampler
+    internal static class ThreadSampler
     {
+        /// <summary>
+        /// Name of the managed thread that periodically captures and exports the thread samples.
+        /// </summary>
+        public const string BackgroundThreadName = "SignalFx Profiling Sampler Thread";
+
         // If you change any of these constants, check with ThreadSampler.cpp first
         private const int BufferSize = 200 * 1024;
 
-        private static TimeSpan _threadSamplingPeriod;
+        private static ImmutableTracerSettings _tracerSettings;
 
-        private static void ReadOneSample(byte[] buf)
+        private static void ReadAndExportThreadSampleBatch(byte[] buf, ThreadSampleExporter exporter)
         {
-            var start = DateTime.UtcNow;
             int read = NativeMethods.SignalFxReadThreadSamples(buf.Length, buf);
-            if (read > 0)
+            if (read <= 0)
             {
-                var parser = new ThreadSampleNativeFormatParser(buf, read);
-                parser.Parse();
-                var end = DateTime.UtcNow;
-                Console.WriteLine("Parsed stack samples in " + ((end.Ticks - start.Ticks) / TimeSpan.TicksPerMillisecond) + " millis from " + read + " bytes");
+                // No data just return.
+                return;
             }
+
+            var parser = new ThreadSampleNativeFormatParser(buf, read);
+            var threadSamples = parser.Parse();
+
+            exporter.ExportThreadSamples(threadSamples);
         }
 
         private static void SampleReadingThread()
         {
-            byte[] buf = new byte[BufferSize];
+            var buf = new byte[BufferSize];
+            var exporter = new ThreadSampleExporter(_tracerSettings);
+
             while (true)
             {
-                Thread.Sleep(_threadSamplingPeriod);
+                Thread.Sleep(_tracerSettings.ThreadSamplingPeriod);
                 try
                 {
                     // Call twice in quick succession to catch up any blips; the second will likely return 0 (no buffer)
-                    ReadOneSample(buf);
-                    ReadOneSample(buf);
+                    ReadAndExportThreadSampleBatch(buf, exporter);
+                    ReadAndExportThreadSampleBatch(buf, exporter);
                 }
                 catch (Exception e)
                 {
@@ -48,15 +60,16 @@ namespace Datadog.Trace.ThreadSampling
         }
 
         /// <summary>
-        ///  Initializes the managed-side thread sample reader
+        ///  Initializes the managed-side thread sample reader.
         /// </summary>
-        /// <param name="threadSamplingPeriod">Thread sampling period</param>
-        public static void Initialize(TimeSpan threadSamplingPeriod)
+        /// <param name="tracerSettings">Configuration settings.</param>
+        public static void Initialize(ImmutableTracerSettings tracerSettings)
         {
-            _threadSamplingPeriod = threadSamplingPeriod;
+            _tracerSettings = tracerSettings;
 
             var thread = new Thread(SampleReadingThread)
             {
+                Name = BackgroundThreadName,
                 IsBackground = true
             };
             thread.Start();

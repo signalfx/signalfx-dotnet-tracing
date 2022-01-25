@@ -1,7 +1,11 @@
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using Datadog.Trace.Logging;
+using Datadog.Trace.Vendors.Serilog.Events;
 
 namespace Datadog.Trace.ThreadSampling
 {
@@ -10,7 +14,7 @@ namespace Datadog.Trace.ThreadSampling
     /// </summary>
     internal class ThreadSampleNativeFormatParser
     {
-        private static bool printStackTraces = false;
+        private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<ThreadSampleNativeFormatParser>();
 
         private readonly byte[] buf;
         private readonly int len;
@@ -37,6 +41,7 @@ namespace Datadog.Trace.ThreadSampling
         {
             uint batchThreadIndex = 0;
             var samples = new List<ThreadSample>();
+            ulong batchTimestampNanos = 0;
 
             // FIXME actually have this go somewhere in the future
             while (pos < len)
@@ -52,8 +57,17 @@ namespace Datadog.Trace.ThreadSampling
                     }
 
                     long sampleStartMillis = ReadInt64();
-                    var sampleStart = new DateTime((sampleStartMillis * TimeSpan.TicksPerMillisecond) + TimeConstants.UnixEpochInTicks).ToLocalTime();
-                    Console.WriteLine("thread samples captured at " + sampleStart.ToLongDateString() + " " + sampleStart.ToLongTimeString());
+                    batchTimestampNanos = (ulong)sampleStartMillis * 1_000_000u;
+
+                    if (Log.IsEnabled(LogEventLevel.Debug))
+                    {
+                        var sampleStart = new DateTime(
+                            (sampleStartMillis * TimeSpan.TicksPerMillisecond) + TimeConstants.UnixEpochInTicks).ToLocalTime();
+                        Log.Debug(
+                            "Parsing thread samples captured at {date} {time}",
+                            sampleStart.ToLongDateString(),
+                            sampleStart.ToLongTimeString());
+                    }
                 }
                 else if (op == OpCodes.StartSample)
                 {
@@ -73,10 +87,13 @@ namespace Datadog.Trace.ThreadSampling
                         continue;
                     }
 
-                    var threadSample = new ThreadSample();
-                    threadSample.TraceIdHigh = traceIdHigh;
-                    threadSample.TraceIdLow = traceIdLow;
-                    threadSample.SpanId = spanId;
+                    var threadSample = new ThreadSample
+                    {
+                        Timestamp = batchTimestampNanos,
+                        TraceIdHigh = traceIdHigh,
+                        TraceIdLow = traceIdLow,
+                        SpanId = spanId,
+                    };
 
                     // The stack follows the experimental GDI conventions described at
                     // https://github.com/signalfx/gdi-specification/blob/29cbcbc969531d50ccfd0b6a4198bb8a89cedebb/specification/semantic_conventions.md#logrecord-message-fields
@@ -115,13 +132,14 @@ namespace Datadog.Trace.ThreadSampling
                         code = ReadShort();
                     }
 
+                    if (threadName == ThreadSampler.BackgroundThreadName)
+                    {
+                        // TODO: add configuration option to include the sampler thread. By default remove it.
+                        continue;
+                    }
+
                     threadSample.StackTrace = stackTraceBuilder.ToString();
                     samples.Add(threadSample);
-
-                    if (printStackTraces)
-                    {
-                        Console.WriteLine(threadSample.StackTrace);
-                    }
                 }
                 else if (op == OpCodes.EndBatch)
                 {
@@ -132,9 +150,14 @@ namespace Datadog.Trace.ThreadSampling
                     int microsSuspended = ReadInt();
                     int numThreads = ReadInt();
                     int totalFrames = ReadInt();
-                    int nameCacheMisses = ReadInt();
+                    int numCacheMisses = ReadInt();
 
-                    Console.WriteLine("  clr was suspended for " + microsSuspended + " micros threads=" + numThreads + " frames=" + totalFrames + " misses=" + nameCacheMisses);
+                    if (Log.IsEnabled(LogEventLevel.Debug))
+                    {
+                        Log.Debug(
+                        "CLR was suspended for {microsSuspended} microseconds to collect a thread sample batch: threads={numThreads} frames={totalFrames} misses={numCacheMisses}",
+                        new object[] { microsSuspended, numThreads, totalFrames, numCacheMisses });
+                    }
                 }
                 else
                 {
