@@ -269,7 +269,7 @@ jobs:
           --target builder \
           --file "./tracer/build/_build/docker/${{ matrix.base-image }}.dockerfile" \
           "./tracer/build/_build"
-    - name: Managed tests in Docker container
+    - name: Native tests in Docker container
       run: |
         docker run --rm \
           --mount type=bind,source="${GITHUB_WORKSPACE}",target=/project \
