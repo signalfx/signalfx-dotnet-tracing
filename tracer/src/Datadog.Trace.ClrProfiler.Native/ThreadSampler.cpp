@@ -18,7 +18,7 @@
 // If you change this, consider ThreadSampler.cs too
 #define SAMPLES_BUFFER_MAXIMUM_SIZE (200 * 1024)
 
-#define SAMPLES_BUFFER_DEFAULT_SIZE 20 * 1024
+#define SAMPLES_BUFFER_DEFAULT_SIZE (20 * 1024)
 
 // If you change these, change ThreadSampler.cs too
 #define DEFAULT_SAMPLE_PERIOD 10000
@@ -151,7 +151,7 @@ private:
 * ints, shorts, and 64-bit longs are written in big-endian format; strings are written as 2-byte-length-prefixed standard windows utf-16 strings
 *
 * I would write out the "spec" for this format here, but it essentially maps to the code
-* (e.g., 0x01 is StartSample, which is followed by an int versionNumber and a long captureStartTimeInMillis)
+* (e.g., 0x01 is StartBatch, which is followed by an int versionNumber and a long captureStartTimeInMillis)
 *
 * The bulk of the data is an (unknown length) array of frame strings, which are represented as coded strings in each buffer.
 * Each used string is given a code (starting at 1) - using an old old inline trick, codes are introduced by writing the code as a
@@ -189,7 +189,7 @@ void ThreadSamplesBuffer::StartBatch()
     writeInt64((int64_t) ms.count());
 }
 
-void ThreadSamplesBuffer::StartSample(ThreadID id, ThreadState* state, ThreadSpanContext context)
+void ThreadSamplesBuffer::StartSample(ThreadID id, ThreadState* state, const ThreadSpanContext& context)
 {
     CHECK_SAMPLES_BUFFER_LENGTH();
     writeByte(THREAD_SAMPLES_START_SAMPLE);
@@ -216,7 +216,7 @@ void ThreadSamplesBuffer::EndBatch()
     CHECK_SAMPLES_BUFFER_LENGTH();
     writeByte(THREAD_SAMPLES_END_BATCH);
 }
-void ThreadSamplesBuffer::WriteFinalStats(SamplingStatistics stats)
+void ThreadSamplesBuffer::WriteFinalStats(const SamplingStatistics& stats)
 {
     CHECK_SAMPLES_BUFFER_LENGTH();
     writeByte(THREAD_SAMPLES_FINAL_STATS);
@@ -256,7 +256,7 @@ void ThreadSamplesBuffer::writeInt(int32_t val)
     buffer->push_back(((val >> 8) & 0xFF));
     buffer->push_back(val & 0xFF);
 }
-void ThreadSamplesBuffer::writeString(WSTRING& str)
+void ThreadSamplesBuffer::writeString(const WSTRING& str)
 {
     // limit strings to a max length overall; this prevents (e.g.) thread names or
     // any other miscellaneous strings that come along from blowing things out
@@ -329,7 +329,7 @@ private:
         ClassID parentClassID;
         HRESULT hr = S_OK;
 
-        if (classId == NULL)
+        if (classId == 0)
         {
             Logger::Debug("NULL classId passed to GetClassName");
             result.append(WStr("Unknown"));
@@ -386,15 +386,15 @@ private:
 
     void GetFunctionName(FunctionID funcID, const COR_PRF_FRAME_INFO frameInfo, WSTRING& result)
     {
-        if (funcID == NULL)
+        if (funcID == 0)
         {
             result.append(WStr("Unknown_Native_Function"));
             return;
         }
 
-        ClassID classId = NULL;
-        ModuleID moduleId = NULL;
-        mdToken token = NULL;
+        ClassID classId = 0;
+        ModuleID moduleId = 0;
+        mdToken token = 0;
 
         HRESULT hr = info10->GetFunctionInfo2(funcID, frameInfo, &classId, &moduleId, &token, 0, NULL, NULL);
         if (FAILED(hr))
@@ -732,11 +732,10 @@ void NameCache::put(UINT_PTR key, WSTRING* val)
 
     if (map.size() > maxSize)
     {
-        auto lru = list.end();
-        lru--;
-        delete lru->second; // FIXME consider using WSTRING directly instead of WSTRING*
+        auto &lru = list.back();
+        delete lru.second; // FIXME consider using WSTRING directly instead of WSTRING*
         list.pop_back();
-        map.erase(lru->first);
+        map.erase(lru.first);
     }
 }
 
@@ -744,11 +743,11 @@ void NameCache::put(UINT_PTR key, WSTRING* val)
 
 extern "C"
 {
-    __declspec(dllexport) int32_t SignalFxReadThreadSamples(int32_t len, unsigned char* buf)
+    EXPORTTHIS int32_t SignalFxReadThreadSamples(int32_t len, unsigned char* buf)
     {
         return ThreadSampling_ConsumeOneThreadSample(len, buf);
     }
-    __declspec(dllexport) void SignalFxSetNativeContext(uint64_t traceIdHigh, uint64_t traceIdLow, uint64_t spanId,
+    EXPORTTHIS void SignalFxSetNativeContext(uint64_t traceIdHigh, uint64_t traceIdLow, uint64_t spanId,
                                                         int32_t managedThreadId)
     {
         ThreadID threadId;

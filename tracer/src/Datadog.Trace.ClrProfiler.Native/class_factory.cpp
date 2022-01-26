@@ -53,7 +53,7 @@ HRESULT STDMETHODCALLTYPE ClassFactory::CreateInstance(IUnknown* pUnkOuter, REFI
         return CLASS_E_NOAGGREGATION;
     }
 
-    trace::Logger::Info("Datadog CLR Profiler ", PROFILER_VERSION, " on",
+    trace::Logger::Info("SignalFx CLR Profiler ", PROFILER_VERSION, " on",
 
 #ifdef _WIN32
                 " Windows"
