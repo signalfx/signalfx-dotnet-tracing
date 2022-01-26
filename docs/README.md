@@ -34,7 +34,7 @@ and [`ActivitySource`](https://docs.microsoft.com/en-us/dotnet/core/diagnostics/
 
 ## Requirements
 
-- .NET Core 3.1, .NET 5.0 and higher on Windows and Linux (except Alpine Linux)
+- .NET Core 3.1, .NET 5.0 and higher on Windows and Linux
 - .NET Framework 4.6.1 and higher on Windows
 
 ## Instrumented libraries and frameworks
@@ -60,7 +60,7 @@ page.
 | `x86.msi`     | Windows 32-bit | x86 | `msiexec /i signalfx-dotnet-tracing-x86.msi /quiet` | |
 | `tar.gz` | Linux distributions using [qlibc](https://wiki.musl-libc.org/projects-using-musl.html) | x64 | `tar -xf signalfx-dotnet-tracing.tar.gz -C /opt/signalfx` | Currently, all [officially supported Linux distribtions](https://docs.microsoft.com/dotnet/core/install/linux) except Alpine use glibc |
 | `amd64.deb`   | Debian-based Linux distributions | x64 | `dpkg -i signalfx-dotnet-tracing.deb` | DEB package |
-<!-- TODO: | `musl.tar.gz` | x64 Linux distributions using [musl](https://wiki.musl-libc.org/projects-using-musl.html) | x64 | `tar -xf signalfx-dotnet-tracing-musl.tar.gz -C /` | Alpine Linux uses musl | -->
+| `musl.tar.gz` | x64 Linux distributions using [musl](https://wiki.musl-libc.org/projects-using-musl.html) | x64 | `tar -xf signalfx-dotnet-tracing-musl.tar.gz -C /opt/signalfx` | Alpine Linux uses musl |
 
 On Linux, after the installation, you can optionally create the log directory:
 

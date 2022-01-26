@@ -19,6 +19,8 @@ namespace Datadog.Trace
 
         IPropagator Propagator { get; }
 
-        ISpan StartSpan(string operationName, ISpanContext parent, string serviceName, DateTimeOffset? startTime, bool ignoreActiveScope);
+        IScopeManager ScopeManager { get; }
+
+        Span StartSpan(string operationName, ISpanContext parent, string serviceName, DateTimeOffset? startTime, bool ignoreActiveScope);
     }
 }

@@ -173,6 +173,8 @@ SET_SOURCE_FILES_PROPERTIES(
 if(ISLINUX)
     SET (CMAKE_C_COMPILER   /usr/bin/clang)
     SET (CMAKE_CXX_COMPILER /usr/bin/clang++)
+    SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
+    SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
 endif()
 
 # Sets compiler options
