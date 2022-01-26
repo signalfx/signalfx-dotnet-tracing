@@ -329,7 +329,7 @@ private:
         ClassID parentClassID;
         HRESULT hr = S_OK;
 
-        if (classId == NULL)
+        if (classId == 0)
         {
             Logger::Debug("NULL classId passed to GetClassName");
             result.append(WStr("Unknown"));
@@ -386,15 +386,15 @@ private:
 
     void GetFunctionName(FunctionID funcID, const COR_PRF_FRAME_INFO frameInfo, WSTRING& result)
     {
-        if (funcID == NULL)
+        if (funcID == 0)
         {
             result.append(WStr("Unknown_Native_Function"));
             return;
         }
 
-        ClassID classId = NULL;
-        ModuleID moduleId = NULL;
-        mdToken token = NULL;
+        ClassID classId = 0;
+        ModuleID moduleId = 0;
+        mdToken token = 0;
 
         HRESULT hr = info10->GetFunctionInfo2(funcID, frameInfo, &classId, &moduleId, &token, 0, NULL, NULL);
         if (FAILED(hr))
@@ -743,11 +743,11 @@ void NameCache::put(UINT_PTR key, WSTRING* val)
 
 extern "C"
 {
-    __declspec(dllexport) int32_t SignalFxReadThreadSamples(int32_t len, unsigned char* buf)
+    EXPORTTHIS int32_t SignalFxReadThreadSamples(int32_t len, unsigned char* buf)
     {
         return ThreadSampling_ConsumeOneThreadSample(len, buf);
     }
-    __declspec(dllexport) void SignalFxSetNativeContext(uint64_t traceIdHigh, uint64_t traceIdLow, uint64_t spanId,
+    EXPORTTHIS void SignalFxSetNativeContext(uint64_t traceIdHigh, uint64_t traceIdLow, uint64_t spanId,
                                                         int32_t managedThreadId)
     {
         ThreadID threadId;
