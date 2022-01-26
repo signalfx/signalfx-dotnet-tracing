@@ -9,10 +9,17 @@
 
 #define UNKNOWN_MANAGED_THREADID -1
 
+#ifdef _WIN32
+#define EXPORTTHIS __declspec(dllexport)
+#else
+#define EXPORTTHIS __attribute__((visibility("default")))
+#endif
+
+
 extern "C"
 {
-    __declspec(dllexport) int32_t SignalFxReadThreadSamples(int32_t len, unsigned char* buf);
-    __declspec(dllexport) void SignalFxSetNativeContext(uint64_t traceIdHigh, uint64_t traceIdLow, uint64_t spanId, int32_t managedThreadId);
+    EXPORTTHIS int32_t SignalFxReadThreadSamples(int32_t len, unsigned char* buf);
+    EXPORTTHIS void SignalFxSetNativeContext(uint64_t traceIdHigh, uint64_t traceIdLow, uint64_t spanId, int32_t managedThreadId);
 }
 
 namespace trace
