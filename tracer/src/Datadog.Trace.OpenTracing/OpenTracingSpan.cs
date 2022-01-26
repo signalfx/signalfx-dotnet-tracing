@@ -13,7 +13,7 @@ namespace Datadog.Trace.OpenTracing
 {
     internal class OpenTracingSpan : global::OpenTracing.ISpan
     {
-        internal OpenTracingSpan(ISpan span)
+        internal OpenTracingSpan(Span span)
         {
             Span = span;
             Context = new OpenTracingSpanContext(span.Context);
@@ -23,7 +23,7 @@ namespace Datadog.Trace.OpenTracing
 
         global::OpenTracing.ISpanContext global::OpenTracing.ISpan.Context => Context;
 
-        internal ISpan Span { get; }
+        internal Span Span { get; }
 
         // TODO lucas: inline this in a separate commit, it will modify a lot of files
         // This is only exposed for tests
