@@ -734,8 +734,8 @@ void NameCache::put(UINT_PTR key, WSTRING* val)
     {
         auto &lru = list.back();
         delete lru.second; // FIXME consider using WSTRING directly instead of WSTRING*
-        list.pop_back();
         map.erase(lru.first);
+        list.pop_back();
     }
 }
 
