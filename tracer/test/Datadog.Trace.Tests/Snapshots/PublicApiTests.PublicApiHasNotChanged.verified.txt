@@ -285,6 +285,8 @@ namespace Datadog.Trace
     {
         public SpanContext(Datadog.Trace.TraceId? traceId, ulong spanId, string traceState) { }
         public SpanContext(Datadog.Trace.TraceId? traceId, ulong spanId, Datadog.Trace.SamplingPriority? samplingPriority = default, string serviceName = null) { }
+        public static readonly Datadog.Trace.ISpanContext None;
+        public SpanContext(ulong? traceId, ulong spanId, Datadog.Trace.SamplingPriority? samplingPriority = default, string serviceName = null) { }
         public Datadog.Trace.ISpanContext Parent { get; }
         public ulong? ParentId { get; }
         public string ServiceName { get; set; }
