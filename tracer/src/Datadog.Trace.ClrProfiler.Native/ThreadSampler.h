@@ -98,17 +98,17 @@ public:
     ThreadSamplesBuffer(std::vector<unsigned char>* buf);
     ~ThreadSamplesBuffer();
     void StartBatch();
-    void StartSample(ThreadID id, ThreadState* state, ThreadSpanContext spanContext);
+    void StartSample(ThreadID id, ThreadState* state, const ThreadSpanContext& spanContext);
     void RecordFrame(FunctionID fid, WSTRING& frame);
     void EndSample();
     void EndBatch();
-    void WriteFinalStats(SamplingStatistics stats);
+    void WriteFinalStats(const SamplingStatistics& stats);
 
 private:
     void writeCodedFrameString(FunctionID fid, WSTRING& str);
     void writeShort(int16_t val);
     void writeInt(int32_t val);
-    void writeString(WSTRING& str);
+    void writeString(const WSTRING& str);
     void writeByte(unsigned char b);
     void writeInt64(int64_t val);
 };
@@ -133,4 +133,4 @@ private:
 bool ThreadSampling_ShouldProduceThreadSample();
 void ThreadSampling_RecordProducedThreadSample(std::vector<unsigned char>* buf);
 // Can return 0 if none are pending
-int ThreadSampling_ConsumeOneThreadSample(int len, unsigned char* buf);
+int32_t ThreadSampling_ConsumeOneThreadSample(int32_t len, unsigned char* buf);
