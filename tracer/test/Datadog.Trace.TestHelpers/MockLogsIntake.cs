@@ -221,13 +221,13 @@ namespace Datadog.Trace.TestHelpers
                 set => Service = value;
             }
 
-            [JsonProperty("dd.trace_id")]
+            [JsonProperty("trace_id")]
             private string TraceId1
             {
                 set => TraceId = value;
             }
 
-            [JsonProperty("dd.span_id")]
+            [JsonProperty("span_id")]
             private string SpanId1
             {
                 set => SpanId = value;
