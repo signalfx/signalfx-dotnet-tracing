@@ -13,6 +13,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using Datadog.Trace.Configuration;
+using OpenTelemetry.TestHelpers;
 using Xunit.Abstractions;
 
 namespace Datadog.Trace.TestHelpers
@@ -466,6 +467,16 @@ namespace Datadog.Trace.TestHelpers
             }
 
             return agent;
+        }
+
+        public MockOtelLogsCollector GetMockOtelLogsCollector()
+        {
+            var logsCollectorPort = TcpPortProvider.GetOpenPort();
+            var logsCollector = new MockOtelLogsCollector(logsCollectorPort);
+
+            _output.WriteLine($"Assigned port {logsCollector.Port} for the logsCollectorPort.");
+
+            return logsCollector;
         }
     }
 }
