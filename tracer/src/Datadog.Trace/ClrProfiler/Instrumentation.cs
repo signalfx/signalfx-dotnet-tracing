@@ -219,7 +219,7 @@ namespace Datadog.Trace.ClrProfiler
                 try
                 {
                     Log.Debug("Initializing thread sampling.");
-                    ThreadSampling.ThreadSampler.Initialize(TracerManager.Instance.Settings.ThreadSamplingPeriod);
+                    ThreadSampling.ThreadSampler.Initialize(TracerManager.Instance.Settings);
                     Log.Information("Thread sampling initialized.");
                 }
                 catch (Exception e)
