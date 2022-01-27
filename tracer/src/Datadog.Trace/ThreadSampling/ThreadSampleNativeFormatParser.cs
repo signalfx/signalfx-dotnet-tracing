@@ -15,6 +15,7 @@ namespace Datadog.Trace.ThreadSampling
     internal class ThreadSampleNativeFormatParser
     {
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<ThreadSampleNativeFormatParser>();
+        private static readonly bool IsLogLevelDebugEnabled = Log.IsEnabled(LogEventLevel.Debug);
 
         private readonly byte[] buf;
         private readonly int len;
@@ -59,7 +60,7 @@ namespace Datadog.Trace.ThreadSampling
                     long sampleStartMillis = ReadInt64();
                     batchTimestampNanos = (ulong)sampleStartMillis * 1_000_000u;
 
-                    if (Log.IsEnabled(LogEventLevel.Debug))
+                    if (IsLogLevelDebugEnabled)
                     {
                         var sampleStart = new DateTime(
                             (sampleStartMillis * TimeSpan.TicksPerMillisecond) + TimeConstants.UnixEpochInTicks).ToLocalTime();
@@ -152,7 +153,7 @@ namespace Datadog.Trace.ThreadSampling
                     int totalFrames = ReadInt();
                     int numCacheMisses = ReadInt();
 
-                    if (Log.IsEnabled(LogEventLevel.Debug))
+                    if (IsLogLevelDebugEnabled)
                     {
                         Log.Debug(
                         "CLR was suspended for {microsSuspended} microseconds to collect a thread sample batch: threads={numThreads} frames={totalFrames} misses={numCacheMisses}",

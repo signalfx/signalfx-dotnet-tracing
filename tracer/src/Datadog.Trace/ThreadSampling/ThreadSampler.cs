@@ -4,6 +4,7 @@ using System;
 using System.Threading;
 using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.Configuration;
+using Datadog.Trace.Logging;
 
 namespace Datadog.Trace.ThreadSampling
 {
@@ -19,6 +20,8 @@ namespace Datadog.Trace.ThreadSampling
 
         // If you change any of these constants, check with ThreadSampler.cpp first
         private const int BufferSize = 200 * 1024;
+
+        private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(ThreadSampleExporter));
 
         private static ImmutableTracerSettings _tracerSettings;
 
@@ -51,10 +54,9 @@ namespace Datadog.Trace.ThreadSampling
                     ReadAndExportThreadSampleBatch(buf, exporter);
                     ReadAndExportThreadSampleBatch(buf, exporter);
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    // FIXME logging
-                    Console.WriteLine("could not read samples: " + e);
+                    Log.Error(ex, "Error processing thread samples batch.");
                 }
             }
         }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Net;
 using Datadog.Trace.Configuration;
+using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Propagation;
 using Datadog.Tracer.OpenTelemetry.Proto.Common.V1;
@@ -48,6 +49,7 @@ namespace Datadog.Trace.ThreadSampling
 
             for (int i = 0; i < threadSamples.Count; i++)
             {
+                var threadSample = threadSamples[i];
                 var logRecord = new LogRecord
                 {
                     Attributes =
@@ -55,9 +57,16 @@ namespace Datadog.Trace.ThreadSampling
                         _fixedLogRecordAttributes[0],
                         _fixedLogRecordAttributes[1],
                     },
-                    Body = new AnyValue { StringValue = threadSamples[i].StackTrace },
-                    TimeUnixNano = threadSamples[i].Timestamp,
+                    Body = new AnyValue { StringValue = threadSample.StackTrace },
+                    TimeUnixNano = threadSample.Timestamp,
                 };
+
+                if (threadSample.SpanId != 0 || threadSample.TraceIdHigh != 0 || threadSample.TraceIdLow != 0)
+                {
+                    // TODO: Add tests and validate.
+                    logRecord.SpanId = BitConverter.GetBytes(threadSample.SpanId);
+                    logRecord.TraceId = BitConverter.GetBytes(threadSample.TraceIdHigh).Concat(BitConverter.GetBytes(threadSample.TraceIdLow));
+                }
 
                 logRecords.Add(logRecord);
             }
@@ -67,20 +76,32 @@ namespace Datadog.Trace.ThreadSampling
 
         internal void SendLogsData()
         {
-            var httpWebRequest = WebRequest.CreateHttp(_logsEndpointUrl);
-            httpWebRequest.ContentType = "application/x-protobuf";
-            httpWebRequest.Method = "POST";
-            httpWebRequest.Headers.Add(CommonHttpHeaderNames.TracingEnabled, "false");
+            HttpWebRequest httpWebRequest;
 
-            using (var stream = httpWebRequest.GetRequestStream())
+            try
             {
-                Vendors.ProtoBuf.Serializer.Serialize(stream, _logsData);
-                stream.Flush();
-            }
+                httpWebRequest = WebRequest.CreateHttp(_logsEndpointUrl);
+                httpWebRequest.ContentType = "application/x-protobuf";
+                httpWebRequest.Method = "POST";
+                httpWebRequest.Headers.Add(CommonHttpHeaderNames.TracingEnabled, "false");
 
-            // The exporter reuses the _logsData object, but the actual log records are not
-            // needed after serialization, release the log records so they can be garbage collected.
-            _logsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs.Clear();
+                using (var stream = httpWebRequest.GetRequestStream())
+                {
+                    Vendors.ProtoBuf.Serializer.Serialize(stream, _logsData);
+                    stream.Flush();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Exception preparing request to send thread samples to {0}: {1}", _logsEndpointUrl, ex);
+                return;
+            }
+            finally
+            {
+                // The exporter reuses the _logsData object, but the actual log records are not
+                // needed after serialization, release the log records so they can be garbage collected.
+                _logsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs.Clear();
+            }
 
             try
             {
