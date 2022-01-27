@@ -18,7 +18,7 @@ namespace Datadog.Trace.ThreadSampling
         /// </summary>
         public const string BackgroundThreadName = "SignalFx Profiling Sampler Thread";
 
-        // If you change any of these constants, check with ThreadSampler.cpp first
+        // If you change any of these constants, check with thread_sampler.cpp first
         private const int BufferSize = 200 * 1024;
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(ThreadSampleExporter));
