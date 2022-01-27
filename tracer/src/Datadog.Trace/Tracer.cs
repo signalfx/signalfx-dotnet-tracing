@@ -215,6 +215,11 @@ namespace Datadog.Trace
         /// </summary>
         IPropagator IDatadogOpenTracingTracer.Propagator => TracerManager.Propagator;
 
+        /// <summary>
+        /// Gets the <see cref="IScopeManager"/> instance used by this <see cref="IDatadogTracer"/> instance.
+        /// </summary>
+        IScopeManager IDatadogOpenTracingTracer.ScopeManager => TracerManager.ScopeManager;
+
         internal TracerManager TracerManager => _tracerManager ?? TracerManager.Instance;
 
         /// <summary>
@@ -294,7 +299,7 @@ namespace Datadog.Trace
         /// <param name="startTime">An explicit start time for that span</param>
         /// <param name="ignoreActiveScope">If set the span will not be a child of the currently active span</param>
         /// <returns>The newly created span</returns>
-        ISpan IDatadogOpenTracingTracer.StartSpan(string operationName, ISpanContext parent, string serviceName, DateTimeOffset? startTime, bool ignoreActiveScope)
+        Span IDatadogOpenTracingTracer.StartSpan(string operationName, ISpanContext parent, string serviceName, DateTimeOffset? startTime, bool ignoreActiveScope)
         {
             return StartSpan(operationName, parent, serviceName, startTime, ignoreActiveScope);
         }

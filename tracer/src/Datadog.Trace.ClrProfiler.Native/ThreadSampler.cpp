@@ -18,7 +18,7 @@
 // If you change this, consider ThreadSampler.cs too
 #define SAMPLES_BUFFER_MAXIMUM_SIZE (200 * 1024)
 
-#define SAMPLES_BUFFER_DEFAULT_SIZE 20 * 1024
+#define SAMPLES_BUFFER_DEFAULT_SIZE (20 * 1024)
 
 // If you change these, change ThreadSampler.cs too
 #define DEFAULT_SAMPLE_PERIOD 10000
@@ -41,7 +41,7 @@ static std::vector<unsigned char>* bufferB;
 static std::mutex threadSpanContextLock;
 static std::unordered_map<ThreadID, trace::ThreadSpanContext> threadSpanContextMap;
 
-static ICorProfilerInfo* profilerInfo; // FIXME should really refactor and have a single static instance of ThreadSampler
+static ICorProfilerInfo* profilerInfo; // After feature sets settle down, perhaps this should be refactored and have a single static instance of ThreadSampler
 
 // Dirt-simple backpressure system to save overhead if managed code is not reading fast enough
 bool ThreadSampling_ShouldProduceThreadSample()
@@ -57,12 +57,18 @@ void ThreadSampling_RecordProducedThreadSample(std::vector<unsigned char>* buf)
     } else if (bufferB == NULL) {
         bufferB = buf;
     } else {
+        trace::Logger::Warn("Unexpected buffer drop in ThreadSampling_RecordProducedThreadSample");
         delete buf; // needs to be dropped now
     }
 }
 // Can return 0 if none are pending
-int ThreadSampling_ConsumeOneThreadSample(int len, unsigned char* buf)
+int32_t ThreadSampling_ConsumeOneThreadSample(int32_t len, unsigned char* buf)
 {
+    if (len <= 0 || buf == NULL)
+    {
+        trace::Logger::Warn("Unexpected 0/null buffer to ThreadSampling_ConsumeOneThreadSample");
+        return 0;
+    }
     std::vector<unsigned char>* toUse = NULL;
     {
         std::lock_guard<std::mutex> guard(bufferLock);
@@ -81,10 +87,10 @@ int ThreadSampling_ConsumeOneThreadSample(int len, unsigned char* buf)
     {
         return 0;
     }
-    int toUseLen = (int) std::min(toUse->size(), (size_t) len);
+    size_t toUseLen = (int) std::min(toUse->size(), (size_t) len);
     memcpy(buf, toUse->data(), toUseLen);
     delete toUse;
-    return toUseLen;
+    return (int32_t) toUseLen;
 }
 
 namespace trace
@@ -123,7 +129,6 @@ public:
 
     MetaInterface** operator&()
     {
-        // _ASSERT(m_ptr == NULL);
         return &m_ptr;
     }
 
@@ -146,13 +151,15 @@ private:
 * ints, shorts, and 64-bit longs are written in big-endian format; strings are written as 2-byte-length-prefixed standard windows utf-16 strings
 *
 * I would write out the "spec" for this format here, but it essentially maps to the code
-* (e.g., 0x01 is StartSample, which is followed by an int versionNumber and a long captureStartTimeInMillis)
+* (e.g., 0x01 is StartBatch, which is followed by an int versionNumber and a long captureStartTimeInMillis)
 *
 * The bulk of the data is an (unknown length) array of frame strings, which are represented as coded strings in each buffer.
 * Each used string is given a code (starting at 1) - using an old old inline trick, codes are introduced by writing the code as a
 * negative number followed by the definition of the string (length-prefixed) that maps to that code.  Later uses of the code
 * simply use the 2-byte (positive) code, meaning frequently used strings will take only 2 bytes apiece.  0 is reserved for "end of list"
 * since the number of frames is not known up-front.
+* 
+* Each buffer can be parsed/decoded independently; the codes and the LRU NameCache are not related.
 */
 
 // defined opcodes
@@ -161,12 +168,14 @@ private:
 #define THREAD_SAMPLES_END_BATCH    0x06
 #define THREAD_SAMPLES_FINAL_STATS  0x07
 
+#define CURRENT_THREADSAMPLES_BUFFER_VERSION 1
+
 ThreadSamplesBuffer::ThreadSamplesBuffer(std::vector<unsigned char>* buf) : buffer(buf)
 {
 }
 ThreadSamplesBuffer ::~ThreadSamplesBuffer()
 {
-    buffer = NULL; // specifically don't delete as ownership/lifecycle is complicated
+    buffer = NULL; // specifically don't delete as this is done by RecordProduced/ConsumeOneThreadSample
 }
 
 #define CHECK_SAMPLES_BUFFER_LENGTH() {  if (buffer->size() >= SAMPLES_BUFFER_MAXIMUM_SIZE) { return; } }
@@ -174,13 +183,13 @@ void ThreadSamplesBuffer::StartBatch()
 {
     CHECK_SAMPLES_BUFFER_LENGTH();
     writeByte(THREAD_SAMPLES_START_BATCH);
-    writeInt(1); // version number
+    writeInt(CURRENT_THREADSAMPLES_BUFFER_VERSION);
     std::chrono::milliseconds ms =
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
     writeInt64((int64_t) ms.count());
 }
 
-void ThreadSamplesBuffer::StartSample(ThreadID id, ThreadState* state, ThreadSpanContext context)
+void ThreadSamplesBuffer::StartSample(ThreadID id, ThreadState* state, const ThreadSpanContext& context)
 {
     CHECK_SAMPLES_BUFFER_LENGTH();
     writeByte(THREAD_SAMPLES_START_SAMPLE);
@@ -207,7 +216,7 @@ void ThreadSamplesBuffer::EndBatch()
     CHECK_SAMPLES_BUFFER_LENGTH();
     writeByte(THREAD_SAMPLES_END_BATCH);
 }
-void ThreadSamplesBuffer::WriteFinalStats(SamplingStatistics stats)
+void ThreadSamplesBuffer::WriteFinalStats(const SamplingStatistics& stats)
 {
     CHECK_SAMPLES_BUFFER_LENGTH();
     writeByte(THREAD_SAMPLES_FINAL_STATS);
@@ -247,7 +256,7 @@ void ThreadSamplesBuffer::writeInt(int32_t val)
     buffer->push_back(((val >> 8) & 0xFF));
     buffer->push_back(val & 0xFF);
 }
-void ThreadSamplesBuffer::writeString(WSTRING& str)
+void ThreadSamplesBuffer::writeString(const WSTRING& str)
 {
     // limit strings to a max length overall; this prevents (e.g.) thread names or
     // any other miscellaneous strings that come along from blowing things out
@@ -255,6 +264,7 @@ void ThreadSamplesBuffer::writeString(WSTRING& str)
     writeShort(usedLen);
     // odd bit of casting since we're copying bytes, not wchars
     unsigned char* strBegin = (unsigned char*)(&str.c_str()[0]);
+    // possible endian-ness assumption here; unclear how the managed layer would decode on big endian platforms
     buffer->insert(buffer->end(), strBegin, strBegin + usedLen * 2);
 }
 void ThreadSamplesBuffer::writeByte(unsigned char b)
@@ -319,7 +329,7 @@ private:
         ClassID parentClassID;
         HRESULT hr = S_OK;
 
-        if (classId == NULL)
+        if (classId == 0)
         {
             Logger::Debug("NULL classId passed to GetClassName");
             result.append(WStr("Unknown"));
@@ -341,7 +351,7 @@ private:
         }
         else if (CORPROF_E_DATAINCOMPLETE == hr)
         {
-            // type-loading is not yet complete. Cannot do anything about it.
+            Logger::Warn("Type loading is not yet complete; cannot decode ClassID");
             result.append(WStr("DataIncomplete"));
             return;
         }
@@ -376,20 +386,22 @@ private:
 
     void GetFunctionName(FunctionID funcID, const COR_PRF_FRAME_INFO frameInfo, WSTRING& result)
     {
-        if (funcID == NULL)
+        if (funcID == 0)
         {
             result.append(WStr("Unknown_Native_Function"));
             return;
         }
 
-        ClassID classId = NULL;
-        ModuleID moduleId = NULL;
-        mdToken token = NULL;
+        ClassID classId = 0;
+        ModuleID moduleId = 0;
+        mdToken token = 0;
 
         HRESULT hr = info10->GetFunctionInfo2(funcID, frameInfo, &classId, &moduleId, &token, 0, NULL, NULL);
         if (FAILED(hr))
         {
             Logger::Debug("GetFunctionInfo2 failed: ", hr);
+            result.append(WStr("Unknown"));
+            return;
         }
 
         COMPtrHolder<IMetaDataImport> pIMDImport;
@@ -397,6 +409,8 @@ private:
         if (FAILED(hr))
         {
             Logger::Debug("GetModuleMetaData failed: ", hr);
+            result.append(WStr("Unknown"));
+            return;
         }
 
         WCHAR funcName[MAX_FUNC_NAME_LEN];
@@ -405,6 +419,8 @@ private:
         if (FAILED(hr))
         {
             Logger::Debug("GetMethodProps failed: ", hr);
+            result.append(WStr("Unknown"));
+            return;
         }
 
         // If the ClassID returned from GetFunctionInfo is 0, then the function
@@ -422,7 +438,7 @@ private:
 
         result.append(funcName);
 
-        // FIXME What about method signature to differentiate overloaded methods?
+        // Future feature: capture method signature to differentiate overloaded methods
     }
 
 public:
@@ -532,6 +548,7 @@ int GetSamplingPeriod()
 
 void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, SamplingHelper & helper)
 {
+    // These locks are in use by managed threads; Acquire locks before suspending the runtime to prevent deadlock
     std::lock_guard<std::mutex> threadStateGuard(ts->threadStateLock);
     std::lock_guard<std::mutex> spanContextGuard(threadSpanContextLock);
 
@@ -563,6 +580,10 @@ void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, Sa
     // I don't have any proof but I sure hope that if suspending fails then it's still ok to ask to resume, with no
     // ill effects
     hr = info10->ResumeRuntime();
+    if (FAILED(hr))
+    {
+        Logger::Error("Could not resume runtime? : ", hr);
+    }
 
 #ifdef _WIN32
     QueryPerformanceCounter(&end);
@@ -583,8 +604,6 @@ void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, Sa
     elapsedMicros = elapsed.tv_sec * 1000000 + elapsed.tv_nsec/1000;
 #endif
     helper.stats.microsSuspended = elapsedMicros;
-    printf("Resuming runtime micros=%i threads=%i frames=%i misses=%i\n", helper.stats.microsSuspended, 
-        helper.stats.numThreads, helper.stats.totalFrames, helper.stats.nameCacheMisses);
     helper.curWriter->WriteFinalStats(helper.stats);
 
     helper.PublishBuffer();
@@ -605,6 +624,8 @@ DWORD WINAPI SamplingThreadMain(_In_ LPVOID param)
     ICorProfilerInfo10* info10 = ts->info10;
     SamplingHelper helper;
     helper.info10 = info10;
+
+    info10->InitializeCurrentThread();
 
     while (1)
     {
@@ -711,11 +732,10 @@ void NameCache::put(UINT_PTR key, WSTRING* val)
 
     if (map.size() > maxSize)
     {
-        auto lru = list.end();
-        lru--;
-        delete lru->second; // FIXME consider using WSTRING directly instead of WSTRING*
+        auto &lru = list.back();
+        delete lru.second; // FIXME consider using WSTRING directly instead of WSTRING*
+        map.erase(lru.first);
         list.pop_back();
-        map.erase(lru->first);
     }
 }
 
@@ -723,11 +743,11 @@ void NameCache::put(UINT_PTR key, WSTRING* val)
 
 extern "C"
 {
-    __declspec(dllexport) int SignalFxReadThreadSamples(int len, unsigned char* buf)
+    EXPORTTHIS int32_t SignalFxReadThreadSamples(int32_t len, unsigned char* buf)
     {
         return ThreadSampling_ConsumeOneThreadSample(len, buf);
     }
-    __declspec(dllexport) void SignalFxSetNativeContext(uint64_t traceIdHigh, uint64_t traceIdLow, uint64_t spanId,
+    EXPORTTHIS void SignalFxSetNativeContext(uint64_t traceIdHigh, uint64_t traceIdLow, uint64_t spanId,
                                                         int32_t managedThreadId)
     {
         ThreadID threadId;

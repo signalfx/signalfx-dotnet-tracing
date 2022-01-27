@@ -111,6 +111,49 @@ jobs:
         path: ${{ env.artifacts }}/nuget/SignalFx.NET.Tracing.Azure.Site.Extension.*.nupkg
         name: nuget-packages
 
+  container-build:
+    name: Container Build 
+    strategy:
+      fail-fast: false
+      matrix:
+        base-image: [ alpine ]
+    runs-on: ubuntu-20.04
+    timeout-minutes: 60
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: | 
+          2.1.x
+          3.1.x
+          5.0.x
+          6.0.x
+    - name: Build Docker image
+      run: |
+        docker build \
+          --build-arg DOTNETSDK_VERSION=${dotnetSdkVersion} \
+          --tag dd-trace-dotnet/${{ matrix.base-image }}-builder \
+          --target builder \
+          --file "./tracer/build/_build/docker/${{ matrix.base-image }}.dockerfile" \
+          "./tracer/build/_build"
+    - name: Build in Docker container
+      run: |
+        docker run --rm \
+          --mount type=bind,source="${GITHUB_WORKSPACE}",target=/project \
+          --env NugetPackageDirectory=/project/$(relativeNugetPackageDirectory) \
+          --env tracerHome=/project/${relativeTracerHome} \
+          --env artifacts=/project/${relativeArtifacts} \
+          --env SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN} \
+          dd-trace-dotnet/${{ matrix.base-image }}-builder \
+          dotnet /build/bin/Debug/_build.dll BuildTracerHome ZipTracerHome
+    - name: Publish Linux x64-musl packages
+      uses: actions/upload-artifact@v2
+      with:
+        path: ${{ env.artifacts }}/linux-x64
+        name: linux-x64-musl-packages
+      if: (${{ job.status }} != 'cancelled')
+      continue-on-error: true
+
   managed-unit-tests:
     name: Managed unit tests
     strategy:
@@ -136,6 +179,49 @@ jobs:
       if: (${{ job.status }} != 'cancelled')
       continue-on-error: true
 
+  container-managed-unit-tests:
+    name: Container Managed unit tests 
+    strategy:
+      fail-fast: false
+      matrix:
+        base-image: [ alpine ]
+    runs-on: ubuntu-20.04
+    timeout-minutes: 60
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: | 
+          2.1.x
+          3.1.x
+          5.0.x
+          6.0.x
+    - name: Build Docker image
+      run: |
+        docker build \
+          --build-arg DOTNETSDK_VERSION=${dotnetSdkVersion} \
+          --tag dd-trace-dotnet/${{ matrix.base-image }}-tester \
+          --target tester \
+          --file "./tracer/build/_build/docker/${{ matrix.base-image }}.dockerfile" \
+          "./tracer/build/_build"
+    - name: Managed tests in Docker container
+      run: |
+        docker run --rm \
+          --mount type=bind,source="${GITHUB_WORKSPACE}",target=/project \
+          --env NugetPackageDirectory=/project/$(relativeNugetPackageDirectory) \
+          --env tracerHome=/project/${relativeTracerHome} \
+          --env artifacts=/project/${relativeArtifacts} \
+          --env SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN} \
+          dd-trace-dotnet/${{ matrix.base-image }}-tester \
+          dotnet /build/bin/Debug/_build.dll BuildTracerHome BuildAndRunManagedUnitTests
+    - name: Publish managed tests results
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.base-image }}-managed-unit-tests-build_data
+        path: tracer/build_data
+      if: (${{ job.status }} != 'cancelled')
+      continue-on-error: true
+
   native-unit-tests:
     name: Native unit tests
     strategy:
@@ -157,6 +243,49 @@ jobs:
       if: ${{ runner.os == 'Linux' }}
       run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh -o cmakeinstall.sh && chmod +x cmakeinstall.sh && sudo ./cmakeinstall.sh --prefix=/usr/local --exclude-subdir
     - run: ./tracer/build.cmd BuildTracerHome BuildAndRunNativeUnitTests
+
+  container-native-unit-tests:
+    name: Container Native unit tests
+    strategy:
+      fail-fast: false
+      matrix:
+        base-image: [ alpine ]
+    runs-on: ubuntu-20.04
+    timeout-minutes: 60
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: | 
+          2.1.x
+          3.1.x
+          5.0.x
+          6.0.x
+    - name: Build Docker image
+      run: |
+        docker build \
+          --build-arg DOTNETSDK_VERSION=${dotnetSdkVersion} \
+          --tag dd-trace-dotnet/${{ matrix.base-image }}-builder \
+          --target builder \
+          --file "./tracer/build/_build/docker/${{ matrix.base-image }}.dockerfile" \
+          "./tracer/build/_build"
+    - name: Native tests in Docker container
+      run: |
+        docker run --rm \
+          --mount type=bind,source="${GITHUB_WORKSPACE}",target=/project \
+          --env NugetPackageDirectory=/project/$(relativeNugetPackageDirectory) \
+          --env tracerHome=/project/${relativeTracerHome} \
+          --env artifacts=/project/${relativeArtifacts} \
+          --env SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN} \
+          dd-trace-dotnet/${{ matrix.base-image }}-builder \
+          dotnet /build/bin/Debug/_build.dll BuildTracerHome BuildAndRunNativeUnitTests
+    - name: Publish native tests results
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.base-image }}-native-unit-tests-build_data
+        path: tracer/build_data
+      if: (${{ job.status }} != 'cancelled')
+      continue-on-error: true
 
   integration-tests:
     name: Integration tests 
@@ -203,8 +332,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        #TODO: base-image: [ debian, alpine ]
-        base-image: [ debian ]
+        base-image: [ debian, alpine ]
         framework: [ netcoreapp3.1, net5.0, net6.0 ]
     runs-on: ubuntu-20.04
     timeout-minutes: 60

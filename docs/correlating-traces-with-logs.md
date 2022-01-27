@@ -20,14 +20,15 @@ Supported loggers:
 - Serilog
 - ILogger (Microsoft.Extensions.Logging)
 
+(Find samples [here](https://github.com/signalfx/signalfx-dotnet-tracing/tree/main/tracer/samples/AutomaticTraceIdInjection))
+
 ## Supported Loggers
 
 These are the supported logging frameworks.
 
 ### Log4Net
 
-- Versions ≥ 1.2.11 (.NET Framework)
-- Versions ≥ 2.0.12 (.NET core)
+- Versions: 1.0.0 ≤ 2.*.*
 
 Available layouts:
 
@@ -36,8 +37,7 @@ Available layouts:
 
 ### NLog
 
-- Versions ≥ 1.0.0.505 (.NET Framework)
-- Versions ≥ 4.5.11 (.NET Core)
+- Versions: 1.0.0.505 ≤ 4.*.*
 
 Available layouts:
 
@@ -46,8 +46,7 @@ Available layouts:
 
 ### Serilog
 
-- Versions ≥ 2.0.0 (.NET Framework)
-- Versions ≥ 2.0.0 (.NET Core)
+- Versions: 1.4.0 ≤ 2.*.*
 
 Available layouts:
 
@@ -64,6 +63,15 @@ Configure rules for:
 - `service_name` => `service.name`
 - `service_version` => `service.version`
 - `deployment_environment` => `deployment.environment`
+
+### ILogger (Microsoft.Extensions.Logging.Abstractions)
+
+- Versions: 2.0.0 ≤ 6.*.*
+
+Available layouts:
+
+- JSON format: `json` (from the NetEscapades.Extensions.Logging)
+
 
 ## Fields injected into log context
 

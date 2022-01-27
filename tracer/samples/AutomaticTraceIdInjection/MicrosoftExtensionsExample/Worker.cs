@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Datadog.Trace;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using OpenTracing.Util;
 
 public class Worker : BackgroundService
 {
@@ -16,21 +16,25 @@ public class Worker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        while(!stoppingToken.IsCancellationRequested)
+        // Obtain the automatically registered OpenTracing.Util.GlobalTracer instance
+        var tracer = GlobalTracer.Instance;
+
+        while (!stoppingToken.IsCancellationRequested)
         {
             using (_logger.BeginScope(new Dictionary<string, object>{{"order-number", 1024}}))
             {
                 _logger.LogInformation("Message before a trace.");
 
-                using (Tracer.Instance.StartActive("Microsoft.Extensions.Example - Worker.ExecuteAsync()"))
+                using (tracer.BuildSpan("Microsoft.Extensions.Example - Worker.ExecuteAsync()").StartActive(finishSpanOnDispose: true))
                 {
                     _logger.LogInformation("Message during a trace.");
 
-                    using (Tracer.Instance.StartActive("Microsoft.Extensions.Example - Nested span"))
+                    using (tracer.BuildSpan("Microsoft.Extensions.Example - Nested span").StartActive(finishSpanOnDispose: true))
                     {
                         _logger.LogInformation("Message during a child span.");
                     }
                 }
+
                 _logger.LogInformation("Message after a trace.");
             }
 
