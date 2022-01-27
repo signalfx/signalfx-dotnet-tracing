@@ -193,6 +193,7 @@ namespace Datadog.Trace.TestHelpers
             int agentPort,
             int aspNetCorePort,
             int? statsdPort,
+            int? logsCollectorPort,
             StringDictionary environmentVariables,
             string processToProfile = null,
             bool enableSecurity = false,
@@ -234,6 +235,11 @@ namespace Datadog.Trace.TestHelpers
             if (statsdPort != null)
             {
                 environmentVariables["SIGNALFX_DOGSTATSD_PORT"] = statsdPort.Value.ToString();
+            }
+
+            if (logsCollectorPort.HasValue)
+            {
+                environmentVariables["SIGNALFX_LOGS_ENDPOINT_URL"] = $"http://127.0.0.1:{logsCollectorPort.Value}/";
             }
 
             if (enableSecurity)
