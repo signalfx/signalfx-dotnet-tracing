@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -48,11 +50,12 @@ namespace Datadog.Trace.TestHelpers
                 settings.UseParameters(parameters);
             }
 
+            VerifierSettings.MemberConverter<MockSpan, Dictionary<string, string>>(x => x.Tags, ScrubStackTraceForErrors);
+
             settings.ModifySerialization(_ =>
             {
                 _.IgnoreMember<MockSpan>(s => s.Duration);
                 _.IgnoreMember<MockSpan>(s => s.Start);
-                _.MemberConverter<MockSpan, Dictionary<string, string>>(x => x.Tags, ScrubStackTraceForErrors);
             });
 
             settings.AddScrubber(builder => ReplaceRegex(builder, LocalhostRegex, "localhost:00000"));

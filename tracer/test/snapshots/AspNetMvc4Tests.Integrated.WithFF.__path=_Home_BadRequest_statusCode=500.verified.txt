@@ -19,7 +19,7 @@
       runtime-id: Guid_1,
       sfx.error.kind: System.Exception,
       sfx.error.message: Oops, it broke.,
-      sfx.error.stack: 
+      sfx.error.stack:
 System.Exception: Oops, it broke.
 at Samples.AspNetMvc4.Controllers.HomeController.BadRequest(),
       signalfx.tracing.library: dotnet-tracing,
@@ -28,9 +28,9 @@ at Samples.AspNetMvc4.Controllers.HomeController.BadRequest(),
       version: 1.0.0
     },
     Metrics: {
-      _sampling_priority_v1: 1.0,
+      _dd.top_level: 1.0,
       _dd.tracer_kr: 1.0,
-      _dd.top_level: 1.0
+      _sampling_priority_v1: 1.0
     }
   },
   {
@@ -56,7 +56,7 @@ at Samples.AspNetMvc4.Controllers.HomeController.BadRequest(),
       net.peer.ip: ::1,
       sfx.error.kind: System.Exception,
       sfx.error.message: Oops, it broke.,
-      sfx.error.stack: 
+      sfx.error.stack:
 System.Exception: Oops, it broke.
 at Samples.AspNetMvc4.Controllers.HomeController.BadRequest(),
       span.kind: server,
