@@ -18,10 +18,10 @@
       net.peer.ip: ::1,
       runtime-id: Guid_1,
       sfx.error.kind: System.ArgumentException,
-      sfx.error.message: 
+      sfx.error.message:
 The parameters dictionary contains a null entry for parameter 'id' of non-nullable type 'System.Int32' for method 'System.Web.Mvc.ActionResult Get(Int32)' in 'Samples.AspNetMvc5.Controllers.HomeController'. An optional parameter must be a reference type, a nullable type, or be declared as an optional parameter.
 Parameter name: parameters,
-      sfx.error.stack: 
+      sfx.error.stack:
 System.ArgumentException: The parameters dictionary contains a null entry for parameter 'id' of non-nullable type 'System.Int32' for method 'System.Web.Mvc.ActionResult Get(Int32)' in 'Samples.AspNetMvc5.Controllers.HomeController'. An optional parameter must be a reference type, a nullable type, or be declared as an optional parameter.
 Parameter name: parameters
 at System.Web.Mvc.ActionDescriptor.ExtractParameterFromDictionary(ParameterInfo parameterInfo, IDictionary`2 parameters, MethodInfo methodInfo),
@@ -58,10 +58,10 @@ at System.Web.Mvc.ActionDescriptor.ExtractParameterFromDictionary(ParameterInfo 
       language: dotnet,
       net.peer.ip: ::1,
       sfx.error.kind: System.ArgumentException,
-      sfx.error.message: 
+      sfx.error.message:
 The parameters dictionary contains a null entry for parameter 'id' of non-nullable type 'System.Int32' for method 'System.Web.Mvc.ActionResult Get(Int32)' in 'Samples.AspNetMvc5.Controllers.HomeController'. An optional parameter must be a reference type, a nullable type, or be declared as an optional parameter.
 Parameter name: parameters,
-      sfx.error.stack: 
+      sfx.error.stack:
 System.ArgumentException: The parameters dictionary contains a null entry for parameter 'id' of non-nullable type 'System.Int32' for method 'System.Web.Mvc.ActionResult Get(Int32)' in 'Samples.AspNetMvc5.Controllers.HomeController'. An optional parameter must be a reference type, a nullable type, or be declared as an optional parameter.
 Parameter name: parameters
 at System.Web.Mvc.ActionDescriptor.ExtractParameterFromDictionary(ParameterInfo parameterInfo, IDictionary`2 parameters, MethodInfo methodInfo),

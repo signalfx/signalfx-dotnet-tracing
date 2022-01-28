@@ -32,7 +32,7 @@
       runtime-id: Guid_1,
       sfx.error.kind: System.ArgumentException,
       sfx.error.message: Source: PassThroughQuerySuccessMessageHandler. Error: Query param ps was set to a non-true value,
-      sfx.error.stack: 
+      sfx.error.stack:
 System.ArgumentException: Source: PassThroughQuerySuccessMessageHandler. Error: Query param ps was set to a non-true value
 at Samples.AspNetMvc5.Handlers.PassThroughQuerySuccessMessageHandler.<SendAsync>d__1.MoveNext(),
       signalfx.tracing.library: dotnet-tracing,
