@@ -19,7 +19,7 @@
       runtime-id: Guid_1,
       sfx.error.kind: System.ArgumentException,
       sfx.error.message: Passed in value was not 'true': false,
-      sfx.error.stack: 
+      sfx.error.stack:
 System.ArgumentException: Passed in value was not 'true': false
 at Samples.AspNetMvc5.Controllers.ApiController.TransientFailure(String value),
       signalfx.tracing.library: dotnet-tracing,
@@ -28,9 +28,9 @@ at Samples.AspNetMvc5.Controllers.ApiController.TransientFailure(String value),
       version: 1.0.0
     },
     Metrics: {
-      _sampling_priority_v1: 1.0,
+      _dd.top_level: 1.0,
       _dd.tracer_kr: 1.0,
-      _dd.top_level: 1.0
+      _sampling_priority_v1: 1.0
     }
   },
   {
@@ -48,9 +48,9 @@ at Samples.AspNetMvc5.Controllers.ApiController.TransientFailure(String value),
       version: 1.0.0
     },
     Metrics: {
-      _sampling_priority_v1: 1.0,
+      _dd.top_level: 1.0,
       _dd.tracer_kr: 1.0,
-      _dd.top_level: 1.0
+      _sampling_priority_v1: 1.0
     }
   }
 ]
