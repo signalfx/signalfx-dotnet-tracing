@@ -23,8 +23,8 @@
     }
   },
   {
-    TraceId: Id_1,
-    SpanId: Id_3,
+    TraceId: Id_10,
+    SpanId: Id_12,
     Name: GET /health/index,
     LogicScope: aspnet.request,
     Resource: GET /health/index,
@@ -40,7 +40,7 @@
       net.peer.ip: ::1,
       runtime-id: Guid_1,
       signalfx.tracing.library: dotnet-tracing,
-      signalfx.tracing.version: 0.2.0.0,
+      signalfx.tracing.version: x.y.z,
       span.kind: server
     },
     Metrics: {
@@ -50,7 +50,7 @@
     }
   },
   {
-    TraceId: Id_4,
+    TraceId: Id_13,
     SpanId: Id_14,
     Name: GET /health/index,
     LogicScope: aspnet-mvc.request,
@@ -90,7 +90,7 @@
       net.peer.ip: ::1,
       runtime-id: Guid_1,
       signalfx.tracing.library: dotnet-tracing,
-      signalfx.tracing.version: 0.2.0.0,
+      signalfx.tracing.version: x.y.z,
       span.kind: server
     },
     Metrics: {
