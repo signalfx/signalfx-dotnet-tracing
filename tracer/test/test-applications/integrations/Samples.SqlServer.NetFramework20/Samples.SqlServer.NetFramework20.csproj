@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <!-- override to only build/run net461 -->
-    <TargetFramework Condition="'$(OS)' == 'Windows_NT'">net461</TargetFramework>
-    <TargetFramework Condition="'$(OS)' != 'Windows_NT'">netcoreapp3.1</TargetFramework>
+    <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net461</TargetFrameworks>
+    <TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">netcoreapp3.1</TargetFrameworks>
 
     <!-- Required to build multiple projects with the same Configuration|Platform -->
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
