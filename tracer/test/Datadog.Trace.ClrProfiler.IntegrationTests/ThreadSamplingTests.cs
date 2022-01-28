@@ -26,17 +26,14 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetEnvironmentVariable("SIGNALFX_THREAD_SAMPLING_ENABLED", "true");
             SetEnvironmentVariable("SIGNALFX_THREAD_SAMPLING_PERIOD", "1000");
 
-            // TODO: Start OTel collector, and capture stakcs sent to it, verify the actual stacks.
-            // While that is not done use verbose log directed to the stdout.
-            SetEnvironmentVariable("SIGNALFX_TRACE_DEBUG", "true");
-            SetEnvironmentVariable("SIGNALFX_STDOUT_LOG_ENABLED", "true");
-
             using (var agent = EnvironmentHelper.GetMockAgent())
-            using (var processResult = RunSampleAndWaitForExit(agent.Port))
+            using (var logsCollector = EnvironmentHelper.GetMockOtelLogsCollector())
+            using (var processResult = RunSampleAndWaitForExit(agent.Port, logCollectorPort: logsCollector.Port))
             {
+                var logsData = logsCollector.LogsData.ToArray();
                 // The application works for 5 seconds with debug logging enabled we expect at least 2 attempts of thread sampling in CI.
                 // On a dev box it is typical to get at least 3 but the CI machines seem slower, using 2 until the test is improved.
-                processResult.StandardOutput.Should().Contain("thread samples captured at", AtLeast.Times(expected: 2));
+                logsData.Length.Should().BeGreaterOrEqualTo(expected: 2);
             }
         }
     }
