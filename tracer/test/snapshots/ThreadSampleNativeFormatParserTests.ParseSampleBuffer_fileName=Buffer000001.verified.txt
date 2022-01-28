@@ -1,7 +1,7 @@
 ﻿[
   {
     Timestamp: 1642466715691000000,
-    StackTrace: 
+    StackTrace:
 "" #0 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0x1 nid=0x4c38
 
 	at System.Threading.ManualResetEventSlim.Wait(unknown)
@@ -15,7 +15,7 @@
   },
   {
     Timestamp: 1642466715691000000,
-    StackTrace: 
+    StackTrace:
 "" #3 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0x4 nid=0x247c
 
 	at System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction(unknown)
@@ -32,7 +32,7 @@
   },
   {
     Timestamp: 1642466715691000000,
-    StackTrace: 
+    StackTrace:
 "" #5 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0x6 nid=0x4ddc
 
 	at System.Diagnostics.Tracing.EventPipeEventDispatcher.DispatchEventsToEventListeners(unknown)
@@ -50,7 +50,7 @@
   },
   {
     Timestamp: 1642466715691000000,
-    StackTrace: 
+    StackTrace:
 "" #8 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0x9 nid=0x55c4
 
 	at Datadog.Trace.ThreadSampling.ThreadSampler.SampleReadingThread(unknown)

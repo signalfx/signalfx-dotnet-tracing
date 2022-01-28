@@ -1,7 +1,7 @@
 ﻿[
   {
     Timestamp: 1642466727710000000,
-    StackTrace: 
+    StackTrace:
 "" #0 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x1244
 
 	at System.Threading.WaitHandle.WaitOneNoCheck(unknown)
@@ -19,7 +19,7 @@
   },
   {
     Timestamp: 1642466727710000000,
-    StackTrace: 
+    StackTrace:
 ".NET ThreadPool Worker" #3 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0x4 nid=0x5370
 
 	at Kernel32.GetQueuedCompletionStatus(unknown)
@@ -32,7 +32,7 @@
   },
   {
     Timestamp: 1642466727710000000,
-    StackTrace: 
+    StackTrace:
 ".NET ThreadPool Gate" #4 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x317c
 
 	at System.Threading.WaitHandle.WaitOneNoCheck(unknown)
@@ -43,7 +43,7 @@
   },
   {
     Timestamp: 1642466727710000000,
-    StackTrace: 
+    StackTrace:
 ".NET ThreadPool Worker" #5 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0x6 nid=0x94c
 
 	at Kernel32.GetQueuedCompletionStatus(unknown)
@@ -56,7 +56,7 @@
   },
   {
     Timestamp: 1642466727710000000,
-    StackTrace: 
+    StackTrace:
 ".NET Long Running Task" #7 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x84b8
 
 	at System.Threading.WaitHandle.WaitOneNoCheck(unknown)
@@ -73,7 +73,7 @@
   },
   {
     Timestamp: 1642466727710000000,
-    StackTrace: 
+    StackTrace:
 ".NET ThreadPool Worker" #8 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0x9 nid=0x75e8
 
 	at Kernel32.GetQueuedCompletionStatus(unknown)
@@ -86,7 +86,7 @@
   },
   {
     Timestamp: 1642466727710000000,
-    StackTrace: 
+    StackTrace:
 ".NET ThreadPool Worker" #9 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x5ebc
 
 	at Kernel32.GetQueuedCompletionStatus(unknown)
@@ -99,7 +99,7 @@
   },
   {
     Timestamp: 1642466727710000000,
-    StackTrace: 
+    StackTrace:
 "" #10 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x63c8
 
 	at System.Threading.Thread.Sleep(unknown)
@@ -110,7 +110,7 @@
   },
   {
     Timestamp: 1642466727710000000,
-    StackTrace: 
+    StackTrace:
 ".NET Long Running Task" #12 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xd nid=0x60a8
 
 	at System.Threading.WaitHandle.WaitOneNoCheck(unknown)
@@ -128,7 +128,7 @@
   },
   {
     Timestamp: 1642466727710000000,
-    StackTrace: 
+    StackTrace:
 ".NET Long Running Task" #13 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0xb68
 
 	at System.Threading.WaitHandle.WaitOneNoCheck(unknown)
@@ -146,7 +146,7 @@
   },
   {
     Timestamp: 1642466727710000000,
-    StackTrace: 
+    StackTrace:
 ".NET Long Running Task" #14 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xf nid=0x808
 
 	at System.Threading.WaitHandle.WaitOneNoCheck(unknown)
@@ -164,7 +164,7 @@
   },
   {
     Timestamp: 1642466727710000000,
-    StackTrace: 
+    StackTrace:
 ".NET Long Running Task" #15 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x272c
 
 	at System.Threading.WaitHandle.WaitOneNoCheck(unknown)
@@ -182,7 +182,7 @@
   },
   {
     Timestamp: 1642466727710000000,
-    StackTrace: 
+    StackTrace:
 ".NET ThreadPool Worker" #16 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x6f08
 
 	at Kernel32.GetQueuedCompletionStatus(unknown)
@@ -195,7 +195,7 @@
   },
   {
     Timestamp: 1642466727710000000,
-    StackTrace: 
+    StackTrace:
 ".NET ThreadPool Worker" #17 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x4914
 
 	at Kernel32.GetQueuedCompletionStatus(unknown)
@@ -208,7 +208,7 @@
   },
   {
     Timestamp: 1642466727710000000,
-    StackTrace: 
+    StackTrace:
 "In-proc Node (Default)" #18 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x7dbc
 
 	at System.Threading.WaitHandle.WaitMultiple(unknown)
@@ -222,7 +222,7 @@
   },
   {
     Timestamp: 1642466727710000000,
-    StackTrace: 
+    StackTrace:
 "RequestBuilder thread" #19 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x1f2c
 
 	at System.Threading.Monitor.Wait(unknown)
@@ -239,7 +239,7 @@
   },
   {
     Timestamp: 1642466727710000000,
-    StackTrace: 
+    StackTrace:
 ".NET ThreadPool Wait" #20 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x5398
 
 	at System.Threading.WaitHandle.WaitAnyMultiple(unknown)
@@ -250,7 +250,7 @@
   },
   {
     Timestamp: 1642466727710000000,
-    StackTrace: 
+    StackTrace:
 "RequestBuilder thread" #21 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x19fc
 
 	at System.Threading.Monitor.Wait(unknown)
@@ -267,7 +267,7 @@
   },
   {
     Timestamp: 1642466727710000000,
-    StackTrace: 
+    StackTrace:
 ".NET ThreadPool Worker" #22 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x4008
 
 	at Kernel32.GetQueuedCompletionStatus(unknown)
@@ -280,7 +280,7 @@
   },
   {
     Timestamp: 1642466727710000000,
-    StackTrace: 
+    StackTrace:
 ".NET ThreadPool Worker" #23 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x105c
 
 	at Kernel32.GetQueuedCompletionStatus(unknown)
@@ -293,7 +293,7 @@
   },
   {
     Timestamp: 1642466727710000000,
-    StackTrace: 
+    StackTrace:
 "RequestBuilder thread" #24 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x79b8
 
 	at System.Threading.Monitor.Wait(unknown)
@@ -310,7 +310,7 @@
   },
   {
     Timestamp: 1642466727710000000,
-    StackTrace: 
+    StackTrace:
 "In-proc Node (Default)" #25 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x67c4
 
 	at System.Threading.WaitHandle.WaitMultiple(unknown)
