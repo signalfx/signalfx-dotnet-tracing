@@ -108,17 +108,6 @@ namespace Datadog.Trace.Security.IntegrationTests
             agent.SpanFilters.Add(s => s.Tags.ContainsKey("http.url") && s.Tags["http.url"].IndexOf("Health", StringComparison.InvariantCultureIgnoreCase) > 0);
             var spans = agent.WaitForSpans(expectedSpans, minDateTime: minDateTime);
             Assert.Equal(expectedSpans, spans.Count);
-            settings.ModifySerialization(serializationSettings => serializationSettings.MemberConverter<MockSpan, Dictionary<string, string>>(sp => sp.Tags, (target, value) =>
-            {
-                if (target.Tags.TryGetValue(Tags.AppSecJson, out var appsecJson))
-                {
-                    var appSecJsonObj = JsonConvert.DeserializeObject<AppSecJson>(appsecJson);
-                    var orderedAppSecJson = JsonConvert.SerializeObject(appSecJsonObj, _jsonSerializerSettingsOrderProperty);
-                    target.Tags[Tags.AppSecJson] = orderedAppSecJson;
-                }
-
-                return target.Tags;
-            }));
 
             // Overriding the type name here as we have multiple test classes in the file
             // Ensures that we get nice file nesting in Solution Explorer
