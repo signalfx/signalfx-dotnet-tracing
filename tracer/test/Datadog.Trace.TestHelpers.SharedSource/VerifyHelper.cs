@@ -19,6 +19,10 @@ namespace Datadog.Trace.TestHelpers
     {
         private static readonly Regex LocalhostRegex = new(@"localhost\:\d+", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private static readonly Regex KeepRateRegex = new(@"_dd.tracer_kr: \d\.\d+", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex TimeUnixNanoRegex = new(@"TimeUnixNano: \d+", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex VersionRegex = new(@"StringValue: \d\.\d\.\d\.\d", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex NidRegex = new(@"nid=0x\S{4}", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex TidRegex = new(@"tid=0x\S+ ", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         /// <summary>
         /// With <see cref="Verify"/>, parameters are used as part of the filename.
@@ -39,11 +43,7 @@ namespace Datadog.Trace.TestHelpers
         {
             var settings = new VerifySettings();
 
-            VerifierSettings.DerivePathInfo(
-                (sourceFile, projectDirectory, type, method) =>
-                {
-                    return new(directory: Path.Combine(projectDirectory, "..", "snapshots"));
-                });
+            DerivePathInfoForSnapshotFiles();
 
             if (parameters.Length > 0)
             {
@@ -62,6 +62,31 @@ namespace Datadog.Trace.TestHelpers
             settings.AddScrubber(builder => ReplaceRegex(builder, KeepRateRegex, "_dd.tracer_kr: 1.0"));
 
             return settings;
+        }
+
+        public static VerifySettings GetThreadSamplingVerifierSettings()
+        {
+            var settings = new VerifySettings();
+
+            DerivePathInfoForSnapshotFiles();
+
+            settings.DisableRequireUniquePrefix();
+
+            settings.AddScrubber(builder => ReplaceRegex(builder, TimeUnixNanoRegex, "TimeUnixNano: FakeTimeUnixNano"));
+            settings.AddScrubber(builder => ReplaceRegex(builder, VersionRegex, "StringValue: w.x.y.z"));
+            settings.AddScrubber(builder => ReplaceRegex(builder, TidRegex, "tid=0xaaaaaa "));
+            settings.AddScrubber(builder => ReplaceRegex(builder, NidRegex, "nid=0x0000"));
+
+            return settings;
+        }
+
+        private static void DerivePathInfoForSnapshotFiles()
+        {
+            VerifierSettings.DerivePathInfo(
+                (sourceFile, projectDirectory, type, method) =>
+                {
+                    return new(directory: Path.Combine(projectDirectory, "..", "snapshots"));
+                });
         }
 
         private static void ReplaceRegex(StringBuilder builder, Regex regex, string replacement)
