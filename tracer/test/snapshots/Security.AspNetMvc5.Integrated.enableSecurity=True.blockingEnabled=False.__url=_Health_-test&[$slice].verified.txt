@@ -19,7 +19,8 @@
       http.url: http://localhost:00000/Health/?test&[$slice],
       language: dotnet,
       net.peer.ip: ::1,
-      span.kind: server
+      span.kind: server,
+      _dd.origin: appsec
     }
   },
   {
@@ -79,7 +80,8 @@
       http.url: http://localhost:00000/Health/?test&[$slice],
       language: dotnet,
       net.peer.ip: ::1,
-      span.kind: server
+      span.kind: server,
+      _dd.origin: appsec
     }
   },
   {
@@ -139,7 +141,8 @@
       http.url: http://localhost:00000/Health/?test&[$slice],
       language: dotnet,
       net.peer.ip: ::1,
-      span.kind: server
+      span.kind: server,
+      _dd.origin: appsec
     }
   },
   {
@@ -199,7 +202,8 @@
       http.url: http://localhost:00000/Health/?test&[$slice],
       language: dotnet,
       net.peer.ip: ::1,
-      span.kind: server
+      span.kind: server,
+      _dd.origin: appsec
     }
   },
   {
@@ -259,7 +263,8 @@
       http.url: http://localhost:00000/Health/?test&[$slice],
       language: dotnet,
       net.peer.ip: ::1,
-      span.kind: server
+      span.kind: server,
+      _dd.origin: appsec
     }
   },
   {

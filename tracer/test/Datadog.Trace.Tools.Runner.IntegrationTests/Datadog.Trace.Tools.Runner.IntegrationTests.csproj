@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Verify.Xunit" Version="14.13.1" />
+    <PackageReference Include="Verify.Xunit" Version="15.1.1" />
   </ItemGroup>
 
 </Project>
