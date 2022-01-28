@@ -16,7 +16,7 @@
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
-      http.url: http://localhost:00000/Health/?arg=[$slice],
+      http.url: http://localhost:00000/Health/?test&[$slice],
       language: dotnet,
       net.peer.ip: ::1,
       span.kind: server
@@ -35,12 +35,12 @@
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
-      http.url: http://localhost:00000/Health/?arg=[$slice],
+      http.url: http://localhost:00000/Health/?test&[$slice],
       language: dotnet,
       net.peer.ip: ::1,
       runtime-id: Guid_1,
       signalfx.tracing.library: dotnet-tracing,
-      signalfx.tracing.version: x.y.z,
+      signalfx.tracing.version: 0.2.0.0,
       span.kind: server
     },
     Metrics: {
@@ -66,7 +66,7 @@
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
-      http.url: http://localhost:00000/Health/?arg=[$slice],
+      http.url: http://localhost:00000/Health/?test&[$slice],
       language: dotnet,
       net.peer.ip: ::1,
       span.kind: server
@@ -85,12 +85,12 @@
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
-      http.url: http://localhost:00000/Health/?arg=[$slice],
+      http.url: http://localhost:00000/Health/?test&[$slice],
       language: dotnet,
       net.peer.ip: ::1,
       runtime-id: Guid_1,
       signalfx.tracing.library: dotnet-tracing,
-      signalfx.tracing.version: x.y.z,
+      signalfx.tracing.version: 0.2.0.0,
       span.kind: server
     },
     Metrics: {
@@ -116,7 +116,7 @@
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
-      http.url: http://localhost:00000/Health/?arg=[$slice],
+      http.url: http://localhost:00000/Health/?test&[$slice],
       language: dotnet,
       net.peer.ip: ::1,
       span.kind: server
@@ -135,12 +135,12 @@
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
-      http.url: http://localhost:00000/Health/?arg=[$slice],
+      http.url: http://localhost:00000/Health/?test&[$slice],
       language: dotnet,
       net.peer.ip: ::1,
       runtime-id: Guid_1,
       signalfx.tracing.library: dotnet-tracing,
-      signalfx.tracing.version: x.y.z,
+      signalfx.tracing.version: 0.2.0.0,
       span.kind: server
     },
     Metrics: {
@@ -166,7 +166,7 @@
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
-      http.url: http://localhost:00000/Health/?arg=[$slice],
+      http.url: http://localhost:00000/Health/?test&[$slice],
       language: dotnet,
       net.peer.ip: ::1,
       span.kind: server
@@ -185,12 +185,12 @@
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
-      http.url: http://localhost:00000/Health/?arg=[$slice],
+      http.url: http://localhost:00000/Health/?test&[$slice],
       language: dotnet,
       net.peer.ip: ::1,
       runtime-id: Guid_1,
       signalfx.tracing.library: dotnet-tracing,
-      signalfx.tracing.version: x.y.z,
+      signalfx.tracing.version: 0.2.0.0,
       span.kind: server
     },
     Metrics: {
@@ -216,7 +216,7 @@
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
-      http.url: http://localhost:00000/Health/?arg=[$slice],
+      http.url: http://localhost:00000/Health/?test&[$slice],
       language: dotnet,
       net.peer.ip: ::1,
       span.kind: server
@@ -235,12 +235,12 @@
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
-      http.url: http://localhost:00000/Health/?arg=[$slice],
+      http.url: http://localhost:00000/Health/?test&[$slice],
       language: dotnet,
       net.peer.ip: ::1,
       runtime-id: Guid_1,
       signalfx.tracing.library: dotnet-tracing,
-      signalfx.tracing.version: x.y.z,
+      signalfx.tracing.version: 0.2.0.0,
       span.kind: server
     },
     Metrics: {
