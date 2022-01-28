@@ -35,6 +35,7 @@ namespace Datadog.Trace.AppSec
         private static bool _globalInstanceInitialized;
         private static object _globalInstanceLock = new();
 
+        private readonly RateLimiterTimer _rateLimiter;
         private readonly IWaf _waf;
         private readonly InstrumentationGateway _instrumentationGateway;
         private readonly SecuritySettings _settings;
@@ -110,6 +111,7 @@ namespace Datadog.Trace.AppSec
                     }
 
                     LifetimeManager.Instance.AddShutdownTask(RunShutdown);
+                    _rateLimiter = new RateLimiterTimer(_settings.TraceRateLimit);
                 }
             }
             catch (Exception ex)
@@ -237,7 +239,11 @@ namespace Datadog.Trace.AppSec
         /// <summary>
         /// Frees resources
         /// </summary>
-        public void Dispose() => _waf?.Dispose();
+        public void Dispose()
+        {
+            _waf?.Dispose();
+            _rateLimiter.Dispose();
+        }
 
         private void InstrumentationGateway_AddHeadersResponseTags(object sender, InstrumentationGatewayEventArgs e)
         {
@@ -250,9 +256,22 @@ namespace Datadog.Trace.AppSec
         private void Report(ITransport transport, Span span, string resultData, bool blocked)
         {
             span.SetTag(Tags.AppSecEvent, "true");
-            var samplingPirority = _settings.KeepTraces
-                                       ? SamplingPriority.UserKeep : SamplingPriority.AutoReject;
-            span.SetTraceSamplingPriority(samplingPirority);
+            var exceededTraces = _rateLimiter.UpdateTracesCounter();
+            if (exceededTraces <= 0)
+            {
+                // NOTE: DD_APPSEC_KEEP_TRACES=false means "drop all traces by setting AutoReject".
+                // It does _not_ mean "stop setting UserKeep (do nothing)". It should only be used for testing.
+                span.SetTraceSamplingPriority(_settings.KeepTraces ? SamplingPriority.UserKeep : SamplingPriority.AutoReject);
+            }
+            else
+            {
+                span.SetMetric(Metrics.AppSecRateLimitDroppedTraces, exceededTraces);
+
+                if (!_settings.KeepTraces)
+                {
+                    span.SetTraceSamplingPriority(SamplingPriority.AutoReject);
+                }
+            }
 
             LogMatchesIfDebugEnabled(resultData, blocked);
 

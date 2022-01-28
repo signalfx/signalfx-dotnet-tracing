@@ -9,12 +9,12 @@ internal class ReadOnlySpanContext : ISpanContext
 {
     public ReadOnlySpanContext(ulong traceId, ulong spanId, string serviceName)
     {
-        TraceId = traceId;
+        TraceId = TraceId.CreateFromUlong(traceId);
         SpanId = spanId;
         ServiceName = serviceName;
     }
 
-    public ulong TraceId { get; }
+    public TraceId TraceId { get; }
 
     public ulong SpanId { get; }
 
