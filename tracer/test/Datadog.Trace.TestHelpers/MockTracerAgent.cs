@@ -10,7 +10,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -183,7 +182,7 @@ namespace Datadog.Trace.TestHelpers
 
         /// <summary>
         /// Gets the TCP port that this Agent is listening on.
-        /// Can be different from <see cref="MockTracerAgent(int, int)"/>'s <c>initialPort</c>
+        /// Can be different from <see cref="MockTracerAgent(int, int, bool)"/>'s <c>initialPort</c>
         /// parameter if listening on that port fails.
         /// </summary>
         public int Port { get; }

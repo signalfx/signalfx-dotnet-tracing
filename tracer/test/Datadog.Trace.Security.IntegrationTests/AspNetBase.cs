@@ -33,7 +33,7 @@ namespace Datadog.Trace.Security.IntegrationTests
         private readonly JsonSerializerSettings _jsonSerializerSettingsOrderProperty;
         private int _httpPort;
         private Process _process;
-        private MockTracerAgent _agent;
+        private Datadog.Trace.TestHelpers.MockTracerAgent _agent;
 
         public AspNetBase(string sampleName, ITestOutputHelper outputHelper, string shutdownPath, string samplesDir = null, string testName = null)
             : base(sampleName, samplesDir ?? "test/test-applications/security", outputHelper)
@@ -150,6 +150,8 @@ namespace Datadog.Trace.Security.IntegrationTests
             string arguments,
             int? aspNetCorePort = null,
             string packageVersion = "",
+            int? statsdPort = null,
+            int? logsCollectorPort = null,
             string framework = "",
             string path = "/Home",
             bool enableSecurity = true,
@@ -177,6 +179,8 @@ namespace Datadog.Trace.Security.IntegrationTests
                 EnvironmentHelper,
                 agent,
                 args,
+                statsdPort: statsdPort,
+                logsCollectorPort: logsCollectorPort,
                 aspNetCorePort: aspNetCorePort.GetValueOrDefault(5000),
                 enableSecurity: enableSecurity,
                 enableBlocking: enableBlocking,

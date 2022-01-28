@@ -14,7 +14,7 @@
     <RazorPagesProject Include="test/test-applications/**/Samples.AspNetCoreRazorPages.csproj" />
     <ExcludeExpenseItDemoProject Remove="test/test-applications/regression/**/ExpenseItDemo*.csproj" />
     <ExcludeLegacyRedisProject Remove="test/test-applications/regression/**/StackExchange.Redis.AssemblyConflict.LegacyProject.csproj" />
-    <CsharpTestHelperProject Include="test\**\*.TestHelpers.csproj"/>
+    <CsharpTestHelperProject Include="test\**\OpenTelemetry.TestHelpers.csproj;test\**\*.TestHelpers.csproj"/>
     <CppProject Include="src\**\*.vcxproj"/>
     <CppTestProject Include="test\**\*.vcxproj"/>
     <VbSampleLibProject Include="test\test-applications\integrations\**\*.vbproj" />

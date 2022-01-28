@@ -19,7 +19,7 @@
 #include "stats.h"
 #include "util.h"
 #include "version.h"
-#include "ThreadSampler.h"
+#include "thread_sampler.h"
 
 #ifdef MACOS
 #include <mach-o/dyld.h>

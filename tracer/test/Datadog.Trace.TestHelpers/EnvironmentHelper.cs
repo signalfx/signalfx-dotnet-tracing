@@ -13,6 +13,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using Datadog.Trace.Configuration;
+using OpenTelemetry.TestHelpers;
 using Xunit.Abstractions;
 
 namespace Datadog.Trace.TestHelpers
@@ -194,6 +195,8 @@ namespace Datadog.Trace.TestHelpers
         public void SetEnvironmentVariables(
             MockTracerAgent agent,
             int aspNetCorePort,
+            int? statsdPort,
+            int? logsCollectorPort,
             StringDictionary environmentVariables,
             string processToProfile = null,
             bool enableSecurity = false,
@@ -228,6 +231,16 @@ namespace Datadog.Trace.TestHelpers
 
             // for ASP.NET Core sample apps, set the server's port
             environmentVariables["ASPNETCORE_URLS"] = $"http://127.0.0.1:{aspNetCorePort}/";
+
+            if (statsdPort != null)
+            {
+                environmentVariables["SIGNALFX_DOGSTATSD_PORT"] = statsdPort.Value.ToString();
+            }
+
+            if (logsCollectorPort.HasValue)
+            {
+                environmentVariables["SIGNALFX_LOGS_ENDPOINT_URL"] = $"http://127.0.0.1:{logsCollectorPort.Value}/";
+            }
 
             if (enableSecurity)
             {
@@ -529,6 +542,16 @@ namespace Datadog.Trace.TestHelpers
             _output.WriteLine($"Agent listener info: {agent.ListenerInfo}");
 
             return agent;
+        }
+
+        public MockOtelLogsCollector GetMockOtelLogsCollector()
+        {
+            var logsCollectorPort = TcpPortProvider.GetOpenPort();
+            var logsCollector = new MockOtelLogsCollector(logsCollectorPort);
+
+            _output.WriteLine($"Assigned port {logsCollector.Port} for the logsCollectorPort.");
+
+            return logsCollector;
         }
     }
 }
