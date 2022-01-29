@@ -5,6 +5,7 @@
 
 // Modified by Splunk Inc.
 
+using System;
 using System.Threading;
 using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.Logging;
@@ -15,35 +16,30 @@ namespace Datadog.Trace
     {
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(AsyncLocalScopeManager));
 
-        private readonly bool _pushScopeToNative;
-
         private readonly AsyncLocal<Scope> _activeScope = new();
 
         public AsyncLocalScopeManager(bool pushScopeToNative)
         {
-            _pushScopeToNative = pushScopeToNative;
+            _activeScope = !pushScopeToNative
+                ? new()
+                : new AsyncLocal<Scope>(
+                    (AsyncLocalValueChangedArgs<Scope> args) =>
+                    {
+                        UpdateProfilerContext(args.CurrentValue);
+                    });
         }
 
         public Scope Active
         {
             get => _activeScope.Value;
-            private set
-            {
-                _activeScope.Value = value;
-                if (_pushScopeToNative)
-                {
-                    int managedThreadId = Thread.CurrentThread.ManagedThreadId;
-                    if (value == null)
-                    {
-                        NativeMethods.SignalFxSetNativeContext(0, 0, 0, managedThreadId);
-                    }
-                    else
-                    {
-                        NativeMethods.SignalFxSetNativeContext(value.Span.TraceId.Higher, value.Span.TraceId.Lower, value.Span.SpanId, managedThreadId);
-                    }
-                }
-            }
+            private set => _activeScope.Value = value;
         }
+
+        // SetProfilingContext is a internal property to facilitate tests, since the native functions are not available
+        // on the unit tests. However, it has a cost, since it introduces indirection, per IL it causes an extra callvirt.
+        // TODO: Move this test to a location that the native API can be accessed, add a test helper on the native side
+        // and remove this delegate.
+        internal Action<ulong, ulong, ulong, int> SetProfilingContext { get; set; } = NativeMethods.SignalFxSetNativeContext;
 
         Scope IScopeRawAccess.Active
         {
@@ -79,6 +75,19 @@ namespace Datadog.Trace
 
             // scope.Parent is null for distributed traces, so use scope.Span.Context.Parent
             DistributedTracer.Instance.SetSpanContext(scope.Span.Context.Parent as SpanContext);
+        }
+
+        private void UpdateProfilerContext(Scope scope)
+        {
+            int managedThreadId = Thread.CurrentThread.ManagedThreadId;
+            if (scope == null)
+            {
+                SetProfilingContext(0, 0, 0, managedThreadId);
+            }
+            else
+            {
+                SetProfilingContext(scope.Span.TraceId.Higher, scope.Span.TraceId.Lower, scope.Span.SpanId, managedThreadId);
+            }
         }
     }
 }

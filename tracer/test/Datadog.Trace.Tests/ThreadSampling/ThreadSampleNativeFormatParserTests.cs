@@ -1,3 +1,5 @@
+// Modified by Splunk Inc.
+
 #if NETCOREAPP3_1_OR_GREATER
 using System.Collections.Generic;
 using System.IO;
