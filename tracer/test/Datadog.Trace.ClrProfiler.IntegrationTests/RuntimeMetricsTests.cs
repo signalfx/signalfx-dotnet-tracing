@@ -26,7 +26,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("RunOnWindows", "True")]
         public void MetricsDisabled()
         {
-            SetEnvironmentVariable("DD_RUNTIME_METRICS_ENABLED", "0");
+            SetEnvironmentVariable("SIGNALFX_RUNTIME_METRICS_ENABLED", "0");
             using var agent = EnvironmentHelper.GetMockAgent(useStatsD: true);
 
             using var processResult = RunSampleAndWaitForExit(agent);
@@ -57,15 +57,10 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
         private void RunTest()
         {
-            int agentPort = TcpPortProvider.GetOpenPort();
-
-            Output.WriteLine($"Assigning port {agentPort} for the agentPort.");
             SetEnvironmentVariable("SIGNALFX_RUNTIME_METRICS_ENABLED", "1");
             SetEnvironmentVariable("SIGNALFX_METRICS_EXPORTER", "StatsD");
 
-            using var agent = new MockTracerAgent(agentPort, useStatsd: true);
-            Output.WriteLine($"Assigning port {agent.StatsdPort} for the statsdPort.");
-
+            using var agent = EnvironmentHelper.GetMockAgent(useStatsD: true);
             using var processResult = RunSampleAndWaitForExit(agent);
             var requests = agent.StatsdRequests;
 
