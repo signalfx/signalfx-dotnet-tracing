@@ -6,6 +6,7 @@
 // Modified by Splunk Inc.
 
 using System;
+using Datadog.Trace.Configuration.Helpers;
 using Datadog.Trace.Vendors.StatsdClient.Transport;
 
 namespace Datadog.Trace.Configuration
@@ -62,12 +63,10 @@ namespace Datadog.Trace.Configuration
                 // default value
                 ?? false;
 
-            var partialFlushMinSpans = source?.GetInt32(ConfigurationKeys.PartialFlushMinSpans);
-
-            if ((partialFlushMinSpans ?? 0) <= 0)
-            {
-                PartialFlushMinSpans = 500;
-            }
+            PartialFlushMinSpans = source.SafeReadInt32(
+                key: ConfigurationKeys.PartialFlushMinSpans,
+                defaultTo: 500,
+                validators: (val) => val > 0);
         }
 
         /// <summary>
@@ -151,22 +150,22 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         internal TransportType MetricsTransport { get; set; }
 
-        private static string GetConfiguredMetricsEndpoint(string ingestRealm)
+        private static Uri GetConfiguredMetricsEndpoint(string ingestRealm)
         {
             return IsDefaultIngestRealm(ingestRealm) ?
                        // local collector
-                       "http://localhost:9943/v2/datapoint" :
+                       new Uri("http://127.0.0.1:9943/v2/datapoint") :
                        // direct ingest
-                       $"https://ingest.{ingestRealm}.signalfx.com/v2/datapoint";
+                       new Uri($"https://ingest.{ingestRealm}.signalfx.com/v2/datapoint");
         }
 
-        private static string GetConfiguredTracesEndpoint(string ingestRealm, int agentPort)
+        private static Uri GetConfiguredTracesEndpoint(string ingestRealm, int agentPort)
         {
             return IsDefaultIngestRealm(ingestRealm) ?
                        // local collector
-                       $"http://localhost:{agentPort}/api/v2/spans" :
+                       new Uri($"http://127.0.0.1:{agentPort}/api/v2/spans", UriKind.Absolute) :
                        // direct ingest
-                       $"https://ingest.{ingestRealm}.signalfx.com/v2/trace";
+                       new Uri($"https://ingest.{ingestRealm}.signalfx.com/v2/trace", UriKind.Absolute);
         }
 
         private static bool IsDefaultIngestRealm(string ingestRealm)
@@ -198,16 +197,16 @@ namespace Datadog.Trace.Configuration
 
             MetricsTransport = metricsTransport;
 
-            var metricsEndpointUrl = source?.GetString(ConfigurationKeys.MetricsEndpointUrl) ??
-                                     GetConfiguredMetricsEndpoint(ingestRealm);
-            MetricsEndpointUrl = new Uri(metricsEndpointUrl);
+            MetricsEndpointUrl = source?.SafeReadUri(
+                key: ConfigurationKeys.MetricsEndpointUrl,
+                defaultTo: GetConfiguredMetricsEndpoint(ingestRealm));
         }
 
         private void ConfigureLogsTransport(IConfigurationSource source)
         {
             var logsEndpointUrl = source?.GetString(ConfigurationKeys.LogsEndpointUrl) ??
                                   // default value
-                                  "http://localhost:4318/v1/logs";
+                                  "http://127.0.0.1:4318/v1/logs";
             LogsEndpointUrl = new Uri(logsEndpointUrl);
         }
 
@@ -219,9 +218,9 @@ namespace Datadog.Trace.Configuration
                             // default value
                             DefaultAgentPort;
 
-            var agentUri = source?.GetString(ConfigurationKeys.EndpointUrl) ?? GetConfiguredTracesEndpoint(ingestRealm, agentPort);
-
-            AgentUri = new Uri(agentUri);
+            AgentUri = source.SafeReadUri(
+                key: ConfigurationKeys.EndpointUrl,
+                defaultTo: GetConfiguredTracesEndpoint(ingestRealm, agentPort));
 
             if (string.Equals(AgentUri.Host, "localhost", StringComparison.OrdinalIgnoreCase))
             {
@@ -229,7 +228,7 @@ namespace Datadog.Trace.Configuration
                 // When ipv6 is enabled, localhost is first resolved to ::1, which fails
                 // because the trace agent is only bound to ipv4.
                 // This causes delays when sending traces.
-                var builder = new UriBuilder(agentUri) { Host = "127.0.0.1" };
+                var builder = new UriBuilder(AgentUri.AbsoluteUri) { Host = "127.0.0.1" };
                 AgentUri = builder.Uri;
             }
 
