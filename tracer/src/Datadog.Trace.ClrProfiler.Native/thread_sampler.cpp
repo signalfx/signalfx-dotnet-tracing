@@ -331,7 +331,7 @@ private:
 
         if (classId == 0)
         {
-            Logger::Debug("NULL classId passed to GetClassName");
+            Logger::Debug("Zero (0) classId passed to GetClassName");
             result.append(WStr("Unknown"));
             return;
         }

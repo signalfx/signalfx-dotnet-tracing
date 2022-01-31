@@ -238,7 +238,7 @@ namespace Datadog.Trace.ThreadSampling
             public const byte EndBatch = 0x06;
 
             /// <summary>
-            /// Marks the begining of a section with statistics, see THREAD_SAMPLES_FINAL_STATS on native code.
+            /// Marks the beginning of a section with statistics, see THREAD_SAMPLES_FINAL_STATS on native code.
             /// </summary>
             public const byte BatchStats = 0x07;
         }

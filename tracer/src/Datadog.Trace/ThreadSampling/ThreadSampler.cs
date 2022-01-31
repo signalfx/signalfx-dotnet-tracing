@@ -21,7 +21,7 @@ namespace Datadog.Trace.ThreadSampling
         // If you change any of these constants, check with thread_sampler.cpp first
         private const int BufferSize = 200 * 1024;
 
-        private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(ThreadSampleExporter));
+        private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(ThreadSampler));
 
         private static ImmutableTracerSettings _tracerSettings;
 
