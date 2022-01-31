@@ -11,56 +11,67 @@ namespace Datadog.Trace.Tests.ThreadSampling
     public class AsyncLocalScopeManagerTests
     {
         [Fact(Timeout = 5_000)]
-        public async Task PushAsyncContextToNative()
+        public void PushAsyncContextToNative()
         {
             // For the tests use a delegate that keeps track of current context
             var tid2ProfilingCtx = new Dictionary<int, ProfilingContext>();
-            var mockSetProfilingContext = (ulong traceIdHigher, ulong traceIdLower, ulong spanId, int managedThreadId) =>
-                {
-                    if (traceIdHigher == 0 && traceIdLower == 0 && spanId == 0)
-                    {
-                        tid2ProfilingCtx.Remove(managedThreadId);
-                        return;
-                    }
 
-                    tid2ProfilingCtx[managedThreadId] = new ProfilingContext
+            // Have the whole tests running a dedicated thread so Tasks get to
+            // run in the thread pool, causing an async thread change. This is
+            // not required on dev boxes but makes the test more robust for machines
+            // with a smaller number of cores.
+            var testThread = new Thread(async () =>
+            {
+                var mockSetProfilingContext = (ulong traceIdHigher, ulong traceIdLower, ulong spanId, int managedThreadId) =>
                     {
-                        TraceIdHigher = traceIdHigher,
-                        TraceIdLower = traceIdLower,
-                        SpanId = spanId,
+                        if (traceIdHigher == 0 && traceIdLower == 0 && spanId == 0)
+                        {
+                            tid2ProfilingCtx.Remove(managedThreadId);
+                            return;
+                        }
+
+                        tid2ProfilingCtx[managedThreadId] = new ProfilingContext
+                        {
+                            TraceIdHigher = traceIdHigher,
+                            TraceIdLower = traceIdLower,
+                            SpanId = spanId,
+                        };
                     };
+
+                var scopeManager = new AsyncLocalScopeManager(pushScopeToNative: true)
+                {
+                    SetProfilingContext = mockSetProfilingContext
                 };
 
-            var scopeManager = new AsyncLocalScopeManager(pushScopeToNative: true)
-            {
-                SetProfilingContext = mockSetProfilingContext
-            };
+                var span = new Span(new SpanContext(TraceId.CreateFromInt(42), 41), DateTimeOffset.UtcNow, null);
+                Scope activeScope = scopeManager.Activate(span, false);
 
-            var span = new Span(new SpanContext(TraceId.CreateFromInt(42), 41), DateTimeOffset.UtcNow, null);
-            Scope activeScope = scopeManager.Activate(span, false);
+                var currentManagedThreadId = Thread.CurrentThread.ManagedThreadId;
+                var initialManagedThreadId = currentManagedThreadId;
 
-            var currentManagedThreadId = Thread.CurrentThread.ManagedThreadId;
-            var initialManagedThreadId = currentManagedThreadId;
+                AssertProfilingContextMatchesScope(activeScope, currentManagedThreadId);
 
-            AssertProfilingContextMatchesScope(activeScope, currentManagedThreadId);
+                while (currentManagedThreadId == initialManagedThreadId)
+                {
+                    var blockingThreadTask = Task.Run(() => Thread.Sleep(200));
+                    await Task.Delay(100);
+                    await blockingThreadTask;
+                    currentManagedThreadId = Thread.CurrentThread.ManagedThreadId;
+                }
 
-            while (currentManagedThreadId == initialManagedThreadId)
-            {
-                var blockingThreadTask = Task.Run(() => Thread.Sleep(200));
-                await Task.Delay(100);
-                await blockingThreadTask;
-                currentManagedThreadId = Thread.CurrentThread.ManagedThreadId;
-            }
+                // Context must have migrated to the new thread.
+                AssertProfilingContextMatchesScope(activeScope, currentManagedThreadId);
 
-            // Context must have migrated to the new thread.
-            AssertProfilingContextMatchesScope(activeScope, currentManagedThreadId);
+                // Context must have been cleaned up from old thread.
+                Assert.False(tid2ProfilingCtx.ContainsKey(initialManagedThreadId));
 
-            // Context must have been cleaned up from old thread.
-            Assert.False(tid2ProfilingCtx.ContainsKey(initialManagedThreadId));
+                activeScope.Close();
 
-            activeScope.Close();
+                Assert.False(tid2ProfilingCtx.ContainsKey(currentManagedThreadId));
+            });
 
-            Assert.False(tid2ProfilingCtx.ContainsKey(currentManagedThreadId));
+            testThread.Start();
+            testThread.Join();
 
             void AssertProfilingContextMatchesScope(Scope scope, int managedThreadId)
             {
