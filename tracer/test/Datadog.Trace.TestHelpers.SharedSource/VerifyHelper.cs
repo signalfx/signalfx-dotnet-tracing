@@ -19,10 +19,7 @@ namespace Datadog.Trace.TestHelpers
     {
         private static readonly Regex LocalhostRegex = new(@"localhost\:\d+", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private static readonly Regex KeepRateRegex = new(@"_dd.tracer_kr: \d\.\d+", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        private static readonly Regex TimeUnixNanoRegex = new(@"TimeUnixNano: \d+", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        private static readonly Regex VersionRegex = new(@"StringValue: \d\.\d\.\d\.\d", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        private static readonly Regex NidRegex = new(@"nid=0x\S{4}", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        private static readonly Regex TidRegex = new(@"tid=0x\S+ ", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex ThreadSamplingVersionRegex = new(@"StringValue: \d\.\d\.\d\.\d", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         /// <summary>
         /// With <see cref="Verify"/>, parameters are used as part of the filename.
@@ -64,18 +61,20 @@ namespace Datadog.Trace.TestHelpers
             return settings;
         }
 
-        public static VerifySettings GetThreadSamplingVerifierSettings()
+        public static VerifySettings GetThreadSamplingVerifierSettings(params object[] parameters)
         {
             var settings = new VerifySettings();
 
             DerivePathInfoForSnapshotFiles();
 
+            if (parameters.Length > 0)
+            {
+                settings.UseParameters(parameters);
+            }
+
             settings.DisableRequireUniquePrefix();
 
-            settings.AddScrubber(builder => ReplaceRegex(builder, TimeUnixNanoRegex, "TimeUnixNano: FakeTimeUnixNano"));
-            settings.AddScrubber(builder => ReplaceRegex(builder, VersionRegex, "StringValue: w.x.y.z"));
-            settings.AddScrubber(builder => ReplaceRegex(builder, TidRegex, "tid=0xaaaaaa "));
-            settings.AddScrubber(builder => ReplaceRegex(builder, NidRegex, "nid=0x0000"));
+            settings.AddScrubber(builder => ReplaceRegex(builder, ThreadSamplingVersionRegex, "StringValue: w.x.y.z"));
 
             return settings;
         }
