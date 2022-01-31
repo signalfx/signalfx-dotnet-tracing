@@ -46,7 +46,9 @@ namespace Datadog.Trace.Tests.ThreadSampling
 
             while (currentManagedThreadId == initialManagedThreadId)
             {
+                var blockingThreadTask = Task.Run(() => Thread.Sleep(200));
                 await Task.Delay(100);
+                await blockingThreadTask;
                 currentManagedThreadId = Thread.CurrentThread.ManagedThreadId;
             }
 
