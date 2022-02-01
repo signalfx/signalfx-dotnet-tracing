@@ -8,15 +8,12 @@
 using System;
 using System.Threading;
 using Datadog.Trace.ClrProfiler;
-using Datadog.Trace.Logging;
 
 namespace Datadog.Trace
 {
     internal class AsyncLocalScopeManager : IScopeManager, IScopeRawAccess
     {
-        private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(AsyncLocalScopeManager));
-
-        private readonly AsyncLocal<Scope> _activeScope = new();
+        private readonly AsyncLocal<Scope> _activeScope;
 
         public AsyncLocalScopeManager(bool pushScopeToNative)
         {
@@ -61,7 +58,6 @@ namespace Datadog.Trace
         public void Close(Scope scope)
         {
             var current = Active;
-            var isRootSpan = scope.Parent == null;
 
             if (current == null || current != scope)
             {
