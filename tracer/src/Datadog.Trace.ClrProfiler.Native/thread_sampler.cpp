@@ -512,10 +512,11 @@ void CaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, SamplingHelpe
             helper.curWriter->StartSample(threadID, &unknown, spanContext);
         }
 
-        HRESULT localHr = info10->DoStackSnapshot(threadID, &FrameCallback, COR_PRF_SNAPSHOT_DEFAULT, &helper, NULL, 0);
-        if (FAILED(hr))
+        // Don't reuse the hr being used for the thread enum, especially since a failed snapshot isn't fatal
+        HRESULT snapshotHr = info10->DoStackSnapshot(threadID, &FrameCallback, COR_PRF_SNAPSHOT_DEFAULT, &helper, NULL, 0);
+        if (FAILED(snapshotHr))
         {
-            Logger::Debug("DoStackSnapshot failed: ", hr);
+            Logger::Debug("DoStackSnapshot failed: ", snapshotHr);
         }
         helper.curWriter->EndSample();
     }
