@@ -16,6 +16,7 @@ namespace Datadog.Trace.SignalFx.Metrics
         public SignalFxStats(SignalFxMetricSender metricSender)
         {
             _metricSender = metricSender ?? throw new ArgumentNullException(nameof(metricSender));
+            // splunk: consider supporting telemetry with our metric exporter
             TelemetryCounters = new Telemetry();
         }
 
@@ -23,7 +24,7 @@ namespace Datadog.Trace.SignalFx.Metrics
 
         public void Dispose()
         {
-            // nothing to dispose
+            _metricSender?.Dispose();
         }
 
         public void Configure(StatsdConfig config)

@@ -193,7 +193,7 @@ namespace Datadog.Trace.TestHelpers
         public void SetEnvironmentVariables(
             int agentPort,
             int aspNetCorePort,
-            int? statsdPort,
+            int? metricCollectorPort,
             int? logsCollectorPort,
             StringDictionary environmentVariables,
             string processToProfile = null,
@@ -233,9 +233,9 @@ namespace Datadog.Trace.TestHelpers
             // for ASP.NET Core sample apps, set the server's port
             environmentVariables["ASPNETCORE_URLS"] = $"http://127.0.0.1:{aspNetCorePort}/";
 
-            if (statsdPort != null)
+            if (metricCollectorPort != null)
             {
-                environmentVariables["SIGNALFX_DOGSTATSD_PORT"] = statsdPort.Value.ToString();
+                environmentVariables["SIGNALFX_METRICS_ENDPOINT_URL"] = $"http://127.0.0.1:{metricCollectorPort}/";
             }
 
             if (logsCollectorPort.HasValue)
@@ -453,18 +453,13 @@ namespace Datadog.Trace.TestHelpers
             return $"net{_major}{_minor}{_patch ?? string.Empty}";
         }
 
-        public MockTracerAgent GetMockAgent(bool useStatsD = false)
+        public MockTracerAgent GetMockAgent()
         {
             // Strategy pattern for agent transports goes here
             var agentPort = TcpPortProvider.GetOpenPort();
-            var agent = new MockTracerAgent(agentPort, useStatsd: useStatsD);
+            var agent = new MockTracerAgent(agentPort);
 
             _output.WriteLine($"Assigned port {agent.Port} for the agentPort.");
-
-            if (useStatsD)
-            {
-                _output.WriteLine($"Assigning port {agent.StatsdPort} for the statsdPort.");
-            }
 
             return agent;
         }
