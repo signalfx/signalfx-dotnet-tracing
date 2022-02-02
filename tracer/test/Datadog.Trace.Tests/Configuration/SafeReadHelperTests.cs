@@ -21,9 +21,9 @@ namespace Datadog.Trace.Tests.Configuration
         [InlineData("SIGNALFX_FOO_URI", "", "http://www.temp.org", false)]
         public void SafeReadUri(string settingName, string settingValue, string expected, bool log)
         {
-            bool waslogged = false;
+            bool wasLogged = false;
 
-            SetupLogger(settingName, value => waslogged = value);
+            SetupLogger(settingName, value => wasLogged = value);
 
             var source = new NameValueConfigurationSource(new NameValueCollection
             {
@@ -33,7 +33,7 @@ namespace Datadog.Trace.Tests.Configuration
             Uri value = source.SafeReadUri(settingName, new Uri("http://www.temp.org", UriKind.Absolute));
 
             Assert.Equal(new Uri(expected, UriKind.Absolute), value);
-            Assert.Equal(log, waslogged);
+            Assert.Equal(log, wasLogged);
         }
 
         [Theory]
@@ -42,20 +42,20 @@ namespace Datadog.Trace.Tests.Configuration
         [InlineData("SIGNALFX_FOO_VALUE", "abc", 1, 0, false)]
         public void SafeReadInt32(string settingName, string settingValue, int expected, int condition, bool log)
         {
-            bool waslogged = false;
+            bool wasLogged = false;
 
-            SetupLogger(settingName, value => waslogged = value);
+            SetupLogger(settingName, value => wasLogged = value);
 
             var source = new NameValueConfigurationSource(new NameValueCollection
             {
                 { settingName, settingValue }
             });
 
-            // using foo validator setting > condtion
+            // using foo validator setting > condition
             int value = source.SafeReadInt32(settingName, expected, (val) => val > condition);
 
             Assert.Equal(expected, value);
-            Assert.Equal(log, waslogged);
+            Assert.Equal(log, wasLogged);
         }
 
         private void SetupLogger(string key, Action<bool> wasCalled)

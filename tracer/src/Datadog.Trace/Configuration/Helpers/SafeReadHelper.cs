@@ -8,10 +8,10 @@ namespace Datadog.Trace.Configuration.Helpers
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(SafeReadHelper));
 
         /// <summary>
-        /// Tries to read String from congiguration source as Uri. In case of:
-        /// Null source default is retuned,
+        /// Tries to read String from configuration source as Uri. In case of:
+        /// Null source default is returned,
         /// Empty configuration default is returned,
-        /// Invalid configuraion error is logged and default is returned.
+        /// Invalid configuration error is logged and default is returned.
         /// </summary>
         /// <param name="source">Configuration source.</param>
         /// <param name="key">Configuration key.</param>
@@ -40,9 +40,9 @@ namespace Datadog.Trace.Configuration.Helpers
 
         /// <summary>
         /// Tries to read Int32 from configuration source. In case of:
-        /// Null source default is retuned,
+        /// Null source default is returned,
         /// Empty configuration default is returned,
-        /// Invalid configuraion error is logged and default is returned.
+        /// Invalid configuration error is logged and default is returned.
         /// </summary>
         /// <param name="source">Configuration source.</param>
         /// <param name="key">Configuration key.</param>
