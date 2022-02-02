@@ -39,8 +39,6 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
                         // ignore
                     }
                 }
-
-                Console.Error.WriteLine(message, args);
             }
             catch
             {
