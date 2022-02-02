@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Modified by Splunk Inc.
+
+using System;
 using System.Net;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Propagation;

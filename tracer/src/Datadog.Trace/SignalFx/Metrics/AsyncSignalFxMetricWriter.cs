@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Modified by Splunk Inc.
+
+using System;
 using Datadog.Trace.Vendors.StatsdClient.Worker;
 using Datadog.Tracer.SignalFx.Metrics.Protobuf;
 
@@ -17,7 +19,7 @@ internal class AsyncSignalFxMetricWriter : ISignalFxMetricWriter
 
         if (maxItems < 1)
         {
-            throw new ArgumentException("MaxItems has to be greater or equal to 1", nameof(maxItems));
+            throw new ArgumentOutOfRangeException(nameof(maxItems), "MaxItems has to be greater or equal to 1");
         }
 
         _worker = new AsynchronousWorker<DataPoint>(

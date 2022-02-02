@@ -1,7 +1,8 @@
-﻿using System;
+﻿// Modified by Splunk Inc.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Logging;
 using Datadog.Tracer.SignalFx.Metrics.Protobuf;
 
@@ -64,14 +65,14 @@ namespace Datadog.Trace.SignalFx.Metrics
 
         private void Send(MetricType metricType, string name, double value, string[] tags)
         {
-            var datapoint = CreateDatapoint(metricType, name, value, tags);
-            if (!_writer.TryWrite(datapoint))
+            var dataPoint = CreateDataPoint(metricType, name, value, tags);
+            if (!_writer.TryWrite(dataPoint))
             {
                 Log.Warning("Metric upload failed, worker queue full.");
             }
         }
 
-        private DataPoint CreateDatapoint(MetricType metricType, string name, double value, string[] tags)
+        private DataPoint CreateDataPoint(MetricType metricType, string name, double value, string[] tags)
         {
             // splunk: consider pooling data points
             var dataPoint = new DataPoint
