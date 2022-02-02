@@ -40,12 +40,14 @@ namespace Datadog.Trace.OpenTracing.Tests
         [Fact]
         public void Extract_WrongHeaderCase_ExtractionStillWorks()
         {
-            var traceId = TraceId.CreateFromInt(10);
-            const ulong spanId = 120;
+            TraceId traceId = TraceId.CreateFromInt(10);
+            const ulong parentId = 120;
+            const int samplingPriority = SamplingPriorityValues.UserKeep;
 
             var headers = new MockTextMap();
             headers.Set(HttpHeaderTraceId.ToUpper(), traceId.ToString());
-            headers.Set(HttpHeaderSpanId.ToUpper(), spanId.ToString());
+            headers.Set(HttpHeaderParentId.ToUpper(), parentId.ToString());
+            headers.Set(HttpHeaderSamplingPriority.ToUpper(), samplingPriority.ToString());
 
             var spanContext = _codec.Extract(headers) as OpenTracingSpanContext;
 
@@ -58,10 +60,10 @@ namespace Datadog.Trace.OpenTracing.Tests
         public void Inject_SpanContext_HeadersWithCorrectInfo()
         {
             const ulong spanId = 10;
-            var traceId = TraceId.CreateFromInt(7);
-            const SamplingPriority samplingPriority = SamplingPriority.UserKeep;
+            TraceId traceId = TraceId.CreateFromInt(7);
+            const int samplingPriority = SamplingPriorityValues.UserKeep;
 
-            var ddSpanContext = new SpanContext(traceId, spanId, samplingPriority);
+            var ddSpanContext = new SpanContext(traceId, spanId, (SamplingPriority)samplingPriority);
             var spanContext = new OpenTracingSpanContext(ddSpanContext);
             var headers = new MockTextMap();
 
@@ -69,6 +71,10 @@ namespace Datadog.Trace.OpenTracing.Tests
 
             Assert.Equal(spanId, ulong.Parse(headers.Get(HttpHeaderSpanId), NumberStyles.HexNumber));
             Assert.Equal(traceId.ToString(), headers.Get(HttpHeaderTraceId));
+<<<<<<< HEAD
+=======
+            Assert.Equal(samplingPriority.ToString(), headers.Get(HttpHeaderSamplingPriority));
+>>>>>>> 41e924c48 (use `int` internally instead of `enum` for sampling priority values (#2372))
         }
     }
 }

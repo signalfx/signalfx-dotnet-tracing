@@ -8,7 +8,6 @@
 using System;
 using System.Diagnostics;
 using System.Globalization;
-using System.Text;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Tagging;
@@ -189,11 +188,16 @@ namespace Datadog.Trace
                     Context.Origin = value;
                     break;
                 case Trace.Tags.SamplingPriority:
-                    if (Enum.TryParse(value, out SamplingPriority samplingPriority) &&
-                        Enum.IsDefined(typeof(SamplingPriority), samplingPriority))
+                    // allow setting the sampling priority via a tag
+                    // note: this tag allows numeric or string representations of the enum,
+                    // (e.g. "AutoKeep" or "1"), but try parsing as `int` first since it's much faster
+                    if (int.TryParse(value, out var samplingPriorityInt32))
                     {
-                        // allow setting the sampling priority via a tag
-                        Context.TraceContext.SetSamplingPriority(samplingPriority);
+                        Context.TraceContext.SetSamplingPriority(samplingPriorityInt32);
+                    }
+                    else if (Enum.TryParse<SamplingPriority>(value, out var samplingPriorityEnum))
+                    {
+                        Context.TraceContext.SetSamplingPriority((int?)samplingPriorityEnum);
                     }
 
                     break;
@@ -201,7 +205,7 @@ namespace Datadog.Trace
                     if (value?.ToBoolean() == true)
                     {
                         // user-friendly tag to set UserKeep priority
-                        Context.TraceContext.SetSamplingPriority(SamplingPriority.UserKeep);
+                        Context.TraceContext.SetSamplingPriority(SamplingPriorityValues.UserKeep);
                     }
 
                     break;
@@ -209,7 +213,7 @@ namespace Datadog.Trace
                     if (value?.ToBoolean() == true)
                     {
                         // user-friendly tag to set UserReject priority
-                        Context.TraceContext.SetSamplingPriority(SamplingPriority.UserReject);
+                        Context.TraceContext.SetSamplingPriority(SamplingPriorityValues.UserReject);
                     }
 
                     break;
@@ -340,7 +344,8 @@ namespace Datadog.Trace
             switch (key)
             {
                 case Trace.Tags.SamplingPriority:
-                    return ((int?)(Context.TraceContext?.SamplingPriority ?? Context.SamplingPriority))?.ToString();
+                    var samplingPriority = Context.TraceContext?.SamplingPriority ?? Context.SamplingPriority;
+                    return samplingPriority?.ToString();
                 case Trace.Tags.Origin:
                     return Context.Origin;
                 default:

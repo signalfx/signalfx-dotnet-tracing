@@ -50,6 +50,11 @@ namespace Datadog.Trace.ExtensionMethods
         /// <param name="samplingPriority">The new sampling priority for the trace.</param>
         public static void SetTraceSamplingPriority(this ISpan span, SamplingPriority samplingPriority)
         {
+            span.SetTraceSamplingPriority((int)samplingPriority);
+        }
+
+        internal static void SetTraceSamplingPriority(this ISpan span, int samplingPriority)
+        {
             if (span == null) { ThrowHelper.ThrowArgumentNullException(nameof(span)); }
 
             if (span.Context is SpanContext spanContext && spanContext.TraceContext != null)

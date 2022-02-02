@@ -24,7 +24,7 @@ namespace Datadog.Trace
         private ArrayBuilder<Span> _spans;
 
         private int _openSpans;
-        private SamplingPriority? _samplingPriority;
+        private int? _samplingPriority;
 
         public TraceContext(IDatadogTracer tracer)
         {
@@ -40,7 +40,7 @@ namespace Datadog.Trace
         /// <summary>
         /// Gets the trace's sampling priority.
         /// </summary>
-        public SamplingPriority? SamplingPriority
+        public int? SamplingPriority
         {
             get => _samplingPriority;
         }
@@ -79,8 +79,7 @@ namespace Datadog.Trace
                         {
                             // this is a local root span (i.e. not propagated).
                             // determine an initial sampling priority for this trace, but don't lock it yet
-                            _samplingPriority =
-                                Tracer.Sampler?.GetSamplingPriority(RootSpan);
+                            _samplingPriority = Tracer.Sampler?.GetSamplingPriority(RootSpan);
                         }
                     }
                 }
@@ -151,7 +150,7 @@ namespace Datadog.Trace
             }
         }
 
-        public void SetSamplingPriority(SamplingPriority? samplingPriority, bool notifyDistributedTracer = true)
+        public void SetSamplingPriority(int? samplingPriority, bool notifyDistributedTracer = true)
         {
             _samplingPriority = samplingPriority;
 
@@ -166,15 +165,15 @@ namespace Datadog.Trace
             return Elapsed + (_utcStart - date);
         }
 
-        private static void AddSamplingPriorityTags(Span span, SamplingPriority samplingPriority)
+        private static void AddSamplingPriorityTags(Span span, int samplingPriority)
         {
             if (span.Tags is CommonTags tags)
             {
-                tags.SamplingPriority = (int)samplingPriority;
+                tags.SamplingPriority = samplingPriority;
             }
             else
             {
-                span.Tags.SetMetric(Metrics.SamplingPriority, (int)samplingPriority);
+                span.Tags.SetMetric(Metrics.SamplingPriority, samplingPriority);
             }
         }
 
