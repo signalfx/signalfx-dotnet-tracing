@@ -44,7 +44,7 @@ namespace Datadog.Trace.Agent
                 Log.Warning("Trace buffer is full. Dropping a trace from the buffer.");
             }
 
-            // splunk: adjust metric names to sfx convention
+            // TODO splunk: adjust metric names to sfx convention
             _metrics.Increment(TracerMetricNames.Queue.EnqueuedTraces);
             _metrics.Increment(TracerMetricNames.Queue.EnqueuedSpans, trace.Count);
 

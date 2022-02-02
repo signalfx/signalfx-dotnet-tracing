@@ -33,7 +33,7 @@ namespace Datadog.Trace.SignalFx.Metrics
 
         public void Send(DataPointUploadMessage msg)
         {
-            if (msg == null || msg.datapoints.Count < 1)
+            if (msg?.datapoints == null || msg.datapoints.Count < 1)
             {
                 return;
             }
