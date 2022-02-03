@@ -74,7 +74,7 @@ namespace Datadog.Trace.SignalFx.Metrics
 
         private DataPoint CreateDataPoint(MetricType metricType, string name, double value, string[] tags)
         {
-            // splunk: consider pooling data points
+            // TODO splunk: consider pooling data points
             var dataPoint = new DataPoint
             {
                 metricType = metricType,
