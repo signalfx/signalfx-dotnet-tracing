@@ -307,13 +307,14 @@ jobs:
           3.1.x
           5.0.x
           6.0.x
-    - name: Start CosmosDB Emulator
-      if: ${{ matrix.target == 'BuildAndRunWindowsIntegrationTests' }}
-      shell: powershell
-      run: |
-        Write-Host "Starting CosmosDB Emulator"
-        Import-Module "C:/Program Files/Azure Cosmos DB Emulator/PSModules/Microsoft.Azure.CosmosDB.Emulator"
-        Start-CosmosDbEmulator -Timeout 300
+    # Cosmos is _way_ to flaky at the moment. Try enabling again at a later time
+    # - name: Start CosmosDB Emulator
+    #   if: ${{ matrix.target == 'BuildAndRunWindowsIntegrationTests' }}
+    #   shell: powershell
+    #   run: |
+    #     Write-Host "Starting CosmosDB Emulator"
+    #     Import-Module "C:/Program Files/Azure Cosmos DB Emulator/PSModules/Microsoft.Azure.CosmosDB.Emulator"
+    #     Start-CosmosDbEmulator -Timeout 300
     # Workaround around long name being hit in MultiDomainHostTests.WorksOutsideTheGAC tests
     - name: Subst for shorter path and Run Tests
       run: |
