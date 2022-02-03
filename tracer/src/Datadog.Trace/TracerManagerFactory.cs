@@ -33,6 +33,7 @@ namespace Datadog.Trace
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<TracerManagerFactory>();
 
         public static readonly TracerManagerFactory Instance = new();
+        private const int MaxMetricsInAsyncQueue = 1000;
 
         /// <summary>
         /// The primary factory method, called by <see cref="TracerManager"/>,
@@ -164,7 +165,6 @@ namespace Datadog.Trace
         {
             try
             {
-                // TODO: replace with key-value pairs so split is not needed later in case of SignalFx metric exporter
                 var constantTags = new List<string>
                                    {
                                        "lang:.NET",
@@ -187,8 +187,8 @@ namespace Datadog.Trace
 
                 if (settings.MetricsExporter == MetricsExporterType.SignalFx)
                 {
-                    var reporter = new SignalFxReporter(settings.ExporterSettings.MetricsEndpointUrl, settings.SignalFxAccessToken);
-                    var metricSender = new SignalFxMetricSender(reporter, constantTags.ToArray());
+                    var metricExporter = new SignalFxMetricExporter(settings.ExporterSettings.MetricsEndpointUrl, settings.SignalFxAccessToken);
+                    var metricSender = new SignalFxMetricSender(new AsyncSignalFxMetricWriter(metricExporter, MaxMetricsInAsyncQueue), constantTags.ToArray());
                     return new SignalFxStats(metricSender);
                 }
 

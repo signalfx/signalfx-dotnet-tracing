@@ -30,30 +30,29 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             Output.WriteLine($"Assigning port {agentPort} for the agentPort.");
 
             SetEnvironmentVariable("SIGNALFX_RUNTIME_METRICS_ENABLED", "1");
-            SetEnvironmentVariable("SIGNALFX_METRICS_EXPORTER", "StatsD");
 
-            using var agent = new MockTracerAgent(agentPort, useStatsd: true);
-            Output.WriteLine($"Assigning port {agent.StatsdPort} for the statsdPort.");
+            using var agent = new MockTracerAgent(agentPort, useSfxMetrics: true);
+            Output.WriteLine($"Assigning port {agent.MetricsPort} for the SignalFx metrics.");
 
-            using var processResult = RunSampleAndWaitForExit(agent.Port, agent.StatsdPort);
-            var requests = agent.StatsdRequests;
+            using var processResult = RunSampleAndWaitForExit(agent.Port, agent.MetricsPort);
+            var requests = agent.Metrics;
 
             // Check if we receive 2 kinds of metrics:
             // - exception count is gathered using common .NET APIs
             // - contention count is gathered using platform-specific APIs
 
-            var exceptionRequestsCount = requests.Count(r => r.Contains("runtime.dotnet.exceptions.count"));
+            var exceptionRequestsCount = requests.Count(r => r.metric == "runtime.dotnet.exceptions.count");
 
-            Assert.True(exceptionRequestsCount > 0, "No exception metrics received. Metrics received: " + string.Join("\n", requests));
+            Assert.True(exceptionRequestsCount > 0, "No exception metrics received.");
 
             // Check if .NET Framework or .NET Core 3.1+
             if (!EnvironmentHelper.IsCoreClr()
              || (Environment.Version.Major == 3 && Environment.Version.Minor == 1)
              || Environment.Version.Major >= 5)
             {
-                var contentionRequestsCount = requests.Count(r => r.Contains("runtime.dotnet.threads.contention_count"));
+                var contentionRequestsCount = requests.Count(r => r.metric == "runtime.dotnet.threads.contention_count");
 
-                Assert.True(contentionRequestsCount > 0, "No contention metrics received. Metrics received: " + string.Join("\n", requests));
+                Assert.True(contentionRequestsCount > 0, "No contention metrics received.");
             }
         }
 
@@ -62,13 +61,18 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("RunOnWindows", "True")]
         public void MetricsDisabled()
         {
+            var agentPort = TcpPortProvider.GetOpenPort();
+            Output.WriteLine($"Assigning port {agentPort} for the agentPort.");
+
             SetEnvironmentVariable("SIGNALFX_RUNTIME_METRICS_ENABLED", "0");
-            using var agent = EnvironmentHelper.GetMockAgent(useStatsD: true);
 
-            using var processResult = RunSampleAndWaitForExit(agent.Port, agent.StatsdPort);
-            var requests = agent.StatsdRequests;
+            using var agent = new MockTracerAgent(agentPort, useSfxMetrics: true);
+            Output.WriteLine($"Assigning port {agent.MetricsPort} for the SignalFx metrics.");
 
-            Assert.True(requests.Count == 0, "Received metrics despite being disabled. Metrics received: " + string.Join("\n", requests));
+            using var processResult = RunSampleAndWaitForExit(agent.Port, agent.MetricsPort);
+            var requests = agent.Metrics;
+
+            Assert.True(requests.Count == 0, "Received metrics despite being disabled.");
         }
     }
 }

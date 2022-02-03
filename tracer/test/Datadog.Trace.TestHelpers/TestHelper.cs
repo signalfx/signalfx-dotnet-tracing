@@ -57,7 +57,7 @@ namespace Datadog.Trace.TestHelpers
 
         protected ITestOutputHelper Output { get; }
 
-        public Process StartDotnetTestSample(int traceAgentPort, string arguments, string packageVersion, int aspNetCorePort, int? statsdPort = null, int? logsCollectorPort = null, string framework = "")
+        public Process StartDotnetTestSample(int traceAgentPort, string arguments, string packageVersion, int aspNetCorePort, int? metricCollectorPort = null, int? logsCollectorPort = null, string framework = "")
         {
             // get path to sample app that the profiler will attach to
             string sampleAppPath = EnvironmentHelper.GetTestCommandForSampleApplicationPath(packageVersion, framework);
@@ -77,15 +77,15 @@ namespace Datadog.Trace.TestHelpers
                 EnvironmentHelper,
                 $"{appPath} {arguments ?? string.Empty}",
                 traceAgentPort: traceAgentPort,
-                statsdPort: statsdPort,
+                metricCollectorPort: metricCollectorPort,
                 logsCollectorPort: logsCollectorPort,
                 aspNetCorePort: aspNetCorePort,
                 processToProfile: exec + ";testhost.exe");
         }
 
-        public ProcessResult RunDotnetTestSampleAndWaitForExit(int traceAgentPort, int? statsdPort = null, int? logsCollectorPort = null, string arguments = null, string packageVersion = "", string framework = "")
+        public ProcessResult RunDotnetTestSampleAndWaitForExit(int traceAgentPort, int? metricCollectorPort = null, int? logsCollectorPort = null, string arguments = null, string packageVersion = "", string framework = "")
         {
-            var process = StartDotnetTestSample(traceAgentPort, arguments, packageVersion, aspNetCorePort: 5000, statsdPort: statsdPort, logsCollectorPort: logsCollectorPort, framework: framework);
+            var process = StartDotnetTestSample(traceAgentPort, arguments, packageVersion, aspNetCorePort: 5000, metricCollectorPort: metricCollectorPort, logsCollectorPort: logsCollectorPort, framework: framework);
 
             using var helper = new ProcessHelper(process);
 
@@ -113,7 +113,7 @@ namespace Datadog.Trace.TestHelpers
             return new ProcessResult(process, standardOutput, standardError, exitCode);
         }
 
-        public Process StartSample(int traceAgentPort, string arguments, string packageVersion, int aspNetCorePort, int? statsdPort = null, int? logCollectorPort = null, string framework = "")
+        public Process StartSample(int traceAgentPort, string arguments, string packageVersion, int aspNetCorePort, int? metricCollectorPort = null, int? logCollectorPort = null, string framework = "")
         {
             // get path to sample app that the profiler will attach to
             string sampleAppPath = EnvironmentHelper.GetSampleApplicationPath(packageVersion, framework);
@@ -131,15 +131,15 @@ namespace Datadog.Trace.TestHelpers
                 EnvironmentHelper,
                 args,
                 traceAgentPort: traceAgentPort,
-                statsdPort: statsdPort,
+                metricCollectorPort: metricCollectorPort,
                 logsCollectorPort: logCollectorPort,
                 aspNetCorePort: aspNetCorePort,
                 processToProfile: executable);
         }
 
-        public ProcessResult RunSampleAndWaitForExit(int traceAgentPort, int? statsdPort = null, int? logCollectorPort = null, string arguments = null, string packageVersion = "", string framework = "", int aspNetCorePort = 5000)
+        public ProcessResult RunSampleAndWaitForExit(int traceAgentPort, int? metricCollectorPort = null, int? logCollectorPort = null, string arguments = null, string packageVersion = "", string framework = "", int aspNetCorePort = 5000)
         {
-            var process = StartSample(traceAgentPort, arguments, packageVersion, aspNetCorePort: aspNetCorePort, statsdPort: statsdPort, logCollectorPort: logCollectorPort, framework: framework);
+            var process = StartSample(traceAgentPort, arguments, packageVersion, aspNetCorePort: aspNetCorePort, metricCollectorPort: metricCollectorPort, logCollectorPort: logCollectorPort, framework: framework);
 
             using var helper = new ProcessHelper(process);
 

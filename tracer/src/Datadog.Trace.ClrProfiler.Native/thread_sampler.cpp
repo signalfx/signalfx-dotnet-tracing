@@ -606,6 +606,8 @@ void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, Sa
 #endif
     helper.stats.microsSuspended = elapsedMicros;
     helper.curWriter->WriteFinalStats(helper.stats);
+    Logger::Debug("Threads sampled in ", elapsedMicros, " micros. threads=", helper.stats.numThreads,
+                  " frames=", helper.stats.totalFrames, " misses=", helper.stats.nameCacheMisses);
 
     helper.PublishBuffer();
 }
