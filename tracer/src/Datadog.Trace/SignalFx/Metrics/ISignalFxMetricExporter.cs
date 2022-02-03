@@ -3,9 +3,9 @@
 namespace Datadog.Trace.SignalFx.Metrics
 {
     /// <summary>
-    /// Sends message to metrics endpoint.
+    /// Exports metric in SignalFx proto format.
     /// </summary>
-    internal interface ISignalFxReporter
+    internal interface ISignalFxMetricExporter
     {
         void Send(DataPointUploadMessage msg);
     }

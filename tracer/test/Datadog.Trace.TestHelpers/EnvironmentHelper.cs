@@ -195,7 +195,7 @@ namespace Datadog.Trace.TestHelpers
         public void SetEnvironmentVariables(
             MockTracerAgent agent,
             int aspNetCorePort,
-            int? statsdPort,
+            int? metricCollectorPort,
             int? logsCollectorPort,
             StringDictionary environmentVariables,
             string processToProfile = null,
@@ -232,9 +232,9 @@ namespace Datadog.Trace.TestHelpers
             // for ASP.NET Core sample apps, set the server's port
             environmentVariables["ASPNETCORE_URLS"] = $"http://127.0.0.1:{aspNetCorePort}/";
 
-            if (statsdPort != null)
+            if (metricCollectorPort != null)
             {
-                environmentVariables["SIGNALFX_DOGSTATSD_PORT"] = statsdPort.Value.ToString();
+                environmentVariables["SIGNALFX_METRICS_ENDPOINT_URL"] = $"http://127.0.0.1:{metricCollectorPort}/";
             }
 
             if (logsCollectorPort.HasValue)
@@ -310,9 +310,9 @@ namespace Datadog.Trace.TestHelpers
                 environmentVariables["SIGNALFX_TRACE_AGENT_HOSTNAME"] = "127.0.0.1";
                 environmentVariables["SIGNALFX_TRACE_AGENT_PORT"] = agent.Port.ToString();
 
-                if (agent.StatsdPort != default(int))
+                if (agent.MetricsPort != default(int))
                 {
-                    environmentVariables["SIGNALFX_DOGSTATSD_PORT"] = agent.StatsdPort.ToString();
+                    environmentVariables["SIGNALFX_DOGSTATSD_PORT"] = agent.MetricsPort.ToString();
                 }
             }
         }
@@ -524,7 +524,7 @@ namespace Datadog.Trace.TestHelpers
             {
                 // Default
                 var agentPort = TcpPortProvider.GetOpenPort();
-                agent = new MockTracerAgent(agentPort, useStatsd: useStatsD);
+                agent = new MockTracerAgent(agentPort, useSfxMetrics: useStatsD);
             }
 #else
             if (TransportType == TestTransports.WindowsNamedPipe)
@@ -535,10 +535,11 @@ namespace Datadog.Trace.TestHelpers
             {
                 // Default
                 var agentPort = TcpPortProvider.GetOpenPort();
-                agent = new MockTracerAgent(agentPort, useStatsd: useStatsD);
+                agent = new MockTracerAgent(agentPort, useSfxMetrics: useStatsD);
             }
 #endif
 
+            _output.WriteLine($"Assigned port {agent.Port} for the agentPort.");
             _output.WriteLine($"Agent listener info: {agent.ListenerInfo}");
 
             return agent;

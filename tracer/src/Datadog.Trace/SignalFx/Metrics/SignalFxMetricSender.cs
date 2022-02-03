@@ -1,18 +1,29 @@
-﻿using System;
+﻿// Modified by Splunk Inc.
+
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using Datadog.Trace.Logging;
 using Datadog.Tracer.SignalFx.Metrics.Protobuf;
 
 namespace Datadog.Trace.SignalFx.Metrics
 {
-    internal class SignalFxMetricSender
+    internal class SignalFxMetricSender : IDisposable
     {
-        private readonly ISignalFxReporter _reporter;
-        private readonly string[] _globalTags;
+        private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(SignalFxMetricSender));
 
-        public SignalFxMetricSender(ISignalFxReporter reporter, string[] globalTags)
+        private readonly ISignalFxMetricWriter _writer;
+        private readonly List<Dimension> _globalDimensions;
+
+        public SignalFxMetricSender(ISignalFxMetricWriter writer, string[] globalTags)
         {
-            _reporter = reporter ?? throw new ArgumentNullException(nameof(reporter));
-            _globalTags = globalTags ?? throw new ArgumentNullException(nameof(globalTags));
+            if (globalTags == null)
+            {
+                throw new ArgumentNullException(nameof(globalTags));
+            }
+
+            _writer = writer ?? throw new ArgumentNullException(nameof(writer));
+            _globalDimensions = globalTags.Select(tag => ToDimension(tag)).ToList();
         }
 
         /// <summary>
@@ -37,6 +48,11 @@ namespace Datadog.Trace.SignalFx.Metrics
             Send(MetricType.COUNTER, name, value, tags);
         }
 
+        public void Dispose()
+        {
+            _writer?.Dispose();
+        }
+
         private static Dimension ToDimension(string t)
         {
             var kv = t.Split(separator: ':');
@@ -49,25 +65,35 @@ namespace Datadog.Trace.SignalFx.Metrics
 
         private void Send(MetricType metricType, string name, double value, string[] tags)
         {
-            var message = CreateUploadMessage(metricType, name, value, tags);
-            _reporter.Send(message);
+            var dataPoint = CreateDataPoint(metricType, name, value, tags);
+            if (!_writer.TryWrite(dataPoint))
+            {
+                Log.Warning("Metric upload failed, worker queue full.");
+            }
         }
 
-        private DataPointUploadMessage CreateUploadMessage(MetricType metricType, string name, double value, string[] tags)
+        private DataPoint CreateDataPoint(MetricType metricType, string name, double value, string[] tags)
         {
+            // TODO splunk: consider pooling data points
             var dataPoint = new DataPoint
             {
                 metricType = metricType,
                 metric = name,
-                value = new Datum { doubleValue = value }
+                value = new Datum { doubleValue = value },
+                timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
             };
-            var requestedTags = tags ?? Array.Empty<string>();
-            var finalTags = requestedTags.Concat(_globalTags);
-            dataPoint.dimensions.AddRange(finalTags.Select(t => ToDimension(t)));
 
-            var message = new DataPointUploadMessage();
-            message.datapoints.Add(dataPoint);
-            return message;
+            dataPoint.dimensions.AddRange(_globalDimensions);
+
+            if (tags != null)
+            {
+                foreach (var tag in tags)
+                {
+                    dataPoint.dimensions.Add(ToDimension(tag));
+                }
+            }
+
+            return dataPoint;
         }
     }
 }

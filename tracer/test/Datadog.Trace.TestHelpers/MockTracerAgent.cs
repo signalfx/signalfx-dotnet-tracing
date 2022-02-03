@@ -18,17 +18,17 @@ using System.Text;
 using System.Threading;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.HttpOverStreams;
+using Datadog.Tracer.SignalFx.Metrics.Protobuf;
 using MessagePack; // use nuget MessagePack to deserialize
-using Xunit.Abstractions;
 
 namespace Datadog.Trace.TestHelpers
 {
     public class MockTracerAgent : IDisposable
     {
         private readonly HttpListener _listener;
-        private readonly UdpClient _udpClient;
+        private readonly HttpListener _metricsListener;
         private readonly Thread _tracesListenerThread;
-        private readonly Thread _statsdThread;
+        private readonly Thread _metricsListenerThread;
         private readonly CancellationTokenSource _cancellationTokenSource;
 
 #if NETCOREAPP
@@ -58,8 +58,8 @@ namespace Datadog.Trace.TestHelpers
 
                 _udsStatsSocket.Bind(_statsEndpoint);
                 // NOTE: Connectionless protocols don't use Listen()
-                _statsdThread = new Thread(HandleUdsStats) { IsBackground = true };
-                _statsdThread.Start();
+                _metricsListenerThread = new Thread(HandleUdsStats) { IsBackground = true };
+                _metricsListenerThread.Start();
             }
 
             _tracesEndpoint = new UnixDomainSocketEndPoint(config.Traces);
@@ -83,7 +83,7 @@ namespace Datadog.Trace.TestHelpers
             throw new NotImplementedException("Windows named pipes are not yet implemented in the MockTracerAgent");
         }
 
-        public MockTracerAgent(int port = 8126, int retries = 5, bool useStatsd = false, bool doNotBindPorts = false, int? requestedStatsDPort = null)
+        public MockTracerAgent(int port = 8126, int retries = 5, bool useSfxMetrics = false, bool doNotBindPorts = false, int? requestedStatsDPort = null)
         {
             _cancellationTokenSource = new CancellationTokenSource();
 
@@ -96,41 +96,59 @@ namespace Datadog.Trace.TestHelpers
 
             var listeners = new List<string>();
 
-            if (useStatsd)
+            if (useSfxMetrics)
             {
+                var metricsPort = 8226;
+                var metricsRetries = 5;
+
                 if (requestedStatsDPort != null)
                 {
                     // This port is explicit, allow failure if not available
-                    StatsdPort = requestedStatsDPort.Value;
-                    _udpClient = new UdpClient(requestedStatsDPort.Value);
+                    var metricsListener = new HttpListener();
+                    metricsListener.Prefixes.Add($"http://127.0.0.1:{requestedStatsDPort}/");
+                    metricsListener.Prefixes.Add($"http://localhost:{requestedStatsDPort}/");
+
+                    MetricsPort = requestedStatsDPort.Value;
+                    _metricsListener = metricsListener;
+
+                    _metricsListenerThread = new Thread(HandleMetricsHttpRequests) { IsBackground = true };
+                    _metricsListenerThread.Start();
                 }
                 else
                 {
-                    const int basePort = 11555;
-
-                    var retriesLeft = retries;
-
                     while (true)
                     {
+                        var metricsListener = new HttpListener();
+                        metricsListener.Prefixes.Add($"http://127.0.0.1:{metricsPort}/");
+                        metricsListener.Prefixes.Add($"http://localhost:{metricsPort}/");
+
                         try
                         {
-                            _udpClient = new UdpClient(basePort + retriesLeft);
+                            metricsListener.Start();
+
+                            // successfully listening
+                            MetricsPort = metricsPort;
+                            _metricsListener = metricsListener;
+
+                            _metricsListenerThread = new Thread(HandleMetricsHttpRequests) { IsBackground = true };
+                            _metricsListenerThread.Start();
+
+                            break;
                         }
-                        catch (Exception) when (retriesLeft > 0)
+                        catch (HttpListenerException) when (metricsRetries > 0)
                         {
-                            retriesLeft--;
-                            continue;
+                            // only catch the exception if there are retries left
+                            metricsPort = TcpPortProvider.GetOpenPort();
+                            metricsRetries--;
                         }
 
-                        StatsdPort = basePort + retriesLeft;
-                        break;
+                        // always close listener if exception is thrown,
+                        // whether it was caught or not
+                        metricsListener.Close();
                     }
                 }
 
-                _statsdThread = new Thread(HandleStatsdRequests) { IsBackground = true };
-                _statsdThread.Start();
-
-                listeners.Add($"Stats at port {StatsdPort}");
+                listeners.Add($"Stats at port {MetricsPort}");
             }
 
             // try up to 5 consecutive ports before giving up
@@ -189,9 +207,9 @@ namespace Datadog.Trace.TestHelpers
         public int Port { get; }
 
         /// <summary>
-        /// Gets the UDP port for statsd
+        /// Gets the port that this agent is listening for SignalFx metrics on.
         /// </summary>
-        public int StatsdPort { get; }
+        public int MetricsPort { get; }
 
         public string TracesUdsPath { get; }
 
@@ -210,9 +228,9 @@ namespace Datadog.Trace.TestHelpers
 
         public IImmutableList<MockSpan> Spans { get; private set; } = ImmutableList<MockSpan>.Empty;
 
-        public IImmutableList<NameValueCollection> RequestHeaders { get; private set; } = ImmutableList<NameValueCollection>.Empty;
+        public IImmutableList<DataPoint> Metrics { get; private set; } = ImmutableList<DataPoint>.Empty;
 
-        public ConcurrentQueue<string> StatsdRequests { get; } = new();
+        public IImmutableList<NameValueCollection> RequestHeaders { get; private set; } = ImmutableList<NameValueCollection>.Empty;
 
         /// <summary>
         /// Gets or sets a value indicating whether to skip deserialization of traces.
@@ -300,8 +318,8 @@ namespace Datadog.Trace.TestHelpers
         public void Dispose()
         {
             _listener?.Stop();
+            _metricsListener?.Stop();
             _cancellationTokenSource.Cancel();
-            _udpClient?.Close();
 #if NETCOREAPP
             if (_udsTracesSocket != null)
             {
@@ -364,30 +382,6 @@ namespace Datadog.Trace.TestHelpers
             if (!assertion(header))
             {
                 throw new Exception($"Failed assertion for {headerKey} on {header}");
-            }
-        }
-
-        private void HandleStatsdRequests()
-        {
-            var endPoint = new IPEndPoint(IPAddress.Loopback, 0);
-
-            while (!_cancellationTokenSource.IsCancellationRequested)
-            {
-                try
-                {
-                    var buffer = _udpClient.Receive(ref endPoint);
-                    var stats = Encoding.UTF8.GetString(buffer);
-                    OnMetricsReceived(stats);
-                    StatsdRequests.Enqueue(stats);
-                }
-                catch (Exception) when (_cancellationTokenSource.IsCancellationRequested)
-                {
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Exceptions.Add(ex);
-                }
             }
         }
 
@@ -499,9 +493,15 @@ namespace Datadog.Trace.TestHelpers
                     var bytesReceived = new byte[0x1000];
                     // Connectionless protocol doesn't need Accept, Receive will block until we get something
                     var byteCount = _udsStatsSocket.Receive(bytesReceived);
+                    Stream stream = new MemoryStream(bytesReceived);
                     var stats = Encoding.UTF8.GetString(bytesReceived, 0, byteCount);
                     OnMetricsReceived(stats);
-                    StatsdRequests.Enqueue(stats);
+
+                    var uploadMessage = Vendors.ProtoBuf.Serializer.Deserialize<DataPointUploadMessage>(stream);
+                    lock (this)
+                    {
+                        Metrics = Metrics.AddRange(uploadMessage.datapoints);
+                    }
                 }
                 catch (Exception) when (_cancellationTokenSource.IsCancellationRequested)
                 {
@@ -599,6 +599,44 @@ namespace Datadog.Trace.TestHelpers
                     // for now ignore, and we'll see if this introduces downstream issues
                 }
                 catch (Exception) when (!_listener.IsListening)
+                {
+                    // we don't care about any exception when listener is stopped
+                }
+            }
+        }
+
+        private void HandleMetricsHttpRequests()
+        {
+            while (_metricsListener.IsListening)
+            {
+                try
+                {
+                    var ctx = _metricsListener.GetContext();
+                    var uploadMessage = Vendors.ProtoBuf.Serializer.Deserialize<DataPointUploadMessage>(ctx.Request.InputStream);
+
+                    lock (this)
+                    {
+                        Metrics = Metrics.AddRange(uploadMessage.datapoints);
+                    }
+
+                    ctx.Response.StatusCode = 200;
+                    ctx.Response.Close();
+                }
+                catch (HttpListenerException)
+                {
+                    // listener was stopped,
+                    // ignore to let the loop end and the method return
+                }
+                catch (ObjectDisposedException)
+                {
+                    // the response has been already disposed.
+                }
+                catch (InvalidOperationException)
+                {
+                    // this can occur when setting Response.ContentLength64, with the framework claiming that the response has already been submitted
+                    // for now ignore, and we'll see if this introduces downstream issues
+                }
+                catch (Exception) when (!_metricsListener.IsListening)
                 {
                     // we don't care about any exception when listener is stopped
                 }
