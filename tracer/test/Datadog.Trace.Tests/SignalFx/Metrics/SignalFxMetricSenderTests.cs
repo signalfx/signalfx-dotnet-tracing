@@ -11,7 +11,7 @@ namespace Datadog.Trace.Tests.SignalFx.Metrics
         [Fact]
         public void Gauge_metric_types_are_sent()
         {
-            var reporter = new TestReporter();
+            var reporter = new TestWriter();
             var sender = new SignalFxMetricSender(reporter, new[] { "tag1:v1" });
 
             sender.SendGaugeMetric("test_metric", 1.11, tags: new[] { "tag2:v2" });
@@ -22,7 +22,7 @@ namespace Datadog.Trace.Tests.SignalFx.Metrics
         [Fact]
         public void Counter_metric_types_are_sent()
         {
-            var reporter = new TestReporter();
+            var reporter = new TestWriter();
             var sender = new SignalFxMetricSender(reporter, new[] { "tag1:v1" });
 
             sender.SendCounterMetric("test_metric", 1.11, tags: new[] { "tag2:v2" });
@@ -30,14 +30,10 @@ namespace Datadog.Trace.Tests.SignalFx.Metrics
             Assert(reporter.SentMessages, MetricType.COUNTER);
         }
 
-        private static void Assert(IList<DataPointUploadMessage> dataPointUploadMessages, MetricType expectedMetricType)
+        private static void Assert(IList<DataPoint> dataPointUploadMessages, MetricType expectedMetricType)
         {
             dataPointUploadMessages.Should().HaveCount(1);
-
-            var sentMessage = dataPointUploadMessages[0];
-
-            sentMessage.datapoints.Should().HaveCount(1);
-            var dataPoint = sentMessage.datapoints[0];
+            var dataPoint = dataPointUploadMessages[0];
             dataPoint.metric.Should().Be("test_metric");
             dataPoint.value.doubleValue.Should().Be(1.11);
             dataPoint.metricType.Should().Be(expectedMetricType);
@@ -45,20 +41,25 @@ namespace Datadog.Trace.Tests.SignalFx.Metrics
 
             dataPointDimensions.Should().HaveCount(2);
 
-            dataPointDimensions[0].key.Should().Be("tag2");
-            dataPointDimensions[0].value.Should().Be("v2");
+            dataPointDimensions[0].key.Should().Be("tag1");
+            dataPointDimensions[0].value.Should().Be("v1");
 
-            dataPointDimensions[1].key.Should().Be("tag1");
-            dataPointDimensions[1].value.Should().Be("v1");
+            dataPointDimensions[1].key.Should().Be("tag2");
+            dataPointDimensions[1].value.Should().Be("v2");
         }
 
-        private class TestReporter : ISignalFxReporter
+        private class TestWriter : ISignalFxMetricWriter
         {
-            public IList<DataPointUploadMessage> SentMessages { get; } = new List<DataPointUploadMessage>();
+            public IList<DataPoint> SentMessages { get; } = new List<DataPoint>();
 
-            public void Send(DataPointUploadMessage msg)
+            public bool TryWrite(DataPoint msg)
             {
                 SentMessages.Add(msg);
+                return true;
+            }
+
+            public void Dispose()
+            {
             }
         }
     }
