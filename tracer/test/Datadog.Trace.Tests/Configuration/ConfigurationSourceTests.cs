@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.SignalFx.Metrics;
 using Datadog.Trace.Vendors.Newtonsoft.Json;
@@ -17,13 +18,24 @@ namespace Datadog.Trace.Tests.Configuration
 {
     [CollectionDefinition(nameof(ConfigurationSourceTests), DisableParallelization = true)]
     [Collection(nameof(ConfigurationSourceTests))]
-    public class ConfigurationSourceTests
+    public class ConfigurationSourceTests : IDisposable
     {
         private static readonly Dictionary<string, string> TagsK1V1K2V2 = new Dictionary<string, string> { { "k1", "v1" }, { "k2", "v2" } };
         private static readonly Dictionary<string, string> TagsK2V2 = new Dictionary<string, string> { { "k2", "v2" } };
         private static readonly Dictionary<string, string> HeaderTagsWithOptionalMappings = new Dictionary<string, string> { { "header1", "tag1" }, { "header2", "content-type" }, { "header3", "content-type" }, { "header4", "c___ont_____ent----typ_/_e" }, { "validheaderonly", string.Empty }, { "validheaderwithoutcolon", string.Empty } };
         private static readonly Dictionary<string, string> HeaderTagsWithDots = new Dictionary<string, string> { { "header3", "my.header.with.dot" }, { "my.new.header.with.dot", string.Empty } };
         private static readonly Dictionary<string, string> HeaderTagsSameTag = new Dictionary<string, string> { { "header1", "tag1" }, { "header2", "tag1" } };
+
+        private readonly Dictionary<string, string> _envVars;
+
+        public ConfigurationSourceTests()
+        {
+            _envVars = GetTestData()
+                      .Concat(GetGlobalTestData())
+                      .Select(allArgs => (string)allArgs[0])
+                      .Distinct()
+                      .ToDictionary(key => key, key => Environment.GetEnvironmentVariable(key));
+        }
 
         public static IEnumerable<object[]> GetGlobalDefaultTestData()
         {
@@ -167,6 +179,14 @@ namespace Datadog.Trace.Tests.Configuration
             return settingGetter;
         }
 
+        public void Dispose()
+        {
+            foreach (var envVar in _envVars)
+            {
+                Environment.SetEnvironmentVariable(envVar.Key, envVar.Value, EnvironmentVariableTarget.Process);
+            }
+        }
+
         [Theory]
         [MemberData(nameof(GetDefaultTestData))]
         public void DefaultSetting(Func<TracerSettings, object> settingGetter, object expectedValue)
@@ -199,40 +219,26 @@ namespace Datadog.Trace.Tests.Configuration
             Func<TracerSettings, object> settingGetter,
             object expectedValue)
         {
-            // save original value so we can restore later
-            var originalValue = Environment.GetEnvironmentVariable(key);
-
             TracerSettings settings;
 
             if (key == "SIGNALFX_SERVICE_NAME")
             {
                 // We need to ensure SIGNALFX_SERVICE_NAME is empty.
-                string originalServiceName = Environment.GetEnvironmentVariable(ConfigurationKeys.ServiceName);
                 Environment.SetEnvironmentVariable(ConfigurationKeys.ServiceName, null, EnvironmentVariableTarget.Process);
-
                 settings = GetTracerSettings(key, value);
-
-                // after load settings we can restore the original SIGNALFX_SERVICE_NAME
-                Environment.SetEnvironmentVariable(ConfigurationKeys.ServiceName, originalServiceName, EnvironmentVariableTarget.Process);
             }
             else if (key == ConfigurationKeys.AgentHost || key == ConfigurationKeys.AgentPort)
             {
-                // We need to ensure SIGNALFX_ENDPOINT_URL is empty.
-                string originalAgentUri = Environment.GetEnvironmentVariable(ConfigurationKeys.EndpointUrl);
-                Environment.SetEnvironmentVariable(ConfigurationKeys.EndpointUrl, null, EnvironmentVariableTarget.Process);
+                // We need to ensure all the agent URLs are empty.
+                Environment.SetEnvironmentVariable(ConfigurationKeys.AgentHost, null, EnvironmentVariableTarget.Process);
+                Environment.SetEnvironmentVariable(ConfigurationKeys.AgentPort, null, EnvironmentVariableTarget.Process);
 
                 settings = GetTracerSettings(key, value);
-
-                // after load settings we can restore the original SIGNALFX_ENDPOINT_URL
-                Environment.SetEnvironmentVariable(ConfigurationKeys.EndpointUrl, originalAgentUri, EnvironmentVariableTarget.Process);
             }
             else
             {
                 settings = GetTracerSettings(key, value);
             }
-
-            // restore original value
-            Environment.SetEnvironmentVariable(key, originalValue, EnvironmentVariableTarget.Process);
 
             object actualValue = settingGetter(settings);
             Assert.Equal(expectedValue, actualValue);
@@ -297,10 +303,8 @@ namespace Datadog.Trace.Tests.Configuration
             IConfigurationSource source = new EnvironmentConfigurationSource();
 
             // save original value so we can restore later
-            var originalValue = Environment.GetEnvironmentVariable(key);
             Environment.SetEnvironmentVariable(key, value, EnvironmentVariableTarget.Process);
             var settings = new GlobalSettings(source);
-            Environment.SetEnvironmentVariable(key, originalValue, EnvironmentVariableTarget.Process);
 
             object actualValue = settingGetter(settings);
             Assert.Equal(expectedValue, actualValue);
