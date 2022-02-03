@@ -168,6 +168,7 @@ namespace Datadog.Trace.Security.IntegrationTests
                 EnvironmentHelper,
                 agent,
                 args,
+                metricCollectorPort: metricCollectorPort,
                 logsCollectorPort: logsCollectorPort,
                 aspNetCorePort: aspNetCorePort.GetValueOrDefault(5000),
                 enableSecurity: enableSecurity,
