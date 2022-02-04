@@ -195,7 +195,6 @@ namespace Datadog.Trace.TestHelpers
         public void SetEnvironmentVariables(
             MockTracerAgent agent,
             int aspNetCorePort,
-            int? metricCollectorPort,
             int? logsCollectorPort,
             StringDictionary environmentVariables,
             string processToProfile = null,
@@ -231,11 +230,6 @@ namespace Datadog.Trace.TestHelpers
 
             // for ASP.NET Core sample apps, set the server's port
             environmentVariables["ASPNETCORE_URLS"] = $"http://127.0.0.1:{aspNetCorePort}/";
-
-            if (metricCollectorPort != null)
-            {
-                environmentVariables["SIGNALFX_METRICS_ENDPOINT_URL"] = $"http://127.0.0.1:{metricCollectorPort}/";
-            }
 
             if (logsCollectorPort.HasValue)
             {
@@ -312,7 +306,7 @@ namespace Datadog.Trace.TestHelpers
 
                 if (agent.MetricsPort != default(int))
                 {
-                    environmentVariables["SIGNALFX_DOGSTATSD_PORT"] = agent.MetricsPort.ToString();
+                    environmentVariables["SIGNALFX_METRICS_ENDPOINT_URL"] = $"http://127.0.0.1:{agent.MetricsPort}/";
                 }
             }
         }

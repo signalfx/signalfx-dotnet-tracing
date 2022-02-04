@@ -6,14 +6,12 @@
 // Modified by Splunk Inc.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Datadog.Trace.AppSec.EventModel;
 using Datadog.Trace.TestHelpers;
 using Datadog.Trace.Vendors.Newtonsoft.Json;
 using VerifyTests;
@@ -139,7 +137,6 @@ namespace Datadog.Trace.Security.IntegrationTests
             string arguments,
             int? aspNetCorePort = null,
             string packageVersion = "",
-            int? metricCollectorPort = null,
             int? logsCollectorPort = null,
             string framework = "",
             string path = "/Home",
@@ -168,7 +165,6 @@ namespace Datadog.Trace.Security.IntegrationTests
                 EnvironmentHelper,
                 agent,
                 args,
-                metricCollectorPort: metricCollectorPort,
                 logsCollectorPort: logsCollectorPort,
                 aspNetCorePort: aspNetCorePort.GetValueOrDefault(5000),
                 enableSecurity: enableSecurity,

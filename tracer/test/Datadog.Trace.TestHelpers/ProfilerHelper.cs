@@ -17,7 +17,6 @@ namespace Datadog.Trace.TestHelpers
             string arguments = null,
             bool redirectStandardInput = false,
             int aspNetCorePort = 5000,
-            int? metricCollectorPort = null,
             int? logsCollectorPort = null,
             string processToProfile = null,
             bool? enableSecurity = null,
@@ -37,7 +36,6 @@ namespace Datadog.Trace.TestHelpers
             environmentHelper.SetEnvironmentVariables(
                 agent,
                 aspNetCorePort,
-                metricCollectorPort,
                 logsCollectorPort,
                 startInfo.EnvironmentVariables,
                 processToProfile,
