@@ -1,10 +1,13 @@
 // Modified by Splunk Inc.
 
 // Thread Sampling is not supported by .NET Framework and lower versions of .NET Core
+
 #if NETCOREAPP3_1_OR_GREATER
 
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Datadog.Trace.TestHelpers;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -48,6 +51,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 foreach (var data in logsData)
                 {
                     var logRecords = data.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs;
+
+                    await DumpLogRecords(data);
 
                     using (new AssertionScope())
                     {
@@ -99,6 +104,17 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 "\tat ClassC.MethodC(unknown)\n" +
                 "\tat ClassB.MethodB(unknown)\n" +
                 "\tat ClassA.MethodA(unknown)\n");
+        }
+
+        private async Task DumpLogRecords(LogsData data)
+        {
+            await using var memoryStream = new MemoryStream();
+            await System.Text.Json.JsonSerializer.SerializeAsync(memoryStream, data);
+            memoryStream.Position = 0;
+            using var sr = new StreamReader(memoryStream);
+            var readToEnd = await sr.ReadToEndAsync();
+
+            Output.WriteLine(readToEnd);
         }
     }
 }
