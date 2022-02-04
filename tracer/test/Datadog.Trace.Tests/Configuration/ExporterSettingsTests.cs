@@ -1,4 +1,4 @@
-﻿// Modified by Splunk Inc.
+// Modified by Splunk Inc.
 
 using System.Collections.Specialized;
 using Datadog.Trace.Configuration;
@@ -28,7 +28,7 @@ public class ExporterSettingsTests
 
         var settings = new ExporterSettings(configuration);
 
-        settings.MetricsEndpointUrl.Should().Be("http://localhost:9943/v2/datapoint");
+        settings.MetricsEndpointUrl.Should().Be("http://127.0.0.1:9943/v2/datapoint");
     }
 
     [Fact]
@@ -76,7 +76,7 @@ public class ExporterSettingsTests
 
         var settings = new ExporterSettings(configuration);
 
-        settings.MetricsEndpointUrl.Should().Be("http://localhost:9943/v2/datapoint");
+        settings.MetricsEndpointUrl.Should().Be("http://127.0.0.1:9943/v2/datapoint");
     }
 
     [Theory]
