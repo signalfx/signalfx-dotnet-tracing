@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 using Datadog.Trace.Agent;
 using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.Configuration;
-using Datadog.Trace.Logging;
 using Datadog.Trace.PlatformHelpers;
 using Datadog.Trace.Propagation;
 using Datadog.Trace.Sampling;
@@ -28,7 +27,7 @@ namespace Datadog.Trace
     /// </summary>
     public class Tracer : ITracer, IDatadogTracer, IDatadogOpenTracingTracer
     {
-        private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(Tracer));
+        private static readonly object GlobalInstanceLock = new();
 
         /// <summary>
         /// The number of Tracer instances that have been created and not yet destroyed.
@@ -39,7 +38,6 @@ namespace Datadog.Trace
 
         private static Tracer _instance;
         private static bool _globalInstanceInitialized;
-        private static object _globalInstanceLock = new object();
 
         private readonly TracerManager _tracerManager;
 
@@ -129,11 +127,26 @@ namespace Datadog.Trace
         {
             get
             {
-                return LazyInitializer.EnsureInitialized(
-                    ref _instance,
-                    ref _globalInstanceInitialized,
-                    ref _globalInstanceLock,
-                    () => new Tracer(tracerManager: null)); // don't replace settings, use existing
+                if (_globalInstanceInitialized)
+                {
+                    return _instance;
+                }
+
+                Tracer instance;
+                lock (GlobalInstanceLock)
+                {
+                    if (_globalInstanceInitialized)
+                    {
+                        return _instance;
+                    }
+
+                    instance = new Tracer(tracerManager: null); // don't replace settings, use existing
+                    _instance = instance;
+                    _globalInstanceInitialized = true;
+                }
+
+                instance.TracerManager.Start();
+                return instance;
             }
 
             // TODO: Make this API internal
@@ -141,7 +154,7 @@ namespace Datadog.Trace
                       " instance in code.")]
             set
             {
-                lock (_globalInstanceLock)
+                lock (GlobalInstanceLock)
                 {
                     // This check is probably no longer necessary, as it's the TracerManager we really care about
                     // Kept for safety reasons
@@ -153,6 +166,8 @@ namespace Datadog.Trace
                     _instance = value;
                     _globalInstanceInitialized = true;
                 }
+
+                value?.TracerManager.Start();
             }
         }
 
@@ -241,11 +256,13 @@ namespace Datadog.Trace
         /// <param name="instance">Tracer instance</param>
         internal static void UnsafeSetTracerInstance(Tracer instance)
         {
-            lock (_globalInstanceLock)
+            lock (GlobalInstanceLock)
             {
                 _instance = instance;
                 _globalInstanceInitialized = true;
             }
+
+            instance?.TracerManager.Start();
         }
 
         /// <inheritdoc cref="ITracer" />
