@@ -230,8 +230,6 @@ namespace Datadog.Trace.TestHelpers
 
         public IImmutableList<DataPoint> Metrics { get; private set; } = ImmutableList<DataPoint>.Empty;
 
-        public ConcurrentQueue<string> UdsMetrics { get; } = new();
-
         public IImmutableList<NameValueCollection> RequestHeaders { get; private set; } = ImmutableList<NameValueCollection>.Empty;
 
         /// <summary>
@@ -495,9 +493,15 @@ namespace Datadog.Trace.TestHelpers
                     var bytesReceived = new byte[0x1000];
                     // Connectionless protocol doesn't need Accept, Receive will block until we get something
                     var byteCount = _udsStatsSocket.Receive(bytesReceived);
+                    Stream stream = new MemoryStream(bytesReceived);
                     var stats = Encoding.UTF8.GetString(bytesReceived, 0, byteCount);
                     OnMetricsReceived(stats);
-                    UdsMetrics.Enqueue(stats);
+
+                    var uploadMessage = Vendors.ProtoBuf.Serializer.Deserialize<DataPointUploadMessage>(stream);
+                    lock (this)
+                    {
+                        Metrics = Metrics.AddRange(uploadMessage.datapoints);
+                    }
                 }
                 catch (Exception) when (_cancellationTokenSource.IsCancellationRequested)
                 {
