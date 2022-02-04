@@ -53,7 +53,24 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         public void UdsSubmitsMetrics()
         {
             EnvironmentHelper.EnableUnixDomainSockets();
-            RunTest();
+            SetEnvironmentVariable("SIGNALFX_RUNTIME_METRICS_ENABLED", "1");
+
+            using var agent = EnvironmentHelper.GetMockAgent(useStatsD: true);
+            Output.WriteLine($"Assigning port {agent.MetricsPort} for the SignalFx metrics.");
+
+            using var processResult = RunSampleAndWaitForExit(agent);
+            var requests = agent.UdsMetrics;
+
+            // Check if we receive 2 kinds of metrics:
+            // - exception count is gathered using common .NET APIs
+            // - contention count is gathered using platform-specific APIs
+
+            var exceptionRequestsCount = requests.Count(r => r.Contains("runtime.dotnet.exceptions.count"));
+            Assert.True(exceptionRequestsCount > 0, "No exception metrics received.");
+
+            var contentionRequestsCount = requests.Count(r => r.Contains("runtime.dotnet.threads.contention_count"));
+            Assert.True(contentionRequestsCount > 0, "No contention metrics received.");
+            Assert.Empty(agent.Exceptions);
         }
 #endif
 
