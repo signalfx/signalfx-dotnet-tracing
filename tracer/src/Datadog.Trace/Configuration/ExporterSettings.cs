@@ -154,7 +154,7 @@ namespace Datadog.Trace.Configuration
         {
             return IsDefaultIngestRealm(ingestRealm) ?
                        // local collector
-                       new Uri("http://127.0.0.1:9943/v2/datapoint") :
+                       new Uri("http://localhost:9943/v2/datapoint") :
                        // direct ingest
                        new Uri($"https://ingest.{ingestRealm}.signalfx.com/v2/datapoint");
         }
@@ -163,7 +163,7 @@ namespace Datadog.Trace.Configuration
         {
             return IsDefaultIngestRealm(ingestRealm) ?
                        // local collector
-                       new Uri($"http://127.0.0.1:{agentPort}/api/v2/spans", UriKind.Absolute) :
+                       new Uri($"http://localhost:{agentPort}/api/v2/spans", UriKind.Absolute) :
                        // direct ingest
                        new Uri($"https://ingest.{ingestRealm}.signalfx.com/v2/trace", UriKind.Absolute);
         }
@@ -206,7 +206,7 @@ namespace Datadog.Trace.Configuration
         {
             var logsEndpointUrl = source?.GetString(ConfigurationKeys.LogsEndpointUrl) ??
                                   // default value
-                                  "http://127.0.0.1:4318/v1/logs";
+                                  "http://localhost:4318/v1/logs";
             LogsEndpointUrl = new Uri(logsEndpointUrl);
         }
 
