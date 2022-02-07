@@ -1,4 +1,4 @@
-﻿// Modified by Splunk Inc.
+// Modified by Splunk Inc.
 
 using System.Collections.Specialized;
 using Datadog.Trace.Configuration;
