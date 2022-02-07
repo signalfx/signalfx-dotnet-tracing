@@ -1,3 +1,5 @@
+// Modified by Splunk Inc.
+
 using System;
 using Datadog.Trace.Logging;
 
