@@ -44,9 +44,6 @@ namespace Datadog.Trace.Configuration
             MetricsPipeName = settings.MetricsPipeName;
             DogStatsdPort = settings.DogStatsdPort;
 
-            TracesUnixDomainSocketPath = settings.TracesUnixDomainSocketPath;
-            MetricsUnixDomainSocketPath = settings.MetricsUnixDomainSocketPath;
-
             PartialFlushEnabled = settings.PartialFlushEnabled;
             PartialFlushMinSpans = settings.PartialFlushMinSpans;
         }
@@ -108,18 +105,6 @@ namespace Datadog.Trace.Configuration
         /// Gets the minimum number of closed spans in a trace before it's partially flushed
         /// </summary>
         public int PartialFlushMinSpans { get; }
-
-        /// <summary>
-        /// Gets the unix domain socket path where the Tracer can connect to the Agent.
-        /// </summary>
-        /// <seealso cref="ConfigurationKeys.TracesUnixDomainSocketPath"/>
-        public string TracesUnixDomainSocketPath { get; }
-
-        /// <summary>
-        /// Gets the unix domain socket path where the Tracer can send stats.
-        /// </summary>
-        /// <seealso cref="ConfigurationKeys.MetricsUnixDomainSocketPath"/>
-        public string MetricsUnixDomainSocketPath { get; }
 
         /// <summary>
         /// Gets the transport used to send traces to the Agent.

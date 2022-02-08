@@ -78,8 +78,6 @@ namespace Datadog.Trace.Tests.Configuration
                 (e, i) => e.AgentUri == i.AgentUri,
                 (e, i) => e.PartialFlushEnabled == i.PartialFlushEnabled,
                 (e, i) => e.PartialFlushMinSpans == i.PartialFlushMinSpans,
-                (e, i) => e.MetricsUnixDomainSocketPath == i.MetricsUnixDomainSocketPath,
-                (e, i) => e.TracesUnixDomainSocketPath == i.TracesUnixDomainSocketPath,
             };
 
             var mutableProperties = typeof(ExporterSettings)
@@ -90,8 +88,6 @@ namespace Datadog.Trace.Tests.Configuration
 
             var exporterSettings = new ExporterSettings();
 
-            exporterSettings.MetricsUnixDomainSocketPath = "metricsuds";
-            exporterSettings.TracesUnixDomainSocketPath = "tracesuds";
             exporterSettings.MetricsPipeName = "metricspipe";
             exporterSettings.TracesPipeName = "tracespipe";
             exporterSettings.DogStatsdPort = 1234;

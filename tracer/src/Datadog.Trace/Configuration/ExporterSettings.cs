@@ -6,10 +6,8 @@
 // Modified by Splunk Inc.
 
 using System;
-using System.IO;
 using Datadog.Trace.Agent;
 using Datadog.Trace.Configuration.Helpers;
-using Datadog.Trace.Vendors.StatsdClient.Transport;
 using MetricsTransportType = Datadog.Trace.Vendors.StatsdClient.Transport.TransportType;
 
 namespace Datadog.Trace.Configuration
@@ -20,11 +18,6 @@ namespace Datadog.Trace.Configuration
     public class ExporterSettings
     {
         private int _partialFlushMinSpans;
-
-        /// <summary>
-        /// Allows overriding of file system access for tests.
-        /// </summary>
-        private Func<string, bool> _fileExists;
 
         /// <summary>
         /// The default host value for <see cref="AgentUri"/>.
@@ -44,21 +37,6 @@ namespace Datadog.Trace.Configuration
         private const string LocalIngestRealm = "none";
 
         /// <summary>
-        /// Prefix for unix domain sockets.
-        /// </summary>
-        internal const string UnixDomainSocketPrefix = "unix://";
-
-        /// <summary>
-        /// Default traces UDS path.
-        /// </summary>
-        internal const string DefaultTracesUnixDomainSocket = "/var/run/datadog/apm.socket";
-
-        /// <summary>
-        /// Default metrics UDS path.
-        /// </summary>
-        internal const string DefaultMetricsUnixDomainSocket = "/var/run/datadog/dsd.socket";
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ExporterSettings"/> class with default values.
         /// </summary>
         public ExporterSettings()
@@ -67,23 +45,11 @@ namespace Datadog.Trace.Configuration
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ExporterSettings"/> class
-        /// using the specified <see cref="IConfigurationSource"/> to initialize values.
-        /// </summary>
-        /// <param name="source">The <see cref="IConfigurationSource"/> to use when retrieving configuration values.</param>
-        public ExporterSettings(IConfigurationSource source)
-            : this(source, File.Exists)
-        {
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ExporterSettings"/> class.
         /// Direct use in tests only.
         /// </summary>
-        internal ExporterSettings(IConfigurationSource source, Func<string, bool> fileExists)
+        internal ExporterSettings(IConfigurationSource source)
         {
-            _fileExists = fileExists;
-
             var ingestRealm = source?.GetString(ConfigurationKeys.IngestRealm) ??
                               LocalIngestRealm;
 
@@ -141,18 +107,6 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="ConfigurationKeys.MetricsPipeName"/>
         public string MetricsPipeName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the unix domain socket path where the Tracer can connect to the Agent.
-        /// </summary>
-        /// <seealso cref="ConfigurationKeys.TracesUnixDomainSocketPath"/>
-        public string TracesUnixDomainSocketPath { get; set; }
-
-        /// <summary>
-        /// Gets or sets the unix domain socket path where the Tracer can send stats.
-        /// </summary>
-        /// <seealso cref="ConfigurationKeys.MetricsUnixDomainSocketPath"/>
-        public string MetricsUnixDomainSocketPath { get; set; }
 
         /// <summary>
         /// Gets or sets the port where the DogStatsd server is listening for connections.
@@ -234,21 +188,6 @@ namespace Datadog.Trace.Configuration
                 {
                     metricsTransport = MetricsTransportType.NamedPipe;
                 }
-                else
-                {
-                    // Check for UDS
-                    var metricsUnixDomainSocketPath = source?.GetString(ConfigurationKeys.MetricsUnixDomainSocketPath);
-                    if (metricsUnixDomainSocketPath != null)
-                    {
-                        metricsTransport = MetricsTransportType.UDS;
-                        MetricsUnixDomainSocketPath = metricsUnixDomainSocketPath;
-                    }
-                    else if (_fileExists(DefaultMetricsUnixDomainSocket))
-                    {
-                        metricsTransport = MetricsTransportType.UDS;
-                        MetricsUnixDomainSocketPath = DefaultMetricsUnixDomainSocket;
-                    }
-                }
             }
 
             if (metricsTransport == null)
@@ -307,17 +246,9 @@ namespace Datadog.Trace.Configuration
 
             if (hasExplicitHostOrPortSettings)
             {
-                if (AgentUri.Host?.StartsWith(UnixDomainSocketPrefix) ?? false)
-                {
-                    traceTransport = TracesTransportType.UnixDomainSocket;
-                    TracesUnixDomainSocketPath = AgentUri.Host;
-                }
-                else
-                {
-                    // The agent host is explicitly configured, we should assume UDP for metrics
-                    forceMetricsOverUdp = true;
-                    traceTransport = TracesTransportType.Default;
-                }
+                // The agent host is explicitly configured, we should assume UDP for metrics
+                forceMetricsOverUdp = true;
+                traceTransport = TracesTransportType.Default;
             }
             else if (!string.IsNullOrWhiteSpace(TracesPipeName))
             {
@@ -329,27 +260,6 @@ namespace Datadog.Trace.Configuration
 #else
                     ?? 500;
 #endif
-            }
-
-            if (traceTransport == null)
-            {
-                // Check for UDS
-                var traceSocket = source?.GetString(ConfigurationKeys.TracesUnixDomainSocketPath);
-
-                if (traceSocket != null)
-                {
-                    traceTransport = TracesTransportType.UnixDomainSocket;
-                    TracesUnixDomainSocketPath = traceSocket;
-                }
-                else
-                {
-                    // check for default file
-                    if (_fileExists(DefaultTracesUnixDomainSocket))
-                    {
-                        traceTransport = TracesTransportType.UnixDomainSocket;
-                        TracesUnixDomainSocketPath = DefaultTracesUnixDomainSocket;
-                    }
-                }
             }
 
             TracesTransport = traceTransport ?? TracesTransportType.Default;

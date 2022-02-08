@@ -46,17 +46,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             RunTest();
         }
 
-#if NETCOREAPP3_1_OR_GREATER
-        [SkippableFact]
-        [Trait("Category", "EndToEnd")]
-        [Trait("RunOnWindows", "False")]
-        public void UdsSubmitsMetrics()
-        {
-            EnvironmentHelper.EnableUnixDomainSockets();
-            RunTest();
-        }
-#endif
-
         private void RunTest()
         {
             SetEnvironmentVariable("SIGNALFX_RUNTIME_METRICS_ENABLED", "1");
@@ -66,37 +55,23 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
             using var processResult = RunSampleAndWaitForExit(agent);
 
-            if (EnvironmentHelper.TransportType != TestTransports.Uds)
+            var requests = agent.Metrics;
+
+            // Check if we receive 2 kinds of metrics:
+            // - exception count is gathered using common .NET APIs
+            // - contention count is gathered using platform-specific APIs
+
+            var exceptionRequestsCount = requests.Count(r => r.metric == "runtime.dotnet.exceptions.count");
+
+            Assert.True(exceptionRequestsCount > 0, "No exception metrics received.");
+
+            // Check if .NET Framework or .NET Core 3.1+
+            if (!EnvironmentHelper.IsCoreClr()
+             || (Environment.Version.Major == 3 && Environment.Version.Minor == 1)
+             || Environment.Version.Major >= 5)
             {
-                var requests = agent.Metrics;
+                var contentionRequestsCount = requests.Count(r => r.metric == "runtime.dotnet.threads.contention_count");
 
-                // Check if we receive 2 kinds of metrics:
-                // - exception count is gathered using common .NET APIs
-                // - contention count is gathered using platform-specific APIs
-
-                var exceptionRequestsCount = requests.Count(r => r.metric == "runtime.dotnet.exceptions.count");
-
-                Assert.True(exceptionRequestsCount > 0, "No exception metrics received.");
-
-                // Check if .NET Framework or .NET Core 3.1+
-                if (!EnvironmentHelper.IsCoreClr()
-                 || (Environment.Version.Major == 3 && Environment.Version.Minor == 1)
-                 || Environment.Version.Major >= 5)
-                {
-                    var contentionRequestsCount = requests.Count(r => r.metric == "runtime.dotnet.threads.contention_count");
-
-                    Assert.True(contentionRequestsCount > 0, "No contention metrics received.");
-                }
-
-                Assert.Empty(agent.Exceptions);
-            }
-            else
-            {
-                var requests = agent.UdsMetrics;
-                var exceptionRequestsCount = requests.Count(r => r.Contains("runtime.dotnet.exceptions.count"));
-                Assert.True(exceptionRequestsCount > 0, "No exception metrics received.");
-
-                var contentionRequestsCount = requests.Count(r => r.Contains("runtime.dotnet.threads.contention_count"));
                 Assert.True(contentionRequestsCount > 0, "No contention metrics received.");
             }
 

@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Specialized;
-using System.Linq;
 using Datadog.Trace.Agent;
 using Datadog.Trace.Configuration;
 using FluentAssertions;
@@ -142,7 +141,7 @@ public class ExporterSettingsTests
     [Fact]
     public void NoSocketFiles_NoExplicitConfiguration_DefaultsMatchExpectation()
     {
-        var config = Setup(FileExistsMock());
+        var config = Setup();
         Assert.Equal(expected: TracesTransportType.Default, actual: config.TracesTransport);
         Assert.Equal(expected: MetricsTransportType.UDP, actual: config.MetricsTransport);
         Assert.Equal(expected: new Uri("http://127.0.0.1:9411/api/v2/spans"), actual: config.AgentUri);
@@ -154,24 +153,16 @@ public class ExporterSettingsTests
     [Fact]
     public void PartialFlushVariables_Populated()
     {
-        var config = Setup(FileExistsMock(), "SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED-true", "SIGNALFX_TRACE_PARTIAL_FLUSH_MIN_SPANS-999");
+        var config = Setup("SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED-true", "SIGNALFX_TRACE_PARTIAL_FLUSH_MIN_SPANS-999");
         Assert.True(config.PartialFlushEnabled);
         Assert.Equal(expected: 999, actual: config.PartialFlushMinSpans);
-    }
-
-    [Fact]
-    public void Traces_SocketFilesExist_NoExplicitConfig_UsesTraceSocket()
-    {
-        var config = Setup(DefaultSocketFilesExist());
-        Assert.Equal(expected: TracesTransportType.UnixDomainSocket, actual: config.TracesTransport);
-        Assert.Equal(expected: ExporterSettings.DefaultTracesUnixDomainSocket, actual: config.TracesUnixDomainSocketPath);
     }
 
     [Fact]
     public void Traces_SocketFilesExist_ExplicitAgentHost_UsesDefaultTcp()
     {
         var expectedUri = new Uri("http://127.0.0.1:9411/api/v2/spans");
-        var config = Setup(DefaultSocketFilesExist(), "SIGNALFX_ENDPOINT_URL-http://127.0.0.1:9411/api/v2/spans");
+        var config = Setup("SIGNALFX_ENDPOINT_URL-http://127.0.0.1:9411/api/v2/spans");
         Assert.Equal(expected: TracesTransportType.Default, actual: config.TracesTransport);
         Assert.Equal(expected: expectedUri, actual: config.AgentUri);
     }
@@ -180,7 +171,7 @@ public class ExporterSettingsTests
     public void Traces_SocketFilesExist_ExplicitTraceAgentPort_UsesDefaultTcp()
     {
         var expectedUri = new Uri("http://127.0.0.1:8111/api/v2/spans");
-        var config = Setup(DefaultSocketFilesExist(), "SIGNALFX_TRACE_AGENT_PORT-8111");
+        var config = Setup("SIGNALFX_TRACE_AGENT_PORT-8111");
         Assert.Equal(expected: TracesTransportType.Default, actual: config.TracesTransport);
         Assert.Equal(expected: expectedUri, actual: config.AgentUri);
     }
@@ -188,17 +179,9 @@ public class ExporterSettingsTests
     [Fact]
     public void Traces_SocketFilesExist_ExplicitWindowsPipeConfig_UsesWindowsNamedPipe()
     {
-        var config = Setup(DefaultSocketFilesExist(), "SIGNALFX_TRACE_PIPE_NAME-somepipe");
+        var config = Setup("SIGNALFX_TRACE_PIPE_NAME-somepipe");
         Assert.Equal(expected: TracesTransportType.WindowsNamedPipe, actual: config.TracesTransport);
         Assert.Equal(expected: "somepipe", actual: config.TracesPipeName);
-    }
-
-    [Fact]
-    public void Traces_SocketFilesExist_ExplicitUdsConfig_UsesExplicitConfig()
-    {
-        var config = Setup(DefaultSocketFilesExist(), "SIGNALFX_TRACE_APM_RECEIVER_SOCKET-somesocket");
-        Assert.Equal(expected: TracesTransportType.UnixDomainSocket, actual: config.TracesTransport);
-        Assert.Equal(expected: "somesocket", actual: config.TracesUnixDomainSocketPath);
     }
 
     /// <summary>
@@ -208,30 +191,22 @@ public class ExporterSettingsTests
     [Fact]
     public void Traces_SocketFilesExist_ExplicitConfigForWindowsPipeAndUdp_PrioritizesWindowsPipe()
     {
-        var config = Setup(DefaultSocketFilesExist(), "SIGNALFX_TRACE_PIPE_NAME-somepipe", "SIGNALFX_APM_RECEIVER_SOCKET-somesocket");
+        var config = Setup("SIGNALFX_TRACE_PIPE_NAME-somepipe", "SIGNALFX_APM_RECEIVER_SOCKET-somesocket");
         Assert.Equal(expected: TracesTransportType.WindowsNamedPipe, actual: config.TracesTransport);
     }
 
     [Fact]
     public void Traces_SocketFilesExist_ExplicitConfigForAll_UsesDefaultTcp()
     {
-        var config = Setup(DefaultSocketFilesExist(), "SIGNALFX_ENDPOINT_URL-http://127.0.0.1:9411/api/v2/spans", "SIGNALFX_TRACE_PIPE_NAME-somepipe", "SIGNALFX_APM_RECEIVER_SOCKET-somesocket");
+        var config = Setup("SIGNALFX_ENDPOINT_URL-http://127.0.0.1:9411/api/v2/spans", "SIGNALFX_TRACE_PIPE_NAME-somepipe", "SIGNALFX_APM_RECEIVER_SOCKET-somesocket");
         Assert.Equal(expected: TracesTransportType.Default, actual: config.TracesTransport);
-    }
-
-    [Fact]
-    public void Metrics_SocketFilesExist_NoExplicitConfig_UsesMetricsSocket()
-    {
-        var config = Setup(DefaultSocketFilesExist());
-        Assert.Equal(expected: MetricsTransportType.UDS, actual: config.MetricsTransport);
-        Assert.Equal(expected: ExporterSettings.DefaultMetricsUnixDomainSocket, actual: config.MetricsUnixDomainSocketPath);
     }
 
     [Fact]
     public void Metrics_SocketFilesExist_ExplicitMetricsPort_UsesUdp()
     {
         var expectedPort = 11125;
-        var config = Setup(DefaultSocketFilesExist(), "SIGNALFX_DOGSTATSD_PORT-11125");
+        var config = Setup("SIGNALFX_DOGSTATSD_PORT-11125");
         Assert.Equal(expected: MetricsTransportType.UDP, actual: config.MetricsTransport);
         Assert.Equal(expected: expectedPort, actual: config.DogStatsdPort);
     }
@@ -239,27 +214,19 @@ public class ExporterSettingsTests
     [Fact]
     public void Metrics_SocketFilesExist_ExplicitWindowsPipeConfig_UsesWindowsNamedPipe()
     {
-        var config = Setup(DefaultSocketFilesExist(), "SIGNALFX_DOGSTATSD_PIPE_NAME-somepipe");
+        var config = Setup("SIGNALFX_DOGSTATSD_PIPE_NAME-somepipe");
         Assert.Equal(expected: MetricsTransportType.NamedPipe, actual: config.MetricsTransport);
         Assert.Equal(expected: "somepipe", actual: config.MetricsPipeName);
     }
 
     [Fact]
-    public void Metrics_SocketFilesExist_ExplicitUdsConfig_UsesExplicitConfig()
-    {
-        var config = Setup(DefaultSocketFilesExist(), "SIGNALFX_DOGSTATSD_SOCKET-somesocket");
-        Assert.Equal(expected: MetricsTransportType.UDS, actual: config.MetricsTransport);
-        Assert.Equal(expected: "somesocket", actual: config.MetricsUnixDomainSocketPath);
-    }
-
-    [Fact]
     public void Metrics_SocketFilesExist_ExplicitConfigForAll_UsesDefaultTcp()
     {
-        var config = Setup(DefaultSocketFilesExist(), "SIGNALFX_ENDPOINT_URL-http://localhost:100", "SIGNALFX_DOGSTATSD_PIPE_NAME-somepipe", "SIGNALFX_DOGSTATSD_SOCKET-somesocket");
+        var config = Setup("SIGNALFX_ENDPOINT_URL-http://localhost:100", "SIGNALFX_DOGSTATSD_PIPE_NAME-somepipe", "SIGNALFX_DOGSTATSD_SOCKET-somesocket");
         Assert.Equal(expected: TracesTransportType.Default, actual: config.TracesTransport);
     }
 
-    private ExporterSettings Setup(Func<string, bool> fileExistsMock, params string[] config)
+    private ExporterSettings Setup(params string[] config)
     {
         var configNameValues = new NameValueCollection();
 
@@ -271,21 +238,8 @@ public class ExporterSettingsTests
 
         var configSource = new NameValueConfigurationSource(configNameValues);
 
-        var exporterSettings = new ExporterSettings(configSource, fileExistsMock);
+        var exporterSettings = new ExporterSettings(configSource);
 
         return exporterSettings;
-    }
-
-    private Func<string, bool> DefaultSocketFilesExist()
-    {
-        return FileExistsMock(ExporterSettings.DefaultTracesUnixDomainSocket, ExporterSettings.DefaultMetricsUnixDomainSocket);
-    }
-
-    private Func<string, bool> FileExistsMock(params string[] existingFiles)
-    {
-        return (f) =>
-        {
-            return existingFiles.Contains(f);
-        };
     }
 }

@@ -217,16 +217,6 @@ namespace Datadog.Trace
                             ConstantTags = constantTags.ToArray()
                         });
                         break;
-#if NETCOREAPP3_1_OR_GREATER
-                    case MetricsTransportType.UDS:
-                        Log.Information("Using unix domain sockets for metrics transport.");
-                        statsd.Configure(new StatsdConfig
-                        {
-                            StatsdServerName = $"{ExporterSettings.UnixDomainSocketPrefix}{settings.ExporterSettings.MetricsUnixDomainSocketPath}",
-                            ConstantTags = constantTags.ToArray()
-                        });
-                        break;
-#endif
                     case MetricsTransportType.UDP:
                     default:
                         statsd.Configure(new StatsdConfig

@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 namespace Datadog.Trace.TestHelpers
 {
     public enum TestTransports
@@ -11,11 +13,6 @@ namespace Datadog.Trace.TestHelpers
         /// Default transport
         /// </summary>
         Tcp,
-
-        /// <summary>
-        /// Unix Domain Socket, primarily used in container orchestration
-        /// </summary>
-        Uds,
 
         /// <summary>
         /// Windows Named Pipes, primarily used in Azure App Service scenarios

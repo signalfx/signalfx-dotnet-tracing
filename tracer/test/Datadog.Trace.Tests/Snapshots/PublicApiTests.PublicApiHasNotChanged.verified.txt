@@ -30,18 +30,15 @@ namespace Datadog.Trace.Configuration
         public const string DefaultAgentHost = "localhost";
         public const int DefaultAgentPort = 9411;
         public ExporterSettings() { }
-        public ExporterSettings(Datadog.Trace.Configuration.IConfigurationSource source) { }
         public System.Uri AgentUri { get; set; }
         public int DogStatsdPort { get; set; }
         public System.Uri LogsEndpointUrl { get; set; }
         public System.Uri MetricsEndpointUrl { get; set; }
         public string MetricsPipeName { get; set; }
-        public string MetricsUnixDomainSocketPath { get; set; }
         public bool PartialFlushEnabled { get; set; }
         public int PartialFlushMinSpans { get; set; }
         public string TracesPipeName { get; set; }
         public int TracesPipeTimeoutMs { get; set; }
-        public string TracesUnixDomainSocketPath { get; set; }
     }
     public enum ExporterType
     {
@@ -76,12 +73,10 @@ namespace Datadog.Trace.Configuration
         public System.Uri LogsEndpointUrl { get; }
         public System.Uri MetricsEndpointUrl { get; }
         public string MetricsPipeName { get; }
-        public string MetricsUnixDomainSocketPath { get; }
         public bool PartialFlushEnabled { get; }
         public int PartialFlushMinSpans { get; }
         public string TracesPipeName { get; }
         public int TracesPipeTimeoutMs { get; }
-        public string TracesUnixDomainSocketPath { get; }
     }
     public class ImmutableIntegrationSettings
     {

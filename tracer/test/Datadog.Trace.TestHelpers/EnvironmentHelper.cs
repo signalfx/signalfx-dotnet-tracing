@@ -283,15 +283,7 @@ namespace Datadog.Trace.TestHelpers
             // use DatadogAgent exporter instead of Zipkin, because most of the integration tests use MockTracerAgent instead of MockZipkinCollector
             environmentVariables["SIGNALFX_EXPORTER"] = "DatadogAgent";
 
-            if (TransportType == TestTransports.Uds)
-            {
-                string apmKey = "SIGNALFX_TRACE_APM_RECEIVER_SOCKET";
-                string dsdKey = "SIGNALFX_DOGSTATSD_SOCKET";
-
-                environmentVariables.Add(apmKey, agent.TracesUdsPath);
-                environmentVariables.Add(dsdKey, agent.StatsUdsPath);
-            }
-            else if (TransportType == TestTransports.WindowsNamedPipe)
+            if (TransportType == TestTransports.WindowsNamedPipe)
             {
                 string apmKey = "SIGNALFX_TRACE_PIPE_NAME";
                 string dsdKey = "SIGNALFX_DOGSTATSD_PIPE_NAME";
@@ -488,29 +480,13 @@ namespace Datadog.Trace.TestHelpers
             TransportType = TestTransports.Tcp;
         }
 
-        public void EnableUnixDomainSockets()
-        {
-#if NETCOREAPP
-            TransportType = TestTransports.Uds;
-#else
-            // Unsupported
-            throw new NotSupportedException("UDS is not supported in non-netcore applications");
-#endif
-        }
-
         public MockTracerAgent GetMockAgent(bool useStatsD = false)
         {
             MockTracerAgent agent = null;
 
 #if NETCOREAPP
             // Decide between transports
-            if (TransportType == TestTransports.Uds)
-            {
-                var tracesUdsPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-                var metricsUdsPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-                agent = new MockTracerAgent(new UnixDomainSocketConfig(tracesUdsPath, metricsUdsPath) { UseDogstatsD = useStatsD });
-            }
-            else if (TransportType == TestTransports.WindowsNamedPipe)
+            if (TransportType == TestTransports.WindowsNamedPipe)
             {
                 agent = new MockTracerAgent(new WindowsPipesConfig($"trace-{Guid.NewGuid()}", $"metrics-{Guid.NewGuid()}") { UseDogstatsD = useStatsD });
             }
