@@ -262,7 +262,8 @@ namespace Datadog.Trace.Configuration
 
             MetricsEndpointUrl = source?.SafeReadUri(
                 key: ConfigurationKeys.MetricsEndpointUrl,
-                defaultTo: GetConfiguredMetricsEndpoint(ingestRealm));
+                defaultTo: GetConfiguredMetricsEndpoint(ingestRealm),
+                out _);
         }
 
         private void ConfigureLogsTransport(IConfigurationSource source)
@@ -284,7 +285,8 @@ namespace Datadog.Trace.Configuration
 
             AgentUri = source.SafeReadUri(
                 key: ConfigurationKeys.EndpointUrl,
-                defaultTo: GetConfiguredTracesEndpoint(ingestRealm, agentPort ?? DefaultAgentPort));
+                defaultTo: GetConfiguredTracesEndpoint(ingestRealm, agentPort ?? DefaultAgentPort),
+                out var defaultUsed);
 
             if (string.Equals(AgentUri.Host, "localhost", StringComparison.OrdinalIgnoreCase))
             {
@@ -294,6 +296,39 @@ namespace Datadog.Trace.Configuration
                 // This causes delays when sending traces.
                 var builder = new UriBuilder(AgentUri.AbsoluteUri) { Host = "127.0.0.1" };
                 AgentUri = builder.Uri;
+            }
+
+            TracesPipeName = source?.GetString(ConfigurationKeys.TracesPipeName);
+
+            // Agent port is set to zero in places like AAS where it's needed to prevent port conflict
+            // The agent will fail to start if it can not bind a port, so we need to override 8126 to prevent port conflict
+            // Port 0 means it will pick some random available port
+            var hasExplicitHostOrPortSettings = (agentPort != null && agentPort != 0) || !defaultUsed;
+
+            if (hasExplicitHostOrPortSettings)
+            {
+                if (AgentUri.Host?.StartsWith(UnixDomainSocketPrefix) ?? false)
+                {
+                    traceTransport = TracesTransportType.UnixDomainSocket;
+                    TracesUnixDomainSocketPath = AgentUri.Host;
+                }
+                else
+                {
+                    // The agent host is explicitly configured, we should assume UDP for metrics
+                    forceMetricsOverUdp = true;
+                    traceTransport = TracesTransportType.Default;
+                }
+            }
+            else if (!string.IsNullOrWhiteSpace(TracesPipeName))
+            {
+                traceTransport = TracesTransportType.WindowsNamedPipe;
+
+                TracesPipeTimeoutMs = source?.GetInt32(ConfigurationKeys.TracesPipeTimeoutMs)
+#if DEBUG
+                                   ?? 20_000;
+#else
+                    ?? 500;
+#endif
             }
 
             if (traceTransport == null)
