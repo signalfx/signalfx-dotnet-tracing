@@ -5,9 +5,13 @@
 The SignalFx Instrumentationy for .NET provides automatic instrumentations
 for popular .NET libraries and frameworks.
 
+<<<<<<< HEAD
 The SignalFx Instrumentation for .NET is a [.NET Profiler](https://docs.microsoft.com/en-us/dotnet/framework/unmanaged-api/profiling/profiling-overview)
 which instruments supported libraries and frameworks with bytecode manipulation
 to capture and send telemetry data (metrics, traces, and logs).
+=======
+**[Datadog .NET Continuous Profiler](https://github.com/DataDog/dd-trace-dotnet/tree/master/profiler)**: Libraries that automatically profile your application.
+>>>>>>> 8b1ebbf45 (Move profiler source files into the tracer repository (#2404))
 
 By default:
 
