@@ -8,9 +8,9 @@
 using System;
 using System.IO;
 using Datadog.Trace.Agent;
-using MetricsTransportType = Datadog.Trace.Vendors.StatsdClient.Transport.TransportType;
 using Datadog.Trace.Configuration.Helpers;
 using Datadog.Trace.Vendors.StatsdClient.Transport;
+using MetricsTransportType = Datadog.Trace.Vendors.StatsdClient.Transport.TransportType;
 
 namespace Datadog.Trace.Configuration
 {
@@ -295,6 +295,7 @@ namespace Datadog.Trace.Configuration
                 var builder = new UriBuilder(AgentUri.AbsoluteUri) { Host = "127.0.0.1" };
                 AgentUri = builder.Uri;
             }
+
             if (traceTransport == null)
             {
                 // Check for UDS
