@@ -126,7 +126,7 @@ namespace Datadog.Trace.ThreadSampling
                         if (value != null)
                         {
                             stackTraceBuilder.Append("\tat ");
-                            stackTraceBuilder.Append(value.Replace("::", "."));
+                            stackTraceBuilder.Append(value);
                             stackTraceBuilder.Append("(unknown)\n"); // TODO placeholder for file name and lines numbers
                         }
 

@@ -434,7 +434,7 @@ private:
             result.append(WStr("SharedGenericFunction"));
         }
 
-        result.append(WStr("::"));
+        result.append(WStr("."));
 
         result.append(funcName);
 
