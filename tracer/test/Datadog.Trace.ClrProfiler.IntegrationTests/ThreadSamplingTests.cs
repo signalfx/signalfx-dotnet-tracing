@@ -41,22 +41,28 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             using (var processResult = RunSampleAndWaitForExit(agent, logCollectorPort: logsCollector.Port))
             {
                 var logsData = logsCollector.LogsData.ToArray();
-                // The application works for 5 seconds with debug logging enabled we expect at least 2 attempts of thread sampling in CI.
-                // On a dev box it is typical to get at least 3 but the CI machines seem slower, using 2
-                logsData.Length.Should().BeGreaterOrEqualTo(expected: 2);
+                // The application works for 6 seconds with debug logging enabled we expect at least 2 attempts of thread sampling in CI.
+                // On a dev box it is typical to get at least 4 but the CI machines seem slower, using 3
+                logsData.Length.Should().BeGreaterOrEqualTo(expected: 3);
 
                 var settings = VerifyHelper.GetThreadSamplingVerifierSettings();
                 settings.UseTextForParameters("OnlyCommonAttributes");
 
-                foreach (var data in logsData)
-                {
-                    var logRecords = data.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs;
+                await DumpLogRecords(logsData);
 
-                    await DumpLogRecords(data);
+                for (var index = 0; index < logsData.Length; index++)
+                {
+                    var data = logsData[index];
+                    var logRecords = data.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs;
 
                     using (new AssertionScope())
                     {
-                        logRecords.Should().ContainSingle(x => ContainStackTraceForClassHierarchy(x));
+                        if (index == 0 || index == logsData.Length - 1)
+                        {
+                            // skip verification for the first and the last logs. Depending on env., the expected method may not have started or is already in a finished state
+                            logRecords.Should().ContainSingle(x => ContainStackTraceForClassHierarchy(x));
+                        }
+
                         AllShouldHaveCorrectAttributes(logRecords);
                         AllBodiesShouldHaveCorrectFormat(logRecords);
                     }
@@ -106,15 +112,18 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 "\tat ClassA.MethodA(unknown)\n");
         }
 
-        private async Task DumpLogRecords(LogsData data)
+        private async Task DumpLogRecords(LogsData[] logsData)
         {
-            await using var memoryStream = new MemoryStream();
-            await System.Text.Json.JsonSerializer.SerializeAsync(memoryStream, data);
-            memoryStream.Position = 0;
-            using var sr = new StreamReader(memoryStream);
-            var readToEnd = await sr.ReadToEndAsync();
+            foreach (var data in logsData)
+            {
+                await using var memoryStream = new MemoryStream();
+                await System.Text.Json.JsonSerializer.SerializeAsync(memoryStream, data);
+                memoryStream.Position = 0;
+                using var sr = new StreamReader(memoryStream);
+                var readToEnd = await sr.ReadToEndAsync();
 
-            Output.WriteLine(readToEnd);
+                Output.WriteLine(readToEnd);
+            }
         }
     }
 }
