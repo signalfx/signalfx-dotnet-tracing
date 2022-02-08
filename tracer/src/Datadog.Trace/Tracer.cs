@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Datadog.Trace.Agent;
 using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.Configuration;
+using Datadog.Trace.Logging;
 using Datadog.Trace.PlatformHelpers;
 using Datadog.Trace.Propagation;
 using Datadog.Trace.Sampling;
@@ -27,6 +28,7 @@ namespace Datadog.Trace
     /// </summary>
     public class Tracer : ITracer, IDatadogTracer, IDatadogOpenTracingTracer
     {
+        private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(Tracer));
         private static readonly object GlobalInstanceLock = new();
 
         /// <summary>

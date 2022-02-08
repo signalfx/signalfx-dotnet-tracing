@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -239,11 +238,6 @@ namespace Datadog.Trace.TestHelpers
             if (enableSecurity)
             {
                 environmentVariables[ConfigurationKeys.AppSecEnabled] = enableSecurity.ToString();
-            }
-
-            if (enableBlocking)
-            {
-                environmentVariables[ConfigurationKeys.AppSecBlockingEnabled] = enableBlocking.ToString();
             }
 
             if (!string.IsNullOrEmpty(externalRulesFile))

@@ -62,12 +62,6 @@ namespace Datadog.Trace.Configuration
         public const string AppSecEnabled = "SIGNALFX_APPSEC_ENABLED";
 
         /// <summary>
-        /// Configuration key for enabling or disabling blocking in AppSec.
-        /// Default is value is false (disabled).
-        /// </summary>
-        public const string AppSecBlockingEnabled = "SIGNALFX_APPSEC_BLOCKING_ENABLED";
-
-        /// <summary>
         /// Override the default rules file provided. Must be a path to a valid JSON rules file.
         /// Default is value is null (do not override).
         /// </summary>
@@ -95,7 +89,12 @@ namespace Datadog.Trace.Configuration
         /// <summary>
         /// Limits the amount of AppSec traces sent per second with an integer value, strictly positive.
         /// </summary>
-        internal const string AppSecTraceRateLimit = "DD_APPSEC_TRACE_RATE_LIMIT";
+        internal const string AppSecTraceRateLimit = "SIGNALFX_APPSEC_TRACE_RATE_LIMIT";
+
+        /// <summary>
+        /// Limits the amount of AppSec traces sent per second with an integer value, strictly positive.
+        /// </summary>
+        internal const string AppSecWafTimeout = "SIGNALFX_APPSEC_WAF_TIMEOUT";
 
         /// <summary>
         /// Configuration key for enabling or disabling the Tracer's debug mode.
