@@ -10,6 +10,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Datadog.Trace.Configuration.Helpers;
 using Datadog.Trace.Configuration.Types;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Logging.DirectSubmission;
@@ -165,11 +166,10 @@ namespace Datadog.Trace.Configuration
             TraceBatchInterval = source?.GetInt32(ConfigurationKeys.SerializationBatchInterval)
                         ?? 100;
 
-            RecordedValueMaxLength = source?.GetInt32(ConfigurationKeys.RecordedValueMaxLength) ?? DefaultRecordedValueMaxLength;
-            if (RecordedValueMaxLength < 0)
-            {
-                RecordedValueMaxLength = DefaultRecordedValueMaxLength;
-            }
+            RecordedValueMaxLength = source.SafeReadInt32(
+                key: ConfigurationKeys.RecordedValueMaxLength,
+                defaultTo: DefaultRecordedValueMaxLength,
+                validators: (value) => value >= 0);
 
             RouteTemplateResourceNamesEnabled = source?.GetBool(ConfigurationKeys.FeatureFlags.RouteTemplateResourceNamesEnabled)
                                                    ?? true;
@@ -640,16 +640,12 @@ namespace Datadog.Trace.Configuration
         private static TimeSpan GetThreadSamplingPeriod(IConfigurationSource source)
         {
             // If you change any of these constants, check with thread_sampler.cpp first
-            var defaultSamplePeriod = TimeSpan.FromMilliseconds(value: 10000);
-            const int minimumSamplePeriod = 1000;
+            int period = source.SafeReadInt32(
+                key: ConfigurationKeys.ThreadSampling.Period,
+                defaultTo: 10_000,
+                validators: (value) => value >= 1_000);
 
-            var period = source?.GetInt32(ConfigurationKeys.ThreadSampling.Period);
-            if (!period.HasValue || period.Value < minimumSamplePeriod)
-            {
-                return defaultSamplePeriod;
-            }
-
-            return TimeSpan.FromMilliseconds(period.Value);
+            return TimeSpan.FromMilliseconds(period);
         }
     }
 }

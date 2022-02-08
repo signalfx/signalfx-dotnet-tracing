@@ -13,7 +13,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
     /// </summary>
     public partial class Startup
     {
-        private const string AssemblyName = "SignalFx.Tracing, Version=0.2.0.0, Culture=neutral, PublicKeyToken=e43a27c2023d388a";
+        private const string AssemblyName = "SignalFx.Tracing, Version=0.2.1.0, Culture=neutral, PublicKeyToken=e43a27c2023d388a";
 
         /// <summary>
         /// Initializes static members of the <see cref="Startup"/> class.

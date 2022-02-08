@@ -11,11 +11,20 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 ### General
 
-- Bring back support for Alpine Linux.
-
 ### Breaking changes
 
 ### Enhancements
+
+---
+
+## [Release 0.2.1](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.2.1)
+
+### General
+- Brings back support for Alpine Linux.
+
+### Bugfixes
+
+- Fixes OpenTracing Scope creation when manual tracing is used.
 
 ---
 

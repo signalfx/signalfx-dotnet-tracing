@@ -9,6 +9,8 @@ using System;
 using System.IO;
 using Datadog.Trace.Agent;
 using MetricsTransportType = Datadog.Trace.Vendors.StatsdClient.Transport.TransportType;
+using Datadog.Trace.Configuration.Helpers;
+using Datadog.Trace.Vendors.StatsdClient.Transport;
 
 namespace Datadog.Trace.Configuration
 {
@@ -93,14 +95,10 @@ namespace Datadog.Trace.Configuration
                 // default value
                 ?? false;
 
-            var partialFlushMinSpans = source?.GetInt32(ConfigurationKeys.PartialFlushMinSpans);
-
-            if ((partialFlushMinSpans ?? 0) <= 0)
-            {
-                partialFlushMinSpans = 500;
-            }
-
-            PartialFlushMinSpans = partialFlushMinSpans.Value;
+            PartialFlushMinSpans = source.SafeReadInt32(
+                key: ConfigurationKeys.PartialFlushMinSpans,
+                defaultTo: 500,
+                validators: (val) => val > 0);
         }
 
         /// <summary>
@@ -196,22 +194,22 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         internal MetricsTransportType MetricsTransport { get; set; }
 
-        private static string GetConfiguredMetricsEndpoint(string ingestRealm)
+        private static Uri GetConfiguredMetricsEndpoint(string ingestRealm)
         {
             return IsDefaultIngestRealm(ingestRealm) ?
                        // local collector
-                       "http://localhost:9943/v2/datapoint" :
+                       new Uri("http://localhost:9943/v2/datapoint") :
                        // direct ingest
-                       $"https://ingest.{ingestRealm}.signalfx.com/v2/datapoint";
+                       new Uri($"https://ingest.{ingestRealm}.signalfx.com/v2/datapoint");
         }
 
-        private static string GetConfiguredTracesEndpoint(string ingestRealm, int agentPort)
+        private static Uri GetConfiguredTracesEndpoint(string ingestRealm, int agentPort)
         {
             return IsDefaultIngestRealm(ingestRealm) ?
                        // local collector
-                       $"http://localhost:{agentPort}/api/v2/spans" :
+                       new Uri($"http://localhost:{agentPort}/api/v2/spans", UriKind.Absolute) :
                        // direct ingest
-                       $"https://ingest.{ingestRealm}.signalfx.com/v2/trace";
+                       new Uri($"https://ingest.{ingestRealm}.signalfx.com/v2/trace", UriKind.Absolute);
         }
 
         private static bool IsDefaultIngestRealm(string ingestRealm)
@@ -262,9 +260,9 @@ namespace Datadog.Trace.Configuration
 
             MetricsTransport = metricsTransport.Value;
 
-            var metricsEndpointUrl = source?.GetString(ConfigurationKeys.MetricsEndpointUrl) ??
-                                     GetConfiguredMetricsEndpoint(ingestRealm);
-            MetricsEndpointUrl = new Uri(metricsEndpointUrl);
+            MetricsEndpointUrl = source?.SafeReadUri(
+                key: ConfigurationKeys.MetricsEndpointUrl,
+                defaultTo: GetConfiguredMetricsEndpoint(ingestRealm));
         }
 
         private void ConfigureLogsTransport(IConfigurationSource source)
@@ -284,9 +282,9 @@ namespace Datadog.Trace.Configuration
 
             var agentPort = source?.GetInt32(ConfigurationKeys.AgentPort);
 
-            var agentUri = source?.GetString(ConfigurationKeys.EndpointUrl);
-
-            AgentUri = new Uri(agentUri ?? GetConfiguredTracesEndpoint(ingestRealm, agentPort ?? DefaultAgentPort));
+            AgentUri = source.SafeReadUri(
+                key: ConfigurationKeys.EndpointUrl,
+                defaultTo: GetConfiguredTracesEndpoint(ingestRealm, agentPort ?? DefaultAgentPort));
 
             if (string.Equals(AgentUri.Host, "localhost", StringComparison.OrdinalIgnoreCase))
             {
@@ -294,43 +292,9 @@ namespace Datadog.Trace.Configuration
                 // When ipv6 is enabled, localhost is first resolved to ::1, which fails
                 // because the trace agent is only bound to ipv4.
                 // This causes delays when sending traces.
-                var builder = new UriBuilder(AgentUri) { Host = "127.0.0.1" };
+                var builder = new UriBuilder(AgentUri.AbsoluteUri) { Host = "127.0.0.1" };
                 AgentUri = builder.Uri;
             }
-
-            TracesPipeName = source?.GetString(ConfigurationKeys.TracesPipeName);
-
-            // Agent port is set to zero in places like AAS where it's needed to prevent port conflict
-            // The agent will fail to start if it can not bind a port, so we need to override 8126 to prevent port conflict
-            // Port 0 means it will pick some random available port
-            var hasExplicitHostOrPortSettings = (agentPort != null && agentPort != 0) || agentUri != null;
-
-            if (hasExplicitHostOrPortSettings)
-            {
-                if (AgentUri.Host?.StartsWith(UnixDomainSocketPrefix) ?? false)
-                {
-                    traceTransport = TracesTransportType.UnixDomainSocket;
-                    TracesUnixDomainSocketPath = AgentUri.Host;
-                }
-                else
-                {
-                    // The agent host is explicitly configured, we should assume UDP for metrics
-                    forceMetricsOverUdp = true;
-                    traceTransport = TracesTransportType.Default;
-                }
-            }
-            else if (!string.IsNullOrWhiteSpace(TracesPipeName))
-            {
-                traceTransport = TracesTransportType.WindowsNamedPipe;
-
-                TracesPipeTimeoutMs = source?.GetInt32(ConfigurationKeys.TracesPipeTimeoutMs)
-#if DEBUG
-                    ?? 20_000;
-#else
-                    ?? 500;
-#endif
-            }
-
             if (traceTransport == null)
             {
                 // Check for UDS

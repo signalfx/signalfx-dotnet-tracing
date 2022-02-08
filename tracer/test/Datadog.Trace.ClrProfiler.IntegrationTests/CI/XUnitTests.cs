@@ -82,7 +82,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.CI
                         AssertTargetSpanEqual(targetSpan, "signalfx.tracing.library", "dotnet-tracing");
 
                         // check the SignalFx library version
-                        AssertTargetSpanEqual(targetSpan, "signalfx.tracing.version", "0.2.0.0");
+                        AssertTargetSpanEqual(targetSpan, "signalfx.tracing.version", "0.2.1.0");
 
                         // checks the origin tag
                         CheckOriginTag(targetSpan);
