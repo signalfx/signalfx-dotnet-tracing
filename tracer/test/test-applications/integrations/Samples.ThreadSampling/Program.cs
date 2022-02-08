@@ -29,7 +29,7 @@ internal static class ClassD
     public static void MethodD()
     {
         Console.WriteLine("Thread.Sleep - starting");
-        Thread.Sleep(TimeSpan.FromSeconds(value: 5));
+        Thread.Sleep(TimeSpan.FromSeconds(6));
         Console.WriteLine("Thread.Sleep - finished");
     }
 }
