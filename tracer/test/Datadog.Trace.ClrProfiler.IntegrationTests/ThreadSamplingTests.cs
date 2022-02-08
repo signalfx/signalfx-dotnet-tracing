@@ -59,7 +59,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     {
                         if (index == 0 || index == logsData.Length - 1)
                         {
-                            // skip verification for the first and the last logs. Depends on env. the expected method can not start yest or is in a finished state
+                            // skip verification for the first and the last logs. Depending on env., the expected method may not have started or is already in a finished state
                             logRecords.Should().ContainSingle(x => ContainStackTraceForClassHierarchy(x));
                         }
 
