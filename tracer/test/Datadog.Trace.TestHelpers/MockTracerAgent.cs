@@ -16,6 +16,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.HttpOverStreams;
 using Datadog.Tracer.SignalFx.Metrics.Protobuf;
@@ -28,9 +29,54 @@ namespace Datadog.Trace.TestHelpers
     {
         private readonly HttpListener _listener;
         private readonly HttpListener _metricsListener;
-        private readonly Thread _tracesListenerThread;
-        private readonly Thread _metricsListenerThread;
+        private readonly Task _tracesListenerTask;
+        private readonly Task _metricsListenerTask;
         private readonly CancellationTokenSource _cancellationTokenSource;
+
+#if NETCOREAPP
+        private readonly UnixDomainSocketEndPoint _tracesEndpoint;
+        private readonly Socket _udsTracesSocket;
+        private readonly UnixDomainSocketEndPoint _statsEndpoint;
+        private readonly Socket _udsStatsSocket;
+
+        public MockTracerAgent(UnixDomainSocketConfig config)
+        {
+            _cancellationTokenSource = new CancellationTokenSource();
+
+            ListenerInfo = $"Traces at {config.Traces}";
+
+            if (config.Metrics != null && config.UseDogstatsD)
+            {
+                if (File.Exists(config.Metrics))
+                {
+                    File.Delete(config.Metrics);
+                }
+
+                StatsUdsPath = config.Metrics;
+                ListenerInfo += $", Stats at {config.Metrics}";
+                _statsEndpoint = new UnixDomainSocketEndPoint(config.Metrics);
+
+                _udsStatsSocket = new Socket(AddressFamily.Unix, SocketType.Dgram, ProtocolType.Unspecified);
+
+                _udsStatsSocket.Bind(_statsEndpoint);
+                // NOTE: Connectionless protocols don't use Listen()
+                _statsdTask = Task.Run(HandleUdsStats);
+            }
+
+            _tracesEndpoint = new UnixDomainSocketEndPoint(config.Traces);
+
+            if (File.Exists(config.Traces))
+            {
+                File.Delete(config.Traces);
+            }
+
+            TracesUdsPath = config.Traces;
+            _udsTracesSocket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP);
+            _udsTracesSocket.Bind(_tracesEndpoint);
+            _udsTracesSocket.Listen(1);
+            _tracesListenerTask = Task.Run(HandleUdsTraces);
+        }
+#endif
 
         public MockTracerAgent(WindowsPipesConfig config)
         {
@@ -65,8 +111,7 @@ namespace Datadog.Trace.TestHelpers
                     MetricsPort = requestedStatsDPort.Value;
                     _metricsListener = metricsListener;
 
-                    _metricsListenerThread = new Thread(HandleMetricsHttpRequests) { IsBackground = true };
-                    _metricsListenerThread.Start();
+                    _metricsListenerTask = Task.Run(HandleMetricsHttpRequests);                  
                 }
                 else
                 {
@@ -84,8 +129,7 @@ namespace Datadog.Trace.TestHelpers
                             MetricsPort = metricsPort;
                             _metricsListener = metricsListener;
 
-                            _metricsListenerThread = new Thread(HandleMetricsHttpRequests) { IsBackground = true };
-                            _metricsListenerThread.Start();
+                            _metricsListenerTask = Task.Run(HandleMetricsHttpRequests);
 
                             break;
                         }
@@ -129,8 +173,7 @@ namespace Datadog.Trace.TestHelpers
                     _listener = listener;
 
                     listeners.Add($"Traces at port {Port}");
-                    _tracesListenerThread = new Thread(HandleHttpRequests);
-                    _tracesListenerThread.Start();
+                    _tracesListenerTask = Task.Run(HandleHttpRequests);
 
                     return;
                 }
@@ -329,6 +372,197 @@ namespace Datadog.Trace.TestHelpers
                 throw new Exception($"Failed assertion for {headerKey} on {header}");
             }
         }
+
+        private void HandleStatsdRequests()
+        {
+            var endPoint = new IPEndPoint(IPAddress.Loopback, 0);
+
+            while (!_cancellationTokenSource.IsCancellationRequested)
+            {
+                try
+                {
+                    var buffer = _udpClient.Receive(ref endPoint);
+                    var stats = Encoding.UTF8.GetString(buffer);
+                    OnMetricsReceived(stats);
+                    StatsdRequests.Enqueue(stats);
+                }
+                catch (Exception) when (_cancellationTokenSource.IsCancellationRequested)
+                {
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Exceptions.Add(ex);
+                }
+            }
+        }
+
+#if NETCOREAPP
+        private byte[] GetResponseBytes()
+        {
+            var responseBody = Encoding.UTF8.GetBytes("{}");
+            var contentLength64 = responseBody.LongLength;
+
+            var response = $"HTTP/1.1 200 OK";
+            response += DatadogHttpValues.CrLf;
+            response += $" Date: {DateTime.UtcNow.ToString("ddd, dd MMM yyyy H:mm::ss K")}";
+            response += DatadogHttpValues.CrLf;
+            response += $"Connection: Keep-Alive";
+            response += DatadogHttpValues.CrLf;
+            response += $"Server: dd-mock-agent";
+
+            if (Version != null)
+            {
+                response += DatadogHttpValues.CrLf;
+                response += $"Datadog-Agent-Version: {Version}";
+            }
+
+            response += DatadogHttpValues.CrLf;
+            response += $"Content-Type: application/json";
+            response += DatadogHttpValues.CrLf;
+            response += $"Content-Length: {contentLength64}";
+            response += DatadogHttpValues.CrLf;
+            response += DatadogHttpValues.CrLf;
+            response += Encoding.ASCII.GetString(responseBody);
+
+            var responseBytes = Encoding.UTF8.GetBytes(response);
+            return responseBytes;
+        }
+
+        private void HandlePotentialTraces(MockHttpParser.MockHttpRequest request)
+        {
+            if (ShouldDeserializeTraces && request.ContentLength >= 1)
+            {
+                byte[] body = null;
+                IList<IList<MockSpan>> spans = null;
+
+                try
+                {
+                    var i = 0;
+                    body = new byte[request.ContentLength];
+
+                    while (request.Body.Stream.CanRead && i < request.ContentLength)
+                    {
+                        var nextByte = request.Body.Stream.ReadByte();
+
+                        if (nextByte == -1)
+                        {
+                            break;
+                        }
+
+                        body[i] = (byte)nextByte;
+                        i++;
+                    }
+
+                    if (i < request.ContentLength)
+                    {
+                        throw new Exception($"Less bytes were sent than we counted. {i} read versus {request.ContentLength} expected.");
+                    }
+
+                    spans = MessagePackSerializer.Deserialize<IList<IList<MockSpan>>>(body);
+                    OnRequestDeserialized(spans);
+
+                    lock (this)
+                    {
+                        // we only need to lock when replacing the span collection,
+                        // not when reading it because it is immutable
+                        Spans = Spans.AddRange(spans.SelectMany(trace => trace));
+
+                        var headerCollection = new NameValueCollection();
+                        foreach (var header in request.Headers)
+                        {
+                            headerCollection.Add(header.Name, header.Value);
+                        }
+
+                        RequestHeaders = RequestHeaders.Add(headerCollection);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var message = ex.Message.ToLowerInvariant();
+
+                    if (message.Contains("beyond the end of the stream"))
+                    {
+                        // Accept call is likely interrupted by a dispose
+                        // Swallow the exception and let the test finish
+                    }
+
+                    throw;
+                }
+            }
+        }
+
+        private void HandleUdsStats()
+        {
+            while (!_cancellationTokenSource.IsCancellationRequested)
+            {
+                try
+                {
+                    var bytesReceived = new byte[0x1000];
+                    // Connectionless protocol doesn't need Accept, Receive will block until we get something
+                    var byteCount = _udsStatsSocket.Receive(bytesReceived);
+                    var stats = Encoding.UTF8.GetString(bytesReceived, 0, byteCount);
+                    OnMetricsReceived(stats);
+                    StatsdRequests.Enqueue(stats);
+                }
+                catch (Exception) when (_cancellationTokenSource.IsCancellationRequested)
+                {
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Exceptions.Add(ex);
+                }
+            }
+        }
+
+        private async Task HandleUdsTraces()
+        {
+            while (!_cancellationTokenSource.IsCancellationRequested)
+            {
+                try
+                {
+                    using var handler = await _udsTracesSocket.AcceptAsync();
+                    using var stream = new NetworkStream(handler);
+
+                    var request = await MockHttpParser.ReadRequest(stream);
+                    HandlePotentialTraces(request);
+                    await stream.WriteAsync(GetResponseBytes());
+
+                    // Wait for client to close the connection
+                    // If you're reading this and you know about sockets:
+                    // I have NO IDEA if that's the right way to wait until the response was properly sent
+                    // If you know a better way, by all means, please replace this code.
+                    var buffer = new byte[256];
+                    var status = handler.Receive(buffer);
+
+                    if (status > 0)
+                    {
+                        throw new InvalidOperationException($"Read an extra {status} bytes past the expected end of the stream. It might indicate a protocol error on the client side.");
+                    }
+                }
+                catch (SocketException ex)
+                {
+                    var message = ex.Message.ToLowerInvariant();
+                    if (message.Contains("interrupted"))
+                    {
+                        // Accept call is likely interrupted by a dispose
+                        // Swallow the exception and let the test finish
+                        return;
+                    }
+
+                    if (message.Contains("broken") || message.Contains("forcibly closed") || message.Contains("invalid argument"))
+                    {
+                        // The application was likely shut down
+                        // Swallow the exception and let the test finish
+                        return;
+                    }
+
+                    throw;
+                }
+            }
+        }
+#endif
 
         private void HandleHttpRequests()
         {
