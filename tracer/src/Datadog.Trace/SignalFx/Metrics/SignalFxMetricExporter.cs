@@ -18,12 +18,12 @@ namespace Datadog.Trace.SignalFx.Metrics
     {
         private const int MaxAttempts = 3;
 
-        private static readonly HashSet<HttpStatusCode> TransientErrorStatusCodes = new HashSet<HttpStatusCode>(new[]
+        private static readonly HashSet<int> TransientClientErrorStatusCodes = new HashSet<int>(new[]
         {
-            HttpStatusCode.RequestTimeout,
-#if NETCOREAPP
-            HttpStatusCode.TooManyRequests
-#endif
+            // RequestTimeout
+            408,
+            // TooManyRequests
+            429
         });
 
         private static readonly HashSet<WebExceptionStatus> TransientExceptionStatuses = new HashSet<WebExceptionStatus>(new[]
@@ -91,15 +91,15 @@ namespace Datadog.Trace.SignalFx.Metrics
                     Log.Debug($"Sent {msg.datapoints.Count} metric data points to: {_metricsEndpointAddress}.");
                     return;
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    if (attemptNumber >= MaxAttempts || !IsTransient(e))
+                    if (attemptNumber >= MaxAttempts || !IsTransient(ex))
                     {
-                        Log.Error(e, $"Dropping metrics after {attemptNumber} unsuccessful attempts sending to: {_metricsEndpointAddress}.");
+                        Log.Error(ex, $"Dropping metrics after {attemptNumber} unsuccessful attempt(s) sending to: {_metricsEndpointAddress}.");
                         return;
                     }
 
-                    Log.Debug(e, "Transient exception encountered. Retrying sending metric data.");
+                    Log.Debug(ex, "Transient exception encountered. Retrying sending metric data.");
                 }
 
                 attemptNumber++;
@@ -116,15 +116,19 @@ namespace Datadog.Trace.SignalFx.Metrics
                 var webExceptionStatus = webException.Status;
                 if (webExceptionStatus != WebExceptionStatus.ProtocolError)
                 {
-                    // these are considered to be transient
                     return TransientExceptionStatuses.Contains(webExceptionStatus);
                 }
 
                 using var response = (HttpWebResponse)webException.Response;
-                return TransientErrorStatusCodes.Contains(response.StatusCode);
+                return IndicatesTransientError((int)response.StatusCode);
             }
 
             return false;
+        }
+
+        private static bool IndicatesTransientError(int responseStatusCode)
+        {
+            return TransientClientErrorStatusCodes.Contains(responseStatusCode) || (responseStatusCode >= 500 && responseStatusCode <= 599);
         }
     }
 }
