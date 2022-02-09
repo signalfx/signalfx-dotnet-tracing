@@ -17,11 +17,12 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 ### Enhancements
 
-- Add `SIGNALFX_RUNTIME_METRICS_ENABLED` configuration that enables runtime metrics.
-- Add `SIGNALFX_REALM` configuration that sets realm used
-when exporting telemetry directly to Splunk Observability Cloud.
-- Add `SIGNALFX_METRICS_ENDPOINT_URL` configuration that overrides
-`SIGNALFX_REALM` configuration for the metrics ingestion endpoint if needed.
+- Add `SIGNALFX_RUNTIME_METRICS_ENABLED` setting that enables runtime metrics.
+- Add `SIGNALFX_REALM` setting to let the instrumentation bypass
+the OpenTelemetry Collector and send telemetry directly to Splunk 
+Observability Cloud ingest endpoints.
+- Add `SIGNALFX_METRICS_ENDPOINT_URL` setting that overrides
+the metrics exporter's endpoint.
 
 ---
 
