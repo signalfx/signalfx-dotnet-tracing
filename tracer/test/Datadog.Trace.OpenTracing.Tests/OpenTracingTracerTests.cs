@@ -6,6 +6,7 @@
 // Modified by Splunk Inc.
 
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Datadog.Trace.Agent;
@@ -31,7 +32,7 @@ namespace Datadog.Trace.OpenTracing.Tests
             var settings = new TracerSettings
             {
                 // force to be a Datadog for unit tests purposes, default is B3
-                Propagators = new System.Collections.Generic.HashSet<string> { PropagatorTypes.Datadog },
+                Propagators = new System.Collections.Generic.HashSet<string> { PropagatorTypes.B3 },
                 // force to be a Datadog for unit tests purposes, default is OpenTelemetry
                 Convention = ConventionType.Datadog
             };
@@ -162,8 +163,8 @@ namespace Datadog.Trace.OpenTracing.Tests
 
             _tracer.Inject(span.Context, BuiltinFormats.HttpHeaders, headers);
 
-            Assert.Equal(span.DDSpan.Context.TraceId.ToString(), headers.Get(DDHttpHeaderNames.TraceId));
-            Assert.Equal(span.DDSpan.Context.SpanId.ToString(), headers.Get(DDHttpHeaderNames.ParentId));
+            Assert.Equal(span.DDSpan.Context.TraceId.ToString(), headers.Get(B3HttpHeaderNames.B3TraceId));
+            Assert.Equal(span.DDSpan.Context.SpanId, ulong.Parse(headers.Get(B3HttpHeaderNames.B3SpanId), NumberStyles.HexNumber));
         }
 
         [Fact]
@@ -174,8 +175,8 @@ namespace Datadog.Trace.OpenTracing.Tests
 
             _tracer.Inject(span.Context, BuiltinFormats.TextMap, headers);
 
-            Assert.Equal(span.DDSpan.Context.TraceId.ToString(), headers.Get(DDHttpHeaderNames.TraceId));
-            Assert.Equal(span.DDSpan.Context.SpanId.ToString(), headers.Get(DDHttpHeaderNames.ParentId));
+            Assert.Equal(span.DDSpan.Context.TraceId.ToString(), headers.Get(B3HttpHeaderNames.B3TraceId));
+            Assert.Equal(span.DDSpan.Context.SpanId, ulong.Parse(headers.Get(B3HttpHeaderNames.B3SpanId), NumberStyles.HexNumber));
         }
 
         [Fact]
@@ -194,12 +195,12 @@ namespace Datadog.Trace.OpenTracing.Tests
             const ulong parentId = 10;
             var traceId = TraceId.CreateFromInt(42);
             var headers = new MockTextMap();
-            headers.Set(DDHttpHeaderNames.ParentId, parentId.ToString());
-            headers.Set(DDHttpHeaderNames.TraceId, traceId.ToString());
+            headers.Set(B3HttpHeaderNames.B3SpanId, parentId.ToString());
+            headers.Set(B3HttpHeaderNames.B3TraceId, traceId.ToString());
 
             var otSpanContext = (OpenTracingSpanContext)_tracer.Extract(BuiltinFormats.HttpHeaders, headers);
 
-            Assert.Equal(parentId, otSpanContext.Context.SpanId);
+            Assert.Equal(parentId, ulong.Parse(otSpanContext.Context.SpanId.ToString("X")));
             Assert.Equal(traceId, otSpanContext.Context.TraceId);
         }
 
@@ -209,12 +210,12 @@ namespace Datadog.Trace.OpenTracing.Tests
             const ulong parentId = 10;
             var traceId = TraceId.CreateFromInt(42);
             var headers = new MockTextMap();
-            headers.Set(DDHttpHeaderNames.ParentId, parentId.ToString());
-            headers.Set(DDHttpHeaderNames.TraceId, traceId.ToString());
+            headers.Set(B3HttpHeaderNames.B3SpanId, parentId.ToString());
+            headers.Set(B3HttpHeaderNames.B3TraceId, traceId.ToString());
 
             var otSpanContext = (OpenTracingSpanContext)_tracer.Extract(BuiltinFormats.TextMap, headers);
 
-            Assert.Equal(parentId, otSpanContext.Context.SpanId);
+            Assert.Equal(parentId, ulong.Parse(otSpanContext.Context.SpanId.ToString("X")));
             Assert.Equal(traceId, otSpanContext.Context.TraceId);
         }
 

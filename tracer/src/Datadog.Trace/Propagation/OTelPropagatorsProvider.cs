@@ -12,8 +12,7 @@ namespace Datadog.Trace.Propagation
             new Dictionary<string, Func<ITraceIdConvention, IPropagator>>(StringComparer.InvariantCultureIgnoreCase)
             {
                         { PropagatorTypes.W3C, convention => new W3CSpanContextPropagator(convention) },
-                        { PropagatorTypes.B3, convention => new B3SpanContextPropagator(convention) },
-                        { PropagatorTypes.Datadog, convention => new DDSpanContextPropagator(convention) },
+                        { PropagatorTypes.B3, convention => new B3SpanContextPropagator(convention) }
             };
 
         public bool CanProvide(string propagatorId, ITraceIdConvention traceIdConvention)

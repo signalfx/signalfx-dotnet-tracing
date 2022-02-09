@@ -387,36 +387,6 @@ namespace Datadog.Trace.Tests
         }
 
         [Fact]
-        public void OriginHeader_InjectFromChildSpan()
-        {
-            var traceId = TraceId.CreateFromInt(9);
-            const ulong spanId = 7;
-            const SamplingPriority samplingPriority = SamplingPriority.UserKeep;
-            const string origin = "synthetics";
-
-            var propagatedContext = new SpanContext(traceId, spanId, samplingPriority, null, origin);
-            var propagator = new DDSpanContextPropagator(new DatadogTraceIdConvention());
-
-            var spanCreationSettings = new SpanCreationSettings() { Parent = propagatedContext };
-            using var firstScope = (Scope)_tracer.StartActive("First Span", spanCreationSettings);
-            var firstSpan = firstScope.Span;
-
-            var spanCreationSettings2 = new SpanCreationSettings() { Parent = firstSpan.Context };
-            using var secondScope = (Scope)_tracer.StartActive("Child", spanCreationSettings2);
-            var secondSpan = secondScope.Span;
-
-            IHeadersCollection headers = WebRequest.CreateHttp("http://localhost").Headers.Wrap();
-
-            propagator.Inject(secondSpan.Context, headers);
-            var resultContext = propagator.Extract(headers);
-
-            Assert.NotNull(resultContext);
-            Assert.Equal(firstSpan.Context.Origin, resultContext.Origin);
-            Assert.Equal(secondSpan.Context.Origin, resultContext.Origin);
-            Assert.Equal(origin, resultContext.Origin);
-        }
-
-        [Fact]
         public void RuntimeId()
         {
             var runtimeId = Tracer.RuntimeId;
