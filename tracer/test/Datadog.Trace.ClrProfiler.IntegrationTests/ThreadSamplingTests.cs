@@ -38,7 +38,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
             using (var agent = EnvironmentHelper.GetMockAgent())
             using (var logsCollector = EnvironmentHelper.GetMockOtelLogsCollector())
-            using (var processResult = RunSampleAndWaitForExit(agent.Port, logCollectorPort: logsCollector.Port))
+            using (var processResult = RunSampleAndWaitForExit(agent, logCollectorPort: logsCollector.Port))
             {
                 var logsData = logsCollector.LogsData.ToArray();
                 // The application works for 6 seconds with debug logging enabled we expect at least 2 attempts of thread sampling in CI.

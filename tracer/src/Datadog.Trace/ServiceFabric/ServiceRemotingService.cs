@@ -14,7 +14,7 @@ namespace Datadog.Trace.ServiceFabric
     /// <summary>
     /// Provides tracing of ServiceRemotingServiceEvents.
     /// </summary>
-    internal static class ServiceRemotingService
+    internal static unsafe class ServiceRemotingService
     {
         private static readonly Logging.IDatadogLogger Log = Logging.DatadogLogging.GetLoggerFor(typeof(ServiceRemotingService));
 

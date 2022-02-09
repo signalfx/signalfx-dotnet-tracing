@@ -38,7 +38,7 @@ namespace Datadog.Trace.Tests.Configuration
                 { settingName, settingValue }
             });
 
-            Uri value = source.SafeReadUri(settingName, new Uri("http://www.temp.org", UriKind.Absolute));
+            Uri value = source.SafeReadUri(settingName, new Uri("http://www.temp.org", UriKind.Absolute), out _);
 
             Assert.Equal(new Uri(expected, UriKind.Absolute), value);
 

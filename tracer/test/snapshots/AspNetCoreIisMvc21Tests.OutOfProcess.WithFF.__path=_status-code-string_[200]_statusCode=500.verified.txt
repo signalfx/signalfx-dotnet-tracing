@@ -41,16 +41,18 @@
       runtime-id: Guid_1,
       sfx.error.kind: System.Exception,
       sfx.error.message: Input was not a status code,
-      sfx.error.stack: 
+      sfx.error.stack:
 System.Exception: Input was not a status code
 at Samples.AspNetCoreMvc.Controllers.HomeController.StatusCodeTestString(String input),
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: server,
       version: 1.0.0
     },
     Metrics: {
-      _sampling_priority_v1: 1.0,
+      _dd.top_level: 1.0,
       _dd.tracer_kr: 1.0,
-      _dd.top_level: 1.0
+      _sampling_priority_v1: 1.0
     }
   }
 ]

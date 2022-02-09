@@ -6,11 +6,10 @@
 // Modified by Splunk Inc.
 
 using System.Collections;
-using System.Text;
 
 namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AWS.SQS
 {
-    internal static class ContextPropagation
+    internal static unsafe class ContextPropagation
     {
         private const string SqsKey = "_datadog";
 

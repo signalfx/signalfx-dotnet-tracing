@@ -13,6 +13,7 @@ using Xunit.Abstractions;
 
 namespace Datadog.Trace.ClrProfiler.IntegrationTests
 {
+    [CollectionDefinition(nameof(RuntimeMetricsTests), DisableParallelization = true)]
     public class RuntimeMetricsTests : TestHelper
     {
         public RuntimeMetricsTests(ITestOutputHelper output)
@@ -23,18 +24,37 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [SkippableFact]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
-        public void SubmitsMetrics()
+        public void MetricsDisabled()
         {
-            int agentPort = TcpPortProvider.GetOpenPort();
-
-            Output.WriteLine($"Assigning port {agentPort} for the agentPort.");
-
-            SetEnvironmentVariable("SIGNALFX_RUNTIME_METRICS_ENABLED", "1");
-
-            using var agent = new MockTracerAgent(agentPort, useSfxMetrics: true);
+            SetEnvironmentVariable("SIGNALFX_RUNTIME_METRICS_ENABLED", "0");
+            using var agent = EnvironmentHelper.GetMockAgent(useStatsD: true);
+            Output.WriteLine($"Assigning port {agent.Port} for the agentPort.");
             Output.WriteLine($"Assigning port {agent.MetricsPort} for the SignalFx metrics.");
 
-            using var processResult = RunSampleAndWaitForExit(agent.Port, agent.MetricsPort);
+            using var processResult = RunSampleAndWaitForExit(agent);
+            var requests = agent.Metrics;
+
+            Assert.True(requests.Count == 0, "Received metrics despite being disabled. Metrics received: " + string.Join("\n", requests));
+        }
+
+        [SkippableFact]
+        [Trait("Category", "EndToEnd")]
+        [Trait("RunOnWindows", "True")]
+        public void UdpSubmitsMetrics()
+        {
+            EnvironmentHelper.EnableDefaultTransport();
+            RunTest();
+        }
+
+        private void RunTest()
+        {
+            SetEnvironmentVariable("SIGNALFX_RUNTIME_METRICS_ENABLED", "1");
+
+            using var agent = EnvironmentHelper.GetMockAgent(useStatsD: true);
+            Output.WriteLine($"Assigning port {agent.MetricsPort} for the SignalFx metrics.");
+
+            using var processResult = RunSampleAndWaitForExit(agent);
+
             var requests = agent.Metrics;
 
             // Check if we receive 2 kinds of metrics:
@@ -54,25 +74,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 Assert.True(contentionRequestsCount > 0, "No contention metrics received.");
             }
-        }
 
-        [SkippableFact]
-        [Trait("Category", "EndToEnd")]
-        [Trait("RunOnWindows", "True")]
-        public void MetricsDisabled()
-        {
-            var agentPort = TcpPortProvider.GetOpenPort();
-            Output.WriteLine($"Assigning port {agentPort} for the agentPort.");
-
-            SetEnvironmentVariable("SIGNALFX_RUNTIME_METRICS_ENABLED", "0");
-
-            using var agent = new MockTracerAgent(agentPort, useSfxMetrics: true);
-            Output.WriteLine($"Assigning port {agent.MetricsPort} for the SignalFx metrics.");
-
-            using var processResult = RunSampleAndWaitForExit(agent.Port, agent.MetricsPort);
-            var requests = agent.Metrics;
-
-            Assert.True(requests.Count == 0, "Received metrics despite being disabled.");
+            Assert.Empty(agent.Exceptions);
         }
     }
 }

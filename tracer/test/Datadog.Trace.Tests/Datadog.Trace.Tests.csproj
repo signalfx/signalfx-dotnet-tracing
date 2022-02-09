@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <!-- FIXME: Temporarily suppressing warn/error due to the conflicts caused by the addition of Verify.Xunit package. -->
     <NoWarn>NU1605;SYSLIB0014</NoWarn>
   </PropertyGroup>

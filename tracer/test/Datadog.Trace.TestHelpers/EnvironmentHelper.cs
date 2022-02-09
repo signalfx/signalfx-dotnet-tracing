@@ -69,6 +69,8 @@ namespace Datadog.Trace.TestHelpers
                           : string.Empty;
         }
 
+        public TestTransports TransportType { get; set; } = TestTransports.Tcp;
+
         public bool DebugModeEnabled { get; set; }
 
         public Dictionary<string, string> CustomEnvironmentVariables { get; set; } = new Dictionary<string, string>();
@@ -191,9 +193,8 @@ namespace Datadog.Trace.TestHelpers
         }
 
         public void SetEnvironmentVariables(
-            int agentPort,
+            MockTracerAgent agent,
             int aspNetCorePort,
-            int? metricCollectorPort,
             int? logsCollectorPort,
             StringDictionary environmentVariables,
             string processToProfile = null,
@@ -227,16 +228,8 @@ namespace Datadog.Trace.TestHelpers
                 environmentVariables["SIGNALFX_PROFILER_PROCESSES"] = Path.GetFileName(processToProfile);
             }
 
-            environmentVariables["SIGNALFX_TRACE_AGENT_HOSTNAME"] = "127.0.0.1";
-            environmentVariables["SIGNALFX_TRACE_AGENT_PORT"] = agentPort.ToString();
-
             // for ASP.NET Core sample apps, set the server's port
             environmentVariables["ASPNETCORE_URLS"] = $"http://127.0.0.1:{aspNetCorePort}/";
-
-            if (metricCollectorPort != null)
-            {
-                environmentVariables["SIGNALFX_METRICS_ENDPOINT_URL"] = $"http://127.0.0.1:{metricCollectorPort}/";
-            }
 
             if (logsCollectorPort.HasValue)
             {
@@ -277,12 +270,36 @@ namespace Datadog.Trace.TestHelpers
                 "ServiceHub.IdentityHost.exe;ServiceHub.VSDetouredHost.exe;ServiceHub.SettingsHost.exe;ServiceHub.Host.CLR.x86.exe;" +
                 "ServiceHub.RoslynCodeAnalysisService32.exe;MSBuild.exe;ServiceHub.ThreadedWaitDialog.exe";
 
-            // use DatadogAgent exporter instead of Zipkin, because most of the integration tests use MockTracerAgent instead of MockZipkinCollector
-            environmentVariables["SIGNALFX_EXPORTER"] = "DatadogAgent";
+            ConfigureTransportVariables(environmentVariables, agent);
 
             foreach (var key in CustomEnvironmentVariables.Keys)
             {
                 environmentVariables[key] = CustomEnvironmentVariables[key];
+            }
+        }
+
+        public void ConfigureTransportVariables(StringDictionary environmentVariables, MockTracerAgent agent)
+        {
+            // use DatadogAgent exporter instead of Zipkin, because most of the integration tests use MockTracerAgent instead of MockZipkinCollector
+            environmentVariables["SIGNALFX_EXPORTER"] = "DatadogAgent";
+
+            if (TransportType == TestTransports.WindowsNamedPipe)
+            {
+                string apmKey = "SIGNALFX_TRACE_PIPE_NAME";
+                string dsdKey = "SIGNALFX_DOGSTATSD_PIPE_NAME";
+
+                environmentVariables.Add(apmKey, agent.TracesUdsPath);
+                environmentVariables.Add(dsdKey, agent.StatsUdsPath);
+            }
+            else if (TransportType == TestTransports.Tcp)
+            {
+                environmentVariables["SIGNALFX_TRACE_AGENT_HOSTNAME"] = "127.0.0.1";
+                environmentVariables["SIGNALFX_TRACE_AGENT_PORT"] = agent.Port.ToString();
+
+                if (agent.MetricsPort != default(int))
+                {
+                    environmentVariables["SIGNALFX_METRICS_ENDPOINT_URL"] = $"http://127.0.0.1:{agent.MetricsPort}/";
+                }
             }
         }
 
@@ -453,13 +470,47 @@ namespace Datadog.Trace.TestHelpers
             return $"net{_major}{_minor}{_patch ?? string.Empty}";
         }
 
-        public MockTracerAgent GetMockAgent()
+        public void EnableWindowsNamedPipes(string tracePipeName = null, string statsPipeName = null)
         {
-            // Strategy pattern for agent transports goes here
-            var agentPort = TcpPortProvider.GetOpenPort();
-            var agent = new MockTracerAgent(agentPort);
+            TransportType = TestTransports.WindowsNamedPipe;
+        }
+
+        public void EnableDefaultTransport()
+        {
+            TransportType = TestTransports.Tcp;
+        }
+
+        public MockTracerAgent GetMockAgent(bool useStatsD = false)
+        {
+            MockTracerAgent agent = null;
+
+#if NETCOREAPP
+            // Decide between transports
+            if (TransportType == TestTransports.WindowsNamedPipe)
+            {
+                agent = new MockTracerAgent(new WindowsPipesConfig($"trace-{Guid.NewGuid()}", $"metrics-{Guid.NewGuid()}") { UseDogstatsD = useStatsD });
+            }
+            else
+            {
+                // Default
+                var agentPort = TcpPortProvider.GetOpenPort();
+                agent = new MockTracerAgent(agentPort, useSfxMetrics: useStatsD);
+            }
+#else
+            if (TransportType == TestTransports.WindowsNamedPipe)
+            {
+                agent = new MockTracerAgent(new WindowsPipesConfig($"trace-{Guid.NewGuid()}", $"metrics-{Guid.NewGuid()}"));
+            }
+            else
+            {
+                // Default
+                var agentPort = TcpPortProvider.GetOpenPort();
+                agent = new MockTracerAgent(agentPort, useSfxMetrics: useStatsD);
+            }
+#endif
 
             _output.WriteLine($"Assigned port {agent.Port} for the agentPort.");
+            _output.WriteLine($"Agent listener info: {agent.ListenerInfo}");
 
             return agent;
         }

@@ -1,4 +1,4 @@
-// <copyright file="TracerManager.cs" company="Datadog">
+﻿// <copyright file="TracerManager.cs" company="Datadog">
 // Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
@@ -16,6 +16,7 @@ using Datadog.Trace.Configuration;
 using Datadog.Trace.Conventions;
 using Datadog.Trace.DogStatsd;
 using Datadog.Trace.Logging;
+using Datadog.Trace.Logging.DirectSubmission;
 using Datadog.Trace.PlatformHelpers;
 using Datadog.Trace.Propagation;
 using Datadog.Trace.RuntimeMetrics;
@@ -53,6 +54,7 @@ namespace Datadog.Trace
             IDogStatsd statsd,
             RuntimeMetricsWriter runtimeMetricsWriter,
             ITraceIdConvention traceIdConvention,
+            DirectLogSubmissionManager directLogSubmission,
             string defaultServiceName)
         {
             Settings = settings;
@@ -64,6 +66,7 @@ namespace Datadog.Trace
             RuntimeMetrics = runtimeMetricsWriter;
             DefaultServiceName = defaultServiceName;
             TraceIdConvention = traceIdConvention;
+            DirectLogSubmission = directLogSubmission;
         }
 
         /// <summary>
@@ -112,6 +115,8 @@ namespace Datadog.Trace
         /// Gets the <see cref="ITraceIdConvention"/> instance used by this <see cref="IDatadogTracer"/> instance.
         /// </summary>
         public ITraceIdConvention TraceIdConvention { get; }
+
+        public DirectLogSubmissionManager DirectLogSubmission { get; }
 
         public IDogStatsd Statsd { get; }
 
@@ -356,6 +361,21 @@ namespace Datadog.Trace
 
                     writer.WritePropertyName("logs_endpoint_url");
                     writer.WriteValue(instanceSettings.ExporterSettings.LogsEndpointUrl);
+                    writer.WritePropertyName("direct_logs_submission_enabled_integrations");
+                    writer.WriteStartArray();
+
+                    foreach (var integration in instanceSettings.LogSubmissionSettings.EnabledIntegrationNames)
+                    {
+                        writer.WriteValue(integration);
+                    }
+
+                    writer.WriteEndArray();
+
+                    writer.WritePropertyName("direct_logs_submission_enabled");
+                    writer.WriteValue(instanceSettings.LogSubmissionSettings.IsEnabled);
+
+                    writer.WritePropertyName("direct_logs_submission_error");
+                    writer.WriteValue(string.Join(", ", instanceSettings.LogSubmissionSettings.ValidationErrors));
 
                     writer.WriteEndObject();
                     // ReSharper restore MethodHasAsyncOverload
@@ -408,6 +428,7 @@ namespace Datadog.Trace
             {
                 _instance?.AgentWriter.FlushAndCloseAsync().Wait();
                 _heartbeatTimer?.Dispose();
+                _instance?.DirectLogSubmission?.Dispose();
             }
             catch (Exception ex)
             {

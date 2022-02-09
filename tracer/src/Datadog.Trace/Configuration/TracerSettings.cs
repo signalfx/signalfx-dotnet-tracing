@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using Datadog.Trace.Configuration.Helpers;
 using Datadog.Trace.Configuration.Types;
 using Datadog.Trace.ExtensionMethods;
+using Datadog.Trace.Logging.DirectSubmission;
 using Datadog.Trace.PlatformHelpers;
 using Datadog.Trace.SignalFx.Metrics;
 using Datadog.Trace.Vendors.Serilog;
@@ -189,6 +190,8 @@ namespace Datadog.Trace.Configuration
             // If you change this, change environment_variables.h too
             ThreadSamplingEnabled = source?.GetBool(ConfigurationKeys.ThreadSampling.Enabled) ?? false;
             ThreadSamplingPeriod = GetThreadSamplingPeriod(source);
+
+            LogSubmissionSettings = new DirectLogSubmissionSettings(source);
         }
 
         /// <summary>
@@ -458,6 +461,11 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="ConfigurationKeys.FeatureFlags.RouteTemplateResourceNamesEnabled"/>
         internal bool RouteTemplateResourceNamesEnabled { get; }
+
+        /// <summary>
+        /// Gets or sets the direct log submission settings.
+        /// </summary>
+        internal DirectLogSubmissionSettings LogSubmissionSettings { get; set; }
 
         /// <summary>
         /// Create a <see cref="TracerSettings"/> populated from the default sources

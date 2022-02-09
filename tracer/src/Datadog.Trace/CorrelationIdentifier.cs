@@ -16,16 +16,16 @@ namespace Datadog.Trace
     /// </summary>
     public static class CorrelationIdentifier
     {
-        internal static readonly string ServiceKey = "service.name";
-        internal static readonly string VersionKey = "service.version";
-        internal static readonly string EnvKey = "deployment.environment";
-        internal static readonly string TraceIdKey = "trace_id";
-        internal static readonly string SpanIdKey = "span_id";
+        internal const string ServiceKey = "service.name";
+        internal const string VersionKey = "service.version";
+        internal const string EnvKey = "deployment.environment";
+        internal const string TraceIdKey = "trace_id";
+        internal const string SpanIdKey = "span_id";
 
         // Serilog property names require valid C# identifiers
-        internal static readonly string SerilogServiceKey = "service_name";
-        internal static readonly string SerilogVersionKey = "service_version";
-        internal static readonly string SerilogEnvKey = "deployment_environment";
+        internal const string SerilogServiceKey = "service_name";
+        internal const string SerilogVersionKey = "service_version";
+        internal const string SerilogEnvKey = "deployment_environment";
 
         /// <summary>
         /// Gets the name of the service

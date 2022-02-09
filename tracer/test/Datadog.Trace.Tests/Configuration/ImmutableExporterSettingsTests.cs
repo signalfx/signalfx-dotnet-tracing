@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Datadog.Trace.Agent;
 using Datadog.Trace.Configuration;
 using FluentAssertions;
 using FluentAssertions.Execution;

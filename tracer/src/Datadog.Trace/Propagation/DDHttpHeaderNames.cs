@@ -37,5 +37,17 @@ namespace Datadog.Trace.Propagation
         /// Origin of the distributed trace.
         /// </summary>
         public const string Origin = "x-datadog-origin";
+
+        /// <summary>
+        /// The user agent that originated an http request.
+        /// </summary>
+        public const string UserAgent = "User-Agent";
+
+        /// <summary>
+        /// Internal Datadog tags.
+        /// A collection of internal Datadog tags. Only tags with names that
+        /// begin with "_dd.p.*" will be propagated using this header.
+        /// </summary>
+        public const string DatadogTags = "x-datadog-tags";
     }
 }

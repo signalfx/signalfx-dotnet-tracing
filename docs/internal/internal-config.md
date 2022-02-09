@@ -13,6 +13,15 @@ These settings should be never used by the users.
 | `SIGNALFX_CONVENTION` | Sets the semantic and trace id conventions for the tracer. Available values are: `Datadog` (64bit trace id), `OpenTelemetry` (128 bit trace id). | `OpenTelemetry` |
 | `SIGNALFX_DUMP_ILREWRITE_ENABLED` | Allows the profiler to dump the IL original code and modification to the log. | `false` |
 | `SIGNALFX_EXPORTER` | The exporter to be used. The Tracer uses it to encode and dispatch traces. Available values are: `DatadogAgent`, `Zipkin`. | `Zipkin` |
+| `SIGNALFX_LOGS_DIRECT_SUBMISSION_INTEGRATIONS` | Configuration key for a list of direct log submission integrations to enable. Only selected integrations are enabled for direct log submission. Supports multiple values separated with semi-colons. Valid values are `ILogger`, `Serilog`, `Log4Net`, `NLog` | `` |
+| `SIGNALFX_LOGS_DIRECT_SUBMISSION_HOST` | Configuration key for the name of the originating host for direct logs submission. | `` |
+| `SIGNALFX_LOGS_DIRECT_SUBMISSION_SOURCE` | Configuration key for the originating source for direct logs submission. | `csharp` |
+| `SIGNALFX_LOGS_DIRECT_SUBMISSION_TAGS` | Configuration key for a list of tags to be applied globally to all logs directly submitted. Supports multiple key key-value pairs which are comma-separated, and for which the key and value are colon-separated. For example Key1:Value1, Key2:Value2 | `` |
+| `SIGNALFX_LOGS_DIRECT_SUBMISSION_URL` | Configuration key for the url to send logs to.  | `https://http-intake.logs.datadoghq.com:443` |
+| `SIGNALFX_LOGS_DIRECT_SUBMISSION_MINIMUM_LEVEL` | Configuration key for the minimum level logs should have to be sent to the intake. Should be one of `Verbose`,`Debug`,`Information`,`Warning`,`Error`,`Fatal` | `Information` |
+| `SIGNALFX_LOGS_DIRECT_SUBMISSION_MAX_BATCH_SIZE` | Configuration key for the maximum number of logs to send at one time  | `1000` |
+| `SIGNALFX_LOGS_DIRECT_SUBMISSION_MAX_QUEUE_SIZE` | Configuration key for the maximum number of logs to hold in internal queue at any one time | `100000` |
+| `SIGNALFX_LOGS_DIRECT_SUBMISSION_BATCH_PERIOD_SECONDS` | Configuration key for the time in seconds to wait between checking for batches | `2` |
 
 ## Unsupported upstream settings
 

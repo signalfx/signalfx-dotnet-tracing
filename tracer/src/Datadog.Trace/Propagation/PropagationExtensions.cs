@@ -25,24 +25,42 @@ namespace Datadog.Trace.Propagation
 
         public static IEnumerable<KeyValuePair<string, string>> ExtractHeaderTags(this IHeadersCollection headers, IEnumerable<KeyValuePair<string, string>> headerToTagMap, string defaultTagPrefix)
         {
+            return ExtractHeaderTags(headers, headerToTagMap, defaultTagPrefix, string.Empty);
+        }
+
+        public static IEnumerable<KeyValuePair<string, string>> ExtractHeaderTags(this IHeadersCollection headers, IEnumerable<KeyValuePair<string, string>> headerToTagMap, string defaultTagPrefix, string userAgent)
+        {
             foreach (KeyValuePair<string, string> headerNameToTagName in headerToTagMap)
             {
-                string headerValue = ParseString(headers, headerNameToTagName.Key);
+                var headerName = headerNameToTagName.Key;
+                var providedTagName = headerNameToTagName.Value;
+
+                string headerValue;
+                if (string.Equals(headerName, CommonHttpHeaderNames.UserAgent, StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(userAgent))
+                {
+                    // A specific case for the user agent as it is splitted in .net framework web api.
+                    headerValue = userAgent;
+                }
+                else
+                {
+                    headerValue = ParseString(headers, headerName);
+                }
+
                 if (headerValue is null)
                 {
                     continue;
                 }
 
                 // Tag name is normalized during Tracer instantiation so use as-is
-                if (!string.IsNullOrWhiteSpace(headerNameToTagName.Value))
+                if (!string.IsNullOrWhiteSpace(providedTagName))
                 {
-                    yield return new KeyValuePair<string, string>(headerNameToTagName.Value, headerValue);
+                    yield return new KeyValuePair<string, string>(providedTagName, headerValue);
                 }
                 else
                 {
                     // Since the header name was saved to do the lookup in the input headers,
                     // convert the header to its final tag name once per prefix
-                    var cacheKey = new Key(headerNameToTagName.Key, defaultTagPrefix);
+                    var cacheKey = new Key(headerName, defaultTagPrefix);
                     string tagNameResult = DefaultTagMappingCache.GetOrAdd(cacheKey, key =>
                     {
                         if (key.HeaderName.TryConvertToNormalizedTagName(normalizePeriods: true, out var normalizedHeaderTagName))
