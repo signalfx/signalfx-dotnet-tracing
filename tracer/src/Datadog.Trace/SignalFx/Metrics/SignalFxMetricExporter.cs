@@ -18,14 +18,6 @@ namespace Datadog.Trace.SignalFx.Metrics
     {
         private const int MaxAttempts = 3;
 
-        private static readonly HashSet<int> TransientClientErrorStatusCodes = new HashSet<int>(new[]
-        {
-            // RequestTimeout
-            408,
-            // TooManyRequests
-            429
-        });
-
         private static readonly HashSet<WebExceptionStatus> TransientExceptionStatuses = new HashSet<WebExceptionStatus>(new[]
         {
             WebExceptionStatus.ConnectionClosed,
@@ -51,7 +43,7 @@ namespace Datadog.Trace.SignalFx.Metrics
 
             _metricsEndpointAddress = metricsEndpointAddress;
             _apiToken = apiToken;
-            _webRequestTimeoutMs = 500;
+            _webRequestTimeoutMs = 2000;
             _waitBeforeRetries = TimeSpan.FromMilliseconds(200);
         }
 
@@ -128,7 +120,11 @@ namespace Datadog.Trace.SignalFx.Metrics
 
         private static bool IndicatesTransientError(int responseStatusCode)
         {
-            return TransientClientErrorStatusCodes.Contains(responseStatusCode) || (responseStatusCode >= 500 && responseStatusCode <= 599);
+            // following HTTP status codes are considered as a transient error:
+            // 408 Request Timeout
+            // 429 Too Many Requests
+            // 5xx Server Error
+            return responseStatusCode == 408 || responseStatusCode == 429 || (responseStatusCode >= 500 && responseStatusCode <= 599);
         }
     }
 }
