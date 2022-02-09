@@ -201,6 +201,7 @@ namespace Datadog.Trace
                 {
                     var metricExporter = new SignalFxMetricExporter(settings.ExporterSettings.MetricsEndpointUrl, settings.SignalFxAccessToken);
                     var metricSender = new SignalFxMetricSender(new AsyncSignalFxMetricWriter(metricExporter, MaxMetricsInAsyncQueue), constantTags.ToArray());
+                    // TODO splunk: consider registering dependencies and disposing them inside SignalFxStats
                     return new SignalFxStats(metricSender);
                 }
 
