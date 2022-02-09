@@ -74,7 +74,7 @@ Use following settings to configure where the telemetry data is being exported.
 
 | Setting | Description | Default |
 |-|-|-|
-| `SIGNALFX_ACCESS_TOKEN` | Your Splunk Observability Cloud access token for your organization. It enables sending telemetry directly to the Splunk Observability Cloud ingest endpoint. | |
+| `SIGNALFX_ACCESS_TOKEN` | Splunk Observability Cloud access token for your organization. It enables sending telemetry directly to the Splunk Observability Cloud ingest endpoint. | |
 | `SIGNALFX_REALM` | Your Splunk Observability Cloud realm. To find your realm, open Splunk Observability Cloud, click Settings, then click on your username. | `none` (local collector) |
 | `SIGNALFX_ENDPOINT_URL` | The URL to where trace exporters send traces. Overrides `SIGNALFX_REALM` configuration for the traces ingestion endpoint. | `http://localhost:9411/api/v2/spans` |
 | `SIGNALFX_METRICS_ENDPOINT_URL` | The URL to where metric exporters send metrics. Overrides `SIGNALFX_REALM` configuration for the metrics ingestion endpoint. | `http://localhost:9943/v2/datapoint` |
@@ -94,7 +94,7 @@ configure the following settings:
 | `SIGNALFX_METRICS_ENDPOINT_URL` | Metric ingestion endpoint | Overrides `SIGNALFX_REALM` configuration for the traces ingestion endpoint. |
 
 __IMPORTANT:__ To export data directly to Splunk Observability Cloud,
-set either `SIGNALFX_REALM`, or `SIGNALFX_ENDPOINT_URL` and `SIGNALFX_METRICS_ENDPOINT_URL`,
+set either the `SIGNALFX_REALM` environment variable or the `SIGNALFX_ENDPOINT_URL` and `SIGNALFX_METRICS_ENDPOINT_URL` environment variables,
 in addition to `SIGNALFX_ACCESS_TOKEN`.
 
 ## Trace propagation settings
