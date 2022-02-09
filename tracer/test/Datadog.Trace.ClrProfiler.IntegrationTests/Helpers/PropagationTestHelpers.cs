@@ -14,7 +14,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.Helpers
             var ddParentSpanId = StringUtil.GetHeader(processResult.StandardOutput, B3HttpHeaderNames.B3SpanId);
 
             Assert.Equal(expectedSpan.TraceId.ToString(), ddTraceId);
-            Assert.Equal(expectedSpan.SpanId.ToString("x"), ddParentSpanId);
+            Assert.Equal(expectedSpan.SpanId, ulong.Parse(ddParentSpanId, NumberStyles.HexNumber));
 
             // Verify B3 headers
             var b3TraceId = StringUtil.GetHeader(processResult.StandardOutput, B3HttpHeaderNames.B3TraceId);
