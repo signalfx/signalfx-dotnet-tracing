@@ -6,14 +6,18 @@
 // Modified by Splunk Inc.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using Datadog.Trace.ExtensionMethods;
+using Datadog.Trace.HttpOverStreams;
 using Datadog.Tracer.SignalFx.Metrics.Protobuf;
 using MessagePack; // use nuget MessagePack to deserialize
 
@@ -23,48 +27,81 @@ namespace Datadog.Trace.TestHelpers
     {
         private readonly HttpListener _listener;
         private readonly HttpListener _metricsListener;
-        private readonly Thread _listenerThread;
+        private readonly Thread _tracesListenerThread;
         private readonly Thread _metricsListenerThread;
         private readonly CancellationTokenSource _cancellationTokenSource;
 
-        public MockTracerAgent(int port = 8126, int retries = 5, bool useSfxMetrics = false)
+        public MockTracerAgent(WindowsPipesConfig config)
+        {
+            throw new NotImplementedException("Windows named pipes are not yet implemented in the MockTracerAgent");
+        }
+
+        public MockTracerAgent(int port = 8126, int retries = 5, bool useSfxMetrics = false, bool doNotBindPorts = false, int? requestedStatsDPort = null)
         {
             _cancellationTokenSource = new CancellationTokenSource();
+
+            if (doNotBindPorts)
+            {
+                // This is for any tests that want to use a specific port but never actually bind
+                Port = port;
+                return;
+            }
+
+            var listeners = new List<string>();
 
             if (useSfxMetrics)
             {
                 var metricsPort = 8226;
                 var metricsRetries = 5;
-                while (true)
+
+                if (requestedStatsDPort != null)
                 {
+                    // This port is explicit, allow failure if not available
                     var metricsListener = new HttpListener();
-                    metricsListener.Prefixes.Add($"http://127.0.0.1:{metricsPort}/");
-                    metricsListener.Prefixes.Add($"http://localhost:{metricsPort}/");
+                    metricsListener.Prefixes.Add($"http://127.0.0.1:{requestedStatsDPort}/");
+                    metricsListener.Prefixes.Add($"http://localhost:{requestedStatsDPort}/");
 
-                    try
-                    {
-                        metricsListener.Start();
+                    MetricsPort = requestedStatsDPort.Value;
+                    _metricsListener = metricsListener;
 
-                        // successfully listening
-                        MetricsPort = metricsPort;
-                        _metricsListener = metricsListener;
-
-                        _metricsListenerThread = new Thread(HandleMetricsHttpRequests) { IsBackground = true };
-                        _metricsListenerThread.Start();
-
-                        break;
-                    }
-                    catch (HttpListenerException) when (metricsRetries > 0)
-                    {
-                        // only catch the exception if there are retries left
-                        metricsPort = TcpPortProvider.GetOpenPort();
-                        metricsRetries--;
-                    }
-
-                    // always close listener if exception is thrown,
-                    // whether it was caught or not
-                    metricsListener.Close();
+                    _metricsListenerThread = new Thread(HandleMetricsHttpRequests) { IsBackground = true };
+                    _metricsListenerThread.Start();
                 }
+                else
+                {
+                    while (true)
+                    {
+                        var metricsListener = new HttpListener();
+                        metricsListener.Prefixes.Add($"http://127.0.0.1:{metricsPort}/");
+                        metricsListener.Prefixes.Add($"http://localhost:{metricsPort}/");
+
+                        try
+                        {
+                            metricsListener.Start();
+
+                            // successfully listening
+                            MetricsPort = metricsPort;
+                            _metricsListener = metricsListener;
+
+                            _metricsListenerThread = new Thread(HandleMetricsHttpRequests) { IsBackground = true };
+                            _metricsListenerThread.Start();
+
+                            break;
+                        }
+                        catch (HttpListenerException) when (metricsRetries > 0)
+                        {
+                            // only catch the exception if there are retries left
+                            metricsPort = TcpPortProvider.GetOpenPort();
+                            metricsRetries--;
+                        }
+
+                        // always close listener if exception is thrown,
+                        // whether it was caught or not
+                        metricsListener.Close();
+                    }
+                }
+
+                listeners.Add($"Stats at port {MetricsPort}");
             }
 
             // try up to 5 consecutive ports before giving up
@@ -84,8 +121,9 @@ namespace Datadog.Trace.TestHelpers
                     Port = port;
                     _listener = listener;
 
-                    _listenerThread = new Thread(HandleHttpRequests);
-                    _listenerThread.Start();
+                    listeners.Add($"Traces at port {Port}");
+                    _tracesListenerThread = new Thread(HandleHttpRequests);
+                    _tracesListenerThread.Start();
 
                     return;
                 }
@@ -94,6 +132,10 @@ namespace Datadog.Trace.TestHelpers
                     // only catch the exception if there are retries left
                     port = TcpPortProvider.GetOpenPort();
                     retries--;
+                }
+                finally
+                {
+                    ListenerInfo = string.Join(", ", listeners);
                 }
 
                 // always close listener if exception is thrown,
@@ -105,6 +147,10 @@ namespace Datadog.Trace.TestHelpers
         public event EventHandler<EventArgs<HttpListenerContext>> RequestReceived;
 
         public event EventHandler<EventArgs<IList<IList<MockSpan>>>> RequestDeserialized;
+
+        public event EventHandler<EventArgs<string>> MetricsReceived;
+
+        public string ListenerInfo { get; }
 
         /// <summary>
         /// Gets the TCP port that this Agent is listening on.
@@ -118,10 +164,20 @@ namespace Datadog.Trace.TestHelpers
         /// </summary>
         public int MetricsPort { get; }
 
+        public string TracesUdsPath { get; }
+
+        public string StatsUdsPath { get; }
+
+        public string TracesWindowsPipeName { get; }
+
+        public string StatsWindowsPipeName { get; }
+
         /// <summary>
         /// Gets the filters used to filter out spans we don't want to look at for a test.
         /// </summary>
         public List<Func<MockSpan, bool>> SpanFilters { get; } = new();
+
+        public ConcurrentBag<Exception> Exceptions { get; private set; } = new ConcurrentBag<Exception>();
 
         public IImmutableList<MockSpan> Spans { get; private set; } = ImmutableList<MockSpan>.Empty;
 
@@ -220,6 +276,18 @@ namespace Datadog.Trace.TestHelpers
             _cancellationTokenSource.Cancel();
         }
 
+        protected void IgnoreException(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception ex)
+            {
+                Exceptions.Add(ex);
+            }
+        }
+
         protected virtual void OnRequestReceived(HttpListenerContext context)
         {
             RequestReceived?.Invoke(this, new EventArgs<HttpListenerContext>(context));
@@ -228,6 +296,11 @@ namespace Datadog.Trace.TestHelpers
         protected virtual void OnRequestDeserialized(IList<IList<MockSpan>> traces)
         {
             RequestDeserialized?.Invoke(this, new EventArgs<IList<IList<MockSpan>>>(traces));
+        }
+
+        protected virtual void OnMetricsReceived(string stats)
+        {
+            MetricsReceived?.Invoke(this, new EventArgs<string>(stats));
         }
 
         private void AssertHeader(

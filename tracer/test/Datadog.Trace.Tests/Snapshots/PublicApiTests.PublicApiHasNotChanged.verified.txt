@@ -30,7 +30,6 @@ namespace Datadog.Trace.Configuration
         public const string DefaultAgentHost = "localhost";
         public const int DefaultAgentPort = 9411;
         public ExporterSettings() { }
-        public ExporterSettings(Datadog.Trace.Configuration.IConfigurationSource source) { }
         public System.Uri AgentUri { get; set; }
         public int DogStatsdPort { get; set; }
         public System.Uri LogsEndpointUrl { get; set; }
@@ -213,7 +212,6 @@ namespace Datadog.Trace.Configuration.Types
     public static class PropagatorTypes
     {
         public const string B3 = "B3";
-        public const string Datadog = "Datadog";
         public const string W3C = "W3C";
     }
 }
@@ -466,11 +464,13 @@ namespace Datadog.Trace.Propagation
     }
     public static class DDHttpHeaderNames
     {
+        public const string DatadogTags = "x-datadog-tags";
         public const string Origin = "x-datadog-origin";
         public const string ParentId = "x-datadog-parent-id";
         public const string SamplingPriority = "x-datadog-sampling-priority";
         public const string TraceId = "x-datadog-trace-id";
         public const string TracingEnabled = "x-datadog-tracing-enabled";
+        public const string UserAgent = "User-Agent";
     }
     public interface IPropagator
     {

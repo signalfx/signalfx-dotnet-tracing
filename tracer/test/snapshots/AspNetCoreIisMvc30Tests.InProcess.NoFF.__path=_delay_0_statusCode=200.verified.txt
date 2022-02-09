@@ -1,8 +1,9 @@
-﻿[
+[
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: aspnet_core.request,
+    Name: GET delay/{seconds},
+    LogicScope: aspnet_core.request,
     Resource: GET delay/{seconds},
     Service: Samples.AspNetCoreMvc30,
     Type: web,
@@ -16,13 +17,15 @@
       language: dotnet,
       net.peer.ip: ::1,
       runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: server,
       version: 1.0.0
     },
     Metrics: {
-      _sampling_priority_v1: 1.0,
+      _dd.top_level: 1.0,
       _dd.tracer_kr: 1.0,
-      _dd.top_level: 1.0
+      _sampling_priority_v1: 1.0
     }
   }
 ]

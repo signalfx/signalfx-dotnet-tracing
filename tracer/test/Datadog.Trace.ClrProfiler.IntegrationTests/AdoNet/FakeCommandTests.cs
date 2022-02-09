@@ -40,7 +40,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             const string expectedServiceName = "Samples.FakeDbCommand";
 
             using var agent = EnvironmentHelper.GetMockAgent();
-            using var process = RunSampleAndWaitForExit(agent.Port);
+            using var process = RunSampleAndWaitForExit(agent);
             var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
             int actualSpanCount = spans.Count(s => s.ParentId.HasValue); // Remove unexpected DB spans from the calculation
 

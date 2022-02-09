@@ -5,10 +5,8 @@
 
 // Modified by Splunk Inc.
 
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using Datadog.Trace.ClrProfiler.IntegrationTests.Helpers;
 using Datadog.Trace.TestHelpers;
 using Xunit;
 using Xunit.Abstractions;
@@ -29,7 +27,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         {
             string tmpFile = Path.GetTempFileName();
             SetEnvironmentVariable("SIGNALFX_TRACE_LOG_PATH", tmpFile);
-            using ProcessResult processResult = RunSampleAndWaitForExit(9696);
+            using ProcessResult processResult = RunSampleAndWaitForExit(new MockTracerAgent(9696, doNotBindPorts: true));
             string[] logFileContent = File.ReadAllLines(tmpFile);
             int numOfLoadersLoad = logFileContent.Count(line => line.Contains("SignalFx.Tracing.ClrProfiler.Managed.Loader loaded"));
             Assert.Equal(1, numOfLoadersLoad);

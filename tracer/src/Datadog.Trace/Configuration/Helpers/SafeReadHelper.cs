@@ -18,13 +18,17 @@ namespace Datadog.Trace.Configuration.Helpers
         /// <param name="source">Configuration source.</param>
         /// <param name="key">Configuration key.</param>
         /// <param name="defaultTo">In case of failure, default to this value.</param>
+        /// <param name="defaultUsed">Indicated is the default was used</param>
         /// <returns>Config uri or default.</returns>
-        public static Uri SafeReadUri(this IConfigurationSource source, string key, Uri defaultTo)
+        public static Uri SafeReadUri(this IConfigurationSource source, string key, Uri defaultTo, out bool defaultUsed)
         {
+            defaultUsed = false;
+
             string csValue = source?.GetString(key);
 
             if (string.IsNullOrWhiteSpace(csValue))
             {
+                defaultUsed = true;
                 return defaultTo;
             }
 
@@ -37,6 +41,7 @@ namespace Datadog.Trace.Configuration.Helpers
                 Log.Error(ex, $"[{key}]: Invalid configuration value '{csValue}'. Defaulting to '{defaultTo}'");
             }
 
+            defaultUsed = true;
             return defaultTo;
         }
 

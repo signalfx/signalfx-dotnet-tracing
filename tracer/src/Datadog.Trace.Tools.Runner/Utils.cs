@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Datadog.Trace.Ci.Agent;
 using Datadog.Trace.Ci.Sampling;
 using Datadog.Trace.Configuration;
+using Spectre.Console;
 
 namespace Datadog.Trace.Tools.Runner
 {
@@ -25,7 +26,7 @@ namespace Datadog.Trace.Tools.Runner
     {
         public const string PROFILERID = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}";
 
-        public static Dictionary<string, string> GetProfilerEnvironmentVariables(string runnerFolder, Platform platform, Options options)
+        public static Dictionary<string, string> GetProfilerEnvironmentVariables(string runnerFolder, Platform platform, CommonTracerSettings options)
         {
             // In the current nuspec structure RunnerFolder has the following format:
             //  C:\Users\[user]\.dotnet\tools\.store\datadog.trace.tools.runner\[version]\datadog.trace.tools.runner\[version]\tools\netcoreapp3.1\any
@@ -34,16 +35,23 @@ namespace Datadog.Trace.Tools.Runner
             //  C:\Users\[user]\.dotnet\tools\.store\datadog.trace.tools.runner\[version]\datadog.trace.tools.runner\[version]\home
             // So we have to go up 3 folders.
             string tracerHome = null;
-            if (!string.IsNullOrEmpty(options.TracerHomeFolder))
+            if (!string.IsNullOrEmpty(options.TracerHome))
             {
-                tracerHome = options.TracerHomeFolder;
+                tracerHome = options.TracerHome;
                 if (!Directory.Exists(tracerHome))
                 {
-                    Console.Error.WriteLine("ERROR: The specified home folder doesn't exist.");
+                    WriteError("Error: The specified home folder doesn't exist.");
                 }
             }
 
             tracerHome ??= DirectoryExists("Home", Path.Combine(runnerFolder, "..", "..", "..", "home"), Path.Combine(runnerFolder, "home"));
+
+            if (tracerHome == null)
+            {
+                WriteError("Error: The home directory can't be found. Check that the tool is correctly installed, or use --tracer-home to set a custom path.");
+                return null;
+            }
+
             string tracerMsBuild = FileExists(Path.Combine(tracerHome, "netstandard2.0", "SignalFx.Tracing.MSBuild.dll"));
             string tracerProfiler32 = string.Empty;
             string tracerProfiler64 = string.Empty;
@@ -67,7 +75,7 @@ namespace Datadog.Trace.Tools.Runner
                 }
                 else
                 {
-                    Console.Error.WriteLine($"ERROR: Windows {RuntimeInformation.OSArchitecture} architecture is not supported.");
+                    WriteError($"Error: Windows {RuntimeInformation.OSArchitecture} architecture is not supported.");
                     return null;
                 }
             }
@@ -83,7 +91,7 @@ namespace Datadog.Trace.Tools.Runner
                 }
                 else
                 {
-                    Console.Error.WriteLine($"ERROR: Linux {RuntimeInformation.OSArchitecture} architecture is not supported.");
+                    WriteError($"Error: Linux {RuntimeInformation.OSArchitecture} architecture is not supported.");
                     return null;
                 }
             }
@@ -95,7 +103,116 @@ namespace Datadog.Trace.Tools.Runner
                 }
                 else
                 {
-                    Console.Error.WriteLine($"ERROR: macOS {RuntimeInformation.OSArchitecture} architecture is not supported.");
+                    WriteError($"Error: macOS {RuntimeInformation.OSArchitecture} architecture is not supported.");
+                    return null;
+                }
+            }
+
+            var envVars = new Dictionary<string, string>
+            {
+                ["SIGNALFX_DOTNET_TRACER_HOME"] = tracerHome,
+                ["SIGNALFX_DOTNET_TRACER_MSBUILD"] = tracerMsBuild,
+                ["CORECLR_ENABLE_PROFILING"] = "1",
+                ["CORECLR_PROFILER"] = PROFILERID,
+                ["CORECLR_PROFILER_PATH_32"] = tracerProfiler32,
+                ["CORECLR_PROFILER_PATH_64"] = tracerProfiler64,
+                ["COR_ENABLE_PROFILING"] = "1",
+                ["COR_PROFILER"] = PROFILERID,
+                ["COR_PROFILER_PATH_32"] = tracerProfiler32,
+                ["COR_PROFILER_PATH_64"] = tracerProfiler64,
+            };
+
+            if (!string.IsNullOrWhiteSpace(options.Environment))
+            {
+                envVars["SIGNALFX_ENV"] = options.Environment;
+            }
+
+            if (!string.IsNullOrWhiteSpace(options.Service))
+            {
+                envVars["SIGNALFX_SERVICE_NAME"] = options.Service;
+            }
+
+            if (!string.IsNullOrWhiteSpace(options.Version))
+            {
+                envVars["SIGNALFX_VERSION"] = options.Version;
+            }
+
+            if (!string.IsNullOrWhiteSpace(options.AgentUrl))
+            {
+                envVars["SIGNALFX_ENDPOINT_URL"] = options.AgentUrl;
+            }
+
+            return envVars;
+        }
+
+        public static Dictionary<string, string> GetProfilerEnvironmentVariables(string runnerFolder, Platform platform, LegacySettings options)
+        {
+            // In the current nuspec structure RunnerFolder has the following format:
+            //  C:\Users\[user]\.dotnet\tools\.store\datadog.trace.tools.runner\[version]\datadog.trace.tools.runner\[version]\tools\netcoreapp3.1\any
+            //  C:\Users\[user]\.dotnet\tools\.store\datadog.trace.tools.runner\[version]\datadog.trace.tools.runner\[version]\tools\netcoreapp2.1\any
+            // And the Home folder is:
+            //  C:\Users\[user]\.dotnet\tools\.store\datadog.trace.tools.runner\[version]\datadog.trace.tools.runner\[version]\home
+            // So we have to go up 3 folders.
+            string tracerHome = null;
+            if (!string.IsNullOrEmpty(options.TracerHomeFolder))
+            {
+                tracerHome = options.TracerHomeFolder;
+                if (!Directory.Exists(tracerHome))
+                {
+                    WriteError("Error: The specified home folder doesn't exist.");
+                }
+            }
+
+            tracerHome ??= DirectoryExists("Home", Path.Combine(runnerFolder, "..", "..", "..", "home"), Path.Combine(runnerFolder, "home"));
+
+            if (tracerHome == null)
+            {
+                WriteError("Error: The home directory can't be found. Check that the tool is correctly installed, or use --tracer-home to set a custom path.");
+                return null;
+            }
+
+            string tracerMsBuild = FileExists(Path.Combine(tracerHome, "netstandard2.0", "Signalfx.Tracing.MSBuild.dll"));
+            string tracerProfiler32 = string.Empty;
+            string tracerProfiler64 = string.Empty;
+
+            if (platform == Platform.Windows)
+            {
+                if (RuntimeInformation.OSArchitecture == Architecture.X64 || RuntimeInformation.OSArchitecture == Architecture.X86)
+                {
+                    tracerProfiler32 = FileExists(Path.Combine(tracerHome, "win-x86", "Signalfx.Tracing.ClrProfiler.Native.dll"));
+                    tracerProfiler64 = FileExists(Path.Combine(tracerHome, "win-x64", "Signalfx.Tracing.ClrProfiler.Native.dll"));
+                }
+                else
+                {
+                    WriteError($"Error: Windows {RuntimeInformation.OSArchitecture} architecture is not supported.");
+                    return null;
+                }
+            }
+            else if (platform == Platform.Linux)
+            {
+                if (RuntimeInformation.OSArchitecture == Architecture.X64)
+                {
+                    tracerProfiler64 = FileExists(Path.Combine(tracerHome, "linux-x64", "Signalfx.Tracing.ClrProfiler.Native.so"));
+                }
+                else if (RuntimeInformation.OSArchitecture == Architecture.Arm64)
+                {
+                    tracerProfiler64 = FileExists(Path.Combine(tracerHome, "linux-arm64", "Signalfx.Tracing.ClrProfiler.Native.so"));
+                }
+                else
+                {
+                    WriteError($"Error: Linux {RuntimeInformation.OSArchitecture} architecture is not supported.");
+                    return null;
+                }
+            }
+            else if (platform == Platform.MacOS)
+            {
+                if (RuntimeInformation.OSArchitecture == Architecture.X64)
+                {
+                    tracerProfiler64 = FileExists(Path.Combine(tracerHome, "osx-x64", "Signalfx.Tracing.ClrProfiler.Native.dylib"));
+                }
+                else
+                {
+                    WriteError($"Error: macOS {RuntimeInformation.OSArchitecture} architecture is not supported.");
                     return null;
                 }
             }
@@ -169,12 +286,7 @@ namespace Datadog.Trace.Tools.Runner
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error: The '{name}' directory check thrown an exception: {ex}");
-            }
-
-            if (folderName == null)
-            {
-                Console.Error.WriteLine($"Error: The '{name}' directory can't be found.");
+                WriteError($"Error: The '{name}' directory check thrown an exception: {ex}");
             }
 
             return folderName;
@@ -186,12 +298,12 @@ namespace Datadog.Trace.Tools.Runner
             {
                 if (!File.Exists(filePath))
                 {
-                    Console.Error.WriteLine($"Error: The file '{filePath}' can't be found.");
+                    WriteError($"Error: The file '{filePath}' can't be found.");
                 }
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error: The file '{filePath}' check thrown an exception: {ex}");
+                WriteError($"Error: The file '{filePath}' check thrown an exception: {ex}");
             }
 
             return filePath;
@@ -254,7 +366,7 @@ namespace Datadog.Trace.Tools.Runner
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                AnsiConsole.WriteException(ex);
             }
 
             return 1;
@@ -292,7 +404,7 @@ namespace Datadog.Trace.Tools.Runner
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error while reading environment variable {key}: {ex}");
+                WriteError($"Error while reading environment variable {key}: {ex}");
             }
 
             return defaultValue;
@@ -315,14 +427,14 @@ namespace Datadog.Trace.Tools.Runner
             {
                 if (!await agentWriter.Ping().ConfigureAwait(false))
                 {
-                    Console.WriteLine($"Error connecting to the Datadog Agent at {tracerSettings.ExporterSettings.AgentUri}.");
+                    WriteError($"Error connecting to the Datadog Agent at {tracerSettings.ExporterSettings.AgentUri}.");
                     return false;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error connecting to the Datadog Agent at {tracerSettings.ExporterSettings.AgentUri}.");
-                Console.WriteLine(ex);
+                WriteError($"Error connecting to the Datadog Agent at {tracerSettings.ExporterSettings.AgentUri}.");
+                AnsiConsole.WriteException(ex);
                 return false;
             }
             finally
@@ -331,6 +443,11 @@ namespace Datadog.Trace.Tools.Runner
             }
 
             return true;
+        }
+
+        internal static void WriteError(string message)
+        {
+            AnsiConsole.MarkupLine($"[red]{message.EscapeMarkup()}[/]");
         }
     }
 }

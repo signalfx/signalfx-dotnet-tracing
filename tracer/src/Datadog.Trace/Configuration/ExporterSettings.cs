@@ -6,8 +6,9 @@
 // Modified by Splunk Inc.
 
 using System;
+using Datadog.Trace.Agent;
 using Datadog.Trace.Configuration.Helpers;
-using Datadog.Trace.Vendors.StatsdClient.Transport;
+using MetricsTransportType = Datadog.Trace.Vendors.StatsdClient.Transport.TransportType;
 
 namespace Datadog.Trace.Configuration
 {
@@ -44,19 +45,16 @@ namespace Datadog.Trace.Configuration
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ExporterSettings"/> class
-        /// using the specified <see cref="IConfigurationSource"/> to initialize values.
+        /// Initializes a new instance of the <see cref="ExporterSettings"/> class.
+        /// Direct use in tests only.
         /// </summary>
-        /// <param name="source">The <see cref="IConfigurationSource"/> to use when retrieving configuration values.</param>
-        public ExporterSettings(IConfigurationSource source)
+        internal ExporterSettings(IConfigurationSource source)
         {
-            var isWindows = FrameworkDescription.Instance.OSPlatform == OSPlatform.Windows;
-
             var ingestRealm = source?.GetString(ConfigurationKeys.IngestRealm) ??
                               LocalIngestRealm;
 
-            ConfigureTraceTransport(source, isWindows, ingestRealm);
-            ConfigureMetricsTransport(source, ingestRealm);
+            ConfigureTraceTransport(source, ingestRealm, out var shouldUseUdpForMetrics);
+            ConfigureMetricsTransport(source, shouldUseUdpForMetrics, ingestRealm);
             ConfigureLogsTransport(source);
 
             PartialFlushEnabled = source?.GetBool(ConfigurationKeys.PartialFlushEnabled)
@@ -148,7 +146,7 @@ namespace Datadog.Trace.Configuration
         /// Gets or sets the transport used to connect to the DogStatsD.
         /// Default is <c>TransportStrategy.Tcp</c>.
         /// </summary>
-        internal TransportType MetricsTransport { get; set; }
+        internal MetricsTransportType MetricsTransport { get; set; }
 
         private static Uri GetConfiguredMetricsEndpoint(string ingestRealm)
         {
@@ -173,33 +171,38 @@ namespace Datadog.Trace.Configuration
             return string.Equals(ingestRealm, LocalIngestRealm, StringComparison.OrdinalIgnoreCase);
         }
 
-        private void ConfigureMetricsTransport(IConfigurationSource source, string ingestRealm)
+        private void ConfigureMetricsTransport(IConfigurationSource source, bool forceMetricsOverUdp, string ingestRealm)
         {
-            var metricsTransport = TransportType.UDP; // default
+            MetricsTransportType? metricsTransport = null;
 
             var dogStatsdPort = source?.GetInt32(ConfigurationKeys.DogStatsdPort);
 
-            // Agent port is set to zero in places like AAS where it's needed to prevent port conflict
-            // The agent will fail to start if it can not bind a port
-            if (dogStatsdPort == 0)
-            {
-                MetricsPipeName = source?.GetString(ConfigurationKeys.MetricsPipeName);
+            MetricsPipeName = source?.GetString(ConfigurationKeys.MetricsPipeName);
 
-                if (MetricsPipeName != null)
+            // Agent port is set to zero in places like AAS where it's needed to prevent port conflict.
+            // The agent will fail to start if it can not bind a port.
+            // If the dogstatsd port isn't explicitly configured, check for pipes or sockets.
+            if (!forceMetricsOverUdp && (dogStatsdPort == 0 || dogStatsdPort == null))
+            {
+                if (!string.IsNullOrWhiteSpace(MetricsPipeName))
                 {
-                    metricsTransport = TransportType.NamedPipe;
+                    metricsTransport = MetricsTransportType.NamedPipe;
                 }
             }
-            else
+
+            if (metricsTransport == null)
             {
+                // UDP if nothing explicit was configured or a port is set
                 DogStatsdPort = dogStatsdPort ?? DefaultDogstatsdPort;
+                metricsTransport = MetricsTransportType.UDP;
             }
 
-            MetricsTransport = metricsTransport;
+            MetricsTransport = metricsTransport.Value;
 
             MetricsEndpointUrl = source?.SafeReadUri(
                 key: ConfigurationKeys.MetricsEndpointUrl,
-                defaultTo: GetConfiguredMetricsEndpoint(ingestRealm));
+                defaultTo: GetConfiguredMetricsEndpoint(ingestRealm),
+                out _);
         }
 
         private void ConfigureLogsTransport(IConfigurationSource source)
@@ -210,17 +213,19 @@ namespace Datadog.Trace.Configuration
             LogsEndpointUrl = new Uri(logsEndpointUrl);
         }
 
-        private void ConfigureTraceTransport(IConfigurationSource source, bool isWindows, string ingestRealm)
+        private void ConfigureTraceTransport(IConfigurationSource source, string ingestRealm, out bool forceMetricsOverUdp)
         {
+            // Assume false, as we'll go through typical checks if this is false
+            forceMetricsOverUdp = false;
+
             TracesTransportType? traceTransport = null;
 
-            var agentPort = source?.GetInt32(ConfigurationKeys.AgentPort) ??
-                            // default value
-                            DefaultAgentPort;
+            var agentPort = source?.GetInt32(ConfigurationKeys.AgentPort);
 
             AgentUri = source.SafeReadUri(
                 key: ConfigurationKeys.EndpointUrl,
-                defaultTo: GetConfiguredTracesEndpoint(ingestRealm, agentPort));
+                defaultTo: GetConfiguredTracesEndpoint(ingestRealm, agentPort ?? DefaultAgentPort),
+                out var defaultUsed);
 
             if (string.Equals(AgentUri.Host, "localhost", StringComparison.OrdinalIgnoreCase))
             {
@@ -232,28 +237,26 @@ namespace Datadog.Trace.Configuration
                 AgentUri = builder.Uri;
             }
 
-            // Agent port is set to zero in places like AAS where it's needed to prevent port conflict
-            // The agent will fail to start if it can not bind a port
-            var hasExplicitTcpConfig = agentPort != 0;
+            TracesPipeName = source?.GetString(ConfigurationKeys.TracesPipeName);
 
-            if (hasExplicitTcpConfig)
+            // Agent port is set to zero in places like AAS where it's needed to prevent port conflict
+            // The agent will fail to start if it can not bind a port, so we need to override 8126 to prevent port conflict
+            // Port 0 means it will pick some random available port
+            var hasExplicitHostOrPortSettings = (agentPort != null && agentPort != 0) || !defaultUsed;
+
+            if (hasExplicitHostOrPortSettings)
             {
-                // If there is any explicit configuration for TCP, prioritize it
+                // The agent host is explicitly configured, we should assume UDP for metrics
+                forceMetricsOverUdp = true;
                 traceTransport = TracesTransportType.Default;
             }
-            else if (isWindows)
+            else if (!string.IsNullOrWhiteSpace(TracesPipeName))
             {
-                // Check for explicit windows named pipe config
-                TracesPipeName = source?.GetString(ConfigurationKeys.TracesPipeName);
-
-                if (TracesPipeName != null)
-                {
-                    traceTransport = TracesTransportType.WindowsNamedPipe;
-                }
+                traceTransport = TracesTransportType.WindowsNamedPipe;
 
                 TracesPipeTimeoutMs = source?.GetInt32(ConfigurationKeys.TracesPipeTimeoutMs)
 #if DEBUG
-                    ?? 20_000;
+                                   ?? 20_000;
 #else
                     ?? 500;
 #endif

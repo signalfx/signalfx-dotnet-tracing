@@ -16,8 +16,8 @@ using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
+using Datadog.Trace.Configuration;
 using Datadog.Trace.Propagation;
-using Datadog.Trace.TestHelpers;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -31,6 +31,11 @@ namespace Datadog.Trace.TestHelpers
     {
         protected TestHelper(string sampleAppName, string samplePathOverrides, ITestOutputHelper output)
             : this(new EnvironmentHelper(sampleAppName, typeof(TestHelper), output, samplePathOverrides), output)
+        {
+        }
+
+        protected TestHelper(string sampleAppName, string samplePathOverrides, ITestOutputHelper output, bool prependSamplesToAppName)
+            : this(new EnvironmentHelper(sampleAppName, typeof(TestHelper), output, samplePathOverrides, prependSamplesToAppName: false), output)
         {
         }
 
@@ -57,7 +62,7 @@ namespace Datadog.Trace.TestHelpers
 
         protected ITestOutputHelper Output { get; }
 
-        public Process StartDotnetTestSample(int traceAgentPort, string arguments, string packageVersion, int aspNetCorePort, int? metricCollectorPort = null, int? logsCollectorPort = null, string framework = "")
+        public Process StartDotnetTestSample(MockTracerAgent agent, string arguments, string packageVersion, int aspNetCorePort, int? logsCollectorPort = null, string framework = "")
         {
             // get path to sample app that the profiler will attach to
             string sampleAppPath = EnvironmentHelper.GetTestCommandForSampleApplicationPath(packageVersion, framework);
@@ -75,17 +80,16 @@ namespace Datadog.Trace.TestHelpers
             return ProfilerHelper.StartProcessWithProfiler(
                 exec,
                 EnvironmentHelper,
+                agent,
                 $"{appPath} {arguments ?? string.Empty}",
-                traceAgentPort: traceAgentPort,
-                metricCollectorPort: metricCollectorPort,
                 logsCollectorPort: logsCollectorPort,
                 aspNetCorePort: aspNetCorePort,
                 processToProfile: exec + ";testhost.exe");
         }
 
-        public ProcessResult RunDotnetTestSampleAndWaitForExit(int traceAgentPort, int? metricCollectorPort = null, int? logsCollectorPort = null, string arguments = null, string packageVersion = "", string framework = "")
+        public ProcessResult RunDotnetTestSampleAndWaitForExit(MockTracerAgent agent, int? logsCollectorPort = null, string arguments = null, string packageVersion = "", string framework = "")
         {
-            var process = StartDotnetTestSample(traceAgentPort, arguments, packageVersion, aspNetCorePort: 5000, metricCollectorPort: metricCollectorPort, logsCollectorPort: logsCollectorPort, framework: framework);
+            var process = StartDotnetTestSample(agent, arguments, packageVersion, aspNetCorePort: 5000, logsCollectorPort: logsCollectorPort, framework: framework);
 
             using var helper = new ProcessHelper(process);
 
@@ -113,7 +117,7 @@ namespace Datadog.Trace.TestHelpers
             return new ProcessResult(process, standardOutput, standardError, exitCode);
         }
 
-        public Process StartSample(int traceAgentPort, string arguments, string packageVersion, int aspNetCorePort, int? metricCollectorPort = null, int? logCollectorPort = null, string framework = "")
+        public Process StartSample(MockTracerAgent agent, string arguments, string packageVersion, int aspNetCorePort, int? logCollectorPort = null, string framework = "")
         {
             // get path to sample app that the profiler will attach to
             string sampleAppPath = EnvironmentHelper.GetSampleApplicationPath(packageVersion, framework);
@@ -129,17 +133,16 @@ namespace Datadog.Trace.TestHelpers
             return ProfilerHelper.StartProcessWithProfiler(
                 executable,
                 EnvironmentHelper,
+                agent,
                 args,
-                traceAgentPort: traceAgentPort,
-                metricCollectorPort: metricCollectorPort,
                 logsCollectorPort: logCollectorPort,
                 aspNetCorePort: aspNetCorePort,
                 processToProfile: executable);
         }
 
-        public ProcessResult RunSampleAndWaitForExit(int traceAgentPort, int? metricCollectorPort = null, int? logCollectorPort = null, string arguments = null, string packageVersion = "", string framework = "", int aspNetCorePort = 5000)
+        public ProcessResult RunSampleAndWaitForExit(MockTracerAgent agent, int? logCollectorPort = null, string arguments = null, string packageVersion = "", string framework = "", int aspNetCorePort = 5000)
         {
-            var process = StartSample(traceAgentPort, arguments, packageVersion, aspNetCorePort: aspNetCorePort, metricCollectorPort: metricCollectorPort, logCollectorPort: logCollectorPort, framework: framework);
+            var process = StartSample(agent, arguments, packageVersion, aspNetCorePort: aspNetCorePort, logCollectorPort: logCollectorPort, framework: framework);
 
             using var helper = new ProcessHelper(process);
 
@@ -177,7 +180,7 @@ namespace Datadog.Trace.TestHelpers
             return new ProcessResult(process, standardOutput, standardError, exitCode);
         }
 
-        public (Process Process, string ConfigFile) StartIISExpress(int traceAgentPort, int iisPort, IisAppType appType)
+        public (Process Process, string ConfigFile) StartIISExpress(MockTracerAgent agent, int iisPort, IisAppType appType)
         {
             var iisExpress = EnvironmentHelper.GetIisExpressPath();
 
@@ -233,9 +236,9 @@ namespace Datadog.Trace.TestHelpers
             var process = ProfilerHelper.StartProcessWithProfiler(
                 iisExpress,
                 EnvironmentHelper,
+                agent,
                 arguments: string.Join(" ", args),
                 redirectStandardInput: true,
-                traceAgentPort: traceAgentPort,
                 processToProfile: appType == IisAppType.AspNetCoreOutOfProcess ? "dotnet.exe" : iisExpress);
 
             var wh = new EventWaitHandle(false, EventResetMode.AutoReset);
@@ -353,6 +356,14 @@ namespace Datadog.Trace.TestHelpers
         protected void SetAppSecBlockingEnabled(bool appSecBlockingEnabled)
         {
             SetEnvironmentVariable(Configuration.ConfigurationKeys.AppSecBlockingEnabled, appSecBlockingEnabled ? "true" : "false");
+        }
+
+        protected void EnableDirectLogSubmission(int intakePort, string integrationName, string host = "integration_tests")
+        {
+            SetEnvironmentVariable(ConfigurationKeys.DirectLogSubmission.Host, host);
+            SetEnvironmentVariable(ConfigurationKeys.DirectLogSubmission.Url, $"http://127.0.0.1:{intakePort}");
+            SetEnvironmentVariable(ConfigurationKeys.DirectLogSubmission.EnabledIntegrations, integrationName);
+            SetEnvironmentVariable(ConfigurationKeys.SignalFxAccessToken, "DUMMY_KEY_REQUIRED_FOR_DIRECT_SUBMISSION");
         }
 
         protected async Task<IImmutableList<MockSpan>> GetWebServerSpans(

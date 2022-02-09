@@ -18,7 +18,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             : base("WebRequest", output)
         {
             SetEnvironmentVariable("SIGNALFX_TRACE_SERVICE_MAPPING", "some-trace:not-used,http-client:my-custom-client");
-            SetEnvironmentVariable("SIGNALFX_PROPAGATORS", "datadog,b3");
+            SetEnvironmentVariable("SIGNALFX_PROPAGATORS", "b3");
             SetServiceVersion("1.0.0");
         }
 
@@ -36,7 +36,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             Output.WriteLine($"Assigning port {httpPort} for the httpPort.");
 
             using (var agent = EnvironmentHelper.GetMockAgent())
-            using (RunSampleAndWaitForExit(agent.Port, arguments: $"Port={httpPort}"))
+            using (RunSampleAndWaitForExit(agent, arguments: $"Port={httpPort}"))
             {
                 var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
                 Assert.Equal(expectedSpanCount, spans.Count);

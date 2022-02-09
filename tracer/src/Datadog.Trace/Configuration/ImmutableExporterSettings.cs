@@ -6,6 +6,7 @@
 // Modified by Splunk Inc.
 
 using System;
+using Datadog.Trace.Agent;
 
 namespace Datadog.Trace.Configuration
 {
@@ -112,7 +113,6 @@ namespace Datadog.Trace.Configuration
 
         /// <summary>
         /// Gets the transport used to connect to the DogStatsD.
-        /// Default is <c>TransportStrategy.Tcp</c>.
         /// </summary>
         internal Vendors.StatsdClient.Transport.TransportType MetricsTransport { get; }
     }

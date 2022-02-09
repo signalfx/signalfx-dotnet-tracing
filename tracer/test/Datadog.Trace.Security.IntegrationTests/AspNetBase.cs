@@ -13,6 +13,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Datadog.Trace.TestHelpers;
+using Datadog.Trace.Vendors.Newtonsoft.Json;
 using VerifyTests;
 using VerifyXunit;
 using Xunit;
@@ -27,9 +28,10 @@ namespace Datadog.Trace.Security.IntegrationTests
         private readonly string _testName;
         private readonly HttpClient _httpClient;
         private readonly string _shutdownPath;
+        private readonly JsonSerializerSettings _jsonSerializerSettingsOrderProperty;
         private int _httpPort;
         private Process _process;
-        private MockTracerAgent _agent;
+        private Datadog.Trace.TestHelpers.MockTracerAgent _agent;
 
         public AspNetBase(string sampleName, ITestOutputHelper outputHelper, string shutdownPath, string samplesDir = null, string testName = null)
             : base(sampleName, samplesDir ?? "test/test-applications/security", outputHelper)
@@ -41,6 +43,10 @@ namespace Datadog.Trace.Security.IntegrationTests
             // adding these header so we can later assert it was collect properly
             _httpClient.DefaultRequestHeaders.Add("X-FORWARDED", "86.242.244.246");
             _httpClient.DefaultRequestHeaders.Add("user-agent", "Mistake Not...");
+            _jsonSerializerSettingsOrderProperty = new JsonSerializerSettings
+            {
+                ContractResolver = new OrderedContractResolver()
+            };
         }
 
         public async Task<MockTracerAgent> RunOnSelfHosted(bool enableSecurity, bool enableBlocking, string externalRulesFile = null)
@@ -54,7 +60,7 @@ namespace Datadog.Trace.Security.IntegrationTests
             }
 
             await StartSample(
-                _agent.Port,
+                _agent,
                 arguments: null,
                 aspNetCorePort: _httpPort,
                 enableSecurity: enableSecurity,
@@ -95,9 +101,10 @@ namespace Datadog.Trace.Security.IntegrationTests
         public async Task TestBlockedRequestAsync(MockTracerAgent agent, string url, int expectedSpans, VerifySettings settings)
         {
             Func<Task<(HttpStatusCode StatusCode, string ResponseText)>> attack = () => SubmitRequest(url);
+            var minDateTime = DateTime.UtcNow; // when ran sequentially, we get the spans from the previous tests!
             var resultRequests = await Task.WhenAll(attack(), attack(), attack(), attack(), attack());
             agent.SpanFilters.Add(s => s.Tags.ContainsKey("http.url") && s.Tags["http.url"].IndexOf("Health", StringComparison.InvariantCultureIgnoreCase) > 0);
-            var spans = agent.WaitForSpans(expectedSpans);
+            var spans = agent.WaitForSpans(expectedSpans, minDateTime: minDateTime);
             Assert.Equal(expectedSpans, spans.Count);
 
             // Overriding the type name here as we have multiple test classes in the file
@@ -126,11 +133,10 @@ namespace Datadog.Trace.Security.IntegrationTests
         }
 
         private async Task StartSample(
-            int traceAgentPort,
+            MockTracerAgent agent,
             string arguments,
             int? aspNetCorePort = null,
             string packageVersion = "",
-            int? metricCollectorPort = null,
             int? logsCollectorPort = null,
             string framework = "",
             string path = "/Home",
@@ -157,9 +163,8 @@ namespace Datadog.Trace.Security.IntegrationTests
             _process = ProfilerHelper.StartProcessWithProfiler(
                 executable,
                 EnvironmentHelper,
+                agent,
                 args,
-                traceAgentPort: traceAgentPort,
-                metricCollectorPort: metricCollectorPort,
                 logsCollectorPort: logsCollectorPort,
                 aspNetCorePort: aspNetCorePort.GetValueOrDefault(5000),
                 enableSecurity: enableSecurity,

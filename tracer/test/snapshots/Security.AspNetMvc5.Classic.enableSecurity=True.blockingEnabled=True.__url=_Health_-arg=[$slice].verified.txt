@@ -19,8 +19,7 @@
       http.url: http://localhost:00000/Health/?arg=[$slice],
       language: dotnet,
       net.peer.ip: ::1,
-      span.kind: server,
-      _dd.origin: appsec
+      span.kind: server
     }
   },
   {
@@ -41,7 +40,6 @@
       http.request.headers.x-forwarded: 86.242.244.246,
       http.status_code: 200,
       http.url: http://localhost:00000/Health/?arg=[$slice],
-      http.useragent: Mistake Not...,
       language: dotnet,
       net.peer.ip: ::1,
       network.client.ip: ::1,
@@ -49,7 +47,7 @@
       signalfx.tracing.library: dotnet-tracing,
       signalfx.tracing.version: x.y.z,
       span.kind: server,
-      _dd.appsec.json: {"triggers":[{"rule":{"id":"crs-942-290","name":"Finds basic MongoDB SQL injection attempts","tags":{"type":"nosql_injection","category":"attack_attempt"}},"rule_matches":[{"operator":"match_regex","operator_value":"(?i:(?:\\[\\$(?:ne|eq|lte?|gte?|n?in|mod|all|size|exists|type|slice|x?or|div|like|between|and)\\]))","parameters":[{"address":"server.request.query","highlight":["[$slice]"],"key_path":["arg",0],"value":"[$slice]"}]}]}]},
+      _dd.appsec.json: {"triggers":[{"rule":{"id":"crs-942-290","name":"Finds basic MongoDB SQL injection attempts","tags":{"type":"nosql_injection","category":"attack_attempt"}},"rule_matches":[{"operator":"match_regex","operator_value":"(?i:(?:\\[\\$(?:ne|eq|lte?|gte?|n?in|mod|all|size|exists|type|slice|x?or|div|like|between|and)\\]))","parameters":[{"address":"server.request.query","key_path":["arg",0],"value":"[$slice]","highlight":["[$slice]"]}]}]}]},
       _dd.origin: appsec,
       _dd.runtime_family: dotnet
     },
@@ -80,8 +78,7 @@
       http.url: http://localhost:00000/Health/?arg=[$slice],
       language: dotnet,
       net.peer.ip: ::1,
-      span.kind: server,
-      _dd.origin: appsec
+      span.kind: server
     }
   },
   {
@@ -102,7 +99,6 @@
       http.request.headers.x-forwarded: 86.242.244.246,
       http.status_code: 200,
       http.url: http://localhost:00000/Health/?arg=[$slice],
-      http.useragent: Mistake Not...,
       language: dotnet,
       net.peer.ip: ::1,
       network.client.ip: ::1,
@@ -110,7 +106,7 @@
       signalfx.tracing.library: dotnet-tracing,
       signalfx.tracing.version: x.y.z,
       span.kind: server,
-      _dd.appsec.json: {"triggers":[{"rule":{"id":"crs-942-290","name":"Finds basic MongoDB SQL injection attempts","tags":{"type":"nosql_injection","category":"attack_attempt"}},"rule_matches":[{"operator":"match_regex","operator_value":"(?i:(?:\\[\\$(?:ne|eq|lte?|gte?|n?in|mod|all|size|exists|type|slice|x?or|div|like|between|and)\\]))","parameters":[{"address":"server.request.query","highlight":["[$slice]"],"key_path":["arg",0],"value":"[$slice]"}]}]}]},
+      _dd.appsec.json: {"triggers":[{"rule":{"id":"crs-942-290","name":"Finds basic MongoDB SQL injection attempts","tags":{"type":"nosql_injection","category":"attack_attempt"}},"rule_matches":[{"operator":"match_regex","operator_value":"(?i:(?:\\[\\$(?:ne|eq|lte?|gte?|n?in|mod|all|size|exists|type|slice|x?or|div|like|between|and)\\]))","parameters":[{"address":"server.request.query","key_path":["arg",0],"value":"[$slice]","highlight":["[$slice]"]}]}]}]},
       _dd.origin: appsec,
       _dd.runtime_family: dotnet
     },
@@ -141,8 +137,7 @@
       http.url: http://localhost:00000/Health/?arg=[$slice],
       language: dotnet,
       net.peer.ip: ::1,
-      span.kind: server,
-      _dd.origin: appsec
+      span.kind: server
     }
   },
   {
@@ -163,7 +158,6 @@
       http.request.headers.x-forwarded: 86.242.244.246,
       http.status_code: 200,
       http.url: http://localhost:00000/Health/?arg=[$slice],
-      http.useragent: Mistake Not...,
       language: dotnet,
       net.peer.ip: ::1,
       network.client.ip: ::1,
@@ -171,7 +165,7 @@
       signalfx.tracing.library: dotnet-tracing,
       signalfx.tracing.version: x.y.z,
       span.kind: server,
-      _dd.appsec.json: {"triggers":[{"rule":{"id":"crs-942-290","name":"Finds basic MongoDB SQL injection attempts","tags":{"type":"nosql_injection","category":"attack_attempt"}},"rule_matches":[{"operator":"match_regex","operator_value":"(?i:(?:\\[\\$(?:ne|eq|lte?|gte?|n?in|mod|all|size|exists|type|slice|x?or|div|like|between|and)\\]))","parameters":[{"address":"server.request.query","highlight":["[$slice]"],"key_path":["arg",0],"value":"[$slice]"}]}]}]},
+      _dd.appsec.json: {"triggers":[{"rule":{"id":"crs-942-290","name":"Finds basic MongoDB SQL injection attempts","tags":{"type":"nosql_injection","category":"attack_attempt"}},"rule_matches":[{"operator":"match_regex","operator_value":"(?i:(?:\\[\\$(?:ne|eq|lte?|gte?|n?in|mod|all|size|exists|type|slice|x?or|div|like|between|and)\\]))","parameters":[{"address":"server.request.query","key_path":["arg",0],"value":"[$slice]","highlight":["[$slice]"]}]}]}]},
       _dd.origin: appsec,
       _dd.runtime_family: dotnet
     },
@@ -202,8 +196,7 @@
       http.url: http://localhost:00000/Health/?arg=[$slice],
       language: dotnet,
       net.peer.ip: ::1,
-      span.kind: server,
-      _dd.origin: appsec
+      span.kind: server
     }
   },
   {
@@ -224,7 +217,6 @@
       http.request.headers.x-forwarded: 86.242.244.246,
       http.status_code: 200,
       http.url: http://localhost:00000/Health/?arg=[$slice],
-      http.useragent: Mistake Not...,
       language: dotnet,
       net.peer.ip: ::1,
       network.client.ip: ::1,
@@ -232,7 +224,7 @@
       signalfx.tracing.library: dotnet-tracing,
       signalfx.tracing.version: x.y.z,
       span.kind: server,
-      _dd.appsec.json: {"triggers":[{"rule":{"id":"crs-942-290","name":"Finds basic MongoDB SQL injection attempts","tags":{"type":"nosql_injection","category":"attack_attempt"}},"rule_matches":[{"operator":"match_regex","operator_value":"(?i:(?:\\[\\$(?:ne|eq|lte?|gte?|n?in|mod|all|size|exists|type|slice|x?or|div|like|between|and)\\]))","parameters":[{"address":"server.request.query","highlight":["[$slice]"],"key_path":["arg",0],"value":"[$slice]"}]}]}]},
+      _dd.appsec.json: {"triggers":[{"rule":{"id":"crs-942-290","name":"Finds basic MongoDB SQL injection attempts","tags":{"type":"nosql_injection","category":"attack_attempt"}},"rule_matches":[{"operator":"match_regex","operator_value":"(?i:(?:\\[\\$(?:ne|eq|lte?|gte?|n?in|mod|all|size|exists|type|slice|x?or|div|like|between|and)\\]))","parameters":[{"address":"server.request.query","key_path":["arg",0],"value":"[$slice]","highlight":["[$slice]"]}]}]}]},
       _dd.origin: appsec,
       _dd.runtime_family: dotnet
     },
@@ -263,8 +255,7 @@
       http.url: http://localhost:00000/Health/?arg=[$slice],
       language: dotnet,
       net.peer.ip: ::1,
-      span.kind: server,
-      _dd.origin: appsec
+      span.kind: server
     }
   },
   {
@@ -285,7 +276,6 @@
       http.request.headers.x-forwarded: 86.242.244.246,
       http.status_code: 200,
       http.url: http://localhost:00000/Health/?arg=[$slice],
-      http.useragent: Mistake Not...,
       language: dotnet,
       net.peer.ip: ::1,
       network.client.ip: ::1,
@@ -293,7 +283,7 @@
       signalfx.tracing.library: dotnet-tracing,
       signalfx.tracing.version: x.y.z,
       span.kind: server,
-      _dd.appsec.json: {"triggers":[{"rule":{"id":"crs-942-290","name":"Finds basic MongoDB SQL injection attempts","tags":{"type":"nosql_injection","category":"attack_attempt"}},"rule_matches":[{"operator":"match_regex","operator_value":"(?i:(?:\\[\\$(?:ne|eq|lte?|gte?|n?in|mod|all|size|exists|type|slice|x?or|div|like|between|and)\\]))","parameters":[{"address":"server.request.query","highlight":["[$slice]"],"key_path":["arg",0],"value":"[$slice]"}]}]}]},
+      _dd.appsec.json: {"triggers":[{"rule":{"id":"crs-942-290","name":"Finds basic MongoDB SQL injection attempts","tags":{"type":"nosql_injection","category":"attack_attempt"}},"rule_matches":[{"operator":"match_regex","operator_value":"(?i:(?:\\[\\$(?:ne|eq|lte?|gte?|n?in|mod|all|size|exists|type|slice|x?or|div|like|between|and)\\]))","parameters":[{"address":"server.request.query","key_path":["arg",0],"value":"[$slice]","highlight":["[$slice]"]}]}]}]},
       _dd.origin: appsec,
       _dd.runtime_family: dotnet
     },
