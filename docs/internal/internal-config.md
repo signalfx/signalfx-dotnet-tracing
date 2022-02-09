@@ -13,7 +13,7 @@ These settings should be never used by the users.
 | `SIGNALFX_CONVENTION` | Sets the semantic and trace id conventions for the tracer. Available values are: `Datadog` (64bit trace id), `OpenTelemetry` (128 bit trace id). | `OpenTelemetry` |
 | `SIGNALFX_DUMP_ILREWRITE_ENABLED` | Allows the profiler to dump the IL original code and modification to the log. | `false` |
 | `SIGNALFX_EXPORTER` | The exporter to be used. The Tracer uses it to encode and dispatch traces. Available values are: `DatadogAgent`, `Zipkin`. | `Zipkin` |
-| `SIGNALFX_LOGS_DIRECT_SUBMISSION_INTEGRATIONS` | Configuration key for a list of direct log submission integrations to enable. Only selected integrations are enabled for direct log submission. Supports multiple values separated with semi-colons. | `` |
+| `SIGNALFX_LOGS_DIRECT_SUBMISSION_INTEGRATIONS` | Configuration key for a list of direct log submission integrations to enable. Only selected integrations are enabled for direct log submission. Supports multiple values separated with semi-colons. Valid values are `ILogger`, `Serilog`, `Log4Net`, `NLog` | `` |
 | `SIGNALFX_LOGS_DIRECT_SUBMISSION_HOST` | Configuration key for the name of the originating host for direct logs submission. | `` |
 | `SIGNALFX_LOGS_DIRECT_SUBMISSION_SOURCE` | Configuration key for the originating source for direct logs submission. | `csharp` |
 | `SIGNALFX_LOGS_DIRECT_SUBMISSION_TAGS` | Configuration key for a list of tags to be applied globally to all logs directly submitted. Supports multiple key key-value pairs which are comma-separated, and for which the key and value are colon-separated. For example Key1:Value1, Key2:Value2 | `` |
