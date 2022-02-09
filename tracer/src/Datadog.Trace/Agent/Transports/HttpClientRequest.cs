@@ -7,6 +7,7 @@
 
 #if NETCOREAPP
 using System;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -22,11 +23,17 @@ namespace Datadog.Trace.Agent.Transports
 
         private readonly HttpClient _client;
         private readonly HttpRequestMessage _request;
+        private readonly Uri _uri;
 
         public HttpClientRequest(HttpClient client, Uri endpoint)
         {
             _client = client;
-            _request = new HttpRequestMessage(HttpMethod.Post, endpoint);
+            _request = new HttpRequestMessage()
+            {
+                RequestUri = endpoint
+            };
+
+            _uri = endpoint;
         }
 
         public void AddHeader(string name, string value)
@@ -34,8 +41,24 @@ namespace Datadog.Trace.Agent.Transports
             _request.Headers.Add(name, value);
         }
 
+        public async Task<IApiResponse> GetAsync()
+        {
+            _request.Method = HttpMethod.Get;
+
+            var response = new HttpClientResponse(await _client.SendAsync(_request).ConfigureAwait(false));
+            if (response.StatusCode != 200 && response.StatusCode != 202)
+            {
+                var headers = string.Join(", ", _request.Headers.Select(h => $"{h.Key}: {string.Join(", ", h.Value)}"));
+                Log.Warning("{className} GET request returned error code {statusCode} while calling {uri}. Response: {response} Headers: {headers}", new object[] { nameof(HttpClientRequest), response.StatusCode, _uri, await response.ReadAsStringAsync().ConfigureAwait(false), headers });
+            }
+
+            return response;
+        }
+
         public async Task<IApiResponse> PostAsync(ArraySegment<byte> bytes, string contentType)
         {
+            _request.Method = HttpMethod.Post;
+
             // re-create HttpContent on every retry because some versions of HttpClient always dispose of it, so we can't reuse.
             using (var content = new ByteArrayContent(bytes.Array, bytes.Offset, bytes.Count))
             {
