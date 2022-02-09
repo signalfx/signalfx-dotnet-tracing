@@ -16,9 +16,6 @@ namespace Samples.WebRequest
         private static readonly Encoding Utf8 = Encoding.UTF8;
 
         private static readonly string[] ExpectedHeaders =  {
-                // Datadog headers
-                DDHttpHeaderNames.TraceId, DDHttpHeaderNames.ParentId, DDHttpHeaderNames.SamplingPriority,
-
                 // B3 headers
                 B3HttpHeaderNames.B3TraceId, B3HttpHeaderNames.B3SpanId, B3HttpHeaderNames.B3Sampled
             };

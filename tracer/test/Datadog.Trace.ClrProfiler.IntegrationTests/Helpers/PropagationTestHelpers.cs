@@ -10,11 +10,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.Helpers
         public static void AssertPropagationEnabled(MockSpan expectedSpan, ProcessResult processResult)
         {
             // Verify DD headers
-            var ddTraceId = StringUtil.GetHeader(processResult.StandardOutput, DDHttpHeaderNames.TraceId);
-            var ddParentSpanId = StringUtil.GetHeader(processResult.StandardOutput, DDHttpHeaderNames.ParentId);
+            var ddTraceId = StringUtil.GetHeader(processResult.StandardOutput, B3HttpHeaderNames.B3TraceId);
+            var ddParentSpanId = StringUtil.GetHeader(processResult.StandardOutput, B3HttpHeaderNames.B3SpanId);
 
             Assert.Equal(expectedSpan.TraceId.ToString(), ddTraceId);
-            Assert.Equal(expectedSpan.SpanId.ToString(CultureInfo.InvariantCulture), ddParentSpanId);
+            Assert.Equal(expectedSpan.SpanId.ToString("x"), ddParentSpanId);
 
             // Verify B3 headers
             var b3TraceId = StringUtil.GetHeader(processResult.StandardOutput, B3HttpHeaderNames.B3TraceId);
@@ -34,8 +34,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.Helpers
             Assert.Equal("false", tracingEnabled);
 
             // Verify DD headers
-            var ddTraceId = StringUtil.GetHeader(processResult.StandardOutput, DDHttpHeaderNames.TraceId);
-            var ddParentSpanId = StringUtil.GetHeader(processResult.StandardOutput, DDHttpHeaderNames.ParentId);
+            var ddTraceId = StringUtil.GetHeader(processResult.StandardOutput, B3HttpHeaderNames.B3TraceId);
+            var ddParentSpanId = StringUtil.GetHeader(processResult.StandardOutput, B3HttpHeaderNames.B3SpanId);
 
             Assert.Null(ddTraceId);
             Assert.Null(ddParentSpanId);
