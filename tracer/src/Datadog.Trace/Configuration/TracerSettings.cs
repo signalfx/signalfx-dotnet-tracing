@@ -190,6 +190,7 @@ namespace Datadog.Trace.Configuration
             // If you change this, change environment_variables.h too
             ThreadSamplingEnabled = source?.GetBool(ConfigurationKeys.ThreadSampling.Enabled) ?? false;
             ThreadSamplingPeriod = GetThreadSamplingPeriod(source);
+
             LogSubmissionSettings = new DirectLogSubmissionSettings(source);
         }
 
