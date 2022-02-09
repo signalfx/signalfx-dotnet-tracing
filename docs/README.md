@@ -142,6 +142,10 @@ See [manual-instrumentation.md](manual-instrumentation.md).
 
 See [correlating-traces-with-logs.md](correlating-traces-with-logs.md).
 
+## Runtime metrics
+
+See [runtime-metrics.md](runtime-metrics.md)
+
 ## Troubleshooting
 
 See [troubleshooting.md](troubleshooting.md).
