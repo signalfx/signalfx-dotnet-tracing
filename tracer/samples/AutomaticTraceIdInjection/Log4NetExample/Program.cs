@@ -1,3 +1,5 @@
+// Modified by Splunk Inc.
+
 using System.IO;
 using log4net;
 using log4net.Config;

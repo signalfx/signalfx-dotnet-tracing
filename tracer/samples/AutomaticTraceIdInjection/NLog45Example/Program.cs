@@ -1,3 +1,5 @@
+// Modified by Splunk Inc.
+
 using NLog;
 using OpenTracing.Util;
 
