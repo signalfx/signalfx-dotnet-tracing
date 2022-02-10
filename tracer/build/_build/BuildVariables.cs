@@ -1,3 +1,5 @@
+// Modified by Splunk Inc.
+
 using System.Collections.Generic;
 using Nuke.Common;
 using Nuke.Common.IO;

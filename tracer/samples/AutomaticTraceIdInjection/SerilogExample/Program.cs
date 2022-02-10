@@ -1,3 +1,5 @@
+// Modified by Splunk Inc.
+
 using OpenTracing;
 using OpenTracing.Util;
 using Serilog;

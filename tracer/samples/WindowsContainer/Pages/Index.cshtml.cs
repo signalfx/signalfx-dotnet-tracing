@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+// Modified by Splunk Inc.
+
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using System;

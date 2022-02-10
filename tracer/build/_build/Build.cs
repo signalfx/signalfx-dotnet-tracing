@@ -1,3 +1,5 @@
+// Modified by Splunk Inc.
+
 using System;
 using System.IO;
 using System.Linq;
