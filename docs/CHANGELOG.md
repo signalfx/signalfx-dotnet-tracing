@@ -11,9 +11,17 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 ### General
 
-- The release adds support for automatic runtime metrics.
-
 ### Breaking changes
+
+### Enhancements
+
+---
+
+## [Release 0.2.2](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.2.2)
+
+### General
+
+- The release adds support for automatic runtime metrics.
 
 ### Enhancements
 
