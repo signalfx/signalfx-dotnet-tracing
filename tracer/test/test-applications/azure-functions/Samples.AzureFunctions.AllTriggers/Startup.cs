@@ -1,3 +1,5 @@
+// Modified by Splunk Inc.
+
 using System;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;

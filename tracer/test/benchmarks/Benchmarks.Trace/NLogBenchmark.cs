@@ -1,3 +1,5 @@
+// Modified by Splunk Inc.
+
 using System.IO;
 using BenchmarkDotNet.Attributes;
 using Datadog.Trace;
