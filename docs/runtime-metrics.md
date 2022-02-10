@@ -6,8 +6,13 @@ When enabled, metrics are periodically captured and sent to Splunk Observability
 
 ## Enable runtime metrics
 
-To enable runtime metrics, set the `SIGNALFX_RUNTIME_METRICS_ENABLED` environment variable
-to `true` for your .NET process.
+To enable runtime metrics, set the `SIGNALFX_RUNTIME_METRICS_ENABLED` environment
+variable to `true` for your .NET process.
+
+## Enable trace metrics
+
+To enable additional metrics related to traces, set the `SIGNALFX_TRACE_METRICS_ENABLED`
+environment variable to `true` for your .NET process.
 
 ## Metrics exporter settings
 
