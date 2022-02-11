@@ -128,7 +128,7 @@ See [iis-instrumentation.md](iis-instrumentation.md).
 
 ## Azure instrumentation guide
 
-See [azure.md](azure.md).
+See [azure-instrumentation.md](azure-instrumentation.md).
 
 ## Advanced configuration
 
@@ -142,9 +142,9 @@ See [manual-instrumentation.md](manual-instrumentation.md).
 
 See [correlating-traces-with-logs.md](correlating-traces-with-logs.md).
 
-## Runtime metrics
+## Metrics
 
-See [runtime-metrics.md](runtime-metrics.md)
+See [metrics.md](metrics.md)
 
 ## Troubleshooting
 
