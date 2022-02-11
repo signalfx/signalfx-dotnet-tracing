@@ -52,18 +52,18 @@ To learn about differences between SignalFx metric types, visit [documentation](
 
 ### Additional permissions for IIS
 
-On .NET Framework, metrics are collected using performance counters.
-Users in non-interactive logon sessions
-(that includes IIS application pool accounts and some service accounts)
-must be added to the **Performance Monitoring Users** group to access counter data.
+The .NET Framework collects metrics using performance counters.
+To let service accounts and IIS application pool accounts access counter data,
+add them to the `Performance Monitoring Users` group.
 
-IIS application pools use special accounts that do not appear in the list of users.
-To add them to the Performance Monitoring Users group,
-look for `IIS APPPOOL\<name of the pool>`.
-For instance, the user for the DefaultAppPool would be `IIS APPPOOL\DefaultAppPool`.
+IIS application pools use special accounts that do not appear in the list
+of users. To add IIS application pool accounts to the `Performance Monitoring Users`
+group, search for `IIS APPPOOL\<name-of-the-pool>`. For example, the user for
+the `DefaultAppPool` pool is `IIS APPPOOL\DefaultAppPool`.
 
-This can be done either from the "Computer Management" UI,
-or from an administrator command prompt:
+The following example shows how to add an IIS application pool account to
+the `Performance Monitoring Users` group from a command prompt with
+Administrator permissions:
 
 ```batch
 net localgroup "Performance Monitor Users" "IIS APPPOOL\DefaultAppPool" /add
