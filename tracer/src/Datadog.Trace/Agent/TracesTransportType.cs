@@ -28,6 +28,12 @@ namespace Datadog.Trace.Agent
         /// Windows Named Pipe strategy.
         /// Transport used primarily for Azure App Service.
         /// </summary>
-        WindowsNamedPipe
+        WindowsNamedPipe,
+
+        /// <summary>
+        /// Unix Domain Socket strategy.
+        /// Transport used primarily for kubernetes
+        /// </summary>
+        UnixDomainSocket
     }
 }
