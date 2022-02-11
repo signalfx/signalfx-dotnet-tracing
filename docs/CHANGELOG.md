@@ -21,7 +21,7 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 ### General
 
-- The release adds support for automatic runtime metrics.
+- The release adds support for automatic runtime and tracing metrics.
 
 ### Enhancements
 
