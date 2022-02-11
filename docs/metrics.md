@@ -1,9 +1,13 @@
 # Metrics
 
+The SignalFx Instrumentation for .NET is able to export following metrics:
+
+- [.NET runtime metrics](#.net-runtime-metrics)
+- [Trace metrics](#trace-metrics)
+
 ## .NET runtime metrics
 
 The SignalFx Instrumentation for .NET includes automatic runtime metrics collection.
-This feature can be enabled using configuration settings.
 When enabled, metrics are periodically captured and sent
 to Splunk Observability Cloud.
 
@@ -64,9 +68,7 @@ net localgroup "Performance Monitor Users" "IIS APPPOOL\DefaultAppPool" /add
 
 ## Trace metrics
 
-The SignalFx Instrumentation for .NET supports
-trace metrics collection.
-This feature can be enabled using configuration settings.
+The SignalFx Instrumentation for .NET supports trace metrics collection.
 
 To enable additional metrics related to traces, set the `SIGNALFX_TRACE_METRICS_ENABLED`
 environment variable to `true` for your .NET process.
