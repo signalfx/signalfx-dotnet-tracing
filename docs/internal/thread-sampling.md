@@ -1,7 +1,8 @@
 
-> :construction: The thread sampler feature is experimental.
-
 # About the .NET thread sampler
+
+> :construction: &nbsp;Status: Experimental - exported metric data and
+> configuration properties may change.
 
 The SignalFx Instrumentation for .NET includes a continuous thread sampler
 that can be enabled with a configuration setting. This sampler periodically captures
