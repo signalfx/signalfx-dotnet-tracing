@@ -52,3 +52,26 @@ On Windows, the default log location is `%ProgramData%\SignalFx .NET Tracing\log
 
 After obtaining the logs, remember to remove the environment variable
 `SIGNALFX_TRACE_DEBUG` to avoid unnecessary overhead.
+
+The SignalFx Instrumentation for .NET logs the profiling configuration
+using `INF` log messages during startup. It can be used for troubleshooting.
+
+### Check if runtime metrics are enabled
+
+Verify that the `runtime_metrics_enabled` key is set to `true` under `TRACER CONFIGURATION` log entry.
+
+### Verify the Collector setup for traces
+
+* Make sure that the [Splunk OpenTelemetry Collector](https://github.com/signalfx/splunk-otel-collector) is running.
+* Make sure that a `zipkin` receiver and a `sapm` exporter are configured in the Collector.
+* Make sure that the `access_token` and `endpoint` fields are [configured](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/sapmexporter#configuration).
+* Check that the traces pipeline is configured to use
+the `zipkin` receiver and `sapm` exporter.
+
+### Verify the Collector setup for metrics
+
+* Make sure that the [Splunk OpenTelemetry Collector](https://github.com/signalfx/splunk-otel-collector) is running.
+* Make sure that a `signalfx` receiver and a `signalfx` exporter are configured in the Collector.
+* Make sure that the `access_token` and `realm` fields are [configured](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/signalfxexporter#metrics-configuration).
+* Check that the metrics pipeline is configured to use
+the `signalfx` receiver and `signalfx` exporter.
