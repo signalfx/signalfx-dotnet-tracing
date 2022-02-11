@@ -84,6 +84,9 @@ Use following settings to configure where the telemetry data is being exported.
 
 ### Exporting directly to Splunk Observabilty Cloud
 
+By default, all telemetry is
+sent to the local instance of [Splunk OpenTelemetry Collector](https://github.com/signalfx/splunk-otel-collector).
+
 In order to export telemetry directly to Splunk Observability Cloud,
 configure the following settings:
 
@@ -95,7 +98,8 @@ configure the following settings:
 | `SIGNALFX_METRICS_ENDPOINT_URL` | Metric ingestion endpoint | Overrides `SIGNALFX_REALM` configuration for the traces ingestion endpoint. |
 
 __IMPORTANT:__ To export data directly to Splunk Observability Cloud,
-set either the `SIGNALFX_REALM` environment variable or the `SIGNALFX_ENDPOINT_URL` and `SIGNALFX_METRICS_ENDPOINT_URL` environment variables,
+set either the `SIGNALFX_REALM` environment variable
+or the `SIGNALFX_ENDPOINT_URL` and `SIGNALFX_METRICS_ENDPOINT_URL` environment variables,
 in addition to `SIGNALFX_ACCESS_TOKEN`.
 
 ## Trace propagation settings
