@@ -128,7 +128,7 @@ See [iis-instrumentation.md](iis-instrumentation.md).
 
 ## Azure instrumentation guide
 
-See [azure.md](azure.md).
+See [azure-instrumentation.md](azure-instrumentation.md).
 
 ## Advanced configuration
 
