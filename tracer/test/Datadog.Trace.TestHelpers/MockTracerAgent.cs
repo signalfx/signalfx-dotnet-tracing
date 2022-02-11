@@ -323,8 +323,8 @@ namespace Datadog.Trace.TestHelpers
         public void Dispose()
         {
             // TODO splunk: shutdown gracefully
-            _listener?.Stop();
-            _metricsListener?.Stop();
+            _listener?.Close();
+            _metricsListener?.Close();
             _cancellationTokenSource.Cancel();
         }
 

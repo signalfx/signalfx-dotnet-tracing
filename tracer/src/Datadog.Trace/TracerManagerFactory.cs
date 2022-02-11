@@ -12,6 +12,7 @@ using System.Reflection;
 using Datadog.Trace.Abstractions;
 using Datadog.Trace.Agent;
 using Datadog.Trace.Agent.Zipkin;
+using Datadog.Trace.AppSec;
 using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Conventions;
@@ -23,6 +24,7 @@ using Datadog.Trace.Propagation;
 using Datadog.Trace.RuntimeMetrics;
 using Datadog.Trace.Sampling;
 using Datadog.Trace.SignalFx.Metrics;
+using Datadog.Trace.Telemetry;
 using Datadog.Trace.Util;
 using Datadog.Trace.Vendors.StatsdClient;
 using MetricsTransportType = Datadog.Trace.Vendors.StatsdClient.Transport.TransportType;
@@ -51,13 +53,14 @@ namespace Datadog.Trace
                 scopeManager: previous?.ScopeManager, // no configuration, so can always use the same one
                 statsd: null,
                 runtimeMetrics: null,
-                logSubmissionManager: previous?.DirectLogSubmission);
+                logSubmissionManager: previous?.DirectLogSubmission,
+                telemetry: null);
         }
 
         /// <summary>
         /// Internal for use in tests that create "standalone" <see cref="TracerManager"/> by
         /// </summary>
-        /// <see cref="Tracer(TracerSettings, IAgentWriter, ISampler, IScopeManager, IDogStatsd)"/>
+        /// <see cref="Tracer(TracerSettings, IAgentWriter, ISampler, IScopeManager, IDogStatsd, ITelemetryController)"/>
         internal TracerManager CreateTracerManager(
             ImmutableTracerSettings settings,
             IAgentWriter agentWriter,
@@ -65,7 +68,8 @@ namespace Datadog.Trace
             IScopeManager scopeManager,
             IDogStatsd statsd,
             RuntimeMetricsWriter runtimeMetrics,
-            DirectLogSubmissionManager logSubmissionManager)
+            DirectLogSubmissionManager logSubmissionManager,
+            ITelemetryController telemetry)
         {
             settings ??= ImmutableTracerSettings.FromDefaultSources();
 
@@ -95,7 +99,11 @@ namespace Datadog.Trace
                 settings.Environment,
                 settings.ServiceVersion);
 
-            var tracerManager = CreateTracerManagerFrom(settings, agentWriter, sampler, propagator, scopeManager, statsd, runtimeMetrics, traceIdConvention, logSubmissionManager, defaultServiceName);
+            telemetry ??= TelemetryFactory.CreateTelemetryController(settings);
+            telemetry.RecordTracerSettings(settings, defaultServiceName, AzureAppServices.Metadata);
+            telemetry.RecordSecuritySettings(Security.Instance.Settings);
+
+            var tracerManager = CreateTracerManagerFrom(settings, agentWriter, sampler, propagator, scopeManager, statsd, runtimeMetrics, traceIdConvention, logSubmissionManager, telemetry, defaultServiceName);
             return tracerManager;
         }
 
@@ -112,8 +120,9 @@ namespace Datadog.Trace
             RuntimeMetricsWriter runtimeMetrics,
             ITraceIdConvention traceIdConvention,
             DirectLogSubmissionManager logSubmissionManager,
+            ITelemetryController telemetry,
             string defaultServiceName)
-            => new TracerManager(settings, agentWriter, sampler, propagator, scopeManager, statsd, runtimeMetrics, traceIdConvention, logSubmissionManager, defaultServiceName);
+            => new TracerManager(settings, agentWriter, sampler, propagator, scopeManager, statsd, runtimeMetrics, traceIdConvention, logSubmissionManager, telemetry, defaultServiceName);
 
         protected virtual ISampler GetSampler(ImmutableTracerSettings settings)
         {

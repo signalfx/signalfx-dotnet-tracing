@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Datadog.Trace.Configuration;
 using Datadog.Trace.TestHelpers;
 using Xunit;
 using Xunit.Abstractions;
@@ -36,6 +37,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("Category", "ArmUnsupported")]
         public void SubmitTraces(string packageVersion)
         {
+            using var telemetry = this.ConfigureTelemetry();
             using (var agent = EnvironmentHelper.GetMockAgent())
             using (RunSampleAndWaitForExit(agent, packageVersion: packageVersion))
             {
@@ -65,6 +67,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 }
 
                 ValidateSpans(spans, (span) => span.Resource, expected);
+                telemetry.AssertIntegrationEnabled(IntegrationId.Couchbase);
             }
         }
     }

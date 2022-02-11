@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Datadog.Trace.Configuration;
 using Datadog.Trace.TestHelpers;
 using Xunit;
 using Xunit.Abstractions;
@@ -39,6 +40,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             const string expectedOperationName = dbType + ".query";
             const string expectedServiceName = "Samples.FakeDbCommand";
 
+            using var telemetry = this.ConfigureTelemetry();
             using var agent = EnvironmentHelper.GetMockAgent();
             using var process = RunSampleAndWaitForExit(agent);
             var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
@@ -54,6 +56,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
                 Assert.Equal(dbType, span.Tags[Tags.DbType]);
                 Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
             }
+
+            telemetry.AssertIntegrationEnabled(IntegrationId.AdoNet);
         }
     }
 }

@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.ClrProfiler.IntegrationTests.Helpers;
+using Datadog.Trace.Configuration;
 using Datadog.Trace.TestHelpers;
 using FluentAssertions;
 using Xunit;
@@ -40,6 +41,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             int httpPort = TcpPortProvider.GetOpenPort();
             Output.WriteLine($"Assigning port {httpPort} for the httpPort.");
 
+            using var telemetry = this.ConfigureTelemetry();
             using (var agent = EnvironmentHelper.GetMockAgent())
             using (ProcessResult processResult = RunSampleAndWaitForExit(agent, arguments: $"Port={httpPort}"))
             {
@@ -58,6 +60,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 }
 
                 PropagationTestHelpers.AssertPropagationEnabled(spans.First(), processResult);
+                
+                telemetry.AssertIntegrationEnabled(IntegrationId.WebRequest);
             }
         }
 
@@ -70,6 +74,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
             int httpPort = TcpPortProvider.GetOpenPort();
 
+            using var telemetry = this.ConfigureTelemetry();
             using (var agent = EnvironmentHelper.GetMockAgent())
             using (ProcessResult processResult = RunSampleAndWaitForExit(agent, arguments: $"TracingDisabled Port={httpPort}"))
             {
@@ -77,6 +82,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 Assert.Equal(0, spans.Count);
 
                 PropagationTestHelpers.AssertPropagationDisabled(processResult);
+                
+                telemetry.AssertIntegrationDisabled(IntegrationId.WebRequest);
             }
         }
     }

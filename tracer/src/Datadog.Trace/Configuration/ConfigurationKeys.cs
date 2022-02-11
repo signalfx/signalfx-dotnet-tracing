@@ -307,6 +307,12 @@ namespace Datadog.Trace.Configuration
         public const string DiagnosticSourceEnabled = "SIGNALFX_DIAGNOSTIC_SOURCE_ENABLED";
 
         /// <summary>
+        /// Configuration key for setting the API key, used by the Agent.
+        /// This key is here for troubleshooting purposes.
+        /// </summary>
+        public const string ApiKey = "DD_API_KEY";
+
+        /// <summary>
         /// Configuration key for the exporter to be used. The Tracer uses it to encode and
         /// dispatch traces.
         /// Default is <c>"Zipkin"</c>.
@@ -473,6 +479,21 @@ namespace Datadog.Trace.Configuration
             /// </summary>
             /// <seealso cref="TracerSettings.ThreadSamplingPeriod"/>
             public const string Period = "SIGNALFX_THREAD_SAMPLING_PERIOD";
+        }
+
+        internal static class Telemetry
+        {
+            /// <summary>
+            /// Configuration key for enabling or disabling internal telemetry.
+            /// Default value is <c>true</c> (enabled).
+            /// </summary>
+            public const string Enabled = "DD_INSTRUMENTATION_TELEMETRY_ENABLED";
+
+            /// <summary>
+            /// Configuration key for the telemetry URL where the Tracer sends telemetry.
+            /// Ignored (and <see cref="ExporterSettings.AgentUri"/> is used instead) unless <see cref="ConfigurationKeys.ApiKey"/> is set.
+            /// </summary>
+            public const string Uri = "DD_TRACE_TELEMETRY_URL";
         }
     }
 }

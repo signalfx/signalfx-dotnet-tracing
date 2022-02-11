@@ -18,12 +18,12 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Http.HttpClient
 {
     internal static class HttpMessageHandlerCommon
     {
-        public static CallTargetState OnMethodBegin<TTarget, TRequest>(TTarget instance, TRequest requestMessage, CancellationToken cancellationToken, IntegrationId integrationId, Func<bool> isTracingEnableFunc = null)
+        public static CallTargetState OnMethodBegin<TTarget, TRequest>(TTarget instance, TRequest requestMessage, CancellationToken cancellationToken, IntegrationId integrationId, IntegrationId? implementationIntegrationId)
             where TRequest : IHttpRequestMessage
         {
-            if (requestMessage.Instance is not null && IsTracingEnabled(requestMessage.Headers, isTracingEnableFunc))
+            var tracer = Tracer.Instance;
+            if (requestMessage.Instance is not null && IsTracingEnabled(requestMessage.Headers, implementationIntegrationId))
             {
-                Tracer tracer = Tracer.Instance;
                 Scope scope = ScopeFactory.CreateOutboundHttpScope(tracer, requestMessage.Method.Method, requestMessage.RequestUri, integrationId, out HttpTags tags);
                 if (scope != null)
                 {
@@ -32,6 +32,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Http.HttpClient
                     // add distributed tracing headers to the HTTP request
                     tracer.TracerManager.Propagator.Inject(scope.Span.Context, new HttpHeadersCollection(requestMessage.Headers));
 
+                    tracer.TracerManager.Telemetry.IntegrationGeneratedSpan(implementationIntegrationId ?? integrationId);
                     return new CallTargetState(scope);
                 }
             }
@@ -69,9 +70,9 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Http.HttpClient
             return responseMessage;
         }
 
-        private static bool IsTracingEnabled(IRequestHeaders headers, Func<bool> isTracingEnableFunc = null)
+        private static bool IsTracingEnabled(IRequestHeaders headers, IntegrationId? implementationIntegrationId)
         {
-            if (isTracingEnableFunc != null && !isTracingEnableFunc())
+            if (implementationIntegrationId != null && !Tracer.Instance.Settings.IsIntegrationEnabled(implementationIntegrationId.Value))
             {
                 return false;
             }

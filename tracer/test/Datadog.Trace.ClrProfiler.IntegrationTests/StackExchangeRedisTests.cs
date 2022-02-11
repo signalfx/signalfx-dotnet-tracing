@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.ClrProfiler.IntegrationTests.TestCollections;
+using Datadog.Trace.Configuration;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.TestHelpers;
 using Xunit;
@@ -30,6 +31,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("Category", "EndToEnd")]
         public void SubmitsTraces(string packageVersion)
         {
+            using var telemetry = this.ConfigureTelemetry();
             using (var agent = EnvironmentHelper.GetMockAgent())
             using (RunSampleAndWaitForExit(agent, arguments: $"{TestPrefix}", packageVersion: packageVersion))
             {
@@ -306,6 +308,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 {
                     Assert.True(false, $"no span found for `{e.Item1}`, `{e.Item2}`, remaining spans: `{string.Join(", ", spanLookup.Select(kvp => $"{kvp.Key.Item1}, {kvp.Key.Item2}").ToArray())}`");
                 }
+
+                telemetry.AssertIntegrationEnabled(IntegrationId.StackExchangeRedis);
             }
         }
 

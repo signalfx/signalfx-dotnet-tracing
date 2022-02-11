@@ -17,7 +17,7 @@ namespace Datadog.Trace.SignalFx.Metrics
         {
             _metricSender = metricSender ?? throw new ArgumentNullException(nameof(metricSender));
             // splunk: consider supporting telemetry with our metric exporter
-            TelemetryCounters = new Telemetry();
+            TelemetryCounters = new Vendors.StatsdClient.Telemetry();
         }
 
         public ITelemetryCounters TelemetryCounters { get; }

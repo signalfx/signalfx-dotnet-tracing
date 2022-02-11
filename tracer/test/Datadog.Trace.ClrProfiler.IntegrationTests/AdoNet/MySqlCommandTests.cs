@@ -76,6 +76,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
 
             SetEnvironmentVariable($"SIGNALFX_TRACE_{nameof(IntegrationId.MySql)}_ENABLED", "false");
 
+            using var telemetry = this.ConfigureTelemetry();
             using var agent = EnvironmentHelper.GetMockAgent();
 
             // don't use the first package version which is 6.x and is not supported on ARM64.
@@ -86,6 +87,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
 
             Assert.NotEmpty(spans);
             Assert.Empty(spans.Where(s => s.Name.Equals(expectedOperationName)));
+            telemetry.AssertIntegrationDisabled(IntegrationId.MySql);
         }
 
         private void SubmitsTraces(string packageVersion)
@@ -111,6 +113,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             const string expectedOperationName = dbType + ".query";
             const string expectedServiceName = "Samples.MySql";
 
+            using var telemetry = this.ConfigureTelemetry();
             using var agent = EnvironmentHelper.GetMockAgent();
             using var process = RunSampleAndWaitForExit(agent, packageVersion: packageVersion);
             var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
@@ -127,6 +130,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
                 Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
                 Assert.Contains(Tags.DbStatement, (IDictionary<string, string>)span.Tags);
             }
+
+            telemetry.AssertIntegrationEnabled(IntegrationId.MySql);
         }
     }
 }
