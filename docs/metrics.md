@@ -1,5 +1,8 @@
 # Metrics
 
+> :construction: &nbsp;Status: Experimental - exported telemetry and
+> configuration settings may change.
+
 The SignalFx Instrumentation for .NET is able to export following metrics:
 
 - [.NET runtime metrics](#.net-runtime-metrics)
