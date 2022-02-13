@@ -13,6 +13,7 @@ using Datadog.Trace.AlwaysOnProfiler;
 using Datadog.Trace.Ci;
 using Datadog.Trace.ClrProfiler.ServerlessInstrumentation;
 using Datadog.Trace.Configuration;
+using Datadog.Trace.Debugger;
 using Datadog.Trace.DiagnosticListeners;
 using Datadog.Trace.Logging;
 using Datadog.Trace.ServiceFabric;
@@ -221,6 +222,18 @@ namespace Datadog.Trace.ClrProfiler
             catch (Exception ex)
             {
                 Log.Error(ex, ex.Message);
+            }
+
+            try
+            {
+                if (LiveDebugger.Enabled)
+                {
+                    LiveDebugger.Initialize();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to initialize Live Debugger");
             }
 
 #if !NETFRAMEWORK
