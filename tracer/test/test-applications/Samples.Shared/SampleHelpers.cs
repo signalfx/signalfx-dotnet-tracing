@@ -12,6 +12,9 @@ namespace Samples
     public class SampleHelpers
     {
         private static readonly Type NativeMethodsType = Type.GetType("Datadog.Trace.ClrProfiler.NativeMethods, SignalFx.Tracing");
+        private static readonly Type TracerType = Type.GetType("Datadog.Trace.Tracer, Datadog.Trace");
+        private static readonly MethodInfo GetTracerInstance = TracerType.GetProperty("Instance").GetMethod;
+        private static readonly MethodInfo StartActiveMethod = TracerType.GetMethod("StartActive", types: new[] { typeof(string) });
 
         public static bool IsProfilerAttached()
         {
@@ -62,7 +65,13 @@ namespace Samples
             }
         }
 
-        public static IEnumerable<KeyValuePair<string, string>> GetDatadogEnvironmentVariables()
+        public static IDisposable CreateScope(string operationName)
+        {
+            var tracer = GetTracerInstance.Invoke(null, Array.Empty<object>());
+            return (IDisposable) StartActiveMethod.Invoke(tracer, new object[] { operationName });
+        }
+
+        public static IEnumerable<KeyValuePair<string,string>> GetDatadogEnvironmentVariables()
         {
             var prefixes = new[] { "COR_", "CORECLR_", "SIGNALFX_" };
 
