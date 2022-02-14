@@ -69,7 +69,7 @@ partial class Build : NukeBuild
     readonly bool IsAlpine = false;
 
     [Parameter("The build version. Default is latest")]
-    readonly string Version = "0.2.1";
+    readonly string Version = "0.2.2";
 
     [Parameter("Whether the build version is a prerelease(for packaging purposes). Default is latest")]
     readonly bool IsPrerelease = false;
