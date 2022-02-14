@@ -1,16 +1,17 @@
-name: Create draft release from latest tag
+name: Verify source generator changes have been persisted
 
 on:
+  pull_request:
   workflow_dispatch:
 
 jobs:
-  create_draft_release:
-    runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-      AZURE_DEVOPS_TOKEN: "${{ secrets.AZURE_DEVOPS_TOKEN }}"
+  verify_source_generators:
+    runs-on: windows-latest
 
     steps:
+      - name: Support longpaths
+        run: git config --system core.longpaths true
+
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -18,31 +19,16 @@ jobs:
         with:
           dotnet-version: '6.0.x'
 
-      - name: "Get current version"
-        id: version
-        run: ./tracer/build.sh OutputCurrentVersionToGitHub
+      - name: "Regenerating package versions"
+        run: .\tracer\build.ps1 BuildTracerHome
 
-      - name: "Download assets from Azure Pipelines"
-        id: assets
-        run: ./tracer/build.sh DownloadAzurePipelineArtifacts
-
-      - name: "Extract release notes from changelog"
-        id: release_notes
-        run: ./tracer/build.sh ExtractReleaseNotes
-        env:
-          PIPELINE_ARTIFACTS_LINK: ${{steps.assets.outputs.artifacts_link}}
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          draft: true
-          name: "${{steps.version.outputs.full_version}}"
-          tag_name: "v${{steps.version.outputs.full_version}}"
-          prerelease: ${{steps.version.outputs.isprerelease}}
-          body: ${{steps.release_notes.outputs.release_notes}}
-          fail_on_unmatched_files: true
-          files: |
-            ${{steps.assets.outputs.artifacts_path}}/*.deb
-            ${{steps.assets.outputs.artifacts_path}}/*.rpm
-            ${{steps.assets.outputs.artifacts_path}}/*.tar.gz
-            ${{steps.assets.outputs.artifacts_path}}/*.zip
+      - name: "Verify no changes in generated files"
+        run: |
+          git diff --quiet -- .\tracer\src\Datadog.Trace\Generated
+          if ($LASTEXITCODE -eq 1) {
+            git diff -- .\tracer\src\Datadog.Trace\Generated
+            Write-Error "Found changes in Generated folder. Build the solution locally and ensure you have committed all source generated files."
+            Exit 1
+          } else {
+            echo "No changes found to generated files"
+          }
