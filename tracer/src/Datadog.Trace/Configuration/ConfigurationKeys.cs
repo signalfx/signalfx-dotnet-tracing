@@ -455,14 +455,14 @@ namespace Datadog.Trace.Configuration
             /// The default value is false (disabled)
             /// </summary>
             /// <seealso cref="TracerSettings.ThreadSamplingEnabled"/>
-            public const string Enabled = "SIGNALFX_THREAD_SAMPLING_ENABLED";
+            public const string Enabled = "SIGNALFX_PROFILER_ENABLED";
 
             /// <summary>
             /// Configuration key to set default thread sampling period.
             /// The default value is 1000 milliseconds.
             /// </summary>
             /// <seealso cref="TracerSettings.ThreadSamplingPeriod"/>
-            public const string Period = "SIGNALFX_THREAD_SAMPLING_PERIOD";
+            public const string Period = "SIGNALFX_PROFILER_CALL_STACK_INTERVAL";
         }
     }
 }
