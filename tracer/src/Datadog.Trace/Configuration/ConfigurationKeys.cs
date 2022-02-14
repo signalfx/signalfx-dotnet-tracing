@@ -448,7 +448,7 @@ namespace Datadog.Trace.Configuration
             public const string HeaderTagsNormalizationFixEnabled = "SIGNALFX_TRACE_HEADER_TAG_NORMALIZATION_FIX_ENABLED";
         }
 
-        internal static class ThreadSampling
+        internal static class AlwaysOnProfiler
         {
             /// <summary>
             /// Configuration key for enabling or disabling the thread sampling.

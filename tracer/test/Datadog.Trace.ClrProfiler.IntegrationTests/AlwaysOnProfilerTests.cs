@@ -20,10 +20,10 @@ using Xunit.Abstractions;
 namespace Datadog.Trace.ClrProfiler.IntegrationTests
 {
     [UsesVerify]
-    public class ThreadSamplingTests : TestHelper
+    public class AlwaysOnProfilerTests : TestHelper
     {
-        public ThreadSamplingTests(ITestOutputHelper output)
-            : base("ThreadSampling", output)
+        public AlwaysOnProfilerTests(ITestOutputHelper output)
+            : base("AlwaysOnProfiler", output)
         {
             SetServiceVersion("1.0.0");
         }

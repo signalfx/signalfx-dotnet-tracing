@@ -7,7 +7,7 @@ using System.Text;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.ThreadSampling
+namespace Datadog.Trace.AlwaysOnProfiler
 {
     /// <summary>
     /// Parser the native code's pause-time-optimized format.

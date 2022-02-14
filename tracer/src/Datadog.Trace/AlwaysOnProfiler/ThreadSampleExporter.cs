@@ -12,7 +12,7 @@ using Datadog.Tracer.OpenTelemetry.Proto.Common.V1;
 using Datadog.Tracer.OpenTelemetry.Proto.Logs.V1;
 using Datadog.Tracer.OpenTelemetry.Proto.Resource.V1;
 
-namespace Datadog.Trace.ThreadSampling
+namespace Datadog.Trace.AlwaysOnProfiler
 {
     internal class ThreadSampleExporter
     {
