@@ -20,10 +20,10 @@ using Xunit.Abstractions;
 namespace Datadog.Trace.ClrProfiler.IntegrationTests
 {
     [UsesVerify]
-    public class ThreadSamplingTests : TestHelper
+    public class AlwaysOnProfilerTests : TestHelper
     {
-        public ThreadSamplingTests(ITestOutputHelper output)
-            : base("ThreadSampling", output)
+        public AlwaysOnProfilerTests(ITestOutputHelper output)
+            : base("AlwaysOnProfiler", output)
         {
             SetServiceVersion("1.0.0");
         }
@@ -33,8 +33,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("RunOnWindows", "True")]
         public async void SubmitThreadSamples()
         {
-            SetEnvironmentVariable("SIGNALFX_THREAD_SAMPLING_ENABLED", "true");
-            SetEnvironmentVariable("SIGNALFX_THREAD_SAMPLING_PERIOD", "1000");
+            SetEnvironmentVariable("SIGNALFX_PROFILER_ENABLED", "true");
+            SetEnvironmentVariable("SIGNALFX_PROFILER_CALL_STACK_INTERVAL", "1000");
 
             using (var agent = EnvironmentHelper.GetMockAgent())
             using (var logsCollector = EnvironmentHelper.GetMockOtelLogsCollector())

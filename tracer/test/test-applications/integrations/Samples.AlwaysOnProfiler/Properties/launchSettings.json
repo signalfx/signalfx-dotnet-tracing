@@ -14,8 +14,8 @@
         "SIGNALFX_DOTNET_TRACER_HOME": "$(SolutionDir)tracer\\bin\\tracer-home",
         "SIGNALFX_VERSION": "1.0.0",
 
-        "SIGNALFX_THREAD_SAMPLING_ENABLED": "true",
-        "SIGNALFX_THREAD_SAMPLING_PERIOD":  "1000" 
+        "SIGNALFX_PROFILER_ENABLED": "true",
+        "SIGNALFX_PROFILER_CALL_STACK_INTERVAL":  "1000" 
       },
       "nativeDebugging": true
     }

@@ -6,7 +6,7 @@ using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Logging;
 
-namespace Datadog.Trace.ThreadSampling
+namespace Datadog.Trace.AlwaysOnProfiler
 {
     /// <summary>
     ///  Provides the managed-side thread sample reader
@@ -18,7 +18,7 @@ namespace Datadog.Trace.ThreadSampling
         /// </summary>
         public const string BackgroundThreadName = "SignalFx Profiling Sampler Thread";
 
-        // If you change any of these constants, check with thread_sampler.cpp first
+        // If you change any of these constants, check with always_on_profiler.cpp first
         private const int BufferSize = 200 * 1024;
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(ThreadSampler));

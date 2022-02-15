@@ -1,6 +1,6 @@
 // We want to use std::min, not the windows.h macro
 #define NOMINMAX
-#include "thread_sampler.h"
+#include "always_on_profiler.h"
 #include "logger.h"
 #include <chrono>
 #include <map>
