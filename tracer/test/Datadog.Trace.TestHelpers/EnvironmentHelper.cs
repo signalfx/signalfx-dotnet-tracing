@@ -181,9 +181,9 @@ namespace Datadog.Trace.TestHelpers
                 "SIGNALFX_PROPAGATORS",
 
                 // thread sampling
-                "SIGNALFX_LOGS_ENDPOINT_URL",
-                "SIGNALFX_THREAD_SAMPLING_ENABLED",
-                "SIGNALFX_THREAD_SAMPLING_PERIOD"
+                "SIGNALFX_PROFILER_LOGS_ENDPOINT",
+                "SIGNALFX_PROFILER_ENABLED",
+                "SIGNALFX_PROFILER_CALL_STACK_INTERVAL"
             };
 
             foreach (string variable in environmentVariables)
@@ -233,7 +233,7 @@ namespace Datadog.Trace.TestHelpers
 
             if (logsCollectorPort.HasValue)
             {
-                environmentVariables["SIGNALFX_LOGS_ENDPOINT_URL"] = $"http://127.0.0.1:{logsCollectorPort.Value}/";
+                environmentVariables["SIGNALFX_PROFILER_LOGS_ENDPOINT"] = $"http://127.0.0.1:{logsCollectorPort.Value}/";
             }
 
             if (enableSecurity)

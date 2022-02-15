@@ -12,7 +12,7 @@ using Datadog.Tracer.OpenTelemetry.Proto.Common.V1;
 using Datadog.Tracer.OpenTelemetry.Proto.Logs.V1;
 using Datadog.Tracer.OpenTelemetry.Proto.Resource.V1;
 
-namespace Datadog.Trace.ThreadSampling
+namespace Datadog.Trace.AlwaysOnProfiler
 {
     internal class ThreadSampleExporter
     {
@@ -45,9 +45,9 @@ namespace Datadog.Trace.ThreadSampling
             // The same _logsData instance is used on all export messages. With the exception of the list of
             // LogRecords, the Logs property, all other fields are prepopulated. At this point the code just
             // need to create a LogRecord for each thread sample and add it to the Logs list.
-            List<LogRecord> logRecords = _logsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs;
+            var logRecords = _logsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs;
 
-            for (int i = 0; i < threadSamples.Count; i++)
+            for (var i = 0; i < threadSamples.Count; i++)
             {
                 var threadSample = threadSamples[i];
                 var logRecord = new LogRecord
@@ -63,7 +63,7 @@ namespace Datadog.Trace.ThreadSampling
 
                 if (threadSample.SpanId != 0 || threadSample.TraceIdHigh != 0 || threadSample.TraceIdLow != 0)
                 {
-                    // TODO: Add tests and validate.
+                    // TODO Splunk: Add tests and validate.
                     logRecord.SpanId = BitConverter.GetBytes(threadSample.SpanId);
                     logRecord.TraceId = BitConverter.GetBytes(threadSample.TraceIdHigh).Concat(BitConverter.GetBytes(threadSample.TraceIdLow));
                 }
@@ -85,11 +85,9 @@ namespace Datadog.Trace.ThreadSampling
                 httpWebRequest.Method = "POST";
                 httpWebRequest.Headers.Add(CommonHttpHeaderNames.TracingEnabled, "false");
 
-                using (var stream = httpWebRequest.GetRequestStream())
-                {
-                    Vendors.ProtoBuf.Serializer.Serialize(stream, _logsData);
-                    stream.Flush();
-                }
+                using var stream = httpWebRequest.GetRequestStream();
+                Vendors.ProtoBuf.Serializer.Serialize(stream, _logsData);
+                stream.Flush();
             }
             catch (Exception ex)
             {
@@ -126,8 +124,8 @@ namespace Datadog.Trace.ThreadSampling
         /// </summary>
         private static class GdiProfilingConventions
         {
-            public const string OpenTelemetryProfiling = "otel.profiling";
-            public const string Version = "0.1.0";
+            private const string OpenTelemetryProfiling = "otel.profiling";
+            private const string Version = "0.1.0";
 
             public static LogsData CreateLogsData(IEnumerable<KeyValuePair<string, string>> additionalResources)
             {
@@ -158,13 +156,13 @@ namespace Datadog.Trace.ThreadSampling
 
             private static class OpenTelemetry
             {
-                public static readonly InstrumentationLibrary InstrumentationLibrary = new InstrumentationLibrary
+                public static readonly InstrumentationLibrary InstrumentationLibrary = new()
                 {
                     Name = OpenTelemetryProfiling,
                     Version = Version
                 };
 
-                public static readonly Resource Resource = new Resource
+                public static readonly Resource Resource = new()
                 {
                     Attributes =
                     {
@@ -182,7 +180,7 @@ namespace Datadog.Trace.ThreadSampling
             {
                 public static class Attributes
                 {
-                    public static readonly KeyValue Source = new KeyValue
+                    public static readonly KeyValue Source = new()
                     {
                         Key = "com.splunk.sourcetype",
                         Value = new AnyValue { StringValue = OpenTelemetryProfiling }

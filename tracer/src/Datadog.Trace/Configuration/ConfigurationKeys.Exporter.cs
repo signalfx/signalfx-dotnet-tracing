@@ -73,7 +73,7 @@ namespace Datadog.Trace.Configuration
         /// Currently the Thread Sampler sends stack traces as logs.
         /// </summary>
         /// <seealso cref="ExporterSettings.LogsEndpointUrl"/>
-        public const string LogsEndpointUrl = "SIGNALFX_LOGS_ENDPOINT_URL";
+        public const string LogsEndpointUrl = "SIGNALFX_PROFILER_LOGS_ENDPOINT";
 
         /// <summary>
         /// Configuration key for the trace endpoint. Same as <see creg="AgentUri"/> created

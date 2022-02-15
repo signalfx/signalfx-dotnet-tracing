@@ -1,6 +1,6 @@
 // Modified by Splunk Inc
 
-namespace Datadog.Trace.ThreadSampling
+namespace Datadog.Trace.AlwaysOnProfiler
 {
     internal class ThreadSample
     {

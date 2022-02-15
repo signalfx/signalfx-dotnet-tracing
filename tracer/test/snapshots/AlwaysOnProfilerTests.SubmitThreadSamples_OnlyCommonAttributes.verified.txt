@@ -12,7 +12,7 @@
           {
             Key: service.name,
             Value: {
-              StringValue: Samples.ThreadSampling
+              StringValue: Samples.AlwaysOnProfiler
             }
           },
           {

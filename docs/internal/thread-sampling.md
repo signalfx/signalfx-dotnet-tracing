@@ -38,18 +38,18 @@ _Sending profiling data directly to ingest is not supported at this time_.
 
 # Enable the profiler
 
-To enable the profiler, set the `SIGNALFX_THREAD_SAMPLING_ENABLED` environment variable
+To enable the profiler, set the `SIGNALFX__PROFILER_ENABLED` environment variable
 to `true` for your .NET process.
 
 # Configuration settings
 
 Please check [description](internal-config.md) for the following environment variables
 
-* `SIGNALFX_LOGS_ENDPOINT_URL`,
-* `SIGNALFX_THREAD_SAMPLING_ENABLED`,
-* `SIGNALFX_THREAD_SAMPLING_PERIOD`.
+* `SIGNALFX_PROFILER_LOGS_ENDPOINT`,
+* `SIGNALFX_PROFILER_ENABLED`,
+* `SIGNALFX_PROFILER_CALL_STACK_INTERVAL`.
 
-> We strongly recommend using defaults for `SIGNALFX_THREAD_SAMPLING_PERIOD`.
+> We strongly recommend using defaults for `SIGNALFX_PROFILER_CALL_STACK_INTERVAL`.
 
 # Escape hatch
 
@@ -107,7 +107,7 @@ data from showing in Splunk Observability Cloud.
 Check for the following common issues:
 
 * Look at the values of the SignalFx Instrumentation for .NET's configuration,
-especially `SIGNALFX_LOGS_ENDPOINT_URL`. They are logged at startup.
+especially `SIGNALFX_PROFILER_LOGS_ENDPOINT`. They are logged at startup.
 * Verify that a collector is actually running at that endpoint and that the
 application host/container can resolve any hostnames
 and connect to the given OTLP port (default: 4318).

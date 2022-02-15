@@ -1,6 +1,6 @@
 // We want to use std::min, not the windows.h macro
 #define NOMINMAX
-#include "thread_sampler.h"
+#include "always_on_profiler.h"
 #include "logger.h"
 #include <chrono>
 #include <map>
@@ -47,14 +47,14 @@ static ICorProfilerInfo* profilerInfo; // After feature sets settle down, perhap
 bool ThreadSampling_ShouldProduceThreadSample()
 {
     std::lock_guard<std::mutex> guard(bufferLock);
-    return bufferA == NULL || bufferB == NULL;
+    return bufferA == nullptr || bufferB == nullptr;
 }
 void ThreadSampling_RecordProducedThreadSample(std::vector<unsigned char>* buf)
 {
     std::lock_guard<std::mutex> guard(bufferLock);
-    if (bufferA == NULL) {
+    if (bufferA == nullptr) {
         bufferA = buf;
-    } else if (bufferB == NULL) {
+    } else if (bufferB == nullptr) {
         bufferB = buf;
     } else {
         trace::Logger::Warn("Unexpected buffer drop in ThreadSampling_RecordProducedThreadSample");
@@ -64,26 +64,26 @@ void ThreadSampling_RecordProducedThreadSample(std::vector<unsigned char>* buf)
 // Can return 0 if none are pending
 int32_t ThreadSampling_ConsumeOneThreadSample(int32_t len, unsigned char* buf)
 {
-    if (len <= 0 || buf == NULL)
+    if (len <= 0 || buf == nullptr)
     {
         trace::Logger::Warn("Unexpected 0/null buffer to ThreadSampling_ConsumeOneThreadSample");
         return 0;
     }
-    std::vector<unsigned char>* toUse = NULL;
+    std::vector<unsigned char>* toUse = nullptr;
     {
         std::lock_guard<std::mutex> guard(bufferLock);
-        if (bufferA != NULL)
+        if (bufferA != nullptr)
         {
             toUse = bufferA;
-            bufferA = NULL;
+            bufferA = nullptr;
         }
-        else if (bufferB != NULL)
+        else if (bufferB != nullptr)
         {
             toUse = bufferB;
-            bufferB = NULL;
+            bufferB = nullptr;
         }
     }
-    if (toUse == NULL)
+    if (toUse == nullptr)
     {
         return 0;
     }
@@ -107,7 +107,7 @@ public:
 
     COMPtrHolder(MetaInterface* ptr)
     {
-        if (ptr != NULL)
+        if (ptr != nullptr)
         {
             ptr->AddRef();
         }
@@ -116,7 +116,7 @@ public:
 
     ~COMPtrHolder()
     {
-        if (m_ptr != NULL)
+        if (m_ptr != nullptr)
         {
             m_ptr->Release();
             m_ptr = NULL;
@@ -175,7 +175,7 @@ ThreadSamplesBuffer::ThreadSamplesBuffer(std::vector<unsigned char>* buf) : buff
 }
 ThreadSamplesBuffer ::~ThreadSamplesBuffer()
 {
-    buffer = NULL; // specifically don't delete as this is done by RecordProduced/ConsumeOneThreadSample
+    buffer = nullptr; // specifically don't delete as this is done by RecordProduced/ConsumeOneThreadSample
 }
 
 #define CHECK_SAMPLES_BUFFER_LENGTH() {  if (buffer->size() >= SAMPLES_BUFFER_MAXIMUM_SIZE) { return; } }
@@ -287,12 +287,12 @@ class SamplingHelper
 {
 public:
     // These are permanent parts of the helper object
-    ICorProfilerInfo10* info10 = NULL;
+    ICorProfilerInfo10* info10 = nullptr;
     NameCache functionNameCache;
     NameCache classNameCache;
     // These cycle every sample and/or are owned externally
-    ThreadSamplesBuffer* curWriter = NULL;
-    std::vector<unsigned char>* curBuffer = NULL;
+    ThreadSamplesBuffer* curWriter = nullptr;
+    std::vector<unsigned char>* curBuffer = nullptr;
     SamplingStatistics stats;
 
     SamplingHelper() : functionNameCache(MAX_FUNCTION_NAME_CACHE_SIZE), classNameCache(MAX_CLASS_NAME_CACHE_SIZE), stats()
@@ -316,8 +316,8 @@ public:
     {
         ThreadSampling_RecordProducedThreadSample(curBuffer);
         delete curWriter;
-        curWriter = NULL;
-        curBuffer = NULL;
+        curWriter = nullptr;
+        curBuffer = nullptr;
         stats = SamplingStatistics();
     }
 
@@ -336,7 +336,7 @@ private:
             return;
         }
 
-        hr = info10->GetClassIDInfo2(classId, &modId, &classToken, &parentClassID, 0, NULL, NULL);
+        hr = info10->GetClassIDInfo2(classId, &modId, &classToken, &parentClassID, 0, nullptr, nullptr);
         if (CORPROF_E_CLASSID_IS_ARRAY == hr)
         {
             // We have a ClassID of an array.
@@ -373,7 +373,7 @@ private:
 
         WCHAR wName[MAX_CLASS_NAME_LEN];
         DWORD dwTypeDefFlags = 0;
-        hr = pMDImport->GetTypeDefProps(classToken, wName, MAX_CLASS_NAME_LEN, NULL, &dwTypeDefFlags, NULL);
+        hr = pMDImport->GetTypeDefProps(classToken, wName, MAX_CLASS_NAME_LEN, nullptr, &dwTypeDefFlags, nullptr);
         if (FAILED(hr))
         {
             Logger::Debug("GetTypeDefProps failed: ", hr);
@@ -396,7 +396,7 @@ private:
         ModuleID moduleId = 0;
         mdToken token = 0;
 
-        HRESULT hr = info10->GetFunctionInfo2(funcID, frameInfo, &classId, &moduleId, &token, 0, NULL, NULL);
+        HRESULT hr = info10->GetFunctionInfo2(funcID, frameInfo, &classId, &moduleId, &token, 0, nullptr, nullptr);
         if (FAILED(hr))
         {
             Logger::Debug("GetFunctionInfo2 failed: ", hr);
@@ -415,7 +415,7 @@ private:
 
         WCHAR funcName[MAX_FUNC_NAME_LEN];
         funcName[0] = 0;
-        hr = pIMDImport->GetMethodProps(token, NULL, funcName, MAX_FUNC_NAME_LEN, 0, 0, NULL, NULL, NULL, NULL);
+        hr = pIMDImport->GetMethodProps(token, nullptr, funcName, MAX_FUNC_NAME_LEN, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
         if (FAILED(hr))
         {
             Logger::Debug("GetMethodProps failed: ", hr);
@@ -445,7 +445,7 @@ public:
     WSTRING* Lookup(FunctionID fid, COR_PRF_FRAME_INFO frame)
     {
         WSTRING* answer = functionNameCache.get(fid);
-        if (answer != NULL)
+        if (answer != nullptr)
         {
             return answer;
         }
@@ -459,7 +459,7 @@ public:
     void LookupClassName(ClassID cid, WSTRING& result)
     {
         WSTRING* answer = functionNameCache.get(cid);
-        if (answer != NULL)
+        if (answer != nullptr)
         {
             result.append(*answer);
             return;
@@ -485,7 +485,7 @@ HRESULT __stdcall FrameCallback(_In_ FunctionID funcId, _In_ UINT_PTR ip, _In_ C
 // Factored out from the loop to a separate function for easier auditing and control of the threadstate lock
 void CaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, SamplingHelper& helper)
 {
-    ICorProfilerThreadEnum* threadEnum = NULL;
+    ICorProfilerThreadEnum* threadEnum = nullptr;
     HRESULT hr = info10->EnumThreads(&threadEnum);
     if (FAILED(hr))
     {
@@ -502,7 +502,7 @@ void CaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, SamplingHelpe
         helper.stats.numThreads++;
         ThreadSpanContext spanContext = threadSpanContextMap[threadID];
         auto found = ts->managedTid2state.find(threadID);
-        if (found != ts->managedTid2state.end() && found->second != NULL)
+        if (found != ts->managedTid2state.end() && found->second != nullptr)
         {
             helper.curWriter->StartSample(threadID, found->second, spanContext);
         }
@@ -513,7 +513,7 @@ void CaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, SamplingHelpe
         }
 
         // Don't reuse the hr being used for the thread enum, especially since a failed snapshot isn't fatal
-        HRESULT snapshotHr = info10->DoStackSnapshot(threadID, &FrameCallback, COR_PRF_SNAPSHOT_DEFAULT, &helper, NULL, 0);
+        HRESULT snapshotHr = info10->DoStackSnapshot(threadID, &FrameCallback, COR_PRF_SNAPSHOT_DEFAULT, &helper, nullptr, 0);
         if (FAILED(snapshotHr))
         {
             Logger::Debug("DoStackSnapshot failed: ", snapshotHr);
@@ -651,7 +651,7 @@ void ThreadSampler::StartSampling(ICorProfilerInfo10* info10)
     profilerInfo = info10;
     this->info10 = info10;
 #ifdef _WIN32
-    HANDLE bgThread = CreateThread(NULL, 0, &SamplingThreadMain, this, 0, NULL);
+    HANDLE bgThread = CreateThread(nullptr, 0, &SamplingThreadMain, this, 0, nullptr);
 #else
     pthread_t thr;
     pthread_create(&thr, NULL, (void *(*)(void *)) &SamplingThreadMain, this);
@@ -672,7 +672,7 @@ void ThreadSampler::ThreadDestroyed(ThreadID threadId)
         std::lock_guard<std::mutex> guard(threadStateLock);
 
         ThreadState* state = managedTid2state[threadId];
-        if (state != NULL)
+        if (state != nullptr)
         {
             delete state;
         }
@@ -689,7 +689,7 @@ void ThreadSampler::ThreadAssignedToOSThread(ThreadID threadId, DWORD osThreadId
     std::lock_guard<std::mutex> guard(threadStateLock);
 
     ThreadState* state = managedTid2state[threadId];
-    if (state == NULL)
+    if (state == nullptr)
     {
         state = new ThreadState();
         managedTid2state[threadId] = state;
@@ -701,7 +701,7 @@ void ThreadSampler::ThreadNameChanged(ThreadID threadId, ULONG cchName, WCHAR _n
     std::lock_guard<std::mutex> guard(threadStateLock);
 
     ThreadState* state = managedTid2state[threadId];
-    if (state == NULL)
+    if (state == nullptr)
     {
         state = new ThreadState();
         managedTid2state[threadId] = state;
@@ -719,7 +719,7 @@ WSTRING* NameCache::get(UINT_PTR key)
     auto found = map.find(key);
     if (found == map.end())
     {
-        return NULL;
+        return nullptr;
     }
     // This voodoo moves the single item in the iterator to the front of the list
     // (as it is now the most-recently-used)

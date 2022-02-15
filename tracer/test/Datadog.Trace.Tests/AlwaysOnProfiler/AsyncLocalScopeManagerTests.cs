@@ -8,7 +8,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit;
 
-namespace Datadog.Trace.Tests.ThreadSampling
+namespace Datadog.Trace.Tests.AlwaysOnProfiler
 {
     public class AsyncLocalScopeManagerTests
     {
