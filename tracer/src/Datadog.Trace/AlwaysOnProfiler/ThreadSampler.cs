@@ -25,16 +25,16 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
         private static ImmutableTracerSettings _tracerSettings;
 
-        private static void ReadAndExportThreadSampleBatch(byte[] buf, ThreadSampleExporter exporter)
+        private static void ReadAndExportThreadSampleBatch(byte[] buffer, ThreadSampleExporter exporter)
         {
-            int read = NativeMethods.SignalFxReadThreadSamples(buf.Length, buf);
+            var read = NativeMethods.SignalFxReadThreadSamples(buffer.Length, buffer);
             if (read <= 0)
             {
                 // No data just return.
                 return;
             }
 
-            var parser = new ThreadSampleNativeFormatParser(buf, read);
+            var parser = new ThreadSampleNativeFormatParser(buffer, read);
             var threadSamples = parser.Parse();
 
             exporter.ExportThreadSamples(threadSamples);
@@ -42,7 +42,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
         private static void SampleReadingThread()
         {
-            var buf = new byte[BufferSize];
+            var buffer = new byte[BufferSize];
             var exporter = new ThreadSampleExporter(_tracerSettings);
 
             while (true)
@@ -51,8 +51,8 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 try
                 {
                     // Call twice in quick succession to catch up any blips; the second will likely return 0 (no buffer)
-                    ReadAndExportThreadSampleBatch(buf, exporter);
-                    ReadAndExportThreadSampleBatch(buf, exporter);
+                    ReadAndExportThreadSampleBatch(buffer, exporter);
+                    ReadAndExportThreadSampleBatch(buffer, exporter);
                 }
                 catch (Exception ex)
                 {
