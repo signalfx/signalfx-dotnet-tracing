@@ -19,21 +19,21 @@ ENV \
 RUN apt-get update \
     && apt-get -y upgrade \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --fix-missing \
-        git \
-        procps \
-        wget \
-        curl \
-        cmake \
-        make \
-        llvm \
-        clang \
-        gcc \
-        build-essential \
-        rpm \
-        ruby \
-        ruby-dev \
-        rubygems \
-    && gem install --no-document fpm \
+        git=1:2.30.2-1 \
+        procps=2:3.3.17-5 \
+        wget=1.21-1+deb11u1 \
+        curl=7.74.0-1.3+deb11u1 \
+        cmake=3.18.4-2+deb11u1 \
+        make=4.3-4.1 \
+        llvm=1:11.0-51+nmu5 \
+        clang=1:11.0-51+nmu5 \
+        gcc=4:10.2.1-1 \
+        build-essential=12.9 \
+        rpm=4.16.1.2+dfsg1-3 \
+        ruby=1:2.7+2 \
+        ruby-dev=1:2.7+2 \
+        rubygems=3.2.5-2 \
+    && gem install --no-document fpm --version 1.14.1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Install the .NET SDK
