@@ -75,25 +75,32 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
             if (wireProtocol.TryDuckCast<IWireProtocolWithCommandStruct>(out var protocolWithCommand)
                 && protocolWithCommand.Command != null)
             {
-                // the name of the first element in the command BsonDocument will be the operation type (insert, delete, find, etc)
-                // and its value is the collection name
-                var firstElement = protocolWithCommand.Command.GetElement(0);
-                operationName = firstElement.Name;
-
-                if (operationName == IsMasterOperation || operationName == "hello" || databaseName == AdminDatabaseName)
+                try
                 {
-                    // Assume that this is the driver doing "Heartbeat" or hello or "RoundTripTimeMonitor", don't create an activity for it.
-                    return null;
-                }
+                    // the name of the first element in the command BsonDocument will be the operation type (insert, delete, find, etc)
+                    // and its value is the collection name
+                    var firstElement = protocolWithCommand.Command.GetElement(0);
+                    operationName = firstElement.Name;
 
-                if (tracer.Settings.TagMongoCommands)
+                    if (operationName == IsMasterOperation || operationName == "hello" || databaseName == AdminDatabaseName)
+                    {
+                        // Assume that this is the driver doing "Heartbeat" or hello or "RoundTripTimeMonitor", don't create an activity for it.
+                        return null;
+                    }
+
+                    if (tracer.Settings.TagMongoCommands)
+                    {
+                        statement = protocolWithCommand.Command.ToString();
+                    }
+
+                    collectionName = firstElement.Value?.ToString();
+                    query = protocolWithCommand.Command.ToString();
+                    resourceName = $"{operationName ?? "operation"} {databaseName ?? "database"}";
+                }
+                catch (Exception ex)
                 {
-                    statement = protocolWithCommand.Command.ToString();
+                    Log.Warning(ex, "Unable to access IWireProtocol.Command properties.");
                 }
-
-                collectionName = firstElement.Value?.ToString();
-                query = protocolWithCommand.Command.ToString();
-                resourceName = $"{operationName ?? "operation"} {databaseName ?? "database"}";
             }
 
             string host = null;
