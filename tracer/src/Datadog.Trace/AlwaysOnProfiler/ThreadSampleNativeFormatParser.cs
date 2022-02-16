@@ -161,7 +161,12 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 }
                 else
                 {
-                    _position = _length + 1; // FIXME improve error handling here
+                    _position = _length + 1;
+
+                    if (IsLogLevelDebugEnabled)
+                    {
+                        Log.Debug("Not expected operation code while parsing thread stack trace: '{0}'. Operation will be ignored.", operationCode);
+                    }
                 }
             }
 
