@@ -15,9 +15,8 @@ namespace Datadog.Trace.Telemetry
     {
         public TelemetrySettings(IConfigurationSource source, ImmutableTracerSettings tracerSettings)
         {
-            TelemetryEnabled = source?.GetBool(ConfigurationKeys.Telemetry.Enabled) ??
-                               // default value
-                               false;
+            TelemetryEnabled = source?.GetBool(ConfigurationKeys.Telemetry.Enabled)
+                            ?? false; // disabled by default
 
             var apiKey = source?.GetString(ConfigurationKeys.ApiKey);
 

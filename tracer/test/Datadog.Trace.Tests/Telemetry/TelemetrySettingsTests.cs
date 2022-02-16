@@ -49,7 +49,7 @@ namespace Datadog.Trace.Tests.Telemetry
         {
             var source = new NameValueConfigurationSource(new NameValueCollection
             {
-                { ConfigurationKeys.Telemetry.Enabled, "1" },
+                { ConfigurationKeys.Telemetry.Enabled, "1" }
             });
 
             var settings = new TelemetrySettings(source, _tracerSettings);
@@ -119,6 +119,26 @@ namespace Datadog.Trace.Tests.Telemetry
             var settings = new TelemetrySettings(source, _tracerSettings);
 
             settings.TelemetryUri.Should().Be(_defaultIntakeUrl);
+        }
+
+        [Theory]
+        [InlineData(null, null, false)]
+        [InlineData("SOMEKEY", null, false)]
+        [InlineData(null, "0", false)]
+        [InlineData("SOMEKEY", "0", false)]
+        [InlineData(null, "1", true)]
+        [InlineData("SOMEKEY", "1", true)]
+        public void SetsTelemetryEnabledBasedOnApiKeyAndEnabledSettings(string apiKey, string enabledSetting, bool enabled)
+        {
+            var source = new NameValueConfigurationSource(new NameValueCollection
+            {
+                { ConfigurationKeys.Telemetry.Enabled, enabledSetting },
+                { ConfigurationKeys.ApiKey, apiKey },
+            });
+
+            var settings = new TelemetrySettings(source, _tracerSettings);
+
+            settings.TelemetryEnabled.Should().Be(enabled);
         }
     }
 }
