@@ -13,7 +13,7 @@ RUN apk update \
         ruby \
         ruby-dev \
         ruby-etc \
-    && gem install --no-document fpm
+    && gem install --no-document fpm --version 1.14.1
 
 ENV IsAlpine=true
 
