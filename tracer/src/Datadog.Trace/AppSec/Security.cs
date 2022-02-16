@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using Datadog.Trace.AppSec.Transports;
 using Datadog.Trace.AppSec.Transports.Http;
@@ -39,6 +40,10 @@ namespace Datadog.Trace.AppSec
         private readonly IWaf _waf;
         private readonly InstrumentationGateway _instrumentationGateway;
         private readonly SecuritySettings _settings;
+
+#if NETFRAMEWORK
+        private readonly bool _usingIntegratedPipeline;
+#endif
 
         static Security()
         {
@@ -96,7 +101,17 @@ namespace Datadog.Trace.AppSec
                     {
                         _instrumentationGateway.RequestEnd += InstrumentationGatewayInstrumentationGatewayEvent;
 #if NETFRAMEWORK
-                        if (System.Web.HttpRuntime.UsingIntegratedPipeline)
+                        try
+                        {
+                            _usingIntegratedPipeline = TryGetUsingIntegratedPipelineBool();
+                        }
+                        catch (Exception ex)
+                        {
+                            _usingIntegratedPipeline = false;
+                            Log.Error(ex, "Unable to query the IIS pipeline. Request and response information may be limited.");
+                        }
+
+                        if (_usingIntegratedPipeline)
                         {
                             _instrumentationGateway.LastChanceToWriteTags += InstrumentationGateway_AddHeadersResponseTags;
                         }
@@ -311,7 +326,7 @@ namespace Datadog.Trace.AppSec
             {
                 _instrumentationGateway.RequestEnd -= InstrumentationGatewayInstrumentationGatewayEvent;
 #if NETFRAMEWORK
-                if (System.Web.HttpRuntime.UsingIntegratedPipeline)
+                if (_usingIntegratedPipeline)
                 {
                     _instrumentationGateway.LastChanceToWriteTags -= InstrumentationGateway_AddHeadersResponseTags;
                 }
@@ -322,5 +337,15 @@ namespace Datadog.Trace.AppSec
 
             Dispose();
         }
+
+#if NETFRAMEWORK
+        /// <summary>
+        /// ! This method should be called from within a try-catch block !
+        /// If the application is running in partial trust, then trying to call this method will result in
+        /// a SecurityException to be thrown at the method CALLSITE, not inside the <c>TryGetUsingIntegratedPipelineBool(..)</c> method itself.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private bool TryGetUsingIntegratedPipelineBool() => System.Web.HttpRuntime.UsingIntegratedPipeline;
+#endif
     }
 }
