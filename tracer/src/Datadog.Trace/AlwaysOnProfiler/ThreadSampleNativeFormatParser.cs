@@ -106,7 +106,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         managedId,
                         nativeId);
 
-                    // FIXME: here should go Thread state, equivalent of"    java.lang.Thread.State: TIMED_WAITING (sleeping)"
+                    // TODO Splunk: APMI-2565 here should go Thread state, equivalent of"    java.lang.Thread.State: TIMED_WAITING (sleeping)"
                     stackTraceBuilder.Append("\n");
 
                     while (code != 0)
