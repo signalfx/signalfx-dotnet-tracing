@@ -237,7 +237,7 @@ namespace Datadog.Trace
                     value = SpanId.ToString();
                     return true;
 
-                case DDHttpHeaderNames.SamplingPriority:
+                case "sampling-priority":
                     value = SamplingPriority?.ToString();
                     return true;
 

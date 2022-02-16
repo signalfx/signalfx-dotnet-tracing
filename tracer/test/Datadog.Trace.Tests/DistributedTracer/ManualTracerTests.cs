@@ -36,11 +36,7 @@ namespace Datadog.Trace.Tests.DistributedTracer
             var automaticTracer = new Mock<IAutomaticTracer>();
             var manualTracer = new ManualTracer(automaticTracer.Object);
 
-<<<<<<< HEAD
-            var expectedSpanContext = new SpanContext(TraceId.CreateFromInt(1), 2, SamplingPriority.UserKeep, "Service", "Origin");
-=======
-            var expectedSpanContext = new SpanContext(1, 2, SamplingPriorityValues.UserKeep, "Service", "Origin");
->>>>>>> 41e924c48 (use `int` internally instead of `enum` for sampling priority values (#2372))
+            var expectedSpanContext = new SpanContext(TraceId.CreateFromInt(1), 2, SamplingPriorityValues.UserKeep, "Service", "Origin");
 
             ((IDistributedTracer)manualTracer).SetSpanContext(expectedSpanContext);
 

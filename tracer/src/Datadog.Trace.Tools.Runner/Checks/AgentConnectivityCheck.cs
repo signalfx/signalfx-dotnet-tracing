@@ -75,19 +75,8 @@ namespace Datadog.Trace.Tools.Runner.Checks
 
         private static void DisplayInfoMessage(ImmutableExporterSettings settings)
         {
-            string transport;
-            string endpoint;
-
-            if (settings.TracesTransport == TracesTransportType.UnixDomainSocket)
-            {
-                transport = "domain sockets";
-                endpoint = settings.TracesUnixDomainSocketPath;
-            }
-            else
-            {
-                transport = "HTTP";
-                endpoint = settings.AgentUri.ToString();
-            }
+            var transport = "HTTP";
+            var endpoint = settings.AgentUri.ToString();
 
             AnsiConsole.WriteLine(ConnectToEndpointFormat(endpoint, transport));
         }

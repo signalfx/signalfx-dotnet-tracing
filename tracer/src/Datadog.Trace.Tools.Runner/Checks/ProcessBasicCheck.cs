@@ -50,7 +50,7 @@ namespace Datadog.Trace.Tools.Runner.Checks
                 foundIssue = true;
             }
 
-            if (process.EnvironmentVariables.TryGetValue("DD_DOTNET_TRACER_HOME", out var tracerHome))
+            if (process.EnvironmentVariables.TryGetValue("SIGNALFX_DOTNET_TRACER_HOME", out var tracerHome))
             {
                 if (!Directory.Exists(tracerHome))
                 {
@@ -138,12 +138,12 @@ namespace Datadog.Trace.Tools.Runner.Checks
             {
                 var fileName = Path.GetFileName(module);
 
-                if (fileName.Equals("datadog.trace.dll", StringComparison.OrdinalIgnoreCase))
+                if (fileName.Equals("SignalFx.Tracing.dll", StringComparison.OrdinalIgnoreCase))
                 {
                     result.Tracer = fileName;
                 }
-                else if (fileName.Equals("Datadog.Trace.ClrProfiler.Native.dll", StringComparison.OrdinalIgnoreCase)
-                    || fileName.Equals("Datadog.Trace.ClrProfiler.Native.so", StringComparison.OrdinalIgnoreCase))
+                else if (fileName.Equals("SignalFx.Tracing.ClrProfiler.Native.dll", StringComparison.OrdinalIgnoreCase)
+                    || fileName.Equals("SignalFx.Tracing.ClrProfiler.Native.so", StringComparison.OrdinalIgnoreCase))
                 {
                     result.Profiler = fileName;
                 }

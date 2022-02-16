@@ -61,13 +61,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             const int totalSpanCount = 21;
             const string expectedOperationName = "mssql.query";
 
-<<<<<<< HEAD
             SetEnvironmentVariable($"SIGNALFX_TRACE_{nameof(IntegrationId.SqlClient)}_ENABLED", "false");
-=======
-            SetEnvironmentVariable($"DD_TRACE_{nameof(IntegrationId.SqlClient)}_ENABLED", "false");
 
             using var telemetry = this.ConfigureTelemetry();
->>>>>>> bf21db655 (Add Telemetry (#2241))
             using var agent = EnvironmentHelper.GetMockAgent();
             using var process = RunSampleAndWaitForExit(agent);
             var spans = agent.WaitForSpans(totalSpanCount, returnAllOperations: true);

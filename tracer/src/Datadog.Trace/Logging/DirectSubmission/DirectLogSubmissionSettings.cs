@@ -46,7 +46,7 @@ namespace Datadog.Trace.Logging.DirectSubmission
             }
             else
             {
-                // They didn't provide a URL, use the default (With DD_SITE if provided)
+                // They didn't provide a URL, use the default (With SIGNALFX_SITE if provided)
                 var specificSite = source?.GetString(ConfigurationKeys.Site);
                 var ddSite = string.IsNullOrEmpty(specificSite)
                                  ? DefaultSite

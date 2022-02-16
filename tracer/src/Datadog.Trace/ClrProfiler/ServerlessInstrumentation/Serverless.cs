@@ -14,11 +14,11 @@ namespace Datadog.Trace.ClrProfiler.ServerlessInstrumentation
     internal static class Serverless
     {
         private const string DefinitionsId = "68224F20D001430F9400668DD25245BA";
-        private const string ExtensionEnvName = "_DD_EXTENSION_PATH";
+        private const string ExtensionEnvName = "_SIGNALFX_EXTENSION_PATH";
         private const string ExtensionFullPath = "/opt/extensions/datadog-agent";
         private const string FunctionEnvame = "AWS_LAMBDA_FUNCTION_NAME";
         private const string HandlerEnvName = "_HANDLER";
-        private const string LogLevelEnvName = "DD_LOG_LEVEL";
+        private const string LogLevelEnvName = "SIGNALFX_LOG_LEVEL";
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(Serverless));
 

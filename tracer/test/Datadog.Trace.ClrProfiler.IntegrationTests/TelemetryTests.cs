@@ -69,9 +69,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             int telemetryPort = TcpPortProvider.GetOpenPort();
             using var telemetry = new MockTelemetryAgent<TelemetryData>(telemetryPort);
 
-            SetEnvironmentVariable("DD_INSTRUMENTATION_TELEMETRY_ENABLED", "false");
-            SetEnvironmentVariable("DD_TRACE_TELEMETRY_URL", $"http://localhost:{telemetry.Port}");
-            SetEnvironmentVariable("DD_API_KEY", "INVALID_KEY_FOR_TESTS");
+            SetEnvironmentVariable("SIGNALFX_INSTRUMENTATION_TELEMETRY_ENABLED", "false");
+            SetEnvironmentVariable("SIGNALFX_TRACE_TELEMETRY_URL", $"http://localhost:{telemetry.Port}");
+            SetEnvironmentVariable("SIGNALFX_API_KEY", "INVALID_KEY_FOR_TESTS");
 
             int httpPort = TcpPortProvider.GetOpenPort();
             Output.WriteLine($"Assigning port {httpPort} for the httpPort.");
@@ -87,41 +87,5 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             telemetry.WaitForLatestTelemetry(x => true);
             telemetry.Telemetry.Should().BeEmpty();
         }
-
-#if NETCOREAPP3_1_OR_GREATER
-        [SkippableFact]
-        [Trait("Category", "EndToEnd")]
-        [Trait("RunOnWindows", "True")]
-        public void WhenUsingUdsAgent_DoesntSendTelemetry()
-        {
-            const string expectedOperationName = "http.request";
-            const int expectedSpanCount = 1;
-            const string serviceVersion = "1.0.0";
-
-            EnvironmentHelper.TransportType = TestTransports.Uds;
-            using var agent = EnvironmentHelper.GetMockAgent();
-
-            SetServiceVersion(serviceVersion);
-
-            int telemetryPort = TcpPortProvider.GetOpenPort();
-            using var telemetry = new MockTelemetryAgent<TelemetryData>(telemetryPort);
-
-            SetEnvironmentVariable("DD_INSTRUMENTATION_TELEMETRY_ENABLED", "false");
-
-            int httpPort = TcpPortProvider.GetOpenPort();
-            Output.WriteLine($"Assigning port {httpPort} for the httpPort.");
-            using (ProcessResult processResult = RunSampleAndWaitForExit(agent, arguments: $"Port={httpPort}"))
-            {
-                Assert.True(processResult.ExitCode == 0, $"Process exited with code {processResult.ExitCode}");
-
-                var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
-                Assert.Equal(expectedSpanCount, spans.Count);
-            }
-
-            // Shouldn't have any, but wait for 5s
-            telemetry.WaitForLatestTelemetry(x => true);
-            telemetry.Telemetry.Should().BeEmpty();
-        }
-#endif
     }
 }

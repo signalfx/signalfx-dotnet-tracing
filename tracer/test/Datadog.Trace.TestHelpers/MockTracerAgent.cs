@@ -10,7 +10,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.Specialized;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -19,8 +18,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.HttpOverStreams;
-using Datadog.Tracer.SignalFx.Metrics.Protobuf;
 using Datadog.Trace.Util;
+using Datadog.Tracer.SignalFx.Metrics.Protobuf;
 using MessagePack; // use nuget MessagePack to deserialize
 
 namespace Datadog.Trace.TestHelpers
@@ -32,51 +31,6 @@ namespace Datadog.Trace.TestHelpers
         private readonly Task _tracesListenerTask;
         private readonly Task _metricsListenerTask;
         private readonly CancellationTokenSource _cancellationTokenSource;
-
-#if NETCOREAPP
-        private readonly UnixDomainSocketEndPoint _tracesEndpoint;
-        private readonly Socket _udsTracesSocket;
-        private readonly UnixDomainSocketEndPoint _statsEndpoint;
-        private readonly Socket _udsStatsSocket;
-
-        public MockTracerAgent(UnixDomainSocketConfig config)
-        {
-            _cancellationTokenSource = new CancellationTokenSource();
-
-            ListenerInfo = $"Traces at {config.Traces}";
-
-            if (config.Metrics != null && config.UseDogstatsD)
-            {
-                if (File.Exists(config.Metrics))
-                {
-                    File.Delete(config.Metrics);
-                }
-
-                StatsUdsPath = config.Metrics;
-                ListenerInfo += $", Stats at {config.Metrics}";
-                _statsEndpoint = new UnixDomainSocketEndPoint(config.Metrics);
-
-                _udsStatsSocket = new Socket(AddressFamily.Unix, SocketType.Dgram, ProtocolType.Unspecified);
-
-                _udsStatsSocket.Bind(_statsEndpoint);
-                // NOTE: Connectionless protocols don't use Listen()
-                _statsdTask = Task.Run(HandleUdsStats);
-            }
-
-            _tracesEndpoint = new UnixDomainSocketEndPoint(config.Traces);
-
-            if (File.Exists(config.Traces))
-            {
-                File.Delete(config.Traces);
-            }
-
-            TracesUdsPath = config.Traces;
-            _udsTracesSocket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP);
-            _udsTracesSocket.Bind(_tracesEndpoint);
-            _udsTracesSocket.Listen(1);
-            _tracesListenerTask = Task.Run(HandleUdsTraces);
-        }
-#endif
 
         public MockTracerAgent(WindowsPipesConfig config)
         {
@@ -111,7 +65,7 @@ namespace Datadog.Trace.TestHelpers
                     MetricsPort = requestedStatsDPort.Value;
                     _metricsListener = metricsListener;
 
-                    _metricsListenerTask = Task.Run(HandleMetricsHttpRequests);                  
+                    _metricsListenerTask = Task.Run(HandleMetricsHttpRequests);
                 }
                 else
                 {
@@ -373,30 +327,6 @@ namespace Datadog.Trace.TestHelpers
             }
         }
 
-        private void HandleStatsdRequests()
-        {
-            var endPoint = new IPEndPoint(IPAddress.Loopback, 0);
-
-            while (!_cancellationTokenSource.IsCancellationRequested)
-            {
-                try
-                {
-                    var buffer = _udpClient.Receive(ref endPoint);
-                    var stats = Encoding.UTF8.GetString(buffer);
-                    OnMetricsReceived(stats);
-                    StatsdRequests.Enqueue(stats);
-                }
-                catch (Exception) when (_cancellationTokenSource.IsCancellationRequested)
-                {
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Exceptions.Add(ex);
-                }
-            }
-        }
-
 #if NETCOREAPP
         private byte[] GetResponseBytes()
         {
@@ -492,76 +422,6 @@ namespace Datadog.Trace.TestHelpers
             }
         }
 
-        private void HandleUdsStats()
-        {
-            while (!_cancellationTokenSource.IsCancellationRequested)
-            {
-                try
-                {
-                    var bytesReceived = new byte[0x1000];
-                    // Connectionless protocol doesn't need Accept, Receive will block until we get something
-                    var byteCount = _udsStatsSocket.Receive(bytesReceived);
-                    var stats = Encoding.UTF8.GetString(bytesReceived, 0, byteCount);
-                    OnMetricsReceived(stats);
-                    StatsdRequests.Enqueue(stats);
-                }
-                catch (Exception) when (_cancellationTokenSource.IsCancellationRequested)
-                {
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    Exceptions.Add(ex);
-                }
-            }
-        }
-
-        private async Task HandleUdsTraces()
-        {
-            while (!_cancellationTokenSource.IsCancellationRequested)
-            {
-                try
-                {
-                    using var handler = await _udsTracesSocket.AcceptAsync();
-                    using var stream = new NetworkStream(handler);
-
-                    var request = await MockHttpParser.ReadRequest(stream);
-                    HandlePotentialTraces(request);
-                    await stream.WriteAsync(GetResponseBytes());
-
-                    // Wait for client to close the connection
-                    // If you're reading this and you know about sockets:
-                    // I have NO IDEA if that's the right way to wait until the response was properly sent
-                    // If you know a better way, by all means, please replace this code.
-                    var buffer = new byte[256];
-                    var status = handler.Receive(buffer);
-
-                    if (status > 0)
-                    {
-                        throw new InvalidOperationException($"Read an extra {status} bytes past the expected end of the stream. It might indicate a protocol error on the client side.");
-                    }
-                }
-                catch (SocketException ex)
-                {
-                    var message = ex.Message.ToLowerInvariant();
-                    if (message.Contains("interrupted"))
-                    {
-                        // Accept call is likely interrupted by a dispose
-                        // Swallow the exception and let the test finish
-                        return;
-                    }
-
-                    if (message.Contains("broken") || message.Contains("forcibly closed") || message.Contains("invalid argument"))
-                    {
-                        // The application was likely shut down
-                        // Swallow the exception and let the test finish
-                        return;
-                    }
-
-                    throw;
-                }
-            }
-        }
 #endif
 
         private void HandleHttpRequests()

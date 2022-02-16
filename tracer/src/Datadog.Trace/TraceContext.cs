@@ -38,11 +38,12 @@ namespace Datadog.Trace
         public IDatadogTracer Tracer { get; }
 
         /// <summary>
-        /// Gets the trace's sampling priority.
+        /// Gets or sets the trace's sampling priority.
         /// </summary>
         public int? SamplingPriority
         {
             get => _samplingPriority;
+            set => _samplingPriority = value;
         }
 
         private TimeSpan Elapsed => StopwatchHelpers.GetElapsed(Stopwatch.GetTimestamp() - _timestamp);

@@ -33,7 +33,7 @@ namespace Datadog.Trace.Telemetry
                 }
                 else
                 {
-                    // use the default intake. Use DD_SITE if provided, otherwise use default
+                    // use the default intake. Use SIGNALFX_SITE if provided, otherwise use default
                     var siteFromEnv = source.GetString(ConfigurationKeys.Site);
                     var ddSite = string.IsNullOrEmpty(siteFromEnv) ? "datadoghq.com" : siteFromEnv;
                     TelemetryUri = new Uri($"{TelemetryConstants.TelemetryIntakePrefix}.{ddSite}/");

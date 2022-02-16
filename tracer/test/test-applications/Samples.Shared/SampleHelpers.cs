@@ -12,7 +12,7 @@ namespace Samples
     public class SampleHelpers
     {
         private static readonly Type NativeMethodsType = Type.GetType("Datadog.Trace.ClrProfiler.NativeMethods, SignalFx.Tracing");
-        private static readonly Type TracerType = Type.GetType("Datadog.Trace.Tracer, Datadog.Trace");
+        private static readonly Type TracerType = Type.GetType("Datadog.Trace.Tracer, SignalFx.Tracing");
         private static readonly MethodInfo GetTracerInstance = TracerType.GetProperty("Instance").GetMethod;
         private static readonly MethodInfo StartActiveMethod = TracerType.GetMethod("StartActive", types: new[] { typeof(string) });
 

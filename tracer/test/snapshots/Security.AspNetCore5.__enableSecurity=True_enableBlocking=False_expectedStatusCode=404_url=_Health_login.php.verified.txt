@@ -26,7 +26,7 @@
       signalfx.tracing.library: dotnet-tracing,
       signalfx.tracing.version: x.y.z,
       span.kind: server,
-      _dd.appsec.json: {"triggers":[{"rule":{"id":"nfd-000-001","name":"Detect common directory discovery scans","tags":{"type":"security_scanner","category":"attack_attempt"}},"rule_matches":[{"operator":"match_regex","operator_value":"^404$","parameters":[{"address":"server.response.status","key_path":[],"value":"404","highlight":["404"]}]},{"operator":"phrase_match","operator_value":"","parameters":[{"address":"server.request.uri.raw","key_path":[],"value":"http://localhost:00000/Health/login.php","highlight":["/login.php"]}]}]}]},
+      _dd.appsec.json: {"triggers":[{"rule":{"id":"nfd-000-001","name":"Detect common directory discovery scans","tags":{"category":"attack_attempt","type":"security_scanner"}},"rule_matches":[{"operator":"match_regex","operator_value":"^404$","parameters":[{"address":"server.response.status","highlight":["404"],"key_path":[],"value":"404"}]},{"operator":"phrase_match","operator_value":"","parameters":[{"address":"server.request.uri.raw","highlight":["/login.php"],"key_path":[],"value":"http://localhost:00000/Health/login.php"}]}]}]},
       _dd.origin: appsec,
       _dd.runtime_family: dotnet
     },
@@ -64,7 +64,7 @@
       signalfx.tracing.library: dotnet-tracing,
       signalfx.tracing.version: x.y.z,
       span.kind: server,
-      _dd.appsec.json: {"triggers":[{"rule":{"id":"nfd-000-001","name":"Detect common directory discovery scans","tags":{"type":"security_scanner","category":"attack_attempt"}},"rule_matches":[{"operator":"match_regex","operator_value":"^404$","parameters":[{"address":"server.response.status","key_path":[],"value":"404","highlight":["404"]}]},{"operator":"phrase_match","operator_value":"","parameters":[{"address":"server.request.uri.raw","key_path":[],"value":"http://localhost:00000/Health/login.php","highlight":["/login.php"]}]}]}]},
+      _dd.appsec.json: {"triggers":[{"rule":{"id":"nfd-000-001","name":"Detect common directory discovery scans","tags":{"category":"attack_attempt","type":"security_scanner"}},"rule_matches":[{"operator":"match_regex","operator_value":"^404$","parameters":[{"address":"server.response.status","highlight":["404"],"key_path":[],"value":"404"}]},{"operator":"phrase_match","operator_value":"","parameters":[{"address":"server.request.uri.raw","highlight":["/login.php"],"key_path":[],"value":"http://localhost:00000/Health/login.php"}]}]}]},
       _dd.origin: appsec,
       _dd.runtime_family: dotnet
     },
@@ -102,7 +102,7 @@
       signalfx.tracing.library: dotnet-tracing,
       signalfx.tracing.version: x.y.z,
       span.kind: server,
-      _dd.appsec.json: {"triggers":[{"rule":{"id":"nfd-000-001","name":"Detect common directory discovery scans","tags":{"type":"security_scanner","category":"attack_attempt"}},"rule_matches":[{"operator":"match_regex","operator_value":"^404$","parameters":[{"address":"server.response.status","key_path":[],"value":"404","highlight":["404"]}]},{"operator":"phrase_match","operator_value":"","parameters":[{"address":"server.request.uri.raw","key_path":[],"value":"http://localhost:00000/Health/login.php","highlight":["/login.php"]}]}]}]},
+      _dd.appsec.json: {"triggers":[{"rule":{"id":"nfd-000-001","name":"Detect common directory discovery scans","tags":{"category":"attack_attempt","type":"security_scanner"}},"rule_matches":[{"operator":"match_regex","operator_value":"^404$","parameters":[{"address":"server.response.status","highlight":["404"],"key_path":[],"value":"404"}]},{"operator":"phrase_match","operator_value":"","parameters":[{"address":"server.request.uri.raw","highlight":["/login.php"],"key_path":[],"value":"http://localhost:00000/Health/login.php"}]}]}]},
       _dd.origin: appsec,
       _dd.runtime_family: dotnet
     },
@@ -140,7 +140,7 @@
       signalfx.tracing.library: dotnet-tracing,
       signalfx.tracing.version: x.y.z,
       span.kind: server,
-      _dd.appsec.json: {"triggers":[{"rule":{"id":"nfd-000-001","name":"Detect common directory discovery scans","tags":{"type":"security_scanner","category":"attack_attempt"}},"rule_matches":[{"operator":"match_regex","operator_value":"^404$","parameters":[{"address":"server.response.status","key_path":[],"value":"404","highlight":["404"]}]},{"operator":"phrase_match","operator_value":"","parameters":[{"address":"server.request.uri.raw","key_path":[],"value":"http://localhost:00000/Health/login.php","highlight":["/login.php"]}]}]}]},
+      _dd.appsec.json: {"triggers":[{"rule":{"id":"nfd-000-001","name":"Detect common directory discovery scans","tags":{"category":"attack_attempt","type":"security_scanner"}},"rule_matches":[{"operator":"match_regex","operator_value":"^404$","parameters":[{"address":"server.response.status","highlight":["404"],"key_path":[],"value":"404"}]},{"operator":"phrase_match","operator_value":"","parameters":[{"address":"server.request.uri.raw","highlight":["/login.php"],"key_path":[],"value":"http://localhost:00000/Health/login.php"}]}]}]},
       _dd.origin: appsec,
       _dd.runtime_family: dotnet
     },
@@ -178,7 +178,7 @@
       signalfx.tracing.library: dotnet-tracing,
       signalfx.tracing.version: x.y.z,
       span.kind: server,
-      _dd.appsec.json: {"triggers":[{"rule":{"id":"nfd-000-001","name":"Detect common directory discovery scans","tags":{"type":"security_scanner","category":"attack_attempt"}},"rule_matches":[{"operator":"match_regex","operator_value":"^404$","parameters":[{"address":"server.response.status","key_path":[],"value":"404","highlight":["404"]}]},{"operator":"phrase_match","operator_value":"","parameters":[{"address":"server.request.uri.raw","key_path":[],"value":"http://localhost:00000/Health/login.php","highlight":["/login.php"]}]}]}]},
+      _dd.appsec.json: {"triggers":[{"rule":{"id":"nfd-000-001","name":"Detect common directory discovery scans","tags":{"category":"attack_attempt","type":"security_scanner"}},"rule_matches":[{"operator":"match_regex","operator_value":"^404$","parameters":[{"address":"server.response.status","highlight":["404"],"key_path":[],"value":"404"}]},{"operator":"phrase_match","operator_value":"","parameters":[{"address":"server.request.uri.raw","highlight":["/login.php"],"key_path":[],"value":"http://localhost:00000/Health/login.php"}]}]}]},
       _dd.origin: appsec,
       _dd.runtime_family: dotnet
     },

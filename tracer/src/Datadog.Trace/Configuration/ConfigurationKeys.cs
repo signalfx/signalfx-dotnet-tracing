@@ -310,7 +310,7 @@ namespace Datadog.Trace.Configuration
         /// Configuration key for setting the API key, used by the Agent.
         /// This key is here for troubleshooting purposes.
         /// </summary>
-        public const string ApiKey = "DD_API_KEY";
+        public const string ApiKey = "SIGNALFX_API_KEY";
 
         /// <summary>
         /// Configuration key for the exporter to be used. The Tracer uses it to encode and
@@ -354,7 +354,7 @@ namespace Datadog.Trace.Configuration
         /// Configuration key for setting the default Datadog destination site.
         /// Defaults to "datadoghq.com".
         /// </summary>
-        public const string Site = "DD_SITE";
+        public const string Site = "SIGNALFX_SITE";
 
         /// <summary>
         /// Configuration key for overriding which URLs are skipped by the tracer.
@@ -487,13 +487,13 @@ namespace Datadog.Trace.Configuration
             /// Configuration key for enabling or disabling internal telemetry.
             /// Default value is <c>true</c> (enabled).
             /// </summary>
-            public const string Enabled = "DD_INSTRUMENTATION_TELEMETRY_ENABLED";
+            public const string Enabled = "SIGNALFX_INSTRUMENTATION_TELEMETRY_ENABLED";
 
             /// <summary>
             /// Configuration key for the telemetry URL where the Tracer sends telemetry.
             /// Ignored (and <see cref="ExporterSettings.AgentUri"/> is used instead) unless <see cref="ConfigurationKeys.ApiKey"/> is set.
             /// </summary>
-            public const string Uri = "DD_TRACE_TELEMETRY_URL";
+            public const string Uri = "SIGNALFX_TRACE_TELEMETRY_URL";
         }
     }
 }

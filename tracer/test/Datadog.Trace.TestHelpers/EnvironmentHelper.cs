@@ -475,16 +475,6 @@ namespace Datadog.Trace.TestHelpers
             TransportType = TestTransports.Tcp;
         }
 
-        public void EnableUnixDomainSockets()
-        {
-#if NETCOREAPP
-            TransportType = TestTransports.Uds;
-#else
-            // Unsupported
-            throw new NotSupportedException("UDS is not supported in non-netcore applications");
-#endif
-        }
-
         public MockTracerAgent GetMockAgent(bool useStatsD = false, int? fixedPort = null)
         {
             MockTracerAgent agent = null;

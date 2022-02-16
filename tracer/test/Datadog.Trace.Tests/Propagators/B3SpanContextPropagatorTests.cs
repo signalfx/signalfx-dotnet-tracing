@@ -53,7 +53,7 @@ namespace Datadog.Trace.Tests.Propagators
             var parentContext = new SpanContext(traceId, spanId, samplingPriority);
             var traceContext = new TraceContext(null)
             {
-                SamplingPriority = samplingPriority
+                SamplingPriority = (int?)samplingPriority
             };
 
             var context = new SpanContext(parentContext, traceContext, null);
@@ -71,7 +71,7 @@ namespace Datadog.Trace.Tests.Propagators
             Assert.NotNull(resultContext);
             Assert.Equal(context.SpanId, resultContext.SpanId);
             Assert.Equal(context.TraceId, resultContext.TraceId);
-            Assert.Equal(samplingPriority, resultContext.SamplingPriority);
+            Assert.Equal((int?)samplingPriority, resultContext.SamplingPriority);
         }
 
         [Theory]
@@ -80,7 +80,7 @@ namespace Datadog.Trace.Tests.Propagators
         {
             var traceId = TraceId.CreateFromString("52686470458518446744073709551615");
             const int spanId = 2147483646;
-            const SamplingPriority samplingPriority = SamplingPriority.AutoReject;
+            const int samplingPriority = SamplingPriorityValues.AutoReject;
 
             var context = new SpanContext(traceId, spanId, samplingPriority);
 
@@ -119,7 +119,7 @@ namespace Datadog.Trace.Tests.Propagators
         internal void Extract_InvalidSpanId(IHeadersCollection headers, string spanId)
         {
             var traceId = TraceId.CreateFromString("52686470458518446744073709551615");
-            const SamplingPriority samplingPriority = SamplingPriority.UserKeep;
+            const int samplingPriority = SamplingPriorityValues.UserKeep;
 
             InjectContext(
                 headers,

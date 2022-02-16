@@ -55,7 +55,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 }
 
                 PropagationTestHelpers.AssertPropagationEnabled(spans.First(), processResult);
-                
                 telemetry.AssertIntegrationEnabled(IntegrationId.WebRequest);
             }
         }
@@ -77,7 +76,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 Assert.Equal(0, spans.Count);
 
                 PropagationTestHelpers.AssertPropagationDisabled(processResult);
-                
                 telemetry.AssertIntegrationDisabled(IntegrationId.WebRequest);
             }
         }

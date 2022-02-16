@@ -20,7 +20,7 @@ namespace Datadog.Trace.Tests.Telemetry
         public TelemetrySettingsTests()
         {
             _tracerSettings = new(new TracerSettings());
-            _defaultAgentUrl = $"{_tracerSettings.Exporter.AgentUri}{TelemetryConstants.AgentTelemetryEndpoint}";
+            _defaultAgentUrl = "http://127.0.0.1:9411/api/v2/telemetry/proxy/";
             _defaultIntakeUrl = "https://instrumentation-telemetry-intake.datadoghq.com/";
         }
 

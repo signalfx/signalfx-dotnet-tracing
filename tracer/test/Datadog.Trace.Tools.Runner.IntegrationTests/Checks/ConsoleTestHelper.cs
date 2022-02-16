@@ -42,7 +42,8 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests.Checks
                 EnvironmentHelper.SetEnvironmentVariables(
                     agent,
                     aspNetCorePort: 1000,
-                    processStart.Environment);
+                    logsCollectorPort: null,
+                    environmentVariables: processStart.Environment);
             }
 
             foreach (var (key, value) in environmentVariables)

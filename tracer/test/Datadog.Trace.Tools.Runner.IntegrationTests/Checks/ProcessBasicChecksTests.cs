@@ -80,7 +80,7 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests.Checks
         {
             using var helper = await StartConsole(
                 enableProfiler: false,
-                ("DD_DOTNET_TRACER_HOME", "TheDirectoryDoesNotExist"),
+                ("SIGNALFX_DOTNET_TRACER_HOME", "TheDirectoryDoesNotExist"),
                 (CorProfilerKey, Guid.Empty.ToString("B")),
                 (CorEnableKey, "0"));
             var processInfo = ProcessInfo.GetProcessInfo(helper.Process.Id);
@@ -121,7 +121,7 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests.Checks
             console.Output.Should().NotContainAny(
                 ProfilerNotLoaded,
                 TracerNotLoaded,
-                "DD_DOTNET_TRACER_HOME",
+                "SIGNALFX_DOTNET_TRACER_HOME",
                 CorProfilerKey,
                 CorEnableKey);
         }

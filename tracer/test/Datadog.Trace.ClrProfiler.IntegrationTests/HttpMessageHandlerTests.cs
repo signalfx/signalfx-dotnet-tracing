@@ -85,7 +85,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 }
 
                 PropagationTestHelpers.AssertPropagationEnabled(spans.First(), processResult);
-                
+
                 using var scope = new AssertionScope();
                 telemetry.AssertIntegrationEnabled(IntegrationId.HttpMessageHandler);
                 // ignore for now auto enabled for simplicity
@@ -115,7 +115,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 Assert.Equal(0, spans.Count);
 
                 PropagationTestHelpers.AssertPropagationDisabled(processResult);
-                
+
                 using var scope = new AssertionScope();
                 // ignore auto enabled for simplicity
                 telemetry.AssertIntegrationDisabled(IntegrationId.HttpMessageHandler);

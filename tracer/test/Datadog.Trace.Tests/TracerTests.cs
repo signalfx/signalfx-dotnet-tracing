@@ -145,9 +145,9 @@ namespace Datadog.Trace.Tests
         {
             var traceId = TraceId.CreateFromInt(11);
             const ulong parentId = 7;
-            const int samplingPriority = SamplingPriorityValues.UserKeep;
+            const SamplingPriority samplingPriority = SamplingPriority.UserKeep;
 
-            var parent = new SpanContext(traceId, parentId, (SamplingPriority)samplingPriority);
+            var parent = new SpanContext(traceId, parentId, samplingPriority);
             var spanCreationSettings = new SpanCreationSettings() { Parent = parent };
             var child = (Scope)_tracer.StartActive("Child", spanCreationSettings);
             var childSpan = child.Span;
@@ -159,7 +159,7 @@ namespace Datadog.Trace.Tests
             Assert.Equal(parent, childSpan.Context.Parent);
             Assert.Equal(parentId, childSpan.Context.ParentId);
             Assert.NotNull(childSpan.Context.TraceContext);
-            Assert.Equal(samplingPriority, childSpan.Context.TraceContext.SamplingPriority);
+            Assert.Equal((int?)samplingPriority, childSpan.Context.TraceContext.SamplingPriority);
         }
 
         [Fact]

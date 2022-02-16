@@ -6,12 +6,9 @@
 // Modified by Splunk Inc.
 
 using System;
-<<<<<<< HEAD
-=======
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
->>>>>>> e66af4e21 ([AppSec] Rate Limiter for appsec traces (#2350))
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -19,6 +16,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Datadog.Trace.AppSec.EventModel;
 using Datadog.Trace.TestHelpers;
 using Datadog.Trace.Vendors.Newtonsoft.Json;
 using FluentAssertions;
@@ -110,17 +108,25 @@ namespace Datadog.Trace.Security.IntegrationTests
         {
             var spans = await SendRequestsAsync(agent, url, expectedSpans, expectedSpans * spansPerRequest, string.Empty);
 
-            settings.ModifySerialization(serializationSettings => serializationSettings.MemberConverter<MockSpan, Dictionary<string, string>>(sp => sp.Tags, (target, value) =>
+            VerifierSettings.MemberConverter<MockSpan, Dictionary<string, string>>(sp => sp.Tags, (target, value) =>
             {
-                if (target.Tags.TryGetValue(Tags.AppSecJson, out var appsecJson))
+                if (value.TryGetValue(Tags.AppSecJson, out var appsecJson))
                 {
                     var appSecJsonObj = JsonConvert.DeserializeObject<AppSecJson>(appsecJson);
                     var orderedAppSecJson = JsonConvert.SerializeObject(appSecJsonObj, _jsonSerializerSettingsOrderProperty);
-                    target.Tags[Tags.AppSecJson] = orderedAppSecJson;
+                    value[Tags.AppSecJson] = orderedAppSecJson;
                 }
 
-                return target.Tags;
-            }));
+                return value
+                   .Select(
+                        kvp => kvp.Key switch
+                        {
+                            Tags.SignalFxVersion => new KeyValuePair<string, string>(kvp.Key, "x.y.z"),
+                            _ => kvp
+                        })
+                   .OrderBy(x => x.Key)
+                   .ToDictionary(x => x.Key, x => x.Value);
+            });
             // Overriding the type name here as we have multiple test classes in the file
             // Ensures that we get nice file nesting in Solution Explorer
             await Verifier.Verify(spans, settings)
@@ -292,7 +298,7 @@ namespace Datadog.Trace.Security.IntegrationTests
             Output.WriteLine($"Starting Application: {sampleAppPath}");
             var executable = EnvironmentHelper.IsCoreClr() ? EnvironmentHelper.GetSampleExecutionSource() : sampleAppPath;
             var args = EnvironmentHelper.IsCoreClr() ? $"{sampleAppPath} {arguments ?? string.Empty}" : arguments;
-            EnvironmentHelper.CustomEnvironmentVariables.Add("DD_APPSEC_TRACE_RATE_LIMIT", traceRateLimit?.ToString());
+            EnvironmentHelper.CustomEnvironmentVariables.Add("SIGNALFX_APPSEC_TRACE_RATE_LIMIT", traceRateLimit?.ToString());
 
             _process = ProfilerHelper.StartProcessWithProfiler(
                 executable,

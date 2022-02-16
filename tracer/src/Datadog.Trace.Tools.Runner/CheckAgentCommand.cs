@@ -32,11 +32,11 @@ namespace Datadog.Trace.Tools.Runner
                 configuration = new ExporterSettings { AgentUri = new Uri(settings.Url) };
 
                 // TODO: Remove when the logic has been moved to the ImmutableExporterSettings constructor
-                if (settings.Url.StartsWith("unix://"))
-                {
-                    configuration.TracesTransport = TracesTransportType.UnixDomainSocket;
-                    configuration.TracesUnixDomainSocketPath = configuration.AgentUri.PathAndQuery;
-                }
+                // if (settings.Url.StartsWith("unix://"))
+                // {
+                //     configuration.TracesTransport = TracesTransportType.UnixDomainSocket;
+                //     configuration.TracesUnixDomainSocketPath = configuration.AgentUri.PathAndQuery;
+                // }
             }
 
             var result = await AgentConnectivityCheck.Run(new ImmutableExporterSettings(configuration)).ConfigureAwait(false);
