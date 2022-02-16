@@ -54,7 +54,7 @@ jobs:
             2.1.x
             3.1.x
             5.0.x
-            6.0.x
+            6.0.100
       - run: tracer\build.cmd Clean BuildTracerHome PackageTracerHome
         shell: cmd
       - name: Upload Windows MSI
