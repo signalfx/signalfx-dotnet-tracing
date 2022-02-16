@@ -44,7 +44,6 @@ namespace Datadog.Trace.AlwaysOnProfiler
             var samples = new List<ThreadSample>();
             ulong batchTimestampNanoseconds = 0;
 
-            // FIXME actually have this go somewhere in the future
             while (_position < _length)
             {
                 var operationCode = _buffer[_position];
@@ -107,7 +106,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         managedId,
                         nativeId);
 
-                    // FIXME: here should go Thread state, equivalent of"    java.lang.Thread.State: TIMED_WAITING (sleeping)"
+                    // TODO Splunk: APMI-2565 here should go Thread state, equivalent of"    java.lang.Thread.State: TIMED_WAITING (sleeping)"
                     stackTraceBuilder.Append("\n");
 
                     while (code != 0)
@@ -162,7 +161,12 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 }
                 else
                 {
-                    _position = _length + 1; // FIXME improve error handling here
+                    _position = _length + 1;
+
+                    if (IsLogLevelDebugEnabled)
+                    {
+                        Log.Debug("Not expected operation code while parsing thread stack trace: '{0}'. Operation will be ignored.", operationCode);
+                    }
                 }
             }
 
