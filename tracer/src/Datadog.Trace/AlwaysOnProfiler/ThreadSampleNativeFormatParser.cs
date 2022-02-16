@@ -44,7 +44,6 @@ namespace Datadog.Trace.AlwaysOnProfiler
             var samples = new List<ThreadSample>();
             ulong batchTimestampNanoseconds = 0;
 
-            // FIXME actually have this go somewhere in the future
             while (_position < _length)
             {
                 var operationCode = _buffer[_position];
