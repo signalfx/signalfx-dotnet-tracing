@@ -72,7 +72,7 @@ jobs:
           2.1.x
           3.1.x
           5.0.x
-          6.0.x
+          6.0.100
     - name: Install CMake 3.19.8
       if: ${{ runner.os == 'Linux' }}
       run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh -o cmakeinstall.sh && chmod +x cmakeinstall.sh && sudo ./cmakeinstall.sh --prefix=/usr/local --exclude-subdir
@@ -127,7 +127,7 @@ jobs:
           2.1.x
           3.1.x
           5.0.x
-          6.0.x
+          6.0.100
     - name: Build Docker image
       run: |
         docker build \
@@ -170,7 +170,7 @@ jobs:
           2.1.x
           3.1.x
           5.0.x
-          6.0.x
+          6.0.100
     - run: ./tracer/build.cmd BuildTracerHome BuildAndRunManagedUnitTests
     - uses: actions/upload-artifact@v2
       with:
@@ -195,7 +195,7 @@ jobs:
           2.1.x
           3.1.x
           5.0.x
-          6.0.x
+          6.0.100
     - name: Build Docker image
       run: |
         docker build \
@@ -238,7 +238,7 @@ jobs:
           2.1.x
           3.1.x
           5.0.x
-          6.0.x
+          6.0.100
     - name: Install CMake 3.19.8
       if: ${{ runner.os == 'Linux' }}
       run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh -o cmakeinstall.sh && chmod +x cmakeinstall.sh && sudo ./cmakeinstall.sh --prefix=/usr/local --exclude-subdir
@@ -260,7 +260,7 @@ jobs:
           2.1.x
           3.1.x
           5.0.x
-          6.0.x
+          6.0.100
     - name: Build Docker image
       run: |
         docker build \
@@ -306,7 +306,7 @@ jobs:
           2.1.x
           3.1.x
           5.0.x
-          6.0.x
+          6.0.100
     # Cosmos is _way_ to flaky at the moment. Try enabling again at a later time
     # - name: Start CosmosDB Emulator
     #   if: ${{ matrix.target == 'BuildAndRunWindowsIntegrationTests' }}
@@ -345,7 +345,7 @@ jobs:
           2.1.x
           3.1.x
           5.0.x
-          6.0.x
+          6.0.100
     - name: Build Docker image
       run: |
         docker build \
@@ -398,7 +398,7 @@ jobs:
           2.1.x
           3.1.x
           5.0.x
-          6.0.x
+          6.0.100
     - run: ./tracer/build.cmd BuildTracerHome PackageTracerHome BuildWindowsIntegrationTests -Framework ${{ matrix.framework }}
     - name: docker-compose build IIS containers
       run: docker-compose build --build-arg dotnet_tracer_msi=.$relativeArtifacts/{{ matrix.platform }}/en-us/*.msi --build-arg ENABLE_32_BIT=${{ env.enable32bit }} IntegrationTests.IIS
