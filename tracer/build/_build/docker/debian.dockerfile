@@ -1,5 +1,5 @@
 # We used a fixed, older version of debian for linking reasons
-FROM mcr.microsoft.com/dotnet/runtime-deps:5.0-buster-slim as base
+FROM mcr.microsoft.com/dotnet/runtime-deps:5.0.14-buster-slim as base
 ARG DOTNETSDK_VERSION
 
 # Based on https://github.com/dotnet/dotnet-docker/blob/34c81d5f9c8d56b36cc89da61702ccecbf00f249/src/sdk/6.0/bullseye-slim/amd64/Dockerfile
@@ -19,20 +19,20 @@ ENV \
 RUN apt-get update \
     && apt-get -y upgrade \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --fix-missing \
-        git=1:2.30.2-1 \
-        procps=2:3.3.17-5 \
-        wget=1.21-1+deb11u1 \
-        curl=7.74.0-1.3+deb11u1 \
-        cmake=3.18.4-2+deb11u1 \
-        make=4.3-4.1 \
-        llvm=1:11.0-51+nmu5 \
-        clang=1:11.0-51+nmu5 \
-        gcc=4:10.2.1-1 \
-        build-essential=12.9 \
-        rpm=4.16.1.2+dfsg1-3 \
-        ruby=1:2.7+2 \
-        ruby-dev=1:2.7+2 \
-        rubygems=3.2.5-2 \
+        git=1:2.20.1-2+deb10u3 \
+        procps=2:3.3.15-2 \
+        wget=1.20.1-1.1 \
+        curl=7.64.0-4+deb10u2 \
+        cmake=3.13.4-1 \
+        make=4.2.1-1.2 \
+        llvm=1:7.0-47 \
+        clang=1:7.0-47 \
+        gcc=4:8.3.0-1 \
+        build-essential=12.6 \
+        rpm=4.14.2.1+dfsg1-1 \
+        ruby=1:2.5.1 \
+        ruby-dev=1:2.5.1 \
+        rubygems-integration=1.11+deb10u1 \
     && gem install --no-document fpm --version 1.14.1 \
     && rm -rf /var/lib/apt/lists/*
 
