@@ -60,7 +60,7 @@ namespace Datadog.Trace.Tools.Runner.Tests
             var process = new ProcessInfo(
                 "CallDatadogConfigJson.exe",
                 1,
-                new Dictionary<string, string>() { { "SIGNALFX_TRACE_AGENT_URL", "http://environment/" } },
+                new Dictionary<string, string>() { { "SIGNALFX_ENDPOINT_URL", "http://environment/" } },
                 mainModule: Path.Combine(Environment.CurrentDirectory, "noAppConfig.exe"),
                 GetModulesForNetFramework());
 
