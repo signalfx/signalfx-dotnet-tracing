@@ -54,26 +54,23 @@ namespace Datadog.Trace.Security.IntegrationTests
             };
         }
 
-        public async Task<MockTracerAgent> RunOnSelfHosted(bool enableSecurity, bool enableBlocking, string externalRulesFile = null, int? traceRateLimit = null)
+        public Task<MockTracerAgent> RunOnSelfHosted(bool enableSecurity, bool enableBlocking, string externalRulesFile = null, int? traceRateLimit = null)
         {
             if (_agent == null)
             {
                 var agentPort = TcpPortProvider.GetOpenPort();
-                _httpPort = TcpPortProvider.GetOpenPort();
-
                 _agent = new MockTracerAgent(agentPort);
             }
 
-            await StartSample(
+            StartSample(
                 _agent,
                 arguments: null,
-                aspNetCorePort: _httpPort,
                 enableSecurity: enableSecurity,
                 enableBlocking: enableBlocking,
                 externalRulesFile: externalRulesFile,
                 traceRateLimit: traceRateLimit);
 
-            return _agent;
+            return Task.FromResult(_agent);
         }
 
         public void Dispose()
@@ -270,10 +267,9 @@ namespace Datadog.Trace.Security.IntegrationTests
             return spans;
         }
 
-        private async Task StartSample(
+        private void StartSample(
             MockTracerAgent agent,
             string arguments,
-            int? aspNetCorePort = null,
             string packageVersion = "",
             int? logsCollectorPort = null,
             string framework = "",
@@ -285,8 +281,7 @@ namespace Datadog.Trace.Security.IntegrationTests
         {
             var sampleAppPath = EnvironmentHelper.GetSampleApplicationPath(packageVersion, framework);
             // get path to sample app that the profiler will attach to
-            const int mstimeout = 5000;
-            var message = "Now listening on:";
+            const int mstimeout = 15_000;
 
             if (!File.Exists(sampleAppPath))
             {
@@ -300,13 +295,14 @@ namespace Datadog.Trace.Security.IntegrationTests
             var args = EnvironmentHelper.IsCoreClr() ? $"{sampleAppPath} {arguments ?? string.Empty}" : arguments;
             EnvironmentHelper.CustomEnvironmentVariables.Add("SIGNALFX_APPSEC_TRACE_RATE_LIMIT", traceRateLimit?.ToString());
 
+            int? aspNetCorePort = default;
             _process = ProfilerHelper.StartProcessWithProfiler(
                 executable,
                 EnvironmentHelper,
                 agent,
                 args,
                 logsCollectorPort: logsCollectorPort,
-                aspNetCorePort: aspNetCorePort.GetValueOrDefault(5000),
+                aspNetCorePort: 0,
                 enableSecurity: enableSecurity,
                 enableBlocking: enableBlocking,
                 externalRulesFile: externalRulesFile);
@@ -317,8 +313,10 @@ namespace Datadog.Trace.Security.IntegrationTests
             {
                 if (args.Data != null)
                 {
-                    if (args.Data.Contains(message))
+                    if (args.Data.Contains("Now listening on:"))
                     {
+                        var splitIndex = args.Data.LastIndexOf(':');
+                        aspNetCorePort = int.Parse(args.Data.Substring(splitIndex + 1));
                         wh.Set();
                     }
 
@@ -338,46 +336,13 @@ namespace Datadog.Trace.Security.IntegrationTests
             _process.BeginErrorReadLine();
 
             wh.WaitOne(mstimeout);
-
-            var maxMillisecondsToWait = 15_000;
-            var intervalMilliseconds = 500;
-            var intervals = maxMillisecondsToWait / intervalMilliseconds;
-            var serverReady = false;
-            var responseText = string.Empty;
-
-            // wait for server to be ready to receive requests
-            while (intervals-- > 0)
-            {
-                HttpStatusCode statusCode = default;
-
-                try
-                {
-                    (statusCode, responseText) = await SubmitRequest(path);
-                }
-                catch (Exception ex)
-                {
-                    Output.WriteLine("SubmitRequest failed during warmup with error " + ex);
-                }
-
-                serverReady = statusCode == HttpStatusCode.OK;
-                if (!serverReady)
-                {
-                    Output.WriteLine(responseText);
-                }
-
-                if (serverReady)
-                {
-                    break;
-                }
-
-                Thread.Sleep(intervalMilliseconds);
-            }
-
-            if (!serverReady)
+            if (!aspNetCorePort.HasValue)
             {
                 _process.Kill();
-                throw new Exception($"Couldn't verify the application is ready to receive requests: {responseText}");
+                throw new Exception("Unable to determine port application is listening on");
             }
+
+            _httpPort = aspNetCorePort.Value;
         }
     }
 }
