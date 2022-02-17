@@ -30,9 +30,7 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests.Checks
 
         public static IEnumerable<object[]> TestData => new List<object[]>
         {
-            new object[] { new[] { ("SIGNALFX_ENDPOINT_URL", "http://fakeurl:7777/") } },
-            // new object[] { new[] { ("SIGNALFX_AGENT_HOST", "fakeurl"), ("SIGNALFX_TRACE_AGENT_PORT", "7777") } },
-            // new object[] { new[] { ("SIGNALFX_AGENT_HOST", "wrong"), ("SIGNALFX_TRACE_AGENT_PORT", "1111"), ("SIGNALFX_TRACE_AGENT_URL", "http://fakeurl:7777/") } },
+            new object[] { new[] { ("SIGNALFX_ENDPOINT_URL", "http://fakeurl:7777/") } }
         };
 
         [Theory]
