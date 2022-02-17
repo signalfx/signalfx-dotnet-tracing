@@ -32,7 +32,7 @@ namespace Datadog.Configuration
 
             var mutableConfig = new MutableProductConfiguration(config);
 
-            if (TryGetEnvironmentVariable("DD_PROFILING_UPLOAD_PERIOD", out string envProfilesExportDefaultInterval))
+            if (TryGetEnvironmentVariable("SIGNALFX_PROFILING_UPLOAD_PERIOD", out string envProfilesExportDefaultInterval))
             {
                 if (int.TryParse(envProfilesExportDefaultInterval, out var profilesExportDefaultInterval))
                 {
@@ -42,14 +42,14 @@ namespace Datadog.Configuration
                 {
                     Log.Error(
                         Log.WithCallInfo(LogComponentMoniker),
-                        "The environment variable \"DD_PROFILING_UPLOAD_PERIOD\" is specified (\"",
+                        "The environment variable \"SIGNALFX_PROFILING_UPLOAD_PERIOD\" is specified (\"",
                         envProfilesExportDefaultInterval,
                         "\") but cannot be parsed as an int. Using original value: ",
                         mutableConfig.ProfilesExport_DefaultInterval);
                 }
             }
 
-            if (TryGetEnvironmentVariable("DD_PROFILING_OUTPUT_DIR", out string directory))
+            if (TryGetEnvironmentVariable("SIGNALFX_PROFILING_OUTPUT_DIR", out string directory))
             {
                 mutableConfig.ProfilesExport_LocalFiles_Directory = directory;
             }
@@ -59,17 +59,17 @@ namespace Datadog.Configuration
             // At this point we just extract all of the info that is contained in the environment variables.
             // If both, URL and Host-Port-Etc are specified, we will extract them all and leave the
             // priorization logic of what to use to the config consumer.
-            if (TryGetEnvironmentVariable("DD_TRACE_AGENT_URL", out string ddTraceAgentUrl))
+            if (TryGetEnvironmentVariable("SIGNALFX_TRACE_AGENT_URL", out string ddTraceAgentUrl))
             {
                 mutableConfig.ProfilesIngestionEndpoint_Url = ddTraceAgentUrl;
             }
 
-            if (TryGetEnvironmentVariable("DD_AGENT_HOST", out string ddTraceAgentHost))
+            if (TryGetEnvironmentVariable("SIGNALFX_AGENT_HOST", out string ddTraceAgentHost))
             {
                 mutableConfig.ProfilesIngestionEndpoint_Host = ddTraceAgentHost;
             }
 
-            if (TryGetEnvironmentVariable("DD_TRACE_AGENT_PORT", out string szTraceAgentPort))
+            if (TryGetEnvironmentVariable("SIGNALFX_TRACE_AGENT_PORT", out string szTraceAgentPort))
             {
                 if (int.TryParse(szTraceAgentPort, out int port))
                 {
@@ -79,44 +79,44 @@ namespace Datadog.Configuration
                 {
                     Log.Error(
                         Log.WithCallInfo(LogComponentMoniker),
-                        "The environment variable \"DD_TRACE_AGENT_PORT\" is specified (",
+                        "The environment variable \"SIGNALFX_TRACE_AGENT_PORT\" is specified (",
                         szTraceAgentPort,
                         ") but cannot be parsed as a number and will be ignored.");
                 }
             }
 
             // Api Key is not required for agent-based ingestion scnarios; it IS required for agent-less ingestion.
-            if (TryGetEnvironmentVariable("DD_API_KEY", out string ddApiKey))
+            if (TryGetEnvironmentVariable("SIGNALFX_API_KEY", out string ddApiKey))
             {
                 mutableConfig.ProfilesIngestionEndpoint_DatadogApiKey = ddApiKey;
             }
 
-            if (TryGetEnvironmentVariable("DD_HOSTNAME", out string ddHostName))
+            if (TryGetEnvironmentVariable("SIGNALFX_HOSTNAME", out string ddHostName))
             {
                 mutableConfig.DDDataTags_Host = ddHostName;
             }
 
-            if (TryGetEnvironmentVariable("DD_SERVICE", out string ddServiceName))
+            if (TryGetEnvironmentVariable("SIGNALFX_SERVICE", out string ddServiceName))
             {
                 mutableConfig.DDDataTags_Service = ddServiceName;
             }
 
-            if (TryGetEnvironmentVariable("DD_ENV", out string ddEnvironment))
+            if (TryGetEnvironmentVariable("SIGNALFX_ENV", out string ddEnvironment))
             {
                 mutableConfig.DDDataTags_Env = ddEnvironment;
             }
 
-            if (TryGetEnvironmentVariable("DD_VERSION", out string ddServiceVersion))
+            if (TryGetEnvironmentVariable("SIGNALFX_VERSION", out string ddServiceVersion))
             {
                 mutableConfig.DDDataTags_Version = ddServiceVersion;
             }
 
-            if (TryGetEnvironmentVariable("DD_TAGS", out string ddTagsStr))
+            if (TryGetEnvironmentVariable("SIGNALFX_TAGS", out string ddTagsStr))
             {
                 mutableConfig.DDDataTags_CustomTags = ParseAndMergeDdTags(mutableConfig.DDDataTags_CustomTags, ddTagsStr);
             }
 
-            if (TryGetEnvironmentVariable("DD_TRACE_DEBUG", out string envIsTraceDebugEnabled))
+            if (TryGetEnvironmentVariable("SIGNALFX_TRACE_DEBUG", out string envIsTraceDebugEnabled))
             {
                 const bool isTraceDebugEnabled = true;
                 if (
@@ -131,7 +131,7 @@ namespace Datadog.Configuration
                 {
                     Log.Error(
                         Log.WithCallInfo(LogComponentMoniker),
-                        "The environment variable \"DD_TRACE_DEBUG\" is specified (",
+                        "The environment variable \"SIGNALFX_TRACE_DEBUG\" is specified (",
                         envIsTraceDebugEnabled,
                         $") but cannot be parsed as a boolean. Using {isTraceDebugEnabled.ToString()} as default");
 
@@ -139,12 +139,12 @@ namespace Datadog.Configuration
                 }
             }
 
-            if (TryGetEnvironmentVariable("DD_PROFILING_LOG_DIR", out string ddTraceLogDirectory))
+            if (TryGetEnvironmentVariable("SIGNALFX_PROFILING_LOG_DIR", out string ddTraceLogDirectory))
             {
                 mutableConfig.Log_PreferredLogFileDirectory = ddTraceLogDirectory;
             }
 
-            if (TryGetEnvironmentVariable("DD_INTERNAL_OPERATIONAL_METRICS_ENABLED", out string envIsEnabled))
+            if (TryGetEnvironmentVariable("SIGNALFX_INTERNAL_OPERATIONAL_METRICS_ENABLED", out string envIsEnabled))
             {
                 const bool isOperationalMetricsEnabled = false;
                 if (ConfigurationProviderUtils.TryParseBooleanSettingStr(envIsEnabled, isOperationalMetricsEnabled, out bool isEnabled))
@@ -155,7 +155,7 @@ namespace Datadog.Configuration
                 {
                     Log.Error(
                         Log.WithCallInfo(LogComponentMoniker),
-                        "The environment variable \"DD_INTERNAL_OPERATIONAL_METRICS_ENABLED\" is specified (",
+                        "The environment variable \"SIGNALFX_INTERNAL_OPERATIONAL_METRICS_ENABLED\" is specified (",
                         envIsEnabled,
                         $") but cannot be parsed as a boolean. Using {isOperationalMetricsEnabled.ToString()} as default");
 
@@ -163,7 +163,7 @@ namespace Datadog.Configuration
                 }
             }
 
-            if (TryGetEnvironmentVariable("DD_PROFILING_FRAMES_NATIVE_ENABLED", out string envFramesNativeIsEnabled))
+            if (TryGetEnvironmentVariable("SIGNALFX_PROFILING_FRAMES_NATIVE_ENABLED", out string envFramesNativeIsEnabled))
             {
                 const bool isFramesNativeEnabled = false;
                 if (ConfigurationProviderUtils.TryParseBooleanSettingStr(envFramesNativeIsEnabled, isFramesNativeEnabled, out bool isEnabled))
@@ -174,7 +174,7 @@ namespace Datadog.Configuration
                 {
                     Log.Error(
                         Log.WithCallInfo(LogComponentMoniker),
-                        "The environment variable \"DD_PROFILING_FRAMES_NATIVE_ENABLED\" is specified (",
+                        "The environment variable \"SIGNALFX_PROFILING_FRAMES_NATIVE_ENABLED\" is specified (",
                         envFramesNativeIsEnabled,
                         $") but cannot be parsed as a boolean. Using isFramesNativeEnabled.ToString() as default");
 
@@ -188,7 +188,7 @@ namespace Datadog.Configuration
         private static IEnumerable<KeyValuePair<string, string>> ParseAndMergeDdTags(IEnumerable<KeyValuePair<string, string>> existingTags, string ddTagsStr)
         {
             // This method will not be called if ddTagsStr is null.
-            // This means that "DD_TAGS" was specified with some value, so the resulting merged tag set should never be null.
+            // This means that "SIGNALFX_TAGS" was specified with some value, so the resulting merged tag set should never be null.
             string[] parsedNewTags = ddTagsStr.Split(DDTagsListSeparator, StringSplitOptions.RemoveEmptyEntries);
             if (parsedNewTags == null && parsedNewTags.Length == 0)
             {
@@ -244,7 +244,7 @@ namespace Datadog.Configuration
                 return splitNewTags;
             }
 
-            // We first include all existing tags EXCEPT if they are included in the new set that came in via the DD_TAGS env var.
+            // We first include all existing tags EXCEPT if they are included in the new set that came in via the SIGNALFX_TAGS env var.
             // Existing tags that are also in the new set are considered replaced.
             // We then include all the new tags.
             // Note that a tag key does not need to be unique.

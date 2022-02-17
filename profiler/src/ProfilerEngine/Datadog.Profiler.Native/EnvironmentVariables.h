@@ -8,12 +8,12 @@
 class EnvironmentVariables final
 {
 public:
-    inline static const shared::WSTRING ProfilingEnabled = WStr("DD_PROFILING_ENABLED");
-    inline static const shared::WSTRING DebugLogEnabled = WStr("DD_TRACE_DEBUG");
-    inline static const shared::WSTRING LogPath = WStr("DD_PROFILING_LOG_PATH");
-    inline static const shared::WSTRING LogDirectory = WStr("DD_PROFILING_LOG_DIR");
-    inline static const shared::WSTRING OperationalMetricsEnabled = WStr("DD_INTERNAL_OPERATIONAL_METRICS_ENABLED");
-    inline static const shared::WSTRING Version = WStr("DD_VERSION");
-    inline static const shared::WSTRING ServiceName = WStr("DD_SERVICE");
-    inline static const shared::WSTRING Environment = WStr("DD_ENV");
+    inline static const shared::WSTRING ProfilingEnabled = WStr("SIGNALFX_PROFILING_ENABLED");
+    inline static const shared::WSTRING DebugLogEnabled = WStr("SIGNALFX_TRACE_DEBUG");
+    inline static const shared::WSTRING LogPath = WStr("SIGNALFX_PROFILING_LOG_PATH");
+    inline static const shared::WSTRING LogDirectory = WStr("SIGNALFX_PROFILING_LOG_DIR");
+    inline static const shared::WSTRING OperationalMetricsEnabled = WStr("SIGNALFX_INTERNAL_OPERATIONAL_METRICS_ENABLED");
+    inline static const shared::WSTRING Version = WStr("SIGNALFX_VERSION");
+    inline static const shared::WSTRING ServiceName = WStr("SIGNALFX_SERVICE");
+    inline static const shared::WSTRING Environment = WStr("SIGNALFX_ENV");
 };

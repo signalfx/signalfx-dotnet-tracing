@@ -294,8 +294,8 @@ namespace Datadog.Profiler.SmokeTests
 
         private string GetTestOutputPath()
         {
-            // DD_TESTING_OUPUT_DIR is set by the CI
-            string baseTestOutputDir = Environment.GetEnvironmentVariable("DD_TESTING_OUPUT_DIR") ?? Path.GetTempPath();
+            // SIGNALFX_TESTING_OUPUT_DIR is set by the CI
+            string baseTestOutputDir = Environment.GetEnvironmentVariable("SIGNALFX_TESTING_OUPUT_DIR") ?? Path.GetTempPath();
             string testOutputPath = Path.Combine(baseTestOutputDir, $"SmokeTest_{_appName}", _framework);
 
             DeleteIfNeeded(testOutputPath);

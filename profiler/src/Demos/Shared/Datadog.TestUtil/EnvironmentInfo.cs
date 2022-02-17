@@ -90,12 +90,12 @@ namespace Datadog.TestUtil
             str.AppendLine("        COR_PROFILER_PATH_32:                         " + (Environment.GetEnvironmentVariable("COR_PROFILER_PATH_32") ?? "null"));
             str.AppendLine("        COR_PROFILER_PATH:                            " + (Environment.GetEnvironmentVariable("COR_PROFILER_PATH") ?? "null"));
             str.AppendLine();
-            str.AppendLine("        DD_DOTNET_PROFILER_HOME:                      " + (Environment.GetEnvironmentVariable("DD_DOTNET_PROFILER_HOME") ?? "null"));
-            str.AppendLine("        DD_PROFILING_ENABLED:                         " + (Environment.GetEnvironmentVariable("DD_PROFILING_ENABLED") ?? "null"));
+            str.AppendLine("        SIGNALFX_DOTNET_PROFILER_HOME:                      " + (Environment.GetEnvironmentVariable("SIGNALFX_DOTNET_PROFILER_HOME") ?? "null"));
+            str.AppendLine("        SIGNALFX_PROFILING_ENABLED:                         " + (Environment.GetEnvironmentVariable("SIGNALFX_PROFILING_ENABLED") ?? "null"));
             str.AppendLine();
-            str.AppendLine("        DD_LOADER_REWRITE_MODULE_INITIALIZER_ENABLED: " + (Environment.GetEnvironmentVariable("DD_LOADER_REWRITE_MODULE_INITIALIZER_ENABLED") ?? "null"));
-            str.AppendLine("        DD_LOADER_REWRITE_MODULE_ENTRYPOINT_ENABLED:  " + (Environment.GetEnvironmentVariable("DD_LOADER_REWRITE_MODULE_ENTRYPOINT_ENABLED") ?? "null"));
-            str.AppendLine("        DD_LOADER_REWRITE_MSCORLIB_ENABLED:           " + (Environment.GetEnvironmentVariable("DD_LOADER_REWRITE_MSCORLIB_ENABLED") ?? "null"));
+            str.AppendLine("        SIGNALFX_LOADER_REWRITE_MODULE_INITIALIZER_ENABLED: " + (Environment.GetEnvironmentVariable("SIGNALFX_LOADER_REWRITE_MODULE_INITIALIZER_ENABLED") ?? "null"));
+            str.AppendLine("        SIGNALFX_LOADER_REWRITE_MODULE_ENTRYPOINT_ENABLED:  " + (Environment.GetEnvironmentVariable("SIGNALFX_LOADER_REWRITE_MODULE_ENTRYPOINT_ENABLED") ?? "null"));
+            str.AppendLine("        SIGNALFX_LOADER_REWRITE_MSCORLIB_ENABLED:           " + (Environment.GetEnvironmentVariable("SIGNALFX_LOADER_REWRITE_MSCORLIB_ENABLED") ?? "null"));
             str.AppendLine();
             str.AppendLine("        COMPlus_EnableDiagnostics:                    " + (Environment.GetEnvironmentVariable("COMPlus_EnableDiagnostics") ?? "null"));
             str.AppendLine();

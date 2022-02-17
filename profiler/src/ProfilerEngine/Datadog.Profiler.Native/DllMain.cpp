@@ -46,11 +46,11 @@ bool CheckProfilingEnabledEnvironmentVariable(void)
 {
     // If we are in this function, then the user has already configured profiling by setting CORECLR_ENABLE_PROFILING to 1
     // and by correctly pointing the CORECLR_PROFILER_XXX variables.
-    // However, we still want to respect the DD_PROFILING_ENABLED variable for:
+    // However, we still want to respect the SIGNALFX_PROFILING_ENABLED variable for:
     //  - consistency with other profiling products;
     //  - supporting scenarios where CORECLR_PROFILER_XXX point to the shared native loader, where some of the suit's products
     //    are enabled, but profiling is explicitly disabled;
-    //  - supporting a scenario where CORECLR_PROFILER_XXX is set machine-wide and DD_PROFILING_ENABLED is set per service.
+    //  - supporting a scenario where CORECLR_PROFILER_XXX is set machine-wide and SIGNALFX_PROFILING_ENABLED is set per service.
     const bool IsProfilingEnabledDefault = false;
     shared::WSTRING isProfilingEnabledConfigStr = shared::GetEnvironmentValue(EnvironmentVariables::ProfilingEnabled);
 

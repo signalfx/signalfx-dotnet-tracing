@@ -23,7 +23,7 @@ SET COR_
 SET CORECLR_
 
 ECHO\
-SET DD_
+SET SIGNALFX_
 
 ECHO\
 ECHO You can now run a .NET application and view your Profiles and Traces in the Datadog UI.

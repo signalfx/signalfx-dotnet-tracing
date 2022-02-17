@@ -16,10 +16,10 @@
 
         "COMPlus_EnableDiagnostics": "1",
 
-        "DD_PROFILING_ENABLED": "1",
-        "DD_DOTNET_PROFILER_HOME": "$(BuildOutputRoot)\\bin\\$(Configuration)-AnyCPU\\src\\ProfilerEngine\\Datadog.Profiler.Managed\\",
+        "SIGNALFX_PROFILING_ENABLED": "1",
+        "SIGNALFX_DOTNET_PROFILER_HOME": "$(BuildOutputRoot)\\bin\\$(Configuration)-AnyCPU\\src\\ProfilerEngine\\Datadog.Profiler.Managed\\",
 
-        "DD_INTERNAL_USE_DEVELOPMENT_CONFIGURATION": "true"
+        "SIGNALFX_INTERNAL_USE_DEVELOPMENT_CONFIGURATION": "true"
       },
       "nativeDebugging": true
     }

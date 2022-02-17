@@ -10,7 +10,7 @@ namespace Website_AspNet
         /// </summary>
         public static int GetParallelism(int defaultValue)
         {
-            return GetVariable("DD_APPTEST_FIBO_PARALLELISM", defaultValue);
+            return GetVariable("SIGNALFX_APPTEST_FIBO_PARALLELISM", defaultValue);
         }
 
         /// <summary>
@@ -18,7 +18,7 @@ namespace Website_AspNet
         /// </summary>
         public static int GetFibonacciInput(int defaultValue)
         {
-            return GetVariable("DD_APPTEST_FIBO_INPUT", defaultValue);
+            return GetVariable("SIGNALFX_APPTEST_FIBO_INPUT", defaultValue);
         }
 
         /// <summary>

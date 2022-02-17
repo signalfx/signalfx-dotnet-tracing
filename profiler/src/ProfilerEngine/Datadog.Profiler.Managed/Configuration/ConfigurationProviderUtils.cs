@@ -40,7 +40,7 @@ namespace Datadog.Configuration
         ///   - In some application servers, the Tracer considers whether the app makes GET or POST calls to downstream dependencies;
         ///   - Users may override the service tag programmatically on a per span basis.
         ///   - ...
-        /// Note that if the DD_SERVICE environment variable is set, then the value returned by this method will probably
+        /// Note that if the SIGNALFX_SERVICE environment variable is set, then the value returned by this method will probably
         /// be overwritten anyway (<see cref="EnvironmentVariablesConfigurationProvider" />).
         /// </summary>
         public static string GetDdServiceFallback()

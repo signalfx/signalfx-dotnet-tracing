@@ -22,9 +22,9 @@
         "COR_PROFILER_PATH_64": "$(BuildOutputRoot)\\bin\\$(Configuration)-x64\\src\\ProfilerEngine\\Datadog.Profiler.Native.Windows\\Datadog.AutoInstrumentation.Profiler.Native.x64.dll",
         "ASPNETCORE_ENVIRONMENT": "Development",
         "COR_PROFILER": "{BD1A650D-AC5D-4896-B64F-D6FA25D6B26A}",
-        "DD_PROFILING_ENABLED": "1",
-        "DD_DOTNET_PROFILER_HOME": "$(BuildOutputRoot)\\bin\\$(Configuration)-AnyCPU\\src\\ProfilerEngine\\Datadog.Profiler.Managed\\",
-        "DD_INTERNAL_USE_DEVELOPMENT_CONFIGURATION": "true"
+        "SIGNALFX_PROFILING_ENABLED": "1",
+        "SIGNALFX_DOTNET_PROFILER_HOME": "$(BuildOutputRoot)\\bin\\$(Configuration)-AnyCPU\\src\\ProfilerEngine\\Datadog.Profiler.Managed\\",
+        "SIGNALFX_INTERNAL_USE_DEVELOPMENT_CONFIGURATION": "true"
       },
       "nativeDebugging": true
     },
@@ -42,9 +42,9 @@
         "COR_PROFILER_PATH_64": "$(BuildOutputRoot)\\bin\\$(Configuration)-x64\\src\\ProfilerEngine\\Datadog.Profiler.Native.Windows\\Datadog.AutoInstrumentation.Profiler.Native.x64.dll",
         "ASPNETCORE_ENVIRONMENT": "Development",
         "COR_PROFILER": "{BD1A650D-AC5D-4896-B64F-D6FA25D6B26A}",
-        "DD_PROFILING_ENABLED": "1",
-        "DD_DOTNET_PROFILER_HOME": "$(BuildOutputRoot)\\bin\\$(Configuration)-AnyCPU\\src\\ProfilerEngine\\Datadog.Profiler.Managed\\",
-        "DD_INTERNAL_USE_DEVELOPMENT_CONFIGURATION": "true"
+        "SIGNALFX_PROFILING_ENABLED": "1",
+        "SIGNALFX_DOTNET_PROFILER_HOME": "$(BuildOutputRoot)\\bin\\$(Configuration)-AnyCPU\\src\\ProfilerEngine\\Datadog.Profiler.Managed\\",
+        "SIGNALFX_INTERNAL_USE_DEVELOPMENT_CONFIGURATION": "true"
       },
       "nativeDebugging": true
     }

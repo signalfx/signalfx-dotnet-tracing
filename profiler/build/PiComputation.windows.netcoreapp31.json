@@ -13,8 +13,8 @@
     {
       "name": "Profiler",
       "environmentVariables": {
-        "DD_CLR_ENABLE_NGEN": "true",
-        "DD_PROFILING_ENABLED": "1"
+        "SIGNALFX_CLR_ENABLE_NGEN": "true",
+        "SIGNALFX_PROFILING_ENABLED": "1"
       }
     }
   ],
@@ -29,8 +29,8 @@
     "CORECLR_ENABLE_PROFILING": "1",
     "CORECLR_PROFILER": "{BD1A650D-AC5D-4896-B64F-D6FA25D6B26A}",
     "CORECLR_PROFILER_PATH_64": "$(CWD)\\..\\..\\DDProf-Deploy\\Datadog.AutoInstrumentation.Profiler.Native.x64.dll",
-    "DD_DOTNET_PROFILER_HOME": "$(CWD)\\..\\..\\DDProf-Deploy\\",
-    "DD_PROFILING_METRICS_FILEPATH": "metrics.json"
+    "SIGNALFX_DOTNET_PROFILER_HOME": "$(CWD)\\..\\..\\DDProf-Deploy\\",
+    "SIGNALFX_PROFILING_METRICS_FILEPATH": "metrics.json"
   },
   "tags": {
     "runtime.architecture": "x64",

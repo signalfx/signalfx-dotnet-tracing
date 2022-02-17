@@ -16,7 +16,7 @@ namespace Datadog.Configuration
 
         public static IProductConfiguration ApplyReleaseOrDevDefaults(this IProductConfiguration config)
         {
-            const string EnvVarName = "DD_INTERNAL_USE_DEVELOPMENT_CONFIGURATION";
+            const string EnvVarName = "SIGNALFX_INTERNAL_USE_DEVELOPMENT_CONFIGURATION";
             const bool ddInternalUseDevelopmentConfigurationValDefault = false;
 
             string ddInternalUseDevelopmentConfiguration = Environment.GetEnvironmentVariable(EnvVarName);

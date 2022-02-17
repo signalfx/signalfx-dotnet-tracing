@@ -60,10 +60,10 @@ namespace Datadog.RuntimeMetrics
             writer.Write(metrics);
         }
 
-        // Use the path given by DD_PROFILING_METRICS_FILEPATH as a suffix and prefix it with "Managed_"
+        // Use the path given by SIGNALFX_PROFILING_METRICS_FILEPATH as a suffix and prefix it with "Managed_"
         private static string GetMetricsFilePath()
         {
-            var filePath = Environment.GetEnvironmentVariable("DD_PROFILING_METRICS_FILEPATH");
+            var filePath = Environment.GetEnvironmentVariable("SIGNALFX_PROFILING_METRICS_FILEPATH");
             if (string.IsNullOrEmpty(filePath))
             {
                 return null;

@@ -58,7 +58,7 @@ namespace Datadog.Demos.Computer01
             else
             {
                 // collect CLR metrics that will be saved into a json file
-                // if DD_PROFILING_METRICS_FILEPATH is set
+                // if SIGNALFX_PROFILING_METRICS_FILEPATH is set
                 using (var collector = new MetricsCollector())
                 {
                     if (iterations > 0)

@@ -64,30 +64,30 @@ namespace Datadog.Profiler.IntegrationTests.Helpers
                 environmentVariables["COR_PROFILER_PATH"] = profilerPath;
             }
 
-            environmentVariables["DD_PROFILING_ENABLED"] = "1";
+            environmentVariables["SIGNALFX_PROFILING_ENABLED"] = "1";
 
-            environmentVariables["DD_TRACE_AGENT_PORT"] = agentPort.ToString();
+            environmentVariables["SIGNALFX_TRACE_AGENT_PORT"] = agentPort.ToString();
 
             if (!string.IsNullOrWhiteSpace(testLogDir))
             {
-                environmentVariables["DD_PROFILING_LOG_DIR"] = testLogDir;
+                environmentVariables["SIGNALFX_PROFILING_LOG_DIR"] = testLogDir;
             }
 
             if (!string.IsNullOrWhiteSpace(testPprofDir))
             {
-                environmentVariables["DD_PROFILING_OUTPUT_DIR"] = testPprofDir;
+                environmentVariables["SIGNALFX_PROFILING_OUTPUT_DIR"] = testPprofDir;
             }
 
-            environmentVariables["DD_PROFILING_UPLOAD_PERIOD"] = profilingExportIntervalInSeconds.ToString();
-            environmentVariables["DD_TRACE_DEBUG"] = "1";
-            environmentVariables["DD_DOTNET_PROFILER_HOME"] = GetProfilerHomeDirectory();
+            environmentVariables["SIGNALFX_PROFILING_UPLOAD_PERIOD"] = profilingExportIntervalInSeconds.ToString();
+            environmentVariables["SIGNALFX_TRACE_DEBUG"] = "1";
+            environmentVariables["SIGNALFX_DOTNET_PROFILER_HOME"] = GetProfilerHomeDirectory();
 
             if (serviceName != null)
             {
                 serviceName = serviceName.Trim();
                 if (serviceName.Length > 0)
                 {
-                    environmentVariables["DD_SERVICE"] = serviceName;
+                    environmentVariables["SIGNALFX_SERVICE"] = serviceName;
                 }
             }
         }
@@ -120,8 +120,8 @@ namespace Datadog.Profiler.IntegrationTests.Helpers
 
         private static string GetProfilerHomeDirectory()
         {
-            // DD_TESTING_PROFILER_FOLDER is set by the CI
-            return Environment.GetEnvironmentVariable("DD_TESTING_PROFILER_FOLDER") ?? GetDeployDir();
+            // SIGNALFX_TESTING_PROFILER_FOLDER is set by the CI
+            return Environment.GetEnvironmentVariable("SIGNALFX_TESTING_PROFILER_FOLDER") ?? GetDeployDir();
         }
 
         private static string GetProfilerPath()

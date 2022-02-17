@@ -21,7 +21,7 @@ namespace Website_AspNet
 
         private void StartInvoker()
         {
-            var enableInvoker = Environment.GetEnvironmentVariable("DD_APPTEST_INVOKER_ENABLED");
+            var enableInvoker = Environment.GetEnvironmentVariable("SIGNALFX_APPTEST_INVOKER_ENABLED");
             if (bool.TryParse(enableInvoker, out var isEnable) && isEnable)
             {
                 _selfInvoker = new SelfInvoker();

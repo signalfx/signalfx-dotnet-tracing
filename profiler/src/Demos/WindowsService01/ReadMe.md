@@ -122,7 +122,7 @@ CORECLR_PROFILER={BD1A650D-AC5D-4896-B64F-D6FA25D6B26A}
 CORECLR_PROFILER_PATH_64=c:\00\Code\GitHubDD\DD-DotNet\_build\DDProf-Deploy\Datadog.AutoInstrumentation.Profiler.Native.x64.dll
 CORECLR_PROFILER_PATH_32=c:\00\Code\GitHubDD\DD-DotNet\_build\DDProf-Deploy\Datadog.AutoInstrumentation.Profiler.Native.x86.dll
 
-DD_API_KEY=<!YOUR API KEY!>
+SIGNALFX_API_KEY=<!YOUR API KEY!>
 ```
 
 Make sure to use a valid API key. If you do not, the profiler will run, but no data will arrive at the backend.
