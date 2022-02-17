@@ -4,6 +4,7 @@
 // </copyright>
 
 using System;
+using Datadog.Trace.Tagging;
 
 namespace Datadog.Trace
 {
@@ -14,6 +15,8 @@ namespace Datadog.Trace
         int? SamplingPriority { get; }
 
         Span RootSpan { get; }
+
+        TraceTagCollection Tags { get; }
 
         void AddSpan(Span span);
 
