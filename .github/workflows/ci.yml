@@ -41,7 +41,7 @@ on:
 
 env:
   buildConfiguration: Release
-  dotnetSdkVersion: 6.0.102
+  dotnetSdkVersion: 6.0.200
   relativeTracerHome: /tracer/src/bin/windows-tracer-home
   relativeArtifacts: /tracer/src/bin/artifacts
   binDir: ${{ github.workspace }}/tracer/src/bin
