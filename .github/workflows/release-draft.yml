@@ -15,7 +15,7 @@ jobs:
     timeout-minutes: 30
     env:
       baseImage: ${{ matrix.baseImage }}
-      dotnetSdkVersion: 6.0.102
+      dotnetSdkVersion: 6.0.200
     steps:
     - uses: actions/checkout@v2
     - name: Build Docker image
