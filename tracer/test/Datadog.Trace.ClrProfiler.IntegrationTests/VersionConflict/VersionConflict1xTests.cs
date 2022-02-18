@@ -20,7 +20,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.VersionConflict
         {
         }
 
-        [Fact(Skip = "VersionConflict tests are not ready to work without official next ver release")]
+        [SkippableFact(Skip = "VersionConflict tests are not ready to work without official next ver release")]
         public void SubmitTraces()
         {
             // 1 manual span + 1 http span

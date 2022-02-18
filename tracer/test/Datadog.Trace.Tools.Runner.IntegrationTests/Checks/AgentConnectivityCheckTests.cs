@@ -35,7 +35,7 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests.Checks
             new object[] { new[] { ("SIGNALFX_ENDPOINT_URL", "http://fakeurl:7777/") } }
         };
 
-        [Theory]
+        [SkippableTheory]
         [MemberData(nameof(TestData))]
         public async Task DetectAgentUrl((string, string)[] environmentVariables)
         {
@@ -52,7 +52,7 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests.Checks
             console.Output.Should().Contain(DetectedAgentUrlFormat("http://fakeurl:7777/"));
         }
 
-        [Fact]
+        [SkippableFact]
         public async Task DetectTransportHttp()
         {
             using var agent = new MockTracerAgent(TcpPortProvider.GetOpenPort());
@@ -72,7 +72,7 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests.Checks
             console.Output.Should().Contain(ConnectToEndpointFormat(url, "HTTP"));
         }
 
-        [Fact]
+        [SkippableFact]
         public async Task NoAgent()
         {
             using var console = ConsoleHelper.Redirect();
@@ -86,7 +86,7 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests.Checks
             console.Output.Should().Contain(ErrorDetectingAgent("http://fakeurl/", string.Empty));
         }
 
-        [Fact]
+        [SkippableFact]
         public async Task FaultyAgent()
         {
             using var console = ConsoleHelper.Redirect();
@@ -102,7 +102,7 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests.Checks
             console.Output.Should().Contain(WrongStatusCodeFormat(HttpStatusCode.InternalServerError));
         }
 
-        [Fact]
+        [SkippableFact]
         public async Task DetectVersion()
         {
             const string expectedVersion = "7.66.55";
@@ -121,7 +121,7 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests.Checks
             console.Output.Should().Contain(DetectedAgentVersionFormat(expectedVersion));
         }
 
-        [Fact]
+        [SkippableFact]
         public async Task NoVersion()
         {
             using var console = ConsoleHelper.Redirect();

@@ -20,7 +20,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetServiceVersion("1.0.0");
         }
 
-        [Fact]
+        [SkippableFact]
         public void RunChecksProject()
         {
             SetEnvironmentVariable("SIGNALFX_TRACE_DEBUG", "1");

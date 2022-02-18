@@ -15,7 +15,7 @@ namespace Datadog.Trace.OpenTracing.IntegrationTests
 {
     public class OpenTracingSendTracesToAgent
     {
-        [Fact]
+        [SkippableFact]
         public void MinimalSpan()
         {
             int agentPort = TcpPortProvider.GetOpenPort();
@@ -47,7 +47,7 @@ namespace Datadog.Trace.OpenTracing.IntegrationTests
             }
         }
 
-        [Fact]
+        [SkippableFact]
         public void CustomServiceName()
         {
             int agentPort = TcpPortProvider.GetOpenPort();
@@ -81,7 +81,7 @@ namespace Datadog.Trace.OpenTracing.IntegrationTests
             }
         }
 
-        [Fact]
+        [SkippableFact]
         public void Utf8Everywhere()
         {
             int agentPort = TcpPortProvider.GetOpenPort();
