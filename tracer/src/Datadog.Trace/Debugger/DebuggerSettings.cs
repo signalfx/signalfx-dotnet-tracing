@@ -12,6 +12,8 @@ namespace Datadog.Trace.Debugger;
 
 internal class DebuggerSettings
 {
+    private const int DefaultMaxDepthToSerialize = 3;
+    private const int DefaultSerializationTimeThreshold = 150;
     private const int DefaultConfigurationsPollIntervalSeconds = 1;
     private const string DefaultUri = "http://localhost:8126";
     private const string DefaultProbeConfigurationBackendPath = "api/v2/debugger-cache/configurations";
@@ -64,6 +66,10 @@ internal class DebuggerSettings
         Environment = configurationSource?.GetString(ConfigurationKeys.Environment);
 
         Enabled = configurationSource?.GetBool(ConfigurationKeys.Debugger.DebuggerEnabled) ?? false;
+
+        MaxDepthToSerialize = configurationSource?.GetInt32(ConfigurationKeys.Debugger.MaxDepthToSerialize) ?? DefaultMaxDepthToSerialize;
+
+        SerializationTimeThreshold = configurationSource?.GetInt32(ConfigurationKeys.Debugger.SerializationTimeThreshold) ?? DefaultSerializationTimeThreshold;
     }
 
     public ProbeMode ProbeMode { get; set; }
@@ -83,6 +89,10 @@ internal class DebuggerSettings
     public string Environment { get; set; }
 
     public bool Enabled { get; }
+
+    public int SerializationTimeThreshold { get; }
+
+    public int MaxDepthToSerialize { get; }
 
     public static DebuggerSettings FromDefaultSources()
     {
