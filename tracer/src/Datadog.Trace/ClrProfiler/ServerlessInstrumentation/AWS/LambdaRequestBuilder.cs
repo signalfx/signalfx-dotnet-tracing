@@ -17,7 +17,7 @@ namespace Datadog.Trace.ClrProfiler.ServerlessInstrumentation.AWS
         private const string StartInvocationPath = "/lambda/start-invocation";
         private const string TraceContextPath = "/trace-context";
         private const string TraceContextUri = "http://127.0.0.1:8124";
-        private const string TraceContextUriEnvName = "_DD_TRACE_CONTEXT_ENDPOINT";
+        private const string TraceContextUriEnvName = "_SIGNALFX_TRACE_CONTEXT_ENDPOINT";
 
         internal LambdaRequestBuilder()
         {

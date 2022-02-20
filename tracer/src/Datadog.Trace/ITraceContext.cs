@@ -11,7 +11,7 @@ namespace Datadog.Trace
     {
         DateTimeOffset UtcNow { get; }
 
-        int? SamplingPriority { get; set; }
+        int? SamplingPriority { get; }
 
         Span RootSpan { get; }
 

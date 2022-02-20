@@ -145,9 +145,11 @@ namespace Datadog.Trace.Tests
         {
             var traceId = TraceId.CreateFromInt(11);
             const ulong parentId = 7;
-            const SamplingPriority samplingPriority = SamplingPriority.UserKeep;
 
-            var parent = new SpanContext(traceId, parentId, samplingPriority);
+            // ML: todo: replace with int as in upstream
+            const int samplingPriority = SamplingPriorityValues.UserKeep;
+
+            var parent = new SpanContext(traceId, parentId, (SamplingPriority)samplingPriority);
             var spanCreationSettings = new SpanCreationSettings() { Parent = parent };
             var child = (Scope)_tracer.StartActive("Child", spanCreationSettings);
             var childSpan = child.Span;

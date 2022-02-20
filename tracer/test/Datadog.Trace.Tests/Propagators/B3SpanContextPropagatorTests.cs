@@ -51,10 +51,8 @@ namespace Datadog.Trace.Tests.Propagators
             const SamplingPriority samplingPriority = SamplingPriority.UserKeep;
 
             var parentContext = new SpanContext(traceId, spanId, samplingPriority);
-            var traceContext = new TraceContext(null)
-            {
-                SamplingPriority = (int?)samplingPriority
-            };
+            var traceContext = new TraceContext(null);
+            traceContext.SetSamplingPriority((int?)samplingPriority);
 
             var context = new SpanContext(parentContext, traceContext, null);
 

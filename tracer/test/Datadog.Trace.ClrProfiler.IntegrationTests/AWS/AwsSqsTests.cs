@@ -134,7 +134,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AWS
                     .ExcludingMissingMembers()
                     .ExcludingDefaultSpanProperties()
                     .AssertMetricsMatchExcludingKeys("_dd.tracer_kr", "_sampling_priority_v1")
-                    .AssertTagsMatchAndSpecifiedTagsPresent("deployment.environment", "aws.requestId", "aws.queue.url", "runtime-id"));
+                    .AssertTagsMatchAndSpecifiedTagsPresent("deployment.environment", "aws.requestId", "aws.queue.url"));
                 telemetry.AssertIntegrationEnabled(IntegrationId.AwsSqs);
             }
         }
