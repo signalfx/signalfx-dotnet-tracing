@@ -100,7 +100,7 @@ namespace Datadog.Trace.Tests.Telemetry
             var settings = new TracerSettings() { ServiceName = ServiceName, Environment = env, ServiceVersion = serviceVersion };
             var aas = new AzureAppServices(new Dictionary<string, string>
             {
-                { ConfigurationKeys.ApiKey, "SomeValue" },
+                { ConfigurationKeys.SignalFxAccessToken, "SomeValue" },
                 { AzureAppServices.AzureAppServicesContextKey, "1" },
                 { AzureAppServices.SiteExtensionVersionKey, "1.5.0" },
                 { AzureAppServices.FunctionsExtensionVersionKey, "~3" },
@@ -130,7 +130,7 @@ namespace Datadog.Trace.Tests.Telemetry
             var aas = new AzureAppServices(new Dictionary<string, string>
             {
                 // Without a SIGNALFX_API_KEY, AAS does not consider it safe to trace
-                { ConfigurationKeys.ApiKey, "SomeValue" },
+                // { ConfigurationKeys.SignalFxAccessToken, "SomeValue" },
                 { AzureAppServices.AzureAppServicesContextKey, "1" },
                 { AzureAppServices.SiteExtensionVersionKey, "1.5.0" },
                 { AzureAppServices.FunctionsExtensionVersionKey, "~3" },
