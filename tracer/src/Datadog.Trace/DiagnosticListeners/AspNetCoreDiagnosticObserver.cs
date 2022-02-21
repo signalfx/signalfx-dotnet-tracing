@@ -855,10 +855,10 @@ namespace Datadog.Trace.DiagnosticListeners
                 // If we had an unhandled exception, the status code will already be updated correctly,
                 // but if the span was manually marked as an error, we still need to record the status code
                 var isMissingHttpStatusCode = !span.HasHttpStatusCode();
+                var httpRequest = arg.DuckCast<HttpRequestInStopStruct>();
+                HttpContext httpContext = httpRequest.HttpContext;
                 if (string.IsNullOrEmpty(span.ResourceName) || isMissingHttpStatusCode)
                 {
-                    var httpRequest = arg.DuckCast<HttpRequestInStopStruct>();
-                    HttpContext httpContext = httpRequest.HttpContext;
                     if (string.IsNullOrEmpty(span.ResourceName))
                     {
                         span.ResourceName = AspNetCoreRequestHandler.GetDefaultResourceName(httpContext.Request);
@@ -867,10 +867,10 @@ namespace Datadog.Trace.DiagnosticListeners
                     if (isMissingHttpStatusCode)
                     {
                         span.SetHttpStatusCode(httpContext.Response.StatusCode, isServer: true, tracer.Settings);
-                        span.SetHeaderTags(new HeadersCollectionAdapter(httpContext.Response.Headers), tracer.Settings.HeaderTags, defaultTagPrefix: PropagationExtensions.HttpResponseHeadersTagPrefix);
                     }
                 }
 
+                span.SetHeaderTags(new HeadersCollectionAdapter(httpContext.Response.Headers), tracer.Settings.HeaderTags, defaultTagPrefix: PropagationExtensions.HttpResponseHeadersTagPrefix);
                 scope.Dispose();
             }
         }
