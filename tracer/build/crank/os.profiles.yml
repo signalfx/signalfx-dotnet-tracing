@@ -62,9 +62,9 @@ profiles:
           - "{{ linuxEndpoint }}"
         environmentVariables:
           COR_PROFILER: "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"
-          COR_PROFILER_PATH: "{{ linuxProfilerPath }}/tracer-home-linux/Datadog.Trace.ClrProfiler.Native.so"
+          COR_PROFILER_PATH: "{{ linuxProfilerPath }}/tracer-home-linux/SignalFx.Tracing.ClrProfiler.Native.so"
           CORECLR_PROFILER: "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"
-          CORECLR_PROFILER_PATH: "{{ linuxProfilerPath }}/tracer-home-linux/Datadog.Trace.ClrProfiler.Native.so"
+          CORECLR_PROFILER_PATH: "{{ linuxProfilerPath }}/tracer-home-linux/SignalFx.Tracing.ClrProfiler.Native.so"
           SIGNALFX_DOTNET_TRACER_HOME: "{{ linuxProfilerPath }}/tracer-home-linux"
           SIGNALFX_AGENT_HOST: "{{ controllerIp }}"
           SIGNALFX_TRACE_LOGGING_RATE: 6
