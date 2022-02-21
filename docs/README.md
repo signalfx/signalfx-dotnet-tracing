@@ -68,7 +68,34 @@ On Linux, after the installation, you can optionally create the log directory:
 /opt/signalfx/createLogPath.sh
 ```
 
-### Instrument a .NET application on Windows
+## Instrument a .NET application on Windows
+
+Install latest SignalFX .NET agent
+
+```powershell
+# signalfx-dotnet-tracing github repository API
+$api = "https://api.github.com/repos/signalfx/signalfx-dotnet-tracing/releases/latest"
+
+# determine OS architecture
+$os_bits = (Get-WmiObject Win32_OperatingSystem).OSArchitecture
+$os_arch = (&{If($os_bits -eq "64-bit") {"x64"} Else {"x86"}})
+
+# File pattern to search for
+$pattern = "signalfx-dotnet-tracing-*-$os_arch.msi"
+
+# Find latest MSI to download
+$download = (Invoke-WebRequest $api | ConvertFrom-Json).assets | where { $_.name -like $pattern } | Select-Object -Property browser_download_url,name
+$msi = Join-Path $env:temp $download.name
+
+# Download installer MSI to Temp
+Invoke-WebRequest -Uri $download.browser_download_url -OutFile $msi
+
+# Install downloaded MSI
+Start-Process msiexec.exe -Wait -ArgumentList "/I $msi /quiet"
+
+# Cleanup
+Remove-Item $msi                                                
+```
 
 Before running the application, set the following environment variables:
 
@@ -93,7 +120,7 @@ $Env:SIGNALFX_ENV = "production"                                  # Set the envi
 dotnet run                                                        # Run your application                                                     
 ```
 
-### Instrument a .NET application on Linux
+## Instrument a .NET application on Linux
 
 Before running the application, set the following environment variables:
 
