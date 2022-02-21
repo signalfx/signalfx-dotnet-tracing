@@ -70,7 +70,7 @@ On Linux, after the installation, you can optionally create the log directory:
 
 ## Instrument a .NET application on Windows
 
-Install latest SignalFX .NET agent
+Install latest SignalFx Instrumentation for .NET
 
 ```powershell
 # signalfx-dotnet-tracing github repository API
