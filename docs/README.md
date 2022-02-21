@@ -77,14 +77,14 @@ Install latest SignalFx Instrumentation for .NET
 $api = "https://api.github.com/repos/signalfx/signalfx-dotnet-tracing/releases/latest"
 
 # determine OS architecture
-$os_bits = (Get-WmiObject Win32_OperatingSystem).OSArchitecture
+$os_bits = (Get-CimInstance Win32_OperatingSystem).OSArchitecture
 $os_arch = (&{If($os_bits -eq "64-bit") {"x64"} Else {"x86"}})
 
 # File pattern to search for
 $pattern = "signalfx-dotnet-tracing-*-$os_arch.msi"
 
 # Find latest MSI to download
-$download = (Invoke-WebRequest $api | ConvertFrom-Json).assets | where { $_.name -like $pattern } | Select-Object -Property browser_download_url,name
+$download = (Invoke-WebRequest $api | ConvertFrom-Json).assets | Where-Object { $_.name -like $pattern } | Select-Object -Property browser_download_url,name
 $msi = Join-Path $env:temp $download.name
 
 # Download installer MSI to Temp
@@ -94,7 +94,7 @@ Invoke-WebRequest -Uri $download.browser_download_url -OutFile $msi
 Start-Process msiexec.exe -Wait -ArgumentList "/I $msi /quiet"
 
 # Cleanup
-Remove-Item $msi                                                
+Remove-Item $msi                                           
 ```
 
 Before running the application, set the following environment variables:
