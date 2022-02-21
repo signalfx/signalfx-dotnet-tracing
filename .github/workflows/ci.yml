@@ -69,9 +69,9 @@ jobs:
     - uses: actions/setup-dotnet@v1.9.0
       with:
         dotnet-version: | 
-          2.1.x
-          3.1.x
-          5.0.x
+          2.1.818
+          3.1.416
+          5.0.405
           6.0.200
     - name: Install CMake 3.19.8
       if: ${{ runner.os == 'Linux' }}
@@ -124,9 +124,9 @@ jobs:
     - uses: actions/setup-dotnet@v1.9.0
       with:
         dotnet-version: | 
-          2.1.x
-          3.1.x
-          5.0.x
+          2.1.818
+          3.1.416
+          5.0.405
           6.0.200
     - name: Build Docker image
       run: |
@@ -167,9 +167,9 @@ jobs:
     - uses: actions/setup-dotnet@v1.9.0
       with:
         dotnet-version: | 
-          2.1.x
-          3.1.x
-          5.0.x
+          2.1.818
+          3.1.416
+          5.0.405
           6.0.200
     - run: ./tracer/build.cmd BuildTracerHome BuildAndRunManagedUnitTests
     - uses: actions/upload-artifact@v2.3.1
@@ -192,9 +192,9 @@ jobs:
     - uses: actions/setup-dotnet@v1.9.0
       with:
         dotnet-version: | 
-          2.1.x
-          3.1.x
-          5.0.x
+          2.1.818
+          3.1.416
+          5.0.405
           6.0.200
     - name: Build Docker image
       run: |
@@ -235,9 +235,9 @@ jobs:
     - uses: actions/setup-dotnet@v1.9.0
       with:
         dotnet-version: | 
-          2.1.x
-          3.1.x
-          5.0.x
+          2.1.818
+          3.1.416
+          5.0.405
           6.0.200
     - name: Install CMake 3.19.8
       if: ${{ runner.os == 'Linux' }}
@@ -257,9 +257,9 @@ jobs:
     - uses: actions/setup-dotnet@v1.9.0
       with:
         dotnet-version: | 
-          2.1.x
-          3.1.x
-          5.0.x
+          2.1.818
+          3.1.416
+          5.0.405
           6.0.200
     - name: Build Docker image
       run: |
@@ -303,9 +303,9 @@ jobs:
     - uses: actions/setup-dotnet@v1.9.0
       with:
         dotnet-version: | 
-          2.1.x
-          3.1.x
-          5.0.x
+          2.1.818
+          3.1.416
+          5.0.405
           6.0.200
     # Cosmos is _way_ to flaky at the moment. Try enabling again at a later time
     # - name: Start CosmosDB Emulator
@@ -342,9 +342,9 @@ jobs:
     - uses: actions/setup-dotnet@v1.9.0
       with:
         dotnet-version: | 
-          2.1.x
-          3.1.x
-          5.0.x
+          2.1.818
+          3.1.416
+          5.0.405
           6.0.200
     - name: Build Docker image
       run: |
@@ -395,9 +395,9 @@ jobs:
     - uses: actions/setup-dotnet@v1.9.0
       with:
         dotnet-version: | 
-          2.1.x
-          3.1.x
-          5.0.x
+          2.1.818
+          3.1.416
+          5.0.405
           6.0.200
     - run: ./tracer/build.cmd BuildTracerHome PackageTracerHome BuildWindowsIntegrationTests -Framework ${{ matrix.framework }}
     - name: docker-compose build IIS containers

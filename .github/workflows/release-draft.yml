@@ -51,9 +51,9 @@ jobs:
       - uses: actions/setup-dotnet@v1.9.0
         with:
           dotnet-version: | 
-            2.1.x
-            3.1.x
-            5.0.x
+            2.1.818
+            3.1.416
+            5.0.405
             6.0.200
       - run: tracer\build.cmd Clean BuildTracerHome PackageTracerHome
         shell: cmd
