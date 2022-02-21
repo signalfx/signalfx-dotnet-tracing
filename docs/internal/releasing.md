@@ -1,5 +1,8 @@
 # Release Process
 
+1. Verify if [wizard](https://app.signalfx.com/#/integrations/dotnet-tracing/description)
+needs any adjustments. Contact @signalfx/gdi-docs team if needed.
+
 1. Use nuke target to update version:
 
     - `nuke UpdateVersion --version {new-version-here}`
@@ -31,10 +34,9 @@
 1. Monitor and check the [`Release draft` GitHub workflow](https://github.com/signalfx/signalfx-dotnet-tracing/actions/workflows/release-draft.yml)
    for any errors.
 
-1. Verify if [wizard](https://app.signalfx.com/#/integrations/dotnet-tracing/description)
-needs any adjustments. Contact @signalfx/gdi-docs team if needed.
+1. Double-check and test the GitHub and GitLab release artifacts.
 
-1. Double-check and test the GitHub release artifacts.
+1. Add GitLab release build artifacts to the GitHub release.
 
 1. Update the GitHub release description using the [CHANGELOG.md](../CHANGELOG.md)
    and publish the release.

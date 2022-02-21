@@ -6,41 +6,6 @@ on:
     - 'v*'
 
 jobs:
-  linux_build:
-    name: Linux Build
-    runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        baseImage: [alpine, debian]
-    timeout-minutes: 30
-    env:
-      baseImage: ${{ matrix.baseImage }}
-      dotnetSdkVersion: 6.0.200
-    steps:
-    - uses: actions/checkout@v2.4.0
-    - name: Build Docker image
-      run: |
-        docker build \
-          --build-arg DOTNETSDK_VERSION=${dotnetSdkVersion} \
-          --tag dd-trace-dotnet/${baseImage}-builder \
-          --target builder \
-          --file "./tracer/build/_build/docker/${baseImage}.dockerfile" \
-          "./tracer/build/_build"
-    - name: Run 'Clean BuildTracerHome ZipTracerHome' in Docker
-      run: |
-        docker run --rm \
-          --mount type=bind,source="${GITHUB_WORKSPACE}",target=/project \
-          --env NugetPackageDirectory=/project/packages \
-          --env tracerHome=/project/tracer/bin/tracer-home \
-          --env artifacts=/project/tracer/src/bin/artifacts \
-          dd-trace-dotnet/${baseImage}-builder \
-          dotnet /build/bin/Debug/_build.dll Clean BuildTracerHome ZipTracerHome
-    - name: Upload Linux x64 packages
-      uses: actions/upload-artifact@v2.3.1
-      with:
-        name: artifacts
-        path: ./tracer/src/bin/artifacts/linux-x64
-
   windows_build:
     name: Windows Build
     runs-on: windows-2019
@@ -68,10 +33,10 @@ jobs:
           name: nuget
           path: tracer/bin/artifacts/nuget/SignalFx.NET.Tracing.Azure.Site.Extension.*.nupkg
 
-  create_release:
+  create-release:
     name: Create GH release
     runs-on: ubuntu-20.04
-    needs: [linux_build, windows_build]
+    needs: [ windows_build ]
     permissions:
       contents: write
     timeout-minutes: 10

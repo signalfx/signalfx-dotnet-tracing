@@ -1,4 +1,4 @@
-﻿ARG DOTNETSDK_VERSION
+ARG DOTNETSDK_VERSION
 FROM mcr.microsoft.com/dotnet/sdk:$DOTNETSDK_VERSION-alpine3.14 as base
 
 # SECURITY NOTE: Exception is made for APK packages, 
@@ -18,6 +18,10 @@ RUN apk update \
     && gem install --no-document fpm --version 1.14.1
 
 ENV IsAlpine=true
+
+FROM base as releaser
+COPY . /project
+WORKDIR /project
 
 FROM base as builder
 
