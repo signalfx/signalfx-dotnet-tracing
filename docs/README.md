@@ -49,28 +49,7 @@ to receive telemetry data.
 
 ### Installation
 
-You can find the latest installation packages on the
-[Releases](https://github.com/signalfx/signalfx-dotnet-tracing/releases/latest)
-page.
-
-| File         | Operating system    | Architecture | Install command | Notes |
-| ---           | ---                 | ---          | ---          | ---   |
-| `x86_64.rpm`  | Red Hat-based Linux distributions | x64 | `rpm -ivh signalfx-dotnet-tracing.rpm` | RPM package |
-| `x64.msi`     | Windows 64-bit | x64 |  `msiexec /i signalfx-dotnet-tracing-x64.msi /quiet` | |
-| `x86.msi`     | Windows 32-bit | x86 | `msiexec /i signalfx-dotnet-tracing-x86.msi /quiet` | |
-| `tar.gz` | Linux distributions using [qlibc](https://wiki.musl-libc.org/projects-using-musl.html) | x64 | `tar -xf signalfx-dotnet-tracing.tar.gz -C /opt/signalfx` | Currently, all [officially supported Linux distribtions](https://docs.microsoft.com/dotnet/core/install/linux) except Alpine use glibc |
-| `amd64.deb`   | Debian-based Linux distributions | x64 | `dpkg -i signalfx-dotnet-tracing.deb` | DEB package |
-| `musl.tar.gz` | x64 Linux distributions using [musl](https://wiki.musl-libc.org/projects-using-musl.html) | x64 | `tar -xf signalfx-dotnet-tracing-musl.tar.gz -C /opt/signalfx` | Alpine Linux uses musl |
-
-On Linux, after the installation, you can optionally create the log directory:
-
-```bash
-/opt/signalfx/createLogPath.sh
-```
-
-## Installation
-
-### Automated installation script for Windows
+### Automated download and installation for Windows
 
 ```powershell
 # signalfx-dotnet-tracing github repository API
@@ -95,6 +74,27 @@ Start-Process msiexec.exe -Wait -ArgumentList "/I $msi /quiet"
 
 # Cleanup
 Remove-Item $msi                                           
+```
+
+### Manual installation
+
+You can find the latest installation packages on the
+[Releases](https://github.com/signalfx/signalfx-dotnet-tracing/releases/latest)
+page.
+
+| File         | Operating system    | Architecture | Install command | Notes |
+| ---           | ---                 | ---          | ---          | ---   |
+| `x86_64.rpm`  | Red Hat-based Linux distributions | x64 | `rpm -ivh signalfx-dotnet-tracing.rpm` | RPM package |
+| `x64.msi`     | Windows 64-bit | x64 |  `msiexec /i signalfx-dotnet-tracing-x64.msi /quiet` | |
+| `x86.msi`     | Windows 32-bit | x86 | `msiexec /i signalfx-dotnet-tracing-x86.msi /quiet` | |
+| `tar.gz` | Linux distributions using [qlibc](https://wiki.musl-libc.org/projects-using-musl.html) | x64 | `tar -xf signalfx-dotnet-tracing.tar.gz -C /opt/signalfx` | Currently, all [officially supported Linux distribtions](https://docs.microsoft.com/dotnet/core/install/linux) except Alpine use glibc |
+| `amd64.deb`   | Debian-based Linux distributions | x64 | `dpkg -i signalfx-dotnet-tracing.deb` | DEB package |
+| `musl.tar.gz` | x64 Linux distributions using [musl](https://wiki.musl-libc.org/projects-using-musl.html) | x64 | `tar -xf signalfx-dotnet-tracing-musl.tar.gz -C /opt/signalfx` | Alpine Linux uses musl |
+
+On Linux, after the installation, you can optionally create the log directory:
+
+```bash
+/opt/signalfx/createLogPath.sh
 ```
 
 ## Instrument a .NET application on Windows
