@@ -1,7 +1,7 @@
 // dllmain.cpp : Defines the entry point for the DLL application.
 #include "cor_profiler_class_factory.h"
 
-#include "log.h"
+#include "logging.h"
 #include "dynamic_dispatcher.h"
 #include "util.h"
 
@@ -21,8 +21,8 @@ extern "C"
                 // Initialize once for each new process.
                 // Return FALSE to fail DLL load.
 
-                Log::Debug("DllMain: DLL_PROCESS_ATTACH");
-                Log::Debug("DllMain: Pointer size: ", 8 * sizeof(void*), " bits.");
+                Debug("DllMain: DLL_PROCESS_ATTACH");
+                Debug("DllMain: Pointer size: ", 8 * sizeof(void*), " bits.");
 
                 dispatcher = new DynamicDispatcherImpl();
                 dispatcher->LoadConfiguration(GetConfigurationFilePath());
@@ -32,19 +32,19 @@ extern "C"
             }
             case DLL_THREAD_ATTACH:
                 // Do thread-specific initialization.
-                Log::Debug("DllMain: DLL_THREAD_ATTACH");
+                Debug("DllMain: DLL_THREAD_ATTACH");
 
                 break;
 
             case DLL_THREAD_DETACH:
                 // Do thread-specific cleanup.
-                Log::Debug("DllMain: DLL_THREAD_DETACH");
+                Debug("DllMain: DLL_THREAD_DETACH");
 
                 break;
 
             case DLL_PROCESS_DETACH:
                 // Perform any necessary cleanup.
-                Log::Debug("DllMain: DLL_PROCESS_DETACH");
+                Debug("DllMain: DLL_PROCESS_DETACH");
 
                 break;
         }
@@ -53,7 +53,7 @@ extern "C"
 
     HRESULT STDMETHODCALLTYPE DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
     {
-        Log::Debug("DllGetClassObject");
+        Debug("DllGetClassObject");
 
         // {B4C89B0F-9908-4F73-9F59-0D77C5A06874}
         const GUID CLSID_CorProfiler = {0xb4c89b0f, 0x9908, 0x4f73, {0x9f, 0x59, 0xd, 0x77, 0xc5, 0xa0, 0x68, 0x74}};
@@ -74,7 +74,7 @@ extern "C"
 
     HRESULT STDMETHODCALLTYPE DllCanUnloadNow()
     {
-        Log::Debug("DllCanUnloadNow");
+        Debug("DllCanUnloadNow");
 
         return dispatcher->DllCanUnloadNow();
     }
