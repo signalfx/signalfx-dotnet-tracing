@@ -51,6 +51,8 @@ to receive telemetry data.
 
 ### Automated download and installation for Windows
 
+Run in PowerShell as administrator:
+
 ```powershell
 # signalfx-dotnet-tracing github repository API
 $api = "https://api.github.com/repos/signalfx/signalfx-dotnet-tracing/releases/latest"
@@ -73,7 +75,8 @@ Invoke-WebRequest -Uri $download.browser_download_url -OutFile $msi
 Start-Process msiexec.exe -Wait -ArgumentList "/I $msi /quiet"
 
 # Cleanup
-Remove-Item $msi                                           
+Remove-Item $msi
+
 ```
 
 ### Manual installation
