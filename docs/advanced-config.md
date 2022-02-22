@@ -109,6 +109,14 @@ in addition to `SIGNALFX_ACCESS_TOKEN`.
 |-|-|-|
 | `SIGNALFX_PROPAGATORS` | Comma-separated list of the propagators for the tracer. Available propagators are: `B3`, `W3C`. The Tracer will try to execute extraction in the given order. | `B3` |
 
+[OpenTelemetry `OTEL_PROPAGATORS`](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#general-sdk-configuration)
+to `SIGNALFX_PROPAGATORS` values mapping:
+
+| `OTEL_PROPAGATORS` value | `SIGNALFX_PROPAGATORS` value |
+|-|-|
+| `b3multi` | `B3` |
+| `tracecontext` | `W3C` |
+
 ## Library-specific instrumentation settings
 
 | Setting | Description | Default |
