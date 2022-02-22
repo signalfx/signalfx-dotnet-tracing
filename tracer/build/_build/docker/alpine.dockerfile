@@ -1,6 +1,8 @@
 ﻿ARG DOTNETSDK_VERSION
 FROM mcr.microsoft.com/dotnet/sdk:$DOTNETSDK_VERSION-alpine3.14 as base
 
+# SECURITY NOTE: Exception is made for APK packages, 
+# no need to lock versions
 RUN apk update \
     && apk upgrade \
     && apk add --no-cache --update \
@@ -13,7 +15,7 @@ RUN apk update \
         ruby \
         ruby-dev \
         ruby-etc \
-    && gem install --no-document fpm
+    && gem install --no-document fpm --version 1.14.1
 
 ENV IsAlpine=true
 

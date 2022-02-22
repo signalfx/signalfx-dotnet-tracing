@@ -6,18 +6,18 @@ on:
 
 jobs:
   verify_source_generators:
-    runs-on: windows-latest
+    runs-on: windows-2019
 
     steps:
       - name: Support longpaths
         run: git config --system core.longpaths true
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.4.0
 
-      - uses: actions/setup-dotnet@v1
+      - uses: actions/setup-dotnet@v1.9.0
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: '6.0.200'
 
       - name: "Regenerating package versions"
         run: .\tracer\build.ps1 BuildTracerHome

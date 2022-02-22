@@ -188,7 +188,7 @@ namespace Datadog.Trace.Configuration
             TagElasticsearchQueries = source?.GetBool(ConfigurationKeys.TagElasticsearchQueries) ?? true;
 
             // If you change this, change environment_variables.h too
-            ThreadSamplingEnabled = source?.GetBool(ConfigurationKeys.ThreadSampling.Enabled) ?? false;
+            ThreadSamplingEnabled = source?.GetBool(ConfigurationKeys.AlwaysOnProfiler.Enabled) ?? false;
             ThreadSamplingPeriod = GetThreadSamplingPeriod(source);
 
             LogSubmissionSettings = new DirectLogSubmissionSettings(source);
@@ -640,9 +640,9 @@ namespace Datadog.Trace.Configuration
 
         private static TimeSpan GetThreadSamplingPeriod(IConfigurationSource source)
         {
-            // If you change any of these constants, check with thread_sampler.cpp first
+            // If you change any of these constants, check with always_on_profiler.cpp first
             int period = source.SafeReadInt32(
-                key: ConfigurationKeys.ThreadSampling.Period,
+                key: ConfigurationKeys.AlwaysOnProfiler.Period,
                 defaultTo: 10_000,
                 validators: (value) => value >= 1_000);
 

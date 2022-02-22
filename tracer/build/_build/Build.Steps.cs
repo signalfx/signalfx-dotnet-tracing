@@ -595,7 +595,9 @@ partial class Build
                 $"src/**/bin/{BuildConfiguration}",
                 $"src/Datadog.Trace.Tools.Runner/obj/{BuildConfiguration}",
                 $"test/Datadog.Trace.TestHelpers/**/bin/{BuildConfiguration}",
+                $"test/Datadog.Trace.TestHelpers/obj/{BuildConfiguration}",
                 $"test/OpenTelemetry.TestHelpers/**/bin/{BuildConfiguration}",
+                $"test/OpenTelemetry.TestHelpers/obj/{BuildConfiguration}",
                 $"test/test-applications/integrations/dependency-libs/**/bin/{BuildConfiguration}"
             );
 

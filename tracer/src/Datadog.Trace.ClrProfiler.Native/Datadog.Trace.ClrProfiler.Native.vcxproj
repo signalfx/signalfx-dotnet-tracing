@@ -214,7 +214,7 @@
     <ClInclude Include="rejit_work_offloader.h" />
     <ClInclude Include="stats.h" />
     <ClInclude Include="string.h" />
-    <ClInclude Include="thread_sampler.h" />
+    <ClInclude Include="always_on_profiler.h" />
     <ClInclude Include="util.h" />
     <ClInclude Include="version.h" />
   </ItemGroup>
@@ -240,7 +240,7 @@
     <ClCompile Include="rejit_preprocessor.cpp" />
     <ClCompile Include="rejit_work_offloader.cpp" />
     <ClCompile Include="string.cpp" />
-    <ClCompile Include="thread_sampler.cpp" />
+    <ClCompile Include="always_on_profiler.cpp" />
     <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>

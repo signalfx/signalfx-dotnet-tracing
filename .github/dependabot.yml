@@ -1,5 +1,21 @@
 version: 2
 updates:
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "friday"
+
+  # Maintain dependencies for Dockerfiles used in build pipeline
+  - package-ecosystem: "docker"
+    directory: "/tracer/build/_build/docker"
+    schedule:
+      interval: "weekly"
+      day: "friday"
+
+  # Below are the upstream settings that are disabed to reduce conflicts
+  
   # Mocked projects for dependency notifications
   - package-ecosystem: "nuget"
     directory: "/tracer/dependabot"
@@ -38,6 +54,7 @@ updates:
 
       # Lock Microsoft.Build.Framework for widest compatibility when instrumenting builds
       - dependency-name: "Microsoft.Build.Framework"
+    open-pull-requests-limit: 0 # disable version updates
 
   - package-ecosystem: "nuget"
     directory: "/tracer/src/Datadog.Trace.OpenTracing"
@@ -61,6 +78,7 @@ updates:
       - dependency-name: "System.Reflection.Emit.Lightweight"
       ### End Datadog.Trace.csproj ignored dependencies
     open-pull-requests-limit: 0 # disable version updates
+
   - package-ecosystem: "nuget"
     directory: "/tracer/src/Datadog.Trace.BenchmarkDotNet"
     schedule:

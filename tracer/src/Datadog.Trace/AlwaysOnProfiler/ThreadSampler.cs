@@ -6,7 +6,7 @@ using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Logging;
 
-namespace Datadog.Trace.ThreadSampling
+namespace Datadog.Trace.AlwaysOnProfiler
 {
     /// <summary>
     ///  Provides the managed-side thread sample reader
@@ -18,23 +18,23 @@ namespace Datadog.Trace.ThreadSampling
         /// </summary>
         public const string BackgroundThreadName = "SignalFx Profiling Sampler Thread";
 
-        // If you change any of these constants, check with thread_sampler.cpp first
+        // If you change any of these constants, check with always_on_profiler.cpp first
         private const int BufferSize = 200 * 1024;
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(ThreadSampler));
 
         private static ImmutableTracerSettings _tracerSettings;
 
-        private static void ReadAndExportThreadSampleBatch(byte[] buf, ThreadSampleExporter exporter)
+        private static void ReadAndExportThreadSampleBatch(byte[] buffer, ThreadSampleExporter exporter)
         {
-            int read = NativeMethods.SignalFxReadThreadSamples(buf.Length, buf);
+            var read = NativeMethods.SignalFxReadThreadSamples(buffer.Length, buffer);
             if (read <= 0)
             {
                 // No data just return.
                 return;
             }
 
-            var parser = new ThreadSampleNativeFormatParser(buf, read);
+            var parser = new ThreadSampleNativeFormatParser(buffer, read);
             var threadSamples = parser.Parse();
 
             exporter.ExportThreadSamples(threadSamples);
@@ -42,7 +42,7 @@ namespace Datadog.Trace.ThreadSampling
 
         private static void SampleReadingThread()
         {
-            var buf = new byte[BufferSize];
+            var buffer = new byte[BufferSize];
             var exporter = new ThreadSampleExporter(_tracerSettings);
 
             while (true)
@@ -51,8 +51,8 @@ namespace Datadog.Trace.ThreadSampling
                 try
                 {
                     // Call twice in quick succession to catch up any blips; the second will likely return 0 (no buffer)
-                    ReadAndExportThreadSampleBatch(buf, exporter);
-                    ReadAndExportThreadSampleBatch(buf, exporter);
+                    ReadAndExportThreadSampleBatch(buffer, exporter);
+                    ReadAndExportThreadSampleBatch(buffer, exporter);
                 }
                 catch (Exception ex)
                 {

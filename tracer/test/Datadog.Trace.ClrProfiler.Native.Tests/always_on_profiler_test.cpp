@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include "../../src/Datadog.Trace.ClrProfiler.Native/thread_sampler.h"
+#include "../../src/Datadog.Trace.ClrProfiler.Native/always_on_profiler.h"
 
 using namespace trace;
 

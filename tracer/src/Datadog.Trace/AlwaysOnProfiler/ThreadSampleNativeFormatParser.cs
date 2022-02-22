@@ -7,7 +7,7 @@ using System.Text;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Vendors.Serilog.Events;
 
-namespace Datadog.Trace.ThreadSampling
+namespace Datadog.Trace.AlwaysOnProfiler
 {
     /// <summary>
     /// Parser the native code's pause-time-optimized format.
@@ -17,22 +17,22 @@ namespace Datadog.Trace.ThreadSampling
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<ThreadSampleNativeFormatParser>();
         private static readonly bool IsLogLevelDebugEnabled = Log.IsEnabled(LogEventLevel.Debug);
 
-        private readonly byte[] buf;
-        private readonly int len;
-        private readonly Dictionary<int, string> codes;
-        private int pos;
+        private readonly byte[] _buffer;
+        private readonly int _length;
+        private readonly Dictionary<int, string> _codes;
+        private int _position;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ThreadSampleNativeFormatParser"/> class.
         /// </summary>
-        /// <param name="buf">byte array containing native thread samples format data</param>
-        /// <param name="len">how much of the buffer is actually used</param>
-        internal ThreadSampleNativeFormatParser(byte[] buf, int len)
+        /// <param name="buffer">byte array containing native thread samples format data</param>
+        /// <param name="length">how much of the buffer is actually used</param>
+        internal ThreadSampleNativeFormatParser(byte[] buffer, int length)
         {
-            this.buf = buf;
-            this.len = len;
-            this.pos = 0;
-            codes = new Dictionary<int, string>();
+            _buffer = buffer;
+            _length = length;
+            _position = 0;
+            _codes = new Dictionary<int, string>();
         }
 
         /// <summary>
@@ -42,23 +42,22 @@ namespace Datadog.Trace.ThreadSampling
         {
             uint batchThreadIndex = 0;
             var samples = new List<ThreadSample>();
-            ulong batchTimestampNanos = 0;
+            ulong batchTimestampNanoseconds = 0;
 
-            // FIXME actually have this go somewhere in the future
-            while (pos < len)
+            while (_position < _length)
             {
-                byte op = buf[pos];
-                pos++;
-                if (op == OpCodes.StartBatch)
+                var operationCode = _buffer[_position];
+                _position++;
+                if (operationCode == OpCodes.StartBatch)
                 {
-                    int version = ReadInt();
+                    var version = ReadInt();
                     if (version != 1)
                     {
                         return null; // not able to parse
                     }
 
-                    long sampleStartMillis = ReadInt64();
-                    batchTimestampNanos = (ulong)sampleStartMillis * 1_000_000u;
+                    var sampleStartMillis = ReadInt64();
+                    batchTimestampNanoseconds = (ulong)sampleStartMillis * 1_000_000u;
 
                     if (IsLogLevelDebugEnabled)
                     {
@@ -70,14 +69,14 @@ namespace Datadog.Trace.ThreadSampling
                             sampleStart.ToLongTimeString());
                     }
                 }
-                else if (op == OpCodes.StartSample)
+                else if (operationCode == OpCodes.StartSample)
                 {
-                    int managedId = ReadInt();
-                    int nativeId = ReadInt();
-                    string threadName = ReadString();
-                    long traceIdHigh = ReadInt64();
-                    long traceIdLow = ReadInt64();
-                    long spanId = ReadInt64();
+                    var managedId = ReadInt();
+                    var nativeId = ReadInt();
+                    var threadName = ReadString();
+                    var traceIdHigh = ReadInt64();
+                    var traceIdLow = ReadInt64();
+                    var spanId = ReadInt64();
 
                     var threadIndex = batchThreadIndex++;
 
@@ -90,7 +89,7 @@ namespace Datadog.Trace.ThreadSampling
 
                     var threadSample = new ThreadSample
                     {
-                        Timestamp = batchTimestampNanos,
+                        Timestamp = batchTimestampNanoseconds,
                         TraceIdHigh = traceIdHigh,
                         TraceIdLow = traceIdLow,
                         SpanId = spanId,
@@ -107,27 +106,27 @@ namespace Datadog.Trace.ThreadSampling
                         managedId,
                         nativeId);
 
-                    // FIXME: here should go Thread state, equivalent of"    java.lang.Thread.State: TIMED_WAITING (sleeping)"
+                    // TODO Splunk: APMI-2565 here should go Thread state, equivalent of"    java.lang.Thread.State: TIMED_WAITING (sleeping)"
                     stackTraceBuilder.Append("\n");
 
                     while (code != 0)
                     {
-                        string value = null;
+                        string value;
                         if (code < 0)
                         {
                             value = ReadString();
-                            codes[-code] = value;
+                            _codes[-code] = value;
                         }
-                        else if (code > 0)
+                        else
                         {
-                            value = codes[code];
+                            value = _codes[code];
                         }
 
                         if (value != null)
                         {
                             stackTraceBuilder.Append("\tat ");
                             stackTraceBuilder.Append(value);
-                            stackTraceBuilder.Append("(unknown)\n"); // TODO placeholder for file name and lines numbers
+                            stackTraceBuilder.Append("(unknown)\n"); // TODO Splunk: placeholder for file name and lines numbers
                         }
 
                         code = ReadShort();
@@ -135,23 +134,23 @@ namespace Datadog.Trace.ThreadSampling
 
                     if (threadName == ThreadSampler.BackgroundThreadName)
                     {
-                        // TODO: add configuration option to include the sampler thread. By default remove it.
+                        // TODO Splunk: add configuration option to include the sampler thread. By default remove it.
                         continue;
                     }
 
                     threadSample.StackTrace = stackTraceBuilder.ToString();
                     samples.Add(threadSample);
                 }
-                else if (op == OpCodes.EndBatch)
+                else if (operationCode == OpCodes.EndBatch)
                 {
                     // end batch, nothing here
                 }
-                else if (op == OpCodes.BatchStats)
+                else if (operationCode == OpCodes.BatchStats)
                 {
-                    int microsSuspended = ReadInt();
-                    int numThreads = ReadInt();
-                    int totalFrames = ReadInt();
-                    int numCacheMisses = ReadInt();
+                    var microsSuspended = ReadInt();
+                    var numThreads = ReadInt();
+                    var totalFrames = ReadInt();
+                    var numCacheMisses = ReadInt();
 
                     if (IsLogLevelDebugEnabled)
                     {
@@ -162,7 +161,12 @@ namespace Datadog.Trace.ThreadSampling
                 }
                 else
                 {
-                    pos = len + 1; // FIXME improve error handling here
+                    _position = _length + 1;
+
+                    if (IsLogLevelDebugEnabled)
+                    {
+                        Log.Debug("Not expected operation code while parsing thread stack trace: '{0}'. Operation will be ignored.", operationCode);
+                    }
                 }
             }
 
@@ -171,52 +175,52 @@ namespace Datadog.Trace.ThreadSampling
 
         private string ReadString()
         {
-            short len = ReadShort();
-            string s = new UnicodeEncoding().GetString(buf, pos, len * 2);
-            pos += 2 * len;
+            var length = ReadShort();
+            var s = new UnicodeEncoding().GetString(_buffer, _position, length * 2);
+            _position += 2 * length;
             return s;
         }
 
         private short ReadShort()
         {
-            short s1 = (short)(buf[pos] & 0xFF);
+            var s1 = (short)(_buffer[_position] & 0xFF);
             s1 <<= 8;
-            short s2 = (short)(buf[pos + 1] & 0xFF);
-            pos += 2;
+            var s2 = (short)(_buffer[_position + 1] & 0xFF);
+            _position += 2;
             return (short)(s1 + s2);
         }
 
         private int ReadInt()
         {
-            int i1 = buf[pos] & 0xFF;
+            var i1 = _buffer[_position] & 0xFF;
             i1 <<= 24;
-            int i2 = buf[pos + 1] & 0xFF;
+            var i2 = _buffer[_position + 1] & 0xFF;
             i2 <<= 16;
-            int i3 = buf[pos + 2] & 0xFF;
+            var i3 = _buffer[_position + 2] & 0xFF;
             i3 <<= 8;
-            int i4 = buf[pos + 3] & 0xFF;
-            pos += 4;
+            var i4 = _buffer[_position + 3] & 0xFF;
+            _position += 4;
             return i1 + i2 + i3 + i4;
         }
 
         private long ReadInt64()
         {
-            long l1 = buf[pos] & 0xFF;
+            long l1 = _buffer[_position] & 0xFF;
             l1 <<= 56;
-            long l2 = buf[pos + 1] & 0xFF;
+            long l2 = _buffer[_position + 1] & 0xFF;
             l2 <<= 48;
-            long l3 = buf[pos + 2] & 0xFF;
+            long l3 = _buffer[_position + 2] & 0xFF;
             l3 <<= 40;
-            long l4 = buf[pos + 3] & 0xFF;
+            long l4 = _buffer[_position + 3] & 0xFF;
             l4 <<= 32;
-            long l5 = buf[pos + 4] & 0xFF;
+            long l5 = _buffer[_position + 4] & 0xFF;
             l5 <<= 24;
-            long l6 = buf[pos + 5] & 0xFF;
+            long l6 = _buffer[_position + 5] & 0xFF;
             l6 <<= 16;
-            long l7 = buf[pos + 6] & 0xFF;
+            long l7 = _buffer[_position + 6] & 0xFF;
             l7 <<= 8;
-            long l8 = buf[pos + 7] & 0xFF;
-            pos += 8;
+            long l8 = _buffer[_position + 7] & 0xFF;
+            _position += 8;
             return l1 + l2 + l3 + l4 + l5 + l6 + l7 + l8;
         }
 

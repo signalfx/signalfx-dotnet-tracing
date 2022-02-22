@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
+using Datadog.Trace.AlwaysOnProfiler;
 using Datadog.Trace.AppSec;
 using Datadog.Trace.Ci;
 using Datadog.Trace.ClrProfiler.ServerlessInstrumentation;
@@ -229,7 +230,7 @@ namespace Datadog.Trace.ClrProfiler
                 try
                 {
                     Log.Debug("Initializing thread sampling.");
-                    ThreadSampling.ThreadSampler.Initialize(TracerManager.Instance.Settings);
+                    ThreadSampler.Initialize(TracerManager.Instance.Settings);
                     Log.Information("Thread sampling initialized.");
                 }
                 catch (Exception e)
