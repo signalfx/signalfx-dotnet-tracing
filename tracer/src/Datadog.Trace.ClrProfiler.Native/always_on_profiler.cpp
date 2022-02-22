@@ -240,7 +240,7 @@ void ThreadSamplesBuffer::writeCodedFrameString(FunctionID fid, WSTRING& str)
         {
             codes[fid] = code;
         }
-        writeShort(-code); // note negative sign indiciating definition of code
+        writeShort(-code); // note negative sign indicating definition of code
         writeString(str);
     }
 }
