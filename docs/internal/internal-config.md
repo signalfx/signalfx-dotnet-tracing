@@ -29,7 +29,6 @@ These settings should be never used by the users.
 |-|-|-|
 | `SIGNALFX_AGENT_HOST` | The Agent host where the tracer can send traces. |  |
 | `SIGNALFX_APM_RECEIVER_PORT` | The port for Trace Agent binding. | `8126` |
-| `SIGNALFX_APPSEC_BLOCKING_ENABLED` | Enables the AppSec blocking. | `false` |
 | `SIGNALFX_APPSEC_ENABLED` | Enables the AppSec. | `false` |
 | `SIGNALFX_APPSEC_EXTRA_HEADERS` | Optional custom headers the user wants to send. |  |
 | `SIGNALFX_APPSEC_IPHEADER` | Optional name of the custom header to take into account for the ip address. |  |

@@ -46,7 +46,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AWS
                 {
                     spans[i].ParentId.ToString().Should().Be("2222");
                     spans[i].TraceId.ToString().Should().Be("1111");
-                    spans[i].Name.Should().Be("http.request");
+                    spans[i].LogicScope.Should().Be("http.request");
                 }
 
                 spans[0].Resource.Should().Be("GET localhost/function/HandlerNoParamSync");

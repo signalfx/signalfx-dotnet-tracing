@@ -174,7 +174,7 @@ namespace Datadog.Trace.Tests.Telemetry
         }
 
 #if NETFRAMEWORK
-        [Theory]
+        [Theory(Skip = "Needs investigation")]
         [InlineData(false)]
         [InlineData(true)]
         public void ConfigurationDataShouldIncludeExpectedFullTrustValues(bool isFullTrust)

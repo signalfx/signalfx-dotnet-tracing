@@ -11,6 +11,8 @@ COPY ./src/bin/windows-tracer-home/createLogPath.sh ./test/test-applications/int
 
 ENV SIGNALFX_LOG_LEVEL="DEBUG"
 ENV SIGNALFX_TRACE_ENABLED=true
+ENV SIGNALFX_TRACE_DEBUG="1"
+ENV SIGNALFX_EXPORTER="DatadogAgent"
 ENV SIGNALFX_DOTNET_TRACER_HOME="/opt/signalfx"
 ENV SIGNALFX_INTEGRATIONS="/opt/signalfx/integrations.json"
 ENV _SIGNALFX_EXTENSION_PATH="/opt/signalfx/SignalFx.Tracing.ClrProfiler.Native.so"
