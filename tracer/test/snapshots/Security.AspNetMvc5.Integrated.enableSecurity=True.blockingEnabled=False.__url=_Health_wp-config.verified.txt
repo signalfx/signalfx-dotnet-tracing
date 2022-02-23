@@ -1,4 +1,4 @@
-﻿[
+[
   {
     TraceId: Id_1,
     SpanId: Id_2,
@@ -48,7 +48,7 @@
       signalfx.tracing.library: dotnet-tracing,
       signalfx.tracing.version: x.y.z,
       span.kind: server,
-      _dd.appsec.json: {"triggers":[{"rule":{"id":"nfd-000-001","name":"Detect common directory discovery scans","tags":{"type":"security_scanner","category":"attack_attempt"}},"rule_matches":[{"operator":"match_regex","operator_value":"^404$","parameters":[{"address":"server.response.status","key_path":[],"value":"404","highlight":["404"]}]},{"operator":"phrase_match","operator_value":"","parameters":[{"address":"server.request.uri.raw","key_path":[],"value":"http://localhost:00000/Health/wp-config","highlight":["/wp-config"]}]}]}]},
+      _dd.appsec.json: {"triggers":[{"rule":{"id":"nfd-000-001","name":"Detect common directory discovery scans","tags":{"category":"attack_attempt","type":"security_scanner"}},"rule_matches":[{"operator":"match_regex","operator_value":"^404$","parameters":[{"address":"server.response.status","highlight":["404"],"key_path":[],"value":"404"}]},{"operator":"phrase_match","operator_value":"","parameters":[{"address":"server.request.uri.raw","highlight":["/wp-config"],"key_path":[],"value":"http://localhost:00000/Health/wp-config"}]}]}]},
       _dd.origin: appsec,
       _dd.runtime_family: dotnet
     },
@@ -108,7 +108,7 @@
       signalfx.tracing.library: dotnet-tracing,
       signalfx.tracing.version: x.y.z,
       span.kind: server,
-      _dd.appsec.json: {"triggers":[{"rule":{"id":"nfd-000-001","name":"Detect common directory discovery scans","tags":{"type":"security_scanner","category":"attack_attempt"}},"rule_matches":[{"operator":"match_regex","operator_value":"^404$","parameters":[{"address":"server.response.status","key_path":[],"value":"404","highlight":["404"]}]},{"operator":"phrase_match","operator_value":"","parameters":[{"address":"server.request.uri.raw","key_path":[],"value":"http://localhost:00000/Health/wp-config","highlight":["/wp-config"]}]}]}]},
+      _dd.appsec.json: {"triggers":[{"rule":{"id":"nfd-000-001","name":"Detect common directory discovery scans","tags":{"category":"attack_attempt","type":"security_scanner"}},"rule_matches":[{"operator":"match_regex","operator_value":"^404$","parameters":[{"address":"server.response.status","highlight":["404"],"key_path":[],"value":"404"}]},{"operator":"phrase_match","operator_value":"","parameters":[{"address":"server.request.uri.raw","highlight":["/wp-config"],"key_path":[],"value":"http://localhost:00000/Health/wp-config"}]}]}]},
       _dd.origin: appsec,
       _dd.runtime_family: dotnet
     },
@@ -168,7 +168,7 @@
       signalfx.tracing.library: dotnet-tracing,
       signalfx.tracing.version: x.y.z,
       span.kind: server,
-      _dd.appsec.json: {"triggers":[{"rule":{"id":"nfd-000-001","name":"Detect common directory discovery scans","tags":{"type":"security_scanner","category":"attack_attempt"}},"rule_matches":[{"operator":"match_regex","operator_value":"^404$","parameters":[{"address":"server.response.status","key_path":[],"value":"404","highlight":["404"]}]},{"operator":"phrase_match","operator_value":"","parameters":[{"address":"server.request.uri.raw","key_path":[],"value":"http://localhost:00000/Health/wp-config","highlight":["/wp-config"]}]}]}]},
+      _dd.appsec.json: {"triggers":[{"rule":{"id":"nfd-000-001","name":"Detect common directory discovery scans","tags":{"category":"attack_attempt","type":"security_scanner"}},"rule_matches":[{"operator":"match_regex","operator_value":"^404$","parameters":[{"address":"server.response.status","highlight":["404"],"key_path":[],"value":"404"}]},{"operator":"phrase_match","operator_value":"","parameters":[{"address":"server.request.uri.raw","highlight":["/wp-config"],"key_path":[],"value":"http://localhost:00000/Health/wp-config"}]}]}]},
       _dd.origin: appsec,
       _dd.runtime_family: dotnet
     },
@@ -228,7 +228,7 @@
       signalfx.tracing.library: dotnet-tracing,
       signalfx.tracing.version: x.y.z,
       span.kind: server,
-      _dd.appsec.json: {"triggers":[{"rule":{"id":"nfd-000-001","name":"Detect common directory discovery scans","tags":{"type":"security_scanner","category":"attack_attempt"}},"rule_matches":[{"operator":"match_regex","operator_value":"^404$","parameters":[{"address":"server.response.status","key_path":[],"value":"404","highlight":["404"]}]},{"operator":"phrase_match","operator_value":"","parameters":[{"address":"server.request.uri.raw","key_path":[],"value":"http://localhost:00000/Health/wp-config","highlight":["/wp-config"]}]}]}]},
+      _dd.appsec.json: {"triggers":[{"rule":{"id":"nfd-000-001","name":"Detect common directory discovery scans","tags":{"category":"attack_attempt","type":"security_scanner"}},"rule_matches":[{"operator":"match_regex","operator_value":"^404$","parameters":[{"address":"server.response.status","highlight":["404"],"key_path":[],"value":"404"}]},{"operator":"phrase_match","operator_value":"","parameters":[{"address":"server.request.uri.raw","highlight":["/wp-config"],"key_path":[],"value":"http://localhost:00000/Health/wp-config"}]}]}]},
       _dd.origin: appsec,
       _dd.runtime_family: dotnet
     },
@@ -288,7 +288,7 @@
       signalfx.tracing.library: dotnet-tracing,
       signalfx.tracing.version: x.y.z,
       span.kind: server,
-      _dd.appsec.json: {"triggers":[{"rule":{"id":"nfd-000-001","name":"Detect common directory discovery scans","tags":{"type":"security_scanner","category":"attack_attempt"}},"rule_matches":[{"operator":"match_regex","operator_value":"^404$","parameters":[{"address":"server.response.status","key_path":[],"value":"404","highlight":["404"]}]},{"operator":"phrase_match","operator_value":"","parameters":[{"address":"server.request.uri.raw","key_path":[],"value":"http://localhost:00000/Health/wp-config","highlight":["/wp-config"]}]}]}]},
+      _dd.appsec.json: {"triggers":[{"rule":{"id":"nfd-000-001","name":"Detect common directory discovery scans","tags":{"category":"attack_attempt","type":"security_scanner"}},"rule_matches":[{"operator":"match_regex","operator_value":"^404$","parameters":[{"address":"server.response.status","highlight":["404"],"key_path":[],"value":"404"}]},{"operator":"phrase_match","operator_value":"","parameters":[{"address":"server.request.uri.raw","highlight":["/wp-config"],"key_path":[],"value":"http://localhost:00000/Health/wp-config"}]}]}]},
       _dd.origin: appsec,
       _dd.runtime_family: dotnet
     },
