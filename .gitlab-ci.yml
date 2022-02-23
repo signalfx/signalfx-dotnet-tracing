@@ -38,15 +38,11 @@ linux-build:
 
 # windows-build:
 #   stage: build
-#   # rules:
-#   #   - if: '$CI_COMMIT_TAG =~ /^v[0-9]+\.[0-9]+\.[0-9]+.*/'
 #   tags:
 #     - windows
 #   script:
 #     - tracer\build.ps1 Clean BuildTracerHome PackageTracerHome
 #   artifacts:
 #     paths:
-#       - dist/
 #       - tracer/bin/artifacts/nuget/SignalFx.NET.Tracing.Azure.Site.Extension.*.nupkg
 #       - tracer/bin/artifacts/*/en-us
-  
