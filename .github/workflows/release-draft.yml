@@ -71,7 +71,7 @@ jobs:
   create-release:
     name: Create GH release
     runs-on: ubuntu-20.04
-    needs: [ windows_build ]
+    needs: [ linux_build, windows_build ]
     permissions:
       contents: write
     timeout-minutes: 10
