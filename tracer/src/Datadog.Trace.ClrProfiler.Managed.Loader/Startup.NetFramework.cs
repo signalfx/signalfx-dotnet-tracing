@@ -26,6 +26,12 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
 
         private static Assembly AssemblyResolve_ManagedProfilerDependencies(object sender, ResolveEventArgs args)
         {
+            if (LoadedAssemblies.ContainsKey(args.Name))
+            {
+                StartupLogger.Debug("{0} has already been loaded.", args.Name);
+                return LoadedAssemblies[args.Name];
+            }
+
             var assemblyName = new AssemblyName(args.Name).Name;
 
             // On .NET Framework, having a non-US locale can cause mscorlib
@@ -49,7 +55,10 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
                 }
 
                 StartupLogger.Debug("Resolving {0}, loading {1}", args.Name, path);
-                return Assembly.LoadFrom(path);
+                var loadedAssembly = Assembly.LoadFrom(path);
+                LoadedAssemblies[args.Name] = loadedAssembly;
+
+                return loadedAssembly;
             }
 
             return null;

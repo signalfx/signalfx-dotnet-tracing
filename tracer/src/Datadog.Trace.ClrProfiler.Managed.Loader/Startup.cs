@@ -6,6 +6,8 @@
 // Modified by Splunk Inc.
 
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace Datadog.Trace.ClrProfiler.Managed.Loader
@@ -36,6 +38,8 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
 
             TryLoadManagedAssembly();
         }
+
+        private static IDictionary<string, Assembly> LoadedAssemblies { get; } = new ConcurrentDictionary<string, Assembly>();
 
         internal static string ManagedProfilerDirectory { get; }
 
