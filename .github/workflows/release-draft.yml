@@ -23,7 +23,7 @@ jobs:
         docker build \
           --build-arg DOTNETSDK_VERSION=${dotnetSdkVersion} \
           --tag dd-trace-dotnet/${baseImage}-builder \
-          --target releaser \
+          --target builder \
           --file "./tracer/build/_build/docker/${baseImage}.dockerfile" \
           "./tracer/build/_build"
     - name: Run 'Clean BuildTracerHome ZipTracerHome' in Docker
@@ -34,7 +34,7 @@ jobs:
           --env tracerHome=/project/tracer/bin/tracer-home \
           --env artifacts=/project/tracer/src/bin/artifacts \
           dd-trace-dotnet/${baseImage}-builder \
-          tracer/build.sh Clean BuildTracerHome ZipTracerHome
+          dotnet /build/bin/Debug/_build.dll Clean BuildTracerHome ZipTracerHome
     - name: Upload Linux x64 packages
       uses: actions/upload-artifact@v2.3.1
       with:
