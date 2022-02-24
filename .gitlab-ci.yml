@@ -1,59 +1,48 @@
+workflow:
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v/'
 
 stages:
   - build
-  - publish
-  
-variables:
-  DATADOG_AGENT_WINBUILDIMAGES: v5996510-a9e6a7d
-  GIT_PROFILER_REF: master
-    
-build:
-  only:
-    - master
-    - main
-  stage: build
-  tags: ["runner:windows-docker", "windowsversion:1809"]
-  script:
-    - if (Test-Path build-out) { remove-item -recurse -force build-out }
-    - if (Test-Path artifacts) { remove-item -recurse -force artifacts }
-    - docker run --rm -m 4096M -v "$(Get-Location):c:\mnt" -e CI_JOB_ID=${CI_JOB_ID} -e WINDOWS_BUILDER=true -e AWS_NETWORKING=true -e SIGN_WINDOWS=true 486234852809.dkr.ecr.us-east-1.amazonaws.com/ci/datadog-agent-buildimages/windows_1809_x64:$Env:DATADOG_AGENT_WINBUILDIMAGES c:\mnt\tracer\build\_build\gitlab.bat
-    - mkdir artifacts
-    - xcopy /e/s build-out\${CI_JOB_ID}\*.* artifacts
-    - remove-item -recurse -force build-out\${CI_JOB_ID}
-    - get-childitem build-out
-    - get-childitem artifacts
-  artifacts:
-    expire_in: 2 weeks
-    paths:
-    - artifacts
 
-publish:
-  only:
-    - master
-    - main
-  stage: publish
-  tags: ["runner:windows-docker", "windowsversion:1809"]
-  dependencies: 
-    - build
+linux-build:
+  stage: build
+  parallel:
+    matrix:
+      - baseImage: [ alpine, debian ]
+  variables:
+    dotnetSdkVersion: 6.0.200
   script:
-    - $result =  aws sts assume-role --role-arn "arn:aws:iam::486234852809:role/ci-datadog-windows-filter" --role-session-name AWSCLI-Session
-    - $resultjson = $result | convertfrom-json
-    - $credentials = $($resultjson.Credentials)
-    - $Env:AWS_ACCESS_KEY_ID="$($credentials.AccessKeyId)"
-    - $Env:AWS_SECRET_ACCESS_KEY="$($credentials.SecretAccessKey)"
-    - $Env:AWS_SESSION_TOKEN="$($credentials.SessionToken)"
     - |
-      $i = 0
-      do {
-          try {
-              # The grants option at the end is used to allow public access on the files we upload as the acls only aren't enough.
-              aws s3 cp artifacts/ s3://dd-windowsfilter/builds/tracer/${CI_COMMIT_SHA} --recursive --region us-east-1 --exclude "*" --include "*.zip" --include "*.msi" --grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers full=id=3a6e02b08553fd157ae3fb918945dd1eaae5a1aa818940381ef07a430cf25732
-              return
-          } catch {
-              $msg = $Error[0].Exception.Message
-              Write-Output "Encountered error during while publishing to S3. Error Message is $msg."
-              Write-Output "Retrying..."
-              $i++
-              Start-Sleep -Milliseconds 100
-          }
-      } while ($i -lt 3)
+      rm .dockerignore
+    - |
+      docker build \
+        --build-arg DOTNETSDK_VERSION=${dotnetSdkVersion} \
+        --tag dd-trace-dotnet/${baseImage}-builder \
+        --target releaser \
+        --file "./tracer/build/_build/docker/${baseImage}.dockerfile" \
+        .
+    - |
+      docker run \
+        --env NugetPackageDirectory=/project/packages \
+        --env tracerHome=/project/tracer/bin/tracer-home \
+        --env artifacts=/project/tracer/src/bin/artifacts \
+        --name release \
+        dd-trace-dotnet/${baseImage}-builder \
+        tracer/build.sh Clean BuildTracerHome ZipTracerHome
+    - |
+      docker cp release:/project/tracer/src/bin/artifacts/linux-x64 dist
+  artifacts:
+    paths:
+      - dist/
+
+# windows-build:
+#   stage: build
+#   tags:
+#     - windows
+#   script:
+#     - tracer\build.ps1 Clean BuildTracerHome PackageTracerHome
+#   artifacts:
+#     paths:
+#       - tracer/bin/artifacts/nuget/SignalFx.NET.Tracing.Azure.Site.Extension.*.nupkg
+#       - tracer/bin/artifacts/*/en-us
