@@ -42,27 +42,23 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             {
                 var logsData = logsCollector.LogsData.ToArray();
                 // The application works for 6 seconds with debug logging enabled we expect at least 2 attempts of thread sampling in CI.
-                // On a dev box it is typical to get at least 4 but the CI machines seem slower, using 3
-                logsData.Length.Should().BeGreaterOrEqualTo(expected: 3);
+                // On a dev box it is typical to get at least 4 but the CI machines seem slower, using 2
+                logsData.Length.Should().BeGreaterOrEqualTo(expected: 2);
 
                 var settings = VerifyHelper.GetThreadSamplingVerifierSettings();
                 settings.UseTextForParameters("OnlyCommonAttributes");
 
                 await DumpLogRecords(logsData);
 
-                for (var index = 0; index < logsData.Length; index++)
+                var containStackTraceForClassHierarchy = false;
+                foreach (var data in logsData)
                 {
-                    var data = logsData[index];
                     var logRecords = data.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs;
+
+                    containStackTraceForClassHierarchy |= logRecords.Any(ContainStackTraceForClassHierarchy);
 
                     using (new AssertionScope())
                     {
-                        if (index != 0 && index != logsData.Length - 1)
-                        {
-                            // skip verification for the first and the last logs. Depending on env., the expected method may not have started or is already in a finished state
-                            logRecords.Should().ContainSingle(x => ContainStackTraceForClassHierarchy(x));
-                        }
-
                         AllShouldHaveCorrectAttributes(logRecords);
                         AllBodiesShouldHaveCorrectFormat(logRecords);
                     }
@@ -71,6 +67,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     logRecords.Clear();
                     await Verifier.Verify(data, settings);
                 }
+
+                Assert.True(containStackTraceForClassHierarchy, "At least one stack trace containing class hierarchy should be reported.");
             }
         }
 
