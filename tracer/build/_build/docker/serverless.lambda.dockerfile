@@ -5,8 +5,8 @@ COPY $SERVERLESS_ARTIFACTS_PATH /opt/signalfx
 
 # Add Tests
 COPY $SERVERLESS_ARTIFACTS_PATH/createLogPath.sh ./tracer/test/test-applications/integrations/Samples.AWS.Lambda/bin/Release/netcoreapp3.1/*.dll /var/task/
-COPY ./tracer/test/test-applications/integrations/Samples.AWS.Lambda/bin/Release/netcoreapp3.1/*.deps.json /var/task/
-COPY ./tracer/test/test-applications/integrations/Samples.AWS.Lambda/bin/Release/netcoreapp3.1/*.runtimeconfig.json /var/task/
+COPY $SERVERLESS_ARTIFACTS_PATH/createLogPath.sh ./tracer/test/test-applications/integrations/Samples.AWS.Lambda/bin/Release/netcoreapp3.1/*.deps.json /var/task/
+COPY $SERVERLESS_ARTIFACTS_PATH/createLogPath.sh ./tracer/test/test-applications/integrations/Samples.AWS.Lambda/bin/Release/netcoreapp3.1/*.runtimeconfig.json /var/task/
 
 ENV SIGNALFX_LOG_LEVEL="DEBUG"
 ENV SIGNALFX_TRACE_ENABLED=true
