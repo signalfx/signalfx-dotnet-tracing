@@ -364,8 +364,10 @@ jobs:
           --env SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN} \
           dd-trace-dotnet/${{ matrix.base-image }}-builder \
           dotnet /build/bin/Debug/_build.dll BuildTracerHome BuildLinuxIntegrationTests -Framework ${{ matrix.framework }}
+    - name: Build dependencies
+      run: docker-compose build --build-arg SERVERLESS_ARTIFACTS_PATH=.${relativeTracerHome} serverless-lambda-no-param-sync serverless-lambda-one-param-sync serverless-lambda-two-params-sync serverless-lambda-no-param-async serverless-lambda-one-param-async serverless-lambda-two-params-async serverless-lambda-no-param-void serverless-lambda-one-param-void serverless-lambda-two-params-void
     - name: Start dependencies
-      run: docker-compose run --rm StartDependencies
+      run: docker-compose up -d StartDependencies
     - name: Run integration tests in container
       run: | 
         framework=${{ matrix.framework }} baseImage=${{ matrix.base-image }} docker-compose run --rm \
@@ -374,6 +376,9 @@ jobs:
           -e Verify_DisableClipboard=true \
           -e DiffEngine_Disabled=true \
           IntegrationTests
+    - name: docker-compose stop services
+      run: docker-compose down
+      if: (${{ job.status }} != 'cancelled')
     - uses: actions/upload-artifact@v2.3.1
       with:
         name: ${{ matrix.base-image }}-integration-tests-${{ matrix.framework }}-build_data
