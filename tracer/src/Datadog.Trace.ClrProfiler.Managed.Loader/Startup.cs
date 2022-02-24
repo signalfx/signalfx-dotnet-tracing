@@ -18,6 +18,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
     public partial class Startup
     {
         private const string AssemblyName = "SignalFx.Tracing, Version=0.2.2.0, Culture=neutral, PublicKeyToken=e43a27c2023d388a";
+        private static readonly object Lock = new();
 
         /// <summary>
         /// Initializes static members of the <see cref="Startup"/> class.
@@ -39,7 +40,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
             TryLoadManagedAssembly();
         }
 
-        private static ConcurrentDictionary<string, Assembly> LoadedAssemblies { get; } = new();
+        private static Dictionary<string, Assembly> LoadedAssemblies { get; } = new();
 
         internal static string ManagedProfilerDirectory { get; }
 

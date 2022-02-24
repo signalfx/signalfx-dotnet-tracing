@@ -32,34 +32,45 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
                 return LoadedAssemblies[args.Name];
             }
 
-            var assemblyName = new AssemblyName(args.Name).Name;
-
-            // On .NET Framework, having a non-US locale can cause mscorlib
-            // to enter the AssemblyResolve event when searching for resources
-            // in its satellite assemblies. Exit early so we don't cause
-            // infinite recursion.
-            if (string.Equals(assemblyName, "mscorlib.resources", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(assemblyName, "System.Net.Http", StringComparison.OrdinalIgnoreCase))
+            lock (Lock)
             {
-                return null;
-            }
-
-            var path = Path.Combine(ManagedProfilerDirectory, $"{assemblyName}.dll");
-
-            if (File.Exists(path))
-            {
-                if (args.Name.StartsWith("SignalFx.Tracing, Version=") && args.Name != AssemblyName)
+                if (LoadedAssemblies.ContainsKey(args.Name))
                 {
-                    StartupLogger.Debug("Trying to load {0} which does not match the expected version ({1})", args.Name, AssemblyName);
+                    StartupLogger.Debug("{0} has already been loaded.", args.Name);
+                    return LoadedAssemblies[args.Name];
+                }
+
+                var assemblyName = new AssemblyName(args.Name).Name;
+
+                // On .NET Framework, having a non-US locale can cause mscorlib
+                // to enter the AssemblyResolve event when searching for resources
+                // in its satellite assemblies. Exit early so we don't cause
+                // infinite recursion.
+                if (string.Equals(assemblyName, "mscorlib.resources", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(assemblyName, "System.Net.Http", StringComparison.OrdinalIgnoreCase))
+                {
                     return null;
                 }
 
-                StartupLogger.Debug("Resolving {0}, loading {1}", args.Name, path);
-                var loadedAssembly = Assembly.LoadFrom(path);
-                return LoadedAssemblies.GetOrAdd(args.Name, loadedAssembly);
-            }
+                var path = Path.Combine(ManagedProfilerDirectory, $"{assemblyName}.dll");
 
-            return null;
+                if (File.Exists(path))
+                {
+                    if (args.Name.StartsWith("SignalFx.Tracing, Version=") && args.Name != AssemblyName)
+                    {
+                        StartupLogger.Debug("Trying to load {0} which does not match the expected version ({1})", args.Name, AssemblyName);
+                        return null;
+                    }
+
+                    StartupLogger.Debug("Resolving {0}, loading {1}", args.Name, path);
+                    var loadedAssembly = Assembly.LoadFrom(path);
+                    LoadedAssemblies[args.Name] = loadedAssembly;
+
+                    return loadedAssembly;
+                }
+
+                return null;
+            }
         }
     }
 }
