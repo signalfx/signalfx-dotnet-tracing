@@ -70,9 +70,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
             {
                 StartupLogger.Debug("Loading {0} with DependencyLoadContext.LoadFromAssemblyPath", path);
                 var loadedAssembly = DependencyLoadContext.LoadFromAssemblyPath(path); // Load unresolved framework and third-party dependencies into a custom Assembly Load Context
-                LoadedAssemblies[args.Name] = loadedAssembly;
-
-                return loadedAssembly;
+                return LoadedAssemblies.GetOrAdd(args.Name, loadedAssembly);
             }
 
             return null;

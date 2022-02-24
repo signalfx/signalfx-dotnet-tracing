@@ -56,9 +56,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
 
                 StartupLogger.Debug("Resolving {0}, loading {1}", args.Name, path);
                 var loadedAssembly = Assembly.LoadFrom(path);
-                LoadedAssemblies[args.Name] = loadedAssembly;
-
-                return loadedAssembly;
+                return LoadedAssemblies.GetOrAdd(args.Name, loadedAssembly);
             }
 
             return null;

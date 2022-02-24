@@ -39,7 +39,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
             TryLoadManagedAssembly();
         }
 
-        private static IDictionary<string, Assembly> LoadedAssemblies { get; } = new ConcurrentDictionary<string, Assembly>();
+        private static ConcurrentDictionary<string, Assembly> LoadedAssemblies { get; } = new();
 
         internal static string ManagedProfilerDirectory { get; }
 
