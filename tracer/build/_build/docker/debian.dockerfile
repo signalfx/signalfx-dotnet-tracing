@@ -48,6 +48,10 @@ RUN curl -sSL https://dot.net/v1/dotnet-install.sh --output dotnet-install.sh  \
 ENV CXX=clang++
 ENV CC=clang
 
+FROM base as releaser
+COPY . /project
+WORKDIR /project
+
 FROM base as builder
 
 # Copy the build project in and build it

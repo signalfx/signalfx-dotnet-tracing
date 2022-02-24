@@ -1,27 +1,48 @@
+workflow:
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v/'
 
 stages:
-  - binary_build
-  
-variables:
-  DATADOG_AGENT_WINBUILDIMAGES: v5996510-a9e6a7d
-    
-driver_build:
-  only:
-    - web
-  stage: binary_build
-  tags: ["runner:windows-docker", "windowsversion:1809"]
+  - build
+
+linux-build:
+  stage: build
+  parallel:
+    matrix:
+      - baseImage: [ alpine, debian ]
+  variables:
+    dotnetSdkVersion: 6.0.200
   script:
-    - if (Test-Path build-out) { remove-item -recurse -force build-out }
-    - if (Test-Path artifacts) { remove-item -recurse -force artifacts }
-    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.ddbuild.io/DataDog/dd-continuous-profiler-dotnet.git
-    - docker run --rm -m 4096M -v "$(Get-Location):c:\mnt" -e CI_JOB_ID=${CI_JOB_ID} -e WINDOWS_BUILDER=true -e AWS_NETWORKING=true -e SIGN_WINDOWS=true 486234852809.dkr.ecr.us-east-1.amazonaws.com/ci/datadog-agent-buildimages/windows_1809_x64:$Env:DATADOG_AGENT_WINBUILDIMAGES c:\mnt\tracer\build\_build\gitlab.bat
-    - mkdir artifacts
-    - xcopy /e/s build-out\${CI_JOB_ID}\*.* artifacts
-    - remove-item -recurse -force build-out\${CI_JOB_ID}
-#    - aws s3 cp --region us-east-1 --recursive --exclude "*" --include "*.msm" --include "*.msi" artifacts/ s3://$DRIVER_S3_BUCKET/builds/
-    - get-childitem build-out
-    - get-childitem artifacts
+    - |
+      rm .dockerignore
+    - |
+      docker build \
+        --build-arg DOTNETSDK_VERSION=${dotnetSdkVersion} \
+        --tag dd-trace-dotnet/${baseImage}-builder \
+        --target releaser \
+        --file "./tracer/build/_build/docker/${baseImage}.dockerfile" \
+        .
+    - |
+      docker run \
+        --env NugetPackageDirectory=/project/packages \
+        --env tracerHome=/project/tracer/bin/tracer-home \
+        --env artifacts=/project/tracer/src/bin/artifacts \
+        --name release \
+        dd-trace-dotnet/${baseImage}-builder \
+        tracer/build.sh Clean BuildTracerHome ZipTracerHome
+    - |
+      docker cp release:/project/tracer/src/bin/artifacts/linux-x64 dist
   artifacts:
-    expire_in: 2 weeks
     paths:
-    - artifacts
+      - dist/
+
+# windows-build:
+#   stage: build
+#   tags:
+#     - windows
+#   script:
+#     - tracer\build.ps1 Clean BuildTracerHome PackageTracerHome
+#   artifacts:
+#     paths:
+#       - tracer/bin/artifacts/nuget/SignalFx.NET.Tracing.Azure.Site.Extension.*.nupkg
+#       - tracer/bin/artifacts/*/en-us

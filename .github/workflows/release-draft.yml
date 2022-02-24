@@ -68,10 +68,10 @@ jobs:
           name: nuget
           path: tracer/bin/artifacts/nuget/SignalFx.NET.Tracing.Azure.Site.Extension.*.nupkg
 
-  create_release:
+  create-release:
     name: Create GH release
     runs-on: ubuntu-20.04
-    needs: [linux_build, windows_build]
+    needs: [ linux_build, windows_build ]
     permissions:
       contents: write
     timeout-minutes: 10
