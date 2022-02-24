@@ -417,6 +417,14 @@ namespace Datadog.Trace.Configuration
         public const string TagElasticsearchQueries = "SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES";
 
         /// <summary>
+        /// Configuration key for controlling whether route parameters in ASP.NET and ASP.NET Core resource names
+        /// should be expanded with their values. Only applies when
+        /// <see cref="ConfigurationKeys.FeatureFlags.RouteTemplateResourceNamesEnabled"/> is enabled.
+        /// </summary>
+        /// <seealso cref="TracerSettings.ExpandRouteTemplatesEnabled"/>
+        public const string ExpandRouteTemplatesEnabled = "SIGNALFX_TRACE_EXPAND_ROUTE_TEMPLATES_ENABLED";
+
+        /// <summary>
         /// String format patterns used to match integration-specific configuration keys.
         /// </summary>
         public static class Integrations
