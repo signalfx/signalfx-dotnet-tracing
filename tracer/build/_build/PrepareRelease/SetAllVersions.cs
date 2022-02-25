@@ -230,6 +230,7 @@ namespace PrepareRelease
         {
             return Regex.Replace(text, MainAssemblyString(VersionPattern()), MainAssemblyString(VersionString()), RegexOptions.Singleline);
         }
+
         private string OpenTracingLibFullAssemblyNameReplace(string text)
         {
             return Regex.Replace(text, OpenTracingAssemblyString(VersionPattern()), OpenTracingAssemblyString(VersionString()), RegexOptions.Singleline);
@@ -341,6 +342,7 @@ namespace PrepareRelease
         {
             return AssemblyString("SignalFx.Tracing", versionText);
         }
+
         private string OpenTracingAssemblyString(string versionText)
         {
             return AssemblyString("SignalFx.Tracing.OpenTracing", versionText);
