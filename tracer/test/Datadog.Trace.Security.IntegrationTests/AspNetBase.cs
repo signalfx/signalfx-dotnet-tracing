@@ -54,7 +54,7 @@ namespace Datadog.Trace.Security.IntegrationTests
             };
         }
 
-        public Task<MockTracerAgent> RunOnSelfHosted(bool enableSecurity, bool enableBlocking, string externalRulesFile = null, int? traceRateLimit = null)
+        public Task<MockTracerAgent> RunOnSelfHosted(bool enableSecurity, string externalRulesFile = null, int? traceRateLimit = null)
         {
             if (_agent == null)
             {
@@ -66,7 +66,6 @@ namespace Datadog.Trace.Security.IntegrationTests
                 _agent,
                 arguments: null,
                 enableSecurity: enableSecurity,
-                enableBlocking: enableBlocking,
                 externalRulesFile: externalRulesFile,
                 traceRateLimit: traceRateLimit);
 
@@ -275,7 +274,6 @@ namespace Datadog.Trace.Security.IntegrationTests
             string framework = "",
             string path = "/Home",
             bool enableSecurity = true,
-            bool enableBlocking = true,
             string externalRulesFile = null,
             int? traceRateLimit = null)
         {
@@ -304,7 +302,6 @@ namespace Datadog.Trace.Security.IntegrationTests
                 logsCollectorPort: logsCollectorPort,
                 aspNetCorePort: 0,
                 enableSecurity: enableSecurity,
-                enableBlocking: enableBlocking,
                 externalRulesFile: externalRulesFile);
 
             // then wait server ready
