@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.ClrProfiler.IntegrationTests.Helpers;
+using Datadog.Trace.Configuration;
 using Datadog.Trace.TestHelpers;
 using FluentAssertions;
 using Xunit;
@@ -121,6 +122,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AWS
         [Trait("Category", "EndToEnd")]
         public void SubmitsTraces(string packageVersion)
         {
+            using var telemetry = this.ConfigureTelemetry();
             using (var agent = EnvironmentHelper.GetMockAgent())
             using (RunSampleAndWaitForExit(agent, packageVersion: packageVersion))
             {
@@ -133,6 +135,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AWS
                     .ExcludingDefaultSpanProperties()
                     .AssertMetricsMatchExcludingKeys("_dd.tracer_kr", "_sampling_priority_v1")
                     .AssertTagsMatchAndSpecifiedTagsPresent("deployment.environment", "aws.requestId", "aws.queue.url"));
+                telemetry.AssertIntegrationEnabled(IntegrationId.AwsSqs);
             }
         }
 

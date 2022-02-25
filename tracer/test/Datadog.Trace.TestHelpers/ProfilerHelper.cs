@@ -39,7 +39,7 @@ namespace Datadog.Trace.TestHelpers
                 agent,
                 aspNetCorePort,
                 logsCollectorPort,
-                startInfo.EnvironmentVariables,
+                startInfo.Environment,
                 processToProfile,
                 enableSecurity.GetValueOrDefault(),
                 enableBlocking.GetValueOrDefault(),

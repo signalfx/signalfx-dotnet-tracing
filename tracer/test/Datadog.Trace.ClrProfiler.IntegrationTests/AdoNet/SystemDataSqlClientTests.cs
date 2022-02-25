@@ -52,6 +52,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             const string dbType = "mssql";
             const string expectedOperationName = dbType + ".query";
             const string expectedServiceName = "Samples.SqlServer";
+
+            using var telemetry = this.ConfigureTelemetry();
             using var agent = EnvironmentHelper.GetMockAgent();
             using var process = RunSampleAndWaitForExit(agent, packageVersion: packageVersion);
             var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
@@ -67,6 +69,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
                 Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
                 Assert.Contains(Tags.DbStatement, (IDictionary<string, string>)span.Tags);
             }
+
+            telemetry.AssertIntegrationEnabled(IntegrationId.SqlClient);
         }
 
         [SkippableFact]
@@ -80,12 +84,14 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             SetEnvironmentVariable($"SIGNALFX_TRACE_{nameof(IntegrationId.SqlClient)}_ENABLED", "false");
 
             string packageVersion = PackageVersions.SystemDataSqlClient.First()[0] as string;
+            using var telemetry = this.ConfigureTelemetry();
             using var agent = EnvironmentHelper.GetMockAgent();
             using var process = RunSampleAndWaitForExit(agent, packageVersion: packageVersion);
             var spans = agent.WaitForSpans(totalSpanCount, returnAllOperations: true);
 
             Assert.NotEmpty(spans);
             Assert.Empty(spans.Where(s => s.Name.Equals(expectedOperationName)));
+            telemetry.AssertIntegrationDisabled(IntegrationId.SqlClient);
         }
     }
 }

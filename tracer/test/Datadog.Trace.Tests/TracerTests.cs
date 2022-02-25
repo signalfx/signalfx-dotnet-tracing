@@ -80,7 +80,7 @@ namespace Datadog.Trace.Tests
         public void StartActive_IgnoreActiveScope_RootSpan()
         {
             var firstScope = _tracer.StartActive("First");
-            var secondScope = (Scope)_tracer.StartActive("Second", ignoreActiveScope: true);
+            var secondScope = (Scope)_tracer.StartActive("Second", new SpanCreationSettings { Parent = SpanContext.None });
             var secondSpan = secondScope.Span;
 
             Assert.True(secondSpan.IsRootSpan);
@@ -145,9 +145,11 @@ namespace Datadog.Trace.Tests
         {
             var traceId = TraceId.CreateFromInt(11);
             const ulong parentId = 7;
-            const SamplingPriority samplingPriority = SamplingPriority.UserKeep;
 
-            var parent = new SpanContext(traceId, parentId, samplingPriority);
+            // ML: todo: replace with int as in upstream
+            const int samplingPriority = SamplingPriorityValues.UserKeep;
+
+            var parent = new SpanContext(traceId, parentId, (SamplingPriority)samplingPriority);
             var spanCreationSettings = new SpanCreationSettings() { Parent = parent };
             var child = (Scope)_tracer.StartActive("Child", spanCreationSettings);
             var childSpan = child.Span;
@@ -159,7 +161,7 @@ namespace Datadog.Trace.Tests
             Assert.Equal(parent, childSpan.Context.Parent);
             Assert.Equal(parentId, childSpan.Context.ParentId);
             Assert.NotNull(childSpan.Context.TraceContext);
-            Assert.Equal(samplingPriority, childSpan.Context.TraceContext.SamplingPriority);
+            Assert.Equal((int?)samplingPriority, childSpan.Context.TraceContext.SamplingPriority);
         }
 
         [Fact]
@@ -241,7 +243,7 @@ namespace Datadog.Trace.Tests
         {
             var firstSpan = _tracer.StartSpan("First");
             _tracer.ActivateSpan(firstSpan);
-            var secondSpan = _tracer.StartSpan("Second", ignoreActiveScope: true);
+            var secondSpan = _tracer.StartSpan("Second", parent: SpanContext.None);
 
             Assert.True(secondSpan.IsRootSpan);
         }
@@ -365,7 +367,7 @@ namespace Datadog.Trace.Tests
         {
             var traceId = TraceId.CreateFromInt(9);
             const ulong spanId = 7;
-            const SamplingPriority samplingPriority = SamplingPriority.UserKeep;
+            const int samplingPriority = SamplingPriorityValues.UserKeep;
             const string origin = "synthetics";
 
             var propagatedContext = new SpanContext(traceId, spanId, samplingPriority, null, origin);

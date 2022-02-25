@@ -10,6 +10,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Datadog.Trace.Configuration;
 using Datadog.Trace.TestHelpers;
 using VerifyXunit;
 using Xunit;
@@ -71,6 +72,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
             const string expectedLogicScope = "wcf.request";
 
+            using var telemetry = this.ConfigureTelemetry();
             int wcfPort = 8585;
 
             using (var agent = EnvironmentHelper.GetMockAgent())
@@ -85,6 +87,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 await Verifier.Verify(spans, settings)
                               .UseMethodName("_");
+
+                // The custom binding doesn't trigger the integration
+                telemetry.AssertIntegration(IntegrationId.Wcf, enabled: binding != "Custom", autoEnabled: true);
             }
         }
     }

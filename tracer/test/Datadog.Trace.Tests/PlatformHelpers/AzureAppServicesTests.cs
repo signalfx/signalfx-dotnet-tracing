@@ -166,6 +166,42 @@ namespace Datadog.Trace.Tests.PlatformHelpers
             Assert.Equal(actual: metadata.DebugModeEnabled, expected: expectation);
         }
 
+        [Theory]
+        [InlineData(null, false)]
+        [InlineData("0", false)]
+        [InlineData("false", false)]
+        [InlineData("f", false)]
+        [InlineData("F", false)]
+        [InlineData("1", true)]
+        [InlineData("t", true)]
+        [InlineData("true", true)]
+        [InlineData("T", true)]
+        public void CustomMetricsEnabled_Tests(string customMetrics, bool expectation)
+        {
+            // plan resource group actually doesn't matter for the resource id we build
+            var vars = GetMockVariables("subscription", "deploymentId", "some-resource-group", "siteResourceGroup", enableCustomMetrics: customMetrics);
+            var metadata = new AzureAppServices(vars);
+            Assert.Equal(actual: metadata.NeedsDogStatsD, expected: expectation);
+        }
+
+        [Theory]
+        [InlineData(null, false)]
+        [InlineData("0", false)]
+        [InlineData("false", false)]
+        [InlineData("f", false)]
+        [InlineData("F", false)]
+        [InlineData("1", true)]
+        [InlineData("t", true)]
+        [InlineData("true", true)]
+        [InlineData("T", true)]
+        public void CustomTracingEnabled_Tests(string customTracing, bool expectation)
+        {
+            // plan resource group actually doesn't matter for the resource id we build
+            var vars = GetMockVariables("subscription", "deploymentId", "some-resource-group", "siteResourceGroup", enableCustomTracing: customTracing);
+            var metadata = new AzureAppServices(vars);
+            Assert.Equal(actual: metadata.CustomTracingEnabled, expected: expectation);
+        }
+
         [Fact]
         public void PopulatesOnlyRootSpans()
         {
@@ -229,7 +265,9 @@ namespace Datadog.Trace.Tests.PlatformHelpers
             string siteResourceGroup,
             string ddTraceDebug = null,
             string functionsVersion = null,
-            string functionsRuntime = null)
+            string functionsRuntime = null,
+            string enableCustomTracing = null,
+            string enableCustomMetrics = null)
         {
             var vars = Environment.GetEnvironmentVariables();
 
@@ -237,12 +275,6 @@ namespace Datadog.Trace.Tests.PlatformHelpers
             {
                 // This is the COMPUTERNAME key which we'll remove for consistent testing
                 vars.Remove(AzureAppServices.InstanceNameKey);
-            }
-
-            if (!vars.Contains(Datadog.Trace.Configuration.ConfigurationKeys.SignalFxAccessToken))
-            {
-                // This is a needed configuration for the AAS extension
-                vars.Add(Datadog.Trace.Configuration.ConfigurationKeys.SignalFxAccessToken, "1");
             }
 
             if (vars.Contains(ConfigurationKeys.DebugEnabled))
@@ -274,6 +306,9 @@ namespace Datadog.Trace.Tests.PlatformHelpers
             {
                 vars.Add(AzureAppServices.FunctionsWorkerRuntimeKey, functionsRuntime);
             }
+
+            vars.Add(AzureAppServices.AasEnableCustomTracing, enableCustomTracing ?? "false");
+            vars.Add(AzureAppServices.AasEnableCustomMetrics, enableCustomMetrics ?? "false");
 
             return vars;
         }

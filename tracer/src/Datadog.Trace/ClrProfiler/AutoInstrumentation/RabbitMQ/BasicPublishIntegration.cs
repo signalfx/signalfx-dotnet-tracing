@@ -28,7 +28,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.RabbitMQ
         IntegrationName = RabbitMQConstants.IntegrationName)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public unsafe class BasicPublishIntegration
+    public class BasicPublishIntegration
     {
         private const string Command = RabbitMQIntegration.PublishCommand;
 

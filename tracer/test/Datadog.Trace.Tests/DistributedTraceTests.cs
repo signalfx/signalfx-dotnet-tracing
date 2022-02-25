@@ -19,8 +19,8 @@ namespace Datadog.Trace.Tests
 
             TraceId traceId;
             ulong parentSpanId;
-            string samplingPriorityText = null;
-            var expectedSamplingPriority = (int)SamplingPriority.UserKeep;
+            string samplingPriorityText;
+            var expectedSamplingPriority = SamplingPriorityValues.UserKeep;
 
             using (var scope = tracer.StartActive("manual.trace"))
             {

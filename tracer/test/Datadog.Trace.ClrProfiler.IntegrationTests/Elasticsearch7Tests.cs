@@ -29,6 +29,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("Category", "EndToEnd")]
         public void SubmitsTraces(string packageVersion)
         {
+            using var telemetry = this.ConfigureTelemetry();
             using (var agent = EnvironmentHelper.GetMockAgent())
             using (RunSampleAndWaitForExit(agent, packageVersion: packageVersion))
             {
@@ -148,6 +149,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 }
 
                 ValidateSpans(spans, (span) => span.Resource, expected);
+                telemetry.AssertIntegrationEnabled(IntegrationId.ElasticsearchNet);
             }
         }
 
@@ -156,6 +158,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("Category", "ArmUnsupported")]
         public void IntegrationDisabled()
         {
+            using var telemetry = this.ConfigureTelemetry();
             string packageVersion = PackageVersions.ElasticSearch7.First()[0] as string;
             SetEnvironmentVariable($"SIGNALFX_TRACE_{nameof(IntegrationId.ElasticsearchNet)}_ENABLED", "false");
             using var agent = EnvironmentHelper.GetMockAgent();
@@ -163,6 +166,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             var spans = agent.WaitForSpans(1).Where(s => s.Type == "elasticsearch").ToList();
 
             Assert.Empty(spans);
+            telemetry.AssertIntegrationDisabled(IntegrationId.ElasticsearchNet);
         }
     }
 }

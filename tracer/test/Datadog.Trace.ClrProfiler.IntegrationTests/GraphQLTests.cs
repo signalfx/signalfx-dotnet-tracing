@@ -15,6 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
+using Datadog.Trace.Configuration;
 using Datadog.Trace.TestHelpers;
 using Xunit;
 using Xunit.Abstractions;
@@ -93,6 +94,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
         protected void RunSubmitsTraces(string packageVersion = "")
         {
+            using var telemetry = this.ConfigureTelemetry();
             int aspNetCorePort = TcpPortProvider.GetOpenPort();
 
             using (var agent = EnvironmentHelper.GetMockAgent())
@@ -184,6 +186,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 var spans = graphQLValidateSpans.Concat(graphQLExecuteSpans).ToList();
                 SpanTestHelpers.AssertExpectationsMet(_expectations, spans);
             }
+
+            telemetry.AssertIntegrationEnabled(IntegrationId.GraphQL);
         }
 
         private void InitializeExpectations(string sampleName)

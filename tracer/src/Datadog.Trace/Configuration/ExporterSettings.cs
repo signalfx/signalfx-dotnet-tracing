@@ -48,7 +48,8 @@ namespace Datadog.Trace.Configuration
         /// Initializes a new instance of the <see cref="ExporterSettings"/> class.
         /// Direct use in tests only.
         /// </summary>
-        internal ExporterSettings(IConfigurationSource source)
+        /// <param name="source">The <see cref="IConfigurationSource"/> to use when retrieving configuration values.</param>
+        public ExporterSettings(IConfigurationSource source)
         {
             var ingestRealm = source?.GetString(ConfigurationKeys.IngestRealm) ??
                               LocalIngestRealm;

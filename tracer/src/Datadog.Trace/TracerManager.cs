@@ -1,4 +1,4 @@
-﻿// <copyright file="TracerManager.cs" company="Datadog">
+// <copyright file="TracerManager.cs" company="Datadog">
 // Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
@@ -21,6 +21,7 @@ using Datadog.Trace.PlatformHelpers;
 using Datadog.Trace.Propagation;
 using Datadog.Trace.RuntimeMetrics;
 using Datadog.Trace.Sampling;
+using Datadog.Trace.Telemetry;
 using Datadog.Trace.Util;
 using Datadog.Trace.Vendors.Newtonsoft.Json;
 using Datadog.Trace.Vendors.StatsdClient;
@@ -55,6 +56,7 @@ namespace Datadog.Trace
             RuntimeMetricsWriter runtimeMetricsWriter,
             ITraceIdConvention traceIdConvention,
             DirectLogSubmissionManager directLogSubmission,
+            ITelemetryController telemetry,
             string defaultServiceName)
         {
             Settings = settings;
@@ -67,6 +69,7 @@ namespace Datadog.Trace
             DefaultServiceName = defaultServiceName;
             TraceIdConvention = traceIdConvention;
             DirectLogSubmission = directLogSubmission;
+            Telemetry = telemetry;
         }
 
         /// <summary>
@@ -120,6 +123,8 @@ namespace Datadog.Trace
 
         public IDogStatsd Statsd { get; }
 
+        public ITelemetryController Telemetry { get; }
+
         private RuntimeMetricsWriter RuntimeMetrics { get; }
 
         /// <summary>
@@ -162,6 +167,16 @@ namespace Datadog.Trace
             }
         }
 
+        /// <summary>
+        /// Start internal processes that require Tracer.Instance is already set
+        /// </summary>
+        internal void Start()
+        {
+            // Must be idempotent and thread safe
+            DirectLogSubmission?.Sink.Start();
+            Telemetry?.Start();
+        }
+
         private static async Task CleanUpOldTracerManager(TracerManager oldManager, TracerManager newManager)
         {
             try
@@ -187,10 +202,17 @@ namespace Datadog.Trace
                     oldManager.RuntimeMetrics?.Dispose();
                 }
 
+                var telemetryReplaced = false;
+                if (oldManager.Telemetry != newManager.Telemetry)
+                {
+                    telemetryReplaced = true;
+                    oldManager.Telemetry.Dispose(sendAppClosingTelemetry: false);
+                }
+
                 Log.Information(
                     exception: null,
-                    "Replaced global instances. AgentWriter: {AgentWriterReplaced}, StatsD: {StatsDReplaced}, RuntimeMetricsWriter: {RuntimeMetricsWriterReplaced}",
-                    new object[] { agentWriterReplaced, statsdReplaced, runtimeMetricsWriterReplaced });
+                    "Replaced global instances. AgentWriter: {AgentWriterReplaced}, StatsD: {StatsDReplaced}, RuntimeMetricsWriter: {RuntimeMetricsWriterReplaced}, Telemetry: {TelemetryReplaced}",
+                    new object[] { agentWriterReplaced, statsdReplaced, runtimeMetricsWriterReplaced, telemetryReplaced });
             }
             catch (Exception ex)
             {
@@ -344,8 +366,8 @@ namespace Datadog.Trace
                     writer.WritePropertyName("appsec_enabled");
                     writer.WriteValue(Security.Instance.Settings.Enabled);
 
-                    writer.WritePropertyName("appsec_blocking_enabled");
-                    writer.WriteValue(Security.Instance.Settings.BlockingEnabled);
+                    writer.WritePropertyName("appsec_trace_rate_limit");
+                    writer.WriteValue(Security.Instance.Settings.TraceRateLimit);
 
                     writer.WritePropertyName("appsec_rules_file_path");
                     writer.WriteValue(Security.Instance.Settings.Rules ?? "(default)");
@@ -426,9 +448,11 @@ namespace Datadog.Trace
         {
             try
             {
-                _instance?.AgentWriter.FlushAndCloseAsync().Wait();
+                var flushTracesTask = _instance?.AgentWriter.FlushAndCloseAsync();
                 _heartbeatTimer?.Dispose();
                 _instance?.DirectLogSubmission?.Dispose();
+                _instance?.Telemetry?.Dispose();
+                flushTracesTask?.Wait();
             }
             catch (Exception ex)
             {

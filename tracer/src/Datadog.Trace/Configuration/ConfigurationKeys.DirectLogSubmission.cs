@@ -46,7 +46,8 @@ namespace Datadog.Trace.Configuration
 
             /// <summary>
             /// Configuration key for the url to send logs to.
-            /// Default value is <c>https://http-intake.logs.datadoghq.com:443</c>.
+            /// Default value uses the domain set in <see cref="ConfigurationKeys.Site"/>, so defaults to
+            /// <c>https://http-intake.logs.datadoghq.com:443</c>.
             /// </summary>
             /// <seealso cref="DirectLogSubmissionSettings.DirectLogSubmissionUrl"/>
             public const string Url = "SIGNALFX_LOGS_DIRECT_SUBMISSION_URL";

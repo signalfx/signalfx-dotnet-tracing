@@ -7,6 +7,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using Datadog.Trace.Propagation;
 using Datadog.Trace.Util;
 
 namespace Datadog.Trace
@@ -17,6 +18,13 @@ namespace Datadog.Trace
     public class SpanContext : ISpanContext, IReadOnlyDictionary<string, string>
     {
         private static readonly string[] KeyNames = { "trace-id", "parent-id", "sampling-priority", "origin", "tags" };
+
+        /// <summary>
+        /// An <see cref="ISpanContext"/> with default values. Can be used as the value for
+        /// <see cref="SpanCreationSettings.Parent"/> in <see cref="Tracer.StartActive(string, SpanCreationSettings)"/>
+        /// to specify that the new span should not inherit the currently active scope as its parent.
+        /// </summary>
+        public static readonly ISpanContext None = new ReadOnlySpanContext(traceId: 0, spanId: 0, serviceName: null);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SpanContext"/> class
@@ -31,7 +39,7 @@ namespace Datadog.Trace
             : this(traceId, serviceName)
         {
             SpanId = spanId;
-            SamplingPriority = samplingPriority;
+            SamplingPriority = (int?)samplingPriority;
         }
 
         /// <summary>
@@ -60,7 +68,7 @@ namespace Datadog.Trace
         /// <param name="samplingPriority">The propagated sampling priority.</param>
         /// <param name="serviceName">The service name to propagate to child spans.</param>
         /// <param name="origin">The propagated origin of the trace.</param>
-        internal SpanContext(TraceId? traceId, ulong spanId, SamplingPriority? samplingPriority, string serviceName, string origin)
+        internal SpanContext(TraceId? traceId, ulong spanId, int? samplingPriority, string serviceName, string origin)
             : this(traceId, serviceName)
         {
             SpanId = spanId;
@@ -150,7 +158,7 @@ namespace Datadog.Trace
         /// Gets the sampling priority for contexts created from incoming propagated context.
         /// Returns null for local contexts.
         /// </summary>
-        internal SamplingPriority? SamplingPriority { get; }
+        internal int? SamplingPriority { get; }
 
         /// <inheritdoc/>
         int IReadOnlyCollection<KeyValuePair<string, string>>.Count => KeyNames.Length;
@@ -230,9 +238,7 @@ namespace Datadog.Trace
                     return true;
 
                 case "sampling-priority":
-                    var samplingPriority = SamplingPriority;
-
-                    value = samplingPriority != null ? ((int)samplingPriority.Value).ToString() : null;
+                    value = SamplingPriority?.ToString();
                     return true;
 
                 case "origin":

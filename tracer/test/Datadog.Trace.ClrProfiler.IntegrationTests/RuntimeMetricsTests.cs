@@ -40,7 +40,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [SkippableFact]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
-        public void UdpSubmitsMetrics()
+        public void SubmitsMetrics()
         {
             EnvironmentHelper.EnableDefaultTransport();
             RunTest();

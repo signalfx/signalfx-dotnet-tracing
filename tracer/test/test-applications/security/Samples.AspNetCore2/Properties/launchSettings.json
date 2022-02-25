@@ -14,7 +14,6 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "SIGNALFX_APPSEC_ENABLED": "true",
-        "SIGNALFX_APPSEC_BLOCKING_ENABLED": "true",
 
         "COR_ENABLE_PROFILING": "1",
         "COR_PROFILER": "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}",
@@ -38,7 +37,6 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "SIGNALFX_APPSEC_ENABLED": "true",
-        "SIGNALFX_APPSEC_BLOCKING_ENABLED": "true",
 
         "COR_ENABLE_PROFILING": "1",
         "COR_PROFILER": "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}",

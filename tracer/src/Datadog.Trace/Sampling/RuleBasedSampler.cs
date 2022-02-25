@@ -31,7 +31,7 @@ namespace Datadog.Trace.Sampling
             _defaultRule.SetDefaultSampleRates(sampleRates);
         }
 
-        public SamplingPriority GetSamplingPriority(Span span)
+        public int GetSamplingPriority(Span span)
         {
             var traceId = span.TraceId;
 
@@ -56,7 +56,7 @@ namespace Datadog.Trace.Sampling
 
             Log.Debug("No rules matched for trace {TraceId}", traceId);
 
-            return SamplingPriority.AutoKeep;
+            return SamplingPriorityValues.AutoKeep;
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace Datadog.Trace.Sampling
             _rules.Add(rule);
         }
 
-        private SamplingPriority GetSamplingPriority(Span span, float rate, bool agentSampling)
+        private int GetSamplingPriority(Span span, float rate, bool agentSampling)
         {
             // make a sampling decision as a function of traceId and sampling rate
             var sample = (((ulong)span.TraceId.Lower * KnuthFactor) % TracerConstants.MaxTraceId) <= (rate * TracerConstants.MaxTraceId);
@@ -87,13 +87,13 @@ namespace Datadog.Trace.Sampling
             // legacy sampling based on data from agent
             if (agentSampling)
             {
-                return sample ? SamplingPriority.AutoKeep : SamplingPriority.AutoReject;
+                return sample ? SamplingPriorityValues.AutoKeep : SamplingPriorityValues.AutoReject;
             }
 
             // rules-based sampling + rate limiter
             // NOTE: all tracers are changing this from AutoKeep/AutoReject to UserKeep/UserReject
             // to prevent the agent from overriding user configuration
-            return sample && _limiter.Allowed(span) ? SamplingPriority.UserKeep : SamplingPriority.UserReject;
+            return sample && _limiter.Allowed(span) ? SamplingPriorityValues.UserKeep : SamplingPriorityValues.UserReject;
         }
     }
 }

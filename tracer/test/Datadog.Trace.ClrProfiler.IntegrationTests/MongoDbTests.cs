@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Datadog.Trace.Configuration;
 using Datadog.Trace.TestHelpers;
 using FluentAssertions;
 using Xunit;
@@ -44,6 +45,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         {
             SetEnvironmentVariable("SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS", tagCommands.ToString().ToLowerInvariant());
 
+            using var telemetry = this.ConfigureTelemetry();
             using (var agent = EnvironmentHelper.GetMockAgent())
             using (RunSampleAndWaitForExit(agent, packageVersion: packageVersion))
             {
@@ -107,6 +109,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 }
 
                 foundNames.Should().BeEquivalentTo(expectedNames);
+                telemetry.AssertIntegrationEnabled(IntegrationId.MongoDb);
             }
         }
     }

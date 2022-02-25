@@ -24,7 +24,7 @@ namespace Datadog.Trace.Tests
         {
             var handler = new CustomHandler();
 
-            var factory = new HttpClientRequestFactory(handler);
+            var factory = new HttpClientRequestFactory(AgentHttpHeaderNames.DefaultHeaders, handler);
             var request = factory.Create(new Uri("http://localhost/"));
 
             request.AddHeader("Hello", "World");
@@ -45,7 +45,7 @@ namespace Datadog.Trace.Tests
         {
             var handler = new CustomHandler();
 
-            var factory = new HttpClientRequestFactory(handler);
+            var factory = new HttpClientRequestFactory(AgentHttpHeaderNames.DefaultHeaders, handler);
             var request = factory.Create(new Uri("http://localhost/"));
 
             await request.PostAsync(ArraySegment<byte>.Empty, MimeTypes.MsgPack);

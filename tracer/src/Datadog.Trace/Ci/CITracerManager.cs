@@ -12,14 +12,15 @@ using Datadog.Trace.Logging.DirectSubmission;
 using Datadog.Trace.Propagation;
 using Datadog.Trace.RuntimeMetrics;
 using Datadog.Trace.Sampling;
+using Datadog.Trace.Telemetry;
 using Datadog.Trace.Vendors.StatsdClient;
 
 namespace Datadog.Trace.Ci
 {
     internal class CITracerManager : TracerManager, ILockedTracer
     {
-        public CITracerManager(ImmutableTracerSettings settings, IAgentWriter agentWriter, ISampler sampler, IPropagator propagator, IScopeManager scopeManager, IDogStatsd statsd, RuntimeMetricsWriter runtimeMetricsWriter, ITraceIdConvention traceIdConvention, DirectLogSubmissionManager logSubmissionManager, string defaultServiceName)
-            : base(settings, agentWriter, sampler, propagator, scopeManager, statsd, runtimeMetricsWriter, traceIdConvention, logSubmissionManager, defaultServiceName)
+        public CITracerManager(ImmutableTracerSettings settings, IAgentWriter agentWriter, ISampler sampler, IPropagator propagator, IScopeManager scopeManager, IDogStatsd statsd, RuntimeMetricsWriter runtimeMetricsWriter, ITraceIdConvention traceIdConvention, DirectLogSubmissionManager logSubmissionManager, ITelemetryController telemetry, string defaultServiceName)
+            : base(settings, agentWriter, sampler, propagator, scopeManager, statsd, runtimeMetricsWriter, traceIdConvention, logSubmissionManager, telemetry, defaultServiceName)
         {
         }
     }

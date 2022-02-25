@@ -90,7 +90,6 @@ namespace Datadog.Trace.Tests.Logging.DirectSubmission
         [InlineData(ConfigurationKeys.DirectLogSubmission.Host, "   ")]
         [InlineData(ConfigurationKeys.DirectLogSubmission.Source, "")]
         [InlineData(ConfigurationKeys.DirectLogSubmission.Source, "   ")]
-        [InlineData(ConfigurationKeys.DirectLogSubmission.Url, "")]
         [InlineData(ConfigurationKeys.DirectLogSubmission.Url, "   ")]
         [InlineData(ConfigurationKeys.DirectLogSubmission.Url, "localhost")]
         public void InvalidSettingDisablesDirectLogSubmission(string setting, string value)

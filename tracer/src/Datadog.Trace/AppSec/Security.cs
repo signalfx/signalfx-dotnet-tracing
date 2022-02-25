@@ -35,6 +35,7 @@ namespace Datadog.Trace.AppSec
         private static bool _globalInstanceInitialized;
         private static object _globalInstanceLock = new();
 
+        private readonly RateLimiterTimer _rateLimiter;
         private readonly IWaf _waf;
         private readonly InstrumentationGateway _instrumentationGateway;
         private readonly SecuritySettings _settings;
@@ -88,7 +89,6 @@ namespace Datadog.Trace.AppSec
 
                 _instrumentationGateway = instrumentationGateway ?? new InstrumentationGateway();
 
-                _settings.Enabled = _settings.Enabled && AreArchitectureAndOsSupported();
                 if (_settings.Enabled)
                 {
                     _waf = waf ?? Waf.Waf.Create(_settings.Rules);
@@ -110,12 +110,13 @@ namespace Datadog.Trace.AppSec
                     }
 
                     LifetimeManager.Instance.AddShutdownTask(RunShutdown);
+                    _rateLimiter = new RateLimiterTimer(_settings.TraceRateLimit);
                 }
             }
             catch (Exception ex)
             {
                 _settings = new(source: null) { Enabled = false };
-                Log.Error(ex, "AppSec could not start because of an unexpected error. No security activities will be collected. Please contact support at https://docs.datadoghq.com/help/ for help.");
+                Log.Error(ex, "DDAS-0001-01: AppSec could not start because of an unexpected error. No security activities will be collected. Please contact support at https://docs.datadoghq.com/help/ for help.");
             }
         }
 
@@ -175,7 +176,7 @@ namespace Datadog.Trace.AppSec
                 for (var i = 0; i < results.Length; i++)
                 {
                     var match = results[i];
-                    Log.Debug(blocked ? "Blocking current transaction (rule: {RuleId})" : "Detecting an attack from rule {RuleId}", match.Rule);
+                    Log.Debug(blocked ? "DDAS-0012-02: Blocking current transaction (rule: {RuleId})" : "DDAS-0012-01: Detecting an attack from rule {RuleId}", match.Rule);
                 }
             }
         }
@@ -204,40 +205,14 @@ namespace Datadog.Trace.AppSec
             }
         }
 
-        private static bool AreArchitectureAndOsSupported()
-        {
-            var frameworkDescription = FrameworkDescription.Instance;
-            var osSupported = false;
-            var archSupported = false;
-
-            var currentOs = frameworkDescription.OSPlatform;
-            if (currentOs == OSPlatform.Linux || currentOs == OSPlatform.MacOS || currentOs == OSPlatform.Windows)
-            {
-                osSupported = true;
-            }
-
-            var currentArch = frameworkDescription.ProcessArchitecture;
-            if (currentArch == ProcessArchitecture.X64 || currentArch == ProcessArchitecture.X86)
-            {
-                archSupported = true;
-            }
-
-            if (!osSupported || !archSupported)
-            {
-                Log.Error(
-                    "AppSec could not start because the current environment is not supported. No security activities will be collected. Please contact support at https://docs.datadoghq.com/help/ for help. Host information: operating_system: {{ {OSPlatform} }}, arch: {{ {ProcessArchitecture} }}, runtime_infos: {{ {ProductVersion} }}",
-                    frameworkDescription.OSPlatform,
-                    frameworkDescription.ProcessArchitecture,
-                    frameworkDescription.ProductVersion);
-            }
-
-            return osSupported && archSupported;
-        }
-
         /// <summary>
         /// Frees resources
         /// </summary>
-        public void Dispose() => _waf?.Dispose();
+        public void Dispose()
+        {
+            _waf?.Dispose();
+            _rateLimiter.Dispose();
+        }
 
         private void InstrumentationGateway_AddHeadersResponseTags(object sender, InstrumentationGatewayEventArgs e)
         {
@@ -250,9 +225,22 @@ namespace Datadog.Trace.AppSec
         private void Report(ITransport transport, Span span, string resultData, bool blocked)
         {
             span.SetTag(Tags.AppSecEvent, "true");
-            var samplingPirority = _settings.KeepTraces
-                                       ? SamplingPriority.UserKeep : SamplingPriority.AutoReject;
-            span.SetTraceSamplingPriority(samplingPirority);
+            var exceededTraces = _rateLimiter.UpdateTracesCounter();
+            if (exceededTraces <= 0)
+            {
+                // NOTE: DD_APPSEC_KEEP_TRACES=false means "drop all traces by setting AutoReject".
+                // It does _not_ mean "stop setting UserKeep (do nothing)". It should only be used for testing.
+                span.SetTraceSamplingPriority(_settings.KeepTraces ? SamplingPriorityValues.UserKeep : SamplingPriorityValues.AutoReject);
+            }
+            else
+            {
+                span.SetMetric(Metrics.AppSecRateLimitDroppedTraces, exceededTraces);
+
+                if (!_settings.KeepTraces)
+                {
+                    span.SetTraceSamplingPriority(SamplingPriorityValues.AutoReject);
+                }
+            }
 
             LogMatchesIfDebugEnabled(resultData, blocked);
 
@@ -292,10 +280,10 @@ namespace Datadog.Trace.AppSec
             }
 
             // run the WAF and execute the results
-            using var wafResult = additiveContext.Run(args);
+            using var wafResult = additiveContext.Run(args, _settings.WafTimeoutMicroSeconds);
             if (wafResult.ReturnCode == ReturnCode.Monitor || wafResult.ReturnCode == ReturnCode.Block)
             {
-                var block = _settings.BlockingEnabled && wafResult.ReturnCode == ReturnCode.Block;
+                var block = wafResult.ReturnCode == ReturnCode.Block;
                 if (block)
                 {
                     // blocking has been removed, waiting a better implementation

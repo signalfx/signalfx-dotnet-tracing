@@ -62,12 +62,6 @@ namespace Datadog.Trace.Configuration
         public const string AppSecEnabled = "SIGNALFX_APPSEC_ENABLED";
 
         /// <summary>
-        /// Configuration key for enabling or disabling blocking in AppSec.
-        /// Default is value is false (disabled).
-        /// </summary>
-        public const string AppSecBlockingEnabled = "SIGNALFX_APPSEC_BLOCKING_ENABLED";
-
-        /// <summary>
         /// Override the default rules file provided. Must be a path to a valid JSON rules file.
         /// Default is value is null (do not override).
         /// </summary>
@@ -86,11 +80,21 @@ namespace Datadog.Trace.Configuration
         public const string AppSecExtraHeaders = "SIGNALFX_APPSEC_EXTRA_HEADERS";
 
         /// <summary>
-        /// Specifies if the AppSec traces should be explicitly kept or droped.
-        /// Default is true, to keep all traces, false will drop all traces.
+        /// Specifies if the AppSec traces should be explicitly kept or dropped.
+        /// Default is true, to keep all traces, false means drop all traces (by setting AutoReject as sampling priority).
         /// For internal testing only.
         /// </summary>
         internal const string AppSecKeepTraces = "SIGNALFX_APPSEC_KEEP_TRACES";
+
+        /// <summary>
+        /// Limits the amount of AppSec traces sent per second with an integer value, strictly positive.
+        /// </summary>
+        internal const string AppSecTraceRateLimit = "SIGNALFX_APPSEC_TRACE_RATE_LIMIT";
+
+        /// <summary>
+        /// Limits the amount of AppSec traces sent per second with an integer value, strictly positive.
+        /// </summary>
+        internal const string AppSecWafTimeout = "SIGNALFX_APPSEC_WAF_TIMEOUT";
 
         /// <summary>
         /// Configuration key for enabling or disabling the Tracer's debug mode.
@@ -303,6 +307,12 @@ namespace Datadog.Trace.Configuration
         public const string DiagnosticSourceEnabled = "SIGNALFX_DIAGNOSTIC_SOURCE_ENABLED";
 
         /// <summary>
+        /// Configuration key for setting the API key, used by the Agent.
+        /// This key is here for troubleshooting purposes.
+        /// </summary>
+        public const string ApiKey = "SIGNALFX_API_KEY";
+
+        /// <summary>
         /// Configuration key for the exporter to be used. The Tracer uses it to encode and
         /// dispatch traces.
         /// Default is <c>"Zipkin"</c>.
@@ -339,6 +349,12 @@ namespace Datadog.Trace.Configuration
         /// Override options available: <c>datadog-tcp</c>, <c>datadog-named-pipes</c>
         /// </summary>
         public const string TracesTransport = "SIGNALFX_TRACE_TRANSPORT";
+
+        /// <summary>
+        /// Configuration key for setting the default Datadog destination site.
+        /// Defaults to "datadoghq.com".
+        /// </summary>
+        public const string Site = "SIGNALFX_SITE";
 
         /// <summary>
         /// Configuration key for overriding which URLs are skipped by the tracer.
@@ -463,6 +479,21 @@ namespace Datadog.Trace.Configuration
             /// </summary>
             /// <seealso cref="TracerSettings.ThreadSamplingPeriod"/>
             public const string Period = "SIGNALFX_PROFILER_CALL_STACK_INTERVAL";
+        }
+
+        internal static class Telemetry
+        {
+            /// <summary>
+            /// Configuration key for enabling or disabling internal telemetry.
+            /// Default value is <c>true</c> (enabled).
+            /// </summary>
+            public const string Enabled = "SIGNALFX_INSTRUMENTATION_TELEMETRY_ENABLED";
+
+            /// <summary>
+            /// Configuration key for the telemetry URL where the Tracer sends telemetry.
+            /// Ignored (and <see cref="ExporterSettings.AgentUri"/> is used instead) unless <see cref="ConfigurationKeys.ApiKey"/> is set.
+            /// </summary>
+            public const string Uri = "SIGNALFX_TRACE_TELEMETRY_URL";
         }
     }
 }

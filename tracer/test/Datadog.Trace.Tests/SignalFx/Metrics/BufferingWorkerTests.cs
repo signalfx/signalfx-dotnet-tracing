@@ -84,7 +84,7 @@ public class BufferingWorkerTests
 
         // verify all 3 data points were sent
         metricExporter.SentMessages.Should().HaveCount(1);
-        metricExporter.Snapshots[0].Should().BeEquivalentTo(firstDatapoint, secondDatapoint, thirdDatapoint);
+        metricExporter.Snapshots[0].Should().BeEquivalentTo(new[] { firstDatapoint, secondDatapoint, thirdDatapoint });
     }
 
     [Fact]

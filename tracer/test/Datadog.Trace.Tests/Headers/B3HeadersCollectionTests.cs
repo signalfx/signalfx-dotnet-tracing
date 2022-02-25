@@ -56,7 +56,7 @@ namespace Datadog.Trace.Tests.Headers
         internal void Extract_InvalidSpanId(IHeadersCollection headers, string spanId)
         {
             var traceId = TraceId.CreateFromString("52686470458518446744073709551615");
-            const SamplingPriority samplingPriority = SamplingPriority.UserKeep;
+            const int samplingPriority = SamplingPriorityValues.UserKeep;
 
             InjectContext(
                 headers,

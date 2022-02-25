@@ -35,7 +35,7 @@ partial class Build
     [Solution("Datadog.Trace.sln")] readonly Solution Solution;
     AbsolutePath TracerDirectory => RootDirectory / "tracer";
     AbsolutePath SharedDirectory => RootDirectory / "shared";
-    AbsolutePath ProfilerDirectory => ProfilerSrcDirectory ?? RootDirectory / ".." / "dd-continuous-profiler-dotnet";
+    AbsolutePath ProfilerDirectory => RootDirectory / "profiler";
     AbsolutePath MsBuildProject => TracerDirectory / "Datadog.Trace.proj";
 
     AbsolutePath OutputDirectory => TracerDirectory / "bin";
@@ -53,7 +53,7 @@ partial class Build
 
     AbsolutePath ProfilerHomeDirectory => ProfilerHome ?? RootDirectory / ".." / "_build" / "DDProf-Deploy";
 
-    const string LibDdwafVersion = "1.0.16";
+    const string LibDdwafVersion = "1.0.17";
     AbsolutePath LibDdwafDirectory => (NugetPackageDirectory ?? RootDirectory / "packages") / $"libddwaf.{LibDdwafVersion}";
 
     AbsolutePath SourceDirectory => TracerDirectory / "src";
@@ -296,7 +296,6 @@ partial class Build
         .Unlisted()
         .After(Clean)
         .After(DownloadLibDdwaf)
-        .OnlyWhenStatic(() => !IsArm64) // not supported yet
         .Executes(() =>
         {
             if (IsWin)
@@ -326,7 +325,6 @@ partial class Build
         .Unlisted()
         .After(Clean)
         .After(DownloadLibDdwaf)
-        .OnlyWhenStatic(() => !IsArm64)// not supported yet
         .Executes(() =>
         {
             var project = Solution.GetProject(Projects.AppSecUnitTests);
@@ -513,14 +511,10 @@ partial class Build
                DDTracerHomeDirectory / profilerFileName,
                outputDir / profilerFileName);
 
-           // won't exist yet for arm64 builds
            var srcDdwafFile = DDTracerHomeDirectory / ddwafFileName;
-           if (File.Exists(srcDdwafFile))
-           {
-               MoveFile(
-                   srcDdwafFile,
-                   DDTracerHomeDirectory / architecture / ddwafFileName);
-           }
+           MoveFile(
+               srcDdwafFile,
+               DDTracerHomeDirectory / architecture / ddwafFileName);
        });
 
     Target BuildMsi => _ => _
@@ -668,10 +662,7 @@ partial class Build
                         "createLogPath.sh",
                     };
 
-                    if (!IsArm64)
-                    {
-                        args.Add("libddwaf.so");
-                    }
+                    args.Add("libddwaf.so");
 
                     var arguments = string.Join(" ", args);
                     fpm(arguments, workingDirectory: workingDirectory);
@@ -714,6 +705,7 @@ partial class Build
         .Unlisted()
         .After(Restore)
         .After(CompileManagedSrc)
+        .After(BuildRunnerTool)
         .DependsOn(CopyLibDdwafForAppSecUnitTests)
         .Executes(() =>
         {
@@ -748,6 +740,7 @@ partial class Build
                     .SetTargetPlatformAnyCPU()
                     .SetDDEnvironmentVariables("dd-tracer-dotnet")
                     .When(CodeCoverage, ConfigureCodeCoverage)
+                    .When(!string.IsNullOrEmpty(Filter), c => c.SetFilter(Filter))
                     .CombineWith(testProjects, (x, project) => x
                         .EnableTrxLogOutput(GetResultsDirectory(project))
                         .SetProjectFile(project)));
@@ -1183,6 +1176,7 @@ partial class Build
                         "Samples.AspNetCore2" => Framework == TargetFramework.NETCOREAPP2_1,
                         "Samples.AspNetCore5" => Framework == TargetFramework.NET6_0 || Framework == TargetFramework.NET5_0 || Framework == TargetFramework.NETCOREAPP3_1 || Framework == TargetFramework.NETCOREAPP3_0,
                         "Samples.GraphQL4" => Framework == TargetFramework.NETCOREAPP3_1 || Framework == TargetFramework.NET5_0 || Framework == TargetFramework.NET6_0,
+                        "Samples.AWS.Lambda" => Framework == TargetFramework.NETCOREAPP3_1,
                         var name when projectsToSkip.Contains(name) => false,
                         var name when TestAllPackageVersions && multiPackageProjects.Contains(name) => false,
                         "Samples.AspNetCoreRazorPages" => true,
@@ -1356,24 +1350,24 @@ partial class Build
          .OnlyWhenDynamic(() => (ToolSource != null))
          .Executes(() =>
          {
-            try
-            {
-                DotNetToolUninstall(s => s
-                    .SetToolInstallationPath(ToolInstallDirectory)
-                    .SetPackageName("dd-trace")
-                    .DisableProcessLogOutput());
-            }
-            catch
-            {
-                // This step is expected to fail if the tool is not already installed
-                Logger.Info("Could not uninstall the dd-trace tool. It's probably not installed.");
-            }
+             try
+             {
+                 DotNetToolUninstall(s => s
+                     .SetToolInstallationPath(ToolInstallDirectory)
+                     .SetPackageName("dd-trace")
+                     .DisableProcessLogOutput());
+             }
+             catch
+             {
+                 // This step is expected to fail if the tool is not already installed
+                 Logger.Info("Could not uninstall the dd-trace tool. It's probably not installed.");
+             }
 
-            DotNetToolInstall(s => s
-               .SetToolInstallationPath(ToolInstallDirectory)
-               .SetSources(ToolSourceDirectory)
-               .SetProcessArgumentConfigurator(args => args.Add("--no-cache"))
-               .SetPackageName("dd-trace"));
+             DotNetToolInstall(s => s
+                .SetToolInstallationPath(ToolInstallDirectory)
+                .SetSources(ToolSourceDirectory)
+                .SetProcessArgumentConfigurator(args => args.Add("--no-cache"))
+                .SetPackageName("dd-trace"));
          });
 
     Target BuildToolArtifactTests => _ => _

@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -196,7 +195,7 @@ namespace Datadog.Trace.TestHelpers
             MockTracerAgent agent,
             int aspNetCorePort,
             int? logsCollectorPort,
-            StringDictionary environmentVariables,
+            IDictionary<string, string> environmentVariables,
             string processToProfile = null,
             bool enableSecurity = false,
             bool enableBlocking = false,
@@ -241,11 +240,6 @@ namespace Datadog.Trace.TestHelpers
                 environmentVariables[ConfigurationKeys.AppSecEnabled] = enableSecurity.ToString();
             }
 
-            if (enableBlocking)
-            {
-                environmentVariables[ConfigurationKeys.AppSecBlockingEnabled] = enableBlocking.ToString();
-            }
-
             if (!string.IsNullOrEmpty(externalRulesFile))
             {
                 environmentVariables[ConfigurationKeys.AppSecRules] = externalRulesFile;
@@ -262,6 +256,7 @@ namespace Datadog.Trace.TestHelpers
 
             // set consistent env name (can be overwritten by custom environment variable)
             environmentVariables["SIGNALFX_ENV"] = "integration_tests";
+            environmentVariables[ConfigurationKeys.Telemetry.Enabled] = "false";
 
             // Don't attach the profiler to these processes
             environmentVariables["SIGNALFX_PROFILER_EXCLUDE_PROCESSES"] =
@@ -278,7 +273,7 @@ namespace Datadog.Trace.TestHelpers
             }
         }
 
-        public void ConfigureTransportVariables(StringDictionary environmentVariables, MockTracerAgent agent)
+        public void ConfigureTransportVariables(IDictionary<string, string> environmentVariables, MockTracerAgent agent)
         {
             // use DatadogAgent exporter instead of Zipkin, because most of the integration tests use MockTracerAgent instead of MockZipkinCollector
             environmentVariables["SIGNALFX_EXPORTER"] = "DatadogAgent";
@@ -480,7 +475,7 @@ namespace Datadog.Trace.TestHelpers
             TransportType = TestTransports.Tcp;
         }
 
-        public MockTracerAgent GetMockAgent(bool useStatsD = false)
+        public MockTracerAgent GetMockAgent(bool useStatsD = false, int? fixedPort = null)
         {
             MockTracerAgent agent = null;
 
@@ -493,7 +488,7 @@ namespace Datadog.Trace.TestHelpers
             else
             {
                 // Default
-                var agentPort = TcpPortProvider.GetOpenPort();
+                var agentPort = fixedPort ?? TcpPortProvider.GetOpenPort();
                 agent = new MockTracerAgent(agentPort, useSfxMetrics: useStatsD);
             }
 #else
@@ -504,7 +499,7 @@ namespace Datadog.Trace.TestHelpers
             else
             {
                 // Default
-                var agentPort = TcpPortProvider.GetOpenPort();
+                var agentPort = fixedPort ?? TcpPortProvider.GetOpenPort();
                 agent = new MockTracerAgent(agentPort, useSfxMetrics: useStatsD);
             }
 #endif

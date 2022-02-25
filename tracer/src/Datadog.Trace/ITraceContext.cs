@@ -11,7 +11,7 @@ namespace Datadog.Trace
     {
         DateTimeOffset UtcNow { get; }
 
-        SamplingPriority? SamplingPriority { get; set; }
+        int? SamplingPriority { get; }
 
         Span RootSpan { get; }
 
@@ -19,7 +19,7 @@ namespace Datadog.Trace
 
         void CloseSpan(Span span);
 
-        void SetSamplingPriority(SamplingPriority? samplingPriority, bool notifyDistributedTracer = true);
+        void SetSamplingPriority(int? samplingPriority, bool notifyDistributedTracer = true);
 
         TimeSpan ElapsedSince(DateTimeOffset date);
     }

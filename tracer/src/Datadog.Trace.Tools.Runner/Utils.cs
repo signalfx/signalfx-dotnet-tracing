@@ -24,7 +24,7 @@ namespace Datadog.Trace.Tools.Runner
 {
     internal class Utils
     {
-        public const string PROFILERID = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}";
+        public const string Profilerid = "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}";
 
         public static Dictionary<string, string> GetProfilerEnvironmentVariables(string runnerFolder, Platform platform, CommonTracerSettings options)
         {
@@ -113,11 +113,11 @@ namespace Datadog.Trace.Tools.Runner
                 ["SIGNALFX_DOTNET_TRACER_HOME"] = tracerHome,
                 ["SIGNALFX_DOTNET_TRACER_MSBUILD"] = tracerMsBuild,
                 ["CORECLR_ENABLE_PROFILING"] = "1",
-                ["CORECLR_PROFILER"] = PROFILERID,
+                ["CORECLR_PROFILER"] = Profilerid,
                 ["CORECLR_PROFILER_PATH_32"] = tracerProfiler32,
                 ["CORECLR_PROFILER_PATH_64"] = tracerProfiler64,
                 ["COR_ENABLE_PROFILING"] = "1",
-                ["COR_PROFILER"] = PROFILERID,
+                ["COR_PROFILER"] = Profilerid,
                 ["COR_PROFILER_PATH_32"] = tracerProfiler32,
                 ["COR_PROFILER_PATH_64"] = tracerProfiler64,
             };
@@ -222,11 +222,11 @@ namespace Datadog.Trace.Tools.Runner
                 ["SIGNALFX_DOTNET_TRACER_HOME"] = tracerHome,
                 ["SIGNALFX_DOTNET_TRACER_MSBUILD"] = tracerMsBuild,
                 ["CORECLR_ENABLE_PROFILING"] = "1",
-                ["CORECLR_PROFILER"] = PROFILERID,
+                ["CORECLR_PROFILER"] = Profilerid,
                 ["CORECLR_PROFILER_PATH_32"] = tracerProfiler32,
                 ["CORECLR_PROFILER_PATH_64"] = tracerProfiler64,
                 ["COR_ENABLE_PROFILING"] = "1",
-                ["COR_PROFILER"] = PROFILERID,
+                ["COR_PROFILER"] = Profilerid,
                 ["COR_PROFILER_PATH_32"] = tracerProfiler32,
                 ["COR_PROFILER_PATH_64"] = tracerProfiler64,
             };
@@ -448,6 +448,16 @@ namespace Datadog.Trace.Tools.Runner
         internal static void WriteError(string message)
         {
             AnsiConsole.MarkupLine($"[red]{message.EscapeMarkup()}[/]");
+        }
+
+        internal static void WriteWarning(string message)
+        {
+            AnsiConsole.MarkupLine($"[yellow]{message.EscapeMarkup()}[/]");
+        }
+
+        internal static void WriteSuccess(string message)
+        {
+            AnsiConsole.MarkupLine($"[green]{message.EscapeMarkup()}[/]");
         }
     }
 }

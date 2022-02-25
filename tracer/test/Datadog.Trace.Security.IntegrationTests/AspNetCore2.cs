@@ -31,7 +31,6 @@ namespace Datadog.Trace.Security.IntegrationTests
         [InlineData(true, false, HttpStatusCode.OK, "/Health/?test&[$slice]")]
         [InlineData(true, false, HttpStatusCode.NotFound, "/Health/login.php")]
         [Trait("RunOnWindows", "True")]
-        [Trait("Category", "ArmUnsupported")]
         public async Task TestSecurity(bool enableSecurity, bool enableBlocking, HttpStatusCode expectedStatusCode, string url = DefaultAttackUrl)
         {
             var agent = await RunOnSelfHosted(enableSecurity, enableBlocking);
@@ -39,7 +38,7 @@ namespace Datadog.Trace.Security.IntegrationTests
             var sanitisedUrl = VerifyHelper.SanitisePathsForVerify(url);
             var settings = VerifyHelper.GetSpanVerifierSettings(enableSecurity, enableBlocking, (int)expectedStatusCode, sanitisedUrl);
 
-            await TestBlockedRequestAsync(agent, url, 5, settings);
+            await TestBlockedRequestWithVerifyAsync(agent, url, 5, 1, settings);
         }
     }
 }

@@ -138,7 +138,7 @@ namespace Datadog.Trace.Configuration
 #endif
             };
 
-            if (TryLoadJsonConfigurationFile(configurationSource, out var jsonConfigurationSource))
+            if (TryLoadJsonConfigurationFile(configurationSource, null, out var jsonConfigurationSource))
             {
                 configurationSource.Add(jsonConfigurationSource);
             }
@@ -146,10 +146,11 @@ namespace Datadog.Trace.Configuration
             return configurationSource;
         }
 
-        private static bool TryLoadJsonConfigurationFile(IConfigurationSource configurationSource, out JsonConfigurationSource jsonConfigurationSource)
+        internal static bool TryLoadJsonConfigurationFile(IConfigurationSource configurationSource, string baseDirectory, out JsonConfigurationSource jsonConfigurationSource)
         {
             // if environment variable is not set, look for default file name in the current directory
-            var configurationFileName = configurationSource.GetString(ConfigurationKeys.ConfigurationFileName);
+            var configurationFileName = configurationSource.GetString(ConfigurationKeys.ConfigurationFileName) ??
+                                        Path.Combine(baseDirectory ?? GetCurrentDirectory(), "datadog.json");
 
             return TryLoadJsonConfigurationFile(configurationFileName, out jsonConfigurationSource);
         }

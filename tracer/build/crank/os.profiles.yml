@@ -62,14 +62,14 @@ profiles:
           - "{{ linuxEndpoint }}"
         environmentVariables:
           COR_PROFILER: "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"
-          COR_PROFILER_PATH: "{{ linuxProfilerPath }}/tracer-home-linux/Datadog.Trace.ClrProfiler.Native.so"
+          COR_PROFILER_PATH: "{{ linuxProfilerPath }}/tracer-home-linux/SignalFx.Tracing.ClrProfiler.Native.so"
           CORECLR_PROFILER: "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"
-          CORECLR_PROFILER_PATH: "{{ linuxProfilerPath }}/tracer-home-linux/Datadog.Trace.ClrProfiler.Native.so"
-          DD_DOTNET_TRACER_HOME: "{{ linuxProfilerPath }}/tracer-home-linux"
-          DD_AGENT_HOST: "{{ controllerIp }}"
-          DD_TRACE_LOGGING_RATE: 6
-          DD_TRACE_DEBUG: 0
-          DD_ENV: throughput-adhoc
+          CORECLR_PROFILER_PATH: "{{ linuxProfilerPath }}/tracer-home-linux/SignalFx.Tracing.ClrProfiler.Native.so"
+          SIGNALFX_DOTNET_TRACER_HOME: "{{ linuxProfilerPath }}/tracer-home-linux"
+          SIGNALFX_AGENT_HOST: "{{ controllerIp }}"
+          SIGNALFX_TRACE_LOGGING_RATE: 6
+          SIGNALFX_TRACE_DEBUG: 0
+          SIGNALFX_ENV: throughput-adhoc
         options:
           requiredOperatingSystem: linux
           requiredArchitecture: x64
@@ -91,12 +91,12 @@ profiles:
           COR_PROFILER_PATH: "{{ linuxProfilerPath }}/monitoring-home-linux/Datadog.AutoInstrumentation.NativeLoader.so"
           CORECLR_PROFILER: "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"
           CORECLR_PROFILER_PATH: "{{ linuxProfilerPath }}/monitoring-home-linux/Datadog.AutoInstrumentation.NativeLoader.so"
-          DD_DOTNET_TRACER_HOME: "{{ linuxProfilerPath }}/tracer-home-linux"
-          DD_DOTNET_PROFILER_HOME: "{{ linuxProfilerPath }}/profiler-home-linux"
-          DD_AGENT_HOST: "{{ controllerIp }}"
-          DD_TRACE_LOGGING_RATE: 6
-          DD_TRACE_DEBUG: 0
-          DD_ENV: throughput-adhoc
+          SIGNALFX_DOTNET_TRACER_HOME: "{{ linuxProfilerPath }}/tracer-home-linux"
+          SIGNALFX_DOTNET_PROFILER_HOME: "{{ linuxProfilerPath }}/profiler-home-linux"
+          SIGNALFX_AGENT_HOST: "{{ controllerIp }}"
+          SIGNALFX_TRACE_LOGGING_RATE: 6
+          SIGNALFX_TRACE_DEBUG: 0
+          SIGNALFX_ENV: throughput-adhoc
           LD_LIBRARY_PATH: "{{ linuxProfilerPath }}/profiler-home-linux"
           LD_PRELOAD: "{{ linuxProfilerPath }}/profiler-home-linux/Datadog.Linux.ApiWrapper.x64.so"
         options:

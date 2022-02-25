@@ -40,12 +40,13 @@ namespace Datadog.Trace.OpenTracing.Tests
         [Fact]
         public void Extract_WrongHeaderCase_ExtractionStillWorks()
         {
-            var traceId = TraceId.CreateFromInt(10);
+            TraceId traceId = TraceId.CreateFromInt(10);
             const ulong spanId = 120;
 
             var headers = new MockTextMap();
             headers.Set(HttpHeaderTraceId.ToUpper(), traceId.ToString());
             headers.Set(HttpHeaderSpanId.ToUpper(), spanId.ToString());
+            // headers.Set(HttpHeaderSamplingPriority.ToUpper(), samplingPriority.ToString());
 
             var spanContext = _codec.Extract(headers) as OpenTracingSpanContext;
 
@@ -58,7 +59,7 @@ namespace Datadog.Trace.OpenTracing.Tests
         public void Inject_SpanContext_HeadersWithCorrectInfo()
         {
             const ulong spanId = 10;
-            var traceId = TraceId.CreateFromInt(7);
+            TraceId traceId = TraceId.CreateFromInt(7);
             const SamplingPriority samplingPriority = SamplingPriority.UserKeep;
 
             var ddSpanContext = new SpanContext(traceId, spanId, samplingPriority);
