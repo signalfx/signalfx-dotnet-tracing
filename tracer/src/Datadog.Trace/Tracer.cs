@@ -46,7 +46,6 @@ namespace Datadog.Trace
 
         static Tracer()
         {
-            AgentProcessManager.Initialize();
             RegisterGlobalTracer(Instance);
         }
 

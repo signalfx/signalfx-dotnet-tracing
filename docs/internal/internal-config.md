@@ -58,6 +58,8 @@ These settings should be never used by the users.
 | `SIGNALFX_TRACE_SAMPLING_RULES` | Comma-separated list of sampling rules that enable custom sampling rules based on regular expressions. Rule are matched by order of specification. Only the first match is used. The item "sample_rate" must be in decimal format. Both `service` and `name` accept regular expressions. | `'[{"sample_rate":0.5, "service":"cart.*"}],[{"sample_rate":0.2, "name":"http.request"}]'` |
 | `SIGNALFX_TRACE_SERVICE_MAPPING` | Comma-separated map of services to rename. | `"key1:val1,key2:val2"` |
 | `SIGNALFX_TRACE_TRANSPORT` | Overrides the transport to use for communicating with the trace agent. Available values are: `datagod-tcp`, `datadog-named-pipes`. |  |
+| `SIGNALFX_AAS_ENABLE_CUSTOM_TRACING` | Used to force the loader to start the tracer agent (in case automatic instrumentation is disabled). Used in contexts where the user cannot manage agent processes, such as Azure App Services. |  |
+| `SIGNALFX_AAS_ENABLE_CUSTOM_METRICS` | Used to force the loader to start dogstatsd (in case automatic instrumentation is disabled). Used in contexts where the user cannot manage agent processes, such as Azure App Services. |  |
 
 ## Unpublished settings
 
