@@ -126,15 +126,19 @@ namespace PrepareRelease
             // Fully qualified name updates
             SynchronizeVersion(
                 "src/Datadog.Trace.ClrProfiler.Managed.Loader/Startup.cs",
-                FullAssemblyNameReplace);
+                MainLibFullAssemblyNameReplace);
 
             SynchronizeVersion(
                 "src/Datadog.Trace.ClrProfiler.Native/dd_profiler_constants.h",
-                FullAssemblyNameReplace);
+                MainLibFullAssemblyNameReplace);
 
             SynchronizeVersion(
                 "src/Datadog.Trace.ClrProfiler.Native/dd_profiler_constants.h",
                 text => FunctionCallReplace(text, "WithVersion"));
+
+            SynchronizeVersion(
+                "src/Datadog.Trace/Tracer.cs",
+                OpenTracingLibFullAssemblyNameReplace);
 
             // Four-part AssemblyVersion update
             SynchronizeVersion(
@@ -222,9 +226,14 @@ namespace PrepareRelease
             return Regex.Replace(text, prefix + VersionPattern(split), prefix + VersionString(split), RegexOptions.Singleline);
         }
 
-        private string FullAssemblyNameReplace(string text)
+        private string MainLibFullAssemblyNameReplace(string text)
         {
-            return Regex.Replace(text, AssemblyString(VersionPattern()), AssemblyString(VersionString()), RegexOptions.Singleline);
+            return Regex.Replace(text, MainAssemblyString(VersionPattern()), MainAssemblyString(VersionString()), RegexOptions.Singleline);
+        }
+
+        private string OpenTracingLibFullAssemblyNameReplace(string text)
+        {
+            return Regex.Replace(text, OpenTracingAssemblyString(VersionPattern()), OpenTracingAssemblyString(VersionString()), RegexOptions.Singleline);
         }
 
         private string MajorAssemblyVersionReplace(string text, string split)
@@ -329,9 +338,19 @@ namespace PrepareRelease
             return pattern;
         }
 
-        private string AssemblyString(string versionText)
+        private string MainAssemblyString(string versionText)
         {
-            return $"SignalFx.Tracing, Version={versionText}.0, Culture=neutral, PublicKeyToken=e43a27c2023d388a";
+            return AssemblyString("SignalFx.Tracing", versionText);
+        }
+
+        private string OpenTracingAssemblyString(string versionText)
+        {
+            return AssemblyString("SignalFx.Tracing.OpenTracing", versionText);
+        }
+
+        private string AssemblyString(string assemblyName, string versionText)
+        {
+            return $"{assemblyName}, Version={versionText}.0, Culture=neutral, PublicKeyToken=e43a27c2023d388a";
         }
     }
 }
