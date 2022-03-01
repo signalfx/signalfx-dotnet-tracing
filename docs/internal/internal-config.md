@@ -60,6 +60,11 @@ These settings should be never used by the users.
 | `SIGNALFX_TRACE_TRANSPORT` | Overrides the transport to use for communicating with the trace agent. Available values are: `datagod-tcp`, `datadog-named-pipes`. |  |
 | `SIGNALFX_AAS_ENABLE_CUSTOM_TRACING` | Used to force the loader to start the tracer agent (in case automatic instrumentation is disabled). Used in contexts where the user cannot manage agent processes, such as Azure App Services. |  |
 | `SIGNALFX_AAS_ENABLE_CUSTOM_METRICS` | Used to force the loader to start dogstatsd (in case automatic instrumentation is disabled). Used in contexts where the user cannot manage agent processes, such as Azure App Services. |  |
+| `SIGNALFX_INSTRUMENTATION_TELEMETRY_ENABLED` | Used to enable internal telemetry. | `false` |
+| `SIGNALFX_TRACE_TELEMETRY_URL` | Sets the telemetry URL where the tracer sends telemetry. |  |
+| `SIGNALFX_SITE` | Sets the default destination site. |  |
+| `SIGNALFX_LOG_LEVEL` | Sets the log level for serverless. |  |
+| `_SIGNALFX_EXTENSION_PATH` | Sets the lambda extension path. |  |
 
 ## Unpublished settings
 

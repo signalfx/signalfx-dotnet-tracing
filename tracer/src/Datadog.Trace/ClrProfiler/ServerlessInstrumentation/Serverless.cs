@@ -130,7 +130,7 @@ namespace Datadog.Trace.ClrProfiler.ServerlessInstrumentation
         {
             if (EnvironmentHelpers.GetEnvironmentVariable(LogLevelEnvName)?.ToLower() == "debug")
             {
-                Console.WriteLine("{0} {1}", DateTime.UtcNow.ToString("yyyy-MM-dd MM:mm:ss:fff"), str);
+                Console.WriteLine("{0:yyyy-MM-dd HH:mm:ss:fff} {1}", DateTime.UtcNow, str);
             }
         }
 
