@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Datadog.Trace.AppSec;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.PlatformHelpers;
 
@@ -19,7 +18,6 @@ namespace Datadog.Trace.Telemetry
         private int _tracerInstanceCount = 0;
         private int _hasChangesFlag = 0;
         private volatile CurrentSettings _settings;
-        private volatile SecuritySettings _securitySettings;
         private volatile bool _isTracerInitialized = false;
         private AzureAppServices _azureApServicesMetadata;
         private HostTelemetryData _hostData = null;
@@ -65,12 +63,6 @@ namespace Datadog.Trace.Telemetry
             };
 
             _isTracerInitialized = true;
-            SetHasChanges();
-        }
-
-        public void RecordSecuritySettings(SecuritySettings securitySettings)
-        {
-            _securitySettings = securitySettings;
             SetHasChanges();
         }
 
@@ -128,7 +120,6 @@ namespace Datadog.Trace.Telemetry
                 new(ConfigTelemetryData.PartialflushMinspans, value: settings.ExporterSettings.PartialFlushMinSpans),
                 new(ConfigTelemetryData.AasConfigurationError, value: _azureApServicesMetadata.IsUnsafeToTrace),
                 new(ConfigTelemetryData.TracerInstanceCount, value: _tracerInstanceCount),
-                new(ConfigTelemetryData.SecurityEnabled, value: _securitySettings?.Enabled),
                 new(ConfigTelemetryData.FullTrustAppDomain, value: AppDomain.CurrentDomain.IsFullyTrusted),
             };
 

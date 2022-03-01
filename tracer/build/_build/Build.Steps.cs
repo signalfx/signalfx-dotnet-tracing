@@ -107,8 +107,7 @@ partial class Build
 
     Project[] ClrProfilerIntegrationTests => new[]
     {
-        Solution.GetProject(Projects.ClrProfilerIntegrationTests),
-        Solution.GetProject(Projects.AppSecIntegrationTests),
+        Solution.GetProject(Projects.ClrProfilerIntegrationTests)
     };
 
     readonly IEnumerable<TargetFramework> TargetFrameworks = new[]
@@ -318,44 +317,6 @@ partial class Build
                 Logger.Info($"Copying '{source}' to '{dest}'");
                 CopyFileToDirectory(source, dest, FileExistsPolicy.Overwrite);
 
-            }
-        });
-
-    Target CopyLibDdwafForAppSecUnitTests => _ => _
-        .Unlisted()
-        .After(Clean)
-        .After(DownloadLibDdwaf)
-        .Executes(() =>
-        {
-            var project = Solution.GetProject(Projects.AppSecUnitTests);
-            var directory = project.Directory;
-            var targetFrameworks = project.GetTargetFrameworks();
-            if (IsWin)
-            {
-                foreach (var architecture in WafWindowsArchitectureFolders)
-                {
-                    CopyWaf(architecture, targetFrameworks, directory, "ddwaf", "dll");
-                }
-            }
-            else
-            {
-                var (architecture, ext) = GetUnixArchitectureAndExtension();
-                CopyWaf(architecture, targetFrameworks, directory, "libddwaf", ext);
-            }
-
-            void CopyWaf(string architecture, IEnumerable<string> frameworks, AbsolutePath absolutePath, string wafFileName, string extension)
-            {
-                var source = LibDdwafDirectory / "runtimes" / architecture / "native" / $"{wafFileName}.{extension}";
-                var nativeDir = DDTracerHomeDirectory / architecture / $"SignalFx.Tracing.ClrProfiler.Native.{extension}";
-                foreach (var fmk in frameworks)
-                {
-                    var dest = absolutePath / "bin" / BuildConfiguration / fmk / architecture;
-                    CopyFileToDirectory(source, dest, FileExistsPolicy.Overwrite);
-                    if (!IsWin)
-                    {
-                        CopyFileToDirectory(nativeDir, absolutePath / "bin" / BuildConfiguration / fmk, FileExistsPolicy.Overwrite);
-                    }
-                }
             }
         });
 
@@ -706,7 +667,6 @@ partial class Build
         .After(Restore)
         .After(CompileManagedSrc)
         .After(BuildRunnerTool)
-        .DependsOn(CopyLibDdwafForAppSecUnitTests)
         .Executes(() =>
         {
             // Always AnyCPU
@@ -1279,7 +1239,6 @@ partial class Build
                         .SetProjectFile(project)));
 
             IntegrationTestLinuxProfilerDirFudge(Projects.ClrProfilerIntegrationTests);
-            IntegrationTestLinuxProfilerDirFudge(Projects.AppSecIntegrationTests);
         });
 
     Target RunLinuxIntegrationTests => _ => _

@@ -11,7 +11,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Datadog.Trace.Agent;
-using Datadog.Trace.AppSec;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Conventions;
 using Datadog.Trace.DogStatsd;
@@ -362,18 +361,6 @@ namespace Datadog.Trace
 
                     writer.WritePropertyName("agent_error");
                     writer.WriteValue(agentError ?? string.Empty);
-
-                    writer.WritePropertyName("appsec_enabled");
-                    writer.WriteValue(Security.Instance.Settings.Enabled);
-
-                    writer.WritePropertyName("appsec_trace_rate_limit");
-                    writer.WriteValue(Security.Instance.Settings.TraceRateLimit);
-
-                    writer.WritePropertyName("appsec_rules_file_path");
-                    writer.WriteValue(Security.Instance.Settings.Rules ?? "(default)");
-
-                    writer.WritePropertyName("appsec_libddwaf_version");
-                    writer.WriteValue(Security.Instance.DdlibWafVersion?.ToString() ?? "(none)");
 
                     writer.WritePropertyName("thread_sampling_enabled");
                     writer.WriteValue(instanceSettings.ThreadSamplingEnabled);

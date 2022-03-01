@@ -1,10 +1,9 @@
-﻿// <copyright file="ITelemetryController.cs" company="Datadog">
+// <copyright file="ITelemetryController.cs" company="Datadog">
 // Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
 using System;
-using Datadog.Trace.AppSec;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.PlatformHelpers;
 
@@ -32,11 +31,6 @@ namespace Datadog.Trace.Telemetry
         /// Only the first tracer registered is recorded
         /// </summary>
         void RecordTracerSettings(ImmutableTracerSettings settings, string defaultServiceName, AzureAppServices appServicesMetadata);
-
-        /// <summary>
-        /// Called when app sec security is enabled to record the security settings
-        /// </summary>
-        public void RecordSecuritySettings(SecuritySettings settings);
 
         /// <summary>
         /// Dispose resources for sending telemetry

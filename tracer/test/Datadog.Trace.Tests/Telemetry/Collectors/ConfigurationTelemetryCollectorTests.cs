@@ -13,7 +13,6 @@ using System.Linq;
 using System.Security;
 using System.Security.Permissions;
 #endif
-using Datadog.Trace.AppSec;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.PlatformHelpers;
 using Datadog.Trace.Telemetry;
@@ -72,26 +71,6 @@ namespace Datadog.Trace.Tests.Telemetry
             data.LanguageVersion.Should().Be(FrameworkDescription.Instance.ProductVersion);
             data.RuntimeName.Should().NotBeNullOrEmpty().And.Be(FrameworkDescription.Instance.Name);
             data.RuntimeVersion.Should().BeNull();
-        }
-
-        [Theory]
-        [InlineData(false)]
-        [InlineData(true)]
-        public void ConfigurationDataShouldIncludeExpectedSecurityValues(bool enabled)
-        {
-            var collector = new ConfigurationTelemetryCollector();
-
-            collector.RecordTracerSettings(new ImmutableTracerSettings(new TracerSettings()), ServiceName, EmptyAasSettings);
-            var source = new NameValueConfigurationSource(new NameValueCollection
-            {
-                { ConfigurationKeys.AppSecEnabled, enabled.ToString() },
-            });
-            collector.RecordSecuritySettings(new SecuritySettings(source));
-
-            var data = collector.GetConfigurationData()
-                                .ToDictionary(x => x.Name, x => x.Value);
-
-            data[ConfigTelemetryData.SecurityEnabled].Should().Be(enabled);
         }
 
         [Fact]
