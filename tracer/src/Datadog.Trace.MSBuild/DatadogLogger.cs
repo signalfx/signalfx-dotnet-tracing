@@ -33,7 +33,7 @@ namespace Datadog.Trace.MSBuild
         {
             try
             {
-                Environment.SetEnvironmentVariable(Configuration.ConfigurationKeys.CIVisibilityEnabled, "1", EnvironmentVariableTarget.Process);
+                Environment.SetEnvironmentVariable(Configuration.ConfigurationKeys.CIVisibility.Enabled, "1", EnvironmentVariableTarget.Process);
             }
             catch
             {
@@ -107,6 +107,8 @@ namespace Datadog.Trace.MSBuild
                 _buildSpan.SetTraceSamplingPriority(SamplingPriorityValues.AutoKeep);
 
                 _buildSpan.Type = SpanTypes.Build;
+                _buildSpan.SetTag(Tags.Origin, TestTags.CIAppTestOriginName);
+                _buildSpan.SetTag(Tags.Language, TracerConstants.Language);
                 _buildSpan.SetTag(BuildTags.BuildName, e.SenderName);
                 foreach (KeyValuePair<string, string> envValue in e.BuildEnvironment)
                 {
@@ -120,8 +122,7 @@ namespace Datadog.Trace.MSBuild
                 _buildSpan.SetTag(CommonTags.OSArchitecture, Environment.Is64BitOperatingSystem ? "x64" : "x86");
                 _buildSpan.SetTag(CommonTags.OSVersion, Environment.OSVersion.VersionString);
                 _buildSpan.SetTag(CommonTags.RuntimeArchitecture, Environment.Is64BitProcess ? "x64" : "x86");
-                _buildSpan.SetTag(TestTags.Language, TracerConstants.Language);
-                _buildSpan.SetTag(TestTags.CILibraryVersion, TracerConstants.AssemblyVersion);
+                _buildSpan.SetTag(CommonTags.LibraryVersion, TracerConstants.AssemblyVersion);
                 CIEnvironmentValues.Instance.DecorateSpan(_buildSpan);
             }
             catch (Exception ex)

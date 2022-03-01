@@ -2,6 +2,7 @@
 
 using System;
 using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using Datadog.Trace;
@@ -74,6 +75,10 @@ namespace Benchmarks.Trace
                 var request = _realFactory.Create(endpoint);
 
                 return new FakeApiRequest(request);
+            }
+
+            public void SetProxy(WebProxy proxy, NetworkCredential credential)
+            {
             }
         }
 
