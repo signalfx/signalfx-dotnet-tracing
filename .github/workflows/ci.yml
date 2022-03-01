@@ -66,7 +66,7 @@ jobs:
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v2.4.0
-    - uses: actions/setup-dotnet@v1.9.0
+    - uses: actions/setup-dotnet@v2.0.0
       with:
         dotnet-version: | 
           2.1.818
@@ -121,7 +121,7 @@ jobs:
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v2.4.0
-    - uses: actions/setup-dotnet@v1.9.0
+    - uses: actions/setup-dotnet@v2.0.0
       with:
         dotnet-version: | 
           2.1.818
@@ -164,7 +164,7 @@ jobs:
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v2.4.0
-    - uses: actions/setup-dotnet@v1.9.0
+    - uses: actions/setup-dotnet@v2.0.0
       with:
         dotnet-version: | 
           2.1.818
@@ -189,7 +189,7 @@ jobs:
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v2.4.0
-    - uses: actions/setup-dotnet@v1.9.0
+    - uses: actions/setup-dotnet@v2.0.0
       with:
         dotnet-version: | 
           2.1.818
@@ -232,7 +232,7 @@ jobs:
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v2.4.0
-    - uses: actions/setup-dotnet@v1.9.0
+    - uses: actions/setup-dotnet@v2.0.0
       with:
         dotnet-version: | 
           2.1.818
@@ -254,7 +254,7 @@ jobs:
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v2.4.0
-    - uses: actions/setup-dotnet@v1.9.0
+    - uses: actions/setup-dotnet@v2.0.0
       with:
         dotnet-version: | 
           2.1.818
@@ -300,7 +300,7 @@ jobs:
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v2.4.0
-    - uses: actions/setup-dotnet@v1.9.0
+    - uses: actions/setup-dotnet@v2.0.0
       with:
         dotnet-version: | 
           2.1.818
@@ -339,7 +339,7 @@ jobs:
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v2.4.0
-    - uses: actions/setup-dotnet@v1.9.0
+    - uses: actions/setup-dotnet@v2.0.0
       with:
         dotnet-version: | 
           2.1.818
@@ -397,7 +397,7 @@ jobs:
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v2.4.0
-    - uses: actions/setup-dotnet@v1.9.0
+    - uses: actions/setup-dotnet@v2.0.0
       with:
         dotnet-version: | 
           2.1.818
