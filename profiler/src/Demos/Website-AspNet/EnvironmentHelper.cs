@@ -1,4 +1,6 @@
-﻿using System;
+// Modified by Splunk Inc.
+
+using System;
 
 namespace Website_AspNet
 {
