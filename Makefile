@@ -1,4 +1,5 @@
-# this Makefile is for testing purposes. to be removed later
+# this Makefile is for testing purposes
+# to be removed when this code is moved in .gitlab-ci.yml
 
 all: build run
 
