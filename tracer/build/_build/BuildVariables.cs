@@ -10,6 +10,7 @@ public static class BuildVariables
     {
         envVars.AddTracerEnvironmentVariables(tracerHomeDirectory);
         envVars.Add("SINGNALFX_DEBUGGER_ENABLED", "1");
+        envVars.Add("SINGNALFX_INTERNAL_DEBUGGER_INSTRUMENT_ALL", "1");
     }
 
     public static void AddContinuousProfilerEnvironmentVariables(this Dictionary<string, string> envVars, AbsolutePath tracerHomeDirectory)

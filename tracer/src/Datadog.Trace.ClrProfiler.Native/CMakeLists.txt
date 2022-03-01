@@ -243,6 +243,7 @@ add_library("SignalFx.Tracing.ClrProfiler.Native.static" STATIC
         always_on_profiler_clr_helpers.cpp
         always_on_profiler.cpp
         tracer_tokens.cpp
+        debugger_environment_variables_util.cpp
         ${DOTNET_TRACER_REPO_ROOT_PATH}/shared/src/native-lib/coreclr/src/pal/prebuilt/idl/corprof_i.cpp
         ${GENERATED_OBJ_FILES}
 )
