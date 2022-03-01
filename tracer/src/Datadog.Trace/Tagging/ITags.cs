@@ -6,6 +6,7 @@
 // Modified by Splunk Inc.
 
 using System.Collections.Generic;
+using Datadog.Trace.Processors;
 
 namespace Datadog.Trace.Tagging
 {
@@ -23,6 +24,6 @@ namespace Datadog.Trace.Tagging
 
         void SetMetric(string key, double? value);
 
-        int SerializeTo(ref byte[] buffer, int offset, Span span);
+        int SerializeTo(ref byte[] buffer, int offset, Span span, ITagProcessor[] tagProcessors);
     }
 }
