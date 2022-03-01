@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.IO;
 
@@ -130,7 +132,7 @@ namespace Datadog.Trace.ClrProfiler.ServerlessInstrumentation
         {
             if (EnvironmentHelpers.GetEnvironmentVariable(LogLevelEnvName)?.ToLower() == "debug")
             {
-                Console.WriteLine("{0} {1}", DateTime.UtcNow.ToString("yyyy-MM-dd MM:mm:ss:fff"), str);
+                Console.WriteLine("{0:yyyy-MM-dd HH:mm:ss:fff} {1}", DateTime.UtcNow, str);
             }
         }
 
