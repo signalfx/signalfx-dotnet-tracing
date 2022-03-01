@@ -1,3 +1,5 @@
+// Modified by Splunk Inc.
+
 public static class Projects
 {
     public const string DatadogMonitoringDistribution = "Datadog.Monitoring.Distribution";
