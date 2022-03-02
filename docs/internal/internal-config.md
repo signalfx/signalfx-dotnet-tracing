@@ -29,11 +29,6 @@ These settings should be never used by the users.
 |-|-|-|
 | `SIGNALFX_AGENT_HOST` | The Agent host where the tracer can send traces. |  |
 | `SIGNALFX_APM_RECEIVER_PORT` | The port for Trace Agent binding. | `8126` |
-| `SIGNALFX_APPSEC_ENABLED` | Enables the AppSec. | `false` |
-| `SIGNALFX_APPSEC_EXTRA_HEADERS` | Optional custom headers the user wants to send. |  |
-| `SIGNALFX_APPSEC_IPHEADER` | Optional name of the custom header to take into account for the ip address. |  |
-| `SIGNALFX_APPSEC_KEEP_TRACES` | Specifies if the AppSec traces should be explicitly kept or droped. | `true` |
-| `SIGNALFX_APPSEC_RULES` | Overrides the default rules file provided. Must be a path to a valid JSON rules file. |  |
 | `SIGNALFX_CIVISIBILITY_AGENTLESS_ENABLED` | Enable to activate Agentless in CI Visibility. | `false` |
 | `SIGNALFX_CIVISIBILITY_ENABLED` | Enable to activate CI Visibility. | `false` |
 | `SIGNALFX_DOGSTATSD_ARGS` | Comma-separated list of arguments to be passed to the DogStatsD process. |  |

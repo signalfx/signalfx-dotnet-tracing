@@ -26,7 +26,7 @@ linux-build:
     - |
       docker run \
         --env NugetPackageDirectory=/project/packages \
-        --env tracerHome=/project/tracer/bin/tracer-home \
+        --env tracerHome=/shared/bin/monitoring-home/tracer \
         --env artifacts=/project/tracer/src/bin/artifacts \
         --name release \
         dd-trace-dotnet/${baseImage}-builder \

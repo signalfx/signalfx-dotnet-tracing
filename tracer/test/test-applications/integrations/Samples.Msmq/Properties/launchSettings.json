@@ -4,12 +4,12 @@
       "commandName": "Project",
       "commandLineArgs": "5 5",
       "environmentVariables": {
-        "SIGNALFX_DOTNET_TRACER_HOME": "$(SolutionDir)tracer\\bin\\tracer-home",
+        "SIGNALFX_DOTNET_TRACER_HOME": "$(SolutionDir)shared\\bin\\monitoring-home\\tracer",
         "COR_ENABLE_PROFILING": "1",
         "CORECLR_ENABLE_PROFILING": "1",
-        "COR_PROFILER_PATH": "$(SolutionDir)tracer\\bin\\tracer-home\\win-$(Platform)\\SignalFx.Tracing.ClrProfiler.Native.dll",
+        "COR_PROFILER_PATH": "$(SolutionDir)shared\\bin\\monitoring-home\\tracer\\win-$(Platform)\\SignalFx.Tracing.ClrProfiler.Native.dll",
         "CORECLR_PROFILER": "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}",
-        "CORECLR_PROFILER_PATH": "$(SolutionDir)tracer\\bin\\tracer-home\\win-$(Platform)\\SignalFx.Tracing.ClrProfiler.Native.dll",
+        "CORECLR_PROFILER_PATH": "$(SolutionDir)shared\\bin\\monitoring-home\\tracer\\win-$(Platform)\\SignalFx.Tracing.ClrProfiler.Native.dll",
         "COR_PROFILER": "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"
       },
       "nativeDebugging": true

@@ -42,11 +42,12 @@ on:
 env:
   buildConfiguration: Release
   dotnetSdkVersion: 6.0.200
-  relativeTracerHome: /tracer/src/bin/windows-tracer-home
+  relativeTracerHome: /shared/bin/monitoring-home/tracer
   relativeArtifacts: /tracer/src/bin/artifacts
   binDir: ${{ github.workspace }}/tracer/src/bin
   ddTracerHome: ${{ github.workspace }}/tracer/src/bin/dd-tracer-home
-  tracerHome: ${{ github.workspace }}/tracer/src/bin/windows-tracer-home
+  tracerHome: ${{ github.workspace }}/shared/bin/monitoring-home/tracer
+  profilerSrcDirectory: ${{ github.workspace }}/../dd-continuous-profiler-dotnet
   artifacts: ${{ github.workspace }}/tracer/src/bin/artifacts
   isMainBranch: $[eq(github.ref, 'refs/heads/main')]
   NugetPackageDirectory: ${{ github.workspace }}/packages

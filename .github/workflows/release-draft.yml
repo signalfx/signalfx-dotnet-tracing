@@ -31,7 +31,7 @@ jobs:
         docker run --rm \
           --mount type=bind,source="${GITHUB_WORKSPACE}",target=/project \
           --env NugetPackageDirectory=/project/packages \
-          --env tracerHome=/project/tracer/bin/tracer-home \
+          --env tracerHome=/shared/bin/monitoring-home/tracer \
           --env artifacts=/project/tracer/src/bin/artifacts \
           dd-trace-dotnet/${baseImage}-builder \
           dotnet /build/bin/Debug/_build.dll Clean BuildTracerHome ZipTracerHome

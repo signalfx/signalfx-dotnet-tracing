@@ -25,8 +25,6 @@ scenarios:
       environmentVariables:
         COR_ENABLE_PROFILING: 1
         CORECLR_ENABLE_PROFILING: 1
-        SIGNALFX_APPSEC_ENABLED: false
-        SIGNALFX_APPSEC_KEEP_TRACES: false
     load:
       job: bombardier
       variables:
@@ -41,9 +39,6 @@ scenarios:
       environmentVariables:
         COR_ENABLE_PROFILING: 1
         CORECLR_ENABLE_PROFILING: 1
-        SIGNALFX_APPSEC_ENABLED: true
-        SIGNALFX_APPSEC_BLOCKING_ENABLED: true
-        SIGNALFX_APPSEC_KEEP_TRACES: false
     load:
       job: bombardier
       variables:
@@ -58,9 +53,6 @@ scenarios:
       environmentVariables:
         COR_ENABLE_PROFILING: 1
         CORECLR_ENABLE_PROFILING: 1
-        SIGNALFX_APPSEC_ENABLED: true
-        SIGNALFX_APPSEC_BLOCKING_ENABLED: false
-        SIGNALFX_APPSEC_KEEP_TRACES: false
     load:
       job: bombardier
       variables:
@@ -75,8 +67,6 @@ scenarios:
       environmentVariables:
         COR_ENABLE_PROFILING: 1
         CORECLR_ENABLE_PROFILING: 1
-        SIGNALFX_APPSEC_ENABLED: true
-        SIGNALFX_APPSEC_BLOCKING_ENABLED: true
     load:
       job: bombardier
       variables:
