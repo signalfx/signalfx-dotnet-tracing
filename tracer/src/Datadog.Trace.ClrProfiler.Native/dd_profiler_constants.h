@@ -9,7 +9,7 @@
 namespace trace
 {
 
-const WSTRING env_vars_to_display[]{environment::tracing_enabled,
+const shared::WSTRING env_vars_to_display[]{environment::tracing_enabled,
                                     environment::debug_enabled,
                                     environment::profiler_home_path,
                                     environment::include_process_names,
@@ -30,7 +30,7 @@ const WSTRING env_vars_to_display[]{environment::tracing_enabled,
                                     environment::azure_app_services_app_pool_id,
                                     environment::azure_app_services_cli_telemetry_profile_value};
 
-const WSTRING skip_assembly_prefixes[]{
+const shared::WSTRING skip_assembly_prefixes[]{
     WStr("Microsoft.AI"),
     WStr("Microsoft.ApplicationInsights"),
     WStr("Microsoft.Build"),
@@ -66,7 +66,7 @@ const WSTRING skip_assembly_prefixes[]{
     WStr("System.Xml"),
 };
 
-const WSTRING skip_assemblies[]{WStr("mscorlib"),
+const shared::WSTRING skip_assemblies[]{WStr("mscorlib"),
                                 WStr("netstandard"),
                                 WStr("System.Configuration"),
                                 WStr("Microsoft.AspNetCore.Razor.Language"),
@@ -75,26 +75,26 @@ const WSTRING skip_assemblies[]{WStr("mscorlib"),
                                 WStr("Datadog.AutoInstrumentation.ManagedLoader"),
                                 WStr("ISymWrapper")};
 
-const WSTRING mscorlib_assemblyName = WStr("mscorlib");
-const WSTRING system_private_corelib_assemblyName = WStr("System.Private.CoreLib");
-const WSTRING datadog_trace_clrprofiler_managed_loader_assemblyName = WStr("SignalFx.Tracing.ClrProfiler.Managed.Loader");
+const shared::WSTRING mscorlib_assemblyName = WStr("mscorlib");
+const shared::WSTRING system_private_corelib_assemblyName = WStr("System.Private.CoreLib");
+const shared::WSTRING datadog_trace_clrprofiler_managed_loader_assemblyName = WStr("SignalFx.Tracing.ClrProfiler.Managed.Loader");
 
-const WSTRING managed_profiler_full_assembly_version =
+const shared::WSTRING managed_profiler_full_assembly_version =
     WStr("SignalFx.Tracing, Version=0.2.2.0, Culture=neutral, PublicKeyToken=e43a27c2023d388a");
 
-const WSTRING managed_profiler_name = WStr("SignalFx.Tracing");
+const shared::WSTRING managed_profiler_name = WStr("SignalFx.Tracing");
 
-const WSTRING nonwindows_nativemethods_type = WStr("Datadog.Trace.ClrProfiler.NativeMethods+NonWindows");
-const WSTRING windows_nativemethods_type = WStr("Datadog.Trace.ClrProfiler.NativeMethods+Windows");
+const shared::WSTRING nonwindows_nativemethods_type = WStr("Datadog.Trace.ClrProfiler.NativeMethods+NonWindows");
+const shared::WSTRING windows_nativemethods_type = WStr("Datadog.Trace.ClrProfiler.NativeMethods+Windows");
 
-const WSTRING calltarget_modification_action = WStr("CallTargetModification");
+const shared::WSTRING calltarget_modification_action = WStr("CallTargetModification");
 
 #ifdef _WIN32
-const WSTRING native_dll_filename = WStr("SIGNALFX.TRACING.CLRPROFILER.NATIVE.DLL");
+const shared::WSTRING native_dll_filename = WStr("SIGNALFX.TRACING.CLRPROFILER.NATIVE.DLL");
 #elif MACOS
-const WSTRING native_dll_filename = WStr("SignalFx.Tracing.ClrProfiler.Native.dylib");
+const shared::WSTRING native_dll_filename = WStr("SignalFx.Tracing.ClrProfiler.Native.dylib");
 #else
-const WSTRING native_dll_filename = WStr("SignalFx.Tracing.ClrProfiler.Native.so");
+const shared::WSTRING native_dll_filename = WStr("SignalFx.Tracing.ClrProfiler.Native.so");
 #endif
 
 const AssemblyProperty managed_profiler_assembly_property = AssemblyProperty(
