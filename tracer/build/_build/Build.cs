@@ -154,8 +154,6 @@ partial class Build : NukeBuild
         .DependsOn(PublishOpenTracing)
         .DependsOn(CompileNativeSrc)
         .DependsOn(PublishNativeProfiler)
-        .DependsOn(DownloadLibDdwaf)
-        .DependsOn(CopyLibDdwaf)
         .DependsOn(CreateDdTracerHome);
 
     Target BuildProfilerHome => _ => _
