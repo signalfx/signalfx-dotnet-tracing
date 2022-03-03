@@ -126,7 +126,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         {
                             stackTraceBuilder.Append("\tat ");
                             stackTraceBuilder.Append(value);
-                            stackTraceBuilder.Append("(unknown)\n"); // TODO Splunk: placeholder for file name and lines numbers
+                            stackTraceBuilder.Append('\n');
                         }
 
                         code = ReadShort();
