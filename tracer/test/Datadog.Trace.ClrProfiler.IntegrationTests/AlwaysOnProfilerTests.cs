@@ -103,11 +103,16 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         private static bool ContainStackTraceForClassHierarchy(LogRecord logRecord)
         {
             return logRecord.Body.StringValue.Contains(
-                "\tat System.Threading.Thread.Sleep(unknown)\n" +
-                "\tat ClassD.MethodD(unknown)\n" +
-                "\tat ClassC.MethodC(unknown)\n" +
-                "\tat ClassB.MethodB(unknown)\n" +
-                "\tat ClassA.MethodA(unknown)\n");
+                "\tat System.Threading.Thread.Sleep(System.TimeSpan timeout)\n" +
+                "\tat My.Custom.Test.Namespace.ClassD`1.GenericMethodDFromGenericClass(!0 classArg, !!0 methodArg)\n" +
+                "\tat SharedGenericFunction.GenericMethodCFromGenericClass(!0 arg)\n" +
+                "\tat InternalClassB.MethodB(System.String testArg)\n" +
+                "\tat My.Custom.Test.Namespace.ClassA.<MethodAOthers>g__Action|4_0(System.String s)\n" +
+                "\tat My.Custom.Test.Namespace.ClassA.MethodAOthers(System.String s, System.Object obj, My.Custom.Test.Namespace.CustomClass customClass, My.Custom.Test.Namespace.CustomStruct customStruct, My.Custom.Test.Namespace.CustomClass[] classArray, My.Custom.Test.Namespace.CustomStruct[] structArray, System.Collections.Generic.List`1[!!0] genericList)\n" +
+                "\tat My.Custom.Test.Namespace.ClassA.MethodAFloats(System.Single fl, System.Double db)\n" +
+                "\tat My.Custom.Test.Namespace.ClassA.MethodAInts(System.UInt16 ui16, System.Int16 i16, System.UInt32 ui32, System.Int32 i32, System.UInt64 ui64, System.Int64 i64, System.IntPtr nint, System.UIntPtr nuint)\n" +
+                "\tat My.Custom.Test.Namespace.ClassA.MethodABytes(System.Boolean b, System.Char c, System.SByte sb, System.Byte b2)\n" +
+                "\tat My.Custom.Test.Namespace.ClassA.MethodA()\n");
         }
 
         private async Task DumpLogRecords(LogsData[] logsData)
