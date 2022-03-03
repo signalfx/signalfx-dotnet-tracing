@@ -4,16 +4,16 @@
     StackTrace:
 "" #1 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0xd4c
 
-	at System.Threading.ManualResetEventSlim.Wait(unknown)
-	at System.Threading.Tasks.Task.SpinThenBlockingWait(unknown)
-	at System.Threading.Tasks.Task.InternalWaitCore(unknown)
-	at System.Threading.Tasks.Task.Wait(unknown)
-	at System.Threading.Tasks.Task.Wait(unknown)
-	at Datadog.Trace.TracerManager.RunShutdownTasks(unknown)
-	at Datadog.Trace.LifetimeManager.RunShutdownTasks(unknown)
-	at Datadog.Trace.LifetimeManager.CurrentDomain_ProcessExit(unknown)
-	at System.AppContext.OnProcessExit(unknown)
-	at Unknown_Native_Function(unknown)
+	at System.Threading.ManualResetEventSlim.Wait
+	at System.Threading.Tasks.Task.SpinThenBlockingWait
+	at System.Threading.Tasks.Task.InternalWaitCore
+	at System.Threading.Tasks.Task.Wait
+	at System.Threading.Tasks.Task.Wait
+	at Datadog.Trace.TracerManager.RunShutdownTasks
+	at Datadog.Trace.LifetimeManager.RunShutdownTasks
+	at Datadog.Trace.LifetimeManager.CurrentDomain_ProcessExit
+	at System.AppContext.OnProcessExit
+	at Unknown_Native_Function
 
   },
   {
@@ -21,41 +21,41 @@
     StackTrace:
 "" #3 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0x4 nid=0x4ea8
 
-	at Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.DefaultContractResolver.CreateObjectContract(unknown)
-	at Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.DefaultContractResolver.CreateContract(unknown)
-	at SharedGenericFunction.GetOrAdd(unknown)
-	at SharedGenericFunction.Get(unknown)
-	at Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.DefaultContractResolver.ResolveContract(unknown)
-	at Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.WriteStartArray(unknown)
-	at Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeList(unknown)
-	at Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeValue(unknown)
-	at Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.Serialize(unknown)
-	at Datadog.Trace.Vendors.Newtonsoft.Json.JsonSerializer.SerializeInternal(unknown)
-	at Datadog.Trace.Agent.ZipkinSerializer.Serialize(unknown)
-	at <SendTracesAsync>d__4.MoveNext(unknown)
-	at AsyncStateMachineBox`1.ExecutionContextCallback(unknown)
-	at System.Threading.ExecutionContext.RunInternal(unknown)
-	at AsyncStateMachineBox`1.MoveNext(unknown)
-	at AsyncStateMachineBox`1.MoveNext(unknown)
-	at System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction(unknown)
-	at System.Threading.Tasks.Task.RunContinuations(unknown)
-	at System.Threading.Tasks.Task.FinishContinuations(unknown)
-	at SharedGenericFunction.TrySetResult(unknown)
-	at SharedGenericFunction.TrySetFromTask(unknown)
-	at SharedGenericFunction.ProcessInnerTask(unknown)
-	at SharedGenericFunction.ProcessCompletedOuterTask(unknown)
-	at SharedGenericFunction.Invoke(unknown)
-	at System.Threading.Tasks.Task.RunOrQueueCompletionAction(unknown)
-	at System.Threading.Tasks.Task.RunContinuations(unknown)
-	at System.Threading.Tasks.Task.FinishContinuations(unknown)
-	at System.Threading.Tasks.Task.FinishStageThree(unknown)
-	at System.Threading.Tasks.Task.FinishStageTwo(unknown)
-	at System.Threading.Tasks.Task.ExecuteWithThreadLocal(unknown)
-	at System.Threading.Tasks.Task.ExecuteEntryUnsafe(unknown)
-	at System.Threading.Tasks.Task.ExecuteFromThreadPool(unknown)
-	at System.Threading.ThreadPoolWorkQueue.Dispatch(unknown)
-	at System.Threading._ThreadPoolWaitCallback.PerformWaitCallback(unknown)
-	at Unknown_Native_Function(unknown)
+	at Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.DefaultContractResolver.CreateObjectContract
+	at Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.DefaultContractResolver.CreateContract
+	at SharedGenericFunction.GetOrAdd
+	at SharedGenericFunction.Get
+	at Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.DefaultContractResolver.ResolveContract
+	at Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.WriteStartArray
+	at Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeList
+	at Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeValue
+	at Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.Serialize
+	at Datadog.Trace.Vendors.Newtonsoft.Json.JsonSerializer.SerializeInternal
+	at Datadog.Trace.Agent.ZipkinSerializer.Serialize
+	at <SendTracesAsync>d__4.MoveNext
+	at AsyncStateMachineBox`1.ExecutionContextCallback
+	at System.Threading.ExecutionContext.RunInternal
+	at AsyncStateMachineBox`1.MoveNext
+	at AsyncStateMachineBox`1.MoveNext
+	at System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction
+	at System.Threading.Tasks.Task.RunContinuations
+	at System.Threading.Tasks.Task.FinishContinuations
+	at SharedGenericFunction.TrySetResult
+	at SharedGenericFunction.TrySetFromTask
+	at SharedGenericFunction.ProcessInnerTask
+	at SharedGenericFunction.ProcessCompletedOuterTask
+	at SharedGenericFunction.Invoke
+	at System.Threading.Tasks.Task.RunOrQueueCompletionAction
+	at System.Threading.Tasks.Task.RunContinuations
+	at System.Threading.Tasks.Task.FinishContinuations
+	at System.Threading.Tasks.Task.FinishStageThree
+	at System.Threading.Tasks.Task.FinishStageTwo
+	at System.Threading.Tasks.Task.ExecuteWithThreadLocal
+	at System.Threading.Tasks.Task.ExecuteEntryUnsafe
+	at System.Threading.Tasks.Task.ExecuteFromThreadPool
+	at System.Threading.ThreadPoolWorkQueue.Dispatch
+	at System.Threading._ThreadPoolWaitCallback.PerformWaitCallback
+	at Unknown_Native_Function
 
   },
   {
@@ -63,24 +63,24 @@
     StackTrace:
 "" #5 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x2f4c
 
-	at System.Threading.ManualResetEventSlim.Wait(unknown)
-	at System.Threading.Tasks.Task.SpinThenBlockingWait(unknown)
-	at System.Threading.Tasks.Task.InternalWaitCore(unknown)
-	at System.Threading.Tasks.Task.Wait(unknown)
-	at System.Threading.Tasks.Task.Wait(unknown)
-	at Datadog.Trace.Vendors.StatsdClient.Worker.Waiter.Wait(unknown)
-	at SharedGenericFunction.Dequeue(unknown)
-	at SharedGenericFunction.<.ctor>b__8_0(unknown)
-	at System.Threading.Tasks.Task.InnerInvoke(unknown)
-	at <>c.<.cctor>b__274_0(unknown)
-	at System.Threading.ExecutionContext.RunInternal(unknown)
-	at System.Threading.Tasks.Task.ExecuteWithThreadLocal(unknown)
-	at System.Threading.Tasks.Task.ExecuteEntryUnsafe(unknown)
-	at <>c.<.cctor>b__10_0(unknown)
-	at System.Threading.ThreadHelper.ThreadStart_Context(unknown)
-	at System.Threading.ExecutionContext.RunInternal(unknown)
-	at System.Threading.ThreadHelper.ThreadStart(unknown)
-	at Unknown_Native_Function(unknown)
+	at System.Threading.ManualResetEventSlim.Wait
+	at System.Threading.Tasks.Task.SpinThenBlockingWait
+	at System.Threading.Tasks.Task.InternalWaitCore
+	at System.Threading.Tasks.Task.Wait
+	at System.Threading.Tasks.Task.Wait
+	at Datadog.Trace.Vendors.StatsdClient.Worker.Waiter.Wait
+	at SharedGenericFunction.Dequeue
+	at SharedGenericFunction.<.ctor>b__8_0
+	at System.Threading.Tasks.Task.InnerInvoke
+	at <>c.<.cctor>b__274_0
+	at System.Threading.ExecutionContext.RunInternal
+	at System.Threading.Tasks.Task.ExecuteWithThreadLocal
+	at System.Threading.Tasks.Task.ExecuteEntryUnsafe
+	at <>c.<.cctor>b__10_0
+	at System.Threading.ThreadHelper.ThreadStart_Context
+	at System.Threading.ExecutionContext.RunInternal
+	at System.Threading.ThreadHelper.ThreadStart
+	at Unknown_Native_Function
 
   }
 ]
