@@ -359,7 +359,7 @@ private:
             return;
         }
 
-        COMPtrHolder<IMetaDataImport> pIMDImport;
+        ComPtr<IMetaDataImport2> pIMDImport;
         hr = info10->GetModuleMetaData(moduleId, ofRead, IID_IMetaDataImport, (IUnknown**) &pIMDImport);
         if (FAILED(hr))
         {
