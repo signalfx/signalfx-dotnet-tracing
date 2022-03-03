@@ -350,6 +350,7 @@ private:
         ModuleID moduleId = 0;
         mdToken token = 0;
 
+        // theoretically there is a possibility to use GetFunctionInfo method, but it not support generic methods
         HRESULT hr = info10->GetFunctionInfo2(funcID, frameInfo, &classId, &moduleId, &token, 0, nullptr, nullptr);
         if (FAILED(hr))
         {
