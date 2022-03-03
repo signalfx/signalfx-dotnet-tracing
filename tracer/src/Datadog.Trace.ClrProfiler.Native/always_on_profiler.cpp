@@ -95,52 +95,6 @@ int32_t ThreadSampling_ConsumeOneThreadSample(int32_t len, unsigned char* buf)
 
 namespace trace
 {
-
-template <class MetaInterface>
-class COMPtrHolder
-{
-public:
-    COMPtrHolder()
-    {
-        m_ptr = NULL;
-    }
-
-    COMPtrHolder(MetaInterface* ptr)
-    {
-        if (ptr != nullptr)
-        {
-            ptr->AddRef();
-        }
-        m_ptr = ptr;
-    }
-
-    ~COMPtrHolder()
-    {
-        if (m_ptr != nullptr)
-        {
-            m_ptr->Release();
-            m_ptr = NULL;
-        }
-    }
-    MetaInterface* operator->()
-    {
-        return m_ptr;
-    }
-
-    MetaInterface** operator&()
-    {
-        return &m_ptr;
-    }
-
-    operator MetaInterface*()
-    {
-        return m_ptr;
-    }
-
-private:
-    MetaInterface* m_ptr;
-};
-
 /*
 * The thread samples buffer format is optimized for single-pass and efficient writing by the native sampling thread (which
 * has paused the CLR)
@@ -362,7 +316,7 @@ private:
             return;
         }
 
-        COMPtrHolder<IMetaDataImport> pMDImport;
+        ComPtr<IMetaDataImport> pMDImport;
         hr = info10->GetModuleMetaData(modId, (ofRead | ofWrite), IID_IMetaDataImport, (IUnknown**) &pMDImport);
         if (FAILED(hr))
         {
