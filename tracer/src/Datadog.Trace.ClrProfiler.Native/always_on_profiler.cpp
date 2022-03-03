@@ -434,8 +434,13 @@ private:
         WCHAR parameter_name[MAX_PARAM_NAME_LEN];
         ULONG parameter_name_length;
         result.append(WStr("("));
-        for (ULONG i = 0; (SUCCEEDED(hr) && i < paramCount); i++)
+        for (ULONG i = 0; i < paramCount; i++)
         {
+            if (i != 0)
+            {
+                result.append(WStr(", "));
+            }
+
             result.append(arguments[i].GetTypeTokName(pIMDImport));
 
             result.append(WStr(" "));
@@ -453,11 +458,6 @@ private:
             else
             {
                 result.append(parameter_name);
-            }
-
-            if (i < paramCount - 1)
-            {
-                result.append(WStr(", "));
             }
         }
         result.append(WStr(")"));
