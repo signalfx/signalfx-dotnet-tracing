@@ -498,16 +498,6 @@ namespace Datadog.Trace
         internal const string CosmosDbContainer = "cosmosdb.container";
 
         /// <summary>
-        /// If a span was involved with an application security event
-        /// </summary>
-        internal const string AppSecEvent = "appsec.event";
-
-        /// <summary>
-        /// The details of the security event
-        /// </summary>
-        internal const string AppSecJson = "_dd.appsec.json";
-
-        /// <summary>
         /// Should contain the public IP of the host initiating the request.
         /// </summary>
         internal const string ActorIp = "actor.ip";

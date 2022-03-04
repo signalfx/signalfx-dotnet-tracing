@@ -1,9 +1,10 @@
-﻿// <copyright file="NullTelemetryController.cs" company="Datadog">
+// <copyright file="NullTelemetryController.cs" company="Datadog">
 // Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-using Datadog.Trace.AppSec;
+// Modified by Splunk Inc.
+
 using Datadog.Trace.Configuration;
 using Datadog.Trace.PlatformHelpers;
 
@@ -26,10 +27,6 @@ namespace Datadog.Trace.Telemetry
         }
 
         public void RecordTracerSettings(ImmutableTracerSettings settings, string defaultServiceName, AzureAppServices appServicesMetadata)
-        {
-        }
-
-        public void RecordSecuritySettings(SecuritySettings settings)
         {
         }
 

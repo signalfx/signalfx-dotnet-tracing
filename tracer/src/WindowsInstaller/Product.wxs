@@ -114,10 +114,6 @@
               Checksum="yes">
           <Class Id="$(var.ProfilerCLSID)" Context="InprocServer32" ThreadingModel="both" Description="$(var.ProductNamePlatformAgnostic)"/>
         </File>
-        <File Id="LibDdwaf"
-              Source="$(var.LibDdwafDirectory)\runtimes\win-x64\native\ddwaf.dll"
-              Checksum="yes">
-        </File>
       </Component>
     </ComponentGroup>
 
@@ -128,10 +124,6 @@
               Source="$(var.TracerHomeDirectory)\win-x86\SignalFx.Tracing.ClrProfiler.Native.dll"
               Checksum="yes">
           <Class Id="$(var.ProfilerCLSID)" Context="InprocServer32" ThreadingModel="both" Description="$(var.ProductNamePlatformAgnostic)"/>
-        </File>
-        <File Id="LibDdwaf.32"
-              Source="$(var.LibDdwafDirectory)\runtimes\win-x86\native\ddwaf.dll"
-              Checksum="yes">
         </File>
       </Component>
     </ComponentGroup>
@@ -145,10 +137,6 @@
               Source="$(var.TracerHomeDirectory)\win-x86\SignalFx.Tracing.ClrProfiler.Native.dll"
               Checksum="yes">
           <Class Id="$(var.ProfilerCLSID)" Context="InprocServer32" ThreadingModel="both" Description="$(var.ProductNamePlatformAgnostic)"/>
-        </File>
-        <File Id="LibDdwaf.32"
-              Source="$(var.LibDdwafDirectory)\runtimes\win-x86\native\ddwaf.dll"
-              Checksum="yes">
         </File>
       </Component>
     </ComponentGroup>

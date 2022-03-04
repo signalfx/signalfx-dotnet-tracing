@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
 using Datadog.Trace.AlwaysOnProfiler;
-using Datadog.Trace.AppSec;
 using Datadog.Trace.Ci;
 using Datadog.Trace.ClrProfiler.ServerlessInstrumentation;
 using Datadog.Trace.Configuration;
@@ -160,16 +159,6 @@ namespace Datadog.Trace.ClrProfiler
                     Log.Debug("Initializing tracer singleton instance.");
                     _ = Tracer.Instance;
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, ex.Message);
-            }
-
-            try
-            {
-                Log.Debug("Initializing security singleton instance.");
-                _ = Security.Instance;
             }
             catch (Exception ex)
             {
