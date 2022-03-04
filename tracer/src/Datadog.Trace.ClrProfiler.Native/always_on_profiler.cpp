@@ -383,17 +383,6 @@ private:
             return;
         }
 
-        auto function_method_signature = FunctionMethodSignature(pSig, cbSig);
-
-        hr = function_method_signature.TryParse();
-        bool argumentsAvailable = true;
-        if (FAILED(hr))
-        {
-            argumentsAvailable = false;
-            Logger::Debug("FunctionMethodSignature parsing failed: ", hr);
-        }
-
-
         // If the ClassID returned from GetFunctionInfo is 0, then the function
         // is a shared generic function.
         if (classId != 0)
@@ -409,7 +398,15 @@ private:
 
         result.append(funcName);
 
-        if (argumentsAvailable)
+        // try to list arguments type
+        auto function_method_signature = FunctionMethodSignature(pSig, cbSig);
+        hr = function_method_signature.TryParse();
+        if (FAILED(hr))
+        {
+            result.append(WStr("(unknown)"));
+            Logger::Debug("FunctionMethodSignature parsing failed: ", hr);
+        }
+        else
         {
             const auto arguments = function_method_signature.GetMethodArguments();
             result.append(WStr("("));
@@ -423,10 +420,6 @@ private:
                 result.append(arguments[i].GetTypeTokName(pIMDImport));
             }
             result.append(WStr(")"));
-        }
-        else
-        {
-            result.append(WStr("(unknown)"));
         }
     }
 
