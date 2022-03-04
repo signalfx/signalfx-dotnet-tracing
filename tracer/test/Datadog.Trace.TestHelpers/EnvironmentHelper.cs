@@ -197,7 +197,6 @@ namespace Datadog.Trace.TestHelpers
             int? logsCollectorPort,
             IDictionary<string, string> environmentVariables,
             string processToProfile = null,
-            bool enableSecurity = false,
             bool enableBlocking = false,
             string externalRulesFile = null)
         {
@@ -233,16 +232,6 @@ namespace Datadog.Trace.TestHelpers
             if (logsCollectorPort.HasValue)
             {
                 environmentVariables["SIGNALFX_PROFILER_LOGS_ENDPOINT"] = $"http://127.0.0.1:{logsCollectorPort.Value}/";
-            }
-
-            if (enableSecurity)
-            {
-                environmentVariables[ConfigurationKeys.AppSecEnabled] = enableSecurity.ToString();
-            }
-
-            if (!string.IsNullOrEmpty(externalRulesFile))
-            {
-                environmentVariables[ConfigurationKeys.AppSecRules] = externalRulesFile;
             }
 
             foreach (var name in new[] { "SERVICESTACK_REDIS_HOST", "STACKEXCHANGE_REDIS_HOST" })

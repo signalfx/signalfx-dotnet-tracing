@@ -3,11 +3,12 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #if NETFRAMEWORK
 using System;
 using System.ComponentModel;
 using System.Web;
-using Datadog.Trace.AppSec;
 using Datadog.Trace.AspNet;
 using Datadog.Trace.ClrProfiler.CallTarget;
 using Datadog.Trace.Configuration;
@@ -62,13 +63,6 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
                     var duckedControllerContext = controllerContext.DuckCast<ControllerContextStruct>();
                     scope = AspNetMvcIntegration.CreateScope(duckedControllerContext);
                     SharedItems.PushScope(HttpContext.Current, AspNetMvcIntegration.HttpContextKey, scope);
-
-                    var security = Security.Instance;
-                    if (security.Settings.Enabled)
-                    {
-                        var context = HttpContext.Current;
-                        security.InstrumentationGateway.RaiseMvcBeforeAction(context, null, scope.Span, duckedControllerContext.RouteData);
-                    }
                 }
             }
             catch (Exception ex)

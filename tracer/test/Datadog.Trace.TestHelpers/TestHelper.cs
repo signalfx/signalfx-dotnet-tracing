@@ -348,11 +348,6 @@ namespace Datadog.Trace.TestHelpers
             SetEnvironmentVariable("SIGNALFX_VERSION", serviceVersion);
         }
 
-        protected void SetSecurity(bool security)
-        {
-            SetEnvironmentVariable(Configuration.ConfigurationKeys.AppSecEnabled, security ? "true" : "false");
-        }
-
         protected void EnableDirectLogSubmission(int intakePort, string integrationName, string host = "integration_tests")
         {
             SetEnvironmentVariable(ConfigurationKeys.DirectLogSubmission.Host, host);

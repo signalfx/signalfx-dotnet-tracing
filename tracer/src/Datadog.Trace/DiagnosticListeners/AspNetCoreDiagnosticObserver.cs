@@ -11,7 +11,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Datadog.Trace.AppSec;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.DuckTyping;
 using Datadog.Trace.ExtensionMethods;
@@ -55,7 +54,6 @@ namespace Datadog.Trace.DiagnosticListeners
         private static readonly AspNetCoreHttpRequestHandler AspNetCoreRequestHandler = new AspNetCoreHttpRequestHandler(Log, HttpRequestInOperationName, IntegrationId);
 
         private readonly Tracer _tracer;
-        private readonly Security _security;
 
         private string _hostingHttpRequestInStartEventKey;
         private string _mvcBeforeActionEventKey;
@@ -66,21 +64,18 @@ namespace Datadog.Trace.DiagnosticListeners
         private string _routingEndpointMatchedKey;
 
         public AspNetCoreDiagnosticObserver()
-            : this(null, null)
+            : this(null)
         {
         }
 
-        public AspNetCoreDiagnosticObserver(Tracer tracer, Security security)
+        public AspNetCoreDiagnosticObserver(Tracer tracer)
         {
             _tracer = tracer;
-            _security = security;
         }
 
         protected override string ListenerName => DiagnosticListenerName;
 
         private Tracer CurrentTracer => _tracer ?? Tracer.Instance;
-
-        private IDatadogSecurity CurrentSecurity => _security ?? Security.Instance;
 
 #if NETCOREAPP
         protected override void OnNext(string eventName, object arg)
@@ -599,12 +594,10 @@ namespace Datadog.Trace.DiagnosticListeners
         private void OnHostingHttpRequestInStart(object arg)
         {
             var tracer = CurrentTracer;
-            var security = CurrentSecurity;
 
             var shouldTrace = tracer.Settings.IsIntegrationEnabled(IntegrationId);
-            var shouldSecure = security.Settings.Enabled;
 
-            if (!shouldTrace && !shouldSecure)
+            if (!shouldTrace)
             {
                 return;
             }
@@ -625,24 +618,6 @@ namespace Datadog.Trace.DiagnosticListeners
                     {
                         ServerTimingHeader.SetHeaders(span.Context, httpContextHeaders, (headers, name, value) => headers.Add(name, value));
                     }
-                }
-
-                if (shouldSecure)
-                {
-                    security.InstrumentationGateway.RaiseRequestStart(httpContext, request, span, null);
-                    httpContext.Response.OnStarting(() =>
-                    {
-                        // we subscribe here because in OnHostingHttpRequestInStop or HostingEndRequest it's too late,
-                        // the waf is already disposed by the registerfordispose callback
-                        security.InstrumentationGateway.RaiseRequestEnd(httpContext, request, span);
-                        return System.Threading.Tasks.Task.CompletedTask;
-                    });
-
-                    httpContext.Response.OnCompleted(() =>
-                    {
-                        security.InstrumentationGateway.RaiseLastChanceToWriteTags(httpContext, span);
-                        return System.Threading.Tasks.Task.CompletedTask;
-                    });
                 }
             }
         }
@@ -779,12 +754,10 @@ namespace Datadog.Trace.DiagnosticListeners
         private void OnMvcBeforeAction(object arg)
         {
             var tracer = CurrentTracer;
-            var security = CurrentSecurity;
 
             var shouldTrace = tracer.Settings.IsIntegrationEnabled(IntegrationId);
-            var shouldSecure = security.Settings.Enabled;
 
-            if (!shouldTrace && !shouldSecure)
+            if (!shouldTrace)
             {
                 return;
             }
@@ -809,11 +782,6 @@ namespace Datadog.Trace.DiagnosticListeners
                     {
                         span = StartMvcCoreSpan(tracer, parentSpan, typedArg, httpContext, request);
                     }
-                }
-
-                if (shouldSecure)
-                {
-                    security.InstrumentationGateway.RaiseMvcBeforeAction(httpContext, httpContext.Request, span ?? parentSpan, typedArg.RouteData);
                 }
             }
         }

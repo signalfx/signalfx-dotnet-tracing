@@ -1,13 +1,14 @@
-﻿// <copyright file="CallTargetInvokerTelemetryTests.cs" company="Datadog">
+// <copyright file="CallTargetInvokerTelemetryTests.cs" company="Datadog">
 // Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
+
+// Modified by Splunk Inc.
 
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using Datadog.Trace.Agent;
-using Datadog.Trace.AppSec;
 using Datadog.Trace.ClrProfiler.AutoInstrumentation.Http.HttpClient.HttpClientHandler;
 using Datadog.Trace.ClrProfiler.CallTarget;
 using Datadog.Trace.Configuration;
@@ -109,10 +110,6 @@ namespace Datadog.Trace.Tests.Telemetry
             }
 
             public void RecordTracerSettings(ImmutableTracerSettings settings, string defaultServiceName, AzureAppServices appServicesMetadata)
-            {
-            }
-
-            public void RecordSecuritySettings(SecuritySettings settings)
             {
             }
 
