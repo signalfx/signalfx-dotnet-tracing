@@ -77,7 +77,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v2.4.0
-      - uses: actions/download-artifact@v2.1.0
+      - uses: actions/download-artifact@v3
         with:
           path: .
       - name: Extract Version from Tag
