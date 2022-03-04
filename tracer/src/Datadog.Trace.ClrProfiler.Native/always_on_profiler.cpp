@@ -386,14 +386,13 @@ private:
         auto function_method_signature = FunctionMethodSignature(pSig, cbSig);
 
         hr = function_method_signature.TryParse();
+        bool argumentsAvailable = true;
         if (FAILED(hr))
         {
+            argumentsAvailable = false;
             Logger::Debug("FunctionMethodSignature parsing failed: ", hr);
-            result.append(WStr("Unknown"));
-            return;
         }
 
-        const auto arguments = function_method_signature.GetMethodArguments();
 
         // If the ClassID returned from GetFunctionInfo is 0, then the function
         // is a shared generic function.
@@ -410,17 +409,25 @@ private:
 
         result.append(funcName);
 
-        result.append(WStr("("));
-        for (ULONG i = 0; i < arguments.size(); i++)
+        if (argumentsAvailable)
         {
-            if (i != 0)
+            const auto arguments = function_method_signature.GetMethodArguments();
+            result.append(WStr("("));
+            for (ULONG i = 0; i < arguments.size(); i++)
             {
-                result.append(WStr(", "));
-            }
+                if (i != 0)
+                {
+                    result.append(WStr(", "));
+                }
 
-            result.append(arguments[i].GetTypeTokName(pIMDImport));
+                result.append(arguments[i].GetTypeTokName(pIMDImport));
+            }
+            result.append(WStr(")"));
         }
-        result.append(WStr(")"));
+        else
+        {
+            result.append(WStr("(unknown)"));
+        }
     }
 
 public:
