@@ -27,7 +27,7 @@ namespace Samples.AspNetMvc4
             if (transferRequested)
             {
                 var errorRoute = "~/Error/Index";
-                var errorId = Guid.NewGuid().ToString();
+                var errorId = "C6F95101-67D1-43E4-8F61-D0D7FAC99375";
 
                 var exception = httpContext.Server.GetLastError();
                 System.Diagnostics.Debug.WriteLine(exception);

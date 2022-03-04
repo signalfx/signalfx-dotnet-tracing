@@ -50,7 +50,7 @@ namespace Sandbox.ManualTracing
             var configurationSource = new NameValueConfigurationSource(new NameValueCollection()
             {
                 // TODO: Enable AppSec somehow. There is currently no way to enable it inside a sandboxed environment where environment variables and files cannot be accessed
-                { "DD_RUNTIME_METRICS_ENABLED", "1" },
+                { "SIGNALFX_RUNTIME_METRICS_ENABLED", "1" },
             });
 
             var tracerSettings = new TracerSettings(configurationSource);

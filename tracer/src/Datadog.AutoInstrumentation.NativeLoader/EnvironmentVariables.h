@@ -8,6 +8,6 @@
 class EnvironmentVariables final
 {
 public:
-    inline static const shared::WSTRING LogPath = WStr("DD_TRACE_LOG_PATH");
-    inline static const shared::WSTRING LogDirectory = WStr("DD_TRACE_LOG_DIRECTORY");
+    inline static const shared::WSTRING LogPath = WStr("SIGNALFX_TRACE_LOG_PATH");
+    inline static const shared::WSTRING LogDirectory = WStr("SIGNALFX_TRACE_LOG_DIRECTORY");
 };

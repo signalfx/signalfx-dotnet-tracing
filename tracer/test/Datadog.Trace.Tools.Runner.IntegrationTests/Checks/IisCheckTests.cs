@@ -27,7 +27,7 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests.Checks
         {
         }
 
-        [SkippableTheory]
+        [SkippableTheory(Skip = "Not supported in SignalFx")]
         [InlineData(true)]
         [InlineData(false)]
         public async Task WorkingApp(bool mixedRuntimes)
@@ -64,7 +64,7 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests.Checks
             }
         }
 
-        [SkippableFact]
+        [SkippableFact(Skip = "Not supported in SignalFx")]
         public async Task OutOfProcess()
         {
             EnsureWindowsAndX64();

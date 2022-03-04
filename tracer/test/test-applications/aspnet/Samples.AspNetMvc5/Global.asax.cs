@@ -23,7 +23,7 @@ namespace Samples.AspNetMvc5
             if (transferRequested)
             {
                 var errorRoute = "~/Error/Index";
-                var errorId = Guid.NewGuid().ToString();
+                var errorId = "8DBA5152-2B3E-47C0-942B-0484A9FA2F84";
 
                 var exception = httpContext.Server.GetLastError();
                 System.Diagnostics.Debug.WriteLine(exception);
