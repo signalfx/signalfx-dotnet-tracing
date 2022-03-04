@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using My.Custom.Test.Namespace;
 
@@ -105,20 +104,6 @@ namespace My.Custom.Test.Namespace
         public static void GenericMethodDFromGenericClass<TMethod>(TClass classArg, TMethod methodArg)
         {
             Console.WriteLine("Thread.Sleep - starting " + classArg + methodArg);
-            var stackTrace = new StackTrace();
-            Console.WriteLine(stackTrace);
-            /*
-   at My.Custom.Test.Namespace.ClassD`1.GenericMethodDFromNonGenericClass[TMethod](TClass classArg, TMethod methodArg)
-   at My.Custom.Test.Namespace.GenericClassC`1.GenericMethodCFromGenericClass(T arg)
-   at My.Custom.Test.Namespace.ClassA.InternalClassB.MethodB(String testArg)
-   at My.Custom.Test.Namespace.ClassA.<MethodAOthers>g__Action|4_0[T](String s)
-   at My.Custom.Test.Namespace.ClassA.MethodAOthers[T](String s, Object obj, CustomClass customClass, CustomStruct customStruct, CustomClass[] classArray, CustomStruct[] structArray, List`1 genericList)
-   at My.Custom.Test.Namespace.ClassA.MethodAFloats(Single fl, Double db)
-   at My.Custom.Test.Namespace.ClassA.MethodAInts(UInt16 ui16, Int16 i16, UInt32 ui32, Int32 i32, UInt64 ui64, Int64 i64, IntPtr nint, UIntPtr nuint)
-   at My.Custom.Test.Namespace.ClassA.MethodABytes(Boolean b, Char c, SByte sb, Byte b2)
-   at My.Custom.Test.Namespace.ClassA.MethodA()
-   at Program.<Main>$(String[] args)
-             */
             Thread.Sleep(TimeSpan.FromSeconds(6));
             Console.WriteLine("Thread.Sleep - finished");
         }
