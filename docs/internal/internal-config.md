@@ -75,3 +75,4 @@ These settings should be never used by the users.
 | `SIGNALFX_PROFILER_ENABLED` | Enable to activate thread sampling. | `false` |
 | `SIGNALFX_PROFILER_CALL_STACK_INTERVAL` | Sampling period. It defines how often the threads are stopped in order to fetch all stack traces. This value cannot be lower than `1000` milliseconds. | `10000` |
 | `SIGNALFX_TRACE_AZURE_FUNCTIONS_ENABLED` | Set to instrument within Azure functions. | `false` |
+| `SIGNALFX_TRACE_EXPAND_ROUTE_TEMPLATES_ENABLED` | Set to expand route parameters in ASP.NET and ASP.NET Core resource names. | `false` |
