@@ -10,7 +10,6 @@
 #endif
 
 #define MAX_FUNC_NAME_LEN 256UL
-#define MAX_PARAM_NAME_LEN 256UL
 #define MAX_CLASS_NAME_LEN 512UL
 #define MAX_STRING_LENGTH 512UL
 #define MAX_ARG_COUNT 256UL
@@ -384,18 +383,6 @@ private:
             return;
         }
 
-        HCORENUM hEnum = 0;
-        ULONG paramCount;
-        mdParamDef paramDefs[MAX_ARG_COUNT];
-        hr = pIMDImport->EnumParams(&hEnum, token, paramDefs, MAX_ARG_COUNT, &paramCount);
-        if (FAILED(hr))
-        {
-            Logger::Debug("EnumParams failed: ", hr);
-            result.append(WStr("Unknown"));
-            return;
-        }
-        pIMDImport->CloseEnum(hEnum);
-
         auto function_method_signature = FunctionMethodSignature(pSig, cbSig);
 
         hr = function_method_signature.TryParse();
@@ -407,13 +394,6 @@ private:
         }
 
         const auto arguments = function_method_signature.GetMethodArguments();
-
-        if (arguments.size() != paramCount)
-        {
-            Logger::Debug("Number of arguments from signature is different than from enum params.");
-            result.append(WStr("Unknown"));
-            return;
-        }
 
         // If the ClassID returned from GetFunctionInfo is 0, then the function
         // is a shared generic function.
@@ -430,11 +410,8 @@ private:
 
         result.append(funcName);
 
-        ULONG pul_sequence;
-        WCHAR parameter_name[MAX_PARAM_NAME_LEN];
-        ULONG parameter_name_length;
         result.append(WStr("("));
-        for (ULONG i = 0; i < paramCount; i++)
+        for (ULONG i = 0; i < arguments.size(); i++)
         {
             if (i != 0)
             {
@@ -442,23 +419,6 @@ private:
             }
 
             result.append(arguments[i].GetTypeTokName(pIMDImport));
-
-            result.append(WStr(" "));
-
-            // get the parameter name
-            parameter_name[0] = '\0';
-
-            hr = pIMDImport->GetParamProps(paramDefs[i], nullptr, &pul_sequence, parameter_name, MAX_PARAM_NAME_LEN,
-                                           &parameter_name_length, nullptr, nullptr, nullptr, nullptr);
-            if (FAILED(hr))
-            {
-                Logger::Debug("Returning unknown_parameter_name, GetParamProps failed: ", hr);
-                result.append(WStr("unknown_parameter_name"));
-            }
-            else
-            {
-                result.append(parameter_name);
-            }
         }
         result.append(WStr(")"));
     }
