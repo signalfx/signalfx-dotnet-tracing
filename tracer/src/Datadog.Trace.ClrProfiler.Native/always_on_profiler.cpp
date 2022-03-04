@@ -346,7 +346,7 @@ private:
     {
         if (funcID == 0)
         {
-            result.append(WStr("Unknown_Native_Function"));
+            result.append(WStr("Unknown_Native_Function()"));
             return;
         }
 
