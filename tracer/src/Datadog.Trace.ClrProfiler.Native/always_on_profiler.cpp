@@ -375,7 +375,7 @@ private:
         WCHAR funcName[MAX_FUNC_NAME_LEN];
         funcName[0] = '\0';
         PCCOR_SIGNATURE pSig;
-        ULONG cbSig = 0;
+        ULONG cbSig;
         hr = pIMDImport->GetMethodProps(token, nullptr, funcName, MAX_FUNC_NAME_LEN, nullptr, nullptr, &pSig, &cbSig, nullptr, nullptr);
         if (FAILED(hr))
         {
