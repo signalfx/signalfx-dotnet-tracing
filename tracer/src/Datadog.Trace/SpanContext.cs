@@ -18,7 +18,7 @@ namespace Datadog.Trace
     /// </summary>
     public class SpanContext : ISpanContext, IReadOnlyDictionary<string, string>
     {
-        private static readonly string[] KeyNames = { "trace-id", "parent-id", "sampling-priority", "origin", "tags" };
+        private static readonly string[] KeyNames = { "trace-id", "parent-id", "sampling-priority", "origin" };
 
         /// <summary>
         /// An <see cref="ISpanContext"/> with default values. Can be used as the value for
@@ -255,9 +255,9 @@ namespace Datadog.Trace
                     value = Origin;
                     return true;
 
-                case "tags":
-                    value = DatadogTags;
-                    return true;
+                default:
+                    value = null;
+                    return false;
             }
 
             value = null;
