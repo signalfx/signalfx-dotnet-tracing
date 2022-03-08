@@ -16,7 +16,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.SmokeTests
         {
         }
 
-        [SkippableFact]
+        [SkippableFact(Skip="Splunk - determine minimal permissions for running autointrumentation in app domain")]
         [Trait("Category", "Smoke")]
         public void NoExceptions()
         {
