@@ -110,7 +110,7 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests.Checks
             console.Output.Should().Contain(Resources.MissingGac);
         }
 
-        [SkippableFact]
+        [SkippableFact(Skip = "Splunk - runner is not used. The output is correct but wrongly encoded")]
         public async Task ListSites()
         {
             EnsureWindowsAndX64();
@@ -126,7 +126,7 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests.Checks
             console.Output.Should().Contain(Resources.CouldNotFindSite("dummySite", new[] { "sample" }));
         }
 
-        [SkippableFact]
+        [SkippableFact(Skip = "Splunk - runner is not used. The output is correct but wrongly encoded")]
         public async Task ListApplications()
         {
             EnsureWindowsAndX64();
