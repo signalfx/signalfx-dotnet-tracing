@@ -1,3 +1,5 @@
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Specialized;
 using System.IO;
@@ -22,6 +24,7 @@ namespace Sandbox.ManualTracing
             // Set the minimum permissions needed to run code in the new AppDomain
             PermissionSet permSet = new PermissionSet(PermissionState.None);
             permSet.AddPermission(new SecurityPermission(SecurityPermissionFlag.Execution)); // REQUIRED to run code.
+            permSet.AddPermission(new FileIOPermission(PermissionState.Unrestricted)); // REQUIRED to load external code for SignalFx
             // permSet.AddPermission(new WebPermission(PermissionState.Unrestricted)); // REQUIRED for application to send traces to the Agent over HTTP.
 
             var remote = AppDomain.CreateDomain("Remote", null, AppDomain.CurrentDomain.SetupInformation, permSet);
