@@ -53,6 +53,7 @@ namespace Datadog.Trace.TestHelpers
                     _listener = listener;
 
                     _listenerThread = new Thread(HandleHttpRequests);
+                    _listenerThread.IsBackground = true;
                     _listenerThread.Start();
 
                     return;
