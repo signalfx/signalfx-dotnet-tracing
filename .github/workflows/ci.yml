@@ -65,7 +65,7 @@ jobs:
     runs-on: ${{ matrix.machine }}
     timeout-minutes: 30
     steps:
-    - uses: actions/checkout@v2.4.0
+    - uses: actions/checkout@v3
     - uses: actions/setup-dotnet@v2.0.0
       with:
         dotnet-version: | 
@@ -120,7 +120,7 @@ jobs:
     runs-on: ubuntu-20.04
     timeout-minutes: 60
     steps:
-    - uses: actions/checkout@v2.4.0
+    - uses: actions/checkout@v3
     - uses: actions/setup-dotnet@v2.0.0
       with:
         dotnet-version: | 
@@ -163,7 +163,7 @@ jobs:
     runs-on: ${{ matrix.machine }}
     timeout-minutes: 30
     steps:
-    - uses: actions/checkout@v2.4.0
+    - uses: actions/checkout@v3
     - uses: actions/setup-dotnet@v2.0.0
       with:
         dotnet-version: | 
@@ -188,7 +188,7 @@ jobs:
     runs-on: ubuntu-20.04
     timeout-minutes: 60
     steps:
-    - uses: actions/checkout@v2.4.0
+    - uses: actions/checkout@v3
     - uses: actions/setup-dotnet@v2.0.0
       with:
         dotnet-version: | 
@@ -231,7 +231,7 @@ jobs:
     runs-on: ${{ matrix.machine }}
     timeout-minutes: 30
     steps:
-    - uses: actions/checkout@v2.4.0
+    - uses: actions/checkout@v3
     - uses: actions/setup-dotnet@v2.0.0
       with:
         dotnet-version: | 
@@ -253,7 +253,7 @@ jobs:
     runs-on: ubuntu-20.04
     timeout-minutes: 60
     steps:
-    - uses: actions/checkout@v2.4.0
+    - uses: actions/checkout@v3
     - uses: actions/setup-dotnet@v2.0.0
       with:
         dotnet-version: | 
@@ -299,7 +299,7 @@ jobs:
     runs-on: ${{ matrix.machine }}
     timeout-minutes: 60
     steps:
-    - uses: actions/checkout@v2.4.0
+    - uses: actions/checkout@v3
     - uses: actions/setup-dotnet@v2.0.0
       with:
         dotnet-version: | 
@@ -338,7 +338,7 @@ jobs:
     runs-on: ubuntu-20.04
     timeout-minutes: 60
     steps:
-    - uses: actions/checkout@v2.4.0
+    - uses: actions/checkout@v3
     - uses: actions/setup-dotnet@v2.0.0
       with:
         dotnet-version: | 
@@ -396,7 +396,7 @@ jobs:
         framework: [ netcoreapp3.1, net461 ]
     timeout-minutes: 60
     steps:
-    - uses: actions/checkout@v2.4.0
+    - uses: actions/checkout@v3
     - uses: actions/setup-dotnet@v2.0.0
       with:
         dotnet-version: | 
