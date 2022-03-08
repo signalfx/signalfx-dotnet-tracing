@@ -1,6 +1,6 @@
 # escape=`
 
-FROM mcr.microsoft.com/dotnet/framework/sdk:3.5-20220215-windowsservercore-ltsc2019
+FROM mcr.microsoft.com/dotnet/framework/sdk:4.8-windowsservercore-ltsc2019
 
 # it would be good to not use choco. however it can be used to create "image templates" or for sake of POC
 # reference: https://github.com/DataDog/datadog-agent-buildimages/pull/91
