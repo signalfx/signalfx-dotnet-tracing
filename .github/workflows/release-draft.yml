@@ -36,7 +36,7 @@ jobs:
           dd-trace-dotnet/${baseImage}-builder \
           dotnet /build/bin/Debug/_build.dll Clean BuildTracerHome ZipTracerHome
     - name: Upload Linux x64 packages
-      uses: actions/upload-artifact@v2.3.1
+      uses: actions/upload-artifact@v3
       with:
         name: artifacts
         path: ./tracer/src/bin/artifacts/linux-x64
@@ -58,12 +58,12 @@ jobs:
       - run: tracer\build.cmd Clean BuildTracerHome PackageTracerHome
         shell: cmd
       - name: Upload Windows MSI
-        uses: actions/upload-artifact@v2.3.1
+        uses: actions/upload-artifact@v3
         with:
           name: artifacts
           path: tracer/bin/artifacts/*/en-us
       - name: Upload NuGet packages
-        uses: actions/upload-artifact@v2.3.1
+        uses: actions/upload-artifact@v3
         with:
           name: nuget
           path: tracer/bin/artifacts/nuget/SignalFx.NET.Tracing.Azure.Site.Extension.*.nupkg
