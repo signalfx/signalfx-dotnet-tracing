@@ -1,3 +1,5 @@
+// Modified by Splunk Inc.
+
 public static class Projects
 {
     public const string DatadogMonitoringDistribution = "Datadog.Monitoring.Distribution";
@@ -13,8 +15,6 @@ public static class Projects
     public const string BenchmarksTrace = "Benchmarks.Trace";
 
     public const string TraceIntegrationTests = "Datadog.Trace.IntegrationTests";
-    public const string AppSecUnitTests = "Datadog.Trace.Security.Unit.Tests";
-    public const string AppSecIntegrationTests = "Datadog.Trace.Security.IntegrationTests";
     public const string OpenTracingIntegrationTests = "Datadog.Trace.OpenTracing.IntegrationTests";
     public const string ClrProfilerIntegrationTests = "Datadog.Trace.ClrProfiler.IntegrationTests";
     public const string ToolIntegrationTests = "Datadog.Trace.Tools.Runner.IntegrationTests";

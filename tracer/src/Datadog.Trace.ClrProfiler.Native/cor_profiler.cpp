@@ -629,10 +629,8 @@ HRESULT STDMETHODCALLTYPE CorProfiler::ModuleLoadFinished(ModuleID module_id, HR
         Logger::Info("ModuleLoadFinished: ", managed_profiler_name, " v", assemblyVersion, " - Fix PInvoke maps");
 #ifdef _WIN32
         RewritingPInvokeMaps(module_metadata, windows_nativemethods_type);
-        RewritingPInvokeMaps(module_metadata, appsec_windows_nativemethods_type);
 #else
         RewritingPInvokeMaps(module_metadata, nonwindows_nativemethods_type);
-        RewritingPInvokeMaps(module_metadata, appsec_nonwindows_nativemethods_type);
 #endif // _WIN32
 
         if (IsVersionCompatibilityEnabled())

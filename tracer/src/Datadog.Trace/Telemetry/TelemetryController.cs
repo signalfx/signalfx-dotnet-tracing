@@ -3,10 +3,11 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
-using Datadog.Trace.AppSec;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Logging;
 using Datadog.Trace.PlatformHelpers;
@@ -72,9 +73,6 @@ namespace Datadog.Trace.Telemetry
         {
             _tracerInitialized.TrySetResult(true);
         }
-
-        public void RecordSecuritySettings(SecuritySettings settings)
-            => _configuration.RecordSecuritySettings(settings);
 
         public void IntegrationRunning(IntegrationId integrationId)
             => _integrations.IntegrationRunning(integrationId);

@@ -12,6 +12,8 @@
 #define MAX_FUNC_NAME_LEN 256UL
 #define MAX_CLASS_NAME_LEN 512UL
 #define MAX_STRING_LENGTH 512UL
+#define MAX_ARG_COUNT 256UL
+
 
 #define MAX_CODES_PER_BUFFER (10 * 1000)
 
@@ -95,51 +97,6 @@ int32_t ThreadSampling_ConsumeOneThreadSample(int32_t len, unsigned char* buf)
 
 namespace trace
 {
-
-template <class MetaInterface>
-class COMPtrHolder
-{
-public:
-    COMPtrHolder()
-    {
-        m_ptr = NULL;
-    }
-
-    COMPtrHolder(MetaInterface* ptr)
-    {
-        if (ptr != nullptr)
-        {
-            ptr->AddRef();
-        }
-        m_ptr = ptr;
-    }
-
-    ~COMPtrHolder()
-    {
-        if (m_ptr != nullptr)
-        {
-            m_ptr->Release();
-            m_ptr = NULL;
-        }
-    }
-    MetaInterface* operator->()
-    {
-        return m_ptr;
-    }
-
-    MetaInterface** operator&()
-    {
-        return &m_ptr;
-    }
-
-    operator MetaInterface*()
-    {
-        return m_ptr;
-    }
-
-private:
-    MetaInterface* m_ptr;
-};
 
 /*
 * The thread samples buffer format is optimized for single-pass and efficient writing by the native sampling thread (which
@@ -240,7 +197,7 @@ void ThreadSamplesBuffer::writeCodedFrameString(FunctionID fid, WSTRING& str)
         {
             codes[fid] = code;
         }
-        writeShort(-code); // note negative sign indiciating definition of code
+        writeShort(-code); // note negative sign indicating definition of code
         writeString(str);
     }
 }
@@ -362,7 +319,7 @@ private:
             return;
         }
 
-        COMPtrHolder<IMetaDataImport> pMDImport;
+        ComPtr<IMetaDataImport> pMDImport;
         hr = info10->GetModuleMetaData(modId, (ofRead | ofWrite), IID_IMetaDataImport, (IUnknown**) &pMDImport);
         if (FAILED(hr))
         {
@@ -388,7 +345,7 @@ private:
     {
         if (funcID == 0)
         {
-            result.append(WStr("Unknown_Native_Function"));
+            result.append(WStr("Unknown_Native_Function()"));
             return;
         }
 
@@ -396,6 +353,7 @@ private:
         ModuleID moduleId = 0;
         mdToken token = 0;
 
+        // theoretically there is a possibility to use GetFunctionInfo method, but it does not support generic methods
         HRESULT hr = info10->GetFunctionInfo2(funcID, frameInfo, &classId, &moduleId, &token, 0, nullptr, nullptr);
         if (FAILED(hr))
         {
@@ -404,7 +362,7 @@ private:
             return;
         }
 
-        COMPtrHolder<IMetaDataImport> pIMDImport;
+        ComPtr<IMetaDataImport2> pIMDImport;
         hr = info10->GetModuleMetaData(moduleId, ofRead, IID_IMetaDataImport, (IUnknown**) &pIMDImport);
         if (FAILED(hr))
         {
@@ -414,8 +372,10 @@ private:
         }
 
         WCHAR funcName[MAX_FUNC_NAME_LEN];
-        funcName[0] = 0;
-        hr = pIMDImport->GetMethodProps(token, nullptr, funcName, MAX_FUNC_NAME_LEN, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+        funcName[0] = '\0';
+        PCCOR_SIGNATURE pSig;
+        ULONG cbSig;
+        hr = pIMDImport->GetMethodProps(token, nullptr, funcName, MAX_FUNC_NAME_LEN, nullptr, nullptr, &pSig, &cbSig, nullptr, nullptr);
         if (FAILED(hr))
         {
             Logger::Debug("GetMethodProps failed: ", hr);
@@ -438,7 +398,29 @@ private:
 
         result.append(funcName);
 
-        // Future feature: capture method signature to differentiate overloaded methods
+        // try to list arguments type
+        auto function_method_signature = FunctionMethodSignature(pSig, cbSig);
+        hr = function_method_signature.TryParse();
+        if (FAILED(hr))
+        {
+            result.append(WStr("(unknown)"));
+            Logger::Debug("FunctionMethodSignature parsing failed: ", hr);
+        }
+        else
+        {
+            const auto arguments = function_method_signature.GetMethodArguments();
+            result.append(WStr("("));
+            for (ULONG i = 0; i < arguments.size(); i++)
+            {
+                if (i != 0)
+                {
+                    result.append(WStr(", "));
+                }
+
+                result.append(arguments[i].GetTypeTokName(pIMDImport));
+            }
+            result.append(WStr(")"));
+        }
     }
 
 public:

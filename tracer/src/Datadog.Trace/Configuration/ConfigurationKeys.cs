@@ -56,47 +56,6 @@ namespace Datadog.Trace.Configuration
         public const string TraceEnabled = "SIGNALFX_TRACE_ENABLED";
 
         /// <summary>
-        /// Configuration key for enabling or disabling the AppSec.
-        /// Default is value is false (disabled).
-        /// </summary>
-        public const string AppSecEnabled = "SIGNALFX_APPSEC_ENABLED";
-
-        /// <summary>
-        /// Override the default rules file provided. Must be a path to a valid JSON rules file.
-        /// Default is value is null (do not override).
-        /// </summary>
-        public const string AppSecRules = "SIGNALFX_APPSEC_RULES";
-
-        /// <summary>
-        /// Configuration key indicating the optional name of the custom header to take into account for the ip address.
-        /// Default is value is null (do not override).
-        /// </summary>
-        public const string AppSecCustomIpHeader = "SIGNALFX_APPSEC_IPHEADER";
-
-        /// <summary>
-        /// Comma separated keys indicating the optional custom headers the user wants to send.
-        /// Default is value is null.
-        /// </summary>
-        public const string AppSecExtraHeaders = "SIGNALFX_APPSEC_EXTRA_HEADERS";
-
-        /// <summary>
-        /// Specifies if the AppSec traces should be explicitly kept or dropped.
-        /// Default is true, to keep all traces, false means drop all traces (by setting AutoReject as sampling priority).
-        /// For internal testing only.
-        /// </summary>
-        internal const string AppSecKeepTraces = "SIGNALFX_APPSEC_KEEP_TRACES";
-
-        /// <summary>
-        /// Limits the amount of AppSec traces sent per second with an integer value, strictly positive.
-        /// </summary>
-        internal const string AppSecTraceRateLimit = "SIGNALFX_APPSEC_TRACE_RATE_LIMIT";
-
-        /// <summary>
-        /// Limits the amount of AppSec traces sent per second with an integer value, strictly positive.
-        /// </summary>
-        internal const string AppSecWafTimeout = "SIGNALFX_APPSEC_WAF_TIMEOUT";
-
-        /// <summary>
         /// Configuration key for enabling or disabling the Tracer's debug mode.
         /// Default is value is false (disabled).
         /// </summary>

@@ -245,8 +245,5 @@
     <ClCompile Include="tracer_tokens.cpp" />
     <ClCompile Include="util.cpp" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>

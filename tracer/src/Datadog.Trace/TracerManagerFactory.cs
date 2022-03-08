@@ -12,7 +12,6 @@ using System.Reflection;
 using Datadog.Trace.Abstractions;
 using Datadog.Trace.Agent;
 using Datadog.Trace.Agent.Zipkin;
-using Datadog.Trace.AppSec;
 using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Conventions;
@@ -101,7 +100,6 @@ namespace Datadog.Trace
 
             telemetry ??= TelemetryFactory.CreateTelemetryController(settings);
             telemetry.RecordTracerSettings(settings, defaultServiceName, AzureAppServices.Metadata);
-            telemetry.RecordSecuritySettings(Security.Instance.Settings);
 
             var tracerManager = CreateTracerManagerFrom(settings, agentWriter, sampler, propagator, scopeManager, statsd, runtimeMetrics, traceIdConvention, logSubmissionManager, telemetry, defaultServiceName);
             return tracerManager;

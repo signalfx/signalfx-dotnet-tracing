@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Web;
-using Datadog.Trace.AppSec;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Logging;
@@ -145,12 +144,6 @@ namespace Datadog.Trace.AspNet
 
                 httpContext.Items[_httpContextScopeKey] = scope;
 
-                var security = Security.Instance;
-                if (security.Settings.Enabled)
-                {
-                    security.InstrumentationGateway.RaiseRequestStart(httpContext, httpRequest, scope.Span, null);
-                }
-
                 tracer.TracerManager.Telemetry.IntegrationGeneratedSpan(IntegrationId);
             }
             catch (Exception ex)
@@ -214,20 +207,6 @@ namespace Datadog.Trace.AspNet
                         {
                             string path = UriHelpers.GetCleanUriPath(app.Request.Url);
                             scope.Span.ResourceName = $"{app.Request.HttpMethod.ToUpperInvariant()} {path.ToLowerInvariant()}";
-                        }
-
-                        var security = Security.Instance;
-                        if (security.Settings.Enabled)
-                        {
-                            var httpContext = (sender as HttpApplication)?.Context;
-
-                            if (httpContext == null)
-                            {
-                                return;
-                            }
-
-                            security.InstrumentationGateway.RaiseRequestEnd(httpContext, httpContext.Request, scope.Span, null);
-                            security.InstrumentationGateway.RaiseLastChanceToWriteTags(httpContext, scope.Span);
                         }
 
                         scope.Dispose();

@@ -21,7 +21,6 @@ namespace Datadog.Trace.TestHelpers
             int aspNetCorePort = 5000,
             int? logsCollectorPort = null,
             string processToProfile = null,
-            bool? enableSecurity = null,
             string externalRulesFile = null)
         {
             if (environmentHelper == null)
@@ -40,7 +39,6 @@ namespace Datadog.Trace.TestHelpers
                 logsCollectorPort,
                 startInfo.Environment,
                 processToProfile,
-                enableSecurity.GetValueOrDefault(),
                 externalRulesFile);
 
             startInfo.UseShellExecute = false;

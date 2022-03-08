@@ -4,16 +4,16 @@
     StackTrace:
 "" #1 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0xd4c
 
-	at System.Threading.ManualResetEventSlim.Wait(unknown)
-	at System.Threading.Tasks.Task.SpinThenBlockingWait(unknown)
-	at System.Threading.Tasks.Task.InternalWaitCore(unknown)
-	at System.Threading.Tasks.Task.Wait(unknown)
-	at System.Threading.Tasks.Task.Wait(unknown)
-	at Datadog.Trace.TracerManager.RunShutdownTasks(unknown)
-	at Datadog.Trace.LifetimeManager.RunShutdownTasks(unknown)
-	at Datadog.Trace.LifetimeManager.CurrentDomain_ProcessExit(unknown)
-	at System.AppContext.OnProcessExit(unknown)
-	at Unknown_Native_Function(unknown)
+	at System.Threading.ManualResetEventSlim.Wait
+	at System.Threading.Tasks.Task.SpinThenBlockingWait
+	at System.Threading.Tasks.Task.InternalWaitCore
+	at System.Threading.Tasks.Task.Wait
+	at System.Threading.Tasks.Task.Wait
+	at Datadog.Trace.TracerManager.RunShutdownTasks
+	at Datadog.Trace.LifetimeManager.RunShutdownTasks
+	at Datadog.Trace.LifetimeManager.CurrentDomain_ProcessExit
+	at System.AppContext.OnProcessExit
+	at Unknown_Native_Function
 
   },
   {
@@ -21,23 +21,23 @@
     StackTrace:
 "" #5 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x2f4c
 
-	at System.Threading.ManualResetEventSlim.Wait(unknown)
-	at System.Threading.Tasks.Task.SpinThenBlockingWait(unknown)
-	at System.Threading.Tasks.Task.InternalWaitCore(unknown)
-	at System.Threading.Tasks.Task.Wait(unknown)
-	at Datadog.Trace.Vendors.StatsdClient.Worker.Waiter.Wait(unknown)
-	at SharedGenericFunction.Dequeue(unknown)
-	at SharedGenericFunction.<.ctor>b__8_0(unknown)
-	at System.Threading.Tasks.Task.InnerInvoke(unknown)
-	at <>c.<.cctor>b__274_0(unknown)
-	at System.Threading.ExecutionContext.RunInternal(unknown)
-	at System.Threading.Tasks.Task.ExecuteWithThreadLocal(unknown)
-	at System.Threading.Tasks.Task.ExecuteEntryUnsafe(unknown)
-	at <>c.<.cctor>b__10_0(unknown)
-	at System.Threading.ThreadHelper.ThreadStart_Context(unknown)
-	at System.Threading.ExecutionContext.RunInternal(unknown)
-	at System.Threading.ThreadHelper.ThreadStart(unknown)
-	at Unknown_Native_Function(unknown)
+	at System.Threading.ManualResetEventSlim.Wait
+	at System.Threading.Tasks.Task.SpinThenBlockingWait
+	at System.Threading.Tasks.Task.InternalWaitCore
+	at System.Threading.Tasks.Task.Wait
+	at Datadog.Trace.Vendors.StatsdClient.Worker.Waiter.Wait
+	at SharedGenericFunction.Dequeue
+	at SharedGenericFunction.<.ctor>b__8_0
+	at System.Threading.Tasks.Task.InnerInvoke
+	at <>c.<.cctor>b__274_0
+	at System.Threading.ExecutionContext.RunInternal
+	at System.Threading.Tasks.Task.ExecuteWithThreadLocal
+	at System.Threading.Tasks.Task.ExecuteEntryUnsafe
+	at <>c.<.cctor>b__10_0
+	at System.Threading.ThreadHelper.ThreadStart_Context
+	at System.Threading.ExecutionContext.RunInternal
+	at System.Threading.ThreadHelper.ThreadStart
+	at Unknown_Native_Function
 
   }
 ]
