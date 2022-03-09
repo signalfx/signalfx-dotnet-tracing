@@ -9,28 +9,27 @@
   #include <pthread.h>
 #endif
 
-#define MAX_FUNC_NAME_LEN 256UL
-#define MAX_CLASS_NAME_LEN 512UL
-#define MAX_STRING_LENGTH 512UL
-#define MAX_ARG_COUNT 256UL
+constexpr auto max_func_name_len = 256UL;
+constexpr auto max_class_name_len = 512UL;
+constexpr auto max_string_length = 512UL;
 
 
-#define MAX_CODES_PER_BUFFER (10 * 1000)
+constexpr auto max_codes_per_buffer = 10 * 1000;
 
 // If you change this, consider ThreadSampler.cs too
-#define SAMPLES_BUFFER_MAXIMUM_SIZE (200 * 1024)
+constexpr auto samples_buffer_maximum_size = 200 * 1024;
 
-#define SAMPLES_BUFFER_DEFAULT_SIZE (20 * 1024)
+constexpr auto samples_buffer_default_size = 20 * 1024;
 
 // If you change these, change ThreadSampler.cs too
-#define DEFAULT_SAMPLE_PERIOD 10000
-#define MINIMUM_SAMPLE_PERIOD 1000
+constexpr auto default_sample_period = 10000;
+constexpr auto minimum_sample_period = 1000;
 
 // FIXME make configurable (hidden)?
 // These numbers were chosen to keep total overhead under 1 MB of RAM in typical cases (name lengths being the biggest
 // variable)
-#define MAX_FUNCTION_NAME_CACHE_SIZE 6000
-#define MAX_CLASS_NAME_CACHE_SIZE 1000
+constexpr auto max_function_name_cache_size = 6000;
+constexpr auto max_class_name_cache_size = 1000;
 
 // If you squint you can make out that the original bones of this came from sample code provided by the dotnet project:
 // https://github.com/dotnet/samples/blob/2cf486af936261b04a438ea44779cdc26c613f98/core/profiling/stacksampling/src/sampler.cpp
@@ -135,7 +134,7 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
     buffer = nullptr; // specifically don't delete as this is done by RecordProduced/ConsumeOneThreadSample
 }
 
-#define CHECK_SAMPLES_BUFFER_LENGTH() {  if (buffer->size() >= SAMPLES_BUFFER_MAXIMUM_SIZE) { return; } }
+#define CHECK_SAMPLES_BUFFER_LENGTH() {  if (buffer->size() >= samples_buffer_maximum_size) { return; } }
 void ThreadSamplesBuffer::StartBatch()
 {
     CHECK_SAMPLES_BUFFER_LENGTH();
@@ -193,7 +192,7 @@ void ThreadSamplesBuffer::writeCodedFrameString(FunctionID fid, WSTRING& str)
     else
     {
         int code = (int) codes.size() + 1;
-        if (codes.size() + 1 < MAX_CODES_PER_BUFFER)
+        if (codes.size() + 1 < max_codes_per_buffer)
         {
             codes[fid] = code;
         }
@@ -217,7 +216,7 @@ void ThreadSamplesBuffer::writeString(const WSTRING& str)
 {
     // limit strings to a max length overall; this prevents (e.g.) thread names or
     // any other miscellaneous strings that come along from blowing things out
-    short usedLen = (short) std::min(str.length(), (size_t)MAX_STRING_LENGTH);
+    short usedLen = (short) std::min(str.length(), (size_t)max_string_length);
     writeShort(usedLen);
     // odd bit of casting since we're copying bytes, not wchars
     unsigned char* strBegin = (unsigned char*)(&str.c_str()[0]);
@@ -252,7 +251,7 @@ public:
     std::vector<unsigned char>* curBuffer = nullptr;
     SamplingStatistics stats;
 
-    SamplingHelper() : functionNameCache(MAX_FUNCTION_NAME_CACHE_SIZE), classNameCache(MAX_CLASS_NAME_CACHE_SIZE), stats()
+    SamplingHelper() : functionNameCache(max_function_name_cache_size), classNameCache(max_class_name_cache_size), stats()
     {
     }
 
@@ -265,7 +264,7 @@ public:
         }
         stats = SamplingStatistics();
         curBuffer = new std::vector<unsigned char>();
-        curBuffer->reserve(SAMPLES_BUFFER_DEFAULT_SIZE);
+        curBuffer->reserve(samples_buffer_default_size);
         curWriter = new ThreadSamplesBuffer(curBuffer);
         return should;
     }
@@ -328,9 +327,9 @@ private:
             return;
         }
 
-        WCHAR wName[MAX_CLASS_NAME_LEN];
+        WCHAR wName[max_class_name_len];
         DWORD dwTypeDefFlags = 0;
-        hr = pMDImport->GetTypeDefProps(classToken, wName, MAX_CLASS_NAME_LEN, nullptr, &dwTypeDefFlags, nullptr);
+        hr = pMDImport->GetTypeDefProps(classToken, wName, max_class_name_len, nullptr, &dwTypeDefFlags, nullptr);
         if (FAILED(hr))
         {
             Logger::Debug("GetTypeDefProps failed: ", hr);
@@ -371,11 +370,11 @@ private:
             return;
         }
 
-        WCHAR funcName[MAX_FUNC_NAME_LEN];
+        WCHAR funcName[max_func_name_len];
         funcName[0] = '\0';
         PCCOR_SIGNATURE pSig;
         ULONG cbSig;
-        hr = pIMDImport->GetMethodProps(token, nullptr, funcName, MAX_FUNC_NAME_LEN, nullptr, nullptr, &pSig, &cbSig, nullptr, nullptr);
+        hr = pIMDImport->GetMethodProps(token, nullptr, funcName, max_func_name_len, nullptr, nullptr, &pSig, &cbSig, nullptr, nullptr);
         if (FAILED(hr))
         {
             Logger::Debug("GetMethodProps failed: ", hr);
@@ -510,7 +509,7 @@ int GetSamplingPeriod()
     const WSTRING val = GetEnvironmentValue(environment::thread_sampling_period);
     if (val.empty())
     {
-        return DEFAULT_SAMPLE_PERIOD;
+        return default_sample_period;
     }
     try
     {
@@ -521,11 +520,11 @@ int GetSamplingPeriod()
         std::string str = convert.to_bytes(val);
         int ival = std::stoi(str);
 #endif
-        return (int) std::max(MINIMUM_SAMPLE_PERIOD, ival);
+        return (int) std::max(minimum_sample_period, ival);
     }
     catch (...)
     {
-        return DEFAULT_SAMPLE_PERIOD;
+        return default_sample_period;
     }
 }
 
