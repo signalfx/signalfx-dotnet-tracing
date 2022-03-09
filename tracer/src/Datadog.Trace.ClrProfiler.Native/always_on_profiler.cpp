@@ -88,10 +88,10 @@ int32_t ThreadSampling_ConsumeOneThreadSample(int32_t len, unsigned char* buf)
     {
         return 0;
     }
-    size_t toUseLen = (int) std::min(toUse->size(), (size_t) len);
+    size_t toUseLen = static_cast<int>(std::min(toUse->size(), (size_t) len));
     memcpy(buf, toUse->data(), toUseLen);
     delete toUse;
-    return (int32_t) toUseLen;
+    return static_cast<int32_t>(toUseLen);
 }
 
 namespace trace
@@ -191,7 +191,7 @@ void ThreadSamplesBuffer::writeCodedFrameString(FunctionID fid, WSTRING& str)
     }
     else
     {
-        int code = (int) codes.size() + 1;
+        int code = static_cast<int>(codes.size()) + 1;
         if (codes.size() + 1 < max_codes_per_buffer)
         {
             codes[fid] = code;
@@ -216,7 +216,7 @@ void ThreadSamplesBuffer::writeString(const WSTRING& str)
 {
     // limit strings to a max length overall; this prevents (e.g.) thread names or
     // any other miscellaneous strings that come along from blowing things out
-    short usedLen = (short) std::min(str.length(), (size_t)max_string_length);
+    short usedLen = static_cast<short>(std::min(str.length(), (size_t) max_string_length));
     writeShort(usedLen);
     // odd bit of casting since we're copying bytes, not wchars
     auto strBegin = (const unsigned char*)(&str.c_str()[0]);
@@ -454,7 +454,7 @@ public:
 HRESULT __stdcall FrameCallback(_In_ FunctionID funcId, _In_ UINT_PTR ip, _In_ COR_PRF_FRAME_INFO frameInfo,
                                 _In_ ULONG32 contextSize, _In_ BYTE context[], _In_ void* clientData)
 {
-    auto helper = (SamplingHelper*) clientData;
+    auto helper = static_cast<SamplingHelper*>(clientData);
     helper->stats.totalFrames++;
     WSTRING* name = helper->Lookup(funcId, frameInfo);
     // This is where line numbers could be calculated
@@ -571,7 +571,7 @@ void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, Sa
     elapsed.QuadPart = end.QuadPart - start.QuadPart;
     elapsed.QuadPart *= 1000000;
     elapsed.QuadPart /= frequency.QuadPart;
-    elapsedMicros = (int) elapsed.QuadPart;
+    elapsedMicros = static_cast<int>(elapsed.QuadPart);
 #else
     // FLoating around several places as "microsecond timer on linux c"
     clock_gettime(CLOCK_MONOTONIC, &end);
@@ -603,7 +603,7 @@ void SleepMillis(int millis) {
 DWORD WINAPI SamplingThreadMain(_In_ LPVOID param)
 {
     int sleepMillis = GetSamplingPeriod();
-    auto ts = (ThreadSampler*) param;
+    auto ts = static_cast<ThreadSampler*>(param);
     ICorProfilerInfo10* info10 = ts->info10;
     SamplingHelper helper;
     helper.info10 = info10;
