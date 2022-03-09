@@ -292,7 +292,7 @@ private:
             return;
         }
 
-        hr = info10->GetClassIDInfo2(classId, &modId, &classToken, &parentClassID, 0, nullptr, nullptr);
+        HRESULT hr = info10->GetClassIDInfo2(classId, &modId, &classToken, &parentClassID, 0, nullptr, nullptr);
         if (CORPROF_E_CLASSID_IS_ARRAY == hr)
         {
             // We have a ClassID of an array.
