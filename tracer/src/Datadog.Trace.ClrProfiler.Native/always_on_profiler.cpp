@@ -219,7 +219,7 @@ void ThreadSamplesBuffer::writeString(const WSTRING& str)
     short usedLen = (short) std::min(str.length(), (size_t)max_string_length);
     writeShort(usedLen);
     // odd bit of casting since we're copying bytes, not wchars
-    auto strBegin = (unsigned char*)(&str.c_str()[0]);
+    auto strBegin = (const unsigned char*)(&str.c_str()[0]);
     // possible endian-ness assumption here; unclear how the managed layer would decode on big endian platforms
     buffer->insert(buffer->end(), strBegin, strBegin + usedLen * 2);
 }
