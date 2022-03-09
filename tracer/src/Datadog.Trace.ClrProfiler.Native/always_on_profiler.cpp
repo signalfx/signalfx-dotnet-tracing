@@ -88,7 +88,7 @@ int32_t ThreadSampling_ConsumeOneThreadSample(int32_t len, unsigned char* buf)
     {
         return 0;
     }
-    size_t toUseLen = static_cast<int>(std::min(toUse->size(), (size_t) len));
+    size_t toUseLen = static_cast<int>(std::min(toUse->size(), static_cast<size_t>(len)));
     memcpy(buf, toUse->data(), toUseLen);
     delete toUse;
     return static_cast<int32_t>(toUseLen);
@@ -216,10 +216,10 @@ void ThreadSamplesBuffer::writeString(const WSTRING& str)
 {
     // limit strings to a max length overall; this prevents (e.g.) thread names or
     // any other miscellaneous strings that come along from blowing things out
-    short usedLen = static_cast<short>(std::min(str.length(), (size_t) max_string_length));
+    short usedLen = static_cast<short>(std::min(str.length(), static_cast<size_t>(max_string_length)));
     writeShort(usedLen);
     // odd bit of casting since we're copying bytes, not wchars
-    auto strBegin = (const unsigned char*)(&str.c_str()[0]);
+    auto strBegin = reinterpret_cast<const unsigned char*>(&str.c_str()[0]);
     // possible endian-ness assumption here; unclear how the managed layer would decode on big endian platforms
     buffer->insert(buffer->end(), strBegin, strBegin + usedLen * 2);
 }
@@ -318,7 +318,7 @@ private:
         }
 
         ComPtr<IMetaDataImport> pMDImport;
-        hr = info10->GetModuleMetaData(modId, (ofRead | ofWrite), IID_IMetaDataImport, (IUnknown**) &pMDImport);
+        hr = info10->GetModuleMetaData(modId, (ofRead | ofWrite), IID_IMetaDataImport, reinterpret_cast<IUnknown**>(&pMDImport));
         if (FAILED(hr))
         {
             Logger::Debug("GetModuleMetaData failed: ", hr);
@@ -361,7 +361,7 @@ private:
         }
 
         ComPtr<IMetaDataImport2> pIMDImport;
-        hr = info10->GetModuleMetaData(moduleId, ofRead, IID_IMetaDataImport, (IUnknown**) &pIMDImport);
+        hr = info10->GetModuleMetaData(moduleId, ofRead, IID_IMetaDataImport, reinterpret_cast<IUnknown**>(&pIMDImport));
         if (FAILED(hr))
         {
             Logger::Debug("GetModuleMetaData failed: ", hr);
