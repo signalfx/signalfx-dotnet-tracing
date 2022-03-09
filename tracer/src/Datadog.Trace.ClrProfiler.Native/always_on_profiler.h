@@ -7,7 +7,7 @@
 #include <utility>
 #include <unordered_map>
 
-#define UNKNOWN_MANAGED_THREADID -1
+constexpr auto unknown_managed_thread_id = -1;
 
 #ifdef _WIN32
 #define EXPORTTHIS __declspec(dllexport)
@@ -49,7 +49,7 @@ public:
     uint64_t spanId;
     int32_t managedThreadId;
 
-    ThreadSpanContext() : traceIdHigh(0), traceIdLow(0), spanId(0), managedThreadId(UNKNOWN_MANAGED_THREADID)
+    ThreadSpanContext() : traceIdHigh(0), traceIdLow(0), spanId(0), managedThreadId(unknown_managed_thread_id)
     {
     }
     ThreadSpanContext(uint64_t _traceIdHigh, uint64_t _traceIdLow, uint64_t _spanId, int32_t managedThreadId) :
@@ -78,7 +78,7 @@ public:
 class ThreadSampler
 {
 public:
-    void StartSampling(ICorProfilerInfo10* info10);
+    void StartSampling(ICorProfilerInfo10* cor_profiler_info10);
     ICorProfilerInfo10* info10;
     void ThreadCreated(ThreadID threadId);
     void ThreadDestroyed(ThreadID threadId);
