@@ -534,7 +534,6 @@ void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, Sa
     std::lock_guard<std::mutex> threadStateGuard(ts->threadStateLock);
     std::lock_guard<std::mutex> spanContextGuard(threadSpanContextLock);
 
-    int elapsedMicros = 0;
 #ifdef _WIN32
     LARGE_INTEGER start, end, elapsed, frequency;
     QueryPerformanceFrequency(&frequency);
@@ -567,6 +566,7 @@ void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, Sa
         Logger::Error("Could not resume runtime? : ", hr);
     }
 
+    int elapsedMicros;
 #ifdef _WIN32
     QueryPerformanceCounter(&end);
     elapsed.QuadPart = end.QuadPart - start.QuadPart;
