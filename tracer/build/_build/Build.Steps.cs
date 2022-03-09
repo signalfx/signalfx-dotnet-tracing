@@ -99,7 +99,6 @@ partial class Build
     {
         Solution.GetProject(Projects.TraceIntegrationTests),
         Solution.GetProject(Projects.OpenTracingIntegrationTests),
-        Solution.GetProject(Projects.ToolIntegrationTests)
     };
 
     Project[] ClrProfilerIntegrationTests => new[]
@@ -484,13 +483,11 @@ partial class Build
         .After(CompileManagedSrc)
         .After(CompileDependencyLibs)
         .After(CompileManagedTestHelpers)
-        .After(BuildRunnerTool)
         .Executes(() =>
         {
             // create junction for each directory
             var directories = TracerDirectory.GlobDirectories(
                 $"src/**/bin/{BuildConfiguration}",
-                $"src/Datadog.Trace.Tools.Runner/obj/{BuildConfiguration}",
                 $"test/Datadog.Trace.TestHelpers/**/bin/{BuildConfiguration}",
                 $"test/Datadog.Trace.TestHelpers/obj/{BuildConfiguration}",
                 $"test/OpenTelemetry.TestHelpers/**/bin/{BuildConfiguration}",
@@ -600,7 +597,6 @@ partial class Build
         .Unlisted()
         .After(Restore)
         .After(CompileManagedSrc)
-        .After(BuildRunnerTool)
         .Executes(() =>
         {
             // Always AnyCPU
@@ -778,7 +774,6 @@ partial class Build
         .After(CompileRegressionSamples)
         .After(CompileFrameworkReproductions)
         .After(PublishIisSamples)
-        .After(BuildRunnerTool)
         .Requires(() => Framework)
         .Requires(() => TracerHomeDirectory != null)
         .Executes(() =>
@@ -1152,7 +1147,6 @@ partial class Build
         .After(CompileManagedTestHelpers)
         .After(CompileSamplesLinux)
         .After(CompileMultiApiPackageVersionSamples)
-        .After(BuildRunnerTool)
         .Requires(() => TracerHomeDirectory != null)
         .Requires(() => Framework)
         .Executes(() =>
@@ -1263,37 +1257,6 @@ partial class Build
                 .SetProcessArgumentConfigurator(args => args.Add("--no-cache"))
                 .SetPackageName("dd-trace"));
          });
-
-    Target BuildToolArtifactTests => _ => _
-         .Description("Builds the tool artifacts tests")
-         .After(CompileManagedTestHelpers)
-         .After(InstallDdTraceTool)
-         .Executes(() =>
-          {
-              DotNetBuild(x => x
-                  .SetProjectFile(Solution.GetProject(Projects.ToolArtifactsTests))
-                  .EnableNoDependencies()
-                  .EnableNoRestore()
-                  .SetConfiguration(BuildConfiguration)
-                  .SetNoWarnDotNetCore3());
-          });
-
-    Target RunToolArtifactTests => _ => _
-       .Description("Runs the tool artifacts tests")
-       .After(BuildToolArtifactTests)
-       .Executes(() =>
-        {
-            var project = Solution.GetProject(Projects.ToolArtifactsTests);
-
-            DotNetTest(config => config
-                .SetProjectFile(project)
-                .SetConfiguration(BuildConfiguration)
-                .EnableNoRestore()
-                .EnableNoBuild()
-                .SetProcessEnvironmentVariable("TracerHomeDirectory", TracerHomeDirectory)
-                .SetProcessEnvironmentVariable("ToolInstallDirectory", ToolInstallDirectory)
-                .EnableTrxLogOutput(GetResultsDirectory(project)));
-        });
 
     Target UpdateSnapshots => _ => _
         .Description("Updates verified snapshots files with received ones")
