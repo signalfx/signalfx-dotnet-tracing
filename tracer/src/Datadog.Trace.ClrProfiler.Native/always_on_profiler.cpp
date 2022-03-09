@@ -628,7 +628,7 @@ void ThreadSampler::StartSampling(ICorProfilerInfo10* cor_profiler_info10)
     profilerInfo = cor_profiler_info10;
     this->info10 = cor_profiler_info10;
 #ifdef _WIN32
-    HANDLE bgThread = CreateThread(nullptr, 0, &SamplingThreadMain, this, 0, nullptr);
+    CreateThread(nullptr, 0, &SamplingThreadMain, this, 0, nullptr);
 #else
     pthread_t thr;
     pthread_create(&thr, NULL, (void *(*)(void *)) &SamplingThreadMain, this);
