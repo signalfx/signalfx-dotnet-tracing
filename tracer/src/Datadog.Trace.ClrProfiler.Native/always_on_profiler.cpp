@@ -88,7 +88,7 @@ int32_t ThreadSampling_ConsumeOneThreadSample(int32_t len, unsigned char* buf)
     {
         return 0;
     }
-    size_t toUseLen = static_cast<int>(std::min(toUse->size(), static_cast<size_t>(len)));
+    const size_t toUseLen = static_cast<int>(std::min(toUse->size(), static_cast<size_t>(len)));
     memcpy(buf, toUse->data(), toUseLen);
     delete toUse;
     return static_cast<int32_t>(toUseLen);
@@ -140,7 +140,7 @@ void ThreadSamplesBuffer::StartBatch()
     CHECK_SAMPLES_BUFFER_LENGTH()
     writeByte(thread_samples_start_batch);
     writeInt(current_thread_samples_buffer_version);
-    auto ms =
+    const auto ms =
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
     writeInt64((int64_t) ms.count());
 }
@@ -184,14 +184,14 @@ void ThreadSamplesBuffer::WriteFinalStats(const SamplingStatistics& stats)
 
 void ThreadSamplesBuffer::writeCodedFrameString(FunctionID fid, WSTRING& str)
 {
-    auto found = codes.find(fid);
+    const auto found = codes.find(fid);
     if (found != codes.end())
     {
         writeShort(found->second);
     }
     else
     {
-        int code = static_cast<int>(codes.size()) + 1;
+        const int code = static_cast<int>(codes.size()) + 1;
         if (codes.size() + 1 < max_codes_per_buffer)
         {
             codes[fid] = code;
@@ -216,10 +216,10 @@ void ThreadSamplesBuffer::writeString(const WSTRING& str)
 {
     // limit strings to a max length overall; this prevents (e.g.) thread names or
     // any other miscellaneous strings that come along from blowing things out
-    short usedLen = static_cast<short>(std::min(str.length(), static_cast<size_t>(max_string_length)));
+    const short usedLen = static_cast<short>(std::min(str.length(), static_cast<size_t>(max_string_length)));
     writeShort(usedLen);
     // odd bit of casting since we're copying bytes, not wchars
-    auto strBegin = reinterpret_cast<const unsigned char*>(&str.c_str()[0]);
+    const auto strBegin = reinterpret_cast<const unsigned char*>(&str.c_str()[0]);
     // possible endian-ness assumption here; unclear how the managed layer would decode on big endian platforms
     buffer->insert(buffer->end(), strBegin, strBegin + usedLen * 2);
 }
@@ -257,7 +257,7 @@ public:
 
     bool AllocateBuffer()
     {
-        bool should = ThreadSampling_ShouldProduceThreadSample();
+        const bool should = ThreadSampling_ShouldProduceThreadSample();
         if (!should)
         {
             return should;
@@ -454,7 +454,7 @@ public:
 HRESULT __stdcall FrameCallback(_In_ FunctionID funcId, _In_ UINT_PTR ip, _In_ COR_PRF_FRAME_INFO frameInfo,
                                 _In_ ULONG32 contextSize, _In_ BYTE context[], _In_ void* clientData)
 {
-    auto helper = static_cast<SamplingHelper*>(clientData);
+    const auto helper = static_cast<SamplingHelper*>(clientData);
     helper->stats.totalFrames++;
     WSTRING* name = helper->Lookup(funcId, frameInfo);
     // This is where line numbers could be calculated
@@ -513,7 +513,7 @@ int GetSamplingPeriod()
     try
     {
 #ifdef _WIN32
-        int ival = std::stoi(val);
+        const int ival = std::stoi(val);
 #else
         std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
         std::string str = convert.to_bytes(val);
@@ -602,8 +602,8 @@ void SleepMillis(int millis) {
 
 DWORD WINAPI SamplingThreadMain(_In_ LPVOID param)
 {
-    int sleepMillis = GetSamplingPeriod();
-    auto ts = static_cast<ThreadSampler*>(param);
+    const int sleepMillis = GetSamplingPeriod();
+    const auto ts = static_cast<ThreadSampler*>(param);
     ICorProfilerInfo10* info10 = ts->info10;
     SamplingHelper helper;
     helper.info10 = info10;
@@ -648,7 +648,7 @@ void ThreadSampler::ThreadDestroyed(ThreadID threadId)
     {
         std::lock_guard<std::mutex> guard(threadStateLock);
 
-        ThreadState* state = managedTid2state[threadId];
+        const ThreadState* state = managedTid2state[threadId];
 
         delete state;
 
@@ -692,7 +692,7 @@ NameCache::NameCache(size_t maximumSize) : maxSize(maximumSize)
 
 WSTRING* NameCache::get(UINT_PTR key)
 {
-    auto found = map.find(key);
+    const auto found = map.find(key);
     if (found == map.end())
     {
         return nullptr;
@@ -705,13 +705,13 @@ WSTRING* NameCache::get(UINT_PTR key)
 
 void NameCache::put(UINT_PTR key, WSTRING* val)
 {
-    auto pair = std::pair<FunctionID, WSTRING*>(key, val);
+    const auto pair = std::pair<FunctionID, WSTRING*>(key, val);
     list.push_front(pair);
     map[key] = list.begin();
 
     if (map.size() > maxSize)
     {
-        auto &lru = list.back();
+        const auto &lru = list.back();
         delete lru.second; // FIXME consider using WSTRING directly instead of WSTRING*
         map.erase(lru.first);
         list.pop_back();
@@ -730,7 +730,7 @@ extern "C"
                                                         int32_t managedThreadId)
     {
         ThreadID threadId;
-        HRESULT hr = profilerInfo->GetCurrentThreadID(&threadId);
+        const HRESULT hr = profilerInfo->GetCurrentThreadID(&threadId);
         if (FAILED(hr)) {
             trace::Logger::Debug("GetCurrentThreadID failed: ", hr);
             return;
