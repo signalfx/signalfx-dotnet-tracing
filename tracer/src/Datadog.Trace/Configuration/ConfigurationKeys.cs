@@ -383,6 +383,16 @@ namespace Datadog.Trace.Configuration
         public const string ExpandRouteTemplatesEnabled = "SIGNALFX_TRACE_EXPAND_ROUTE_TEMPLATES_ENABLED";
 
         /// <summary>
+        /// Configuration key for setting the propagation style injection.
+        /// </summary>
+        public const string PropagationStyleInject = "DD_PROPAGATION_STYLE_INJECT";
+
+        /// <summary>
+        /// Configuration key for setting the propagation style extraction.
+        /// </summary>
+        public const string PropagationStyleExtract = "DD_PROPAGATION_STYLE_EXTRACT";
+
+        /// <summary>
         /// String constants for CI Visibility configuration keys.
         /// </summary>
         public static class CIVisibility

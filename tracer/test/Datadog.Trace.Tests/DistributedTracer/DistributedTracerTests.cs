@@ -26,6 +26,7 @@ namespace Datadog.Trace.Tests.DistributedTracer
             var spanContext = new SpanContext(TraceId.CreateFromInt(1), 2, SamplingPriority.UserKeep);
 
             distributedTracer.Setup(t => t.GetSpanContext()).Returns(spanContext);
+            distributedTracer.Setup(t => t.GetRuntimeId()).Returns(Guid.NewGuid().ToString());
 
             ClrProfiler.DistributedTracer.SetInstanceOnlyForTests(distributedTracer.Object);
 
@@ -42,6 +43,8 @@ namespace Datadog.Trace.Tests.DistributedTracer
         public void SetSpanContext()
         {
             var distributedTracer = new Mock<IDistributedTracer>();
+
+            distributedTracer.Setup(t => t.GetRuntimeId()).Returns(Guid.NewGuid().ToString());
 
             ClrProfiler.DistributedTracer.SetInstanceOnlyForTests(distributedTracer.Object);
 

@@ -18,7 +18,19 @@ namespace Datadog.Trace
     /// </summary>
     public class SpanContext : ISpanContext, IReadOnlyDictionary<string, string>
     {
-        private static readonly string[] KeyNames = { "trace-id", "parent-id", "sampling-priority", "origin" };
+        private static readonly string[] KeyNames =
+        { 
+            Keys.TraceId,
+            Keys.ParentId,
+            Keys.SamplingPriority,
+            Keys.Origin,
+            Keys.RawTraceId,
+            Keys.RawSpanId,
+            "trace-id",
+            "parent-id",
+            "sampling-priority",
+            "origin" 
+        };
 
         /// <summary>
         /// An <see cref="ISpanContext"/> with default values. Can be used as the value for
@@ -75,6 +87,28 @@ namespace Datadog.Trace
             SpanId = spanId;
             SamplingPriority = samplingPriority;
             Origin = origin;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SpanContext"/> class
+        /// from a propagated context. <see cref="Parent"/> will be null
+        /// since this is a root context locally.
+        /// </summary>
+        /// <param name="traceId">The propagated trace id.</param>
+        /// <param name="spanId">The propagated span id.</param>
+        /// <param name="samplingPriority">The propagated sampling priority.</param>
+        /// <param name="serviceName">The service name to propagate to child spans.</param>
+        /// <param name="origin">The propagated origin of the trace.</param>
+        /// <param name="rawTraceId">The raw propagated trace id</param>
+        /// <param name="rawSpanId">The raw propagated span id</param>
+        internal SpanContext(TraceId? traceId, ulong spanId, int? samplingPriority, string serviceName, string origin, string rawTraceId, string rawSpanId)
+            : this(traceId, serviceName)
+        {
+            SpanId = spanId;
+            SamplingPriority = samplingPriority;
+            Origin = origin;
+            RawTraceId = rawTraceId;
+            RawSpanId = rawSpanId;
         }
 
         /// <summary>
@@ -170,6 +204,16 @@ namespace Datadog.Trace
         /// </summary>
         internal int? SamplingPriority { get; }
 
+        /// <summary>
+        /// Gets the raw traceId (to support > 64bits)
+        /// </summary>
+        internal string RawTraceId { get; }
+
+        /// <summary>
+        /// Gets the raw spanId
+        /// </summary>
+        internal string RawSpanId { get; }
+
         /// <inheritdoc/>
         int IReadOnlyCollection<KeyValuePair<string, string>>.Count => KeyNames.Length;
 
@@ -239,29 +283,49 @@ namespace Datadog.Trace
         {
             switch (key)
             {
+                case Keys.TraceId:
                 case "trace-id":
                     value = TraceId.ToString();
                     return true;
 
+                case Keys.ParentId:
                 case "parent-id":
                     value = SpanId.ToString();
                     return true;
 
+                case Keys.SamplingPriority:
                 case "sampling-priority":
                     value = SamplingPriority?.ToString();
                     return true;
 
+                case Keys.Origin:
                 case "origin":
                     value = Origin;
+                    return true;
+
+                case Keys.RawTraceId:
+                    value = RawTraceId;
+                    return true;
+
+                case Keys.RawSpanId:
+                    value = RawSpanId;
                     return true;
 
                 default:
                     value = null;
                     return false;
             }
+        }
 
-            value = null;
-            return false;
+        internal static class Keys
+        {
+            private const string Prefix = "__DistributedKey-";
+            public const string TraceId = $"{Prefix}TraceId";
+            public const string ParentId = $"{Prefix}ParentId";
+            public const string SamplingPriority = $"{Prefix}SamplingPriority";
+            public const string Origin = $"{Prefix}Origin";
+            public const string RawTraceId = $"{Prefix}RawTraceId";
+            public const string RawSpanId = $"{Prefix}RawSpanId";
         }
     }
 }

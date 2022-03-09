@@ -45,6 +45,8 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.ILogger
         {
             get
             {
+                // For mismatch version support we need to keep requesting old keys.
+                var distContext = _tracer.DistributedSpanContext;
                 return index switch
                 {
                     0 => new KeyValuePair<string, object>(CorrelationIdentifier.ServiceKey, _service),
@@ -59,31 +61,48 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.ILogger
 
         public override string ToString()
         {
-            var span = _tracer.ActiveScope?.Span;
-            if (span is null)
+            var spanContext = _tracer.DistributedSpanContext;
+            if (spanContext is not null)
             {
-                return _cachedFormat;
+                // For mismatch version support we need to keep requesting old keys.
+                var hasTraceId = spanContext.TryGetValue(SpanContext.Keys.TraceId, out string traceId) ||
+                                 spanContext.TryGetValue("trace-id", out traceId);
+                var hasSpanId = spanContext.TryGetValue(SpanContext.Keys.ParentId, out string spanId) ||
+                                spanContext.TryGetValue("parent-id", out spanId);
+                if (hasTraceId && hasSpanId)
+                {
+                    return string.Format(
+                        CultureInfo.InvariantCulture,
+                        "{0}, dd_trace_id:\"{1}\", dd_span_id:\"{2}\"",
+                        _cachedFormat,
+                        traceId,
+                        spanId);
+                }
             }
 
-            return string.Format(
-                CultureInfo.InvariantCulture,
-                "{0}, trace_id:\"{1}\", span_id:\"{2}\"",
-                _cachedFormat,
-                span.TraceId.ToString(),
-                span.SpanId);
+            return _cachedFormat;
         }
 
         public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
         {
-            var span = _tracer.ActiveScope?.Span;
             yield return new KeyValuePair<string, object>(CorrelationIdentifier.ServiceKey, _service);
             yield return new KeyValuePair<string, object>(CorrelationIdentifier.EnvKey, _env);
             yield return new KeyValuePair<string, object>(CorrelationIdentifier.VersionKey, _version);
 
-            if (span is not null)
+            var spanContext = _tracer.DistributedSpanContext;
+            if (spanContext is not null)
             {
-                yield return new KeyValuePair<string, object>(CorrelationIdentifier.TraceIdKey, span.TraceId.ToString());
-                yield return new KeyValuePair<string, object>(CorrelationIdentifier.SpanIdKey, span.SpanId.ToString());
+                // For mismatch version support we need to keep requesting old keys.
+                var hasTraceId = spanContext.TryGetValue(SpanContext.Keys.TraceId, out string traceId) ||
+                                 spanContext.TryGetValue("trace-id", out traceId);
+                var hasSpanId = spanContext.TryGetValue(SpanContext.Keys.ParentId, out string spanId) ||
+                                spanContext.TryGetValue("parent-id", out spanId);
+
+                if (hasTraceId && hasSpanId)
+                {
+                    yield return new KeyValuePair<string, object>("dd_trace_id", traceId);
+                    yield return new KeyValuePair<string, object>("dd_span_id", spanId);
+                }
             }
         }
 

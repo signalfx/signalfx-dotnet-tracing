@@ -193,6 +193,9 @@ namespace Datadog.Trace.Configuration
             // If you change this, change environment_variables.h too
             ThreadSamplingEnabled = source?.GetBool(ConfigurationKeys.AlwaysOnProfiler.Enabled) ?? false;
             ThreadSamplingPeriod = GetThreadSamplingPeriod(source);
+            PropagationStyleInject = TrimSplitString(source?.GetString(ConfigurationKeys.PropagationStyleInject) ?? nameof(Propagators.ContextPropagators.Names.Datadog), ',').ToArray();
+
+            PropagationStyleExtract = TrimSplitString(source?.GetString(ConfigurationKeys.PropagationStyleExtract) ?? nameof(Propagators.ContextPropagators.Names.Datadog), ',').ToArray();
 
             LogSubmissionSettings = new DirectLogSubmissionSettings(source);
         }
@@ -384,7 +387,18 @@ namespace Datadog.Trace.Configuration
         public bool StartupDiagnosticLogEnabled { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether context server timing header will be added.
+        /// Gets or sets a value indicating the injection propagation style.
+        /// </summary>
+        internal string[] PropagationStyleInject { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating the extraction propagation style.
+        /// </summary>
+        internal string[] PropagationStyleExtract { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether runtime metrics
+        /// are enabled and sent to DogStatsd.
         /// </summary>
         public bool TraceResponseHeaderEnabled { get; set; }
 
