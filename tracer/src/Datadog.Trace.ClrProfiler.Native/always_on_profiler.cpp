@@ -251,7 +251,7 @@ public:
     std::vector<unsigned char>* curBuffer = nullptr;
     SamplingStatistics stats;
 
-    SamplingHelper() : functionNameCache(max_function_name_cache_size), classNameCache(max_class_name_cache_size), stats()
+    SamplingHelper() : functionNameCache(max_function_name_cache_size), classNameCache(max_class_name_cache_size)
     {
     }
 
