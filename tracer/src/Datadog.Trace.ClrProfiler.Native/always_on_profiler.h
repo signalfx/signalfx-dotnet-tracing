@@ -78,7 +78,7 @@ public:
 class ThreadSampler
 {
 public:
-    void StartSampling(ICorProfilerInfo10* info10);
+    void StartSampling(ICorProfilerInfo10* cor_profiler_info10);
     ICorProfilerInfo10* info10;
     void ThreadCreated(ThreadID threadId);
     void ThreadDestroyed(ThreadID threadId);
