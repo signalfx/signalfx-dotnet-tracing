@@ -384,7 +384,8 @@ namespace Datadog.Trace.Configuration
         public bool StartupDiagnosticLogEnabled { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether context server timing header will be added.
+        /// Gets or sets a value indicating whether runtime metrics
+        /// are enabled and sent to DogStatsd.
         /// </summary>
         public bool TraceResponseHeaderEnabled { get; set; }
 

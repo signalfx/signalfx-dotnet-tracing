@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Datadog.Trace.DuckTyping;
 using Datadog.Trace.Logging;
+using Datadog.Trace.Propagators;
 
 namespace Datadog.Trace.ClrProfiler
 {

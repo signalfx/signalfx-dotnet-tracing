@@ -57,11 +57,19 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.Serilog.LogsInje
                 AddPropertyIfAbsent(dict, CorrelationIdentifier.SerilogVersionKey, tracer.Settings.ServiceVersion);
                 AddPropertyIfAbsent(dict, CorrelationIdentifier.SerilogEnvKey, tracer.Settings.Environment);
 
-                var span = tracer.ActiveScope?.Span;
-                if (span is not null)
+                var spanContext = tracer.DistributedSpanContext;
+                if (spanContext is not null)
                 {
-                    AddPropertyIfAbsent(dict, CorrelationIdentifier.TraceIdKey, span.TraceId.ToString());
-                    AddPropertyIfAbsent(dict, CorrelationIdentifier.SpanIdKey, span.SpanId.ToString());
+                    // For mismatch version support we need to keep requesting old keys.
+                    var hasTraceId = spanContext.TryGetValue(SpanContext.Keys.TraceId, out string traceId) ||
+                                     spanContext.TryGetValue("trace-id", out traceId);
+                    var hasSpanId = spanContext.TryGetValue(SpanContext.Keys.ParentId, out string spanId) ||
+                                    spanContext.TryGetValue("parent-id", out spanId);
+                    if (hasTraceId && hasSpanId)
+                    {
+                        AddPropertyIfAbsent(dict, CorrelationIdentifier.TraceIdKey, traceId);
+                        AddPropertyIfAbsent(dict, CorrelationIdentifier.SpanIdKey, spanId);
+                    }
                 }
             }
 
