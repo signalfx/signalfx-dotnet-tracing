@@ -406,7 +406,7 @@ private:
         }
         else
         {
-            const auto arguments = function_method_signature.GetMethodArguments();
+            const auto& arguments = function_method_signature.GetMethodArguments();
             result.append(WStr("("));
             for (ULONG i = 0; i < arguments.size(); i++)
             {
@@ -649,10 +649,9 @@ void ThreadSampler::ThreadDestroyed(ThreadID threadId)
         std::lock_guard<std::mutex> guard(threadStateLock);
 
         ThreadState* state = managedTid2state[threadId];
-        if (state != nullptr)
-        {
-            delete state;
-        }
+
+        delete state;
+
         managedTid2state.erase(threadId);
     }
     {
