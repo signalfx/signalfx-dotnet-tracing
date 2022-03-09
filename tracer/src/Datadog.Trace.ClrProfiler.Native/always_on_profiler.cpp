@@ -140,7 +140,7 @@ void ThreadSamplesBuffer::StartBatch()
     CHECK_SAMPLES_BUFFER_LENGTH();
     writeByte(THREAD_SAMPLES_START_BATCH);
     writeInt(CURRENT_THREADSAMPLES_BUFFER_VERSION);
-    std::chrono::milliseconds ms =
+    auto ms =
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
     writeInt64((int64_t) ms.count());
 }
@@ -219,7 +219,7 @@ void ThreadSamplesBuffer::writeString(const WSTRING& str)
     short usedLen = (short) std::min(str.length(), (size_t)max_string_length);
     writeShort(usedLen);
     // odd bit of casting since we're copying bytes, not wchars
-    unsigned char* strBegin = (unsigned char*)(&str.c_str()[0]);
+    auto strBegin = (unsigned char*)(&str.c_str()[0]);
     // possible endian-ness assumption here; unclear how the managed layer would decode on big endian platforms
     buffer->insert(buffer->end(), strBegin, strBegin + usedLen * 2);
 }
@@ -455,7 +455,7 @@ public:
 HRESULT __stdcall FrameCallback(_In_ FunctionID funcId, _In_ UINT_PTR ip, _In_ COR_PRF_FRAME_INFO frameInfo,
                                 _In_ ULONG32 contextSize, _In_ BYTE context[], _In_ void* clientData)
 {
-    SamplingHelper* helper = (SamplingHelper*) clientData;
+    auto helper = (SamplingHelper*) clientData;
     helper->stats.totalFrames++;
     WSTRING* name = helper->Lookup(funcId, frameInfo);
     // This is where line numbers could be calculated
@@ -604,7 +604,7 @@ void SleepMillis(int millis) {
 DWORD WINAPI SamplingThreadMain(_In_ LPVOID param)
 {
     int sleepMillis = GetSamplingPeriod();
-    ThreadSampler* ts = (ThreadSampler*) param;
+    auto ts = (ThreadSampler*) param;
     ICorProfilerInfo10* info10 = ts->info10;
     SamplingHelper helper;
     helper.info10 = info10;
