@@ -5,11 +5,16 @@
 
 // Modified by Splunk Inc.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.TestHelpers;
 using FluentAssertions;
+using FluentAssertions.Execution;
+using VerifyXunit;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -21,8 +26,12 @@ using static Datadog.Trace.ExtensionMethods.DictionaryExtensions;
 
 namespace Datadog.Trace.ClrProfiler.IntegrationTests
 {
+    [UsesVerify]
     public class MongoDbTests : TestHelper
     {
+        private static readonly Regex OsRegex = new(@"""os"" : \{.*?\} ");
+        private static readonly Regex ObjectIdRegex = new(@"ObjectId\("".*?""\)");
+
         public MongoDbTests(ITestOutputHelper output)
             : base("MongoDB", output)
         {
@@ -41,7 +50,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [SkippableTheory]
         [MemberData(nameof(GetMongoDb))]
         [Trait("Category", "EndToEnd")]
-        public void SubmitsTraces(string packageVersion, bool tagCommands)
+        public async Task SubmitsTraces(string packageVersion, bool tagCommands)
         {
             SetEnvironmentVariable("SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS", tagCommands.ToString().ToLowerInvariant());
 
@@ -58,58 +67,63 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 var spans = agent.WaitForSpans(expectedNames.Count, 500);
                 spans.Count.Should().BeGreaterOrEqualTo(expectedNames.Count);
 
-                var rootSpan = spans.Single(s => s.ParentId == null);
+                var version = string.IsNullOrEmpty(packageVersion) ? null : new Version(packageVersion);
+                var snapshotSuffix = version switch
+                    {
+                        null or { Major: >= 3 } or { Major: 2, Minor: >= 7 } => "2_7", // default is version 2.8.0
+                        { Major: 2, Minor: >= 5 } => "2_5", // version 2.5 + 2.6 include additional info on queries compared to 2.2
+                        { Major: 2, Minor: >= 2 } => "2_2",
+                        _ => "PRE_2_2"
+                    };
 
-                // Check for manual trace
-                rootSpan.Name.Should().Be("Main()");
-                rootSpan.Service.Should().Be("Samples.MongoDB");
-                rootSpan.Type.Should().BeNull();
+                var settings = VerifyHelper.GetSpanVerifierSettings();
+                // mongo stamps the current framework version, and OS so normalise those
+                settings.AddRegexScrubber(OsRegex, @"""os"" : {} ");
+                // v2.5.x records additional info in the insert query which is execution-specific
+                settings.AddRegexScrubber(ObjectIdRegex, @"ObjectId(""ABC123"")");
+                // normalise between running directly against localhost and against mongo container
+                settings.AddSimpleScrubber("net.peer.name: localhost", "net.peer.name: mongo");
+                settings.AddSimpleScrubber("net.peer.name: mongo_arm64", "net.peer.name: mongo");
+                // In some package versions, aggregate queries have an ID, others don't
+                settings.AddSimpleScrubber("\"$group\" : { \"_id\" : null, \"n\"", "\"$group\" : { \"_id\" : 1, \"n\"");
 
-                var foundNames = new HashSet<string>();
+                // The mongodb driver sends periodic monitors
+                var adminSpans = spans
+                                .Where(x => x.Resource is "buildInfo admin" or "getLastError admin")
+                                .ToList();
+                var nonAdminSpans = spans
+                                   .Where(x => !adminSpans.Contains(x))
+                                   .ToList();
 
-                foreach (var span in spans)
+                await VerifyHelper.VerifySpans(nonAdminSpans, settings)
+                                  .UseTextForParameters($"packageVersion={snapshotSuffix}_tagCommands={tagCommands}")
+                                  .DisableRequireUniquePrefix();
+
+                telemetry.AssertIntegrationEnabled(IntegrationId.MongoDb);
+
+                // do some basic verification on the "admin" spans
+                using var scope = new AssertionScope();
+                adminSpans.Should().AllBeEquivalentTo(new { Service = "Samples.MongoDB", Type = "mongodb", });
+                foreach (var adminSpan in adminSpans)
                 {
-                    if (span == rootSpan)
+                    adminSpan.Tags.Should().IntersectWith(new Dictionary<string, string>
                     {
-                        continue;
-                    }
+                        { "component", "MongoDb" },
+                        { "db.name", "admin" },
+                        { "deployment.environment", "integration_tests" },
+                        { "mongodb.collection", "1" },
+                        { "span.kind", "client" },
+                    });
 
-                    var name = span.Name;
-                    foundNames.Add(name);
-
-                    if (span.Service == "Samples.MongoDB" &&
-                        span.LogicScope == "mongodb.query")
+                    if (adminSpan.Resource == "buildInfo admin")
                     {
-                        span.Type.Should().Be(SpanTypes.MongoDb);
-                        span.Tags.GetValueOrDefault(Tags.DbType).Should().Be(SpanTypes.MongoDb);
-                        span.Tags.GetValueOrDefault("component").Should().Be("MongoDb");
-
-                        span.Tags.TryGetValue(Tags.DbStatement, out string statement);
-
-                        if (tagCommands && !name.Equals("mongodb.query"))
-                        {
-                            statement.Should().NotBeNull();
-                        }
-                        else
-                        {
-                            statement.Should().BeNull();
-                        }
-
-                        if (!name.Equals("mongodb.query"))
-                        {
-                            span.Tags.GetValueOrDefault(Tags.DbName).Should().NotBeNull();
-                        }
+                        adminSpan.Tags.Should().Contain("mongodb.query", "{ \"buildInfo\" : 1 }");
                     }
                     else
                     {
-                        // These are manual traces
-                        span.Service.Should().Be("Samples.MongoDB");
-                        span.Tags?.GetValueOrDefault(Tags.Version).Should().Be("1.0.0");
+                        adminSpan.Tags.Should().Contain("mongodb.query", "{ \"getLastError\" : 1 }");
                     }
                 }
-
-                foundNames.Should().BeEquivalentTo(expectedNames);
-                telemetry.AssertIntegrationEnabled(IntegrationId.MongoDb);
             }
         }
     }

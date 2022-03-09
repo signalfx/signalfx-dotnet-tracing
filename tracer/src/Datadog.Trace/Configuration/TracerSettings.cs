@@ -176,6 +176,9 @@ namespace Datadog.Trace.Configuration
 
             TraceResponseHeaderEnabled = source?.GetBool(ConfigurationKeys.TraceResponseHeaderEnabled)
                                             ?? true;
+            ExpandRouteTemplatesEnabled = source?.GetBool(ConfigurationKeys.ExpandRouteTemplatesEnabled)
+                                        // disabled by default if route template resource names enabled
+                                        ?? !RouteTemplateResourceNamesEnabled;
 
             KafkaCreateConsumerScopeEnabled = source?.GetBool(ConfigurationKeys.KafkaCreateConsumerScopeEnabled)
                                            ?? true; // default
@@ -461,6 +464,12 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="ConfigurationKeys.FeatureFlags.RouteTemplateResourceNamesEnabled"/>
         internal bool RouteTemplateResourceNamesEnabled { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether resource names for ASP.NET and ASP.NET Core spans should be expanded. Only applies
+        /// when <see cref="RouteTemplateResourceNamesEnabled"/> is <code>true</code>.
+        /// </summary>
+        internal bool ExpandRouteTemplatesEnabled { get; }
 
         /// <summary>
         /// Gets or sets the direct log submission settings.

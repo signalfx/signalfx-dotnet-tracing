@@ -1,0 +1,111 @@
+[
+  {
+    TraceId: Id_1,
+    SpanId: Id_2,
+    Name: GET error.index,
+    LogicScope: aspnet-mvc.request,
+    Resource: GET error.index,
+    Service: sample,
+    Type: web,
+    ParentId: Id_3,
+    Tags: {
+      aspnet.action: index,
+      aspnet.controller: error,
+      aspnet.route: {controller}/{action}/{id},
+      deployment.environment: integration_tests,
+      http.method: GET,
+      http.request.headers.host: localhost:00000,
+      http.status_code: 401,
+      http.url: http://localhost:00000/Error/Index?errorId=C6F95101-67D1-43E4-8F61-D0D7FAC99375&ErrorStatusCode=401,
+      language: dotnet,
+      net.peer.ip: ::1,
+      span.kind: server,
+      version: 1.0.0
+    }
+  },
+  {
+    TraceId: Id_1,
+    SpanId: Id_3,
+    Name: GET error.index,
+    LogicScope: aspnet.request,
+    Resource: GET error.index,
+    Service: sample,
+    Type: web,
+    ParentId: Id_4,
+    Tags: {
+      deployment.environment: integration_tests,
+      http.method: GET,
+      http.request.headers.host: localhost:00000,
+      http.status_code: 401,
+      http.url: http://localhost:00000/Error/Index?errorId=C6F95101-67D1-43E4-8F61-D0D7FAC99375&ErrorStatusCode=401,
+      language: dotnet,
+      net.peer.ip: ::1,
+      span.kind: server,
+      version: 1.0.0
+    }
+  },
+  {
+    TraceId: Id_1,
+    SpanId: Id_4,
+    Name: GET home.badrequestwithstatuscode,
+    LogicScope: aspnet.request,
+    Resource: GET home.badrequestwithstatuscode,
+    Service: sample,
+    Type: web,
+    Error: 1,
+    Tags: {
+      deployment.environment: integration_tests,
+      http.method: GET,
+      http.request.headers.host: localhost:00000,
+      http.status_code: 401,
+      http.url: http://localhost:00000/Home/BadRequestWithStatusCode?statuscode=401&TransferRequest=true,
+      language: dotnet,
+      net.peer.ip: ::1,
+      runtime-id: Guid_1,
+      sfx.error.kind: System.Exception,
+      sfx.error.message: Oops, it broke. Specified status code was: 401,
+      sfx.error.stack:
+System.Exception: Oops, it broke. Specified status code was: 401
+at Samples.AspNetMvc4.Controllers.HomeController.BadRequestWithStatusCode(Int32 statuscode),
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: server,
+      version: 1.0.0
+    },
+    Metrics: {
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_1,
+    SpanId: Id_5,
+    Name: GET home.badrequestwithstatuscode,
+    LogicScope: aspnet-mvc.request,
+    Resource: GET home.badrequestwithstatuscode,
+    Service: sample,
+    Type: web,
+    ParentId: Id_4,
+    Error: 1,
+    Tags: {
+      aspnet.action: badrequestwithstatuscode,
+      aspnet.controller: home,
+      aspnet.route: {controller}/{action}/{id},
+      deployment.environment: integration_tests,
+      http.method: GET,
+      http.request.headers.host: localhost:00000,
+      http.status_code: 200,
+      http.url: http://localhost:00000/Home/BadRequestWithStatusCode?statuscode=401&TransferRequest=true,
+      language: dotnet,
+      net.peer.ip: ::1,
+      sfx.error.kind: System.Exception,
+      sfx.error.message: Oops, it broke. Specified status code was: 401,
+      sfx.error.stack:
+System.Exception: Oops, it broke. Specified status code was: 401
+at Samples.AspNetMvc4.Controllers.HomeController.BadRequestWithStatusCode(Int32 statuscode),
+      span.kind: server,
+      version: 1.0.0
+    }
+  }
+]

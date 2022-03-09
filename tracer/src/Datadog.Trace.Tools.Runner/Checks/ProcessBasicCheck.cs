@@ -8,9 +8,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
-using Microsoft.Win32;
+using System.Linq;
 using Spectre.Console;
 
 using static Datadog.Trace.Tools.Runner.Checks.Resources;
@@ -34,22 +34,48 @@ namespace Datadog.Trace.Tools.Runner.Checks
             }
             else
             {
-                Utils.WriteWarning(RuntimeDetectionFailed);
+                Utils.WriteWarning(runtime == ProcessInfo.Runtime.Mixed ? BothRuntimesDetected : RuntimeDetectionFailed);
                 runtime = ProcessInfo.Runtime.NetFx;
             }
 
-            var modules = FindTracerModules(process);
-
-            if (modules.Profiler == null)
+            if (FindProfilerModule(process) == null)
             {
                 Utils.WriteWarning(ProfilerNotLoaded);
                 foundIssue = true;
             }
 
-            if (modules.Tracer == null)
+            var tracerModules = FindTracerModules(process).ToArray();
+
+            if (tracerModules.Length == 0)
             {
                 Utils.WriteWarning(TracerNotLoaded);
                 foundIssue = true;
+            }
+            else if (tracerModules.Length > 1)
+            {
+                // There are too many tracers in there. Find out if it's bad or very bad
+                bool areAllVersion2 = true;
+                var versions = new HashSet<string>();
+
+                foreach (var tracer in tracerModules)
+                {
+                    var version = FileVersionInfo.GetVersionInfo(tracer);
+
+                    versions.Add(version.FileVersion ?? "{empty}");
+
+                    if (version.FileMajorPart < 2)
+                    {
+                        areAllVersion2 = false;
+                    }
+                }
+
+                Utils.WriteWarning(MultipleTracers(versions));
+
+                if (!areAllVersion2)
+                {
+                    Utils.WriteError(VersionConflict);
+                    foundIssue = true;
+                }
             }
 
             if (process.EnvironmentVariables.TryGetValue("SIGNALFX_DOTNET_TRACER_HOME", out var tracerHome))
@@ -132,26 +158,33 @@ namespace Datadog.Trace.Tools.Runner.Checks
             }
         }
 
-        private static (string? Profiler, string? Tracer) FindTracerModules(ProcessInfo process)
+        private static string? FindProfilerModule(ProcessInfo process)
         {
-            (string? Profiler, string? Tracer) result = default;
+            foreach (var module in process.Modules)
+            {
+                var fileName = Path.GetFileName(module);
 
+                if (fileName.Equals("SignalFx.Tracing.ClrProfiler.Native.dll", StringComparison.OrdinalIgnoreCase)
+                    || fileName.Equals("SignalFx.Tracing.ClrProfiler.Native.so", StringComparison.OrdinalIgnoreCase))
+                {
+                    return module;
+                }
+            }
+
+            return null;
+        }
+
+        private static IEnumerable<string> FindTracerModules(ProcessInfo process)
+        {
             foreach (var module in process.Modules)
             {
                 var fileName = Path.GetFileName(module);
 
                 if (fileName.Equals("SignalFx.Tracing.dll", StringComparison.OrdinalIgnoreCase))
                 {
-                    result.Tracer = fileName;
-                }
-                else if (fileName.Equals("SignalFx.Tracing.ClrProfiler.Native.dll", StringComparison.OrdinalIgnoreCase)
-                    || fileName.Equals("SignalFx.Tracing.ClrProfiler.Native.so", StringComparison.OrdinalIgnoreCase))
-                {
-                    result.Profiler = fileName;
+                    yield return module;
                 }
             }
-
-            return result;
         }
     }
 }

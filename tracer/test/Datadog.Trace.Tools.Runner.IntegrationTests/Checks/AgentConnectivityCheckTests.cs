@@ -35,7 +35,7 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests.Checks
             new object[] { new[] { ("SIGNALFX_ENDPOINT_URL", "http://fakeurl:7777/") } }
         };
 
-        [Theory]
+        [SkippableTheory]
         [MemberData(nameof(TestData))]
         public async Task DetectAgentUrl((string, string)[] environmentVariables)
         {
@@ -47,12 +47,12 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests.Checks
 
             processInfo.Should().NotBeNull();
 
-            _ = await AgentConnectivityCheck.Run(processInfo!);
+            _ = await AgentConnectivityCheck.RunAsync(processInfo!);
 
             console.Output.Should().Contain(DetectedAgentUrlFormat("http://fakeurl:7777/"));
         }
 
-        [Fact]
+        [SkippableFact]
         public async Task DetectTransportHttp()
         {
             using var agent = new MockTracerAgent(TcpPortProvider.GetOpenPort());
@@ -67,17 +67,17 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests.Checks
 
             processInfo.Should().NotBeNull();
 
-            _ = await AgentConnectivityCheck.Run(processInfo!);
+            _ = await AgentConnectivityCheck.RunAsync(processInfo!);
 
             console.Output.Should().Contain(ConnectToEndpointFormat(url, "HTTP"));
         }
 
-        [Fact]
+        [SkippableFact]
         public async Task NoAgent()
         {
             using var console = ConsoleHelper.Redirect();
 
-            var result = await AgentConnectivityCheck.Run(CreateSettings("http://fakeurl/"));
+            var result = await AgentConnectivityCheck.RunAsync(CreateSettings("http://fakeurl/"));
 
             result.Should().BeFalse();
 
@@ -86,7 +86,7 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests.Checks
             console.Output.Should().Contain(ErrorDetectingAgent("http://fakeurl/", string.Empty));
         }
 
-        [Fact]
+        [SkippableFact]
         public async Task FaultyAgent()
         {
             using var console = ConsoleHelper.Redirect();
@@ -95,14 +95,14 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests.Checks
 
             agent.RequestReceived += (_, e) => e.Value.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-            var result = await AgentConnectivityCheck.Run(CreateSettings($"http://localhost:{agent.Port}/"));
+            var result = await AgentConnectivityCheck.RunAsync(CreateSettings($"http://localhost:{agent.Port}/"));
 
             result.Should().BeFalse();
 
             console.Output.Should().Contain(WrongStatusCodeFormat(HttpStatusCode.InternalServerError));
         }
 
-        [Fact]
+        [SkippableFact]
         public async Task DetectVersion()
         {
             const string expectedVersion = "7.66.55";
@@ -114,14 +114,14 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests.Checks
                 Version = expectedVersion
             };
 
-            var result = await AgentConnectivityCheck.Run(CreateSettings($"http://localhost:{agent.Port}/"));
+            var result = await AgentConnectivityCheck.RunAsync(CreateSettings($"http://localhost:{agent.Port}/"));
 
             result.Should().BeTrue();
 
             console.Output.Should().Contain(DetectedAgentVersionFormat(expectedVersion));
         }
 
-        [Fact]
+        [SkippableFact]
         public async Task NoVersion()
         {
             using var console = ConsoleHelper.Redirect();
@@ -131,7 +131,7 @@ namespace Datadog.Trace.Tools.Runner.IntegrationTests.Checks
                 Version = null
             };
 
-            var result = await AgentConnectivityCheck.Run(CreateSettings($"http://localhost:{agent.Port}/"));
+            var result = await AgentConnectivityCheck.RunAsync(CreateSettings($"http://localhost:{agent.Port}/"));
 
             result.Should().BeTrue();
 
