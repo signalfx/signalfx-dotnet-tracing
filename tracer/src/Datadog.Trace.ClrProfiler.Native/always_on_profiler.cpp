@@ -283,7 +283,6 @@ private:
         ModuleID modId;
         mdTypeDef classToken;
         ClassID parentClassID;
-        HRESULT hr = S_OK;
 
         if (classId == 0)
         {
@@ -299,19 +298,19 @@ private:
             result.append(WStr("ArrayClass"));
             return;
         }
-        else if (CORPROF_E_CLASSID_IS_COMPOSITE == hr)
+        if (CORPROF_E_CLASSID_IS_COMPOSITE == hr)
         {
             // We have a composite class
             result.append(WStr("CompositeClass"));
             return;
         }
-        else if (CORPROF_E_DATAINCOMPLETE == hr)
+        if (CORPROF_E_DATAINCOMPLETE == hr)
         {
             Logger::Warn("Type loading is not yet complete; cannot decode ClassID");
             result.append(WStr("DataIncomplete"));
             return;
         }
-        else if (FAILED(hr))
+        if (FAILED(hr))
         {
             Logger::Debug("GetClassIDInfo failed: ", hr);
             result.append(WStr("Unknown"));
