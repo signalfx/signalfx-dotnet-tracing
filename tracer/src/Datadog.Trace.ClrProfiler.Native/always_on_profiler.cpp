@@ -135,6 +135,7 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
 }
 
 #define CHECK_SAMPLES_BUFFER_LENGTH() {  if (buffer->size() >= samples_buffer_maximum_size) { return; } }
+
 void ThreadSamplesBuffer::StartBatch()
 {
     CHECK_SAMPLES_BUFFER_LENGTH()
