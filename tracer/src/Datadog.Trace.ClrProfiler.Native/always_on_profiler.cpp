@@ -610,7 +610,7 @@ DWORD WINAPI SamplingThreadMain(_In_ LPVOID param)
 
     info10->InitializeCurrentThread();
 
-    while (1)
+    while (true)
     {
         SleepMillis(sleepMillis);
         const bool shouldSample = helper.AllocateBuffer();
