@@ -118,13 +118,13 @@ namespace trace
 * Each buffer can be parsed/decoded independently; the codes and the LRU NameCache are not related.
 */
 
-// defined opcodes
-#define THREAD_SAMPLES_START_BATCH  0x01
-#define THREAD_SAMPLES_START_SAMPLE 0x02
-#define THREAD_SAMPLES_END_BATCH    0x06
-#define THREAD_SAMPLES_FINAL_STATS  0x07
+// defined op codes
+constexpr auto thread_samples_start_batch = 0x01;
+constexpr auto thread_samples_start_sample = 0x02;
+constexpr auto thread_samples_end_batch = 0x06;
+constexpr auto thread_samples_final_stats = 0x07;
 
-#define CURRENT_THREADSAMPLES_BUFFER_VERSION 1
+constexpr auto current_thread_samples_buffer_version = 1;
 
 ThreadSamplesBuffer::ThreadSamplesBuffer(std::vector<unsigned char>* buf) : buffer(buf)
 {
@@ -138,8 +138,8 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
 void ThreadSamplesBuffer::StartBatch()
 {
     CHECK_SAMPLES_BUFFER_LENGTH();
-    writeByte(THREAD_SAMPLES_START_BATCH);
-    writeInt(CURRENT_THREADSAMPLES_BUFFER_VERSION);
+    writeByte(thread_samples_start_batch);
+    writeInt(current_thread_samples_buffer_version);
     auto ms =
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
     writeInt64((int64_t) ms.count());
@@ -148,7 +148,7 @@ void ThreadSamplesBuffer::StartBatch()
 void ThreadSamplesBuffer::StartSample(ThreadID id, ThreadState* state, const ThreadSpanContext& context)
 {
     CHECK_SAMPLES_BUFFER_LENGTH();
-    writeByte(THREAD_SAMPLES_START_SAMPLE);
+    writeByte(thread_samples_start_sample);
     writeInt(context.managedThreadId);
     writeInt(state->nativeId);
     writeString(state->threadName);
@@ -170,12 +170,12 @@ void ThreadSamplesBuffer::EndSample()
 void ThreadSamplesBuffer::EndBatch()
 {
     CHECK_SAMPLES_BUFFER_LENGTH();
-    writeByte(THREAD_SAMPLES_END_BATCH);
+    writeByte(thread_samples_end_batch);
 }
 void ThreadSamplesBuffer::WriteFinalStats(const SamplingStatistics& stats)
 {
     CHECK_SAMPLES_BUFFER_LENGTH();
-    writeByte(THREAD_SAMPLES_FINAL_STATS);
+    writeByte(thread_samples_final_stats);
     writeInt(stats.microsSuspended);
     writeInt(stats.numThreads);
     writeInt(stats.totalFrames);
