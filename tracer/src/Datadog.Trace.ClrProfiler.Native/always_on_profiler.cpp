@@ -613,16 +613,13 @@ DWORD WINAPI SamplingThreadMain(_In_ LPVOID param)
     while (1)
     {
         SleepMillis(sleepMillis);
-        bool shouldSample = helper.AllocateBuffer();
+        const bool shouldSample = helper.AllocateBuffer();
         if (!shouldSample) {
             Logger::Warn("Skipping a thread sample period, buffers are full. ** THIS WILL RESULT IN LOSS OF PROFILING DATA **");
-            continue;
         } else {
             PauseClrAndCaptureSamples(ts, info10, helper);
         }
     }
-
-    return 0;
 }
 
 void ThreadSampler::StartSampling(ICorProfilerInfo10* info10)
