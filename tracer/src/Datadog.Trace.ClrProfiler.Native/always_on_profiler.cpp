@@ -137,7 +137,7 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
 #define CHECK_SAMPLES_BUFFER_LENGTH() {  if (buffer->size() >= samples_buffer_maximum_size) { return; } }
 void ThreadSamplesBuffer::StartBatch()
 {
-    CHECK_SAMPLES_BUFFER_LENGTH();
+    CHECK_SAMPLES_BUFFER_LENGTH()
     writeByte(thread_samples_start_batch);
     writeInt(current_thread_samples_buffer_version);
     auto ms =
@@ -147,7 +147,7 @@ void ThreadSamplesBuffer::StartBatch()
 
 void ThreadSamplesBuffer::StartSample(ThreadID id, ThreadState* state, const ThreadSpanContext& context)
 {
-    CHECK_SAMPLES_BUFFER_LENGTH();
+    CHECK_SAMPLES_BUFFER_LENGTH()
     writeByte(thread_samples_start_sample);
     writeInt(context.managedThreadId);
     writeInt(state->nativeId);
@@ -159,22 +159,22 @@ void ThreadSamplesBuffer::StartSample(ThreadID id, ThreadState* state, const Thr
 }
 void ThreadSamplesBuffer::RecordFrame(FunctionID fid, WSTRING& frame)
 {
-    CHECK_SAMPLES_BUFFER_LENGTH();
+    CHECK_SAMPLES_BUFFER_LENGTH()
     writeCodedFrameString(fid, frame);
 }
 void ThreadSamplesBuffer::EndSample()
 {
-    CHECK_SAMPLES_BUFFER_LENGTH();
+    CHECK_SAMPLES_BUFFER_LENGTH()
     writeShort(0);
 }
 void ThreadSamplesBuffer::EndBatch()
 {
-    CHECK_SAMPLES_BUFFER_LENGTH();
+    CHECK_SAMPLES_BUFFER_LENGTH()
     writeByte(thread_samples_end_batch);
 }
 void ThreadSamplesBuffer::WriteFinalStats(const SamplingStatistics& stats)
 {
-    CHECK_SAMPLES_BUFFER_LENGTH();
+    CHECK_SAMPLES_BUFFER_LENGTH()
     writeByte(thread_samples_final_stats);
     writeInt(stats.microsSuspended);
     writeInt(stats.numThreads);
