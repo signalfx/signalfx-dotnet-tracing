@@ -2,9 +2,7 @@
 
 #include <codecvt>
 #include <filesystem>
-#include <fstream>
 #include <locale>
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -16,11 +14,11 @@ TEST(ThreadSamplerTest, ThreadStateTracking)
 {
     ThreadSampler ts; // Do NOT call StartSampling on this, which will create a background thread, etc.
     ts.ThreadAssignedToOSThread(1, 1001);
-    ts.ThreadNameChanged(1, 6, (WCHAR*) L"Sample");
+    ts.ThreadNameChanged(1, 6, const_cast<WCHAR*>(L"Sample"));
     ts.ThreadCreated(1);
     ts.ThreadAssignedToOSThread(1, 1002);
-    ts.ThreadNameChanged(2, 7, (WCHAR*) L"Thread1");
-    ts.ThreadNameChanged(2, 6, (WCHAR*) L"thread");
+    ts.ThreadNameChanged(2, 7, const_cast<WCHAR*>(L"Thread1"));
+    ts.ThreadNameChanged(2, 6, const_cast<WCHAR*>(L"thread"));
     ts.ThreadCreated(2);
     EXPECT_EQ(1002, ts.managedTid2state[1]->nativeId);
     EXPECT_EQ(L"Sample", ts.managedTid2state[1]->threadName);
@@ -33,7 +31,7 @@ TEST(ThreadSamplerTest, ThreadStateTracking)
 TEST(ThreadSamplerTest, BasicBufferBehavior)
 {
     auto buf = std::vector<unsigned char>();
-    WSTRING longThreadName = WStr("");
+    WSTRING longThreadName;
     for (int i = 0; i < 400; i++) {
         longThreadName.append(WStr("blah blah "));
     }
@@ -59,7 +57,7 @@ TEST(ThreadSamplerTest, BasicBufferBehavior)
 TEST(ThreadSamplerTest, BufferOverrunBehavior)
 {
     auto buf = std::vector<unsigned char>();
-    WSTRING longThreadName = WStr("");
+    WSTRING longThreadName;
     for (int i = 0; i < 400; i++)
     {
         longThreadName.append(WStr("blah blah "));
@@ -90,13 +88,13 @@ TEST(ThreadSamplerTest, BufferOverrunBehavior)
 
 TEST(ThreadSamplerTest, StaticBufferManagement)
 {
-    auto bufA = new std::vector<unsigned char>();
+    const auto bufA = new std::vector<unsigned char>();
     bufA->resize(1);
     std::fill(bufA->begin(), bufA->end(), 'A');
-    auto bufB = new std::vector<unsigned char>();
+    const auto bufB = new std::vector<unsigned char>();
     bufB->resize(2);
     std::fill(bufB->begin(), bufB->end(), 'B');
-    auto bufC = new std::vector<unsigned char>();
+    const auto bufC = new std::vector<unsigned char>();
     bufC->resize(4);
     std::fill(bufC->begin(), bufC->end(), 'C');
     unsigned char readBuf[4];
@@ -116,7 +114,7 @@ TEST(ThreadSamplerTest, StaticBufferManagement)
     ASSERT_EQ('B', readBuf[0]);
     ASSERT_EQ(0, ThreadSampling_ConsumeOneThreadSample(4, readBuf));
 
-    auto bufD = new std::vector<unsigned char>();
+    const auto bufD = new std::vector<unsigned char>();
     bufD->resize(4);
     std::fill(bufD->begin(), bufD->end(), 'D');
     ThreadSampling_RecordProducedThreadSample(bufD);
@@ -124,7 +122,7 @@ TEST(ThreadSamplerTest, StaticBufferManagement)
     ASSERT_EQ('D', readBuf[0]);
 
     // Finally, publish something too big for readBuf and ensure nothing explodes
-    auto bufE = new std::vector<unsigned char>();
+    const auto bufE = new std::vector<unsigned char>();
     bufE->resize(5);
     std::fill(bufE->begin(), bufE->end(), 'E');
     ThreadSampling_RecordProducedThreadSample(bufE);
@@ -134,25 +132,25 @@ TEST(ThreadSamplerTest, StaticBufferManagement)
 
 TEST(ThreadSamplerTest, LRUCache)
 {
-    int max = 10000;
+    constexpr int max = 10000;
     NameCache cache(max);
     for (int i = 1; i <= max; i++)
     {
         ASSERT_EQ(NULL, cache.get(i));
-        WSTRING* val = new WSTRING(L"Function ");
+        auto val = new WSTRING(L"Function ");
         val->append(std::to_wstring(i));
         cache.put(i, val);
         ASSERT_EQ(val, cache.get(i));
     }
     // Now cache is full; add another and item 1 gets kicked out
-    WSTRING* funcMaxPlus1 = new WSTRING(L"Function max+1");
+    auto* funcMaxPlus1 = new WSTRING(L"Function max+1");
     ASSERT_EQ(NULL, cache.get(max+1));
     cache.put(max + 1, funcMaxPlus1);
     ASSERT_EQ(NULL, cache.get(1));
     ASSERT_EQ(funcMaxPlus1, cache.get(max+1));
 
     // Put 1 back, 2 falls off and everything else is there
-    WSTRING* func1 = new WSTRING(L"Function 1");
+    const auto func1 = new WSTRING(L"Function 1");
     cache.put(1, func1);
     ASSERT_EQ(NULL, cache.get(2));
     ASSERT_EQ(func1, cache.get(1));
