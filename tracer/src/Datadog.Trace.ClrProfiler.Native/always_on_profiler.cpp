@@ -143,7 +143,7 @@ void ThreadSamplesBuffer::StartBatch()
     writeInt(current_thread_samples_buffer_version);
     const auto ms =
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-    writeInt64((int64_t) ms.count());
+    writeInt64(ms.count());
 }
 
 void ThreadSamplesBuffer::StartSample(ThreadID id, ThreadState* state, const ThreadSpanContext& context)
