@@ -151,7 +151,7 @@ void ThreadSamplesBuffer::StartSample(ThreadID id, ThreadState* state, const Thr
     CHECK_SAMPLES_BUFFER_LENGTH()
     writeByte(thread_samples_start_sample);
     writeInt(context.managedThreadId);
-    writeInt(state->nativeId);
+    writeInt(static_cast<int32_t>(state->nativeId));
     writeString(state->threadName);
     writeUInt64(context.traceIdHigh);
     writeUInt64(context.traceIdLow);
@@ -188,7 +188,7 @@ void ThreadSamplesBuffer::writeCodedFrameString(FunctionID fid, WSTRING& str)
     const auto found = codes.find(fid);
     if (found != codes.end())
     {
-        writeShort(found->second);
+        writeShort(static_cast<int16_t>(found->second));
     }
     else
     {
@@ -197,7 +197,7 @@ void ThreadSamplesBuffer::writeCodedFrameString(FunctionID fid, WSTRING& str)
         {
             codes[fid] = code;
         }
-        writeShort(-code); // note negative sign indicating definition of code
+        writeShort(static_cast<int16_t>(-code)); // note negative sign indicating definition of code
         writeString(str);
     }
 }
