@@ -110,7 +110,7 @@ private:
     void writeInt(int32_t val);
     void writeString(const WSTRING& str);
     void writeByte(unsigned char b);
-    void writeInt64(int64_t val);
+    void writeUInt64(uint64_t val);
 };
 
 class NameCache

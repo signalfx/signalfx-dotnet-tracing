@@ -143,7 +143,7 @@ void ThreadSamplesBuffer::StartBatch()
     writeInt(current_thread_samples_buffer_version);
     const auto ms =
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-    writeInt64(ms.count());
+    writeUInt64(ms.count());
 }
 
 void ThreadSamplesBuffer::StartSample(ThreadID id, ThreadState* state, const ThreadSpanContext& context)
@@ -153,9 +153,9 @@ void ThreadSamplesBuffer::StartSample(ThreadID id, ThreadState* state, const Thr
     writeInt(context.managedThreadId);
     writeInt(state->nativeId);
     writeString(state->threadName);
-    writeInt64(context.traceIdHigh);
-    writeInt64(context.traceIdLow);
-    writeInt64(context.spanId);
+    writeUInt64(context.traceIdHigh);
+    writeUInt64(context.traceIdLow);
+    writeUInt64(context.spanId);
     // Feature possibilities: (managed/native) thread priority, cpu/wait times, etc.
 }
 void ThreadSamplesBuffer::RecordFrame(FunctionID fid, WSTRING& frame)
@@ -228,7 +228,7 @@ void ThreadSamplesBuffer::writeByte(unsigned char b)
 {
     buffer->push_back(b);
 }
-void ThreadSamplesBuffer::writeInt64(int64_t val)
+void ThreadSamplesBuffer::writeUInt64(uint64_t val)
 {
     buffer->push_back(((val >> 56) & 0xFF));
     buffer->push_back(((val >> 48) & 0xFF));
