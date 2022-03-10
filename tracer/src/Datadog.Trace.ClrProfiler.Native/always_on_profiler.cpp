@@ -9,10 +9,7 @@
   #include <pthread.h>
 #endif
 
-constexpr auto max_func_name_len = 256UL;
-constexpr auto max_class_name_len = 512UL;
 constexpr auto max_string_length = 512UL;
-
 
 constexpr auto max_codes_per_buffer = 10 * 1000;
 
@@ -28,8 +25,7 @@ constexpr auto minimum_sample_period = 1000;
 // FIXME make configurable (hidden)?
 // These numbers were chosen to keep total overhead under 1 MB of RAM in typical cases (name lengths being the biggest
 // variable)
-constexpr auto max_function_name_cache_size = 6000;
-constexpr auto max_class_name_cache_size = 1000;
+constexpr auto max_function_name_cache_size = 7000;
 
 // If you squint you can make out that the original bones of this came from sample code provided by the dotnet project:
 // https://github.com/dotnet/samples/blob/2cf486af936261b04a438ea44779cdc26c613f98/core/profiling/stacksampling/src/sampler.cpp
@@ -246,13 +242,12 @@ public:
     // These are permanent parts of the helper object
     ICorProfilerInfo10* info10 = nullptr;
     NameCache functionNameCache;
-    NameCache classNameCache;
     // These cycle every sample and/or are owned externally
     ThreadSamplesBuffer* curWriter = nullptr;
     std::vector<unsigned char>* curBuffer = nullptr;
     SamplingStatistics stats;
 
-    SamplingHelper() : functionNameCache(max_function_name_cache_size), classNameCache(max_class_name_cache_size)
+    SamplingHelper() : functionNameCache(max_function_name_cache_size)
     {
     }
 
@@ -279,72 +274,15 @@ public:
     }
 
 private:
-    void GetClassName(ClassID classId, WSTRING& result) const
-    {
-        ModuleID modId;
-        mdTypeDef classToken;
-        ClassID parentClassID;
-
-        if (classId == 0)
-        {
-            Logger::Debug("Zero (0) classId passed to GetClassName");
-            result.append(WStr("Unknown"));
-            return;
-        }
-
-        HRESULT hr = info10->GetClassIDInfo2(classId, &modId, &classToken, &parentClassID, 0, nullptr, nullptr);
-        if (CORPROF_E_CLASSID_IS_ARRAY == hr)
-        {
-            // We have a ClassID of an array.
-            result.append(WStr("ArrayClass"));
-            return;
-        }
-        if (CORPROF_E_CLASSID_IS_COMPOSITE == hr)
-        {
-            // We have a composite class
-            result.append(WStr("CompositeClass"));
-            return;
-        }
-        if (CORPROF_E_DATAINCOMPLETE == hr)
-        {
-            Logger::Warn("Type loading is not yet complete; cannot decode ClassID");
-            result.append(WStr("DataIncomplete"));
-            return;
-        }
-        if (FAILED(hr))
-        {
-            Logger::Debug("GetClassIDInfo failed: ", hr);
-            result.append(WStr("Unknown"));
-            return;
-        }
-
-        ComPtr<IMetaDataImport> pMDImport;
-        hr = info10->GetModuleMetaData(modId, (ofRead | ofWrite), IID_IMetaDataImport, reinterpret_cast<IUnknown**>(&pMDImport));
-        if (FAILED(hr))
-        {
-            Logger::Debug("GetModuleMetaData failed: ", hr);
-            result.append(WStr("Unknown"));
-            return;
-        }
-
-        WCHAR wName[max_class_name_len];
-        DWORD dwTypeDefFlags = 0;
-        hr = pMDImport->GetTypeDefProps(classToken, wName, max_class_name_len, nullptr, &dwTypeDefFlags, nullptr);
-        if (FAILED(hr))
-        {
-            Logger::Debug("GetTypeDefProps failed: ", hr);
-            result.append(WStr("Unknown"));
-            return;
-        }
-
-        result.append(wName);
-    }
-
     void GetFunctionName(FunctionID funcID, const COR_PRF_FRAME_INFO frameInfo, WSTRING& result)
     {
+        constexpr auto unknown_list_of_arguments = WStr("(unknown)");
+        constexpr auto unknown_function_name = WStr("Unknown(unknown)");
+        constexpr auto name_separator = WStr(".");
         if (funcID == 0)
         {
-            result.append(WStr("Unknown_Native_Function(unknown)"));
+            constexpr auto unknown_native_function_name = WStr("Unknown_Native_Function(unknown)");
+            result.append(unknown_native_function_name);
             return;
         }
 
@@ -357,7 +295,7 @@ private:
         if (FAILED(hr))
         {
             Logger::Debug("GetFunctionInfo2 failed: ", hr);
-            result.append(WStr("Unknown(unknown)"));
+            result.append(unknown_function_name);
             return;
         }
 
@@ -366,43 +304,43 @@ private:
          if (FAILED(hr))
         {
             Logger::Debug("GetModuleMetaData failed: ", hr);
-            result.append(WStr("Unknown(unknown)"));
+            result.append(unknown_function_name);
             return;
         }
 
-        WCHAR funcName[max_func_name_len];
-        funcName[0] = '\0';
-        PCCOR_SIGNATURE pSig;
-        ULONG cbSig;
-        hr = pIMDImport->GetMethodProps(token, nullptr, funcName, max_func_name_len, nullptr, nullptr, &pSig, &cbSig, nullptr, nullptr);
-        if (FAILED(hr))
+        const auto function_info = GetFunctionInfo(pIMDImport, token);
+
+        if (!function_info.IsValid())
         {
-            Logger::Debug("GetMethodProps failed: ", hr);
-            result.append(WStr("Unknown(unknown)"));
+            Logger::Debug("GetFunctionInfo failed: ", hr);
+            result.append(unknown_function_name);
             return;
         }
 
-        // If the ClassID returned from GetFunctionInfo is 0, then the function
-        // is a shared generic function.
-        if (classId != 0)
+        if (function_info.type.parent_type != nullptr)
         {
-            LookupClassName(classId, result);
-        }
-        else
-        {
-            result.append(WStr("SharedGenericFunction"));
+            std::shared_ptr<TypeInfo> parent_type = function_info.type.parent_type;
+            WSTRING prefix = parent_type->name;
+            while (parent_type->parent_type != nullptr)
+            {
+                prefix = parent_type->parent_type->name + name_separator + prefix;
+                parent_type = parent_type->parent_type;
+            }
+
+            result.append(prefix);
+            result.append(name_separator);
         }
 
-        result.append(WStr("."));
-
-        result.append(funcName);
+        result.append(function_info.type.name);
+        result.append(name_separator);
+        result.append(function_info.name);
 
         // try to list arguments type
-        auto function_method_signature = FunctionMethodSignature(pSig, cbSig);
+        FunctionMethodSignature function_method_signature = function_info.method_signature;
         hr = function_method_signature.TryParse();
         if (FAILED(hr))
         {
-            result.append(WStr("(unknown)"));
+            result.append(unknown_list_of_arguments);
             Logger::Debug("FunctionMethodSignature parsing failed: ", hr);
         }
         else
@@ -435,20 +373,6 @@ public:
         this->GetFunctionName(fid, frame, *answer);
         functionNameCache.put(fid, answer);
         return answer;
-    }
-
-    void LookupClassName(ClassID cid, WSTRING& result)
-    {
-        WSTRING* answer = classNameCache.get(cid);
-        if (answer != nullptr)
-        {
-            result.append(*answer);
-            return;
-        }
-        answer = new WSTRING();
-        this->GetClassName(cid, *answer);
-        result.append(*answer);
-        classNameCache.put(cid, answer);
     }
 };
 
