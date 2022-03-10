@@ -33,7 +33,7 @@ constexpr auto max_class_name_cache_size = 1000;
 
 // If you squint you can make out that the original bones of this came from sample code provided by the dotnet project:
 // https://github.com/dotnet/samples/blob/2cf486af936261b04a438ea44779cdc26c613f98/core/profiling/stacksampling/src/sampler.cpp
-// That stacksampling project is worth reading for a simpler (though higher overhead) take on thread sampling.
+// That stack sampling project is worth reading for a simpler (though higher overhead) take on thread sampling.
 
 static std::mutex bufferLock = std::mutex();
 static std::vector<unsigned char>* bufferA;
@@ -44,7 +44,7 @@ static std::unordered_map<ThreadID, trace::ThreadSpanContext> threadSpanContextM
 
 static ICorProfilerInfo* profilerInfo; // After feature sets settle down, perhaps this should be refactored and have a single static instance of ThreadSampler
 
-// Dirt-simple backpressure system to save overhead if managed code is not reading fast enough
+// Dirt-simple back pressure system to save overhead if managed code is not reading fast enough
 bool ThreadSampling_ShouldProduceThreadSample()
 {
     std::lock_guard<std::mutex> guard(bufferLock);
@@ -136,7 +136,7 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
 
 #define CHECK_SAMPLES_BUFFER_LENGTH() {  if (buffer->size() >= samples_buffer_maximum_size) { return; } }
 
-void ThreadSamplesBuffer::StartBatch()
+void ThreadSamplesBuffer::StartBatch() const
 {
     CHECK_SAMPLES_BUFFER_LENGTH()
     writeByte(thread_samples_start_batch);
@@ -146,34 +146,34 @@ void ThreadSamplesBuffer::StartBatch()
     writeUInt64(ms.count());
 }
 
-void ThreadSamplesBuffer::StartSample(ThreadID id, ThreadState* state, const ThreadSpanContext& context)
+void ThreadSamplesBuffer::StartSample(ThreadID id, const ThreadState* state, const ThreadSpanContext& spanContext) const
 {
     CHECK_SAMPLES_BUFFER_LENGTH()
     writeByte(thread_samples_start_sample);
-    writeInt(context.managedThreadId);
+    writeInt(spanContext.managedThreadId);
     writeInt(static_cast<int32_t>(state->nativeId));
     writeString(state->threadName);
-    writeUInt64(context.traceIdHigh);
-    writeUInt64(context.traceIdLow);
-    writeUInt64(context.spanId);
+    writeUInt64(spanContext.traceIdHigh);
+    writeUInt64(spanContext.traceIdLow);
+    writeUInt64(spanContext.spanId);
     // Feature possibilities: (managed/native) thread priority, cpu/wait times, etc.
 }
-void ThreadSamplesBuffer::RecordFrame(FunctionID fid, WSTRING& frame)
+void ThreadSamplesBuffer::RecordFrame(FunctionID fid, const WSTRING& frame)
 {
     CHECK_SAMPLES_BUFFER_LENGTH()
     writeCodedFrameString(fid, frame);
 }
-void ThreadSamplesBuffer::EndSample()
+void ThreadSamplesBuffer::EndSample() const
 {
     CHECK_SAMPLES_BUFFER_LENGTH()
     writeShort(0);
 }
-void ThreadSamplesBuffer::EndBatch()
+void ThreadSamplesBuffer::EndBatch() const
 {
     CHECK_SAMPLES_BUFFER_LENGTH()
     writeByte(thread_samples_end_batch);
 }
-void ThreadSamplesBuffer::WriteFinalStats(const SamplingStatistics& stats)
+void ThreadSamplesBuffer::WriteFinalStats(const SamplingStatistics& stats) const
 {
     CHECK_SAMPLES_BUFFER_LENGTH()
     writeByte(thread_samples_final_stats);
@@ -183,7 +183,7 @@ void ThreadSamplesBuffer::WriteFinalStats(const SamplingStatistics& stats)
     writeInt(stats.nameCacheMisses);
 }
 
-void ThreadSamplesBuffer::writeCodedFrameString(FunctionID fid, WSTRING& str)
+void ThreadSamplesBuffer::writeCodedFrameString(FunctionID fid, const WSTRING& str)
 {
     const auto found = codes.find(fid);
     if (found != codes.end())
@@ -201,19 +201,19 @@ void ThreadSamplesBuffer::writeCodedFrameString(FunctionID fid, WSTRING& str)
         writeString(str);
     }
 }
-void ThreadSamplesBuffer::writeShort(int16_t val)
+void ThreadSamplesBuffer::writeShort(int16_t val) const
 {
     buffer->push_back(((val >> 8) & 0xFF));
     buffer->push_back(val & 0xFF);
 }
-void ThreadSamplesBuffer::writeInt(int32_t val)
+void ThreadSamplesBuffer::writeInt(int32_t val) const
 {
     buffer->push_back(((val >> 24) & 0xFF));
     buffer->push_back(((val >> 16) & 0xFF));
     buffer->push_back(((val >> 8) & 0xFF));
     buffer->push_back(val & 0xFF);
 }
-void ThreadSamplesBuffer::writeString(const WSTRING& str)
+void ThreadSamplesBuffer::writeString(const WSTRING& str) const
 {
     // limit strings to a max length overall; this prevents (e.g.) thread names or
     // any other miscellaneous strings that come along from blowing things out
@@ -224,11 +224,11 @@ void ThreadSamplesBuffer::writeString(const WSTRING& str)
     // possible endian-ness assumption here; unclear how the managed layer would decode on big endian platforms
     buffer->insert(buffer->end(), strBegin, strBegin + usedLen * 2);
 }
-void ThreadSamplesBuffer::writeByte(unsigned char b)
+void ThreadSamplesBuffer::writeByte(unsigned char b) const
 {
     buffer->push_back(b);
 }
-void ThreadSamplesBuffer::writeUInt64(uint64_t val)
+void ThreadSamplesBuffer::writeUInt64(uint64_t val) const
 {
     buffer->push_back(((val >> 56) & 0xFF));
     buffer->push_back(((val >> 48) & 0xFF));
@@ -279,7 +279,7 @@ public:
     }
 
 private:
-    void GetClassName(ClassID classId, WSTRING& result)
+    void GetClassName(ClassID classId, WSTRING& result) const
     {
         ModuleID modId;
         mdTypeDef classToken;
@@ -457,7 +457,7 @@ HRESULT __stdcall FrameCallback(_In_ FunctionID funcId, _In_ UINT_PTR ip, _In_ C
 {
     const auto helper = static_cast<SamplingHelper*>(clientData);
     helper->stats.totalFrames++;
-    WSTRING* name = helper->Lookup(funcId, frameInfo);
+    const WSTRING* name = helper->Lookup(funcId, frameInfo);
     // This is where line numbers could be calculated
     helper->curWriter->RecordFrame(funcId, *name);
     return S_OK;
@@ -514,13 +514,13 @@ int GetSamplingPeriod()
     try
     {
 #ifdef _WIN32
-        const int ival = std::stoi(val);
+        const int parsedValue = std::stoi(val);
 #else
         std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
         std::string str = convert.to_bytes(val);
-        int ival = std::stoi(str);
+        int parsedValue = std::stoi(str);
 #endif
-        return (int) std::max(minimum_sample_period, ival);
+        return (int) std::max(minimum_sample_period, parsedValue);
     }
     catch (...)
     {
@@ -574,7 +574,7 @@ void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, Sa
     elapsed.QuadPart /= frequency.QuadPart;
     elapsedMicros = static_cast<int>(elapsed.QuadPart);
 #else
-    // FLoating around several places as "microsecond timer on linux c"
+    // Floating around several places as "microsecond timer on linux c"
     clock_gettime(CLOCK_MONOTONIC, &end);
     if ((end.tv_nsec - start.tv_nsec) < 0) {
         elapsed.tv_sec = end.tv_sec - start.tv_sec - 1;
