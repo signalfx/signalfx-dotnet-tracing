@@ -67,7 +67,7 @@ class ThreadState
 public:
     DWORD nativeId;
     WSTRING threadName;
-    ThreadState() : nativeId(0), threadName()
+    ThreadState() : nativeId(0)
     {
     }
     ThreadState(ThreadState const& other) : nativeId(other.nativeId), threadName(other.threadName)
