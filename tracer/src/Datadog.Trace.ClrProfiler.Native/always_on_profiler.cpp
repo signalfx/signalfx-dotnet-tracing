@@ -344,7 +344,7 @@ private:
     {
         if (funcID == 0)
         {
-            result.append(WStr("Unknown_Native_Function()"));
+            result.append(WStr("Unknown_Native_Function(unknown)"));
             return;
         }
 
@@ -357,16 +357,16 @@ private:
         if (FAILED(hr))
         {
             Logger::Debug("GetFunctionInfo2 failed: ", hr);
-            result.append(WStr("Unknown"));
+            result.append(WStr("Unknown(unknown)"));
             return;
         }
 
         ComPtr<IMetaDataImport2> pIMDImport;
         hr = info10->GetModuleMetaData(moduleId, ofRead, IID_IMetaDataImport, reinterpret_cast<IUnknown**>(&pIMDImport));
-        if (FAILED(hr))
+         if (FAILED(hr))
         {
             Logger::Debug("GetModuleMetaData failed: ", hr);
-            result.append(WStr("Unknown"));
+            result.append(WStr("Unknown(unknown)"));
             return;
         }
 
@@ -378,7 +378,7 @@ private:
         if (FAILED(hr))
         {
             Logger::Debug("GetMethodProps failed: ", hr);
-            result.append(WStr("Unknown"));
+            result.append(WStr("Unknown(unknown)"));
             return;
         }
 
