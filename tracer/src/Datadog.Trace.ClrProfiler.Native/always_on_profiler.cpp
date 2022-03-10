@@ -439,7 +439,7 @@ public:
 
     void LookupClassName(ClassID cid, WSTRING& result)
     {
-        WSTRING* answer = functionNameCache.get(cid);
+        WSTRING* answer = classNameCache.get(cid);
         if (answer != nullptr)
         {
             result.append(*answer);
@@ -448,7 +448,7 @@ public:
         answer = new WSTRING();
         this->GetClassName(cid, *answer);
         result.append(*answer);
-        functionNameCache.put(cid, answer);
+        classNameCache.put(cid, answer);
     }
 };
 
