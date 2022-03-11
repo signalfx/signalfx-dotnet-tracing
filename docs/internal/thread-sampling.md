@@ -38,7 +38,7 @@ _Sending profiling data directly to ingest is not supported at this time_.
 
 # Enable the profiler
 
-To enable the profiler, set the `SIGNALFX__PROFILER_ENABLED` environment variable
+To enable the profiler, set the `SIGNALFX_PROFILER_ENABLED` environment variable
 to `true` for your .NET process.
 
 # Configuration settings
