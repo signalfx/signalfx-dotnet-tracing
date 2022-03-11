@@ -87,9 +87,6 @@ const WSTRING managed_profiler_name = WStr("SignalFx.Tracing");
 const WSTRING nonwindows_nativemethods_type = WStr("Datadog.Trace.ClrProfiler.NativeMethods+NonWindows");
 const WSTRING windows_nativemethods_type = WStr("Datadog.Trace.ClrProfiler.NativeMethods+Windows");
 
-const WSTRING appsec_nonwindows_nativemethods_type = WStr("Datadog.Trace.AppSec.Waf.NativeBindings.NativeLibrary+NonWindows");
-const WSTRING appsec_windows_nativemethods_type = WStr("Datadog.Trace.AppSec.Waf.NativeBindings.NativeLibrary+Windows");
-
 const WSTRING calltarget_modification_action = WStr("CallTargetModification");
 
 #ifdef _WIN32

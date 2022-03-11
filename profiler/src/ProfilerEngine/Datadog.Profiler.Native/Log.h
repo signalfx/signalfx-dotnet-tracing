@@ -15,9 +15,9 @@ class Log final
 private:
     struct ProfilerLoggerPolicy
     {
-        inline static const shared::WSTRING filename = WStr("DD-DotNet-Profiler-Native");
+        inline static const shared::WSTRING filename = WStr("dotNet-profiler-native");
 #ifdef _WIN32
-        inline static const shared::WSTRING folder_path = WStr(R"(Datadog-APM\logs)");
+        inline static const shared::WSTRING folder_path = WStr(R"(SignalFx .NET Tracing\logs)");
 #endif
         inline static const std::string pattern = "[%Y-%m-%d %H:%M:%S.%e | %l | PId: %P | TId: %t] %v";
         struct environment

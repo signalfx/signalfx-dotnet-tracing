@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Samples.ThreadSampling": {
+    "Samples.AlwaysOnProfiler": {
       "commandName": "Project",
       "environmentVariables": {
         "COR_ENABLE_PROFILING": "1",
@@ -15,7 +15,7 @@
         "SIGNALFX_VERSION": "1.0.0",
 
         "SIGNALFX_PROFILER_ENABLED": "true",
-        "SIGNALFX_PROFILER_CALL_STACK_INTERVAL":  "1000" 
+        "SIGNALFX_PROFILER_CALL_STACK_INTERVAL": "1000"
       },
       "nativeDebugging": true
     }

@@ -32,21 +32,17 @@ namespace Datadog.Trace.TestHelpers
         private readonly string _samplesDirectory;
         private readonly TargetFrameworkAttribute _targetFramework;
 
-        private bool _requiresProfiling;
-
         public EnvironmentHelper(
             string sampleName,
             Type anchorType,
             ITestOutputHelper output,
             string samplesDirectory = null,
-            bool prependSamplesToAppName = true,
-            bool requiresProfiling = true)
+            bool prependSamplesToAppName = true)
         {
             SampleName = sampleName;
             _samplesDirectory = samplesDirectory ?? Path.Combine("test", "test-applications", "integrations");
             _targetFramework = Assembly.GetAssembly(anchorType).GetCustomAttribute<TargetFrameworkAttribute>();
             _output = output;
-            _requiresProfiling = requiresProfiling;
             TracerHome = GetTracerHomePath();
             ProfilerPath = GetProfilerPath();
 
@@ -69,6 +65,8 @@ namespace Datadog.Trace.TestHelpers
         }
 
         public TestTransports TransportType { get; set; } = TestTransports.Tcp;
+
+        public bool AutomaticInstrumentationEnabled { get; private set; } = true;
 
         public bool DebugModeEnabled { get; set; }
 
@@ -197,11 +195,9 @@ namespace Datadog.Trace.TestHelpers
             int? logsCollectorPort,
             IDictionary<string, string> environmentVariables,
             string processToProfile = null,
-            bool enableSecurity = false,
-            bool enableBlocking = false,
             string externalRulesFile = null)
         {
-            string profilerEnabled = _requiresProfiling ? "1" : "0";
+            string profilerEnabled = AutomaticInstrumentationEnabled ? "1" : "0";
             environmentVariables["SIGNALFX_DOTNET_TRACER_HOME"] = TracerHome;
 
             if (IsCoreClr())
@@ -233,16 +229,6 @@ namespace Datadog.Trace.TestHelpers
             if (logsCollectorPort.HasValue)
             {
                 environmentVariables["SIGNALFX_PROFILER_LOGS_ENDPOINT"] = $"http://127.0.0.1:{logsCollectorPort.Value}/";
-            }
-
-            if (enableSecurity)
-            {
-                environmentVariables[ConfigurationKeys.AppSecEnabled] = enableSecurity.ToString();
-            }
-
-            if (!string.IsNullOrEmpty(externalRulesFile))
-            {
-                environmentVariables[ConfigurationKeys.AppSecRules] = externalRulesFile;
             }
 
             foreach (var name in new[] { "SERVICESTACK_REDIS_HOST", "STACKEXCHANGE_REDIS_HOST" })
@@ -463,6 +449,11 @@ namespace Datadog.Trace.TestHelpers
             }
 
             return $"net{_major}{_minor}{_patch ?? string.Empty}";
+        }
+
+        public void SetAutomaticInstrumentation(bool enabled)
+        {
+            AutomaticInstrumentationEnabled = enabled;
         }
 
         public void EnableWindowsNamedPipes(string tracePipeName = null, string statsPipeName = null)

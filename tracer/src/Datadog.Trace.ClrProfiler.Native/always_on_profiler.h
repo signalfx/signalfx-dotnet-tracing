@@ -7,7 +7,7 @@
 #include <utility>
 #include <unordered_map>
 
-#define UNKNOWN_MANAGED_THREADID -1
+constexpr auto unknown_managed_thread_id = -1;
 
 #ifdef _WIN32
 #define EXPORTTHIS __declspec(dllexport)
@@ -49,7 +49,7 @@ public:
     uint64_t spanId;
     int32_t managedThreadId;
 
-    ThreadSpanContext() : traceIdHigh(0), traceIdLow(0), spanId(0), managedThreadId(UNKNOWN_MANAGED_THREADID)
+    ThreadSpanContext() : traceIdHigh(0), traceIdLow(0), spanId(0), managedThreadId(unknown_managed_thread_id)
     {
     }
     ThreadSpanContext(uint64_t _traceIdHigh, uint64_t _traceIdLow, uint64_t _spanId, int32_t managedThreadId) :
@@ -67,7 +67,7 @@ class ThreadState
 public:
     DWORD nativeId;
     WSTRING threadName;
-    ThreadState() : nativeId(0), threadName()
+    ThreadState() : nativeId(0)
     {
     }
     ThreadState(ThreadState const& other) : nativeId(other.nativeId), threadName(other.threadName)
@@ -78,9 +78,9 @@ public:
 class ThreadSampler
 {
 public:
-    void StartSampling(ICorProfilerInfo10* info10);
+    void StartSampling(ICorProfilerInfo10* cor_profiler_info10);
     ICorProfilerInfo10* info10;
-    void ThreadCreated(ThreadID threadId);
+    static void ThreadCreated(ThreadID threadId);
     void ThreadDestroyed(ThreadID threadId);
     void ThreadAssignedToOSThread(ThreadID managedThreadId, DWORD osThreadId);
     void ThreadNameChanged(ThreadID threadId, ULONG cchName, WCHAR name[]);
@@ -97,20 +97,20 @@ public:
 
     ThreadSamplesBuffer(std::vector<unsigned char>* buf);
     ~ThreadSamplesBuffer();
-    void StartBatch();
-    void StartSample(ThreadID id, ThreadState* state, const ThreadSpanContext& spanContext);
-    void RecordFrame(FunctionID fid, WSTRING& frame);
-    void EndSample();
-    void EndBatch();
-    void WriteFinalStats(const SamplingStatistics& stats);
+    void StartBatch() const;
+    void StartSample(ThreadID id, const ThreadState* state, const ThreadSpanContext& spanContext) const;
+    void RecordFrame(FunctionID fid, const WSTRING& frame);
+    void EndSample() const;
+    void EndBatch() const;
+    void WriteFinalStats(const SamplingStatistics& stats) const;
 
 private:
-    void writeCodedFrameString(FunctionID fid, WSTRING& str);
-    void writeShort(int16_t val);
-    void writeInt(int32_t val);
-    void writeString(const WSTRING& str);
-    void writeByte(unsigned char b);
-    void writeInt64(int64_t val);
+    void writeCodedFrameString(FunctionID fid, const WSTRING& str);
+    void writeShort(int16_t val) const;
+    void writeInt(int32_t val) const;
+    void writeString(const WSTRING& str) const;
+    void writeByte(unsigned char b) const;
+    void writeUInt64(uint64_t val) const;
 };
 
 class NameCache

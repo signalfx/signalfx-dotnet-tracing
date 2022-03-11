@@ -78,7 +78,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
             foreach (var stackTrace in stackTraces)
             {
-                stackTrace.Should().MatchRegex(@""".{0,}"" #\d+ prio=0 os_prio=0 cpu=0 elapsed=0 tid=0x\S+ nid=\S+\n\n(\tat .+\(unknown\)\n)+");
+                stackTrace.Should().MatchRegex(@""".{0,}"" #\d+ prio=0 os_prio=0 cpu=0 elapsed=0 tid=0x\S+ nid=\S+\n\n(\tat .+\(.*\)\n)+");
             }
         }
 
@@ -103,11 +103,16 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         private static bool ContainStackTraceForClassHierarchy(LogRecord logRecord)
         {
             return logRecord.Body.StringValue.Contains(
-                "\tat System.Threading.Thread.Sleep(unknown)\n" +
-                "\tat ClassD.MethodD(unknown)\n" +
-                "\tat ClassC.MethodC(unknown)\n" +
-                "\tat ClassB.MethodB(unknown)\n" +
-                "\tat ClassA.MethodA(unknown)\n");
+                "\tat System.Threading.Thread.Sleep(System.TimeSpan)\n" +
+                "\tat My.Custom.Test.Namespace.ClassD`1.GenericMethodDFromGenericClass(!0, !!0)\n" +
+                "\tat SharedGenericFunction.GenericMethodCFromGenericClass(!0)\n" +
+                "\tat TripleInternalClassB.MethodB(System.String)\n" +
+                "\tat My.Custom.Test.Namespace.ClassA.<MethodAOthers>g__Action|4_0(System.String)\n" +
+                "\tat My.Custom.Test.Namespace.ClassA.MethodAOthers(System.String, System.Object, My.Custom.Test.Namespace.CustomClass, My.Custom.Test.Namespace.CustomStruct, My.Custom.Test.Namespace.CustomClass[], My.Custom.Test.Namespace.CustomStruct[], System.Collections.Generic.List`1[!!0])\n" +
+                "\tat My.Custom.Test.Namespace.ClassA.MethodAFloats(System.Single, System.Double)\n" +
+                "\tat My.Custom.Test.Namespace.ClassA.MethodAInts(System.UInt16, System.Int16, System.UInt32, System.Int32, System.UInt64, System.Int64, System.IntPtr, System.UIntPtr)\n" +
+                "\tat My.Custom.Test.Namespace.ClassA.MethodABytes(System.Boolean, System.Char, System.SByte, System.Byte)\n" +
+                "\tat My.Custom.Test.Namespace.ClassA.MethodA()\n");
         }
 
         private async Task DumpLogRecords(LogsData[] logsData)

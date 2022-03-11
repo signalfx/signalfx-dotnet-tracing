@@ -1,0 +1,115 @@
+[
+  {
+    TraceId: Id_1,
+    SpanId: Id_2,
+    Name: GET error.index,
+    LogicScope: aspnet-mvc.request,
+    Resource: GET error.index,
+    Service: sample,
+    Type: web,
+    ParentId: Id_3,
+    Error: 1,
+    Tags: {
+      aspnet.action: index,
+      aspnet.controller: error,
+      aspnet.route: {controller}/{action}/{id},
+      deployment.environment: integration_tests,
+      http.method: GET,
+      http.request.headers.host: localhost:00000,
+      http.status_code: 500,
+      http.url: http://localhost:00000/Error/Index?errorId=8DBA5152-2B3E-47C0-942B-0484A9FA2F84,
+      language: dotnet,
+      net.peer.ip: ::1,
+      sfx.error.message: The HTTP response has status code 500.,
+      span.kind: server,
+      version: 1.0.0
+    }
+  },
+  {
+    TraceId: Id_1,
+    SpanId: Id_3,
+    Name: GET error.index,
+    LogicScope: aspnet.request,
+    Resource: GET error.index,
+    Service: sample,
+    Type: web,
+    ParentId: Id_4,
+    Error: 1,
+    Tags: {
+      deployment.environment: integration_tests,
+      http.method: GET,
+      http.request.headers.host: localhost:00000,
+      http.status_code: 500,
+      http.url: http://localhost:00000/Error/Index?errorId=8DBA5152-2B3E-47C0-942B-0484A9FA2F84,
+      language: dotnet,
+      net.peer.ip: ::1,
+      sfx.error.message: The HTTP response has status code 500.,
+      span.kind: server,
+      version: 1.0.0
+    }
+  },
+  {
+    TraceId: Id_1,
+    SpanId: Id_4,
+    Name: GET /badrequest,
+    LogicScope: aspnet.request,
+    Resource: GET /badrequest,
+    Service: sample,
+    Type: web,
+    Error: 1,
+    Tags: {
+      deployment.environment: integration_tests,
+      http.method: GET,
+      http.request.headers.host: localhost:00000,
+      http.status_code: 500,
+      http.url: http://localhost:00000/badrequest?TransferRequest=true,
+      language: dotnet,
+      net.peer.ip: ::1,
+      runtime-id: Guid_1,
+      sfx.error.kind: System.Exception,
+      sfx.error.message: Oops, it broke.,
+      sfx.error.stack:
+System.Exception: Oops, it broke.
+at Samples.AspNetMvc5.Controllers.HomeController.BadRequest(),
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: server,
+      version: 1.0.0
+    },
+    Metrics: {
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_1,
+    SpanId: Id_5,
+    Name: GET /badrequest,
+    LogicScope: aspnet-mvc.request,
+    Resource: GET /badrequest,
+    Service: sample,
+    Type: web,
+    ParentId: Id_4,
+    Error: 1,
+    Tags: {
+      aspnet.action: badrequest,
+      aspnet.controller: home,
+      aspnet.route: badrequest,
+      deployment.environment: integration_tests,
+      http.method: GET,
+      http.request.headers.host: localhost:00000,
+      http.status_code: 200,
+      http.url: http://localhost:00000/badrequest?TransferRequest=true,
+      language: dotnet,
+      net.peer.ip: ::1,
+      sfx.error.kind: System.Exception,
+      sfx.error.message: Oops, it broke.,
+      sfx.error.stack:
+System.Exception: Oops, it broke.
+at Samples.AspNetMvc5.Controllers.HomeController.BadRequest(),
+      span.kind: server,
+      version: 1.0.0
+    }
+  }
+]

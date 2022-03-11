@@ -16,7 +16,7 @@ namespace Datadog.Trace
     internal partial class Scope : IScope
     {
         private readonly IScopeManager _scopeManager;
-        private readonly bool _finishOnClose;
+        private bool _finishOnClose;
 
         internal Scope(Scope parent, Span span, IScopeManager scopeManager, bool finishOnClose)
         {
@@ -62,6 +62,11 @@ namespace Datadog.Trace
             {
                 Span.Finish();
             }
+        }
+
+        internal void SetFinishOnClose(bool finishOnClose)
+        {
+            _finishOnClose = finishOnClose;
         }
     }
 }

@@ -1,0 +1,302 @@
+﻿[
+  {
+    TraceId: Id_1,
+    SpanId: Id_2,
+    Name: Main(),
+    Resource: Main(),
+    Service: Samples.MongoDB,
+    Tags: {
+      deployment.environment: integration_tests,
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      version: 1.0.0
+    },
+    Metrics: {
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_1,
+    SpanId: Id_3,
+    Name: sync-calls,
+    Resource: sync-calls,
+    Service: Samples.MongoDB,
+    ParentId: Id_2,
+    Tags: {
+      deployment.environment: integration_tests,
+      version: 1.0.0
+    }
+  },
+  {
+    TraceId: Id_1,
+    SpanId: Id_4,
+    Name: async-calls,
+    Resource: async-calls,
+    Service: Samples.MongoDB,
+    ParentId: Id_2,
+    Tags: {
+      deployment.environment: integration_tests,
+      version: 1.0.0
+    }
+  },
+  {
+    TraceId: Id_1,
+    SpanId: Id_5,
+    Name: sync-calls-execute,
+    Resource: sync-calls-execute,
+    Service: Samples.MongoDB,
+    ParentId: Id_2,
+    Tags: {
+      deployment.environment: integration_tests,
+      version: 1.0.0
+    }
+  },
+  {
+    TraceId: Id_1,
+    SpanId: Id_6,
+    Name: async-calls-execute,
+    Resource: async-calls-execute,
+    Service: Samples.MongoDB,
+    ParentId: Id_2,
+    Tags: {
+      deployment.environment: integration_tests,
+      version: 1.0.0
+    }
+  },
+  {
+    TraceId: Id_1,
+    SpanId: Id_7,
+    Name: delete,
+    LogicScope: mongodb.query,
+    Resource: delete test-db,
+    Service: Samples.MongoDB,
+    Type: mongodb,
+    ParentId: Id_3,
+    Tags: {
+      component: MongoDb,
+      db.name: test-db,
+      db.system: mongodb,
+      deployment.environment: integration_tests,
+      mongodb.collection: employees,
+      mongodb.query: { "delete" : "employees", "ordered" : true },
+      net.peer.name: mongo,
+      net.peer.port: 27017,
+      span.kind: client,
+      version: 1.0.0
+    }
+  },
+  {
+    TraceId: Id_1,
+    SpanId: Id_8,
+    Name: insert,
+    LogicScope: mongodb.query,
+    Resource: insert test-db,
+    Service: Samples.MongoDB,
+    Type: mongodb,
+    ParentId: Id_3,
+    Tags: {
+      component: MongoDb,
+      db.name: test-db,
+      db.system: mongodb,
+      deployment.environment: integration_tests,
+      mongodb.collection: employees,
+      mongodb.query: { "insert" : "employees", "ordered" : true },
+      net.peer.name: mongo,
+      net.peer.port: 27017,
+      span.kind: client,
+      version: 1.0.0
+    }
+  },
+  {
+    TraceId: Id_1,
+    SpanId: Id_9,
+    Name: aggregate,
+    LogicScope: mongodb.query,
+    Resource: aggregate test-db,
+    Service: Samples.MongoDB,
+    Type: mongodb,
+    ParentId: Id_3,
+    Tags: {
+      component: MongoDb,
+      db.name: test-db,
+      db.system: mongodb,
+      deployment.environment: integration_tests,
+      mongodb.collection: employees,
+      mongodb.query: { "aggregate" : "employees", "pipeline" : [{ "$match" : { } }, { "$group" : { "_id" : 1, "n" : { "$sum" : 1 } } }], "cursor" : { } },
+      net.peer.name: mongo,
+      net.peer.port: 27017,
+      span.kind: client,
+      version: 1.0.0
+    }
+  },
+  {
+    TraceId: Id_1,
+    SpanId: Id_10,
+    Name: find,
+    LogicScope: mongodb.query,
+    Resource: find test-db,
+    Service: Samples.MongoDB,
+    Type: mongodb,
+    ParentId: Id_3,
+    Tags: {
+      component: MongoDb,
+      db.name: test-db,
+      db.system: mongodb,
+      deployment.environment: integration_tests,
+      mongodb.collection: employees,
+      mongodb.query: { "find" : "employees", "filter" : { } },
+      net.peer.name: mongo,
+      net.peer.port: 27017,
+      span.kind: client,
+      version: 1.0.0
+    }
+  },
+  {
+    TraceId: Id_1,
+    SpanId: Id_11,
+    Name: mongodb.query,
+    LogicScope: mongodb.query,
+    Resource: mongodb.query,
+    Service: Samples.MongoDB,
+    Type: mongodb,
+    ParentId: Id_3,
+    Tags: {
+      component: MongoDb,
+      db.system: mongodb,
+      deployment.environment: integration_tests,
+      net.peer.name: mongo,
+      net.peer.port: 27017,
+      span.kind: client,
+      version: 1.0.0
+    }
+  },
+  {
+    TraceId: Id_1,
+    SpanId: Id_12,
+    Name: delete,
+    LogicScope: mongodb.query,
+    Resource: delete test-db,
+    Service: Samples.MongoDB,
+    Type: mongodb,
+    ParentId: Id_4,
+    Tags: {
+      component: MongoDb,
+      db.name: test-db,
+      db.system: mongodb,
+      deployment.environment: integration_tests,
+      mongodb.collection: employees,
+      mongodb.query: { "delete" : "employees", "ordered" : true },
+      net.peer.name: mongo,
+      net.peer.port: 27017,
+      span.kind: client,
+      version: 1.0.0
+    }
+  },
+  {
+    TraceId: Id_1,
+    SpanId: Id_13,
+    Name: insert,
+    LogicScope: mongodb.query,
+    Resource: insert test-db,
+    Service: Samples.MongoDB,
+    Type: mongodb,
+    ParentId: Id_4,
+    Tags: {
+      component: MongoDb,
+      db.name: test-db,
+      db.system: mongodb,
+      deployment.environment: integration_tests,
+      mongodb.collection: employees,
+      mongodb.query: { "insert" : "employees", "ordered" : true },
+      net.peer.name: mongo,
+      net.peer.port: 27017,
+      span.kind: client,
+      version: 1.0.0
+    }
+  },
+  {
+    TraceId: Id_1,
+    SpanId: Id_14,
+    Name: aggregate,
+    LogicScope: mongodb.query,
+    Resource: aggregate test-db,
+    Service: Samples.MongoDB,
+    Type: mongodb,
+    ParentId: Id_4,
+    Tags: {
+      component: MongoDb,
+      db.name: test-db,
+      db.system: mongodb,
+      deployment.environment: integration_tests,
+      mongodb.collection: employees,
+      mongodb.query: { "aggregate" : "employees", "pipeline" : [{ "$match" : { } }, { "$group" : { "_id" : 1, "n" : { "$sum" : 1 } } }], "cursor" : { } },
+      net.peer.name: mongo,
+      net.peer.port: 27017,
+      span.kind: client,
+      version: 1.0.0
+    }
+  },
+  {
+    TraceId: Id_1,
+    SpanId: Id_15,
+    Name: find,
+    LogicScope: mongodb.query,
+    Resource: find test-db,
+    Service: Samples.MongoDB,
+    Type: mongodb,
+    ParentId: Id_4,
+    Tags: {
+      component: MongoDb,
+      db.name: test-db,
+      db.system: mongodb,
+      deployment.environment: integration_tests,
+      mongodb.collection: employees,
+      mongodb.query: { "find" : "employees", "filter" : { } },
+      net.peer.name: mongo,
+      net.peer.port: 27017,
+      span.kind: client,
+      version: 1.0.0
+    }
+  },
+  {
+    TraceId: Id_1,
+    SpanId: Id_16,
+    Name: mongodb.query,
+    LogicScope: mongodb.query,
+    Resource: mongodb.query,
+    Service: Samples.MongoDB,
+    Type: mongodb,
+    ParentId: Id_5,
+    Tags: {
+      component: MongoDb,
+      db.system: mongodb,
+      deployment.environment: integration_tests,
+      net.peer.name: mongo,
+      net.peer.port: 27017,
+      span.kind: client,
+      version: 1.0.0
+    }
+  },
+  {
+    TraceId: Id_1,
+    SpanId: Id_17,
+    Name: mongodb.query,
+    LogicScope: mongodb.query,
+    Resource: mongodb.query,
+    Service: Samples.MongoDB,
+    Type: mongodb,
+    ParentId: Id_6,
+    Tags: {
+      component: MongoDb,
+      db.system: mongodb,
+      deployment.environment: integration_tests,
+      net.peer.name: mongo,
+      net.peer.port: 27017,
+      span.kind: client,
+      version: 1.0.0
+    }
+  }
+]

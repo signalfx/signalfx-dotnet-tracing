@@ -53,9 +53,6 @@ partial class Build
 
     AbsolutePath ProfilerHomeDirectory => ProfilerHome ?? RootDirectory / ".." / "_build" / "DDProf-Deploy";
 
-    const string LibDdwafVersion = "1.0.17";
-    AbsolutePath LibDdwafDirectory => (NugetPackageDirectory ?? RootDirectory / "packages") / $"libddwaf.{LibDdwafVersion}";
-
     AbsolutePath SourceDirectory => TracerDirectory / "src";
     AbsolutePath BuildDirectory => TracerDirectory / "build";
     AbsolutePath TestsDirectory => TracerDirectory / "test";
@@ -102,13 +99,11 @@ partial class Build
     {
         Solution.GetProject(Projects.TraceIntegrationTests),
         Solution.GetProject(Projects.OpenTracingIntegrationTests),
-        Solution.GetProject(Projects.ToolIntegrationTests)
     };
 
     Project[] ClrProfilerIntegrationTests => new[]
     {
-        Solution.GetProject(Projects.ClrProfilerIntegrationTests),
-        Solution.GetProject(Projects.AppSecIntegrationTests),
+        Solution.GetProject(Projects.ClrProfilerIntegrationTests)
     };
 
     readonly IEnumerable<TargetFramework> TargetFrameworks = new[]
@@ -268,97 +263,6 @@ partial class Build
         .DependsOn(CompileNativeTestsWindows)
         .DependsOn(CompileNativeTestsLinux);
 
-    Target DownloadLibDdwaf => _ => _
-        .Unlisted()
-        .After(CreateRequiredDirectories)
-        .Executes(async () =>
-        {
-            var libDdwafUri = new Uri($"https://www.nuget.org/api/v2/package/libddwaf/{LibDdwafVersion}");
-            var libDdwafZip = TempDirectory / "libddwaf.zip";
-
-            using (var client = new HttpClient())
-            {
-                var response = await client.GetAsync(libDdwafUri);
-
-                response.EnsureSuccessStatusCode();
-
-                await using var file = File.Create(libDdwafZip);
-                await using var stream = await response.Content.ReadAsStreamAsync();
-                await stream.CopyToAsync(file);
-            }
-
-            Console.WriteLine($"{libDdwafZip} downloaded. Extracting to {LibDdwafDirectory}...");
-
-            UncompressZip(libDdwafZip, LibDdwafDirectory);
-        });
-
-    Target CopyLibDdwaf => _ => _
-        .Unlisted()
-        .After(Clean)
-        .After(DownloadLibDdwaf)
-        .Executes(() =>
-        {
-            if (IsWin)
-            {
-                foreach (var architecture in WafWindowsArchitectureFolders)
-                {
-                    var source = LibDdwafDirectory / "runtimes" / architecture / "native" / "ddwaf.dll";
-                    var dest = TracerHomeDirectory / architecture;
-                    Logger.Info($"Copying '{source}' to '{dest}'");
-                    CopyFileToDirectory(source, dest, FileExistsPolicy.Overwrite);
-                }
-            }
-            else
-            {
-                var (architecture, ext) = GetUnixArchitectureAndExtension();
-                var ddwafFileName = $"libddwaf.{ext}";
-
-                var source = LibDdwafDirectory / "runtimes" / architecture / "native" / ddwafFileName;
-                var dest = TracerHomeDirectory;
-                Logger.Info($"Copying '{source}' to '{dest}'");
-                CopyFileToDirectory(source, dest, FileExistsPolicy.Overwrite);
-
-            }
-        });
-
-    Target CopyLibDdwafForAppSecUnitTests => _ => _
-        .Unlisted()
-        .After(Clean)
-        .After(DownloadLibDdwaf)
-        .Executes(() =>
-        {
-            var project = Solution.GetProject(Projects.AppSecUnitTests);
-            var directory = project.Directory;
-            var targetFrameworks = project.GetTargetFrameworks();
-            if (IsWin)
-            {
-                foreach (var architecture in WafWindowsArchitectureFolders)
-                {
-                    CopyWaf(architecture, targetFrameworks, directory, "ddwaf", "dll");
-                }
-            }
-            else
-            {
-                var (architecture, ext) = GetUnixArchitectureAndExtension();
-                CopyWaf(architecture, targetFrameworks, directory, "libddwaf", ext);
-            }
-
-            void CopyWaf(string architecture, IEnumerable<string> frameworks, AbsolutePath absolutePath, string wafFileName, string extension)
-            {
-                var source = LibDdwafDirectory / "runtimes" / architecture / "native" / $"{wafFileName}.{extension}";
-                var nativeDir = DDTracerHomeDirectory / architecture / $"SignalFx.Tracing.ClrProfiler.Native.{extension}";
-                foreach (var fmk in frameworks)
-                {
-                    var dest = absolutePath / "bin" / BuildConfiguration / fmk / architecture;
-                    CopyFileToDirectory(source, dest, FileExistsPolicy.Overwrite);
-                    if (!IsWin)
-                    {
-                        CopyFileToDirectory(nativeDir, absolutePath / "bin" / BuildConfiguration / fmk, FileExistsPolicy.Overwrite);
-                    }
-                }
-            }
-        });
-
     Target PublishManagedProfiler => _ => _
         .Unlisted()
         .After(CompileManagedSrc)
@@ -486,7 +390,7 @@ partial class Build
 
     Target CreateDdTracerHome => _ => _
        .Unlisted()
-       .After(PublishNativeProfiler, PublishManagedProfiler, DownloadLibDdwaf, CopyLibDdwaf)
+       .After(PublishNativeProfiler, PublishManagedProfiler)
        .Executes(() =>
        {
            // start by copying everything from the tracer home dir
@@ -502,7 +406,6 @@ partial class Build
            var (architecture, ext) = GetUnixArchitectureAndExtension();
 
            var profilerFileName = $"{NativeProfilerModule}.{ext}";
-           var ddwafFileName = $"libddwaf.{ext}";
 
            var outputDir = DDTracerHomeDirectory / architecture;
 
@@ -510,11 +413,6 @@ partial class Build
            MoveFile(
                DDTracerHomeDirectory / profilerFileName,
                outputDir / profilerFileName);
-
-           var srcDdwafFile = DDTracerHomeDirectory / ddwafFileName;
-           MoveFile(
-               srcDdwafFile,
-               DDTracerHomeDirectory / architecture / ddwafFileName);
        });
 
     Target BuildMsi => _ => _
@@ -530,7 +428,6 @@ partial class Build
                     .SetMSBuildPath()
                     .AddProperty("RunWixToolsOutOfProc", true)
                     .SetProperty("TracerHomeDirectory", TracerHomeDirectory)
-                    .SetProperty("LibDdwafDirectory", LibDdwafDirectory)
                     .SetMaxCpuCount(null)
                     .CombineWith(ArchitecturesForPlatform, (o, arch) => o
                         .SetProperty("MsiOutputPath", ArtifactsDirectory / arch.ToString())
@@ -551,7 +448,6 @@ partial class Build
                     .SetMSBuildPath()
                     .AddProperty("RunWixToolsOutOfProc", true)
                     .SetProperty("TracerHomeDirectory", TracerHomeDirectory)
-                    .SetProperty("LibDdwafDirectory", LibDdwafDirectory)
                     .SetProperty("ProfilerHomeDirectory", ProfilerHomeDirectory)
                     .SetProperty("MonitoringHomeDirectory", MonitoringHomeDirectory)
                     .SetProperty("BetaMsiSuffix", BetaMsiSuffix)
@@ -587,13 +483,11 @@ partial class Build
         .After(CompileManagedSrc)
         .After(CompileDependencyLibs)
         .After(CompileManagedTestHelpers)
-        .After(BuildRunnerTool)
         .Executes(() =>
         {
             // create junction for each directory
             var directories = TracerDirectory.GlobDirectories(
                 $"src/**/bin/{BuildConfiguration}",
-                $"src/Datadog.Trace.Tools.Runner/obj/{BuildConfiguration}",
                 $"test/Datadog.Trace.TestHelpers/**/bin/{BuildConfiguration}",
                 $"test/Datadog.Trace.TestHelpers/obj/{BuildConfiguration}",
                 $"test/OpenTelemetry.TestHelpers/**/bin/{BuildConfiguration}",
@@ -662,8 +556,6 @@ partial class Build
                         "createLogPath.sh",
                     };
 
-                    args.Add("libddwaf.so");
-
                     var arguments = string.Join(" ", args);
                     fpm(arguments, workingDirectory: workingDirectory);
                 }
@@ -705,8 +597,6 @@ partial class Build
         .Unlisted()
         .After(Restore)
         .After(CompileManagedSrc)
-        .After(BuildRunnerTool)
-        .DependsOn(CopyLibDdwafForAppSecUnitTests)
         .Executes(() =>
         {
             // Always AnyCPU
@@ -884,7 +774,6 @@ partial class Build
         .After(CompileRegressionSamples)
         .After(CompileFrameworkReproductions)
         .After(PublishIisSamples)
-        .After(BuildRunnerTool)
         .Requires(() => Framework)
         .Requires(() => TracerHomeDirectory != null)
         .Executes(() =>
@@ -1132,6 +1021,7 @@ partial class Build
                 "Samples.OracleMDA.Core", // We don't test these yet
                 "MismatchedTracerVersions",
                 "IBM.Data.DB2.DBCommand",
+                "Sandbox.AutomaticInstrumentation", // Doesn't run on Linux
             };
 
             // These sample projects are built using RestoreAndBuildSamplesForPackageVersions
@@ -1257,7 +1147,6 @@ partial class Build
         .After(CompileManagedTestHelpers)
         .After(CompileSamplesLinux)
         .After(CompileMultiApiPackageVersionSamples)
-        .After(BuildRunnerTool)
         .Requires(() => TracerHomeDirectory != null)
         .Requires(() => Framework)
         .Executes(() =>
@@ -1279,7 +1168,6 @@ partial class Build
                         .SetProjectFile(project)));
 
             IntegrationTestLinuxProfilerDirFudge(Projects.ClrProfilerIntegrationTests);
-            IntegrationTestLinuxProfilerDirFudge(Projects.AppSecIntegrationTests);
         });
 
     Target RunLinuxIntegrationTests => _ => _
@@ -1369,37 +1257,6 @@ partial class Build
                 .SetProcessArgumentConfigurator(args => args.Add("--no-cache"))
                 .SetPackageName("dd-trace"));
          });
-
-    Target BuildToolArtifactTests => _ => _
-         .Description("Builds the tool artifacts tests")
-         .After(CompileManagedTestHelpers)
-         .After(InstallDdTraceTool)
-         .Executes(() =>
-          {
-              DotNetBuild(x => x
-                  .SetProjectFile(Solution.GetProject(Projects.ToolArtifactsTests))
-                  .EnableNoDependencies()
-                  .EnableNoRestore()
-                  .SetConfiguration(BuildConfiguration)
-                  .SetNoWarnDotNetCore3());
-          });
-
-    Target RunToolArtifactTests => _ => _
-       .Description("Runs the tool artifacts tests")
-       .After(BuildToolArtifactTests)
-       .Executes(() =>
-        {
-            var project = Solution.GetProject(Projects.ToolArtifactsTests);
-
-            DotNetTest(config => config
-                .SetProjectFile(project)
-                .SetConfiguration(BuildConfiguration)
-                .EnableNoRestore()
-                .EnableNoBuild()
-                .SetProcessEnvironmentVariable("TracerHomeDirectory", TracerHomeDirectory)
-                .SetProcessEnvironmentVariable("ToolInstallDirectory", ToolInstallDirectory)
-                .EnableTrxLogOutput(GetResultsDirectory(project)));
-        });
 
     Target UpdateSnapshots => _ => _
         .Description("Updates verified snapshots files with received ones")

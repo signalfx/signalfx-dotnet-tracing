@@ -37,6 +37,7 @@ namespace Datadog.Trace.Tests.Configuration
                 { "SIGNALFX_Wcf_ANALYTICS_ENABLED", "false" },
                 { "SIGNALFX_Wcf_ANALYTICS_SAMPLE_RATE", "0.2" },
                 { "SIGNALFX_Msmq_ENABLED", "true" },
+                { "SIGNALFX_TRACE_stackexchangeredis_ENABLED", "false" }
             });
 
             var disabledIntegrations = new HashSet<string> { "foobar", "MongoDb", "Msmq" };
@@ -68,6 +69,36 @@ namespace Datadog.Trace.Tests.Configuration
 
             var consmos = final[IntegrationId.CosmosDb];
             consmos.Enabled.Should().BeNull();
+
+            var redis = final[IntegrationId.StackExchangeRedis];
+            redis.Enabled.Should().BeFalse();
+        }
+
+        [Fact]
+        public void ReturnsIntegrationWhenUsingIncorrectCasing()
+        {
+            var mutable = new IntegrationSettingsCollection(null);
+            var settings = new ImmutableIntegrationSettingsCollection(mutable, new HashSet<string>());
+
+            var log4NetByName = settings["LOG4NET"];
+            var log4NetById = settings[IntegrationId.Log4Net];
+
+            log4NetById.Should().Be(log4NetByName);
+        }
+
+        [Fact]
+        public void ReturnsDefaultSettingsForUnknownIntegration()
+        {
+            var mutable = new IntegrationSettingsCollection(null);
+            var settings = new ImmutableIntegrationSettingsCollection(mutable, new HashSet<string>());
+
+            var integrationName = "blobby";
+            var instance1 = settings[integrationName];
+            instance1.IntegrationName.Should().Be(integrationName);
+            instance1.Enabled.Should().BeNull();
+
+            var instance2 = settings[integrationName];
+            instance2.Should().NotBe(instance1);
         }
     }
 }

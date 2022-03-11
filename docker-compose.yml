@@ -568,7 +568,7 @@ services:
       - framework=${framework:-netcoreapp3.1}
       - baseImage=${baseImage:-debian}
       - TestAllPackageVersions=${TestAllPackageVersions:-true}
-      - IncludeMinorPackageVersions=${IncludeMinorPackageVersions:-false}0
+      - IncludeMinorPackageVersions=${IncludeMinorPackageVersions:-false}
       - Verify_DisableClipboard=true
       - DiffEngine_Disabled=true
       - SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN:-1}

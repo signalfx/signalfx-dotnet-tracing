@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
 using Datadog.Trace.AlwaysOnProfiler;
-using Datadog.Trace.AppSec;
 using Datadog.Trace.Ci;
 using Datadog.Trace.ClrProfiler.ServerlessInstrumentation;
 using Datadog.Trace.Configuration;
@@ -31,6 +30,7 @@ namespace Datadog.Trace.ClrProfiler
         /// Indicates whether we're initializing Instrumentation for the first time
         /// </summary>
         private static int _firstInitialization = 1;
+        private static int _firstNonNativePartsInitialization = 1;
 
         /// <summary>
         /// Gets the CLSID for the Datadog .NET profiler
@@ -138,6 +138,21 @@ namespace Datadog.Trace.ClrProfiler
                 Log.Error(ex, ex.Message);
             }
 
+            InitializeNoNativeParts();
+
+            Log.Debug("Initialization finished.");
+        }
+
+        internal static void InitializeNoNativeParts()
+        {
+            if (Interlocked.Exchange(ref _firstNonNativePartsInitialization, 0) != 1)
+            {
+                // InitializeNoNativeParts() was already called before
+                return;
+            }
+
+            Log.Debug("Initialization of non native parts started.");
+
             try
             {
                 var asm = typeof(Instrumentation).Assembly;
@@ -160,16 +175,6 @@ namespace Datadog.Trace.ClrProfiler
                     Log.Debug("Initializing tracer singleton instance.");
                     _ = Tracer.Instance;
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, ex.Message);
-            }
-
-            try
-            {
-                Log.Debug("Initializing security singleton instance.");
-                _ = Security.Instance;
             }
             catch (Exception ex)
             {
@@ -239,7 +244,7 @@ namespace Datadog.Trace.ClrProfiler
                 }
             }
 
-            Log.Debug("Initialization finished.");
+            Log.Debug("Initialization of non native parts finished.");
         }
 
 #if !NETFRAMEWORK
