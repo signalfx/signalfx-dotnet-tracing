@@ -105,8 +105,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             return logRecord.Body.StringValue.Contains(
                 "\tat System.Threading.Thread.Sleep(System.TimeSpan)\n" +
                 "\tat My.Custom.Test.Namespace.ClassD`1.GenericMethodDFromGenericClass(!0, !!0)\n" +
-                "\tat SharedGenericFunction.GenericMethodCFromGenericClass(!0)\n" +
-                "\tat TripleInternalClassB.MethodB(System.String)\n" +
+                "\tat My.Custom.Test.Namespace.GenericClassC`1.GenericMethodCFromGenericClass(!0)\n" +
+                "\tat My.Custom.Test.Namespace.ClassA.InternalClassB.DoubleInternalClassB.TripleInternalClassB.MethodB(System.String)\n" +
                 "\tat My.Custom.Test.Namespace.ClassA.<MethodAOthers>g__Action|4_0(System.String)\n" +
                 "\tat My.Custom.Test.Namespace.ClassA.MethodAOthers(System.String, System.Object, My.Custom.Test.Namespace.CustomClass, My.Custom.Test.Namespace.CustomStruct, My.Custom.Test.Namespace.CustomClass[], My.Custom.Test.Namespace.CustomStruct[], System.Collections.Generic.List`1[!!0])\n" +
                 "\tat My.Custom.Test.Namespace.ClassA.MethodAFloats(System.Single, System.Double)\n" +
