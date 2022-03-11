@@ -319,6 +319,8 @@ private:
 
         if (function_info.type.parent_type != nullptr)
         {
+            // parent class is available only for internal classes.
+            // See the class in the test application:  My.Custom.Test.Namespace.ClassA.InternalClassB.DoubleInternalClassB.TripleInternalClassB
             std::shared_ptr<TypeInfo> parent_type = function_info.type.parent_type;
             WSTRING prefix = parent_type->name;
             while (parent_type->parent_type != nullptr)
