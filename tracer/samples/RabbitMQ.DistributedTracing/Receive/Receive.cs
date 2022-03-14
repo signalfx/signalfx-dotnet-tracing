@@ -1,5 +1,6 @@
-﻿// Modified by Splunk Inc.using Datadog.Trace;
+﻿// Modified by Splunk Inc.
 
+using Datadog.Trace;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
