@@ -52,6 +52,22 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch
             }
         }
 
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] ElasticsearchTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(InstrumentationTagsProperties,
+                new Datadog.Trace.Tagging.Property<ElasticsearchTags, string?>("span.kind", t => t.SpanKind),
+                new Datadog.Trace.Tagging.Property<ElasticsearchTags, string?>("component", t => t.InstrumentationName),
+                new Datadog.Trace.Tagging.Property<ElasticsearchTags, string?>("db.system", t => t.DbType),
+                new Datadog.Trace.Tagging.Property<ElasticsearchTags, string?>("elasticsearch.action", t => t.Action),
+                new Datadog.Trace.Tagging.Property<ElasticsearchTags, string?>("db.operation", t => t.Method),
+                new Datadog.Trace.Tagging.Property<ElasticsearchTags, string?>("elasticsearch.url", t => t.Url),
+                new Datadog.Trace.Tagging.Property<ElasticsearchTags, string?>("db.statement", t => t.DbStatement)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return ElasticsearchTagsProperties;
+        }
+
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
         {
             var count = 0;
@@ -70,7 +86,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch
             if (DbType != null)
             {
                 count++;
-                WriteTag(ref bytes, ref offset, DbTypeBytes, DbType);
+                WriteTag(ref bytes, ref offset, DbTypeBytes, DbType, tagProcessors);
             }
 
             if (Action != null)
@@ -89,6 +105,12 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Elasticsearch
             {
                 count++;
                 WriteTag(ref bytes, ref offset, UrlBytes, Url, tagProcessors);
+            }
+
+            if (DbStatement != null)
+            {
+                count++;
+                WriteTag(ref bytes, ref offset, DbStatementBytes, DbStatement, tagProcessors);
             }
 
             return count + base.WriteAdditionalTags(ref bytes, ref offset, tagProcessors);

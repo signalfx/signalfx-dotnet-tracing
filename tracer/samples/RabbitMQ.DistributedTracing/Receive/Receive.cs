@@ -1,4 +1,5 @@
-﻿using Datadog.Trace;
+﻿// Modified by Splunk Inc.using Datadog.Trace;
+
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
@@ -38,19 +39,19 @@ namespace Receive
                         SamplingPriority? samplingPriority = null;
 
                         // Parse parentId header
-                        if (headers?[HttpHeaderNames.ParentId] is byte[] parentSpanIdBytes)
+                        if (headers?["parent-id"] is byte[] parentSpanIdBytes)
                         {
                             parentSpanId = BitConverter.ToUInt64(parentSpanIdBytes, 0);
                         }
 
                         // Parse traceId header
-                        if (headers?[HttpHeaderNames.TraceId] is byte[] traceIdBytes)
+                        if (headers?["trace-id"] is byte[] traceIdBytes)
                         {
                             traceId = BitConverter.ToUInt64(traceIdBytes, 0);
                         }
 
                         // Parse samplingPriority header
-                        if (headers?[HttpHeaderNames.SamplingPriority] is byte[] samplingPriorityBytes)
+                        if (headers?["sampling-priority"] is byte[] samplingPriorityBytes)
                         {
                             var samplingPriorityString = Encoding.UTF8.GetString(samplingPriorityBytes);
                             if (Enum.TryParse<SamplingPriority>(samplingPriorityString, out var result))

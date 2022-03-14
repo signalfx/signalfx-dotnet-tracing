@@ -19,7 +19,7 @@ namespace Datadog.Trace
     public class SpanContext : ISpanContext, IReadOnlyDictionary<string, string>
     {
         private static readonly string[] KeyNames =
-        { 
+        {
             Keys.TraceId,
             Keys.ParentId,
             Keys.SamplingPriority,
@@ -29,7 +29,7 @@ namespace Datadog.Trace
             "trace-id",
             "parent-id",
             "sampling-priority",
-            "origin" 
+            "origin"
         };
 
         /// <summary>

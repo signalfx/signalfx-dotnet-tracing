@@ -50,6 +50,21 @@ namespace Datadog.Trace.Tagging
             }
         }
 
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] MsmqTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(InstrumentationTagsProperties,
+                new Datadog.Trace.Tagging.Property<MsmqTags, string?>("msmq.command", t => t.Command),
+                new Datadog.Trace.Tagging.Property<MsmqTags, string?>("span.kind", t => t.SpanKind),
+                new Datadog.Trace.Tagging.Property<MsmqTags, string?>("component", t => t.InstrumentationName),
+                new Datadog.Trace.Tagging.Property<MsmqTags, string?>("msmq.queue.path", t => t.Path),
+                new Datadog.Trace.Tagging.Property<MsmqTags, string?>("msmq.message.transactional", t => t.MessageWithTransaction),
+                new Datadog.Trace.Tagging.Property<MsmqTags, string?>("msmq.queue.transactional", t => t.IsTransactionalQueue)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return MsmqTagsProperties;
+        }
+
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
         {
             var count = 0;

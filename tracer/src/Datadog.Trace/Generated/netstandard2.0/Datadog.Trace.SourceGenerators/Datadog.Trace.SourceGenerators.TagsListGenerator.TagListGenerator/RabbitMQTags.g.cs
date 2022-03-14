@@ -58,6 +58,22 @@ namespace Datadog.Trace.Tagging
             }
         }
 
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] RabbitMQTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(MessagingTagsProperties,
+                new Datadog.Trace.Tagging.Property<RabbitMQTags, string?>("span.kind", t => t.SpanKind),
+                new Datadog.Trace.Tagging.Property<RabbitMQTags, string?>("component", t => t.InstrumentationName),
+                new Datadog.Trace.Tagging.Property<RabbitMQTags, string?>("amqp.command", t => t.Command),
+                new Datadog.Trace.Tagging.Property<RabbitMQTags, string?>("amqp.delivery_mode", t => t.DeliveryMode),
+                new Datadog.Trace.Tagging.Property<RabbitMQTags, string?>("amqp.exchange", t => t.Exchange),
+                new Datadog.Trace.Tagging.Property<RabbitMQTags, string?>("messaging.rabbitmq.routing_key", t => t.RoutingKey),
+                new Datadog.Trace.Tagging.Property<RabbitMQTags, string?>("amqp.queue", t => t.Queue)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return RabbitMQTagsProperties;
+        }
+
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
         {
             var count = 0;
@@ -95,12 +111,6 @@ namespace Datadog.Trace.Tagging
             {
                 count++;
                 WriteTag(ref bytes, ref offset, RoutingKeyBytes, RoutingKey, tagProcessors);
-            }
-
-            if (MessageSize != null)
-            {
-                count++;
-                WriteTag(ref bytes, ref offset, MessageSizeBytes, MessageSize, tagProcessors);
             }
 
             if (Queue != null)

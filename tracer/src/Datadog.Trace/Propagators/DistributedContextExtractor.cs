@@ -21,8 +21,15 @@ namespace Datadog.Trace.Propagators
                 return false;
             }
 
-            var traceId = ParseUtility.ParseUInt64(carrier, carrierGetter, SpanContext.Keys.TraceId);
-            if (traceId is null or 0)
+            var traceIdAsUint64 = ParseUtility.ParseUInt64(carrier, carrierGetter, SpanContext.Keys.TraceId);
+            if (traceIdAsUint64 == null)
+            {
+                // a valid traceId is required to use distributed tracing
+                return false;
+            }
+
+            var traceId = TraceId.CreateFromUlong(traceIdAsUint64.Value);
+            if (traceId == TraceId.Zero)
             {
                 // a valid traceId is required to use distributed tracing
                 return false;

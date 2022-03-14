@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #nullable enable
 
 using System;
@@ -20,7 +22,7 @@ namespace Datadog.Trace.Propagators
         public void Inject<TCarrier, TCarrierSetter>(SpanContext context, TCarrier carrier, TCarrierSetter carrierSetter)
             where TCarrierSetter : struct, ICarrierSetter<TCarrier>
         {
-            var traceId = IsValidTraceId(context.RawTraceId) ? context.RawTraceId : context.TraceId.ToString("x32");
+            var traceId = IsValidTraceId(context.RawTraceId) ? context.RawTraceId : context.TraceId.ToString();
             var spanId = IsValidSpanId(context.RawSpanId) ? context.RawSpanId : context.SpanId.ToString("x16");
             var sampled = context.SamplingPriority > 0 ? "01" : "00";
             carrierSetter.Set(carrier, TraceParent, $"00-{traceId}-{spanId}-{sampled}");
@@ -69,8 +71,8 @@ namespace Datadog.Trace.Propagators
 #if NETCOREAPP
                 var w3cTraceId = traceParent.AsSpan(3, 32);
                 var w3cSpanId = traceParent.AsSpan(36, 16);
-                var traceId = ParseUtility.ParseFromHexOrDefault(w3cTraceId.Slice(16));
-                if (traceId == 0)
+                var traceId = TraceId.CreateDataDogCompatibleFromDecimalString(w3cTraceId.Slice(16).ToString());
+                if (traceId == TraceId.Zero)
                 {
                     return false;
                 }
@@ -81,8 +83,8 @@ namespace Datadog.Trace.Propagators
 #else
                 var w3cTraceId = traceParent.Substring(3, 32);
                 var w3cSpanId = traceParent.Substring(36, 16);
-                var traceId = ParseUtility.ParseFromHexOrDefault(w3cTraceId.Substring(16));
-                if (traceId == 0)
+                var traceId = TraceId.CreateDataDogCompatibleFromDecimalString(w3cTraceId.Substring(16));
+                if (traceId == TraceId.Zero)
                 {
                     return false;
                 }

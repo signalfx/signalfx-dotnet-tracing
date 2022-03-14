@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using Datadog.Trace.Headers;
 using Datadog.Trace.Propagators;
@@ -33,9 +35,9 @@ namespace Datadog.Trace.Tests.Propagators
 
             Propagator.Inject(context, headers.Object);
 
-            headers.Verify(h => h.Set(HttpHeaderNames.TraceId, "123456789"), Times.Once());
-            headers.Verify(h => h.Set(HttpHeaderNames.ParentId, "987654321"), Times.Once());
-            headers.Verify(h => h.Set(HttpHeaderNames.SamplingPriority, "2"), Times.Once());
+            headers.Verify(h => h.Set("trace-id", "123456789"), Times.Once());
+            headers.Verify(h => h.Set("parent-id", "987654321"), Times.Once());
+            headers.Verify(h => h.Set("sampling-priority", "2"), Times.Once());
             headers.Verify(h => h.Set(B3ContextPropagator.TraceId, "00000000075bcd15"), Times.Once());
             headers.Verify(h => h.Set(B3ContextPropagator.SpanId, "000000003ade68b1"), Times.Once());
             headers.Verify(h => h.Set(B3ContextPropagator.Sampled, "1"), Times.Once());
@@ -57,9 +59,9 @@ namespace Datadog.Trace.Tests.Propagators
 
             Propagator.Inject(context, headers.Object, (carrier, name, value) => carrier.Set(name, value));
 
-            headers.Verify(h => h.Set(HttpHeaderNames.TraceId, "123456789"), Times.Once());
-            headers.Verify(h => h.Set(HttpHeaderNames.ParentId, "987654321"), Times.Once());
-            headers.Verify(h => h.Set(HttpHeaderNames.SamplingPriority, "2"), Times.Once());
+            headers.Verify(h => h.Set("trace-id", "123456789"), Times.Once());
+            headers.Verify(h => h.Set("parent-id", "987654321"), Times.Once());
+            headers.Verify(h => h.Set("sampling-priority", "2"), Times.Once());
             headers.Verify(h => h.Set(B3ContextPropagator.TraceId, "00000000075bcd15"), Times.Once());
             headers.Verify(h => h.Set(B3ContextPropagator.SpanId, "000000003ade68b1"), Times.Once());
             headers.Verify(h => h.Set(B3ContextPropagator.Sampled, "1"), Times.Once());
@@ -141,18 +143,18 @@ namespace Datadog.Trace.Tests.Propagators
         public void Extract_Datadog_IHeadersCollection()
         {
             var headers = new Mock<IHeadersCollection>();
-            headers.Setup(h => h.GetValues(HttpHeaderNames.TraceId))
+            headers.Setup(h => h.GetValues("trace-id"))
                    .Returns(new[] { "123456789" });
-            headers.Setup(h => h.GetValues(HttpHeaderNames.ParentId))
+            headers.Setup(h => h.GetValues("parent-id"))
                    .Returns(new[] { "987654321" });
-            headers.Setup(h => h.GetValues(HttpHeaderNames.SamplingPriority))
+            headers.Setup(h => h.GetValues("sampling-priority"))
                    .Returns(new[] { "1" });
 
             var result = Propagator.Extract(headers.Object);
 
-            headers.Verify(h => h.GetValues(HttpHeaderNames.TraceId), Times.Once());
-            headers.Verify(h => h.GetValues(HttpHeaderNames.ParentId), Times.Once());
-            headers.Verify(h => h.GetValues(HttpHeaderNames.SamplingPriority), Times.Once());
+            headers.Verify(h => h.GetValues("trace-id"), Times.Once());
+            headers.Verify(h => h.GetValues("parent-id"), Times.Once());
+            headers.Verify(h => h.GetValues("sampling-priority"), Times.Once());
             result.Should()
                   .BeEquivalentTo(
                        new SpanContextMock

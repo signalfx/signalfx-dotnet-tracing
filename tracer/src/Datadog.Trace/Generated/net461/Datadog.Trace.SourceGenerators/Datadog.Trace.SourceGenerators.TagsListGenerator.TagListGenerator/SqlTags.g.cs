@@ -53,6 +53,21 @@ namespace Datadog.Trace.Tagging
             }
         }
 
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] SqlTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(InstrumentationTagsProperties,
+                new Datadog.Trace.Tagging.Property<SqlTags, string?>("span.kind", t => t.SpanKind),
+                new Datadog.Trace.Tagging.Property<SqlTags, string?>("db.system", t => t.DbType),
+                new Datadog.Trace.Tagging.Property<SqlTags, string?>("component", t => t.InstrumentationName),
+                new Datadog.Trace.Tagging.Property<SqlTags, string?>("db.name", t => t.DbName),
+                new Datadog.Trace.Tagging.Property<SqlTags, string?>("db.user", t => t.DbUser),
+                new Datadog.Trace.Tagging.Property<SqlTags, string?>("net.peer.name", t => t.OutHost)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return SqlTagsProperties;
+        }
+
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
         {
             var count = 0;

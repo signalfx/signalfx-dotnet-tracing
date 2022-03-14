@@ -47,6 +47,21 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Redis
             }
         }
 
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] RedisTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(InstrumentationTagsProperties,
+                new Datadog.Trace.Tagging.Property<RedisTags, string?>("span.kind", t => t.SpanKind),
+                new Datadog.Trace.Tagging.Property<RedisTags, string?>("component", t => t.InstrumentationName),
+                new Datadog.Trace.Tagging.Property<RedisTags, string?>("db.system", t => t.DbType),
+                new Datadog.Trace.Tagging.Property<RedisTags, string?>("db.statement", t => t.RawCommand),
+                new Datadog.Trace.Tagging.Property<RedisTags, string?>("net.peer.name", t => t.Host),
+                new Datadog.Trace.Tagging.Property<RedisTags, string?>("net.peer.port", t => t.Port)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return RedisTagsProperties;
+        }
+
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
         {
             var count = 0;
@@ -65,7 +80,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Redis
             if (DbType != null)
             {
                 count++;
-                WriteTag(ref bytes, ref offset, DbTypeBytes, DbType);
+                WriteTag(ref bytes, ref offset, DbTypeBytes, DbType, tagProcessors);
             }
 
             if (RawCommand != null)

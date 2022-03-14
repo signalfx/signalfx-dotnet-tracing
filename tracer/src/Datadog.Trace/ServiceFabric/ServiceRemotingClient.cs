@@ -70,7 +70,7 @@ namespace Datadog.Trace.ServiceFabric
                         tracer.TracerManager.Propagator.Inject(
                             span.Context,
                             messageHeaders,
-                            default(ServiceRemotingRequestMessageHeaderSetter));
+                            (carrier, key, value) => carrier.TryAddHeader(key, value));
                     }
                 }
                 catch (Exception ex)

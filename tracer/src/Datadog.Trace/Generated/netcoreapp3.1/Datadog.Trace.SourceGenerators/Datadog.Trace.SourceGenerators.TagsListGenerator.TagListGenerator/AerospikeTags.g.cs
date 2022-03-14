@@ -52,6 +52,22 @@ namespace Datadog.Trace.Tagging
             }
         }
 
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] AerospikeTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(InstrumentationTagsProperties,
+                new Datadog.Trace.Tagging.Property<AerospikeTags, string?>("span.kind", t => t.SpanKind),
+                new Datadog.Trace.Tagging.Property<AerospikeTags, string?>("component", t => t.InstrumentationName),
+                new Datadog.Trace.Tagging.Property<AerospikeTags, string?>("db.system", t => t.DbType),
+                new Datadog.Trace.Tagging.Property<AerospikeTags, string?>("db.aerospike.key", t => t.Key),
+                new Datadog.Trace.Tagging.Property<AerospikeTags, string?>("db.aerospike.namespace", t => t.Namespace),
+                new Datadog.Trace.Tagging.Property<AerospikeTags, string?>("db.aerospike.setname", t => t.SetName),
+                new Datadog.Trace.Tagging.Property<AerospikeTags, string?>("db.aerospike.userkey", t => t.UserKey)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return AerospikeTagsProperties;
+        }
+
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
         {
             var count = 0;
@@ -70,7 +86,7 @@ namespace Datadog.Trace.Tagging
             if (DbType != null)
             {
                 count++;
-                WriteTag(ref bytes, ref offset, DbTypeBytes, DbType);
+                WriteTag(ref bytes, ref offset, DbTypeBytes, DbType, tagProcessors);
             }
 
             if (Key != null)

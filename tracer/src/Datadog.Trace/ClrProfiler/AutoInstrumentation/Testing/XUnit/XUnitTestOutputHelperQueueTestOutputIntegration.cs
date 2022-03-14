@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.ComponentModel;
 using System.Text;
@@ -94,11 +96,11 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Testing.XUnit
 
             private readonly struct Context
             {
-                public readonly ulong TraceId;
+                public readonly TraceId TraceId;
                 public readonly ulong SpanId;
                 public readonly string Origin;
 
-                public Context(ulong traceId, ulong spanId, string origin)
+                public Context(TraceId traceId, ulong spanId, string origin)
                 {
                     TraceId = traceId;
                     SpanId = spanId;

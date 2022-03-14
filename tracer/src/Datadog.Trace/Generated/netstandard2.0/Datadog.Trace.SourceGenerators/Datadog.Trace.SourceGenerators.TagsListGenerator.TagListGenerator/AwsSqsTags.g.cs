@@ -38,6 +38,18 @@ namespace Datadog.Trace.Tagging
             }
         }
 
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] AwsSqsTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(AwsSdkTagsProperties,
+                new Datadog.Trace.Tagging.Property<AwsSqsTags, string?>("aws.queue.name", t => t.QueueName),
+                new Datadog.Trace.Tagging.Property<AwsSqsTags, string?>("aws.queue.url", t => t.QueueUrl),
+                new Datadog.Trace.Tagging.Property<AwsSqsTags, string?>("span.kind", t => t.SpanKind)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return AwsSqsTagsProperties;
+        }
+
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
         {
             var count = 0;

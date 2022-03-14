@@ -14,8 +14,5 @@ namespace Datadog.Trace.Tagging
         string Key { get; }
 
         Func<ITags, TResult> Getter { get; }
-        string[] GetLocalMachineValueNames(string key);
-
-        string? GetLocalMachineValue(string key);
     }
 }

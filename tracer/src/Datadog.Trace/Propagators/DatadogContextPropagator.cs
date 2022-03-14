@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #nullable enable
 
 using System.Globalization;
@@ -16,12 +18,12 @@ namespace Datadog.Trace.Propagators
         {
             var invariantCulture = CultureInfo.InvariantCulture;
 
-            carrierSetter.Set(carrier, HttpHeaderNames.TraceId, context.TraceId.ToString(invariantCulture));
-            carrierSetter.Set(carrier, HttpHeaderNames.ParentId, context.SpanId.ToString(invariantCulture));
+            carrierSetter.Set(carrier, "trace-id", context.TraceId.ToString());
+            carrierSetter.Set(carrier, "parent-id", context.SpanId.ToString(invariantCulture));
 
             if (context.Origin != null)
             {
-                carrierSetter.Set(carrier, HttpHeaderNames.Origin, context.Origin);
+                carrierSetter.Set(carrier, "origin", context.Origin);
             }
 
             var samplingPriority = context.TraceContext?.SamplingPriority ?? context.SamplingPriority;
@@ -30,7 +32,7 @@ namespace Datadog.Trace.Propagators
 #pragma warning disable SA1118 // Parameter should not span multiple lines
                 carrierSetter.Set(
                     carrier,
-                    HttpHeaderNames.SamplingPriority,
+                    "sampling-priority",
                     samplingPriority.Value switch
                     {
                         -1 => "-1",
@@ -48,16 +50,23 @@ namespace Datadog.Trace.Propagators
         {
             spanContext = null;
 
-            var traceId = ParseUtility.ParseUInt64(carrier, carrierGetter, HttpHeaderNames.TraceId);
-            if (traceId is null or 0)
+            var traceIdAsUint64 = ParseUtility.ParseUInt64(carrier, carrierGetter, "trace-id");
+            if (traceIdAsUint64 == null)
             {
                 // a valid traceId is required to use distributed tracing
                 return false;
             }
 
-            var parentId = ParseUtility.ParseUInt64(carrier, carrierGetter, HttpHeaderNames.ParentId) ?? 0;
-            var samplingPriority = ParseUtility.ParseInt32(carrier, carrierGetter, HttpHeaderNames.SamplingPriority);
-            var origin = ParseUtility.ParseString(carrier, carrierGetter, HttpHeaderNames.Origin);
+            var traceId = TraceId.CreateFromUlong(traceIdAsUint64.Value);
+            if (traceId == TraceId.Zero)
+            {
+                // a valid traceId is required to use distributed tracing
+                return false;
+            }
+
+            var parentId = ParseUtility.ParseUInt64(carrier, carrierGetter, "parent-id") ?? 0;
+            var samplingPriority = ParseUtility.ParseInt32(carrier, carrierGetter, "sampling-priority");
+            var origin = ParseUtility.ParseString(carrier, carrierGetter, "origin");
 
             spanContext = new SpanContext(traceId, parentId, samplingPriority, serviceName: null, origin);
             return true;

@@ -53,6 +53,21 @@ namespace Datadog.Trace.Tagging
             }
         }
 
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] HttpTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(InstrumentationTagsProperties,
+                new Datadog.Trace.Tagging.Property<HttpTags, string?>("span.kind", t => t.SpanKind),
+                new Datadog.Trace.Tagging.Property<HttpTags, string?>("component", t => t.InstrumentationName),
+                new Datadog.Trace.Tagging.Property<HttpTags, string?>("http.method", t => t.HttpMethod),
+                new Datadog.Trace.Tagging.Property<HttpTags, string?>("http.url", t => t.HttpUrl),
+                new Datadog.Trace.Tagging.Property<HttpTags, string?>("http-client-handler-type", t => t.HttpClientHandlerType),
+                new Datadog.Trace.Tagging.Property<HttpTags, string?>("http.status_code", t => t.HttpStatusCode)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return HttpTagsProperties;
+        }
+
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
         {
             var count = 0;

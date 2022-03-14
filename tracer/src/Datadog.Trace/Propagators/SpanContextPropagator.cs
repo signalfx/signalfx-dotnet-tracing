@@ -185,7 +185,7 @@ namespace Datadog.Trace.Propagators
                 var providedTagName = headerNameToTagName.Value;
 
                 string? headerValue;
-                if (string.Equals(headerName, HttpHeaderNames.UserAgent, StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(useragent))
+                if (string.Equals(headerName, "user-agent", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(useragent))
                 {
                     // A specific case for the user agent as it is splitted in .net framework web api.
                     headerValue = useragent;

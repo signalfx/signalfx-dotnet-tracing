@@ -55,6 +55,22 @@ namespace Datadog.Trace.Tagging
             }
         }
 
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] WebTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(InstrumentationTagsProperties,
+                new Datadog.Trace.Tagging.Property<WebTags, string?>("span.kind", t => t.SpanKind),
+                new Datadog.Trace.Tagging.Property<WebTags, string?>("http.method", t => t.HttpMethod),
+                new Datadog.Trace.Tagging.Property<WebTags, string?>("http.host", t => t.HttpRequestHeadersHost),
+                new Datadog.Trace.Tagging.Property<WebTags, string?>("http.url", t => t.HttpUrl),
+                new Datadog.Trace.Tagging.Property<WebTags, string?>("net.peer.ip", t => t.PeerIp),
+                new Datadog.Trace.Tagging.Property<WebTags, string?>("language", t => t.Language),
+                new Datadog.Trace.Tagging.Property<WebTags, string?>("http.status_code", t => t.HttpStatusCode)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return WebTagsProperties;
+        }
+
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
         {
             var count = 0;
@@ -85,7 +101,7 @@ namespace Datadog.Trace.Tagging
             if (PeerIp != null)
             {
                 count++;
-                WriteTag(ref bytes, ref offset, PeerIpBytes, PeerIp);
+                WriteTag(ref bytes, ref offset, PeerIpBytes, PeerIp, tagProcessors);
             }
 
             if (Language != null)

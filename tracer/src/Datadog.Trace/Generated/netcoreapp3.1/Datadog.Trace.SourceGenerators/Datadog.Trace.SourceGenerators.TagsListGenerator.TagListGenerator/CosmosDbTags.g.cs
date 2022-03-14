@@ -50,6 +50,21 @@ namespace Datadog.Trace.Tagging
             }
         }
 
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] CosmosDbTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(InstrumentationTagsProperties,
+                new Datadog.Trace.Tagging.Property<CosmosDbTags, string?>("span.kind", t => t.SpanKind),
+                new Datadog.Trace.Tagging.Property<CosmosDbTags, string?>("component", t => t.InstrumentationName),
+                new Datadog.Trace.Tagging.Property<CosmosDbTags, string?>("db.system", t => t.DbType),
+                new Datadog.Trace.Tagging.Property<CosmosDbTags, string?>("cosmosdb.container", t => t.ContainerId),
+                new Datadog.Trace.Tagging.Property<CosmosDbTags, string?>("db.name", t => t.DatabaseId),
+                new Datadog.Trace.Tagging.Property<CosmosDbTags, string?>("net.peer.name", t => t.Host)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return CosmosDbTagsProperties;
+        }
+
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
         {
             var count = 0;

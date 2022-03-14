@@ -24,6 +24,8 @@ namespace Datadog.Trace.Ci
 {
     internal class CITracerManager : TracerManager, ILockedTracer
     {
+        private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<CITracerManager>();
+
         public CITracerManager(ImmutableTracerSettings settings, IAgentWriter agentWriter, ISampler sampler, IPropagator propagator, IScopeManager scopeManager, IDogStatsd statsd, RuntimeMetricsWriter runtimeMetricsWriter, ITraceIdConvention traceIdConvention, DirectLogSubmissionManager logSubmissionManager, ITelemetryController telemetry, string defaultServiceName)
             : base(settings, agentWriter, sampler, propagator, scopeManager, statsd, runtimeMetricsWriter, traceIdConvention, logSubmissionManager, telemetry, defaultServiceName, new Trace.Processors.ITraceProcessor[]
             {
@@ -33,8 +35,6 @@ namespace Datadog.Trace.Ci
             })
         {
         }
-
-        private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<CITracerManager>();
 
         private Span ProcessSpan(Span span)
         {

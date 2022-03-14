@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Processors;
@@ -76,13 +78,7 @@ namespace Datadog.Trace.Ci.Agent.MessagePack
             offset += MessagePackBinary.WriteStringBytes(ref bytes, offset, _errorBytes);
             offset += MessagePackBinary.WriteByte(ref bytes, offset, (byte)(value.Error ? 1 : 0));
 
-            ITagProcessor[] tagProcessors = null;
-            if (value.Context.TraceContext?.Tracer is Tracer tracer)
-            {
-                tagProcessors = tracer.TracerManager?.TagProcessors;
-            }
-
-            offset += value.Tags.SerializeTo(ref bytes, offset, value, tagProcessors);
+            offset += value.Tags.SerializeTo(ref bytes, offset, value, Tracer.Instance.TracerManager.TagProcessors);
 
             return offset - originalOffset;
         }

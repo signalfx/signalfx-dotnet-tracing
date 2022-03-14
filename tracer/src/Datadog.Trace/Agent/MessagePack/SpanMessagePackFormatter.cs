@@ -96,13 +96,7 @@ namespace Datadog.Trace.Agent.MessagePack
                 offset += MessagePackBinary.WriteByte(ref bytes, offset, 1);
             }
 
-            ITagProcessor[] tagProcessors = null;
-            if (value.Context.TraceContext?.Tracer is Tracer tracer)
-            {
-                tagProcessors = tracer.TracerManager?.TagProcessors;
-            }
-
-            offset += value.Tags.SerializeTo(ref bytes, offset, value, tagProcessors);
+            offset += value.Tags.SerializeTo(ref bytes, offset, value, Tracer.Instance.TracerManager.TagProcessors);
 
             return offset - originalOffset;
         }

@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #nullable enable
 
 using System;
@@ -20,7 +22,7 @@ namespace Datadog.Trace.Propagators
         public void Inject<TCarrier, TCarrierSetter>(SpanContext context, TCarrier carrier, TCarrierSetter carrierSetter)
             where TCarrierSetter : struct, ICarrierSetter<TCarrier>
         {
-            var traceId = IsValidTraceId(context.RawTraceId) ? context.RawTraceId : context.TraceId.ToString("x16");
+            var traceId = IsValidTraceId(context.RawTraceId) ? context.RawTraceId : context.TraceId.ToString();
             var spanId = IsValidSpanId(context.RawSpanId) ? context.RawSpanId : context.SpanId.ToString("x16");
             var sampled = context.SamplingPriority > 0 ? "1" : "0";
             carrierSetter.Set(carrier, B3, $"{traceId}-{spanId}-{sampled}");
@@ -70,8 +72,8 @@ namespace Datadog.Trace.Propagators
                 }
 
                 var traceId = rawTraceId.Length == 32 ?
-                                  ParseUtility.ParseFromHexOrDefault(rawTraceId.Slice(16)) :
-                                  ParseUtility.ParseFromHexOrDefault(rawTraceId);
+                                  TraceId.CreateDataDogCompatibleFromDecimalString(rawTraceId.Slice(16).ToString()) :
+                                  TraceId.CreateFromString(rawTraceId.ToString());
                 var parentId = ParseUtility.ParseFromHexOrDefault(rawSpanId);
                 var samplingPriority = rawSampled == '1' ? 1 : 0;
 
@@ -100,8 +102,8 @@ namespace Datadog.Trace.Propagators
                 }
 
                 var traceId = rawTraceId.Length == 32 ?
-                                  ParseUtility.ParseFromHexOrDefault(rawTraceId.Substring(16)) :
-                                  ParseUtility.ParseFromHexOrDefault(rawTraceId);
+                                  TraceId.CreateDataDogCompatibleFromDecimalString(rawTraceId.Substring(16)) :
+                                  TraceId.CreateFromString(rawTraceId);
                 var parentId = ParseUtility.ParseFromHexOrDefault(rawSpanId);
                 var samplingPriority = rawSampled == '1' ? 1 : 0;
 

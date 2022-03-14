@@ -49,6 +49,19 @@ namespace Datadog.Trace.Tagging
             }
         }
 
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] CommonTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(TagsListProperties,
+                new Datadog.Trace.Tagging.Property<CommonTags, string?>("deployment.environment", t => t.Environment),
+                new Datadog.Trace.Tagging.Property<CommonTags, string?>("version", t => t.Version),
+                new Datadog.Trace.Tagging.Property<CommonTags, string?>("signalfx.tracing.version", t => t.SignalFxVersion),
+                new Datadog.Trace.Tagging.Property<CommonTags, string?>("signalfx.tracing.library", t => t.SignalFxLibrary)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return CommonTagsProperties;
+        }
+
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
         {
             var count = 0;
@@ -62,6 +75,18 @@ namespace Datadog.Trace.Tagging
             {
                 count++;
                 WriteTag(ref bytes, ref offset, VersionBytes, Version, tagProcessors);
+            }
+
+            if (SignalFxVersion != null)
+            {
+                count++;
+                WriteTag(ref bytes, ref offset, SignalFxVersionBytes, SignalFxVersion, tagProcessors);
+            }
+
+            if (SignalFxLibrary != null)
+            {
+                count++;
+                WriteTag(ref bytes, ref offset, SignalFxLibraryBytes, SignalFxLibrary, tagProcessors);
             }
 
             return count + base.WriteAdditionalTags(ref bytes, ref offset, tagProcessors);

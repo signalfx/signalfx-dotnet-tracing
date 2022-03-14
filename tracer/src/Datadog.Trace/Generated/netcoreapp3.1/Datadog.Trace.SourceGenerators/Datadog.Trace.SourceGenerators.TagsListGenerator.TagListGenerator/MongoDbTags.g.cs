@@ -65,6 +65,24 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
             }
         }
 
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] MongoDbTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(InstrumentationTagsProperties,
+                new Datadog.Trace.Tagging.Property<MongoDbTags, string?>("span.kind", t => t.SpanKind),
+                new Datadog.Trace.Tagging.Property<MongoDbTags, string?>("component", t => t.InstrumentationName),
+                new Datadog.Trace.Tagging.Property<MongoDbTags, string?>("db.system", t => t.DbType),
+                new Datadog.Trace.Tagging.Property<MongoDbTags, string?>("db.statement", t => t.DbStatement),
+                new Datadog.Trace.Tagging.Property<MongoDbTags, string?>("db.name", t => t.DbName),
+                new Datadog.Trace.Tagging.Property<MongoDbTags, string?>("mongodb.query", t => t.Query),
+                new Datadog.Trace.Tagging.Property<MongoDbTags, string?>("mongodb.collection", t => t.Collection),
+                new Datadog.Trace.Tagging.Property<MongoDbTags, string?>("net.peer.name", t => t.Host),
+                new Datadog.Trace.Tagging.Property<MongoDbTags, string?>("net.peer.port", t => t.Port)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return MongoDbTagsProperties;
+        }
+
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
         {
             var count = 0;
@@ -83,13 +101,13 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.MongoDb
             if (DbType != null)
             {
                 count++;
-                WriteTag(ref bytes, ref offset, DbTypeBytes, DbType);
+                WriteTag(ref bytes, ref offset, DbTypeBytes, DbType, tagProcessors);
             }
 
             if (DbStatement != null)
             {
                 count++;
-                WriteTag(ref bytes, ref offset, DbStatementBytes, DbStatement);
+                WriteTag(ref bytes, ref offset, DbStatementBytes, DbStatement, tagProcessors);
             }
 
             if (DbName != null)

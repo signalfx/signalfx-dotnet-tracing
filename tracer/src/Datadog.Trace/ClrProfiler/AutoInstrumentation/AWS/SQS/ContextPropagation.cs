@@ -7,7 +7,6 @@
 
 using System.Collections;
 using System.Text;
-using Datadog.Trace.Propagators;
 
 namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AWS.SQS
 {

@@ -1,4 +1,5 @@
-using System;
+// Modified by Splunk Inc.using System;
+
 using System.Diagnostics;
 using System.Net.Http;
 using System.Text;
@@ -16,9 +17,9 @@ namespace Samples.VersionConflict_2x
             
             server.RequestHandler = context =>
             {
-                var traceId = context.Request.Headers[HttpHeaderNames.TraceId];
-                var spanId = context.Request.Headers[HttpHeaderNames.ParentId];
-                var samplingPriority = context.Request.Headers[HttpHeaderNames.SamplingPriority];
+                var traceId = context.Request.Headers["trace-id"];
+                var spanId = context.Request.Headers["parent-id"];
+                var samplingPriority = context.Request.Headers["sampling-priority"];
 
                 Console.WriteLine($"{traceId}/{spanId}/{samplingPriority}");
 

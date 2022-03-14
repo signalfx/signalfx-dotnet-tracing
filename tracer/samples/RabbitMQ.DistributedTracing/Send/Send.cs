@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Modified by Splunk Inc.
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
@@ -42,9 +44,9 @@ namespace Send
                         //  - "x-datadog-trace-id": "<trace_id>"
                         //  - "x-datadog-parent-id": "<span_id>"
                         //  - "x-datadog-sampling-priority": "<sampling_priority>"
-                        properties.Headers.Add(HttpHeaderNames.TraceId, BitConverter.GetBytes(traceId));
-                        properties.Headers.Add(HttpHeaderNames.ParentId, BitConverter.GetBytes(spanId));
-                        properties.Headers.Add(HttpHeaderNames.SamplingPriority, Encoding.UTF8.GetBytes(samplingPriority));
+                        properties.Headers.Add("trace-id", BitConverter.GetBytes(traceId));
+                        properties.Headers.Add("parent-id", BitConverter.GetBytes(spanId));
+                        properties.Headers.Add("sampling-priority", Encoding.UTF8.GetBytes(samplingPriority));
 
                         // Publish message
                         channel.BasicPublish(exchange: "",
@@ -54,9 +56,9 @@ namespace Send
 
                         // Log message and properties to screen
                         Console.WriteLine(" [x] Sent {0}", message);
-                        Console.WriteLine("     {0}:{1}", HttpHeaderNames.TraceId, traceId);
-                        Console.WriteLine("     {0}:{1}", HttpHeaderNames.ParentId, spanId);
-                        Console.WriteLine("     {0}:{1}", HttpHeaderNames.SamplingPriority, samplingPriority);
+                        Console.WriteLine("     {0}:{1}", "trace-id", traceId);
+                        Console.WriteLine("     {0}:{1}", "parent-id", spanId);
+                        Console.WriteLine("     {0}:{1}", "sampling-priority", samplingPriority);
 
                         // Set Datadog tags
                         var span = scope.Span;

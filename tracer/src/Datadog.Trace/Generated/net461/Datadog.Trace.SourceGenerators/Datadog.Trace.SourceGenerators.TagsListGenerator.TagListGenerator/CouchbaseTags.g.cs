@@ -55,6 +55,22 @@ namespace Datadog.Trace.Tagging
             }
         }
 
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] CouchbaseTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(InstrumentationTagsProperties,
+                new Datadog.Trace.Tagging.Property<CouchbaseTags, string?>("span.kind", t => t.SpanKind),
+                new Datadog.Trace.Tagging.Property<CouchbaseTags, string?>("component", t => t.InstrumentationName),
+                new Datadog.Trace.Tagging.Property<CouchbaseTags, string?>("couchbase.operation.code", t => t.OperationCode),
+                new Datadog.Trace.Tagging.Property<CouchbaseTags, string?>("couchbase.operation.bucket", t => t.Bucket),
+                new Datadog.Trace.Tagging.Property<CouchbaseTags, string?>("couchbase.operation.key", t => t.Key),
+                new Datadog.Trace.Tagging.Property<CouchbaseTags, string?>("net.peer.name", t => t.Host),
+                new Datadog.Trace.Tagging.Property<CouchbaseTags, string?>("net.peer.port", t => t.Port)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return CouchbaseTagsProperties;
+        }
+
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
         {
             var count = 0;

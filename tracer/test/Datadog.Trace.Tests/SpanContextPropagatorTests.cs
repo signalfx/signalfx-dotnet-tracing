@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
@@ -25,10 +27,10 @@ namespace Datadog.Trace.Tests
 
         private static readonly KeyValuePair<string, string>[] DefaultHeaderValues =
         {
-            new(HttpHeaderNames.TraceId, TraceId.ToString(InvariantCulture)),
-            new(HttpHeaderNames.ParentId, SpanId.ToString(InvariantCulture)),
-            new(HttpHeaderNames.SamplingPriority, SamplingPriority.ToString(InvariantCulture)),
-            new(HttpHeaderNames.Origin, Origin),
+            new("trace-id", TraceId.ToString(InvariantCulture)),
+            new("parent-id", SpanId.ToString(InvariantCulture)),
+            new("sampling-priority", SamplingPriority.ToString(InvariantCulture)),
+            new("origin", Origin),
         };
 
         public static TheoryData<string> GetInvalidIds() => new()
@@ -73,8 +75,8 @@ namespace Datadog.Trace.Tests
             SpanContextPropagator.Instance.Inject(context, headers.Object);
 
             // null values are not set, so only traceId and spanId (the first two in the list) should be set
-            headers.Verify(h => h.Set(HttpHeaderNames.TraceId, TraceId.ToString(InvariantCulture)), Times.Once());
-            headers.Verify(h => h.Set(HttpHeaderNames.ParentId, SpanId.ToString(InvariantCulture)), Times.Once());
+            headers.Verify(h => h.Set("trace-id", TraceId.ToString(InvariantCulture)), Times.Once());
+            headers.Verify(h => h.Set("parent-id", SpanId.ToString(InvariantCulture)), Times.Once());
             headers.VerifyNoOtherCalls();
         }
 
@@ -87,9 +89,9 @@ namespace Datadog.Trace.Tests
             SpanContextPropagator.Instance.Inject(context, headers.Object);
 
             // null values are not set, so only traceId and spanId (the first two in the list) should be set
-            headers.Verify(h => h.Set(HttpHeaderNames.TraceId, TraceId.ToString(InvariantCulture)), Times.Once());
-            headers.Verify(h => h.Set(HttpHeaderNames.ParentId, SpanId.ToString(InvariantCulture)), Times.Once());
-            headers.Verify(h => h.Set(HttpHeaderNames.SamplingPriority, "12"), Times.Once());
+            headers.Verify(h => h.Set("trace-id", TraceId.ToString(InvariantCulture)), Times.Once());
+            headers.Verify(h => h.Set("parent-id", SpanId.ToString(InvariantCulture)), Times.Once());
+            headers.Verify(h => h.Set("sampling-priority", "12"), Times.Once());
             headers.VerifyNoOtherCalls();
         }
 
@@ -166,7 +168,7 @@ namespace Datadog.Trace.Tests
             var headers = new Mock<IHeadersCollection>();
 
             // only setup TraceId, other properties remain null/empty
-            headers.Setup(h => h.GetValues(HttpHeaderNames.TraceId)).Returns(new[] { TraceId.ToString(InvariantCulture) });
+            headers.Setup(h => h.GetValues("trace-id")).Returns(new[] { TraceId.ToString(InvariantCulture) });
             var result = SpanContextPropagator.Instance.Extract(headers.Object);
 
             result.Should().BeEquivalentTo(new SpanContextMock { TraceId = TraceId });
@@ -202,7 +204,7 @@ namespace Datadog.Trace.Tests
             var headers = SetupMockHeadersCollection();
 
             // replace TraceId setup
-            headers.Setup(h => h.GetValues(HttpHeaderNames.TraceId)).Returns(new[] { traceId });
+            headers.Setup(h => h.GetValues("trace-id")).Returns(new[] { traceId });
 
             var result = SpanContextPropagator.Instance.Extract(headers.Object);
 
@@ -217,7 +219,7 @@ namespace Datadog.Trace.Tests
             var headers = SetupMockHeadersCollection();
 
             // replace ParentId setup
-            headers.Setup(h => h.GetValues(HttpHeaderNames.ParentId)).Returns(new[] { spanId });
+            headers.Setup(h => h.GetValues("parent-id")).Returns(new[] { spanId });
 
             var result = SpanContextPropagator.Instance.Extract(headers.Object);
 
@@ -247,7 +249,7 @@ namespace Datadog.Trace.Tests
             var headers = SetupMockHeadersCollection();
 
             // replace SamplingPriority setup
-            headers.Setup(h => h.GetValues(HttpHeaderNames.SamplingPriority)).Returns(new[] { samplingPriority });
+            headers.Setup(h => h.GetValues("sampling-priority")).Returns(new[] { samplingPriority });
 
             object result = SpanContextPropagator.Instance.Extract(headers.Object);
 
