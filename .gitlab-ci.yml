@@ -51,9 +51,9 @@ linux-build:
 verify-artifacts:
   stage: verify
   before_script:
-    - apk update && apk add curl unzip
+    - apt-get update && apt-get install -y --fix-missing curl unzip
   script:
-    - mkdir /project/tracer/bin/artifacts/temp
+    - mkdir -p /project/tracer/bin/artifacts/temp
     - cd /project/tracer/bin/artifacts/temp
     - 'curl --location --output artifacts.zip "https://cd.splunkdev.com/o11y-gdi/dotnet-maintainers/signalfx-dotnet-tracing-releaser/-/jobs/$CI_JOB_ID/artifacts/download?job_token=$CI_JOB_TOKEN"'
     - unzip artifacts.zip
