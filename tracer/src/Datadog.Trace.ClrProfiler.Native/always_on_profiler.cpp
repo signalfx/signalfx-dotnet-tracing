@@ -300,7 +300,7 @@ private:
         }
 
         ComPtr<IMetaDataImport2> pIMDImport;
-        hr = info10->GetModuleMetaData(moduleId, ofRead, IID_IMetaDataImport, reinterpret_cast<IUnknown**>(&pIMDImport));
+        hr = info10->GetModuleMetaData(moduleId, ofRead, IID_IMetaDataImport2, reinterpret_cast<IUnknown**>(&pIMDImport));
         if (FAILED(hr))
         {
             Logger::Debug("GetModuleMetaData failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
