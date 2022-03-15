@@ -81,9 +81,8 @@ namespace Datadog.Trace.ExtensionMethods
                 tags.HttpMethod = method;
                 tags.HttpRequestHeadersHost = host;
                 tags.HttpUrl = httpUrl;
+                tags.PeerIp = remoteIp;
             }
-
-            tags.PeerIp = remoteIp;
 
             foreach (KeyValuePair<string, string> kvp in tagsFromHeaders)
             {

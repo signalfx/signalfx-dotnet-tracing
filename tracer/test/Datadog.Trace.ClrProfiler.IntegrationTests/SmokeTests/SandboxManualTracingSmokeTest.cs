@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #if NET461
 using Xunit;
 using Xunit.Abstractions;
@@ -16,7 +18,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.SmokeTests
         {
         }
 
-        [SkippableFact(Skip="Splunk - determine minimal permissions for running autointrumentation in app domain")]
+        [SkippableFact(Skip = "Splunk - not supported")]
         [Trait("Category", "Smoke")]
         public void NoExceptions()
         {

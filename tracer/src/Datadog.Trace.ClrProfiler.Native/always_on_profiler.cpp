@@ -9,10 +9,7 @@
   #include <pthread.h>
 #endif
 
-constexpr auto max_func_name_len = 256UL;
-constexpr auto max_class_name_len = 512UL;
 constexpr auto max_string_length = 512UL;
-
 
 constexpr auto max_codes_per_buffer = 10 * 1000;
 
@@ -28,12 +25,11 @@ constexpr auto minimum_sample_period = 1000;
 // FIXME make configurable (hidden)?
 // These numbers were chosen to keep total overhead under 1 MB of RAM in typical cases (name lengths being the biggest
 // variable)
-constexpr auto max_function_name_cache_size = 6000;
-constexpr auto max_class_name_cache_size = 1000;
+constexpr auto max_function_name_cache_size = 7000;
 
 // If you squint you can make out that the original bones of this came from sample code provided by the dotnet project:
 // https://github.com/dotnet/samples/blob/2cf486af936261b04a438ea44779cdc26c613f98/core/profiling/stacksampling/src/sampler.cpp
-// That stacksampling project is worth reading for a simpler (though higher overhead) take on thread sampling.
+// That stack sampling project is worth reading for a simpler (though higher overhead) take on thread sampling.
 
 static std::mutex bufferLock = std::mutex();
 static std::vector<unsigned char>* bufferA;
@@ -44,7 +40,7 @@ static std::unordered_map<ThreadID, trace::ThreadSpanContext> threadSpanContextM
 
 static ICorProfilerInfo* profilerInfo; // After feature sets settle down, perhaps this should be refactored and have a single static instance of ThreadSampler
 
-// Dirt-simple backpressure system to save overhead if managed code is not reading fast enough
+// Dirt-simple back pressure system to save overhead if managed code is not reading fast enough
 bool ThreadSampling_ShouldProduceThreadSample()
 {
     std::lock_guard<std::mutex> guard(bufferLock);
@@ -136,44 +132,44 @@ ThreadSamplesBuffer ::~ThreadSamplesBuffer()
 
 #define CHECK_SAMPLES_BUFFER_LENGTH() {  if (buffer->size() >= samples_buffer_maximum_size) { return; } }
 
-void ThreadSamplesBuffer::StartBatch()
+void ThreadSamplesBuffer::StartBatch() const
 {
     CHECK_SAMPLES_BUFFER_LENGTH()
     writeByte(thread_samples_start_batch);
     writeInt(current_thread_samples_buffer_version);
     const auto ms =
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-    writeInt64((int64_t) ms.count());
+    writeUInt64(ms.count());
 }
 
-void ThreadSamplesBuffer::StartSample(ThreadID id, ThreadState* state, const ThreadSpanContext& context)
+void ThreadSamplesBuffer::StartSample(ThreadID id, const ThreadState* state, const ThreadSpanContext& spanContext) const
 {
     CHECK_SAMPLES_BUFFER_LENGTH()
     writeByte(thread_samples_start_sample);
-    writeInt(context.managedThreadId);
-    writeInt(state->nativeId);
+    writeInt(spanContext.managedThreadId);
+    writeInt(static_cast<int32_t>(state->nativeId));
     writeString(state->threadName);
-    writeInt64(context.traceIdHigh);
-    writeInt64(context.traceIdLow);
-    writeInt64(context.spanId);
+    writeUInt64(spanContext.traceIdHigh);
+    writeUInt64(spanContext.traceIdLow);
+    writeUInt64(spanContext.spanId);
     // Feature possibilities: (managed/native) thread priority, cpu/wait times, etc.
 }
-void ThreadSamplesBuffer::RecordFrame(FunctionID fid, shared::WSTRING& frame)
+void ThreadSamplesBuffer::RecordFrame(FunctionID fid, const shared::WSTRING& frame)
 {
     CHECK_SAMPLES_BUFFER_LENGTH()
     writeCodedFrameString(fid, frame);
 }
-void ThreadSamplesBuffer::EndSample()
+void ThreadSamplesBuffer::EndSample() const
 {
     CHECK_SAMPLES_BUFFER_LENGTH()
     writeShort(0);
 }
-void ThreadSamplesBuffer::EndBatch()
+void ThreadSamplesBuffer::EndBatch() const
 {
     CHECK_SAMPLES_BUFFER_LENGTH()
     writeByte(thread_samples_end_batch);
 }
-void ThreadSamplesBuffer::WriteFinalStats(const SamplingStatistics& stats)
+void ThreadSamplesBuffer::WriteFinalStats(const SamplingStatistics& stats) const
 {
     CHECK_SAMPLES_BUFFER_LENGTH()
     writeByte(thread_samples_final_stats);
@@ -183,12 +179,12 @@ void ThreadSamplesBuffer::WriteFinalStats(const SamplingStatistics& stats)
     writeInt(stats.nameCacheMisses);
 }
 
-void ThreadSamplesBuffer::writeCodedFrameString(FunctionID fid, shared::WSTRING& str)
+void ThreadSamplesBuffer::writeCodedFrameString(FunctionID fid, const shared::WSTRING& str)
 {
     const auto found = codes.find(fid);
     if (found != codes.end())
     {
-        writeShort(found->second);
+        writeShort(static_cast<int16_t>(found->second));
     }
     else
     {
@@ -197,23 +193,23 @@ void ThreadSamplesBuffer::writeCodedFrameString(FunctionID fid, shared::WSTRING&
         {
             codes[fid] = code;
         }
-        writeShort(-code); // note negative sign indicating definition of code
+        writeShort(static_cast<int16_t>(-code)); // note negative sign indicating definition of code
         writeString(str);
     }
 }
-void ThreadSamplesBuffer::writeShort(int16_t val)
+void ThreadSamplesBuffer::writeShort(int16_t val) const
 {
     buffer->push_back(((val >> 8) & 0xFF));
     buffer->push_back(val & 0xFF);
 }
-void ThreadSamplesBuffer::writeInt(int32_t val)
+void ThreadSamplesBuffer::writeInt(int32_t val) const
 {
     buffer->push_back(((val >> 24) & 0xFF));
     buffer->push_back(((val >> 16) & 0xFF));
     buffer->push_back(((val >> 8) & 0xFF));
     buffer->push_back(val & 0xFF);
 }
-void ThreadSamplesBuffer::writeString(const shared::WSTRING& str)
+void ThreadSamplesBuffer::writeString(const shared::WSTRING& str) const
 {
     // limit strings to a max length overall; this prevents (e.g.) thread names or
     // any other miscellaneous strings that come along from blowing things out
@@ -224,11 +220,11 @@ void ThreadSamplesBuffer::writeString(const shared::WSTRING& str)
     // possible endian-ness assumption here; unclear how the managed layer would decode on big endian platforms
     buffer->insert(buffer->end(), strBegin, strBegin + usedLen * 2);
 }
-void ThreadSamplesBuffer::writeByte(unsigned char b)
+void ThreadSamplesBuffer::writeByte(unsigned char b) const
 {
     buffer->push_back(b);
 }
-void ThreadSamplesBuffer::writeInt64(int64_t val)
+void ThreadSamplesBuffer::writeUInt64(uint64_t val) const
 {
     buffer->push_back(((val >> 56) & 0xFF));
     buffer->push_back(((val >> 48) & 0xFF));
@@ -246,13 +242,12 @@ public:
     // These are permanent parts of the helper object
     ICorProfilerInfo10* info10 = nullptr;
     NameCache functionNameCache;
-    NameCache classNameCache;
     // These cycle every sample and/or are owned externally
     ThreadSamplesBuffer* curWriter = nullptr;
     std::vector<unsigned char>* curBuffer = nullptr;
     SamplingStatistics stats;
 
-    SamplingHelper() : functionNameCache(max_function_name_cache_size), classNameCache(max_class_name_cache_size)
+    SamplingHelper() : functionNameCache(max_function_name_cache_size)
     {
     }
 
@@ -279,72 +274,15 @@ public:
     }
 
 private:
-    void GetClassName(ClassID classId, shared::WSTRING& result)
-    {
-        ModuleID modId;
-        mdTypeDef classToken;
-        ClassID parentClassID;
-
-        if (classId == 0)
-        {
-            Logger::Debug("Zero (0) classId passed to GetClassName");
-            result.append(WStr("Unknown"));
-            return;
-        }
-
-        HRESULT hr = info10->GetClassIDInfo2(classId, &modId, &classToken, &parentClassID, 0, nullptr, nullptr);
-        if (CORPROF_E_CLASSID_IS_ARRAY == hr)
-        {
-            // We have a ClassID of an array.
-            result.append(WStr("ArrayClass"));
-            return;
-        }
-        if (CORPROF_E_CLASSID_IS_COMPOSITE == hr)
-        {
-            // We have a composite class
-            result.append(WStr("CompositeClass"));
-            return;
-        }
-        if (CORPROF_E_DATAINCOMPLETE == hr)
-        {
-            Logger::Warn("Type loading is not yet complete; cannot decode ClassID");
-            result.append(WStr("DataIncomplete"));
-            return;
-        }
-        if (FAILED(hr))
-        {
-            Logger::Debug("GetClassIDInfo failed: ", hr);
-            result.append(WStr("Unknown"));
-            return;
-        }
-
-        ComPtr<IMetaDataImport> pMDImport;
-        hr = info10->GetModuleMetaData(modId, (ofRead | ofWrite), IID_IMetaDataImport, reinterpret_cast<IUnknown**>(&pMDImport));
-        if (FAILED(hr))
-        {
-            Logger::Debug("GetModuleMetaData failed: ", hr);
-            result.append(WStr("Unknown"));
-            return;
-        }
-
-        WCHAR wName[max_class_name_len];
-        DWORD dwTypeDefFlags = 0;
-        hr = pMDImport->GetTypeDefProps(classToken, wName, max_class_name_len, nullptr, &dwTypeDefFlags, nullptr);
-        if (FAILED(hr))
-        {
-            Logger::Debug("GetTypeDefProps failed: ", hr);
-            result.append(WStr("Unknown"));
-            return;
-        }
-
-        result.append(wName);
-    }
-
     void GetFunctionName(FunctionID funcID, const COR_PRF_FRAME_INFO frameInfo, shared::WSTRING& result)
     {
+        constexpr auto unknown_list_of_arguments = WStr("(unknown)");
+        constexpr auto unknown_function_name = WStr("Unknown(unknown)");
+        constexpr auto name_separator = WStr(".");
         if (funcID == 0)
         {
-            result.append(WStr("Unknown_Native_Function()"));
+            constexpr auto unknown_native_function_name = WStr("Unknown_Native_Function(unknown)");
+            result.append(unknown_native_function_name);
             return;
         }
 
@@ -357,52 +295,54 @@ private:
         if (FAILED(hr))
         {
             Logger::Debug("GetFunctionInfo2 failed: ", hr);
-            result.append(WStr("Unknown"));
+            result.append(unknown_function_name);
             return;
         }
 
         ComPtr<IMetaDataImport2> pIMDImport;
         hr = info10->GetModuleMetaData(moduleId, ofRead, IID_IMetaDataImport, reinterpret_cast<IUnknown**>(&pIMDImport));
-        if (FAILED(hr))
+         if (FAILED(hr))
         {
             Logger::Debug("GetModuleMetaData failed: ", hr);
-            result.append(WStr("Unknown"));
+            result.append(unknown_function_name);
             return;
         }
 
-        WCHAR funcName[max_func_name_len];
-        funcName[0] = '\0';
-        PCCOR_SIGNATURE pSig;
-        ULONG cbSig;
-        hr = pIMDImport->GetMethodProps(token, nullptr, funcName, max_func_name_len, nullptr, nullptr, &pSig, &cbSig, nullptr, nullptr);
-        if (FAILED(hr))
+        const auto function_info = GetFunctionInfo(pIMDImport, token);
+
+        if (!function_info.IsValid())
         {
-            Logger::Debug("GetMethodProps failed: ", hr);
-            result.append(WStr("Unknown"));
+            Logger::Debug("GetFunctionInfo failed: ", hr);
+            result.append(unknown_function_name);
             return;
         }
 
-        // If the ClassID returned from GetFunctionInfo is 0, then the function
-        // is a shared generic function.
-        if (classId != 0)
+        if (function_info.type.parent_type != nullptr)
         {
-            LookupClassName(classId, result);
-        }
-        else
-        {
-            result.append(WStr("SharedGenericFunction"));
+            // parent class is available only for internal classes.
+            // See the class in the test application:  My.Custom.Test.Namespace.ClassA.InternalClassB.DoubleInternalClassB.TripleInternalClassB
+            std::shared_ptr<TypeInfo> parent_type = function_info.type.parent_type;
+            shared::WSTRING prefix = parent_type->name;
+            while (parent_type->parent_type != nullptr)
+            {
+                prefix = parent_type->parent_type->name + name_separator + prefix;
+                parent_type = parent_type->parent_type;
+            }
+
+            result.append(prefix);
+            result.append(name_separator);
         }
 
-        result.append(WStr("."));
-
-        result.append(funcName);
+        result.append(function_info.type.name);
+        result.append(name_separator);
+        result.append(function_info.name);
 
         // try to list arguments type
-        auto function_method_signature = FunctionMethodSignature(pSig, cbSig);
+        FunctionMethodSignature function_method_signature = function_info.method_signature;
         hr = function_method_signature.TryParse();
         if (FAILED(hr))
         {
-            result.append(WStr("(unknown)"));
+            result.append(unknown_list_of_arguments);
             Logger::Debug("FunctionMethodSignature parsing failed: ", hr);
         }
         else
@@ -436,20 +376,6 @@ public:
         functionNameCache.put(fid, answer);
         return answer;
     }
-
-    void LookupClassName(ClassID cid, shared::WSTRING& result)
-    {
-        shared::WSTRING* answer = functionNameCache.get(cid);
-        if (answer != nullptr)
-        {
-            result.append(*answer);
-            return;
-        }
-        answer = new shared::WSTRING();
-        this->GetClassName(cid, *answer);
-        result.append(*answer);
-        functionNameCache.put(cid, answer);
-    }
 };
 
 HRESULT __stdcall FrameCallback(_In_ FunctionID funcId, _In_ UINT_PTR ip, _In_ COR_PRF_FRAME_INFO frameInfo,
@@ -457,7 +383,7 @@ HRESULT __stdcall FrameCallback(_In_ FunctionID funcId, _In_ UINT_PTR ip, _In_ C
 {
     const auto helper = static_cast<SamplingHelper*>(clientData);
     helper->stats.totalFrames++;
-    shared::WSTRING* name = helper->Lookup(funcId, frameInfo);
+    const shared::WSTRING* name = helper->Lookup(funcId, frameInfo);
     // This is where line numbers could be calculated
     helper->curWriter->RecordFrame(funcId, *name);
     return S_OK;
@@ -514,13 +440,13 @@ int GetSamplingPeriod()
     try
     {
 #ifdef _WIN32
-        const int ival = std::stoi(val);
+        const int parsedValue = std::stoi(val);
 #else
         std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
         std::string str = convert.to_bytes(val);
-        int ival = std::stoi(str);
+        int parsedValue = std::stoi(str);
 #endif
-        return (int) std::max(minimum_sample_period, ival);
+        return (int) std::max(minimum_sample_period, parsedValue);
     }
     catch (...)
     {
@@ -574,7 +500,7 @@ void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, Sa
     elapsed.QuadPart /= frequency.QuadPart;
     elapsedMicros = static_cast<int>(elapsed.QuadPart);
 #else
-    // FLoating around several places as "microsecond timer on linux c"
+    // Floating around several places as "microsecond timer on linux c"
     clock_gettime(CLOCK_MONOTONIC, &end);
     if ((end.tv_nsec - start.tv_nsec) < 0) {
         elapsed.tv_sec = end.tv_sec - start.tv_sec - 1;

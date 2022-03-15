@@ -78,15 +78,21 @@ namespace My.Custom.Test.Namespace
             CustomStruct[] structArray,
             List<T> genericList)
         {
-            void Action(string s) => InternalClassB.MethodB(s);
+            void Action(string s) => InternalClassB.DoubleInternalClassB.TripleInternalClassB.MethodB(s);
             Action("test arg");
         }
 
         internal static class InternalClassB
         {
-            public static void MethodB(string testArg)
+            internal static class DoubleInternalClassB
             {
-                GenericClassC<string>.GenericMethodCFromGenericClass(testArg);
+                internal static class TripleInternalClassB
+                {
+                    public static void MethodB(string testArg)
+                    {
+                        GenericClassC<string>.GenericMethodCFromGenericClass(testArg);
+                    }
+                }
             }
         }
     }

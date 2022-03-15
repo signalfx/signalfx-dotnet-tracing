@@ -67,7 +67,7 @@ class ThreadState
 public:
     DWORD nativeId;
     shared::WSTRING threadName;
-    ThreadState() : nativeId(0), threadName()
+    ThreadState() : nativeId(0)
     {
     }
     ThreadState(ThreadState const& other) : nativeId(other.nativeId), threadName(other.threadName)
@@ -80,7 +80,7 @@ class ThreadSampler
 public:
     void StartSampling(ICorProfilerInfo10* cor_profiler_info10);
     ICorProfilerInfo10* info10;
-    void ThreadCreated(ThreadID threadId);
+    static void ThreadCreated(ThreadID threadId);
     void ThreadDestroyed(ThreadID threadId);
     void ThreadAssignedToOSThread(ThreadID managedThreadId, DWORD osThreadId);
     void ThreadNameChanged(ThreadID threadId, ULONG cchName, WCHAR name[]);
@@ -97,20 +97,20 @@ public:
 
     ThreadSamplesBuffer(std::vector<unsigned char>* buf);
     ~ThreadSamplesBuffer();
-    void StartBatch();
-    void StartSample(ThreadID id, ThreadState* state, const ThreadSpanContext& spanContext);
-    void RecordFrame(FunctionID fid, shared::WSTRING& frame);
-    void EndSample();
-    void EndBatch();
-    void WriteFinalStats(const SamplingStatistics& stats);
+    void StartBatch() const;
+    void StartSample(ThreadID id, const ThreadState* state, const ThreadSpanContext& spanContext) const;
+    void RecordFrame(FunctionID fid, const shared::WSTRING& frame);
+    void EndSample() const;
+    void EndBatch() const;
+    void WriteFinalStats(const SamplingStatistics& stats) const;
 
 private:
-    void writeCodedFrameString(FunctionID fid, shared::WSTRING& str);
-    void writeShort(int16_t val);
-    void writeInt(int32_t val);
-    void writeString(const shared::WSTRING& str);
-    void writeByte(unsigned char b);
-    void writeInt64(int64_t val);
+    void writeCodedFrameString(FunctionID fid, const shared::WSTRING& str);
+    void writeShort(int16_t val) const;
+    void writeInt(int32_t val) const;
+    void writeString(const shared::WSTRING& str) const;
+    void writeByte(unsigned char b) const;
+    void writeUInt64(uint64_t val) const;
 };
 
 class NameCache
