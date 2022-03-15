@@ -294,16 +294,16 @@ private:
         HRESULT hr = info10->GetFunctionInfo2(funcID, frameInfo, &classId, &moduleId, &token, 0, nullptr, nullptr);
         if (FAILED(hr))
         {
-            Logger::Debug("GetFunctionInfo2 failed: ", hr);
+            Logger::Debug("GetFunctionInfo2 failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
             result.append(unknown_function_name);
             return;
         }
 
         ComPtr<IMetaDataImport2> pIMDImport;
         hr = info10->GetModuleMetaData(moduleId, ofRead, IID_IMetaDataImport, reinterpret_cast<IUnknown**>(&pIMDImport));
-         if (FAILED(hr))
+        if (FAILED(hr))
         {
-            Logger::Debug("GetModuleMetaData failed: ", hr);
+            Logger::Debug("GetModuleMetaData failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
             result.append(unknown_function_name);
             return;
         }
@@ -312,7 +312,7 @@ private:
 
         if (!function_info.IsValid())
         {
-            Logger::Debug("GetFunctionInfo failed: ", hr);
+            Logger::Debug("GetFunctionInfo failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
             result.append(unknown_function_name);
             return;
         }
@@ -343,7 +343,7 @@ private:
         if (FAILED(hr))
         {
             result.append(unknown_list_of_arguments);
-            Logger::Debug("FunctionMethodSignature parsing failed: ", hr);
+            Logger::Debug("FunctionMethodSignature parsing failed. HRESULT=0x", std::setfill('0'), std::setw(8),std::hex, hr);
         }
         else
         {
@@ -396,7 +396,7 @@ void CaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, SamplingHelpe
     HRESULT hr = info10->EnumThreads(&threadEnum);
     if (FAILED(hr))
     {
-        Logger::Debug("Could not EnumThreads: ", hr);
+        Logger::Debug("Could not EnumThreads. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
         return;
     }
     ThreadID threadID;
@@ -423,7 +423,7 @@ void CaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, SamplingHelpe
         HRESULT snapshotHr = info10->DoStackSnapshot(threadID, &FrameCallback, COR_PRF_SNAPSHOT_DEFAULT, &helper, nullptr, 0);
         if (FAILED(snapshotHr))
         {
-            Logger::Debug("DoStackSnapshot failed: ", snapshotHr);
+            Logger::Debug("DoStackSnapshot failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, snapshotHr);
         }
         helper.curWriter->EndSample();
     }
@@ -472,7 +472,7 @@ void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, Sa
     HRESULT hr = info10->SuspendRuntime();
     if (FAILED(hr))
     {
-        Logger::Warn("Could not suspend runtime to sample threads: ", hr);
+        Logger::Warn("Could not suspend runtime to sample threads. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
     }
     else
     {
@@ -489,7 +489,7 @@ void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, Sa
     hr = info10->ResumeRuntime();
     if (FAILED(hr))
     {
-        Logger::Error("Could not resume runtime? : ", hr);
+        Logger::Error("Could not resume runtime? HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
     }
 
     int elapsedMicros;
@@ -659,7 +659,7 @@ extern "C"
         ThreadID threadId;
         const HRESULT hr = profilerInfo->GetCurrentThreadID(&threadId);
         if (FAILED(hr)) {
-            trace::Logger::Debug("GetCurrentThreadID failed: ", hr);
+            trace::Logger::Debug("GetCurrentThreadID failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
             return;
         }
 
