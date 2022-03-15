@@ -66,7 +66,7 @@ class ThreadState
 {
 public:
     DWORD nativeId;
-    WSTRING threadName;
+    shared::WSTRING threadName;
     ThreadState() : nativeId(0), threadName()
     {
     }
@@ -99,16 +99,16 @@ public:
     ~ThreadSamplesBuffer();
     void StartBatch();
     void StartSample(ThreadID id, ThreadState* state, const ThreadSpanContext& spanContext);
-    void RecordFrame(FunctionID fid, WSTRING& frame);
+    void RecordFrame(FunctionID fid, shared::WSTRING& frame);
     void EndSample();
     void EndBatch();
     void WriteFinalStats(const SamplingStatistics& stats);
 
 private:
-    void writeCodedFrameString(FunctionID fid, WSTRING& str);
+    void writeCodedFrameString(FunctionID fid, shared::WSTRING& str);
     void writeShort(int16_t val);
     void writeInt(int32_t val);
-    void writeString(const WSTRING& str);
+    void writeString(const shared::WSTRING& str);
     void writeByte(unsigned char b);
     void writeInt64(int64_t val);
 };
@@ -117,13 +117,13 @@ class NameCache
 {
 public:
     NameCache(size_t maximumSize);
-    WSTRING* get(UINT_PTR key);
-    void put(UINT_PTR key, WSTRING* val);
+    shared::WSTRING* get(UINT_PTR key);
+    void put(UINT_PTR key, shared::WSTRING* val);
 
 private:
     size_t maxSize;
-    std::list<std::pair<FunctionID, WSTRING*>> list;
-    std::unordered_map<FunctionID, std::list<std::pair<FunctionID, WSTRING*>>::iterator> map;
+    std::list<std::pair<FunctionID, shared::WSTRING*>> list;
+    std::unordered_map<FunctionID, std::list<std::pair<FunctionID, shared::WSTRING*>>::iterator> map;
 };
 
 

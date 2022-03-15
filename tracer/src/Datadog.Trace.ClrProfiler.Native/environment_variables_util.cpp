@@ -60,7 +60,7 @@ bool IsVersionCompatibilityEnabled()
 
 bool IsThreadSamplingEnabled()
 {
-    CheckIfTrue(GetEnvironmentValue(environment::thread_sampling_enabled));
+    CheckIfTrue(shared::GetEnvironmentValue(environment::thread_sampling_enabled));
 }
 
 } // namespace trace

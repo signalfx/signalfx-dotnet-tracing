@@ -37,36 +37,9 @@ inline shared::WSTRING GetDatadogLogFilePath(const std::string& file_name_suffix
 #ifdef _WIN32
                WStr('\\') +
 #else
-                WStr('/') +
+               WStr('/') +
 #endif
-                WStr("dotnet-tracer-native.log");
-        }
-
-        WSTRING path = GetEnvironmentValue(environment::log_path);
-
-        if (path.length() > 0) {
-            return path;
-        }
-
-#ifdef _WIN32
-        char* p_program_data;
-        size_t length;
-        const errno_t result = _dupenv_s(&p_program_data, &length, "PROGRAMDATA");
-        std::string program_data;
-
-        if (SUCCEEDED(result) && p_program_data != nullptr && length > 0) {
-            program_data = std::string(p_program_data);
-        }
-        else {
-            program_data = R"(C:\ProgramData)";
-        }
-
-        return ToWSTRING(program_data +
-            R"(\SignalFx .NET Tracing\logs\dotnet-tracer-native.log)");
-#else
-        return WStr("/var/log/signalfx/dotnet/dotnet-tracer-native.log");
-#endif
-               ToWSTRING(file_name);
+               ToWSTRING("dotnet-tracer-native.log");
     }
 
     WSTRING path = GetEnvironmentValue(TLoggerPolicy::logging_environment::log_path);
@@ -86,9 +59,9 @@ inline shared::WSTRING GetDatadogLogFilePath(const std::string& file_name_suffix
     }
 
     // on Windows WSTRING == wstring
-    return (program_data_path / TLoggerPolicy::folder_path / file_name).wstring();
+    return (program_data_path / R"(\SignalFx .NET Tracing\logs\dotnet-tracer-native.log)").wstring();
 #else
-    return ToWSTRING("/var/log/datadog/dotnet/" + file_name);
+    return ToWSTRING("/var/log/signalfx/dotnet/dotnet-tracer-native.log");
 #endif
 }
 
@@ -158,4 +131,3 @@ inline WSTRING GetCurrentModuleFileName()
 }
 
 } // namespace shared
-

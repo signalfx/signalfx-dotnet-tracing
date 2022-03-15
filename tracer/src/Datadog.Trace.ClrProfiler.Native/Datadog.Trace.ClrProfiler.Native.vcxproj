@@ -242,7 +242,6 @@
     <ClCompile Include="rejit_handler.cpp" />
     <ClCompile Include="rejit_preprocessor.cpp" />
     <ClCompile Include="rejit_work_offloader.cpp" />
-    <ClCompile Include="string.cpp" />
     <ClCompile Include="always_on_profiler.cpp" />
     <ClCompile Include="tracer_tokens.cpp" />
   </ItemGroup>

@@ -108,9 +108,9 @@ namespace environment {
     const shared::WSTRING clr_enable_ngen = WStr("SIGNALFX_CLR_ENABLE_NGEN");
 
     // If you change this, change corresponding logic in Instrument.cs too
-    const WSTRING thread_sampling_enabled = WStr("SIGNALFX_PROFILER_ENABLED");
+    const shared::WSTRING thread_sampling_enabled = WStr("SIGNALFX_PROFILER_ENABLED");
 
-    const WSTRING thread_sampling_period = WStr("SIGNALFX_PROFILER_CALL_STACK_INTERVAL");
+    const shared::WSTRING thread_sampling_period = WStr("SIGNALFX_PROFILER_CALL_STACK_INTERVAL");
 } // namespace environment
 } // namespace trace
 

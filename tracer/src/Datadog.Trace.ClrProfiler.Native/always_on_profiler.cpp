@@ -158,7 +158,7 @@ void ThreadSamplesBuffer::StartSample(ThreadID id, ThreadState* state, const Thr
     writeInt64(context.spanId);
     // Feature possibilities: (managed/native) thread priority, cpu/wait times, etc.
 }
-void ThreadSamplesBuffer::RecordFrame(FunctionID fid, WSTRING& frame)
+void ThreadSamplesBuffer::RecordFrame(FunctionID fid, shared::WSTRING& frame)
 {
     CHECK_SAMPLES_BUFFER_LENGTH()
     writeCodedFrameString(fid, frame);
@@ -183,7 +183,7 @@ void ThreadSamplesBuffer::WriteFinalStats(const SamplingStatistics& stats)
     writeInt(stats.nameCacheMisses);
 }
 
-void ThreadSamplesBuffer::writeCodedFrameString(FunctionID fid, WSTRING& str)
+void ThreadSamplesBuffer::writeCodedFrameString(FunctionID fid, shared::WSTRING& str)
 {
     const auto found = codes.find(fid);
     if (found != codes.end())
@@ -213,7 +213,7 @@ void ThreadSamplesBuffer::writeInt(int32_t val)
     buffer->push_back(((val >> 8) & 0xFF));
     buffer->push_back(val & 0xFF);
 }
-void ThreadSamplesBuffer::writeString(const WSTRING& str)
+void ThreadSamplesBuffer::writeString(const shared::WSTRING& str)
 {
     // limit strings to a max length overall; this prevents (e.g.) thread names or
     // any other miscellaneous strings that come along from blowing things out
@@ -279,7 +279,7 @@ public:
     }
 
 private:
-    void GetClassName(ClassID classId, WSTRING& result)
+    void GetClassName(ClassID classId, shared::WSTRING& result)
     {
         ModuleID modId;
         mdTypeDef classToken;
@@ -340,7 +340,7 @@ private:
         result.append(wName);
     }
 
-    void GetFunctionName(FunctionID funcID, const COR_PRF_FRAME_INFO frameInfo, WSTRING& result)
+    void GetFunctionName(FunctionID funcID, const COR_PRF_FRAME_INFO frameInfo, shared::WSTRING& result)
     {
         if (funcID == 0)
         {
@@ -423,29 +423,29 @@ private:
     }
 
 public:
-    WSTRING* Lookup(FunctionID fid, COR_PRF_FRAME_INFO frame)
+    shared::WSTRING* Lookup(FunctionID fid, COR_PRF_FRAME_INFO frame)
     {
-        WSTRING* answer = functionNameCache.get(fid);
+        shared::WSTRING* answer = functionNameCache.get(fid);
         if (answer != nullptr)
         {
             return answer;
         }
         stats.nameCacheMisses++;
-        answer = new WSTRING();
+        answer = new shared::WSTRING();
         this->GetFunctionName(fid, frame, *answer);
         functionNameCache.put(fid, answer);
         return answer;
     }
 
-    void LookupClassName(ClassID cid, WSTRING& result)
+    void LookupClassName(ClassID cid, shared::WSTRING& result)
     {
-        WSTRING* answer = functionNameCache.get(cid);
+        shared::WSTRING* answer = functionNameCache.get(cid);
         if (answer != nullptr)
         {
             result.append(*answer);
             return;
         }
-        answer = new WSTRING();
+        answer = new shared::WSTRING();
         this->GetClassName(cid, *answer);
         result.append(*answer);
         functionNameCache.put(cid, answer);
@@ -457,7 +457,7 @@ HRESULT __stdcall FrameCallback(_In_ FunctionID funcId, _In_ UINT_PTR ip, _In_ C
 {
     const auto helper = static_cast<SamplingHelper*>(clientData);
     helper->stats.totalFrames++;
-    WSTRING* name = helper->Lookup(funcId, frameInfo);
+    shared::WSTRING* name = helper->Lookup(funcId, frameInfo);
     // This is where line numbers could be calculated
     helper->curWriter->RecordFrame(funcId, *name);
     return S_OK;
@@ -506,7 +506,7 @@ void CaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, SamplingHelpe
 
 int GetSamplingPeriod()
 {
-    const WSTRING val = GetEnvironmentValue(environment::thread_sampling_period);
+    const shared::WSTRING val = shared::GetEnvironmentValue(environment::thread_sampling_period);
     if (val.empty())
     {
         return default_sample_period;
@@ -691,7 +691,7 @@ NameCache::NameCache(size_t maximumSize) : maxSize(maximumSize)
 {
 }
 
-WSTRING* NameCache::get(UINT_PTR key)
+shared::WSTRING* NameCache::get(UINT_PTR key)
 {
     const auto found = map.find(key);
     if (found == map.end())
@@ -704,9 +704,9 @@ WSTRING* NameCache::get(UINT_PTR key)
     return found->second->second;
 }
 
-void NameCache::put(UINT_PTR key, WSTRING* val)
+void NameCache::put(UINT_PTR key, shared::WSTRING* val)
 {
-    const auto pair = std::pair<FunctionID, WSTRING*>(key, val);
+    const auto pair = std::pair<FunctionID, shared::WSTRING*>(key, val);
     list.push_front(pair);
     map[key] = list.begin();
 
