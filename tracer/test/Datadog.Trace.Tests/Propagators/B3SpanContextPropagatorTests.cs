@@ -25,7 +25,7 @@ namespace Datadog.Trace.Tests.Propagators
         [Fact]
         public void Inject_IHeadersCollection()
         {
-            var traceId = TraceId.CreateFromInt(123456789);
+            var traceId = TraceId.CreateFromString("00000000075bcd15");
             ulong spanId = 987654321;
             var samplingPriority = SamplingPriorityValues.UserKeep;
             var context = new SpanContext(traceId, spanId, samplingPriority, serviceName: null, null);
@@ -33,7 +33,7 @@ namespace Datadog.Trace.Tests.Propagators
 
             B3Propagator.Inject(context, headers.Object);
 
-            headers.Verify(h => h.Set(B3ContextPropagator.TraceId, "00000000075bcd15"), Times.Once());
+            headers.Verify(h => h.Set(B3ContextPropagator.TraceId, "000000000000000000000000075bcd15"), Times.Once());
             headers.Verify(h => h.Set(B3ContextPropagator.SpanId, "000000003ade68b1"), Times.Once());
             headers.Verify(h => h.Set(B3ContextPropagator.Sampled, "1"), Times.Once());
             headers.VerifyNoOtherCalls();
@@ -42,7 +42,7 @@ namespace Datadog.Trace.Tests.Propagators
         [Fact]
         public void Inject_CarrierAndDelegate()
         {
-            var traceId = TraceId.CreateFromInt(123456789);
+            var traceId = TraceId.CreateFromString("00000000075bcd15");
             ulong spanId = 987654321;
             var samplingPriority = SamplingPriorityValues.UserKeep;
             var context = new SpanContext(traceId, spanId, samplingPriority, serviceName: null, null);
@@ -52,7 +52,7 @@ namespace Datadog.Trace.Tests.Propagators
 
             B3Propagator.Inject(context, headers.Object, (carrier, name, value) => carrier.Set(name, value));
 
-            headers.Verify(h => h.Set(B3ContextPropagator.TraceId, "00000000075bcd15"), Times.Once());
+            headers.Verify(h => h.Set(B3ContextPropagator.TraceId, "000000000000000000000000075bcd15"), Times.Once());
             headers.Verify(h => h.Set(B3ContextPropagator.SpanId, "000000003ade68b1"), Times.Once());
             headers.Verify(h => h.Set(B3ContextPropagator.Sampled, "1"), Times.Once());
             headers.VerifyNoOtherCalls();
@@ -78,7 +78,7 @@ namespace Datadog.Trace.Tests.Propagators
                   .BeEquivalentTo(
                        new SpanContextMock
                        {
-                           TraceId = TraceId.CreateFromInt(123456789),
+                           TraceId = TraceId.CreateFromString("00000000075bcd15"),
                            SpanId = 987654321,
                            Origin = null,
                            SamplingPriority = SamplingPriorityValues.AutoKeep,
@@ -107,7 +107,7 @@ namespace Datadog.Trace.Tests.Propagators
                   .BeEquivalentTo(
                        new SpanContextMock
                        {
-                           TraceId = TraceId.CreateFromInt(123456789),
+                           TraceId = TraceId.CreateFromString("00000000075bcd15"),
                            SpanId = 987654321,
                            Origin = null,
                            SamplingPriority = SamplingPriorityValues.AutoKeep,
@@ -130,14 +130,14 @@ namespace Datadog.Trace.Tests.Propagators
             var result = B3Propagator.Extract(headers.Object);
 
             // 64 bits verify
-            var expectedTraceId = TraceId.CreateFromUlong(9532127138774266268UL);
+            var expectedTraceId = TraceId.CreateFromString(traceId);
             var expectedSpanId = 67667974448284343UL;
             Assert.Equal(expectedTraceId, result.TraceId);
             Assert.Equal(expectedSpanId, result.SpanId);
 
             // Check truncation
             var truncatedTraceId64 = expectedTraceId.ToString();
-            Assert.Equal(truncatedTraceId64, traceId.Substring(16));
+            Assert.Equal(truncatedTraceId64, traceId);
 
             // Check the injection restoring the 128 bits traceId.
             var headersForInjection = new Mock<IHeadersCollection>(MockBehavior.Strict);
