@@ -78,7 +78,7 @@ namespace Datadog.Trace.Tests.Propagators
                   .BeEquivalentTo(
                        new SpanContextMock
                        {
-                           TraceId = 123456789,
+                           TraceId = TraceId.CreateFromInt(123456789),
                            SpanId = 987654321,
                            Origin = null,
                            SamplingPriority = SamplingPriorityValues.AutoKeep,
@@ -107,7 +107,7 @@ namespace Datadog.Trace.Tests.Propagators
                   .BeEquivalentTo(
                        new SpanContextMock
                        {
-                           TraceId = 123456789,
+                           TraceId = TraceId.CreateFromInt(123456789),
                            SpanId = 987654321,
                            Origin = null,
                            SamplingPriority = SamplingPriorityValues.AutoKeep,

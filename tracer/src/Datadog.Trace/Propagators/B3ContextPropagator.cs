@@ -53,15 +53,7 @@ namespace Datadog.Trace.Propagators
             var samplingPriority = ParseUtility.ParseInt32(carrier, carrierGetter, Sampled);
             if (IsValidTraceId(rawTraceId) && IsValidSpanId(rawSpanId))
             {
-#if NETCOREAPP
-                var traceId = rawTraceId.Length == 32 ?
-                                  Trace.TraceId.CreateDataDogCompatibleFromDecimalString(rawTraceId.AsSpan(16).ToString()) :
-                                  Trace.TraceId.CreateFromString(rawTraceId);
-#else
-                var traceId = rawTraceId.Length == 32 ?
-                                  Trace.TraceId.CreateDataDogCompatibleFromDecimalString(rawTraceId.Substring(16)) :
-                                  Trace.TraceId.CreateFromString(rawTraceId);
-#endif
+                var traceId = Trace.TraceId.CreateFromString(rawTraceId);
 
                 if (traceId == Trace.TraceId.Zero)
                 {

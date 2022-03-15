@@ -18,16 +18,16 @@ namespace Datadog.Trace.Tests
 {
     public class SpanContextPropagatorTests
     {
-        private const ulong TraceId = 1;
         private const ulong SpanId = 2;
         private const int SamplingPriority = SamplingPriorityValues.UserReject;
         private const string Origin = "origin";
+        private static readonly TraceId TraceId = TraceId.CreateFromInt(1);
 
         private static readonly CultureInfo InvariantCulture = CultureInfo.InvariantCulture;
 
         private static readonly KeyValuePair<string, string>[] DefaultHeaderValues =
         {
-            new("trace-id", TraceId.ToString(InvariantCulture)),
+            new("trace-id", TraceId.ToString()),
             new("parent-id", SpanId.ToString(InvariantCulture)),
             new("sampling-priority", SamplingPriority.ToString(InvariantCulture)),
             new("origin", Origin),
@@ -75,7 +75,7 @@ namespace Datadog.Trace.Tests
             SpanContextPropagator.Instance.Inject(context, headers.Object);
 
             // null values are not set, so only traceId and spanId (the first two in the list) should be set
-            headers.Verify(h => h.Set("trace-id", TraceId.ToString(InvariantCulture)), Times.Once());
+            headers.Verify(h => h.Set("trace-id", TraceId.ToString()), Times.Once());
             headers.Verify(h => h.Set("parent-id", SpanId.ToString(InvariantCulture)), Times.Once());
             headers.VerifyNoOtherCalls();
         }
@@ -89,7 +89,7 @@ namespace Datadog.Trace.Tests
             SpanContextPropagator.Instance.Inject(context, headers.Object);
 
             // null values are not set, so only traceId and spanId (the first two in the list) should be set
-            headers.Verify(h => h.Set("trace-id", TraceId.ToString(InvariantCulture)), Times.Once());
+            headers.Verify(h => h.Set("trace-id", TraceId.ToString()), Times.Once());
             headers.Verify(h => h.Set("parent-id", SpanId.ToString(InvariantCulture)), Times.Once());
             headers.Verify(h => h.Set("sampling-priority", "12"), Times.Once());
             headers.VerifyNoOtherCalls();
@@ -168,7 +168,7 @@ namespace Datadog.Trace.Tests
             var headers = new Mock<IHeadersCollection>();
 
             // only setup TraceId, other properties remain null/empty
-            headers.Setup(h => h.GetValues("trace-id")).Returns(new[] { TraceId.ToString(InvariantCulture) });
+            headers.Setup(h => h.GetValues("trace-id")).Returns(new[] { TraceId.ToString() });
             var result = SpanContextPropagator.Instance.Extract(headers.Object);
 
             result.Should().BeEquivalentTo(new SpanContextMock { TraceId = TraceId });
@@ -333,7 +333,7 @@ namespace Datadog.Trace.Tests
     // used to compare property values
     internal class SpanContextMock
     {
-        public ulong TraceId { get; set; }
+        public TraceId TraceId { get; set; }
 
         public ulong SpanId { get; set; }
 

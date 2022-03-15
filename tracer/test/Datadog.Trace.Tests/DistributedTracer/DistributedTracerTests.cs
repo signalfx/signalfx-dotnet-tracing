@@ -5,6 +5,7 @@
 
 // Modified by Splunk Inc.
 
+using System;
 using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.TestHelpers;
 using FluentAssertions;

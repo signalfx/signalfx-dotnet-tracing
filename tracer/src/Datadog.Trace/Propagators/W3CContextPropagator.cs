@@ -71,7 +71,7 @@ namespace Datadog.Trace.Propagators
 #if NETCOREAPP
                 var w3cTraceId = traceParent.AsSpan(3, 32);
                 var w3cSpanId = traceParent.AsSpan(36, 16);
-                var traceId = TraceId.CreateDataDogCompatibleFromDecimalString(w3cTraceId.Slice(16).ToString());
+                var traceId = TraceId.CreateFromString(w3cTraceId.ToString());
                 if (traceId == TraceId.Zero)
                 {
                     return false;
@@ -83,7 +83,7 @@ namespace Datadog.Trace.Propagators
 #else
                 var w3cTraceId = traceParent.Substring(3, 32);
                 var w3cSpanId = traceParent.Substring(36, 16);
-                var traceId = TraceId.CreateDataDogCompatibleFromDecimalString(w3cTraceId.Substring(16));
+                var traceId = TraceId.CreateFromString(w3cTraceId);
                 if (traceId == TraceId.Zero)
                 {
                     return false;

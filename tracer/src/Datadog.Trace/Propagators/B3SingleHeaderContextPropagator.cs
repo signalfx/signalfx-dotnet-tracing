@@ -71,9 +71,7 @@ namespace Datadog.Trace.Propagators
                     return false;
                 }
 
-                var traceId = rawTraceId.Length == 32 ?
-                                  TraceId.CreateDataDogCompatibleFromDecimalString(rawTraceId.Slice(16).ToString()) :
-                                  TraceId.CreateFromString(rawTraceId.ToString());
+                var traceId = TraceId.CreateFromString(rawTraceId.ToString());
                 var parentId = ParseUtility.ParseFromHexOrDefault(rawSpanId);
                 var samplingPriority = rawSampled == '1' ? 1 : 0;
 
@@ -101,9 +99,7 @@ namespace Datadog.Trace.Propagators
                     return false;
                 }
 
-                var traceId = rawTraceId.Length == 32 ?
-                                  TraceId.CreateDataDogCompatibleFromDecimalString(rawTraceId.Substring(16)) :
-                                  TraceId.CreateFromString(rawTraceId);
+                var traceId = TraceId.CreateFromString(rawTraceId);
                 var parentId = ParseUtility.ParseFromHexOrDefault(rawSpanId);
                 var samplingPriority = rawSampled == '1' ? 1 : 0;
 
