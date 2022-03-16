@@ -1,5 +1,7 @@
 # Dependency bumping
 
+## Tracked by version
+
 This section is tracking dependencies that are needed to be bumped from time to time.
 
 | Dependency | Files | Bumping | Notes |
@@ -12,4 +14,12 @@ This section is tracking dependencies that are needed to be bumped from time to 
 | Gihub CI OS | ./github/workflows/*.yml | Manual | Search for ```runs-on:``` |
 | APT | debian.dockerfile | Manual | Search for ```apt-get install``` |
 | Ruby gems | *.dockerfile | Manual | Search for ```gem install``` |
+
+## Tracked by checksum
+
+This section is tracking dependencies that are verified via hardcoded checksum value.
+
+| Dependency | Files | Bumping | Checksum | Notes |
+|-|-|-|-|-|
+| dotnet-install.sh | *.dockerfile | Manual | SHA256 | |
 
