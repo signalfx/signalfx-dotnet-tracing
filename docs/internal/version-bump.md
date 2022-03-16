@@ -17,7 +17,7 @@ This section describes dependencies that require a periodical version bump.
 
 ## Tracked by checksum
 
-This section is tracking dependencies that are verified via hardcoded checksum value.
+This section describes dependencies tracked and verified using hardcoded checksum values.
 
 | Dependency | Files | Bumping | Checksum | Notes |
 |-|-|-|-|-|
