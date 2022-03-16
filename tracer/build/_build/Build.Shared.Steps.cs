@@ -2,6 +2,7 @@ using Nuke.Common;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.IO;
 using System.Linq;
+using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.MSBuild;
 using static Nuke.Common.EnvironmentInfo;
@@ -68,7 +69,7 @@ partial class Build
             {
                 // Copy native tracer assets
                 var source = NativeProfilerProject.Directory / "bin" / BuildConfiguration / architecture.ToString() /
-                             $"{NativeProfilerProject.Name}.dll";
+                             "SignalFx.Tracing.ClrProfiler.Native.dll";
                 var dest = TracerHomeDirectory / $"win-{architecture}";
                 Logger.Info($"Copying '{source}' to '{dest}'");
                 CopyFileToDirectory(source, dest, FileExistsPolicy.Overwrite);

@@ -63,7 +63,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.NLog.DirectSubmi
 
             // We render the event to a string immediately as we need to capture the properties
             // This is more expensive from a CPU perspective, but is necessary as the properties
-            // won't necessarily be serialized correctly otherwise (e.g. dd_span_id/dd_trace_id)
+            // won't necessarily be serialized correctly otherwise (e.g. span_id/trace_id)
 
             var logEvent = new LogEntry(logEventInfo, contextProperties, eventProperties);
             var logFormatter = _formatter ?? TracerManager.Instance.DirectLogSubmission.Formatter;

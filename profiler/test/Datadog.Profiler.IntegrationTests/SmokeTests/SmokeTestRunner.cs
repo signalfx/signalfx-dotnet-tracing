@@ -22,7 +22,7 @@ namespace Datadog.Profiler.SmokeTests
 {
     public class SmokeTestRunner
     {
-        private static readonly Dictionary<string, string> ActivateNewPipeline = new Dictionary<string, string>() { { "DD_INTERNAL_PROFILING_LIBDDPROF_ENABLED", "1" } };
+        private static readonly Dictionary<string, string> ActivateNewPipeline = new Dictionary<string, string>() { { "SIGNALFX_INTERNAL_PROFILING_LIBDDPROF_ENABLED", "1" } };
 
         private readonly ITestOutputHelper _output;
         // The max test duration is _really_ big on some runners the test(s) can

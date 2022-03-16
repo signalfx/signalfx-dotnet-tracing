@@ -73,7 +73,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.ILogger
                 {
                     return string.Format(
                         CultureInfo.InvariantCulture,
-                        "{0}, dd_trace_id:\"{1}\", dd_span_id:\"{2}\"",
+                        "{0}, trace_id:\"{1}\", span_id:\"{2}\"",
                         _cachedFormat,
                         traceId,
                         spanId);
@@ -100,8 +100,8 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.ILogger
 
                 if (hasTraceId && hasSpanId)
                 {
-                    yield return new KeyValuePair<string, object>("dd_trace_id", traceId);
-                    yield return new KeyValuePair<string, object>("dd_span_id", spanId);
+                    yield return new KeyValuePair<string, object>("trace_id", traceId);
+                    yield return new KeyValuePair<string, object>("span_id", spanId);
                 }
             }
         }

@@ -134,7 +134,7 @@ TEST(ConfigurationTest, CheckDefaultLogDirectoryWhenVariableIsNotSet)
 #ifdef _WINDOWS
         WStr("C:\\ProgramData\\Datadog-APM\\logs\\DotNet");
 #else
-        WStr("/var/log/datadog/");
+        WStr("/var/log/signalfx/");
 #endif
     ASSERT_EQ(expectedValue, configuration.GetLogDirectory());
 }
@@ -155,7 +155,7 @@ TEST(ConfigurationTest, CheckDefaultPprofDirectoryWhenVariableIsNotSet)
 #ifdef _WINDOWS
         WStr("C:\\ProgramData\\Datadog-APM\\Pprof-files\\DotNet");
 #else
-        WStr("/var/log/datadog/pprof-files");
+        WStr("/var/log/signalfx/pprof-files");
 #endif
     ASSERT_EQ(expectedValue, configuration.GetProfilesOutputDirectory());
 }

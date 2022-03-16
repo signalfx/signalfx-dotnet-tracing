@@ -60,7 +60,7 @@ namespace environment {
     // If set, this setting takes precedence over environment variable SIGNALFX_TRACE_LOG_PATH.
     // If not set, default is
     // "%ProgramData%"\Datadog .NET Tracer\logs\" on Windows or
-    // "/var/log/datadog/dotnet/" on Linux.
+    // "/var/log/signalfx/dotnet/" on Linux.
     const shared::WSTRING log_directory = WStr("SIGNALFX_TRACE_LOG_DIRECTORY");
 
     // Sets whether to disable all JIT optimizations.

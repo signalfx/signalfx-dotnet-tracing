@@ -31,7 +31,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.CI.Agent
             var sender = new Mock<ICIAgentlessWriterSender>();
             var agentlessWriter = new CIAgentlessWriter(_settings, null, sender.Object);
 
-            var span = new Span(new SpanContext(1, 1), DateTimeOffset.UtcNow);
+            var span = new Span(new SpanContext(TraceId.CreateFromInt(1), 1), DateTimeOffset.UtcNow);
             span.Type = SpanTypes.Test;
             span.SetTag(TestTags.Type, TestTags.TypeTest);
 
@@ -70,7 +70,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.CI.Agent
                     return flushTcs.Task;
                 });
 
-            var span = new Span(new SpanContext(1, 1), DateTimeOffset.UtcNow);
+            var span = new Span(new SpanContext(TraceId.CreateFromInt(1), 1), DateTimeOffset.UtcNow);
             var expectedPayload = new Ci.Agent.Payloads.CITestCyclePayload();
             expectedPayload.TryProcessEvent(new SpanEvent(span));
             expectedPayload.TryProcessEvent(new SpanEvent(span));
@@ -112,7 +112,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.CI.Agent
         {
             int headerSize = Ci.Agent.Payloads.EventsBuffer<Ci.IEvent>.HeaderSize;
 
-            var span = new Span(new SpanContext(1, 1), DateTimeOffset.UtcNow);
+            var span = new Span(new SpanContext(TraceId.CreateFromInt(1), 1), DateTimeOffset.UtcNow);
             var spanEvent = new SpanEvent(span);
             var individualType = MessagePackSerializer.Serialize<Ci.IEvent>(spanEvent, Ci.Agent.MessagePack.CIFormatterResolver.Instance);
 
