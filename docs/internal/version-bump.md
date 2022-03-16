@@ -11,7 +11,7 @@ This section describes dependencies that require a periodical version bump.
 | Docker | *.dockerfile | Dependabot | Bumps Docker image versions |
 | dotnet SDK | (CI templates) | Manual | Search for ```actions/setup-dotnet``` or ```dotnetSdkVersion:``` |
 | ASP.NET Runtime | *.dockerfile | Manual | Search for ```./dotnet-install.sh --runtime aspnetcore``` |
-| Gihub CI OS | ./github/workflows/*.yml | Manual | Search for ```runs-on:``` |
+| GitHub CI OS | ./github/workflows/*.yml | Manual | Search for `runs-on:` |
 | APT | debian.dockerfile | Manual | Search for ```apt-get install``` |
 | Ruby gems | *.dockerfile | Manual | Search for ```gem install``` |
 
