@@ -383,16 +383,6 @@ namespace Datadog.Trace.Configuration
         public const string ExpandRouteTemplatesEnabled = "SIGNALFX_TRACE_EXPAND_ROUTE_TEMPLATES_ENABLED";
 
         /// <summary>
-        /// Configuration key for setting the propagation style injection.
-        /// </summary>
-        public const string PropagationStyleInject = "DD_PROPAGATION_STYLE_INJECT";
-
-        /// <summary>
-        /// Configuration key for setting the propagation style extraction.
-        /// </summary>
-        public const string PropagationStyleExtract = "DD_PROPAGATION_STYLE_EXTRACT";
-
-        /// <summary>
         /// String constants for CI Visibility configuration keys.
         /// </summary>
         public static class CIVisibility
@@ -401,19 +391,19 @@ namespace Datadog.Trace.Configuration
             /// Configuration key for enabling or disabling CI Visibility.
             /// Default is value is false (disabled).
             /// </summary>
-            public const string Enabled = "DD_CIVISIBILITY_ENABLED";
+            public const string Enabled = "SIGNALFX_CIVISIBILITY_ENABLED";
 
             /// <summary>
             /// Configuration key for enabling or disabling Agentless in CI Visibility.
             /// Default is value is false (disabled).
             /// </summary>
-            public const string AgentlessEnabled = "DD_CIVISIBILITY_AGENTLESS_ENABLED";
+            public const string AgentlessEnabled = "SIGNALFX_CIVISIBILITY_AGENTLESS_ENABLED";
 
             /// <summary>
             /// Configuration key for enabling or disabling Logs direct submission.
             /// Default is value is false (disabled).
             /// </summary>
-            public const string Logs = "DD_CIVISIBILITY_LOGS_ENABLED";
+            public const string Logs = "SIGNALFX_CIVISIBILITY_LOGS_ENABLED";
         }
 
         /// <summary>
@@ -424,13 +414,13 @@ namespace Datadog.Trace.Configuration
             /// <summary>
             /// Configuration key to set a proxy server for https requests.
             /// </summary>
-            public const string ProxyHttps = "DD_PROXY_HTTPS";
+            public const string ProxyHttps = "SIGNALFX_PROXY_HTTPS";
 
             /// <summary>
             /// Configuration key to set a list of hosts that should bypass the proxy.
             /// The list is space-separated.
             /// </summary>
-            public const string ProxyNoProxy = "DD_PROXY_NO_PROXY";
+            public const string ProxyNoProxy = "SIGNALFX_PROXY_NO_PROXY";
         }
 
         /// <summary>

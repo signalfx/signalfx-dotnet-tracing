@@ -53,7 +53,7 @@ namespace environment {
     const shared::WSTRING disabled_integrations = WStr("SIGNALFX_DISABLED_INTEGRATIONS");
 
     // Sets the path for the profiler's log file.
-    // Environment variable DD_TRACE_LOG_DIRECTORY takes precedence over this setting, if set.
+    // Environment variable SIGNALFX_TRACE_LOG_DIRECTORY takes precedence over this setting, if set.
     const shared::WSTRING log_path = WStr("SIGNALFX_TRACE_LOG_PATH");
 
     // Sets the directory for the profiler's log file.
