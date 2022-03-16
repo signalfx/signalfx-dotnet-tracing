@@ -7,7 +7,7 @@ This section describes dependencies that require a periodical version bump.
 | Dependency | Files | Bumping | Notes |
 |-|-|-|-|
 | Nuget | .csproj | Upstream | Test packages might need to stay on a certain version. |
-| Github CI | ./github/workflows/*.yml | Dependabot | Bumps Github step templates |
+| GitHub CI | ./github/workflows/*.yml | Dependabot | Bumps GitHub step templates |
 | Docker | *.dockerfile | Dependabot | Bumps Docker image versions |
 | dotnet SDK | (CI templates) | Manual | Search for ```actions/setup-dotnet``` or ```dotnetSdkVersion:``` |
 | ASP.NET Runtime | *.dockerfile | Manual | Search for ```./dotnet-install.sh --runtime aspnetcore``` |
