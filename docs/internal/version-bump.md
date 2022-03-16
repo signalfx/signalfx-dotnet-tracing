@@ -2,7 +2,7 @@
 
 ## Tracked by version
 
-This section is tracking dependencies that are needed to be bumped from time to time.
+This section describes dependencies that require a periodical version bump.
 
 | Dependency | Files | Bumping | Notes |
 |-|-|-|-|
