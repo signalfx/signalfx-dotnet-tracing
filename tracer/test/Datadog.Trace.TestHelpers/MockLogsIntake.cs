@@ -203,10 +203,10 @@ namespace Datadog.Trace.TestHelpers
             [JsonProperty("dd_service")]
             public string Service { get; set; }
 
-            [JsonProperty("trace_id")]
+            [JsonProperty("dd_trace_id")]
             public string TraceId { get; set; }
 
-            [JsonProperty("span_id")]
+            [JsonProperty("dd_span_id")]
             public string SpanId { get; set; }
 
             [JsonExtensionData]
