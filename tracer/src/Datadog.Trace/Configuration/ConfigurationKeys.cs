@@ -147,7 +147,15 @@ namespace Datadog.Trace.Configuration
         /// to be submitted per second.
         /// </summary>
         /// <seealso cref="TracerSettings.MaxTracesSubmittedPerSecond"/>
+        [Obsolete("This parameter is obsolete and should be replaced by `SIGNALFX_TRACE_RATE_LIMIT`")]
         public const string MaxTracesSubmittedPerSecond = "SIGNALFX_MAX_TRACES_PER_SECOND";
+
+        /// <summary>
+        /// Configuration key for setting the number of traces allowed
+        /// to be submitted per second.
+        /// </summary>
+        /// <seealso cref="TracerSettings.MaxTracesSubmittedPerSecond"/>
+        public const string TraceRateLimit = "SIGNALFX_TRACE_RATE_LIMIT";
 
         /// <summary>
         /// Configuration key for enabling or disabling the diagnostic log at startup
