@@ -40,4 +40,4 @@ needs any adjustments. Contact @signalfx/gdi-docs team if needed.
    and publish the release.
 
 1. [Publish](https://docs.microsoft.com/en-us/nuget/nuget-org/publish-a-package)
-   the NuGet packages to the offical [nuget.org feed](https://www.nuget.org/).
+   the NuGet packages to the official [nuget.org feed](https://www.nuget.org/).

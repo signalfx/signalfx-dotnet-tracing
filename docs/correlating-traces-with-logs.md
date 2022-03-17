@@ -78,9 +78,10 @@ Supported layouts:
 When using the output template you can either use `{Properties}`
 to print out all contextual properties.
 
-Alternativly, for more fine-grained control,
+Alternatively, for more fine-grained control,
 you can use the trace context fields explicitly.
-However the values must be surrounded by quotation mark (e.g. `service.name=\"{service_name}\"`).
+However, the values must be surrounded with a quotation mark
+(e.g. `service.name=\"{service_name}\"`).
 
 The log transformation rules must be configured as Serilog does not support
 property names with '`.`'. Find more information about the log processing rules
