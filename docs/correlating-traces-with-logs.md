@@ -1,30 +1,33 @@
 # Correlating traces with logs
 
-You can link individual log entries with trace IDs and span IDs associated with
-corresponding events. If your application uses a supported logger, enable trace
-injection to automatically include trace context in your application's logs.
+If your application uses a supported logger,
+you can configure log correlation to
+include trace context in your application's logs.
 
-To inject traces in logs, enable log correlation by setting the environment variable
+To inject trace context fields in logs,
+enable log correlation by setting the environment variable
 `SIGNALFX_LOGS_INJECTION=true` before running your instrumented application.
 
-If your logger uses JSON, the tracing library automatically handles trace ID
-injection.
+If your logger uses JSON logging format,
+then SignalFx Instrumentation for .NET automatically adds
+span context to the logs.
 
-If your logger uses a raw format, manually configure your logger to include
-the trace ID and span ID.
+If your logger uses a different format,
+you may have to manually configure your
+logger to include the trace context fields.
 
-Supported loggers:
+## Fields injected into log context
 
-- Log4Net
-- NLog
-- Serilog
-- ILogger (Microsoft.Extensions.Logging)
+- `trace_id`
+- `span_id`
+- `service.name` (`service_name` when using Serilog) -
+  [`SIGNALFX_SERVICE_NAME`](advanced-config.md) setting
+- `service.version` (`service_version` when using Serilog) -
+  [`SIGNALFX_VERSION`](advanced-config.md) setting
+- `deployment.environment` (`deployment_environment` when using Serilog) -
+  [`SIGNALFX_ENV`](advanced-config.md) setting
 
-(Find samples [here](https://github.com/signalfx/signalfx-dotnet-tracing/tree/main/tracer/samples/AutomaticTraceIdInjection))
-
-## Supported Loggers
-
-These are the supported logging frameworks.
+## Supported logging libraries
 
 ### Log4Net
 
@@ -35,6 +38,8 @@ Available layouts:
 - JSON format: `SerializedLayout` (from the `log4net.Ext.Json` NuGet package)
 - Raw format: `PatternLayout` (requires manual configuration)
 
+Find samples here: [Log4NetExample](../tracer/samples/AutomaticTraceIdInjection/Log4NetExample).
+
 ### NLog
 
 - Versions: 1.0.0.505 ≤ 4.*.*
@@ -44,18 +49,40 @@ Available layouts:
 - JSON format: `JsonLayout`
 - Raw format: Custom layout (requires manual configuration)
 
+Find samples here:
+
+- [NLog 4.0.x](../tracer/samples/AutomaticTraceIdInjection/NLog40Example).
+- [NLog 4.5.x](../tracer/samples/AutomaticTraceIdInjection/NLog45Example).
+- [NLog 4.6.x](../tracer/samples/AutomaticTraceIdInjection/NLog45Example).
+
 ### Serilog
 
 - Versions: 1.4.0 ≤ 2.*.*
 
-Available layouts:
+Regardless of the output layout, your `LoggerConfiguration` must be
+enriched from the LogContext to extract the trace context
+that is automatically injected.
+
+```csharp
+var loggerConfiguration = new LoggerConfiguration()
+    .Enrich.FromLogContext() // addition
+```
+
+Supported layouts:
 
 - JSON format: `JsonFormatter`
 - JSON format: `CompactJsonFormatter` (from the `Serilog.Formatting.Compact`
   NuGet package)
 - Raw format: output template (requires manual configuration)
 
-\* Log transformation rules must be configured as Serilog doesn't support
+When using the output template you can either use `{Properties}`
+to print out all contextual properties.
+
+Alternativly, for more fine-grained control,
+you can use the trace context fields explicitly.
+However the values must be surrounded by quotation mark (e.g. `service.name=\"{service_name}\"`).
+
+The log transformation rules must be configured as Serilog does not support
 property names with '`.`'. Find more information about the log processing rules
 [here](https://docs.splunk.com/Observability/logs/processors.html#logs-processors).
 Configure rules for:
@@ -63,6 +90,8 @@ Configure rules for:
 - `service_name` => `service.name`
 - `service_version` => `service.version`
 - `deployment_environment` => `deployment.environment`
+
+Find samples here: [SerilogExample/Program.cs](../tracer/samples/AutomaticTraceIdInjection/SerilogExample/Program.cs).
 
 ### ILogger (Microsoft.Extensions.Logging.Abstractions)
 
@@ -72,11 +101,4 @@ Available layouts:
 
 - JSON format: `json` (from the NetEscapades.Extensions.Logging)
 
-
-## Fields injected into log context
-
-- `trace_id`
-- `span_id`
-- `service.name` - [`SIGNALFX_SERVICE_NAME`](advanced-config.md) configuration option
-- `service.version` - [`SIGNALFX_VERSION`](advanced-config.md) configuration option
-- `deployment.environment` - [`SIGNALFX_ENV`](advanced-config.md) configuration option
+Find samples here: [MicrosoftExtensionsExample](../tracer/samples/AutomaticTraceIdInjection/MicrosoftExtensionsExample).
