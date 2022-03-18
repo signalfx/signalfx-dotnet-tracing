@@ -5,8 +5,8 @@ you can configure log correlation to
 include trace context in your application's logs.
 
 To inject trace context fields in logs,
-enable log correlation by setting the environment variable
-`SIGNALFX_LOGS_INJECTION=true` before running your instrumented application.
+enable log correlation by setting the `SIGNALFX_LOGS_INJECTION` 
+environment variable to `true` before running your instrumented application.
 
 If your logger uses JSON as the logging format,
 the SignalFx Instrumentation for .NET automatically adds
