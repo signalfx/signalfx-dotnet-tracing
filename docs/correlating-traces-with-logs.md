@@ -80,9 +80,10 @@ to print out all contextual properties.
 
 Alternatively, for more fine-grained control,
 you can use the trace context fields explicitly.
-However, the values must be surrounded with a quotation mark.
+The values MUST be surrounded with a quotation mark.
 For instance, you can use following output template,
-which also transforms the field names:
+which also transforms the field name
+(the log transformation step would not be required):
 
 ```csharp
 "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] trace_id=\"{trace_id}\" span_id=\"{span_id}\" service.name=\"{service_name}\" service.version=\"{service_version}\" deployment.environment=\"{deployment_environment}\"{NewLine}{Message:lj}{NewLine}{Exception}"
