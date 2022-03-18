@@ -27,6 +27,10 @@ constexpr auto minimum_sample_period = 1000;
 // variable)
 constexpr auto max_function_name_cache_size = 7000;
 
+constexpr auto param_name_max_len = 260;
+constexpr auto generic_params_max_len = 20;
+constexpr auto unknown = WStr("Unknown");
+
 // If you squint you can make out that the original bones of this came from sample code provided by the dotnet project:
 // https://github.com/dotnet/samples/blob/2cf486af936261b04a438ea44779cdc26c613f98/core/profiling/stacksampling/src/sampler.cpp
 // That stack sampling project is worth reading for a simpler (though higher overhead) take on thread sampling.
@@ -279,6 +283,7 @@ private:
         constexpr auto unknown_list_of_arguments = WStr("(unknown)");
         constexpr auto unknown_function_name = WStr("Unknown(unknown)");
         constexpr auto name_separator = WStr(".");
+
         if (funcID == 0)
         {
             constexpr auto unknown_native_function_name = WStr("Unknown_Native_Function(unknown)");
@@ -288,10 +293,10 @@ private:
 
         ClassID classId = 0;
         ModuleID moduleId = 0;
-        mdToken token = 0;
+        mdToken functionToken = 0;
 
         // theoretically there is a possibility to use GetFunctionInfo method, but it does not support generic methods
-        HRESULT hr = info10->GetFunctionInfo2(funcID, frameInfo, &classId, &moduleId, &token, 0, nullptr, nullptr);
+        HRESULT hr = info10->GetFunctionInfo2(funcID, frameInfo, &classId, &moduleId, &functionToken, 0, nullptr, nullptr);
         if (FAILED(hr))
         {
             Logger::Debug("GetFunctionInfo2 failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
@@ -308,7 +313,7 @@ private:
             return;
         }
 
-        const auto function_info = GetFunctionInfo(pIMDImport, token);
+        const auto function_info = GetFunctionInfo(pIMDImport, functionToken);
 
         if (!function_info.IsValid())
         {
@@ -325,6 +330,7 @@ private:
             WSTRING prefix = parent_type->name;
             while (parent_type->parent_type != nullptr)
             {
+                // TODO splunk: address warning
                 prefix = parent_type->parent_type->name + name_separator + prefix;
                 parent_type = parent_type->parent_type;
             }
@@ -337,9 +343,28 @@ private:
         result.append(name_separator);
         result.append(function_info.name);
 
+        
+        HCORENUM functionGenParamsIter = nullptr;
+        HCORENUM classGenParamsIter = nullptr;
+        mdGenericParam functionGenericParams[generic_params_max_len]{};
+        mdGenericParam classGenericParams[generic_params_max_len]{};
+        ULONG functionGenParamsCount = 0;
+        ULONG classGenParamsCount = 0;
+
+        mdTypeDef classToken = function_info.type.id;
+
+        pIMDImport->EnumGenericParams(&classGenParamsIter, classToken, classGenericParams, generic_params_max_len,
+                                     &classGenParamsCount);
+        pIMDImport->EnumGenericParams(&functionGenParamsIter, functionToken, functionGenericParams,
+                                     generic_params_max_len,
+                                      &functionGenParamsCount);
+        
+        pIMDImport->CloseEnum(classGenParamsIter);
+        pIMDImport->CloseEnum(functionGenParamsIter);
+
         // try to list arguments type
-        FunctionMethodSignature function_method_signature = function_info.method_signature;
-        hr = function_method_signature.TryParse();
+        FunctionMethodSignature functionMethodSignature = function_info.method_signature;
+        hr = functionMethodSignature.TryParse();
         if (FAILED(hr))
         {
             result.append(unknown_list_of_arguments);
@@ -347,7 +372,7 @@ private:
         }
         else
         {
-            const auto& arguments = function_method_signature.GetMethodArguments();
+            const auto& arguments = functionMethodSignature.GetMethodArguments();
             result.append(WStr("("));
             for (ULONG i = 0; i < arguments.size(); i++)
             {
@@ -356,10 +381,247 @@ private:
                     result.append(WStr(", "));
                 }
 
-                result.append(arguments[i].GetTypeTokName(pIMDImport));
+                auto& currentArg = arguments[i];
+                PCCOR_SIGNATURE pbCur = &currentArg.pbBase[currentArg.offset];
+                result.append(GetSigTypeTokName(pbCur, pIMDImport, classGenericParams, functionGenericParams));
             }
             result.append(WStr(")"));
         }
+    }
+
+    WSTRING ExtractParameterName(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaDataImport2>& pImport, const mdGenericParam* genericParameters) const
+    {
+        pbCur++;
+        ULONG num = 0;
+        pbCur += CorSigUncompressData(pbCur, &num);
+        if (num >= generic_params_max_len)
+        {
+            return unknown;
+        }
+        WCHAR param_type_name[param_name_max_len]{};
+        ULONG pch_name = 0;
+        pImport->GetGenericParamProps(genericParameters[num], nullptr, nullptr, nullptr, nullptr,
+                                          param_type_name, param_name_max_len - 1, &pch_name);
+        return param_type_name;
+    }
+
+    WSTRING GetSigTypeTokName(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaDataImport2>& pImport,
+                              mdGenericParam classParams[], mdGenericParam methodParams[])
+    {
+        WSTRING tokenName = EmptyWStr;
+        bool ref_flag = false;
+        if (*pbCur == ELEMENT_TYPE_BYREF)
+        {
+            pbCur++;
+            ref_flag = true;
+        }
+
+        switch (*pbCur)
+        {
+            case ELEMENT_TYPE_BOOLEAN:
+                tokenName = SystemBoolean;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_CHAR:
+                tokenName = SystemChar;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_I1:
+                tokenName = SystemSByte;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_U1:
+                tokenName = SystemByte;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_U2:
+                tokenName = SystemUInt16;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_I2:
+                tokenName = SystemInt16;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_I4:
+                tokenName = SystemInt32;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_U4:
+                tokenName = SystemUInt32;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_I8:
+                tokenName = SystemInt64;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_U8:
+                tokenName = SystemUInt64;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_R4:
+                tokenName = SystemSingle;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_R8:
+                tokenName = SystemDouble;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_I:
+                tokenName = SystemIntPtr;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_U:
+                tokenName = SystemUIntPtr;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_STRING:
+                tokenName = SystemString;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_OBJECT:
+                tokenName = SystemObject;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_CLASS:
+            case ELEMENT_TYPE_VALUETYPE:
+            {
+                pbCur++;
+                mdToken token;
+                pbCur += CorSigUncompressToken(pbCur, &token);
+                tokenName = GetTypeInfo(pImport, token).name;
+                break;
+            }
+            case ELEMENT_TYPE_SZARRAY:
+            {
+                pbCur++;
+                tokenName = GetSigTypeTokName(pbCur, pImport, classParams, methodParams) + WStr("[]");
+                break;
+            }
+            case ELEMENT_TYPE_GENERICINST:
+            {
+                pbCur++;
+                tokenName = GetSigTypeTokName(pbCur, pImport, classParams, methodParams);
+                tokenName += WStr("[");
+                ULONG num = 0;
+                pbCur += CorSigUncompressData(pbCur, &num);
+                for (ULONG i = 0; i < num; i++)
+                {
+                    tokenName += GetSigTypeTokName(pbCur, pImport, classParams, methodParams);
+                    if (i != num - 1)
+                    {
+                        tokenName += WStr(",");
+                    }
+                }
+                tokenName += WStr("]");
+                break;
+            }
+            case ELEMENT_TYPE_MVAR:
+            {
+                tokenName += ExtractParameterName(pbCur, pImport, methodParams);
+                break;
+            }
+            case ELEMENT_TYPE_VAR:
+            {
+                tokenName += ExtractParameterName(pbCur, pImport, classParams);
+                break;
+            }
+            default:
+                break;
+        }
+
+        if (ref_flag)
+        {
+            tokenName += WStr("&");
+        }
+        return tokenName;
+    }
+
+    TypeInfo GetTypeInfo(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token)
+    {
+        mdToken parent_token = mdTokenNil;
+        std::shared_ptr<TypeInfo> parentTypeInfo = nullptr;
+        mdToken parent_type_token = mdTokenNil;
+        WCHAR type_name[kNameMaxSize]{};
+        DWORD type_name_len = 0;
+        DWORD type_flags;
+        std::shared_ptr<TypeInfo> extendsInfo = nullptr;
+        mdToken type_extends = mdTokenNil;
+        bool type_valueType = false;
+        bool type_isGeneric = false;
+
+        HRESULT hr = E_FAIL;
+        const auto token_type = TypeFromToken(token);
+
+        switch (token_type)
+        {
+            case mdtTypeDef:
+                hr = metadata_import->GetTypeDefProps(token, type_name, kNameMaxSize, &type_name_len, &type_flags,
+                                                      &type_extends);
+
+                metadata_import->GetNestedClassProps(token, &parent_type_token);
+                if (parent_type_token != mdTokenNil)
+                {
+                    parentTypeInfo = std::make_shared<TypeInfo>(GetTypeInfo(metadata_import, parent_type_token));
+                }
+
+                if (type_extends != mdTokenNil)
+                {
+                    extendsInfo = std::make_shared<TypeInfo>(GetTypeInfo(metadata_import, type_extends));
+                    type_valueType =
+                        extendsInfo->name == WStr("System.ValueType") || extendsInfo->name == WStr("System.Enum");
+                }
+                break;
+            case mdtTypeRef:
+                hr = metadata_import->GetTypeRefProps(token, &parent_token, type_name, kNameMaxSize, &type_name_len);
+                break;
+            case mdtTypeSpec:
+            {
+                PCCOR_SIGNATURE signature{};
+                ULONG signature_length{};
+
+                hr = metadata_import->GetTypeSpecFromToken(token, &signature, &signature_length);
+
+                if (FAILED(hr) || signature_length < 3)
+                {
+                    return {};
+                }
+
+                if (signature[0] & ELEMENT_TYPE_GENERICINST)
+                {
+                    mdToken type_token;
+                    CorSigUncompressToken(&signature[2], &type_token);
+                    const auto baseType = GetTypeInfo(metadata_import, type_token);
+                    return {baseType.id,        baseType.name,        token,
+                            token_type,         baseType.extend_from, baseType.valueType,
+                            baseType.isGeneric, baseType.parent_type, baseType.scopeToken};
+                }
+            }
+            break;
+            case mdtModuleRef:
+                metadata_import->GetModuleRefProps(token, type_name, kNameMaxSize, &type_name_len);
+                break;
+            case mdtMemberRef:
+                return GetFunctionInfo(metadata_import, token).type;
+                break;
+            case mdtMethodDef:
+                return GetFunctionInfo(metadata_import, token).type;
+                break;
+        }
+        if (FAILED(hr) || type_name_len == 0)
+        {
+            return {};
+        }
+
+        const auto type_name_string = WSTRING(type_name);
+        const auto generic_token_index = type_name_string.rfind(WStr("`"));
+        if (generic_token_index != std::string::npos)
+        {
+            const auto idxFromRight = type_name_string.length() - generic_token_index - 1;
+            type_isGeneric = idxFromRight == 1 || idxFromRight == 2;
+        }
+
+        return {token,          type_name_string, mdTypeSpecNil,  token_type,  extendsInfo,
+                type_valueType, type_isGeneric,   parentTypeInfo, parent_token};
     }
 
 public:
