@@ -145,6 +145,25 @@ Find samples here: [SerilogExample/Program.cs](../tracer/samples/AutomaticTraceI
 
 Supported layouts:
 
-- JSON format: `json` (from the NetEscapades.Extensions.Logging)
+- JSON format: `json`
+  (from the `NetEscapades.Extensions.Logging.RollingFile` NuGet package)
+
+When using `NetEscapades.Extensions.Logging.RollingFile`
+you have to enable the `IncludeScopes` option and use the `json` formatter. For example:
+
+```csharp
+Host.ConfigureLogging(builder => 
+    builder.AddFile(opts =>
+    {
+        opts.FileName = "logs";
+        opts.Extension = "json";
+        opts.FormatterName = "json"; // supported formatter
+        opts.IncludeScopes = true; // addition
+    })
+);
+```
+
+It is worth the notice, that the log correlation also works if `ILogger` wrapps
+any other supported logger.
 
 Find samples here: [MicrosoftExtensionsExample](../tracer/samples/AutomaticTraceIdInjection/MicrosoftExtensionsExample).
