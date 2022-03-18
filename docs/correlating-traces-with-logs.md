@@ -80,7 +80,7 @@ to print out all contextual properties.
 
 Alternatively, for more fine-grained control,
 you can use the trace context fields explicitly.
-The values MUST be surrounded with a quotation mark.
+The values MUST be wrapped in quotation marks.
 For instance, you can use following output template,
 which also transforms the field name
 (the log transformation step would not be required):
