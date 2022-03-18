@@ -39,7 +39,7 @@ Supported layouts:
 - Raw format: `PatternLayout`
 
 When using the `SerializedLayout` you can add all contextual properties
-by adding `properties` member as following:
+by adding the `properties` member as following:
 
 ```xml
 <layout type='log4net.Layout.SerializedLayout, log4net.Ext.Json'>
@@ -83,7 +83,7 @@ Supported layouts:
 
 When using `JsonLayout` and `NLog` version is at least 4.4.10,
 you can add all contextual properties
-by setting the attribute `includeMdlc` to `true` as following:
+by setting the attribute `includeMdlc` to `true`. For example:
 
 ```xml
 <layout xsi:type="JsonLayout" includeMdlc="true"> <!-- includeMdlc property available in NLog 4.4.10+ -->
@@ -104,8 +104,8 @@ You can also add the context fields explicitly. For example:
 </layout>
 ```
 
-When using the custom layout you have to add the context fields manually
-and their values must be wrapped in quotation marks. For example:
+When using the custom layout, add the context fields manually.
+Values must be wrapped in quotation marks. For example:
 
 ```xml
 <target
@@ -192,7 +192,7 @@ Host.ConfigureLogging(builder =>
 );
 ```
 
-It is worth the notice, that the log correlation also works if `ILogger` wrapps
-any other supported logger.
+> Log correlation also works when `ILogger` is wrapping
+any of the other supported loggers.
 
 Find samples here: [MicrosoftExtensionsExample](../tracer/samples/AutomaticTraceIdInjection/MicrosoftExtensionsExample).
