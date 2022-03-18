@@ -5,13 +5,13 @@
 
 // Modified by Splunk Inc.
 
-using System;
+using System.Threading.Tasks;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.PlatformHelpers;
 
 namespace Datadog.Trace.Telemetry
 {
-    internal interface ITelemetryController : IDisposable
+    internal interface ITelemetryController
     {
         /// <summary>
         /// Should be called when an integration is first executed (not necessarily successfully)
@@ -38,7 +38,12 @@ namespace Datadog.Trace.Telemetry
         /// Dispose resources for sending telemetry
         /// </summary>
         /// <param name="sendAppClosingTelemetry">True if the controller should send "app closing" telemetry before disposing</param>
-        public void Dispose(bool sendAppClosingTelemetry);
+        public Task DisposeAsync(bool sendAppClosingTelemetry);
+
+        /// <summary>
+        /// Dispose resources for sending telemetry
+        /// </summary>
+        public Task DisposeAsync();
 
         /// <summary>
         /// Indicates the

@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Datadog.Trace.Agent;
 using Datadog.Trace.ClrProfiler.AutoInstrumentation.Http.HttpClient.HttpClientHandler;
 using Datadog.Trace.ClrProfiler.CallTarget;
@@ -113,15 +114,17 @@ namespace Datadog.Trace.Tests.Telemetry
             {
             }
 
-            public void Dispose(bool sendAppClosingTelemetry)
+            public Task DisposeAsync(bool sendAppClosingTelemetry)
             {
+                return Task.CompletedTask;
+            }
+
+            public Task DisposeAsync()
+            {
+                return Task.CompletedTask;
             }
 
             public void Start()
-            {
-            }
-
-            public void Dispose()
             {
             }
         }
