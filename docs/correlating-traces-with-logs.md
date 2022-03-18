@@ -8,12 +8,12 @@ To inject trace context fields in logs,
 enable log correlation by setting the environment variable
 `SIGNALFX_LOGS_INJECTION=true` before running your instrumented application.
 
-If your logger uses JSON logging format,
-then SignalFx Instrumentation for .NET automatically adds
+If your logger uses JSON as the logging format,
+the SignalFx Instrumentation for .NET automatically adds
 span context to the logs.
 
 If your logger uses a different format,
-you may have to manually configure your
+you might have to manually configure your
 logger to include the trace context fields.
 
 ## Fields injected into log context
@@ -61,7 +61,7 @@ Find samples here:
 
 Regardless of the output layout, your `LoggerConfiguration` must be
 enriched from the LogContext to extract the trace context
-that is automatically injected.
+that is automatically injected. For example:
 
 ```csharp
 var loggerConfiguration = new LoggerConfiguration()
@@ -76,14 +76,11 @@ Supported layouts:
 - Raw format: output template (requires manual configuration)
 
 When using the output template you can either use `{Properties}`
-to print out all contextual properties.
+to print out all contextual properties or add context fields explicitly.
 
-Alternatively, for more fine-grained control,
-you can use the trace context fields explicitly.
-The values MUST be wrapped in quotation marks.
-For instance, you can use following output template,
-which also transforms the field name
-(the log transformation step would not be required):
+When adding context fields manually, values must be wrapped in 
+quotation marks. For instance, you can use the following output template,
+which also transforms the field name (the log transformation step would not be required):
 
 ```csharp
 "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] trace_id=\"{trace_id}\" span_id=\"{span_id}\" service.name=\"{service_name}\" service.version=\"{service_version}\" deployment.environment=\"{deployment_environment}\"{NewLine}{Message:lj}{NewLine}{Exception}"
