@@ -58,5 +58,5 @@ verify-artifacts:
     - linux-build
   artifacts:
     paths:
-      - tracer/bin/artifacts/checksums.txt
+      - /project/dist/checksums.txt
     
