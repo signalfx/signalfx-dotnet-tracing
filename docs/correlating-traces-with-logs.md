@@ -61,8 +61,8 @@ You can also add the context fields explicitly. For example:
 </layout>
 ```
 
-When using the `PatternLayout` you have to add the context fields manually
-and their values must be wrapped in quotation marks. For example:
+When using the `PatternLayout`, add the context fields manually. 
+Values must be wrapped in quotation marks. For example:
 
 ```xml
 <layout type="log4net.Layout.PatternLayout">
