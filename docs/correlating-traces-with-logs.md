@@ -79,13 +79,42 @@ Find samples here: [Log4NetExample](../tracer/samples/AutomaticTraceIdInjection/
 Supported layouts:
 
 - JSON format: `JsonLayout`
-- Raw format: Custom layout (requires manual configuration)
+- Raw format: custom layout
 
-Find samples here:
+When using `JsonLayout` and `NLog` version is at least 4.4.10,
+you can add all contextual properties
+by setting the attribute `includeMdlc` to `true` as following:
 
-- [NLog 4.0.x](../tracer/samples/AutomaticTraceIdInjection/NLog40Example).
-- [NLog 4.5.x](../tracer/samples/AutomaticTraceIdInjection/NLog45Example).
-- [NLog 4.6.x](../tracer/samples/AutomaticTraceIdInjection/NLog45Example).
+```xml
+<layout xsi:type="JsonLayout" includeMdlc="true"> <!-- includeMdlc property available in NLog 4.4.10+ -->
+  <!-- existing configuration -->
+</layout>
+```
+
+You can also add the context fields explicitly. For example:
+
+```xml
+<layout xsi:type="JsonLayout">
+  <!-- existing configuration -->
+  <attribute name="trace_id" layout="${mdc:item=trace_id}"/>
+  <attribute name="span_id" layout="${mdc:item=span_id}"/>    
+  <attribute name="service.name" layout="${mdc:item=service.name}"/>
+  <attribute name="service.version" layout="${mdc:item=service.version}"/>
+  <attribute name="deployment.environment" layout="${mdc:item=deployment.environment}"/>
+</layout>
+```
+
+When using the custom layout you have to add the context fields manually
+and their values must be wrapped in quotation marks. For example:
+
+```xml
+<target
+  // existing configuration
+  layout="${longdate}|${uppercase:${level}}|${logger}|{trace_id=&quot;${mdc:item=trace_id}&quot;,span_id=&quot;${mdc:item=span_id}&quot;,service.name=&quot;${mdc:item=service.name}&quot;,service.version=&quot;${mdc:item=service.version}&quot;,deployment.environment=&quot;${mdc:item=deployment.environment}&quot;}|${message}"
+/>
+```
+
+Find samples here: [NLog46Example](../tracer/samples/AutomaticTraceIdInjection/NLog46Example).
 
 ### Serilog
 
