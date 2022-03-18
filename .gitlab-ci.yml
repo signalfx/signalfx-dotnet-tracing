@@ -61,6 +61,8 @@ verify-artifacts:
     - cd /project
     - rm -rd /project/tracer/bin/artifacts/temp
     - tracer/build.sh ChecksumArtifacts --artifacts /project/tracer/bin/artifacts
+  dependencies: 
+    - linux-build
   artifacts:
     paths:
       - tracer/bin/artifacts/checksums.txt
