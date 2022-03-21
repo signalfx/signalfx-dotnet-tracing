@@ -53,6 +53,8 @@ verify-artifacts:
   variables:
     dotnetSdkVersion: 6.0.200
   script:
+    - |
+      rm .dockerignore
     - | 
       docker build \
         --build-arg DOTNETSDK_VERSION=${dotnetSdkVersion} \
