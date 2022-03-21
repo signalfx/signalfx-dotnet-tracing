@@ -353,15 +353,29 @@ private:
 
         mdTypeDef classToken = function_info.type.id;
 
-        pIMDImport->EnumGenericParams(&classGenParamsIter, classToken, classGenericParams, generic_params_max_len,
+        hr = pIMDImport->EnumGenericParams(&classGenParamsIter, classToken, classGenericParams, generic_params_max_len,
                                      &classGenParamsCount);
-        pIMDImport->EnumGenericParams(&functionGenParamsIter, functionToken, functionGenericParams,
+        pIMDImport->CloseEnum(classGenParamsIter);
+        if (FAILED(hr))
+        {
+            Logger::Debug("Class generic parameters enumeration failed. HRESULT=0x", std::setfill('0'), std::setw(8),
+                          std::hex, hr);
+            result.append(unknown_list_of_arguments);
+            return;
+        }
+        hr = pIMDImport->EnumGenericParams(&functionGenParamsIter, functionToken, functionGenericParams,
                                      generic_params_max_len,
                                       &functionGenParamsCount);
-        
-        pIMDImport->CloseEnum(classGenParamsIter);
         pIMDImport->CloseEnum(functionGenParamsIter);
 
+        if (FAILED(hr))
+        {
+            Logger::Debug("Method generic parameters enumeration failed. HRESULT=0x", std::setfill('0'), std::setw(8),
+                          std::hex, hr);
+            result.append(unknown_list_of_arguments);
+            return;
+        }
+        
         // try to list arguments type
         FunctionMethodSignature functionMethodSignature = function_info.method_signature;
         hr = functionMethodSignature.TryParse();
@@ -400,8 +414,14 @@ private:
         }
         WCHAR param_type_name[param_name_max_len]{};
         ULONG pch_name = 0;
-        pImport->GetGenericParamProps(genericParameters[num], nullptr, nullptr, nullptr, nullptr,
-                                          param_type_name, param_name_max_len - 1, &pch_name);
+        const auto hr = pImport->GetGenericParamProps(genericParameters[num], nullptr, nullptr, nullptr, nullptr,
+                                                      param_type_name, param_name_max_len - 1, &pch_name);
+        if (FAILED(hr))
+        {
+            Logger::Debug("GetGenericParamProps failed. HRESULT=0x", std::setfill('0'), std::setw(8),
+                          std::hex, hr);
+            return unknown;
+        }
         return param_type_name;
     }
 
@@ -534,94 +554,6 @@ private:
             tokenName += WStr("&");
         }
         return tokenName;
-    }
-
-    TypeInfo GetTypeInfo(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token)
-    {
-        mdToken parent_token = mdTokenNil;
-        std::shared_ptr<TypeInfo> parentTypeInfo = nullptr;
-        mdToken parent_type_token = mdTokenNil;
-        WCHAR type_name[kNameMaxSize]{};
-        DWORD type_name_len = 0;
-        DWORD type_flags;
-        std::shared_ptr<TypeInfo> extendsInfo = nullptr;
-        mdToken type_extends = mdTokenNil;
-        bool type_valueType = false;
-        bool type_isGeneric = false;
-
-        HRESULT hr = E_FAIL;
-        const auto token_type = TypeFromToken(token);
-
-        switch (token_type)
-        {
-            case mdtTypeDef:
-                hr = metadata_import->GetTypeDefProps(token, type_name, kNameMaxSize, &type_name_len, &type_flags,
-                                                      &type_extends);
-
-                metadata_import->GetNestedClassProps(token, &parent_type_token);
-                if (parent_type_token != mdTokenNil)
-                {
-                    parentTypeInfo = std::make_shared<TypeInfo>(GetTypeInfo(metadata_import, parent_type_token));
-                }
-
-                if (type_extends != mdTokenNil)
-                {
-                    extendsInfo = std::make_shared<TypeInfo>(GetTypeInfo(metadata_import, type_extends));
-                    type_valueType =
-                        extendsInfo->name == WStr("System.ValueType") || extendsInfo->name == WStr("System.Enum");
-                }
-                break;
-            case mdtTypeRef:
-                hr = metadata_import->GetTypeRefProps(token, &parent_token, type_name, kNameMaxSize, &type_name_len);
-                break;
-            case mdtTypeSpec:
-            {
-                PCCOR_SIGNATURE signature{};
-                ULONG signature_length{};
-
-                hr = metadata_import->GetTypeSpecFromToken(token, &signature, &signature_length);
-
-                if (FAILED(hr) || signature_length < 3)
-                {
-                    return {};
-                }
-
-                if (signature[0] & ELEMENT_TYPE_GENERICINST)
-                {
-                    mdToken type_token;
-                    CorSigUncompressToken(&signature[2], &type_token);
-                    const auto baseType = GetTypeInfo(metadata_import, type_token);
-                    return {baseType.id,        baseType.name,        token,
-                            token_type,         baseType.extend_from, baseType.valueType,
-                            baseType.isGeneric, baseType.parent_type, baseType.scopeToken};
-                }
-            }
-            break;
-            case mdtModuleRef:
-                metadata_import->GetModuleRefProps(token, type_name, kNameMaxSize, &type_name_len);
-                break;
-            case mdtMemberRef:
-                return GetFunctionInfo(metadata_import, token).type;
-                break;
-            case mdtMethodDef:
-                return GetFunctionInfo(metadata_import, token).type;
-                break;
-        }
-        if (FAILED(hr) || type_name_len == 0)
-        {
-            return {};
-        }
-
-        const auto type_name_string = WSTRING(type_name);
-        const auto generic_token_index = type_name_string.rfind(WStr("`"));
-        if (generic_token_index != std::string::npos)
-        {
-            const auto idxFromRight = type_name_string.length() - generic_token_index - 1;
-            type_isGeneric = idxFromRight == 1 || idxFromRight == 2;
-        }
-
-        return {token,          type_name_string, mdTypeSpecNil,  token_type,  extendsInfo,
-                type_valueType, type_isGeneric,   parentTypeInfo, parent_token};
     }
 
 public:
