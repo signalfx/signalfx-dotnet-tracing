@@ -50,6 +50,8 @@ linux-build:
 
 verify-artifacts:
   stage: verify
+  variables:
+    dotnetSdkVersion: 6.0.200
   script:
     - | 
       docker build \
