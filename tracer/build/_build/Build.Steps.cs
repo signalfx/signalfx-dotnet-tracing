@@ -588,17 +588,22 @@ partial class Build
 
             foreach (var artifact in artifacts)
             {
+                Logger.Info($"Found artifact '{artifact}'");
+
                 using (var sha256 = SHA256.Create())
                 using (var stream = File.OpenRead(artifact))
                 {
-                    var hash = BitConverter.ToString(sha256.ComputeHash(stream)).Replace("-", string.Empty);
                     var fileName = Path.GetFileName(artifact);
+                    var hash = BitConverter.ToString(sha256.ComputeHash(stream)).Replace("-", string.Empty);
 
                     checksums.AppendLine($"{hash}  {fileName}");
                 }
             }
 
-            File.WriteAllText(Path.Combine(Artifacts, "checksums.txt"), checksums.ToString());
+            var checksumsPath = Path.Combine(Artifacts, "checksums.txt");
+
+            Logger.Info($"Generating checksums file: '{checksumsPath}'");
+            File.WriteAllText(checksumsPath, checksums.ToString());
         });
 
     Target CompileManagedTestHelpers => _ => _
