@@ -73,5 +73,5 @@ verify-artifacts:
     - linux-build
   artifacts:
     paths:
-      - /project/dist/checksums.txt
+      - dist/checksums.txt
     
