@@ -43,6 +43,7 @@ at Samples.AspNetMvc5.Controllers.ConventionsController.TransientFailure(String 
     Service: Samples.Owin.WebApi2,
     Tags: {
       deployment.environment: integration_tests,
+      language: dotnet,
       runtime-id: Guid_1,
       signalfx.tracing.library: dotnet-tracing,
       signalfx.tracing.version: x.y.z,
