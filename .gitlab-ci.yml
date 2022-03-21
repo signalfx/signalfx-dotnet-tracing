@@ -50,16 +50,20 @@ linux-build:
 
 verify-artifacts:
   stage: verify
-  before_script:
-    - apt-get update && apt-get install -y --fix-missing curl unzip wget
-    - wget https://packages.microsoft.com/config/debian/11/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-    - sudo dpkg -i packages-microsoft-prod.deb
-    - sudo apt-get update; \
-      sudo apt-get install -y apt-transport-https && \
-      sudo apt-get update && \
-      sudo apt-get install -y dotnet-sdk-6.0
   script:
-    - tracer/build.sh ChecksumArtifacts --artifacts /project/dist/
+    - docker build \
+        --build-arg DOTNETSDK_VERSION=${dotnetSdkVersion} \
+        --tag splunk-trace-dotnet/checksums \
+        --file "./tracer/build/_build/docker/dotnet.dockerfile" \
+        .
+    - |
+      docker run \
+        --env artifacts=/project/dist \
+        --name checksums \
+        splunk-trace-dotnet/checksums \
+        tracer/build.sh ChecksumArtifacts
+    - |
+      docker cp checksums:/project/dist/checksums.txt dist/checksums.txt
   dependencies: 
     - linux-build
   artifacts:
