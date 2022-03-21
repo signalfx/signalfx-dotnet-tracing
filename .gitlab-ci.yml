@@ -51,7 +51,8 @@ linux-build:
 verify-artifacts:
   stage: verify
   script:
-    - docker build \
+    - | 
+      docker build \
         --build-arg DOTNETSDK_VERSION=${dotnetSdkVersion} \
         --tag splunk-trace-dotnet/checksums \
         --file "./tracer/build/_build/docker/dotnet.dockerfile" \
