@@ -415,7 +415,7 @@ private:
         WCHAR param_type_name[param_name_max_len]{};
         ULONG pch_name = 0;
         const auto hr = pImport->GetGenericParamProps(genericParameters[num], nullptr, nullptr, nullptr, nullptr,
-                                                      param_type_name, param_name_max_len - 1, &pch_name);
+                                                      param_type_name, param_name_max_len, &pch_name);
         if (FAILED(hr))
         {
             Logger::Debug("GetGenericParamProps failed. HRESULT=0x", std::setfill('0'), std::setw(8),
