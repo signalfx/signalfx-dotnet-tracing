@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Nuke.Common;
@@ -575,6 +577,33 @@ partial class Build
                     workingDirectory / $"{packageName}.tar.gz",
                     workingDirectory / versionedName);
             }
+        });
+
+    Target ChecksumArtifacts => _ => _
+        .Requires(() => Artifacts)
+        .Executes(() =>
+        {
+            var artifacts = Directory.GetFiles(Artifacts);
+            var checksums = new StringBuilder();
+
+            foreach (var artifact in artifacts)
+            {
+                Logger.Info($"Found artifact '{artifact}'");
+
+                using (var sha256 = SHA256.Create())
+                using (var stream = File.OpenRead(artifact))
+                {
+                    var fileName = Path.GetFileName(artifact);
+                    var hash = BitConverter.ToString(sha256.ComputeHash(stream)).Replace("-", string.Empty);
+
+                    checksums.AppendLine($"{hash}  {fileName}");
+                }
+            }
+
+            var checksumsPath = Path.Combine(Artifacts, "checksums.txt");
+
+            Logger.Info($"Generating checksums file: '{checksumsPath}'");
+            File.WriteAllText(checksumsPath, checksums.ToString());
         });
 
     Target CompileManagedTestHelpers => _ => _

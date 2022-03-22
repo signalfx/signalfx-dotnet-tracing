@@ -4,6 +4,7 @@ workflow:
 
 stages:
   - build
+  - verify
 
 linux-build:
   stage: build
@@ -46,3 +47,31 @@ linux-build:
 #     paths:
 #       - tracer/bin/artifacts/nuget/SignalFx.NET.Tracing.Azure.Site.Extension.*.nupkg
 #       - tracer/bin/artifacts/*/en-us
+
+verify-artifacts:
+  stage: verify
+  variables:
+    dotnetSdkVersion: 6.0.200
+  script:
+    - |
+      rm .dockerignore
+    - | 
+      docker build \
+        --build-arg DOTNETSDK_VERSION=${dotnetSdkVersion} \
+        --tag splunk-trace-dotnet/checksums \
+        --file "./tracer/build/_build/docker/dotnet.dockerfile" \
+        .
+    - |
+      docker run \
+        --env artifacts=/project/dist \
+        --name checksums \
+        splunk-trace-dotnet/checksums \
+        tracer/build.sh ChecksumArtifacts
+    - |
+      docker cp checksums:/project/dist/checksums.txt dist/checksums.txt
+  dependencies: 
+    - linux-build
+  artifacts:
+    paths:
+      - dist/checksums.txt
+    
