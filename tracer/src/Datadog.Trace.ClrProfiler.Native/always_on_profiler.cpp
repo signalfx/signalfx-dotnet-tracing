@@ -363,11 +363,11 @@ private:
             result.append(unknown_list_of_arguments);
             return;
         }
+        
         hr = pIMDImport->EnumGenericParams(&functionGenParamsIter, functionToken, functionGenericParams,
                                      generic_params_max_len,
                                       &functionGenParamsCount);
         pIMDImport->CloseEnum(functionGenParamsIter);
-
         if (FAILED(hr))
         {
             Logger::Debug("Method generic parameters enumeration failed. HRESULT=0x", std::setfill('0'), std::setw(8),
