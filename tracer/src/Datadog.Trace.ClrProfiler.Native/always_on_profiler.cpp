@@ -375,6 +375,34 @@ private:
             result.append(unknown_list_of_arguments);
             return;
         }
+
+        if (functionGenParamsCount > 0)
+        {
+            result.append(WStr("["));
+            for (ULONG i = 0; i < functionGenParamsCount; ++i)
+            {
+                if (i != 0)
+                {
+                    result.append(WStr(", "));
+                }
+
+                WCHAR param_type_name[param_name_max_len]{};
+                ULONG pch_name = 0;
+                const auto hr =
+                    pIMDImport->GetGenericParamProps(functionGenericParams[i], nullptr, nullptr, nullptr, nullptr,
+                                                     param_type_name, param_name_max_len, &pch_name);
+                if (FAILED(hr))
+                {
+                    Logger::Debug("GetGenericParamProps failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
+                    result.append(unknown);
+                }
+                else
+                {
+                    result.append(param_type_name);
+                }
+            }
+            result.append(WStr("]"));
+        }
         
         // try to list arguments type
         FunctionMethodSignature functionMethodSignature = function_info.method_signature;
