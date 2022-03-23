@@ -377,6 +377,12 @@ namespace Datadog.Trace.Configuration
         public const string ExpandRouteTemplatesEnabled = "SIGNALFX_TRACE_EXPAND_ROUTE_TEMPLATES_ENABLED";
 
         /// <summary>
+        /// Configuration key for enabling automatic instrumentation on specified methods.
+        /// Default value is "" (disabled).
+        /// </summary>
+        public const string TraceMethods = "DD_TRACE_METHODS";
+
+        /// <summary>
         /// String constants for CI Visibility configuration keys.
         /// </summary>
         public static class CIVisibility

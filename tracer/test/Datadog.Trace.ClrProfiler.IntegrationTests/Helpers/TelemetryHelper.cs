@@ -79,5 +79,28 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
             return latestIntegrationsData;
         }
+
+        public static TelemetryData AssertConfiguration(this MockTelemetryAgent<TelemetryData> telemetry, string key)
+        {
+            var allData = telemetry.Telemetry.ToArray();
+            var (latestConfigurationData, configurationPayload) =
+                allData
+                   .Where(x => x.RequestType == TelemetryRequestTypes.AppStarted)
+                   .OrderByDescending(x => x.SeqId)
+                   .Select(
+                        data =>
+                        {
+                            var configuration = ((AppStartedPayload)data.Payload).Configuration;
+                            return (data, configuration);
+                        })
+                   .FirstOrDefault(x => x.configuration is not null);
+
+            latestConfigurationData.Should().NotBeNull();
+            configurationPayload.Should().NotBeNull();
+
+            configurationPayload.Single(telemetryValue => telemetryValue.Name == key).Should().NotBeNull();
+
+            return latestConfigurationData;
+        }
     }
 }

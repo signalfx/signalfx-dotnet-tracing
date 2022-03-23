@@ -83,6 +83,25 @@ namespace Datadog.Trace.ClrProfiler
             }
         }
 
+        public static void InitializeTraceMethods(string id, string assemblyName, string typeName, string configuration)
+        {
+            if (string.IsNullOrWhiteSpace(configuration)
+                || string.IsNullOrWhiteSpace(assemblyName)
+                || string.IsNullOrWhiteSpace(typeName))
+            {
+                return;
+            }
+
+            if (IsWindows)
+            {
+                Windows.InitializeTraceMethods(id, assemblyName, typeName, configuration);
+            }
+            else
+            {
+                NonWindows.InitializeTraceMethods(id, assemblyName, typeName, configuration);
+            }
+        }
+
         public static int SignalFxReadThreadSamples(int len, byte[] buf)
         {
             return IsWindows ? Windows.SignalFxReadThreadSamples(len, buf) : NonWindows.SignalFxReadThreadSamples(len, buf);
@@ -120,6 +139,9 @@ namespace Datadog.Trace.ClrProfiler
             public static extern void AddDerivedInstrumentations([MarshalAs(UnmanagedType.LPWStr)] string id, [In] NativeCallTargetDefinition[] methodArrays, int size);
 
             [DllImport("SignalFx.Tracing.ClrProfiler.Native.dll")]
+            public static extern void InitializeTraceMethods([MarshalAs(UnmanagedType.LPWStr)] string id, [MarshalAs(UnmanagedType.LPWStr)] string assemblyName, [MarshalAs(UnmanagedType.LPWStr)] string typeName, [MarshalAs(UnmanagedType.LPWStr)] string configuration);
+
+            [DllImport("SignalFx.Tracing.ClrProfiler.Native.dll")]
             public static extern int SignalFxReadThreadSamples(int len, byte[] buf);
 
             [DllImport("SignalFx.Tracing.ClrProfiler.Native.dll")]
@@ -143,6 +165,9 @@ namespace Datadog.Trace.ClrProfiler
 
             [DllImport("SignalFx.Tracing.ClrProfiler.Native")]
             public static extern void AddDerivedInstrumentations([MarshalAs(UnmanagedType.LPWStr)] string id, [In] NativeCallTargetDefinition[] methodArrays, int size);
+
+            [DllImport("SignalFx.Tracing.ClrProfiler.Native")]
+            public static extern void InitializeTraceMethods([MarshalAs(UnmanagedType.LPWStr)] string id, [MarshalAs(UnmanagedType.LPWStr)] string assemblyName, [MarshalAs(UnmanagedType.LPWStr)] string typeName, [MarshalAs(UnmanagedType.LPWStr)] string configuration);
 
             [DllImport("SignalFx.Tracing.ClrProfiler.Native")]
             public static extern int SignalFxReadThreadSamples(int len, byte[] buf);
