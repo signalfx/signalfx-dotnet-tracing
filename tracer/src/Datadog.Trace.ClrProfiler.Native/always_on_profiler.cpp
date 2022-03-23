@@ -403,7 +403,7 @@ private:
         }
     }
 
-    WSTRING ExtractParameterName(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaDataImport2>& pImport, const mdGenericParam* genericParameters) const
+    shared::WSTRING ExtractParameterName(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaDataImport2>& pImport, const mdGenericParam* genericParameters) const
     {
         pbCur++;
         ULONG num = 0;
@@ -425,10 +425,10 @@ private:
         return param_type_name;
     }
 
-    WSTRING GetSigTypeTokName(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaDataImport2>& pImport,
+    shared::WSTRING GetSigTypeTokName(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaDataImport2>& pImport,
                               mdGenericParam classParams[], mdGenericParam methodParams[])
     {
-        WSTRING tokenName = EmptyWStr;
+        shared::WSTRING tokenName = shared::EmptyWStr;
         bool ref_flag = false;
         if (*pbCur == ELEMENT_TYPE_BYREF)
         {
