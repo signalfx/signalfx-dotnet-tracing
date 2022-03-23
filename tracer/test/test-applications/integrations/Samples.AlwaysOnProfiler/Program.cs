@@ -117,12 +117,12 @@ namespace My.Custom.Test.Namespace
         // Always on profiler supports fetching at most 20 generic arguments. This class covers scenario where there are more than 20 parameters.
         public static void MethodD(T01 p01, T02 p02, T03 p03, T04 p04, T05 p05, T06 p06, T07 p07, T08 p08, T09 p09, T10 p10, T11 p11, T12 p12, T13 p13, T14 p14, T15 p15, T16 p16, T17 p17, T18 p18, T19 p19, T20 p20, T21 p21)
         {
-            ClassE<TimeSpan>.GenericMethodDFromGenericClass(TimeSpan.MaxValue, p01, 1);
+            ClassENonStandardCharactersĄĘÓŁŻŹĆąęółżźśćĜЖᏳⳄʤǋₓڿଟഐቐ〣‿؁੮ᾭ_<TimeSpan>.GenericMethodDFromGenericClass(TimeSpan.MaxValue, p01, 1);
 
         }
     }
 
-    internal static class ClassE<TClass>
+    internal static class ClassENonStandardCharactersĄĘÓŁŻŹĆąęółżźśćĜЖᏳⳄʤǋₓڿଟഐቐ〣‿؁੮ᾭ_<TClass>
     {
         public static void GenericMethodDFromGenericClass<TMethod, TMethod2>(TClass classArg, TMethod methodArg, TMethod2 additionalArg)
         {
