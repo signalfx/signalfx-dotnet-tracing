@@ -30,6 +30,11 @@ constexpr auto max_function_name_cache_size = 7000;
 constexpr auto param_name_max_len = 260;
 constexpr auto generic_params_max_len = 20;
 constexpr auto unknown = WStr("Unknown");
+constexpr auto params_separator = WStr(", ");
+constexpr auto generic_params_opening_brace = WStr("[");
+constexpr auto generic_params_closing_brace = WStr("]");
+constexpr auto function_params_opening_brace = WStr("(");
+constexpr auto function_params_closing_brace = WStr(")");
 
 // If you squint you can make out that the original bones of this came from sample code provided by the dotnet project:
 // https://github.com/dotnet/samples/blob/2cf486af936261b04a438ea44779cdc26c613f98/core/profiling/stacksampling/src/sampler.cpp
@@ -363,17 +368,45 @@ private:
             result.append(unknown_list_of_arguments);
             return;
         }
+        
         hr = pIMDImport->EnumGenericParams(&functionGenParamsIter, functionToken, functionGenericParams,
                                      generic_params_max_len,
                                       &functionGenParamsCount);
         pIMDImport->CloseEnum(functionGenParamsIter);
-
         if (FAILED(hr))
         {
             Logger::Debug("Method generic parameters enumeration failed. HRESULT=0x", std::setfill('0'), std::setw(8),
                           std::hex, hr);
             result.append(unknown_list_of_arguments);
             return;
+        }
+
+        if (functionGenParamsCount > 0)
+        {
+            result.append(generic_params_opening_brace);
+            for (ULONG i = 0; i < functionGenParamsCount; ++i)
+            {
+                if (i != 0)
+                {
+                    result.append(params_separator);
+                }
+
+                WCHAR param_type_name[param_name_max_len]{};
+                ULONG pch_name = 0;
+                const auto hr =
+                    pIMDImport->GetGenericParamProps(functionGenericParams[i], nullptr, nullptr, nullptr, nullptr,
+                                                     param_type_name, param_name_max_len, &pch_name);
+                if (FAILED(hr))
+                {
+                    Logger::Debug("GetGenericParamProps failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
+                    result.append(unknown);
+                }
+                else
+                {
+                    result.append(param_type_name);
+                }
+            }
+            result.append(generic_params_closing_brace);
         }
         
         // try to list arguments type
@@ -387,19 +420,19 @@ private:
         else
         {
             const auto& arguments = functionMethodSignature.GetMethodArguments();
-            result.append(WStr("("));
+            result.append(function_params_opening_brace);
             for (ULONG i = 0; i < arguments.size(); i++)
             {
                 if (i != 0)
                 {
-                    result.append(WStr(", "));
+                    result.append(params_separator);
                 }
 
                 auto& currentArg = arguments[i];
                 PCCOR_SIGNATURE pbCur = &currentArg.pbBase[currentArg.offset];
                 result.append(GetSigTypeTokName(pbCur, pIMDImport, classGenericParams, functionGenericParams));
             }
-            result.append(WStr(")"));
+            result.append(function_params_closing_brace);
         }
     }
 
@@ -415,7 +448,7 @@ private:
         WCHAR param_type_name[param_name_max_len]{};
         ULONG pch_name = 0;
         const auto hr = pImport->GetGenericParamProps(genericParameters[num], nullptr, nullptr, nullptr, nullptr,
-                                                      param_type_name, param_name_max_len - 1, &pch_name);
+                                                      param_type_name, param_name_max_len, &pch_name);
         if (FAILED(hr))
         {
             Logger::Debug("GetGenericParamProps failed. HRESULT=0x", std::setfill('0'), std::setw(8),
@@ -521,7 +554,7 @@ private:
             {
                 pbCur++;
                 tokenName = GetSigTypeTokName(pbCur, pImport, classParams, methodParams);
-                tokenName += WStr("[");
+                tokenName += generic_params_opening_brace;
                 ULONG num = 0;
                 pbCur += CorSigUncompressData(pbCur, &num);
                 for (ULONG i = 0; i < num; i++)
@@ -529,10 +562,10 @@ private:
                     tokenName += GetSigTypeTokName(pbCur, pImport, classParams, methodParams);
                     if (i != num - 1)
                     {
-                        tokenName += WStr(",");
+                        tokenName += params_separator;
                     }
                 }
-                tokenName += WStr("]");
+                tokenName += generic_params_closing_brace;
                 break;
             }
             case ELEMENT_TYPE_MVAR:
