@@ -104,11 +104,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         {
             return logRecord.Body.StringValue.Contains(
                 "\tat System.Threading.Thread.Sleep(System.TimeSpan)\n" +
-                "\tat My.Custom.Test.Namespace.ClassD`1.GenericMethodDFromGenericClass(!0, !!0)\n" +
-                "\tat My.Custom.Test.Namespace.GenericClassC`1.GenericMethodCFromGenericClass(!0)\n" +
-                "\tat My.Custom.Test.Namespace.ClassA.InternalClassB.DoubleInternalClassB.TripleInternalClassB.MethodB(System.String)\n" +
+                "\tat My.Custom.Test.Namespace.ClassD`1.GenericMethodDFromGenericClass(TClass, TMethod, TMethod2)\n" +
+                "\tat My.Custom.Test.Namespace.GenericClassC`1.GenericMethodCFromGenericClass(T)\n" +
+                "\tat My.Custom.Test.Namespace.ClassA.InternalClassB`2.DoubleInternalClassB.TripleInternalClassB`1.MethodB(System.String, TC[], TB, TD, System.Collections.Generic.IList`1[TA])\n" +
                 "\tat My.Custom.Test.Namespace.ClassA.<MethodAOthers>g__Action|4_0(System.String)\n" +
-                "\tat My.Custom.Test.Namespace.ClassA.MethodAOthers(System.String, System.Object, My.Custom.Test.Namespace.CustomClass, My.Custom.Test.Namespace.CustomStruct, My.Custom.Test.Namespace.CustomClass[], My.Custom.Test.Namespace.CustomStruct[], System.Collections.Generic.List`1[!!0])\n" +
+                "\tat My.Custom.Test.Namespace.ClassA.MethodAOthers(System.String, System.Object, My.Custom.Test.Namespace.CustomClass, My.Custom.Test.Namespace.CustomStruct, My.Custom.Test.Namespace.CustomClass[], My.Custom.Test.Namespace.CustomStruct[], System.Collections.Generic.List`1[T])\n" +
                 "\tat My.Custom.Test.Namespace.ClassA.MethodAFloats(System.Single, System.Double)\n" +
                 "\tat My.Custom.Test.Namespace.ClassA.MethodAInts(System.UInt16, System.Int16, System.UInt32, System.Int32, System.UInt64, System.Int64, System.IntPtr, System.UIntPtr)\n" +
                 "\tat My.Custom.Test.Namespace.ClassA.MethodABytes(System.Boolean, System.Char, System.SByte, System.Byte)\n" +

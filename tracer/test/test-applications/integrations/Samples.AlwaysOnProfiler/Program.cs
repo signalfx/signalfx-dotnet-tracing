@@ -78,17 +78,17 @@ namespace My.Custom.Test.Namespace
             CustomStruct[] structArray,
             List<T> genericList)
         {
-            void Action(string s) => InternalClassB.DoubleInternalClassB.TripleInternalClassB.MethodB(s);
+            void Action(string s) => InternalClassB<string, int>.DoubleInternalClassB.TripleInternalClassB<int>.MethodB(s, new int[] { 3 }, TimeSpan.Zero, 0, new List<string>{"a"});
             Action("test arg");
         }
 
-        internal static class InternalClassB
+        internal static class InternalClassB<TA, TD>
         {
             internal static class DoubleInternalClassB
             {
-                internal static class TripleInternalClassB
+                internal static class TripleInternalClassB<TC>
                 {
-                    public static void MethodB(string testArg)
+                    public static void MethodB<TB>(string testArg, TC[] a, TB b, TD t, IList<TA> c)
                     {
                         GenericClassC<string>.GenericMethodCFromGenericClass(testArg);
                     }
@@ -101,13 +101,13 @@ namespace My.Custom.Test.Namespace
     {
         public static void GenericMethodCFromGenericClass(T arg)
         {
-            ClassD<TimeSpan>.GenericMethodDFromGenericClass(TimeSpan.MaxValue, arg);
+            ClassD<TimeSpan>.GenericMethodDFromGenericClass(TimeSpan.MaxValue, arg, 1);
         }
     }
 
     internal static class ClassD<TClass>
     {
-        public static void GenericMethodDFromGenericClass<TMethod>(TClass classArg, TMethod methodArg)
+        public static void GenericMethodDFromGenericClass<TMethod, TMethod2>(TClass classArg, TMethod methodArg, TMethod2 additionalArg)
         {
             Console.WriteLine("Thread.Sleep - starting " + classArg + methodArg);
             Thread.Sleep(TimeSpan.FromSeconds(6));

@@ -27,6 +27,10 @@ constexpr auto minimum_sample_period = 1000;
 // variable)
 constexpr auto max_function_name_cache_size = 7000;
 
+constexpr auto param_name_max_len = 260;
+constexpr auto generic_params_max_len = 20;
+constexpr auto unknown = WStr("Unknown");
+
 // If you squint you can make out that the original bones of this came from sample code provided by the dotnet project:
 // https://github.com/dotnet/samples/blob/2cf486af936261b04a438ea44779cdc26c613f98/core/profiling/stacksampling/src/sampler.cpp
 // That stack sampling project is worth reading for a simpler (though higher overhead) take on thread sampling.
@@ -279,6 +283,7 @@ private:
         constexpr auto unknown_list_of_arguments = WStr("(unknown)");
         constexpr auto unknown_function_name = WStr("Unknown(unknown)");
         constexpr auto name_separator = WStr(".");
+
         if (funcID == 0)
         {
             constexpr auto unknown_native_function_name = WStr("Unknown_Native_Function(unknown)");
@@ -288,10 +293,10 @@ private:
 
         ClassID classId = 0;
         ModuleID moduleId = 0;
-        mdToken token = 0;
+        mdToken functionToken = 0;
 
         // theoretically there is a possibility to use GetFunctionInfo method, but it does not support generic methods
-        HRESULT hr = info10->GetFunctionInfo2(funcID, frameInfo, &classId, &moduleId, &token, 0, nullptr, nullptr);
+        HRESULT hr = info10->GetFunctionInfo2(funcID, frameInfo, &classId, &moduleId, &functionToken, 0, nullptr, nullptr);
         if (FAILED(hr))
         {
             Logger::Debug("GetFunctionInfo2 failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
@@ -308,7 +313,7 @@ private:
             return;
         }
 
-        const auto function_info = GetFunctionInfo(pIMDImport, token);
+        const auto function_info = GetFunctionInfo(pIMDImport, functionToken);
 
         if (!function_info.IsValid())
         {
@@ -325,6 +330,7 @@ private:
             shared::WSTRING prefix = parent_type->name;
             while (parent_type->parent_type != nullptr)
             {
+                // TODO splunk: address warning
                 prefix = parent_type->parent_type->name + name_separator + prefix;
                 parent_type = parent_type->parent_type;
             }
@@ -337,9 +343,42 @@ private:
         result.append(name_separator);
         result.append(function_info.name);
 
+        
+        HCORENUM functionGenParamsIter = nullptr;
+        HCORENUM classGenParamsIter = nullptr;
+        mdGenericParam functionGenericParams[generic_params_max_len]{};
+        mdGenericParam classGenericParams[generic_params_max_len]{};
+        ULONG functionGenParamsCount = 0;
+        ULONG classGenParamsCount = 0;
+
+        mdTypeDef classToken = function_info.type.id;
+
+        hr = pIMDImport->EnumGenericParams(&classGenParamsIter, classToken, classGenericParams, generic_params_max_len,
+                                     &classGenParamsCount);
+        pIMDImport->CloseEnum(classGenParamsIter);
+        if (FAILED(hr))
+        {
+            Logger::Debug("Class generic parameters enumeration failed. HRESULT=0x", std::setfill('0'), std::setw(8),
+                          std::hex, hr);
+            result.append(unknown_list_of_arguments);
+            return;
+        }
+        hr = pIMDImport->EnumGenericParams(&functionGenParamsIter, functionToken, functionGenericParams,
+                                     generic_params_max_len,
+                                      &functionGenParamsCount);
+        pIMDImport->CloseEnum(functionGenParamsIter);
+
+        if (FAILED(hr))
+        {
+            Logger::Debug("Method generic parameters enumeration failed. HRESULT=0x", std::setfill('0'), std::setw(8),
+                          std::hex, hr);
+            result.append(unknown_list_of_arguments);
+            return;
+        }
+        
         // try to list arguments type
-        FunctionMethodSignature function_method_signature = function_info.method_signature;
-        hr = function_method_signature.TryParse();
+        FunctionMethodSignature functionMethodSignature = function_info.method_signature;
+        hr = functionMethodSignature.TryParse();
         if (FAILED(hr))
         {
             result.append(unknown_list_of_arguments);
@@ -347,7 +386,7 @@ private:
         }
         else
         {
-            const auto& arguments = function_method_signature.GetMethodArguments();
+            const auto& arguments = functionMethodSignature.GetMethodArguments();
             result.append(WStr("("));
             for (ULONG i = 0; i < arguments.size(); i++)
             {
@@ -356,10 +395,165 @@ private:
                     result.append(WStr(", "));
                 }
 
-                result.append(arguments[i].GetTypeTokName(pIMDImport));
+                auto& currentArg = arguments[i];
+                PCCOR_SIGNATURE pbCur = &currentArg.pbBase[currentArg.offset];
+                result.append(GetSigTypeTokName(pbCur, pIMDImport, classGenericParams, functionGenericParams));
             }
             result.append(WStr(")"));
         }
+    }
+
+    WSTRING ExtractParameterName(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaDataImport2>& pImport, const mdGenericParam* genericParameters) const
+    {
+        pbCur++;
+        ULONG num = 0;
+        pbCur += CorSigUncompressData(pbCur, &num);
+        if (num >= generic_params_max_len)
+        {
+            return unknown;
+        }
+        WCHAR param_type_name[param_name_max_len]{};
+        ULONG pch_name = 0;
+        const auto hr = pImport->GetGenericParamProps(genericParameters[num], nullptr, nullptr, nullptr, nullptr,
+                                                      param_type_name, param_name_max_len - 1, &pch_name);
+        if (FAILED(hr))
+        {
+            Logger::Debug("GetGenericParamProps failed. HRESULT=0x", std::setfill('0'), std::setw(8),
+                          std::hex, hr);
+            return unknown;
+        }
+        return param_type_name;
+    }
+
+    WSTRING GetSigTypeTokName(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaDataImport2>& pImport,
+                              mdGenericParam classParams[], mdGenericParam methodParams[])
+    {
+        WSTRING tokenName = EmptyWStr;
+        bool ref_flag = false;
+        if (*pbCur == ELEMENT_TYPE_BYREF)
+        {
+            pbCur++;
+            ref_flag = true;
+        }
+
+        switch (*pbCur)
+        {
+            case ELEMENT_TYPE_BOOLEAN:
+                tokenName = SystemBoolean;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_CHAR:
+                tokenName = SystemChar;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_I1:
+                tokenName = SystemSByte;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_U1:
+                tokenName = SystemByte;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_U2:
+                tokenName = SystemUInt16;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_I2:
+                tokenName = SystemInt16;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_I4:
+                tokenName = SystemInt32;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_U4:
+                tokenName = SystemUInt32;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_I8:
+                tokenName = SystemInt64;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_U8:
+                tokenName = SystemUInt64;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_R4:
+                tokenName = SystemSingle;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_R8:
+                tokenName = SystemDouble;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_I:
+                tokenName = SystemIntPtr;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_U:
+                tokenName = SystemUIntPtr;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_STRING:
+                tokenName = SystemString;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_OBJECT:
+                tokenName = SystemObject;
+                pbCur++;
+                break;
+            case ELEMENT_TYPE_CLASS:
+            case ELEMENT_TYPE_VALUETYPE:
+            {
+                pbCur++;
+                mdToken token;
+                pbCur += CorSigUncompressToken(pbCur, &token);
+                tokenName = GetTypeInfo(pImport, token).name;
+                break;
+            }
+            case ELEMENT_TYPE_SZARRAY:
+            {
+                pbCur++;
+                tokenName = GetSigTypeTokName(pbCur, pImport, classParams, methodParams) + WStr("[]");
+                break;
+            }
+            case ELEMENT_TYPE_GENERICINST:
+            {
+                pbCur++;
+                tokenName = GetSigTypeTokName(pbCur, pImport, classParams, methodParams);
+                tokenName += WStr("[");
+                ULONG num = 0;
+                pbCur += CorSigUncompressData(pbCur, &num);
+                for (ULONG i = 0; i < num; i++)
+                {
+                    tokenName += GetSigTypeTokName(pbCur, pImport, classParams, methodParams);
+                    if (i != num - 1)
+                    {
+                        tokenName += WStr(",");
+                    }
+                }
+                tokenName += WStr("]");
+                break;
+            }
+            case ELEMENT_TYPE_MVAR:
+            {
+                tokenName += ExtractParameterName(pbCur, pImport, methodParams);
+                break;
+            }
+            case ELEMENT_TYPE_VAR:
+            {
+                tokenName += ExtractParameterName(pbCur, pImport, classParams);
+                break;
+            }
+            default:
+                break;
+        }
+
+        if (ref_flag)
+        {
+            tokenName += WStr("&");
+        }
+        return tokenName;
     }
 
 public:
