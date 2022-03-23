@@ -101,15 +101,9 @@ partial class Build
         .After(CompileNativeLoader)
         .Executes(() =>
         {
-                // Copy native tracer assets
-                var source = NativeProfilerProject.Directory / "build" / "bin" / "SignalFx.Tracing.ClrProfiler.Native.so";
-                var dest = TracerHomeDirectory;
-                Logger.Info($"Copying '{source}' to '{dest}'");
-                CopyFileToDirectory(source, dest, FileExistsPolicy.Overwrite);
-
                 // Copy native loader assets
-                source = NativeLoaderProject.Directory / "bin" / "loader.conf";
-                dest = MonitoringHomeDirectory;
+                var source = NativeLoaderProject.Directory / "bin" / "loader.conf";
+                var dest = MonitoringHomeDirectory;
                 Logger.Info($"Copying '{source}' to '{dest}'");
                 CopyFileToDirectory(source, dest, FileExistsPolicy.Overwrite);
 
