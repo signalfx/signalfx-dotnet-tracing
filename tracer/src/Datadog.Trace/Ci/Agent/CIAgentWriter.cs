@@ -32,6 +32,7 @@ namespace Datadog.Trace.Ci.Agent
             var api = new Api(settings.ExporterSettings.AgentUri, apiRequestFactory, null, rates => sampler.SetDefaultSampleRates(rates), isPartialFlushEnabled);
             _agentWriter = new AgentWriter(api, null, maxBufferSize: maxBufferSize);
         }
+
         public CIAgentWriter(IApi api, int maxBufferSize = DefaultMaxBufferSize)
         {
             _agentWriter = new AgentWriter(api, null, maxBufferSize: maxBufferSize);

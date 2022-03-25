@@ -18,6 +18,8 @@ namespace Datadog.Trace
 
         TraceTagCollection Tags { get; }
 
+        public IDatadogTracer Tracer { get; }
+
         void AddSpan(Span span);
 
         void CloseSpan(Span span);

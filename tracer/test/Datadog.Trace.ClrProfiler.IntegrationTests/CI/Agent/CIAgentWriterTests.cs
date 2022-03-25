@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -34,7 +36,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.CI.Agent
         [Fact]
         public async Task WriteTrace_2Traces_SendToApi()
         {
-            var trace = new[] { new Span(new SpanContext(1, 1), DateTimeOffset.UtcNow) };
+            var trace = new[] { new Span(new SpanContext(TraceId.CreateFromUlong(1), 1), DateTimeOffset.UtcNow) };
             var expectedData1 = Vendors.MessagePack.MessagePackSerializer.Serialize(trace, SpanFormatterResolver.Instance);
 
             _ciAgentWriter.WriteTrace(new ArraySegment<Span>(trace));
@@ -44,7 +46,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.CI.Agent
 
             _api.Invocations.Clear();
 
-            trace = new[] { new Span(new SpanContext(2, 2), DateTimeOffset.UtcNow) };
+            trace = new[] { new Span(new SpanContext(TraceId.CreateFromUlong(2), 2), DateTimeOffset.UtcNow) };
             var expectedData2 = Vendors.MessagePack.MessagePackSerializer.Serialize(trace, SpanFormatterResolver.Instance);
 
             _ciAgentWriter.WriteTrace(new ArraySegment<Span>(trace));

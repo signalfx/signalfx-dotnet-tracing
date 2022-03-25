@@ -5,7 +5,6 @@
 
 // Modified by Splunk Inc.
 
-using System.Collections.Generic;
 using System.Text;
 
 namespace Datadog.Trace.SourceGenerators.TagsListGenerator
