@@ -44,5 +44,20 @@ namespace Datadog.Trace
         /// Records the keep rate of spans in the tracer, independent of sampling rate
         /// </summary>
         internal const string TracesKeepRate = "_dd.tracer_kr";
+
+        /// <summary>
+        /// The process id.
+        /// </summary>
+        internal const string ProcessId = "process_id";
+
+        /// <summary>
+        /// Whether the libraries application security features are enabled.
+        /// </summary>
+        public const string AppSecEnabled = "_dd.appsec.enabled";
+
+        /// <summary>
+        /// The number of AppSec traces ignored by the AppSec rate limiter
+        /// </summary>
+        public const string AppSecRateLimitDroppedTraces = "_dd.appsec.rate_limit.dropped_traces";
     }
 }
