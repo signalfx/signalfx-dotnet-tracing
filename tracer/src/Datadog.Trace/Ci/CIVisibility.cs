@@ -27,6 +27,21 @@ namespace Datadog.Trace.Ci
 
         public static bool IsRunning => Interlocked.CompareExchange(ref _firstInitialization, 0, 0) == 0;
 
+        public static CIVisibilitySettings Settings => _settings;
+
+        public static CITracerManager Manager
+        {
+            get
+            {
+                if (Tracer.Instance.TracerManager is CITracerManager cITracerManager)
+                {
+                    return cITracerManager;
+                }
+
+                return null;
+            }
+        }
+
         public static void Initialize()
         {
             if (Interlocked.Exchange(ref _firstInitialization, 0) != 1)
@@ -39,10 +54,7 @@ namespace Datadog.Trace.Ci
 
             LifetimeManager.Instance.AddShutdownTask(FlushSpans);
 
-            TracerSettings tracerSettings = _settings.TracerSettings ?? TracerSettings.FromDefaultSources();
-
-            // Set the tracer buffer size to the max
-            tracerSettings.TraceBufferSize = 1024 * 1024 * 45; // slightly lower than the 50mb payload agent limit.
+            TracerSettings tracerSettings = _settings.TracerSettings;
 
             // Set the service name if empty
             Log.Information("Setting up the service name");
@@ -54,7 +66,7 @@ namespace Datadog.Trace.Ci
 
             // Initialize Tracer
             Log.Information("Initialize Test Tracer instance");
-            TracerManager.ReplaceGlobalManager(tracerSettings.Build(), new CITracerManagerFactory());
+            TracerManager.ReplaceGlobalManager(tracerSettings.Build(), new CITracerManagerFactory(_settings));
         }
 
         internal static void FlushSpans()
@@ -141,7 +153,7 @@ namespace Datadog.Trace.Ci
                 try
                 {
                     // Set the configuration key to propagate the configuration to child processes.
-                    Environment.SetEnvironmentVariable(ConfigurationKeys.CIVisibilityEnabled, "1", EnvironmentVariableTarget.Process);
+                    Environment.SetEnvironmentVariable(ConfigurationKeys.CIVisibility.Enabled, "1", EnvironmentVariableTarget.Process);
                 }
                 catch
                 {
@@ -159,7 +171,7 @@ namespace Datadog.Trace.Ci
                 try
                 {
                     // Set the configuration key to propagate the configuration to child processes.
-                    Environment.SetEnvironmentVariable(ConfigurationKeys.CIVisibilityEnabled, "1", EnvironmentVariableTarget.Process);
+                    Environment.SetEnvironmentVariable(ConfigurationKeys.CIVisibility.Enabled, "1", EnvironmentVariableTarget.Process);
                 }
                 catch
                 {

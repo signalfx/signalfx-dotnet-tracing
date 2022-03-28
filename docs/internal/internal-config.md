@@ -34,6 +34,7 @@ These settings should be never used by the users.
 | `SIGNALFX_APPSEC_IPHEADER` | Optional name of the custom header to take into account for the ip address. |  |
 | `SIGNALFX_APPSEC_KEEP_TRACES` | Specifies if the AppSec traces should be explicitly kept or droped. | `true` |
 | `SIGNALFX_APPSEC_RULES` | Overrides the default rules file provided. Must be a path to a valid JSON rules file. |  |
+| `SIGNALFX_CIVISIBILITY_AGENTLESS_ENABLED` | Enable to activate Agentless in CI Visibility. | `false` |
 | `SIGNALFX_CIVISIBILITY_ENABLED` | Enable to activate CI Visibility. | `false` |
 | `SIGNALFX_DOGSTATSD_ARGS` | Comma-separated list of arguments to be passed to the DogStatsD process. |  |
 | `SIGNALFX_DOGSTATSD_PATH` | The DogStatsD path for when a standalone instance needs to be started. |  |
@@ -41,6 +42,8 @@ These settings should be never used by the users.
 | `SIGNALFX_DOGSTATSD_PORT` | The port of the targeted StatsD server. | `8125` |
 | `SIGNALFX_INTERNAL_TRACE_VERSION_COMPATIBILITY` | Enables the compatibility with other versions of tracer. | `false` |
 | `SIGNALFX_MAX_TRACES_PER_SECOND` | The number of traces allowed to be submitted per second. | `100` |
+| `SIGNALFX_PROXY_HTTPS` | TConfiguration key to set a proxy server for https requests. |  |
+| `SIGNALFX_PROXY_NO_PROXY` | Configuration key to set a list of hosts that should bypass the proxy. The list is space-separated|  |
 | `SIGNALFX_TRACE_{0}_ANALYTICS_ENABLED` | Enable to activate analytics for specific integration. | `false` |
 | `SIGNALFX_TRACE_{0}_ANALYTICS_SAMPLE_RATE` | Set sample rate for analytics in specific integration. |  |
 | `SIGNALFX_TRACE_AGENT_ARGS` | Comma-separated list of arguments to be passed to the Trace Agent process. |  |

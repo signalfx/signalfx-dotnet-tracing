@@ -5,9 +5,14 @@
 
 // Modified by Splunk Inc.
 
+using System;
+using System.Runtime.CompilerServices;
 using Datadog.Trace.Agent;
+using Datadog.Trace.Ci.Agent;
+using Datadog.Trace.Ci.EventModel;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Conventions;
+using Datadog.Trace.Logging;
 using Datadog.Trace.Logging.DirectSubmission;
 using Datadog.Trace.Propagation;
 using Datadog.Trace.RuntimeMetrics;
@@ -19,9 +24,54 @@ namespace Datadog.Trace.Ci
 {
     internal class CITracerManager : TracerManager, ILockedTracer
     {
+        private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<CITracerManager>();
+
         public CITracerManager(ImmutableTracerSettings settings, IAgentWriter agentWriter, ISampler sampler, IPropagator propagator, IScopeManager scopeManager, IDogStatsd statsd, RuntimeMetricsWriter runtimeMetricsWriter, ITraceIdConvention traceIdConvention, DirectLogSubmissionManager logSubmissionManager, ITelemetryController telemetry, string defaultServiceName)
-            : base(settings, agentWriter, sampler, propagator, scopeManager, statsd, runtimeMetricsWriter, traceIdConvention, logSubmissionManager, telemetry, defaultServiceName)
+            : base(settings, agentWriter, sampler, propagator, scopeManager, statsd, runtimeMetricsWriter, traceIdConvention, logSubmissionManager, telemetry, defaultServiceName, new Trace.Processors.ITraceProcessor[]
+            {
+                new Trace.Processors.NormalizerTraceProcessor(),
+                new Trace.Processors.TruncatorTraceProcessor(),
+                new Processors.OriginTagTraceProcessor(settings.ExporterSettings.PartialFlushEnabled, agentWriter is CIAgentlessWriter),
+            })
         {
+        }
+
+        private Span ProcessSpan(Span span)
+        {
+            if (span is not null)
+            {
+                foreach (var processor in TraceProcessors)
+                {
+                    if (processor is not null)
+                    {
+                        try
+                        {
+                            span = processor.Process(span);
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Error(e, e.Message);
+                        }
+                    }
+                }
+            }
+
+            return span;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void WriteEvent(IEvent @event)
+        {
+            if (@event is TestEvent testEvent)
+            {
+                testEvent.Content = ProcessSpan(testEvent.Content);
+            }
+            else if (@event is SpanEvent spanEvent)
+            {
+                spanEvent.Content = ProcessSpan(spanEvent.Content);
+            }
+
+            ((IEventWriter)AgentWriter).WriteEvent(@event);
         }
     }
 }
