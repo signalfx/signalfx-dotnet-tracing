@@ -165,8 +165,8 @@ namespace Datadog.Profiler
         private static bool GenerateProfilesInManagedCode()
         {
             // Use the managed code to generate pprof file by default.
-            // DD_INTERNAL_PROFILING_LIBDDPROF_ENABLED flag is used to activate the native pprof generation
-            var envString = Environment.GetEnvironmentVariable("DD_INTERNAL_PROFILING_LIBDDPROF_ENABLED");
+            // SIGNALFX_INTERNAL_PROFILING_LIBDDPROF_ENABLED flag is used to activate the native pprof generation
+            var envString = Environment.GetEnvironmentVariable("SIGNALFX_INTERNAL_PROFILING_LIBDDPROF_ENABLED");
 
             // Either we cannot parse the environment variable value, either it represents a false value
             var defaultValue = false;
