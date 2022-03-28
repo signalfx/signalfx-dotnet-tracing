@@ -31,12 +31,12 @@ TEST(ThreadSamplerTest, ThreadStateTracking)
 TEST(ThreadSamplerTest, BasicBufferBehavior)
 {
     auto buf = std::vector<unsigned char>();
-    WSTRING longThreadName;
+    shared::WSTRING longThreadName;
     for (int i = 0; i < 400; i++) {
         longThreadName.append(WStr("blah blah "));
     }
-    WSTRING frame1 = WStr("SomeFairlyLongClassName::SomeMildlyLongMethodName");
-    WSTRING frame2 = WStr("SomeFairlyLongClassName::ADifferentMethodName");
+    shared::WSTRING frame1 = WStr("SomeFairlyLongClassName::SomeMildlyLongMethodName");
+    shared::WSTRING frame2 = WStr("SomeFairlyLongClassName::ADifferentMethodName");
     ThreadSamplesBuffer tsb(&buf);
     ThreadState threadState;
     threadState.nativeId = 1000;
@@ -57,13 +57,13 @@ TEST(ThreadSamplerTest, BasicBufferBehavior)
 TEST(ThreadSamplerTest, BufferOverrunBehavior)
 {
     auto buf = std::vector<unsigned char>();
-    WSTRING longThreadName;
+    shared::WSTRING longThreadName;
     for (int i = 0; i < 400; i++)
     {
         longThreadName.append(WStr("blah blah "));
     }
-    WSTRING frame1 = WStr("SomeFairlyLongClassName::SomeMildlyLongMethodName");
-    WSTRING frame2 = WStr("SomeFairlyLongClassName::ADifferentMethodName");
+    shared::WSTRING frame1 = WStr("SomeFairlyLongClassName::SomeMildlyLongMethodName");
+    shared::WSTRING frame2 = WStr("SomeFairlyLongClassName::ADifferentMethodName");
     ThreadSamplesBuffer tsb(&buf);
 
     ThreadState threadState;
@@ -137,20 +137,20 @@ TEST(ThreadSamplerTest, LRUCache)
     for (int i = 1; i <= max; i++)
     {
         ASSERT_EQ(NULL, cache.get(i));
-        auto val = new WSTRING(L"Function ");
+        auto val = new shared::WSTRING(L"Function ");
         val->append(std::to_wstring(i));
         cache.put(i, val);
         ASSERT_EQ(val, cache.get(i));
     }
     // Now cache is full; add another and item 1 gets kicked out
-    auto* funcMaxPlus1 = new WSTRING(L"Function max+1");
+    auto* funcMaxPlus1 = new shared::WSTRING(L"Function max+1");
     ASSERT_EQ(NULL, cache.get(max+1));
     cache.put(max + 1, funcMaxPlus1);
     ASSERT_EQ(NULL, cache.get(1));
     ASSERT_EQ(funcMaxPlus1, cache.get(max+1));
 
     // Put 1 back, 2 falls off and everything else is there
-    const auto func1 = new WSTRING(L"Function 1");
+    const auto func1 = new shared::WSTRING(L"Function 1");
     cache.put(1, func1);
     ASSERT_EQ(NULL, cache.get(2));
     ASSERT_EQ(func1, cache.get(1));
