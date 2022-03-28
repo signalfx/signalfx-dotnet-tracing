@@ -41,15 +41,15 @@ CURDIR=$(current_dir)
 # Enable .NET Framework Profiling API
 export COR_ENABLE_PROFILING="1"
 export COR_PROFILER="{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"
-export COR_PROFILER_PATH="${CURDIR}/tracer/bin/tracer-home/${OPT_DIR}SignalFx.Tracing.ClrProfiler.Native.${SUFIX}"
+export COR_PROFILER_PATH="${CURDIR}/shared/bin/monitoring-home/tracer${OPT_DIR}SignalFx.Tracing.ClrProfiler.Native.${SUFIX}"
 
 # Enable .NET Core Profiling API
 export CORECLR_ENABLE_PROFILING="1"
 export CORECLR_PROFILER="{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"
-export CORECLR_PROFILER_PATH="${CURDIR}/tracer/bin/tracer-home/${OPT_DIR}SignalFx.Tracing.ClrProfiler.Native.${SUFIX}"
+export CORECLR_PROFILER_PATH="${CURDIR}/shared/bin/monitoring-home/tracer/${OPT_DIR}SignalFx.Tracing.ClrProfiler.Native.${SUFIX}"
 
 # Configure SFx .NET Tracer 
-export SIGNALFX_DOTNET_TRACER_HOME="${CURDIR}/tracer/bin/tracer-home"
+export SIGNALFX_DOTNET_TRACER_HOME="${CURDIR}/shared/bin/monitoring-home/tracer"
 export SIGNALFX_VERSION="1.0.0"
 export SIGNALFX_TRACE_DEBUG="1"
 export SIGNALFX_DUMP_ILREWRITE_ENABLED="0"

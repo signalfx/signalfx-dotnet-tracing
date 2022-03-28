@@ -109,7 +109,7 @@ namespace Datadog.Configuration
 
             // --> to preprod
             mutableConfig.ProfilesIngestionEndpoint_Url = "https://intake.profile.datadoghq.com/v1/input";
-            mutableConfig.ProfilesIngestionEndpoint_DatadogApiKey = "";
+            mutableConfig.ProfilesIngestionEndpoint_DatadogApiKey = string.Empty;
 
             string ddService = ConfigurationProviderUtils.GetDdServiceFallback();
             mutableConfig.DDDataTags_Host = ConfigurationProviderUtils.GetMachineName();

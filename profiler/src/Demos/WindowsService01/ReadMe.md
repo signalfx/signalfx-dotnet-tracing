@@ -137,7 +137,7 @@ Wait until the shutdown is complete.
 Start the service again.
 Wait until starting is complete (pausing/resuming will not be enough).
 
-6. Profiler should attach and start working. Logs should be found in the default (or specified) log location. The default is `C:\ProgramData\Datadog-APM\logs\DotNet\`. 
+6. Profiler should attach and start working. Logs should be found in the default (or specified) log location. The default is `C:\ProgramData\SignalFx .NET Tracing\logs\DotNet\`. 
 
 For some additional info, see https://docs.datadoghq.com/tracing/setup_overview/setup/dotnet-framework/?tab=environmentvariables#installation-and-getting-started
 

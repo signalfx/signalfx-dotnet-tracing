@@ -240,7 +240,7 @@ namespace Datadog.Configuration
 
         private static class DefaultDirectories
         {
-            public const string WindowsAppDataRoot = @"Datadog-APM\";   // relative to Environment.SpecialFolder.CommonApplicationData
+            public const string WindowsAppDataRoot = @"SignalFx .NET Tracing\";   // relative to Environment.SpecialFolder.CommonApplicationData
             public const string LinuxAppDataRoot = @"/var/log/signalfx";  // global path
 
             public const string WindowsLogsDir = @"logs";               // relative to AppDataRoot

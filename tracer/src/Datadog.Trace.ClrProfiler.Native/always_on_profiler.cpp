@@ -163,7 +163,7 @@ void ThreadSamplesBuffer::StartSample(ThreadID id, const ThreadState* state, con
     writeUInt64(spanContext.spanId);
     // Feature possibilities: (managed/native) thread priority, cpu/wait times, etc.
 }
-void ThreadSamplesBuffer::RecordFrame(FunctionID fid, const WSTRING& frame)
+void ThreadSamplesBuffer::RecordFrame(FunctionID fid, const shared::WSTRING& frame)
 {
     CHECK_SAMPLES_BUFFER_LENGTH()
     writeCodedFrameString(fid, frame);
@@ -188,7 +188,7 @@ void ThreadSamplesBuffer::WriteFinalStats(const SamplingStatistics& stats) const
     writeInt(stats.nameCacheMisses);
 }
 
-void ThreadSamplesBuffer::writeCodedFrameString(FunctionID fid, const WSTRING& str)
+void ThreadSamplesBuffer::writeCodedFrameString(FunctionID fid, const shared::WSTRING& str)
 {
     const auto found = codes.find(fid);
     if (found != codes.end())
@@ -218,7 +218,7 @@ void ThreadSamplesBuffer::writeInt(int32_t val) const
     buffer->push_back(((val >> 8) & 0xFF));
     buffer->push_back(val & 0xFF);
 }
-void ThreadSamplesBuffer::writeString(const WSTRING& str) const
+void ThreadSamplesBuffer::writeString(const shared::WSTRING& str) const
 {
     // limit strings to a max length overall; this prevents (e.g.) thread names or
     // any other miscellaneous strings that come along from blowing things out
@@ -283,7 +283,7 @@ public:
     }
 
 private:
-    void GetFunctionName(FunctionID funcID, const COR_PRF_FRAME_INFO frameInfo, WSTRING& result)
+    void GetFunctionName(FunctionID funcID, const COR_PRF_FRAME_INFO frameInfo, shared::WSTRING& result)
     {
         constexpr auto unknown_list_of_arguments = WStr("(unknown)");
         constexpr auto unknown_function_name = WStr("Unknown(unknown)");
@@ -332,7 +332,7 @@ private:
             // parent class is available only for internal classes.
             // See the class in the test application:  My.Custom.Test.Namespace.ClassA.InternalClassB.DoubleInternalClassB.TripleInternalClassB
             std::shared_ptr<TypeInfo> parent_type = function_info.type.parent_type;
-            WSTRING prefix = parent_type->name;
+            shared::WSTRING prefix = parent_type->name;
             while (parent_type->parent_type != nullptr)
             {
                 // TODO splunk: address warning
@@ -436,7 +436,8 @@ private:
         }
     }
 
-    WSTRING ExtractParameterName(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaDataImport2>& pImport, const mdGenericParam* genericParameters) const
+    shared::WSTRING ExtractParameterName(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaDataImport2>& pImport,
+                                         const mdGenericParam* genericParameters) const
     {
         pbCur++;
         ULONG num = 0;
@@ -458,10 +459,10 @@ private:
         return param_type_name;
     }
 
-    WSTRING GetSigTypeTokName(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaDataImport2>& pImport,
+    shared::WSTRING GetSigTypeTokName(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaDataImport2>& pImport,
                               mdGenericParam classParams[], mdGenericParam methodParams[])
     {
-        WSTRING tokenName = EmptyWStr;
+        shared::WSTRING tokenName = shared::EmptyWStr;
         bool ref_flag = false;
         if (*pbCur == ELEMENT_TYPE_BYREF)
         {
@@ -590,15 +591,15 @@ private:
     }
 
 public:
-    WSTRING* Lookup(FunctionID fid, COR_PRF_FRAME_INFO frame)
+    shared::WSTRING* Lookup(FunctionID fid, COR_PRF_FRAME_INFO frame)
     {
-        WSTRING* answer = functionNameCache.get(fid);
+        shared::WSTRING* answer = functionNameCache.get(fid);
         if (answer != nullptr)
         {
             return answer;
         }
         stats.nameCacheMisses++;
-        answer = new WSTRING();
+        answer = new shared::WSTRING();
         this->GetFunctionName(fid, frame, *answer);
         functionNameCache.put(fid, answer);
         return answer;
@@ -610,7 +611,7 @@ HRESULT __stdcall FrameCallback(_In_ FunctionID funcId, _In_ UINT_PTR ip, _In_ C
 {
     const auto helper = static_cast<SamplingHelper*>(clientData);
     helper->stats.totalFrames++;
-    const WSTRING* name = helper->Lookup(funcId, frameInfo);
+    const shared::WSTRING* name = helper->Lookup(funcId, frameInfo);
     // This is where line numbers could be calculated
     helper->curWriter->RecordFrame(funcId, *name);
     return S_OK;
@@ -659,7 +660,7 @@ void CaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, SamplingHelpe
 
 int GetSamplingPeriod()
 {
-    const WSTRING val = GetEnvironmentValue(environment::thread_sampling_period);
+    const shared::WSTRING val = shared::GetEnvironmentValue(environment::thread_sampling_period);
     if (val.empty())
     {
         return default_sample_period;
@@ -844,7 +845,7 @@ NameCache::NameCache(size_t maximumSize) : maxSize(maximumSize)
 {
 }
 
-WSTRING* NameCache::get(UINT_PTR key)
+shared::WSTRING* NameCache::get(UINT_PTR key)
 {
     const auto found = map.find(key);
     if (found == map.end())
@@ -857,9 +858,9 @@ WSTRING* NameCache::get(UINT_PTR key)
     return found->second->second;
 }
 
-void NameCache::put(UINT_PTR key, WSTRING* val)
+void NameCache::put(UINT_PTR key, shared::WSTRING* val)
 {
-    const auto pair = std::pair<FunctionID, WSTRING*>(key, val);
+    const auto pair = std::pair<FunctionID, shared::WSTRING*>(key, val);
     list.push_front(pair);
     map[key] = list.begin();
 
