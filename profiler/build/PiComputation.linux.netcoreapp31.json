@@ -14,7 +14,16 @@
       "name": "Profiler",
       "environmentVariables": {
         "SIGNALFX_CLR_ENABLE_NGEN": "true",
-        "SIGNALFX_PROFILING_ENABLED": "1"
+        "SIGNALFX_PROFILING_ENABLED": "1",
+        "SIGNALFX_INTERNAL_PROFILING_LIBDDPROF_ENABLED": "0"
+      }
+    },
+    {
+      "name": "ProfilerNewPipeline",
+      "environmentVariables": {
+        "SIGNALFX_CLR_ENABLE_NGEN": "true",
+        "SIGNALFX_PROFILING_ENABLED": "1",
+        "SIGNALFX_INTERNAL_PROFILING_LIBDDPROF_ENABLED": "1"
       }
     }
   ],

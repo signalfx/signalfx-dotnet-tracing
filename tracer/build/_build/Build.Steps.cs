@@ -490,10 +490,10 @@ partial class Build
             // create junction for each directory
             var directories = TracerDirectory.GlobDirectories(
                 $"src/**/bin/{BuildConfiguration}",
+                $"test/Datadog.Trace.TestHelpers/**/obj/{BuildConfiguration}",
                 $"test/Datadog.Trace.TestHelpers/**/bin/{BuildConfiguration}",
-                $"test/Datadog.Trace.TestHelpers/obj/{BuildConfiguration}",
                 $"test/OpenTelemetry.TestHelpers/**/bin/{BuildConfiguration}",
-                $"test/OpenTelemetry.TestHelpers/obj/{BuildConfiguration}",
+                $"test/OpenTelemetry.TestHelpers/**/obj/{BuildConfiguration}",
                 $"test/test-applications/integrations/dependency-libs/**/bin/{BuildConfiguration}"
             );
 
@@ -1162,6 +1162,7 @@ partial class Build
                 .SetProperty("TargetFramework", Framework.ToString())
                 .SetProperty("BuildInParallel", "true")
                 .SetProperty("CheckEolTargetFramework", "false")
+                .When(IsAlpine, o => o.SetProperty("IsAlpine", "true"))
                 .SetProcessArgumentConfigurator(arg => arg.Add("/nowarn:NU1701"))
                 .When(TestAllPackageVersions, o => o.SetProperty("TestAllPackageVersions", "true"))
                 .When(IncludeMinorPackageVersions, o => o.SetProperty("IncludeMinorPackageVersions", "true"))

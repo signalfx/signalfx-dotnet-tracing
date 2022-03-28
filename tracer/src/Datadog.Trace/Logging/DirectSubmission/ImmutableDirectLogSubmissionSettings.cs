@@ -26,6 +26,7 @@ namespace Datadog.Trace.Logging.DirectSubmission
             IntegrationId.ILogger,
             IntegrationId.Log4Net,
             IntegrationId.NLog,
+            IntegrationId.XUnit,
         };
 
         private readonly bool[] _enabledIntegrations;

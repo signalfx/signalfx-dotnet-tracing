@@ -6,6 +6,7 @@
 // Modified by Splunk Inc.
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -45,7 +46,7 @@ namespace Datadog.Profiler.IntegrationTests.Helpers
 #endif
         }
 
-        internal void SetEnvironmentVariables(StringDictionary environmentVariables, int agentPort, int profilingExportIntervalInSeconds, string testLogDir, string testPprofDir, string serviceName)
+        internal void SetEnvironmentVariables(StringDictionary environmentVariables, int agentPort, int profilingExportIntervalInSeconds, string testLogDir, string testPprofDir, string serviceName, IReadOnlyDictionary<string, string> additionalEnvVars)
         {
             var profilerPath = GetProfilerPath();
             if (!File.Exists(profilerPath))
@@ -90,6 +91,14 @@ namespace Datadog.Profiler.IntegrationTests.Helpers
                 if (serviceName.Length > 0)
                 {
                     environmentVariables["SIGNALFX_SERVICE"] = serviceName;
+                }
+            }
+
+            if (additionalEnvVars != null)
+            {
+                foreach (var kv in additionalEnvVars)
+                {
+                    environmentVariables[kv.Key] = kv.Value;
                 }
             }
         }
