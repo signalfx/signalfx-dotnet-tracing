@@ -10,8 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using Datadog.Trace.Propagation;
-using Datadog.Trace.Ci;
 
 namespace Datadog.Trace.Agent.Transports
 {
