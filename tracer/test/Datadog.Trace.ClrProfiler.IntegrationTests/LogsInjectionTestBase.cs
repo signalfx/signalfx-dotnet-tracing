@@ -145,8 +145,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 var versionProperty = test.PropertiesUseSerilogNaming ? "service_version" : @"service\.version";
                 var envProperty = test.PropertiesUseSerilogNaming ? "deployment_environment" : @"deployment\.environment";
                 var serviceProperty = test.PropertiesUseSerilogNaming ? "service_name" : @"service\.name";
-                var traceIdProperty = "dd_trace_id";
-                var spanIdProperty = "dd_span_id";
+                var traceIdProperty = "trace_id";
+                var spanIdProperty = "span_id";
 
                 var versionRegex = string.Format(test.RegexFormat, versionProperty, @"""1.0.0""");
                 var envRegex = string.Format(test.RegexFormat, envProperty, @"""integration_tests""");

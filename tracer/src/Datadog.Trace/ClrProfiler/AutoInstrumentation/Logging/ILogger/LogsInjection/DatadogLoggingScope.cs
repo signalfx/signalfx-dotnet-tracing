@@ -49,11 +49,11 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.ILogger
                 var distContext = _tracer.DistributedSpanContext;
                 return index switch
                 {
-                    0 => new KeyValuePair<string, object>("dd_service", _service),
-                    1 => new KeyValuePair<string, object>("dd_env", _env),
-                    2 => new KeyValuePair<string, object>("dd_version", _version),
-                    3 => new KeyValuePair<string, object>("dd_trace_id", distContext?[SpanContext.Keys.TraceId] ?? distContext?["trace-id"] ?? "0"),
-                    4 => new KeyValuePair<string, object>("dd_span_id", distContext?[SpanContext.Keys.ParentId] ?? distContext?["parent-id"] ?? "0"),
+                    0 => new KeyValuePair<string, object>(CorrelationIdentifier.ServiceKey, _service),
+                    1 => new KeyValuePair<string, object>(CorrelationIdentifier.EnvKey, _env),
+                    2 => new KeyValuePair<string, object>(CorrelationIdentifier.VersionKey, _version),
+                    3 => new KeyValuePair<string, object>(CorrelationIdentifier.TraceIdKey, (_tracer.ActiveScope?.Span.TraceId ?? TraceId.Zero).ToString()),
+                    4 => new KeyValuePair<string, object>(CorrelationIdentifier.SpanIdKey, (_tracer.ActiveScope?.Span.SpanId ?? 0).ToString()),
                     _ => throw new ArgumentOutOfRangeException(nameof(index))
                 };
             }
@@ -73,7 +73,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.ILogger
                 {
                     return string.Format(
                         CultureInfo.InvariantCulture,
-                        "{0}, dd_trace_id:\"{1}\", dd_span_id:\"{2}\"",
+                        "{0}, trace_id:\"{1}\", span_id:\"{2}\"",
                         _cachedFormat,
                         traceId,
                         spanId);
@@ -84,7 +84,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.ILogger
         }
 
         public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
-       {
+        {
             yield return new KeyValuePair<string, object>(CorrelationIdentifier.ServiceKey, _service);
             yield return new KeyValuePair<string, object>(CorrelationIdentifier.EnvKey, _env);
             yield return new KeyValuePair<string, object>(CorrelationIdentifier.VersionKey, _version);
@@ -100,8 +100,8 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.ILogger
 
                 if (hasTraceId && hasSpanId)
                 {
-                    yield return new KeyValuePair<string, object>("dd_trace_id", traceId);
-                    yield return new KeyValuePair<string, object>("dd_span_id", spanId);
+                    yield return new KeyValuePair<string, object>("trace_id", traceId);
+                    yield return new KeyValuePair<string, object>("span_id", spanId);
                 }
             }
         }
