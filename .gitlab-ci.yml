@@ -84,4 +84,3 @@ sign-artifacts-new:
   artifacts:
     paths:
       - dist/checksums2.txt
-  
