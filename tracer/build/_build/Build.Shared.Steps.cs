@@ -101,8 +101,8 @@ partial class Build
         .After(CompileNativeLoader)
         .Executes(() =>
         {
-                source = NativeLoaderProject.Directory / "bin" / "loader.conf";
-                dest = MonitoringHomeDirectory;
+                var source = NativeLoaderProject.Directory / "bin" / "loader.conf";
+                var dest = MonitoringHomeDirectory;
                 Logger.Info($"Copying '{source}' to '{dest}'");
                 CopyFileToDirectory(source, dest, FileExistsPolicy.Overwrite);
 
