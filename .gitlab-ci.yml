@@ -49,7 +49,7 @@ linux-build:
 #       - tracer/bin/artifacts/*/en-us
 
 sign-artifacts:
-  stage: verify
+  stage: sign
   variables:
     dotnetSdkVersion: 6.0.200
   script:
@@ -76,7 +76,7 @@ sign-artifacts:
       - dist/checksums.txt
 
 sign-artifacts-new:
-  stage: verify
+  stage: sign
   script:
     - pushd dist && shasum -a 256 * > checksums2.txt && popd
   dependencies: 
