@@ -4,4 +4,8 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\dependency-libs\Samples.AlwaysOnProfiler.Vb\Samples.AlwaysOnProfiler.Vb.vbproj" />
+  </ItemGroup>
+
 </Project>
