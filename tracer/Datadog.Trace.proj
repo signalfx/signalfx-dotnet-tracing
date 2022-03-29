@@ -16,6 +16,7 @@
     <CsharpTestHelperProject Include="test\**\OpenTelemetry.TestHelpers.csproj;test\**\*.TestHelpers.csproj"/>
     <CppProject Include="src\**\*.vcxproj"/>
     <CppTestProject Include="test\**\*.vcxproj"/>
+    <FsSampleLibProject Include="test\test-applications\integrations\**\*.fsproj" />
     <VbSampleLibProject Include="test\test-applications\integrations\**\*.vbproj" />
     <SampleLibProject Include="test\test-applications\integrations\dependency-libs\**\*.csproj" Exclude="test\test-applications\integrations\dependency-libs\**\Samples.MultiDomainHost.App.*.csproj" />
     <RegressionSampleLibProject Include="test\test-applications\regression\dependency-libs\**\Datadog.StackExchange.Redis*.csproj" />
@@ -69,7 +70,7 @@
 
   <!--  Used by CompileDependencyLibs-->
   <Target Name="BuildDependencyLibs">
-    <MSBuild Targets="Build" Projects="@(SampleLibProject);@(VbSampleLibProject)">
+    <MSBuild Targets="Build" Projects="@(SampleLibProject);@(FsSampleLibProject);@(VbSampleLibProject)">
       <Output TaskParameter="TargetOutputs" ItemName="CollectedBuildOutput"/>
     </MSBuild>
   </Target>
