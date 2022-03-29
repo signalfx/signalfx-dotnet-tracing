@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using My.Custom.Test.Namespace;
+using Samples.AlwaysOnProfiler.Vb;
 
 ClassA.MethodA();
 
@@ -125,9 +126,7 @@ namespace My.Custom.Test.Namespace
     {
         public static void GenericMethodDFromGenericClass<TMethod, TMethod2>(TClass classArg, TMethod methodArg, TMethod2 additionalArg)
         {
-            Console.WriteLine("Thread.Sleep - starting " + classArg + methodArg);
-            Thread.Sleep(TimeSpan.FromSeconds(6));
-            Console.WriteLine("Thread.Sleep - finished");
+            ClassVb.MethodVb("testParam");
         }
     }
 }
