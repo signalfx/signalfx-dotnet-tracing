@@ -4,7 +4,7 @@ workflow:
 
 stages:
   - build
-  - verify
+  - sign
 
 linux-build:
   stage: build
@@ -48,7 +48,7 @@ linux-build:
 #       - tracer/bin/artifacts/nuget/SignalFx.NET.Tracing.Azure.Site.Extension.*.nupkg
 #       - tracer/bin/artifacts/*/en-us
 
-verify-artifacts:
+sign-artifacts:
   stage: verify
   variables:
     dotnetSdkVersion: 6.0.200
@@ -74,4 +74,14 @@ verify-artifacts:
   artifacts:
     paths:
       - dist/checksums.txt
-    
+
+sign-artifacts-new:
+  stage: verify
+  script:
+    - pushd dist && shasum -a 256 * > checksums2.txt && popd
+  dependencies: 
+    - linux-build
+  artifacts:
+    paths:
+      - dist/checksums2.txt
+  
