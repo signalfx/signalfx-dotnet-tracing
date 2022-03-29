@@ -19,8 +19,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Tests
         [Fact(Skip="Unstable test. Cannot read pdb file in CI. Not used in Splunk distribution")]
         public void ReadPDBs()
         {
-            string assemblyFullPath = Assembly.GetExecutingAssembly().Location;
-            using var pdbReader = DatadogPdbReader.CreatePdbReader(assemblyFullPath);
+            using var pdbReader = DatadogPdbReader.CreatePdbReader(Assembly.GetExecutingAssembly());
 
             var symbolMethod = pdbReader.ReadMethodSymbolInfo(MethodBase.GetCurrentMethod().MetadataToken);
 
