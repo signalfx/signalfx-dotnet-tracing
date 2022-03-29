@@ -50,7 +50,7 @@ linux-build:
 
 sign-artifacts:
   stage: sign
-  image: '${DOCKER_CICD_REPO}/ci-container:python-3.9'
+  image: docker.repo.splunkdev.net/ci-cd/ci-container:python-3.9
   variables:
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   cache:
