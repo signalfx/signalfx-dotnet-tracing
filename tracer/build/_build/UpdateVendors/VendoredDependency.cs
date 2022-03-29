@@ -147,6 +147,12 @@ namespace UpdateVendors
                             // dnlib's only targets net461 and netstandard2.0. 
                             // For our needs, it's more correct to consider `NETSTANDARD` as 'everything not .NET Framework'
                             builder.Replace("#if NETSTANDARD", "#if !NETFRAMEWORK");
+                            
+                            // Make certain classes partial so we can extend them.
+                            foreach (var className in new[] { "SymbolReaderImpl", "PdbReader", "PortablePdbReader" })
+                            {
+                                builder.Replace($"class {className}", $"partial class {className}");
+                            }
                         }
 
                         // Special ProtoBuf handling
