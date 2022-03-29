@@ -50,6 +50,7 @@ linux-build:
 
 sign-artifacts:
   stage: sign
+  image: '${DOCKER_CICD_REPO}/ci-container:python-3.9'
   variables:
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   cache:
@@ -60,8 +61,9 @@ sign-artifacts:
       - .cache/pip
   script:
     - pip3 install -r scripts/signing/requirements.txt
-    - python3 scripts/signing/sign_release.py --path=dist
+    - python3 scripts/signing/sign.py --type RPM --path $( ls dist/*.rpm )
     - pushd dist && shasum -a 256 * > checksums.txt && popd
+    - python3 scripts/signing/sign.py --type GPG --path dist/checksums.txt
   dependencies: 
     - linux-build
   artifacts:
