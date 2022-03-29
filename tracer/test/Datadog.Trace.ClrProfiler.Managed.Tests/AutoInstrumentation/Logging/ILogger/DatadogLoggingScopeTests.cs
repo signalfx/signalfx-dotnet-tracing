@@ -52,7 +52,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Tests.AutoInstrumentation.Logging.IL
 
             var actual = scope.ToString();
 
-            var expected = @$"service.name:""TestService"", deployment.environment:""test"", service.version:""1.2.3"", dd_trace_id:""{spanScope.Span.TraceId}"", dd_span_id:""{spanScope.Span.SpanId}""";
+            var expected = @$"service.name:""TestService"", deployment.environment:""test"", service.version:""1.2.3"", trace_id:""{spanScope.Span.TraceId}"", span_id:""{spanScope.Span.SpanId}""";
             actual.Should().Be(expected);
         }
     }
