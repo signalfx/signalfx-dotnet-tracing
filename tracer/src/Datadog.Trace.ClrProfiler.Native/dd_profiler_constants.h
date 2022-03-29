@@ -84,11 +84,8 @@ const shared::WSTRING managed_profiler_full_assembly_version =
 
 const shared::WSTRING managed_profiler_name = WStr("SignalFx.Tracing");
 
-const shared::WSTRING nonwindows_nativemethods_type = WStr("SignalFx.Tracing.ClrProfiler.NativeMethods+NonWindows");
-const shared::WSTRING windows_nativemethods_type = WStr("SignalFx.Tracing.ClrProfiler.NativeMethods+Windows");
-
-const shared::WSTRING appsec_nonwindows_nativemethods_type = WStr("SignalFx.Tracing.AppSec.Waf.NativeBindings.NativeLibrary+NonWindows");
-const shared::WSTRING appsec_windows_nativemethods_type = WStr("SignalFx.Tracing.AppSec.Waf.NativeBindings.NativeLibrary+Windows");
+const shared::WSTRING nonwindows_nativemethods_type = WStr("Datadog.Trace.ClrProfiler.NativeMethods+NonWindows");
+const shared::WSTRING windows_nativemethods_type = WStr("Datadog.Trace.ClrProfiler.NativeMethods+Windows");
 
 const shared::WSTRING calltarget_modification_action = WStr("CallTargetModification");
 
