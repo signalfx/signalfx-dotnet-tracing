@@ -1,6 +1,6 @@
 workflow:
   rules:
-    - if: '$CI_COMMIT_TAG =~ /^v/'
+    #- if: '$CI_COMMIT_TAG =~ /^v/'
 
 stages:
   - build
@@ -51,36 +51,19 @@ linux-build:
 sign-artifacts:
   stage: sign
   variables:
-    dotnetSdkVersion: 6.0.200
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  cache:
+    key:
+      files:
+        - scripts/signing/requirements.txt
+    paths:
+      - .cache/pip
   script:
-    - |
-      rm .dockerignore
-    - | 
-      docker build \
-        --build-arg DOTNETSDK_VERSION=${dotnetSdkVersion} \
-        --tag splunk-trace-dotnet/checksums \
-        --file "./tracer/build/_build/docker/dotnet.dockerfile" \
-        .
-    - |
-      docker run \
-        --env artifacts=/project/dist \
-        --name checksums \
-        splunk-trace-dotnet/checksums \
-        tracer/build.sh ChecksumArtifacts
-    - |
-      docker cp checksums:/project/dist/checksums.txt dist/checksums.txt
+    - pip3 install -r scripts/signing/requirements.txt
+    - python3 scripts/signing/sign_release.py --path=dist
+    - pushd dist && shasum -a 256 * > checksums.txt && popd
   dependencies: 
     - linux-build
   artifacts:
     paths:
       - dist/checksums.txt
-
-sign-artifacts-new:
-  stage: sign
-  script:
-    - pushd dist && shasum -a 256 * > checksums2.txt && popd
-  dependencies: 
-    - linux-build
-  artifacts:
-    paths:
-      - dist/checksums2.txt
