@@ -337,3 +337,6 @@ tracer/src/Datadog.Trace.ClrProfiler.Native/cmake_install.cmake
 
 .ionide/
 /devenv.bat
+
+# GitLab pipeline artifacts
+dist/

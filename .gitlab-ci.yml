@@ -61,9 +61,9 @@ sign-artifacts:
       - .cache/pip
   script:
     - pip3 install -r scripts/signing/requirements.txt
-    - python3 scripts/signing/sign.py --type RPM --path $( ls dist/*.rpm )
+    - python3 scripts/signing/sign.py --type RPM $( ls dist/*.rpm )
     - pushd dist && shasum -a 256 * > checksums.txt && popd
-    - python3 scripts/signing/sign.py --type GPG --path dist/checksums.txt
+    - python3 scripts/signing/sign.py --type GPG dist/checksums.txt
   dependencies: 
     - linux-build
   artifacts:
