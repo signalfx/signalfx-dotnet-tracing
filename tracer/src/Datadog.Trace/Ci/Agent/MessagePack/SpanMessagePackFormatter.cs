@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Processors;
@@ -39,7 +41,7 @@ namespace Datadog.Trace.Ci.Agent.MessagePack
             var context = value.Context;
 
             offset += MessagePackBinary.WriteStringBytes(ref bytes, offset, _traceIdBytes);
-            offset += MessagePackBinary.WriteUInt64(ref bytes, offset, context.TraceId);
+            offset += MessagePackBinary.WriteUInt64(ref bytes, offset, context.TraceId.Lower);
 
             offset += MessagePackBinary.WriteStringBytes(ref bytes, offset, _spanIdBytes);
             offset += MessagePackBinary.WriteUInt64(ref bytes, offset, context.SpanId);
