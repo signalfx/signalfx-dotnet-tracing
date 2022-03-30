@@ -7,7 +7,7 @@
     Service: sample,
     ParentId: Id_3,
     Tags: {
-      env: integration_tests,
+      deployment.environment: integration_tests,
       span.kind: server,
       version: 1.0.0
     }
@@ -15,24 +15,28 @@
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: aspnet.request,
+    Name: GET /api/transient-failure/false,
+    LogicScope: aspnet.request,
     Resource: GET /api/transient-failure/false,
     Service: sample,
     Type: web,
     Error: 1,
     Tags: {
-      env: integration_tests,
-      error.msg: Passed in value was not 'true': false,
-      error.stack:
-System.ArgumentException: Passed in value was not 'true': false
-at Samples.AspNetMvc5.Controllers.ApiController.TransientFailure(String value),
-      error.type: System.ArgumentException,
+      deployment.environment: integration_tests,
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 500,
-      http.url: /api/transient-failure/false,
+      http.url: http://localhost:00000/api/transient-failure/false,
       language: dotnet,
+      net.peer.ip: ::1,
       runtime-id: Guid_1,
+      sfx.error.kind: System.ArgumentException,
+      sfx.error.message: Passed in value was not 'true': false,
+      sfx.error.stack:
+System.ArgumentException: Passed in value was not 'true': false
+at Samples.AspNetMvc5.Controllers.ApiController.TransientFailure(String value),
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: server,
       version: 1.0.0
     },
@@ -45,7 +49,8 @@ at Samples.AspNetMvc5.Controllers.ApiController.TransientFailure(String value),
   {
     TraceId: Id_1,
     SpanId: Id_4,
-    Name: aspnet-webapi.request,
+    Name: GET /api/transient-failure/false,
+    LogicScope: aspnet-webapi.request,
     Resource: GET /api/transient-failure/false,
     Service: sample,
     Type: web,
@@ -53,17 +58,18 @@ at Samples.AspNetMvc5.Controllers.ApiController.TransientFailure(String value),
     Error: 1,
     Tags: {
       aspnet.route: api/transient-failure/{value},
-      env: integration_tests,
-      error.msg: Passed in value was not 'true': false,
-      error.stack:
-System.ArgumentException: Passed in value was not 'true': false
-at Samples.AspNetMvc5.Controllers.ApiController.TransientFailure(String value),
-      error.type: System.ArgumentException,
+      deployment.environment: integration_tests,
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 500,
       http.url: http://localhost:00000/api/transient-failure/false,
       language: dotnet,
+      net.peer.ip: ::1,
+      sfx.error.kind: System.ArgumentException,
+      sfx.error.message: Passed in value was not 'true': false,
+      sfx.error.stack:
+System.ArgumentException: Passed in value was not 'true': false
+at Samples.AspNetMvc5.Controllers.ApiController.TransientFailure(String value),
       span.kind: server,
       version: 1.0.0
     }

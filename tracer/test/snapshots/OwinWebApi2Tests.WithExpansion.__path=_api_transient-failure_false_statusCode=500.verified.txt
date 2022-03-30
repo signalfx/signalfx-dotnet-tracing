@@ -2,25 +2,28 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: aspnet-webapi.request,
+    Name: GET /api/transient-failure/false,
+    LogicScope: aspnet-webapi.request,
     Resource: GET /api/transient-failure/false,
     Service: Samples.Owin.WebApi2,
     Type: web,
     Error: 1,
     Tags: {
       aspnet.route: api/transient-failure/{value},
-      env: integration_tests,
-      error.msg: Passed in value was not 'true': false,
-      error.stack:
-System.ArgumentException: Passed in value was not 'true': false
-at Samples.AspNetMvc5.Controllers.ApiController.TransientFailure(String value),
-      error.type: System.ArgumentException,
+      deployment.environment: integration_tests,
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.url: http://localhost:00000/api/transient-failure/false,
-      http_useragent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36,
+      http_useragent: Mozilla/5.0,
       language: dotnet,
       runtime-id: Guid_1,
+      sfx.error.kind: System.ArgumentException,
+      sfx.error.message: Passed in value was not 'true': false,
+      sfx.error.stack:
+System.ArgumentException: Passed in value was not 'true': false
+at Samples.AspNetMvc5.Controllers.ApiController.TransientFailure(String value),
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: server,
       version: 1.0.0
     },
@@ -37,8 +40,10 @@ at Samples.AspNetMvc5.Controllers.ApiController.TransientFailure(String value),
     Resource: CustomTracingExceptionHandler.handle-async,
     Service: Samples.Owin.WebApi2,
     Tags: {
-      env: integration_tests,
+      deployment.environment: integration_tests,
       runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: server,
       version: 1.0.0
     },

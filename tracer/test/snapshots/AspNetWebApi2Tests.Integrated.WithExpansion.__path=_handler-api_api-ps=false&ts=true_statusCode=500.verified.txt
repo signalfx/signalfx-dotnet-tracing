@@ -7,7 +7,7 @@
     Service: sample,
     ParentId: Id_3,
     Tags: {
-      env: integration_tests,
+      deployment.environment: integration_tests,
       span.kind: server,
       version: 1.0.0
     }
@@ -15,24 +15,28 @@
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: aspnet.request,
+    Name: GET,
+    LogicScope: aspnet.request,
     Resource: GET /handler-api/api,
     Service: sample,
     Type: web,
     Error: 1,
     Tags: {
-      env: integration_tests,
-      error.msg: Source: PassThroughQuerySuccessMessageHandler. Error: Query param ps was set to a non-true value,
-      error.stack:
-System.ArgumentException: Source: PassThroughQuerySuccessMessageHandler. Error: Query param ps was set to a non-true value
-at Samples.AspNetMvc5.Handlers.PassThroughQuerySuccessMessageHandler.<SendAsync>d__1.MoveNext(),
-      error.type: System.ArgumentException,
+      deployment.environment: integration_tests,
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 500,
-      http.url: /handler-api/api?ps=false&ts=true,
+      http.url: http://localhost:00000/handler-api/api?ps=false&ts=true,
       language: dotnet,
+      net.peer.ip: ::1,
       runtime-id: Guid_1,
+      sfx.error.kind: System.ArgumentException,
+      sfx.error.message: Source: PassThroughQuerySuccessMessageHandler. Error: Query param ps was set to a non-true value,
+      sfx.error.stack:
+System.ArgumentException: Source: PassThroughQuerySuccessMessageHandler. Error: Query param ps was set to a non-true value
+at Samples.AspNetMvc5.Handlers.PassThroughQuerySuccessMessageHandler.<SendAsync>d__1.MoveNext(),
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: server,
       version: 1.0.0
     },
