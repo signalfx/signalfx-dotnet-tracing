@@ -344,17 +344,6 @@ namespace Datadog.Trace.ClrProfiler
             Instrumentations.Add(InstrumentationCategory.Tracing, payload);
             InstrumentationsNatives = InstrumentationsNatives.Concat(payload.Definitions);
                 
-            // root types for InstrumentationCategory AppSec
-            payload = new Payload
-            {
-                DefinitionsId = "8A0651DE92625A7EF3E2BBF32F0D2048",
-                Definitions = new NativeCallTargetDefinition[]
-                {
-                }
-            };
-            Instrumentations.Add(InstrumentationCategory.AppSec, payload);
-            InstrumentationsNatives = InstrumentationsNatives.Concat(payload.Definitions);
-                
             // derived types for InstrumentationCategory Tracing
             payload = new Payload
             {
@@ -374,17 +363,6 @@ namespace Datadog.Trace.ClrProfiler
                 }
             };
             DerivedInstrumentations.Add(InstrumentationCategory.Tracing, payload);
-            DerivedInstrumentationsNatives = DerivedInstrumentationsNatives.Concat(payload.Definitions);
-            
-            // derived types for InstrumentationCategory AppSec
-            payload = new Payload
-            {
-                DefinitionsId = "02043D9EE45819725C08A53565EFDB14",
-                Definitions = new NativeCallTargetDefinition[]
-                {
-                }
-            };
-            DerivedInstrumentations.Add(InstrumentationCategory.AppSec, payload);
             DerivedInstrumentationsNatives = DerivedInstrumentationsNatives.Concat(payload.Definitions);
             
         }

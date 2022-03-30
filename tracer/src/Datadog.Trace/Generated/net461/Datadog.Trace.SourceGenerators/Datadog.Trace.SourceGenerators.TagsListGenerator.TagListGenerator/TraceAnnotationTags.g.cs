@@ -28,6 +28,16 @@ namespace Datadog.Trace.Tagging
             }
         }
 
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] TraceAnnotationTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(CommonTagsProperties,
+                new Datadog.Trace.Tagging.Property<TraceAnnotationTags, string?>("component", t => t.InstrumentationName)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return TraceAnnotationTagsProperties;
+        }
+
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
         {
             var count = 0;
