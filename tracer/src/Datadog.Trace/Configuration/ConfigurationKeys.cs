@@ -402,7 +402,7 @@ namespace Datadog.Trace.Configuration
             /// <summary>
             /// Configuration key for setting the agentless url endpoint
             /// </summary>
-            public const string AgentlessUrl = "DD_CIVISIBILITY_AGENTLESS_URL";
+            public const string AgentlessUrl = "SIGNALFX_CIVISIBILITY_AGENTLESS_URL";
 
             /// <summary>
             /// Configuration key for enabling or disabling Logs direct submission.
