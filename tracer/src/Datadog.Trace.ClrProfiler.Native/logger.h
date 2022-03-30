@@ -75,11 +75,6 @@ public:
         return shared::LoggerImpl<TracerLoggerPolicy>::Instance()->IsDebugEnabled();
     }
 
-    static void Shutdown()
-    {
-        shared::LoggerImpl<TracerLoggerPolicy>::Shutdown();
-    }
-
     static void Flush()
     {
         shared::LoggerImpl<TracerLoggerPolicy>::Instance()->Flush();
