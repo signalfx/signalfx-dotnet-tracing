@@ -100,8 +100,8 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.ILogger
 
                 if (hasTraceId && hasSpanId)
                 {
-                    yield return new KeyValuePair<string, object>("trace_id", traceId);
-                    yield return new KeyValuePair<string, object>("span_id", spanId);
+                    yield return new KeyValuePair<string, object>(CorrelationIdentifier.TraceIdKey, traceId);
+                    yield return new KeyValuePair<string, object>(CorrelationIdentifier.SpanIdKey, spanId);
                 }
             }
         }
