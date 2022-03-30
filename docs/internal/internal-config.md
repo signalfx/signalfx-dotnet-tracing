@@ -37,7 +37,7 @@ These settings should be never used by the users.
 | `SIGNALFX_DOGSTATSD_PIPE_NAME` | The named pipe that DogStatsD binds to. |  |
 | `SIGNALFX_DOGSTATSD_PORT` | The port of the targeted StatsD server. | `8125` |
 | `SIGNALFX_INTERNAL_TRACE_VERSION_COMPATIBILITY` | Enables the compatibility with other versions of tracer. | `false` |
-| `SIGNALFX_MAX_TRACES_PER_SECOND` | The number of traces allowed to be submitted per second. | `100` |
+| `SIGNALFX_TRACE_RATE_LIMIT` | The number of traces allowed to be submitted per second. | `100` |
 | `SIGNALFX_PROXY_HTTPS` | TConfiguration key to set a proxy server for https requests. |  |
 | `SIGNALFX_PROXY_NO_PROXY` | Configuration key to set a list of hosts that should bypass the proxy. The list is space-separated|  |
 | `SIGNALFX_TRACE_{0}_ANALYTICS_ENABLED` | Enable to activate analytics for specific integration. | `false` |
