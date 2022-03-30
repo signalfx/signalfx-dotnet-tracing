@@ -13,6 +13,10 @@ namespace Samples.WebRequest
 {
     public static class Program
     {
+        private const string TraceId = "x-datadog-trace-id";
+        private const string ParentId = "x-datadog-parent-id";
+        private const string SamplingPriority = "x-datadog-sampling-priority";
+
         private const string RequestContent = "PING";
         private const string ResponseContent = "PONG";
         private static readonly Encoding Utf8 = Encoding.UTF8;
@@ -51,7 +55,7 @@ namespace Samples.WebRequest
                 Console.WriteLine("Stopping HTTP listener.");
             }
 
-            await Tracer.Instance.ForceFlushAsync();
+            await SampleHelpers.ForceTracerFlushAsync();
         }
 
         private static void HandleHttpRequests(HttpListenerContext context)
