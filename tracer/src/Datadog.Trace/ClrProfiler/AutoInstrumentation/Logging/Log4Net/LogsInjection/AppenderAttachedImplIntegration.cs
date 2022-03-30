@@ -47,11 +47,20 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Log4Net
                 loggingEvent.Properties[CorrelationIdentifier.VersionKey] = tracer.Settings.ServiceVersion ?? string.Empty;
                 loggingEvent.Properties[CorrelationIdentifier.EnvKey] = tracer.Settings.Environment ?? string.Empty;
 
-                var span = tracer.ActiveScope?.Span;
-                if (span is not null)
+                var spanContext = tracer.DistributedSpanContext;
+                if (spanContext is not null)
                 {
-                    loggingEvent.Properties[CorrelationIdentifier.TraceIdKey] = span.TraceId.ToString();
-                    loggingEvent.Properties[CorrelationIdentifier.SpanIdKey] = span.SpanId;
+                    // For mismatch version support we need to keep requesting old keys.
+                    var hasTraceId = spanContext.TryGetValue(SpanContext.Keys.TraceId, out string traceId) ||
+                                     spanContext.TryGetValue("trace-id", out traceId);
+                    var hasSpanId = spanContext.TryGetValue(SpanContext.Keys.ParentId, out string spanId) ||
+                                    spanContext.TryGetValue("parent-id", out spanId);
+
+                    if (hasTraceId && hasSpanId)
+                    {
+                        loggingEvent.Properties[CorrelationIdentifier.TraceIdKey] = traceId;
+                        loggingEvent.Properties[CorrelationIdentifier.SpanIdKey] = spanId;
+                    }
                 }
             }
 

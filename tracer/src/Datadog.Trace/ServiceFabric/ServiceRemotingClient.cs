@@ -9,6 +9,7 @@
 
 using System;
 using System.Threading;
+using Datadog.Trace.Propagators;
 
 namespace Datadog.Trace.ServiceFabric
 {
@@ -69,7 +70,7 @@ namespace Datadog.Trace.ServiceFabric
                         tracer.TracerManager.Propagator.Inject(
                             span.Context,
                             messageHeaders,
-                            static (headers, headerName, headerValue) => headers.TryAddHeader(headerName, headerValue));
+                            (carrier, key, value) => carrier.TryAddHeader(key, value));
                     }
                 }
                 catch (Exception ex)
@@ -100,6 +101,14 @@ namespace Datadog.Trace.ServiceFabric
             }
 
             ServiceRemotingHelpers.FinishSpan(e, SpanKinds.Client);
+        }
+
+        private readonly struct ServiceRemotingRequestMessageHeaderSetter : ICarrierSetter<IServiceRemotingRequestMessageHeader>
+        {
+            public void Set(IServiceRemotingRequestMessageHeader carrier, string key, string value)
+            {
+                carrier.TryAddHeader(key, value);
+            }
         }
     }
 }

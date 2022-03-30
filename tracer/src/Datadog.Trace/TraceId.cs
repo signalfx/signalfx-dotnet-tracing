@@ -195,7 +195,15 @@ namespace Datadog.Trace
         /// <returns>True if TraceIds are equal, false otherwise.</returns>
         public bool Equals(TraceId other)
         {
-            return Lower == other.Lower && Higher == other.Higher && _isDataDogCompatible == other._isDataDogCompatible;
+            var hasSameBits = Lower == other.Lower && Higher == other.Higher;
+
+            // if we compare two zeros the compatibility mode does not matter
+            if (Lower == 0 && Higher == 0)
+            {
+                return hasSameBits;
+            }
+
+            return hasSameBits && _isDataDogCompatible == other._isDataDogCompatible;
         }
 
         /// <inheritdoc/>

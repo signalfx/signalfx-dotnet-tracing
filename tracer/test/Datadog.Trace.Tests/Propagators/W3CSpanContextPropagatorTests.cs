@@ -1,145 +1,197 @@
-using System;
-using System.Collections.Generic;
-using Datadog.Trace.Conventions;
+// <copyright file="W3CSpanContextPropagatorTests.cs" company="Datadog">
+// Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
+// This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
+// </copyright>
+
+// Modified by Splunk Inc.
+
 using Datadog.Trace.Headers;
-using Datadog.Trace.Propagation;
-using Datadog.Trace.TestHelpers;
+using Datadog.Trace.Propagators;
 using FluentAssertions;
-using FluentAssertions.Execution;
+using Moq;
 using Xunit;
 
 namespace Datadog.Trace.Tests.Propagators
 {
-    public class W3CSpanContextPropagatorTests : HeadersCollectionTestBase
+    public class W3CSpanContextPropagatorTests
     {
-        [Theory]
-        [MemberData(nameof(GetHeaderCollectionImplementations))]
-        internal void Inject_CratesCorrectTraceParentHeader(IHeadersCollection headers)
+        private static readonly SpanContextPropagator W3CPropagator;
+
+        static W3CSpanContextPropagatorTests()
         {
-            var traceId = TraceId.CreateFromString("0af7651916cd43dd8448eb211c80319c");
-            const ulong spanId = 67667974448284343;
-            var spanContext = new SpanContext(traceId, spanId);
-            var propagator = new W3CSpanContextPropagator(new OtelTraceIdConvention());
-
-            propagator.Inject(spanContext, headers);
-
-            using (new AssertionScope())
-            {
-                headers.GetValues(W3CHeaderNames.TraceParent).Should().HaveCount(1);
-                headers.GetValues(W3CHeaderNames.TraceParent).Should().BeEquivalentTo(new List<string> { "00-0af7651916cd43dd8448eb211c80319c-00f067aa0ba902b7-01" });
-            }
+            W3CPropagator = ContextPropagators.GetSpanContextPropagator(new[] { nameof(ContextPropagators.Names.W3C) }, new[] { nameof(ContextPropagators.Names.W3C) });
         }
 
-        [Theory]
-        [MemberData(nameof(GetHeaderCollectionImplementations))]
-        internal void Inject_CreateCorrectTraceStateHeaderIfPresent(IHeadersCollection headers)
+        [Fact]
+        public void Inject_IHeadersCollection()
         {
-            var traceId = TraceId.CreateFromString("0af7651916cd43dd8448eb211c80319c");
-            const ulong spanId = 67667974448284343;
-            var spanContext = new SpanContext(traceId, spanId, "state");
-            var propagator = new W3CSpanContextPropagator(new OtelTraceIdConvention());
+            TraceId traceId = TraceId.CreateFromString("00000000075bcd15");
+            ulong spanId = 987654321;
+            var samplingPriority = SamplingPriorityValues.UserKeep;
+            var context = new SpanContext(traceId, spanId, samplingPriority, serviceName: null, null);
+            var headers = new Mock<IHeadersCollection>();
 
-            propagator.Inject(spanContext, headers);
+            W3CPropagator.Inject(context, headers.Object);
 
-            using (new AssertionScope())
-            {
-                headers.GetValues(W3CHeaderNames.TraceState).Should().HaveCount(1);
-                headers.GetValues(W3CHeaderNames.TraceState).Should().BeEquivalentTo(new List<string> { "state" });
-            }
+            headers.Verify(h => h.Set(W3CContextPropagator.TraceParent, "00-000000000000000000000000075bcd15-000000003ade68b1-01"), Times.Once());
+            headers.VerifyNoOtherCalls();
         }
 
-        [Theory]
-        [MemberData(nameof(GetHeaderCollectionImplementations))]
-        internal void Inject_DoNotCreateCorrectTraceStateHeaderIfNotPresent(IHeadersCollection headers)
+        [Fact]
+        public void Inject_CarrierAndDelegate()
         {
-            var traceId = TraceId.CreateFromString("0af7651916cd43dd8448eb211c80319c");
-            const ulong spanId = 67667974448284343;
-            var spanContext = new SpanContext(traceId, spanId, traceState: null);
-            var propagator = new W3CSpanContextPropagator(new OtelTraceIdConvention());
+            TraceId traceId = TraceId.CreateFromString("00000000075bcd15");
+            ulong spanId = 987654321;
+            var samplingPriority = SamplingPriorityValues.UserKeep;
+            var context = new SpanContext(traceId, spanId, samplingPriority, serviceName: null, null);
 
-            propagator.Inject(spanContext, headers);
+            // using IHeadersCollection for convenience, but carrier could be any type
+            var headers = new Mock<IHeadersCollection>();
 
-            headers.GetValues(W3CHeaderNames.TraceState).Should().HaveCount(0);
+            W3CPropagator.Inject(context, headers.Object, (carrier, name, value) => carrier.Set(name, value));
+
+            headers.Verify(h => h.Set(W3CContextPropagator.TraceParent, "00-000000000000000000000000075bcd15-000000003ade68b1-01"), Times.Once());
+            headers.VerifyNoOtherCalls();
         }
 
-        [Theory]
-        [MemberData(nameof(GetHeaderCollectionImplementations))]
-        internal void Extract_ReturnCorrectTraceAndSpanIdInContext(IHeadersCollection headers)
+        [Fact]
+        public void Extract_IHeadersCollection()
         {
-            var propagator = new W3CSpanContextPropagator(new OtelTraceIdConvention());
-            headers.Set(W3CHeaderNames.TraceParent, "00-0af7651916cd43dd8448eb211c80319c-00f067aa0ba902b7-01");
+            var headers = new Mock<IHeadersCollection>(MockBehavior.Strict);
+            headers.Setup(h => h.GetValues(W3CContextPropagator.TraceParent))
+                   .Returns(new[] { "00-000000000000000000000000075bcd15-000000003ade68b1-01" });
 
-            var spanContext = propagator.Extract(headers);
+            var result = W3CPropagator.Extract(headers.Object);
 
-            using (new AssertionScope())
-            {
-                spanContext.SpanId.Should().Be(67667974448284343);
-                spanContext.TraceId.Should().Be(TraceId.CreateFromString("0af7651916cd43dd8448eb211c80319c"));
-            }
+            headers.Verify(h => h.GetValues(W3CContextPropagator.TraceParent), Times.Once());
+            result.Should()
+                  .BeEquivalentTo(
+                       new SpanContextMock
+                       {
+                           TraceId = TraceId.CreateFromString("00000000075bcd15"),
+                           SpanId = 987654321,
+                           Origin = null,
+                           SamplingPriority = SamplingPriorityValues.AutoKeep,
+                       });
         }
 
-        [Theory]
-        [MemberData(nameof(GetHeaderCollectionImplementations))]
-        internal void Extract_ReturnCorrectTraceStateInContextIfPresent(IHeadersCollection headers)
+        [Fact]
+        public void Extract_CarrierAndDelegate()
         {
-            var propagator = new W3CSpanContextPropagator(new OtelTraceIdConvention());
-            headers.Set(W3CHeaderNames.TraceParent, "00-0af7651916cd43dd8448eb211c80319c-00f067aa0ba902b7-01");
-            headers.Set(W3CHeaderNames.TraceState, "state=2,am=dsa");
+            // using IHeadersCollection for convenience, but carrier could be any type
+            var headers = new Mock<IHeadersCollection>(MockBehavior.Strict);
+            headers.Setup(h => h.GetValues(W3CContextPropagator.TraceParent))
+                   .Returns(new[] { "00-000000000000000000000000075bcd15-000000003ade68b1-01" });
 
-            var spanContext = propagator.Extract(headers);
+            var result = W3CPropagator.Extract(headers.Object, (carrier, name) => carrier.GetValues(name));
 
-            spanContext.TraceState.Should().Be("state=2,am=dsa");
+            headers.Verify(h => h.GetValues(W3CContextPropagator.TraceParent), Times.Once());
+
+            result.Should()
+                  .BeEquivalentTo(
+                       new SpanContextMock
+                       {
+                           TraceId = TraceId.CreateFromString("00000000075bcd15"),
+                           SpanId = 987654321,
+                           Origin = null,
+                           SamplingPriority = SamplingPriorityValues.AutoKeep,
+                       });
         }
 
-        [Theory]
-        [MemberData(nameof(GetHeaderCollectionImplementations))]
-        internal void Extract_DoNotReturnTraceStateInContextIfNotPresent(IHeadersCollection headers)
+        [Fact]
+        public void ExtractAndInject_PreserveOriginalTraceId()
         {
-            var propagator = new W3CSpanContextPropagator(new OtelTraceIdConvention());
-            headers.Set(W3CHeaderNames.TraceParent, "00-0af7651916cd43dd8448eb211c80319c-00f067aa0ba902b7-01");
+            var traceId = "0af7651916cd43dd8448eb211c80319c";
+            var spanId = "00f067aa0ba902b7";
+            var expectedTraceParent = $"00-{traceId}-{spanId}-01";
+            var headers = new Mock<IHeadersCollection>(MockBehavior.Strict);
+            headers.Setup(h => h.GetValues(W3CContextPropagator.TraceParent))
+                   .Returns(new[] { expectedTraceParent });
 
-            var spanContext = propagator.Extract(headers);
+            var result = W3CPropagator.Extract(headers.Object);
 
-            spanContext.TraceState.Should().BeNullOrEmpty();
+            // 64 bits verify
+            var expectedTraceId = TraceId.CreateFromString(traceId);
+            var expectedSpanId = 67667974448284343UL;
+            Assert.Equal(expectedTraceId, result.TraceId);
+            Assert.Equal(expectedSpanId, result.SpanId);
+
+            // Check truncation
+            var truncatedTraceId64 = expectedTraceId.ToString();
+            Assert.Equal(truncatedTraceId64, traceId);
+
+            // Check the injection restoring the 128 bits traceId.
+            var headersForInjection = new Mock<IHeadersCollection>(MockBehavior.Strict);
+            headersForInjection.Setup(h => h.Set(W3CContextPropagator.TraceParent, expectedTraceParent));
+
+            W3CPropagator.Inject(result, headersForInjection.Object);
+
+            headersForInjection.Verify(h => h.Set(W3CContextPropagator.TraceParent, expectedTraceParent), Times.Once());
         }
 
-        [Theory]
-        [MemberData(nameof(GetHeaderCollectionImplementations))]
-        internal void Extract_OmitsTraceStateWithIncorrectValue(IHeadersCollection headers)
+        [Fact]
+        public void Extract_InvalidLength()
         {
-            var propagator = new W3CSpanContextPropagator(new OtelTraceIdConvention());
-            headers.Set(W3CHeaderNames.TraceParent, "00-0af7651916cd43dd8448eb211c80319c-00f067aa0ba902b7-01");
-            headers.Set(W3CHeaderNames.TraceState, "state=,arn=2");
+            var headers = new Mock<IHeadersCollection>(MockBehavior.Strict);
+            headers.Setup(h => h.GetValues(W3CContextPropagator.TraceParent))
+                   .Returns(new[] { "00-1234000000000000000000000000075bcd15-000000003ade68b1-01" });
 
-            var spanContext = propagator.Extract(headers);
+            var result = W3CPropagator.Extract(headers.Object);
 
-            spanContext.TraceState.Should().BeNullOrEmpty();
+            headers.Verify(h => h.GetValues(W3CContextPropagator.TraceParent), Times.Once());
+            Assert.Null(result);
         }
 
-        [Theory]
-        [MemberData(nameof(GetHeaderCollectionImplementations))]
-        internal void Extract_OmitsTraceStateWithIncorrectKey(IHeadersCollection headers)
+        [Fact]
+        public void Extract_InvalidFormat()
         {
-            var propagator = new W3CSpanContextPropagator(new OtelTraceIdConvention());
-            headers.Set(W3CHeaderNames.TraceParent, "00-0af7651916cd43dd8448eb211c80319c-00f067aa0ba902b7-01");
-            headers.Set(W3CHeaderNames.TraceState, "statDSAe=3,arn=2");
+            var headers = new Mock<IHeadersCollection>(MockBehavior.Strict);
+            headers.Setup(h => h.GetValues(W3CContextPropagator.TraceParent))
+                   .Returns(new[] { "00=000000000000000000000000075bcd15=000000003ade68b1=01" });
 
-            var spanContext = propagator.Extract(headers);
+            var result = W3CPropagator.Extract(headers.Object);
 
-            spanContext.TraceState.Should().BeNullOrEmpty();
+            headers.Verify(h => h.GetValues(W3CContextPropagator.TraceParent), Times.Once());
+            Assert.Null(result);
         }
 
-        [Theory]
-        [MemberData(nameof(GetHeaderCollectionImplementations))]
-        internal void Extract_OmitsEmptyTraceState(IHeadersCollection headers)
+        [Fact]
+        public void Extract_InvalidSampledFormat()
         {
-            var propagator = new W3CSpanContextPropagator(new OtelTraceIdConvention());
-            headers.Set(W3CHeaderNames.TraceParent, "00-0af7651916cd43dd8448eb211c80319c-00f067aa0ba902b7-01");
-            headers.Set(W3CHeaderNames.TraceState, string.Empty);
+            var headers = new Mock<IHeadersCollection>(MockBehavior.Strict);
+            headers.Setup(h => h.GetValues(W3CContextPropagator.TraceParent))
+                   .Returns(new[] { "00-000000000000000000000000075bcd15-000000003ade68b1-51" });
 
-            var spanContext = propagator.Extract(headers);
+            var result = W3CPropagator.Extract(headers.Object);
 
-            spanContext.TraceState.Should().BeNullOrEmpty();
+            headers.Verify(h => h.GetValues(W3CContextPropagator.TraceParent), Times.Once());
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void Extract_EmptyTraceIdStrings()
+        {
+            var headers = new Mock<IHeadersCollection>(MockBehavior.Strict);
+            headers.Setup(h => h.GetValues(W3CContextPropagator.TraceParent))
+                   .Returns(new[] { "00-                                -000000003ade68b1-01" });
+
+            var result = W3CPropagator.Extract(headers.Object);
+
+            headers.Verify(h => h.GetValues(W3CContextPropagator.TraceParent), Times.Once());
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void Extract_EmptyStrings()
+        {
+            var headers = new Mock<IHeadersCollection>(MockBehavior.Strict);
+            headers.Setup(h => h.GetValues(W3CContextPropagator.TraceParent))
+                   .Returns(new[] { "       " });
+
+            var result = W3CPropagator.Extract(headers.Object);
+
+            headers.Verify(h => h.GetValues(W3CContextPropagator.TraceParent), Times.Once());
+            Assert.Null(result);
         }
     }
 }
