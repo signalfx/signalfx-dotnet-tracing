@@ -1,7 +1,6 @@
 #include "pch.h"
 
 #include <codecvt>
-#include <filesystem>
 #include <locale>
 #include <string>
 #include <vector>
