@@ -5,7 +5,7 @@
     Name: HTTP GET,
     LogicScope: aspnet_core.request,
     Resource: GET /health/login.php,
-    Service: Samples.AspNetCore5,
+    Service: Samples.Security.AspNetCore5,
     Type: web,
     Tags: {
       actor.ip: 86.242.244.246,
@@ -44,7 +44,7 @@
     Name: HTTP GET,
     LogicScope: aspnet_core.request,
     Resource: GET /health/login.php,
-    Service: Samples.AspNetCore5,
+    Service: Samples.Security.AspNetCore5,
     Type: web,
     Tags: {
       actor.ip: 86.242.244.246,
@@ -83,7 +83,7 @@
     Name: HTTP GET,
     LogicScope: aspnet_core.request,
     Resource: GET /health/login.php,
-    Service: Samples.AspNetCore5,
+    Service: Samples.Security.AspNetCore5,
     Type: web,
     Tags: {
       actor.ip: 86.242.244.246,
@@ -122,7 +122,7 @@
     Name: HTTP GET,
     LogicScope: aspnet_core.request,
     Resource: GET /health/login.php,
-    Service: Samples.AspNetCore5,
+    Service: Samples.Security.AspNetCore5,
     Type: web,
     Tags: {
       actor.ip: 86.242.244.246,
@@ -161,7 +161,7 @@
     Name: HTTP GET,
     LogicScope: aspnet_core.request,
     Resource: GET /health/login.php,
-    Service: Samples.AspNetCore5,
+    Service: Samples.Security.AspNetCore5,
     Type: web,
     Tags: {
       actor.ip: 86.242.244.246,

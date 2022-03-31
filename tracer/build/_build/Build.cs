@@ -322,7 +322,7 @@ partial class Build : NukeBuild
                     .SetFramework(TargetFramework.NETCOREAPP3_1)
                     .EnableNoRestore()
                     .EnableNoBuild()
-                    .SetApplicationArguments("-r net472 netcoreapp3.1 -m -f * --iterationTime 2000")
+                    .SetApplicationArguments($"-r net472 netcoreapp3.1 -m -f {Filter ?? "*"} --iterationTime 2000")
                     .SetProcessEnvironmentVariable("SIGNALFX_SERVICE_NAME", "otel-trace-dotnet")
                     .SetProcessEnvironmentVariable("SIGNALFX_ENV", "CI")
                     .When(!string.IsNullOrEmpty(NugetPackageDirectory), o => o.SetPackageDirectory(NugetPackageDirectory))

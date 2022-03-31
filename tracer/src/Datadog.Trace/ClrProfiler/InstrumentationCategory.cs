@@ -8,6 +8,6 @@ namespace Datadog.Trace.ClrProfiler
     internal enum InstrumentationCategory
     {
         [DefinitionsId("FFAFA5168C4F4718B40CA8788875C2DA", "61BF627FA9B5477F85595A9F0D68B29C")]
-        Tracing
+        Tracing,
     }
 }
