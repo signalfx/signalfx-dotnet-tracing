@@ -7,7 +7,7 @@
 #include <algorithm>
 #ifndef _WIN32
   #include <pthread.h>
-  #include<codecvt>
+  #include <codecvt>
 #endif
 
 constexpr auto max_string_length = 512UL;

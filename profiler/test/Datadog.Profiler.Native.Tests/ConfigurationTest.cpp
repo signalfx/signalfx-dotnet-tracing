@@ -153,7 +153,7 @@ TEST(ConfigurationTest, CheckDefaultPprofDirectoryWhenVariableIsNotSet)
     auto configuration = Configuration{};
     auto expectedValue =
 #ifdef _WINDOWS
-        WStr("C:\\ProgramData\\SignalFx .NET Tracing\Pprof-files\\DotNet");
+        WStr("C:\\ProgramData\\SignalFx .NET Tracing\\Pprof-files\\DotNet");
 #else
         WStr("/var/log/signalfx/pprof-files");
 #endif
