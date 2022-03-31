@@ -144,7 +144,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                         }
                         else
                         {
-                            Assert.Equal(expectedRuntimeId, currentRuntimeId);
+                            // TODO Splunk: this assertion can be uncommented if we start using *.AutoInstrumentation.NativeLoader.*.dll
+                            // Assert.Equal(expectedRuntimeId, currentRuntimeId);
                         }
                     }
                 }
