@@ -61,9 +61,9 @@ sign-artifacts:
       - .cache/pip
   script:
     - pip3 install -r scripts/signing/requirements.txt
-    - python3 scripts/signing/sign.py --staging-repo $STAGING_REPO --staging-user $STAGING_USER --staging-pass $STAGING_PASS --chaperone-token $CHAPERONE_TOKEN --type RPM --dest dist/signed $( ls dist/*.rpm )
+    - python3 scripts/signing/main.py --staging-repo $STAGING_REPO --staging-user $STAGING_USER --staging-pass $STAGING_PASS --chaperone-token $CHAPERONE_TOKEN --type RPM --dest dist/signed $( ls dist/*.rpm )
     - pushd dist && shasum -a 256 * > checksums.txt && popd
-    - python3 scripts/signing/sign.py --staging-repo $STAGING_REPO --staging-user $STAGING_USER --staging-pass $STAGING_PASS --chaperone-token $CHAPERONE_TOKEN --type GPG --dest dist dist/checksums.txt
+    - python3 scripts/signing/main.py --staging-repo $STAGING_REPO --staging-user $STAGING_USER --staging-pass $STAGING_PASS --chaperone-token $CHAPERONE_TOKEN --type GPG --dest dist dist/checksums.txt
   dependencies: 
     - linux-build
   artifacts:
