@@ -147,7 +147,7 @@ namespace Datadog.Trace.Configuration
         /// to be submitted per second.
         /// </summary>
         /// <seealso cref="TracerSettings.MaxTracesSubmittedPerSecond"/>
-        public const string MaxTracesSubmittedPerSecond = "SIGNALFX_MAX_TRACES_PER_SECOND";
+        public const string TraceRateLimit = "SIGNALFX_TRACE_RATE_LIMIT";
 
         /// <summary>
         /// Configuration key for enabling or disabling the diagnostic log at startup
@@ -377,6 +377,12 @@ namespace Datadog.Trace.Configuration
         public const string ExpandRouteTemplatesEnabled = "SIGNALFX_TRACE_EXPAND_ROUTE_TEMPLATES_ENABLED";
 
         /// <summary>
+        /// Configuration key for enabling automatic instrumentation on specified methods.
+        /// Default value is "" (disabled).
+        /// </summary>
+        public const string TraceMethods = "DD_TRACE_METHODS";
+
+        /// <summary>
         /// String constants for CI Visibility configuration keys.
         /// </summary>
         public static class CIVisibility
@@ -392,6 +398,11 @@ namespace Datadog.Trace.Configuration
             /// Default is value is false (disabled).
             /// </summary>
             public const string AgentlessEnabled = "SIGNALFX_CIVISIBILITY_AGENTLESS_ENABLED";
+
+            /// <summary>
+            /// Configuration key for setting the agentless url endpoint
+            /// </summary>
+            public const string AgentlessUrl = "SIGNALFX_CIVISIBILITY_AGENTLESS_URL";
 
             /// <summary>
             /// Configuration key for enabling or disabling Logs direct submission.

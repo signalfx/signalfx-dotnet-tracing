@@ -469,7 +469,6 @@ namespace Datadog.Trace.IntegrationTests.DiagnosticListeners
             parentSpan.Type.Should().Be(SpanTypes.Web);
             parentSpan.ResourceName.Should().Be(resourceName);
             AssertTagHasValue(parentSpan, Tags.SpanKind, SpanKinds.Server);
-            AssertTagHasValue(parentSpan, Tags.Language, TracerConstants.Language);
             AssertTagHasValue(parentSpan, Tags.HttpStatusCode, ((int)statusCode).ToString());
             Assert.Equal(parentSpan.Status.StatusCode == StatusCode.Error, isError);
 
@@ -491,7 +490,6 @@ namespace Datadog.Trace.IntegrationTests.DiagnosticListeners
                 childSpan.Type.Should().Be(SpanTypes.Web);
                 childSpan.ResourceName.Should().Be(childSpan1ResourceName ?? resourceName);
                 AssertTagHasValue(childSpan, Tags.SpanKind, SpanKinds.Server);
-                AssertTagHasValue(childSpan, Tags.Language, TracerConstants.Language);
 
                 if (firstChildSpanTags is not null)
                 {
@@ -510,7 +508,6 @@ namespace Datadog.Trace.IntegrationTests.DiagnosticListeners
                     childSpan2.Type.Should().Be(SpanTypes.Web);
                     childSpan2.ResourceName.Should().Be(childSpan2ResourceName);
                     AssertTagHasValue(childSpan2, Tags.SpanKind, SpanKinds.Server);
-                    AssertTagHasValue(childSpan2, Tags.Language, TracerConstants.Language);
 
                     if (secondChildSpanTags is not null)
                     {

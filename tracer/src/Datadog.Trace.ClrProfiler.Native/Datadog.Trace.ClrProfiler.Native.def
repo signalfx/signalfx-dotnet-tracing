@@ -9,5 +9,6 @@ EXPORTS
     EnableByRefInstrumentation
     EnableCallTargetStateByRef
     AddDerivedInstrumentations
+    InitializeTraceMethods
     SignalFxReadThreadSamples
     SignalFxSetNativeContext

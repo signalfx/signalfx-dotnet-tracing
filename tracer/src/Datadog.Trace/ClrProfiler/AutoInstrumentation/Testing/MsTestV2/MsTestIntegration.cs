@@ -44,18 +44,16 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Testing.MsTestV2
             span.SetTraceSamplingPriority(SamplingPriorityValues.AutoKeep);
             span.ResourceName = $"{testSuite}.{testName}";
             span.SetTag(Tags.Origin, TestTags.CIAppTestOriginName);
-            span.SetTag(Tags.Language, TracerConstants.Language);
             span.SetTag(TestTags.Bundle, testBundle);
             span.SetTag(TestTags.Suite, testSuite);
             span.SetTag(TestTags.Name, testName);
             span.SetTag(TestTags.Framework, testFramework);
             span.SetTag(TestTags.FrameworkVersion, type.Assembly?.GetName().Version.ToString());
             span.SetTag(TestTags.Type, TestTags.TypeTest);
-            span.SetTag(CommonTags.LibraryVersion, TracerConstants.AssemblyVersion);
             CIEnvironmentValues.Instance.DecorateSpan(span);
 
             var framework = FrameworkDescription.Instance;
-
+            span.SetTag(CommonTags.LibraryVersion, TracerConstants.AssemblyVersion);
             span.SetTag(CommonTags.RuntimeName, framework.Name);
             span.SetTag(CommonTags.RuntimeVersion, framework.ProductVersion);
             span.SetTag(CommonTags.RuntimeArchitecture, framework.ProcessArchitecture);

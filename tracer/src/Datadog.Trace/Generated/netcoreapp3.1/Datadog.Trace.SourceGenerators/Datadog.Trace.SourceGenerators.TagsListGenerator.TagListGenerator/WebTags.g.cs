@@ -12,7 +12,6 @@ namespace Datadog.Trace.Tagging
         private static readonly byte[] HttpRequestHeadersHostBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("http.host");
         private static readonly byte[] HttpUrlBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("http.url");
         private static readonly byte[] PeerIpBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("net.peer.ip");
-        private static readonly byte[] LanguageBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("language");
         private static readonly byte[] HttpStatusCodeBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("http.status_code");
 
         public override string? GetTag(string key)
@@ -24,7 +23,6 @@ namespace Datadog.Trace.Tagging
                 "http.host" => HttpRequestHeadersHost,
                 "http.url" => HttpUrl,
                 "net.peer.ip" => PeerIp,
-                "language" => Language,
                 "http.status_code" => HttpStatusCode,
                 _ => base.GetTag(key),
             };
@@ -62,7 +60,6 @@ namespace Datadog.Trace.Tagging
                 new Datadog.Trace.Tagging.Property<WebTags, string?>("http.host", t => t.HttpRequestHeadersHost),
                 new Datadog.Trace.Tagging.Property<WebTags, string?>("http.url", t => t.HttpUrl),
                 new Datadog.Trace.Tagging.Property<WebTags, string?>("net.peer.ip", t => t.PeerIp),
-                new Datadog.Trace.Tagging.Property<WebTags, string?>("language", t => t.Language),
                 new Datadog.Trace.Tagging.Property<WebTags, string?>("http.status_code", t => t.HttpStatusCode)
 );
 
@@ -102,12 +99,6 @@ namespace Datadog.Trace.Tagging
             {
                 count++;
                 WriteTag(ref bytes, ref offset, PeerIpBytes, PeerIp, tagProcessors);
-            }
-
-            if (Language != null)
-            {
-                count++;
-                WriteTag(ref bytes, ref offset, LanguageBytes, Language, tagProcessors);
             }
 
             if (HttpStatusCode != null)
@@ -153,13 +144,6 @@ namespace Datadog.Trace.Tagging
             {
                 sb.Append("net.peer.ip (tag):")
                   .Append(PeerIp)
-                  .Append(',');
-            }
-
-            if (Language != null)
-            {
-                sb.Append("language (tag):")
-                  .Append(Language)
                   .Append(',');
             }
 
