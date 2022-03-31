@@ -1,4 +1,4 @@
-[
+﻿[
   {
     TraceId: Id_1,
     SpanId: Id_2,
@@ -7,9 +7,11 @@
     Service: Samples.TraceAnnotations,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       version: 1.0.0
     },
     Metrics: {
@@ -27,7 +29,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -41,7 +43,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -55,7 +57,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -69,7 +71,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -83,7 +85,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -97,7 +99,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -111,7 +113,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -125,7 +127,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -139,7 +141,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -153,7 +155,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -167,7 +169,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -181,7 +183,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -195,7 +197,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -209,7 +211,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -223,7 +225,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -237,7 +239,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -251,7 +253,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -265,7 +267,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -279,7 +281,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -293,7 +295,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -307,7 +309,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -321,7 +323,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -335,7 +337,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -349,7 +351,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -363,7 +365,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -377,7 +379,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -391,7 +393,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -405,7 +407,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -419,7 +421,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -433,7 +435,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -447,7 +449,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -461,7 +463,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -475,7 +477,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -489,7 +491,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -503,7 +505,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -517,7 +519,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -531,7 +533,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -545,7 +547,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -559,7 +561,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
