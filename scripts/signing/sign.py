@@ -101,7 +101,7 @@ def submit_signing_request(
     resp = requests.post(CHAPERONE_API_URL + "/SIGN/submit", headers=headers, data=data)
     assert (
         resp.status_code == 200
-    ), f"signing request failed:\n{resp.reason}\n{resp.text}"
+    ), f"Signing request failed: {resp.reason}\n{resp.text}"
     assert (
         "item_key" in resp.json().keys()
     ), f"'item_key' not found in response\n{resp.text}"
