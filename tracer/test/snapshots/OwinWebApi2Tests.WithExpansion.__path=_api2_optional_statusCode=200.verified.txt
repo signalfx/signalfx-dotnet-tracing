@@ -1,0 +1,33 @@
+[
+  {
+    TraceId: Id_1,
+    SpanId: Id_2,
+    Name: GET /api2/optional/{value},
+    LogicScope: aspnet-webapi.request,
+    Resource: GET /api2/optional/{value},
+    Service: Samples.Owin.WebApi2,
+    Type: web,
+    Tags: {
+      aspnet.action: optional,
+      aspnet.controller: conventions,
+      aspnet.route: api2/{action}/{value},
+      deployment.environment: integration_tests,
+      http.method: GET,
+      http.request.headers.host: localhost:00000,
+      http.status_code: 200,
+      http.url: http://localhost:00000/api2/optional,
+      http_useragent: Mozilla/5.0,
+      language: dotnet,
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: server,
+      version: 1.0.0
+    },
+    Metrics: {
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  }
+]

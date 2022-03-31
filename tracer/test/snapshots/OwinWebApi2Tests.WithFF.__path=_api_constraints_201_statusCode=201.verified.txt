@@ -1,0 +1,31 @@
+[
+  {
+    TraceId: Id_1,
+    SpanId: Id_2,
+    Name: GET /api/constraints/{statuscode},
+    LogicScope: aspnet-webapi.request,
+    Resource: GET /api/constraints/{statuscode},
+    Service: Samples.Owin.WebApi2,
+    Type: web,
+    Tags: {
+      aspnet.route: api/constraints/{statuscode},
+      deployment.environment: integration_tests,
+      http.method: GET,
+      http.request.headers.host: localhost:00000,
+      http.status_code: 201,
+      http.url: http://localhost:00000/api/constraints/201,
+      http_useragent: Mozilla/5.0,
+      language: dotnet,
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: server,
+      version: 1.0.0
+    },
+    Metrics: {
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  }
+]

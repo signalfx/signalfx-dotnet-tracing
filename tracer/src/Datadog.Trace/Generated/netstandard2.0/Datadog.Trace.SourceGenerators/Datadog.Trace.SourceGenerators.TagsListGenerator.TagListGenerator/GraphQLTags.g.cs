@@ -9,7 +9,6 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.GraphQL
     {
         private static readonly byte[] SpanKindBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("span.kind");
         private static readonly byte[] InstrumentationNameBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("component");
-        private static readonly byte[] LanguageBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("language");
         private static readonly byte[] SourceBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("graphql.source");
         private static readonly byte[] OperationNameBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("graphql.operation.name");
         private static readonly byte[] OperationTypeBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("graphql.operation.type");
@@ -20,7 +19,6 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.GraphQL
             {
                 "span.kind" => SpanKind,
                 "component" => InstrumentationName,
-                "language" => Language,
                 "graphql.source" => Source,
                 "graphql.operation.name" => OperationName,
                 "graphql.operation.type" => OperationType,
@@ -51,7 +49,6 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.GraphQL
              Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(InstrumentationTagsProperties,
                 new Datadog.Trace.Tagging.Property<GraphQLTags, string?>("span.kind", t => t.SpanKind),
                 new Datadog.Trace.Tagging.Property<GraphQLTags, string?>("component", t => t.InstrumentationName),
-                new Datadog.Trace.Tagging.Property<GraphQLTags, string?>("language", t => t.Language),
                 new Datadog.Trace.Tagging.Property<GraphQLTags, string?>("graphql.source", t => t.Source),
                 new Datadog.Trace.Tagging.Property<GraphQLTags, string?>("graphql.operation.name", t => t.OperationName),
                 new Datadog.Trace.Tagging.Property<GraphQLTags, string?>("graphql.operation.type", t => t.OperationType)
@@ -75,12 +72,6 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.GraphQL
             {
                 count++;
                 WriteTag(ref bytes, ref offset, InstrumentationNameBytes, InstrumentationName, tagProcessors);
-            }
-
-            if (Language != null)
-            {
-                count++;
-                WriteTag(ref bytes, ref offset, LanguageBytes, Language, tagProcessors);
             }
 
             if (Source != null)
@@ -117,13 +108,6 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.GraphQL
             {
                 sb.Append("component (tag):")
                   .Append(InstrumentationName)
-                  .Append(',');
-            }
-
-            if (Language != null)
-            {
-                sb.Append("language (tag):")
-                  .Append(Language)
                   .Append(',');
             }
 

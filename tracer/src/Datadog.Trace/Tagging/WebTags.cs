@@ -26,9 +26,6 @@ namespace Datadog.Trace.Tagging
         [Tag(Trace.Tags.Net.PeerIP)]
         public string PeerIp { get; set; }
 
-        [Tag(Trace.Tags.Language)]
-        public string Language => TracerConstants.Language;
-
         [Tag(Trace.Tags.HttpStatusCode)]
         public string HttpStatusCode { get; set; }
     }

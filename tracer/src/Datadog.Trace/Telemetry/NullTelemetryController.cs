@@ -5,6 +5,7 @@
 
 // Modified by Splunk Inc.
 
+using System.Threading.Tasks;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.PlatformHelpers;
 
@@ -30,16 +31,18 @@ namespace Datadog.Trace.Telemetry
         {
         }
 
-        public void Dispose(bool sendAppClosingTelemetry)
+        public Task DisposeAsync(bool sendAppClosingTelemetry)
         {
+            return Task.CompletedTask;
         }
 
         public void Start()
         {
         }
 
-        public void Dispose()
+        public Task DisposeAsync()
         {
+            return Task.CompletedTask;
         }
     }
 }

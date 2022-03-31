@@ -118,6 +118,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 var spans = agent.WaitForSpans(expectedSpanCount);
                 Assert.True(spans.Count >= expectedSpanCount, $"Expected at least {expectedSpanCount} span, only received {spans.Count}");
 
+                var expectedRuntimeId = string.Empty;
+
                 foreach (var span in spans)
                 {
                     Assert.Equal(expectedOperationName, span.LogicScope);
@@ -132,6 +134,20 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                     newCount++;
                     actualMap[span.Service] = newCount;
+
+                    if (span.Tags?.TryGetValue(Tags.RuntimeId, out var currentRuntimeId) ?? false)
+                    {
+                        Assert.False(string.IsNullOrEmpty(currentRuntimeId));
+                        if (expectedRuntimeId == string.Empty)
+                        {
+                            expectedRuntimeId = currentRuntimeId;
+                        }
+                        else
+                        {
+                            // TODO Splunk: this assertion can be uncommented if we start using *.AutoInstrumentation.NativeLoader.*.dll
+                            // Assert.Equal(expectedRuntimeId, currentRuntimeId);
+                        }
+                    }
                 }
 
                 Assert.Equal(expectedMap, actualMap);

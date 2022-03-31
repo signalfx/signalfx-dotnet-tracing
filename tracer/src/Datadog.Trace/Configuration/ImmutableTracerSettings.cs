@@ -67,6 +67,7 @@ namespace Datadog.Trace.Configuration
             TraceBatchInterval = settings.TraceBatchInterval;
             RouteTemplateResourceNamesEnabled = settings.RouteTemplateResourceNamesEnabled;
             DelayWcfInstrumentationEnabled = settings.DelayWcfInstrumentationEnabled;
+            TraceMethods = settings.TraceMethods;
 
             TagMongoCommands = settings.TagMongoCommands;
             TagRedisCommands = settings.TagRedisCommands;
@@ -148,7 +149,7 @@ namespace Datadog.Trace.Configuration
         /// Gets a value indicating the maximum number of traces set to AutoKeep (p1) per second.
         /// Default is <c>100</c>.
         /// </summary>
-        /// <seealso cref="ConfigurationKeys.MaxTracesSubmittedPerSecond"/>
+        /// <seealso cref="ConfigurationKeys.TraceRateLimit"/>
         public int MaxTracesSubmittedPerSecond { get; }
 
         /// <summary>
@@ -332,6 +333,11 @@ namespace Datadog.Trace.Configuration
         /// until later in the WCF pipeline when the WCF server exception handling is established.
         /// </summary>
         internal bool DelayWcfInstrumentationEnabled { get; }
+
+        /// <summary>
+        /// Gets a value indicating the trace methods configuration.
+        /// </summary>
+        internal string TraceMethods { get; }
 
         /// <summary>
         /// Create a <see cref="ImmutableTracerSettings"/> populated from the default sources

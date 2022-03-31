@@ -33,6 +33,7 @@ RUN apt-get update \
         ruby=1:2.5.1 \
         ruby-dev=1:2.5.1 \
         rubygems-integration=1.11+deb10u1 \
+        uuid-dev=2.33.1-0.1 \
     && gem install --no-document fpm --version 1.14.1 \
     && rm -rf /var/lib/apt/lists/*
 

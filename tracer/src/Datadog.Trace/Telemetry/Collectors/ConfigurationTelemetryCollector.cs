@@ -116,11 +116,13 @@ namespace Datadog.Trace.Telemetry
                 new(ConfigTelemetryData.LogInjectionEnabled, value: settings.LogsInjectionEnabled),
                 new(ConfigTelemetryData.RuntimeMetricsEnabled, value: settings.RuntimeMetricsEnabled),
                 new(ConfigTelemetryData.RoutetemplateResourcenamesEnabled, value: settings.RouteTemplateResourceNamesEnabled),
+                new(ConfigTelemetryData.RoutetemplateExpansionEnabled, value: settings.ExpandRouteTemplatesEnabled),
                 new(ConfigTelemetryData.PartialflushEnabled, value: settings.ExporterSettings.PartialFlushEnabled),
                 new(ConfigTelemetryData.PartialflushMinspans, value: settings.ExporterSettings.PartialFlushMinSpans),
                 new(ConfigTelemetryData.AasConfigurationError, value: _azureApServicesMetadata.IsUnsafeToTrace),
                 new(ConfigTelemetryData.TracerInstanceCount, value: _tracerInstanceCount),
                 new(ConfigTelemetryData.FullTrustAppDomain, value: AppDomain.CurrentDomain.IsFullyTrusted),
+                new(ConfigTelemetryData.TraceMethods, value: settings.TraceMethods),
             };
 
             if (_azureApServicesMetadata.IsRelevant)
