@@ -35,9 +35,11 @@ def sign(
         assert os.path.isfile(path), f"{path} file not found"
     assert os.path.isdir(dest), f"{path} directory not found"
 
+    # generate a random subdir for uploading (staging) files
+    subdir = "".join(random.choices(string.ascii_lowercase + string.digits, k=12))
+
     for path in file_paths:
-        # upload file to artifactory
-        subdir = "".join(random.choices(string.ascii_lowercase + string.digits, k=12))
+        # upload (stage) file to artifactory
         filename = os.path.basename(path)
         staged_artifact_url = f"{STAGING_URL}/{staging_repo}/{subdir}/{filename}"
         print(f"Uploading {path} to {staged_artifact_url} ...")
@@ -77,7 +79,7 @@ def sign(
             )
             print(f"Downloaded {output}")
         finally:
-            # remove the uploaded file
+            # remove the uploaded (staged) file
             if artifactory_file_exists(staged_artifact_url, staging_user, staging_pass):
                 delete_artifactory_file(staged_artifact_url, staging_user, staging_pass)
 
