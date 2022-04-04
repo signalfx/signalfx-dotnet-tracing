@@ -146,6 +146,9 @@ struct std::hash<trace::FunctionIdentifier>
 namespace trace {
 class NameCache
 {
+// TODO Splunk: cache based on mdToken (Function token) and ModuleID
+// ModuleID is volatile but it is unlikely to have exactly same pair of Function Token and ModuleId after changes.
+// If fails we should end up we Unknown(unknown) as a result
 public:
     NameCache(size_t maximumSize);
     shared::WSTRING* get(FunctionIdentifier key);

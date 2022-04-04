@@ -612,6 +612,8 @@ public:
     {
         const auto function_identifier = this->GetFunctionIdentifier(fid, frame);
 
+        // TODO Splunk: consider two layers cache. Based on FunctionID while CLR is suspended.
+        // The second one based on Function token (mdToken) and ModuleID - it can susrvive multiple CLR suspensions.
         shared::WSTRING* answer = functionNameCache.get(function_identifier);
         if (answer != nullptr)
         {
