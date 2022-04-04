@@ -297,12 +297,11 @@ private:
             return;
         }
 
-        ClassID classId = 0;
         ModuleID moduleId = 0;
         mdToken functionToken = 0;
 
         // theoretically there is a possibility to use GetFunctionInfo method, but it does not support generic methods
-        HRESULT hr = info10->GetFunctionInfo2(funcID, frameInfo, &classId, &moduleId, &functionToken, 0, nullptr, nullptr);
+        HRESULT hr = info10->GetFunctionInfo2(funcID, frameInfo, nullptr, &moduleId, &functionToken, 0, nullptr, nullptr);
         if (FAILED(hr))
         {
             Logger::Debug("GetFunctionInfo2 failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
