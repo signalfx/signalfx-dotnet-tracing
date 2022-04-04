@@ -5,6 +5,8 @@
 
 // Modified by Splunk Inc.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +34,7 @@ namespace Datadog.Trace.Logging.DirectSubmission
         {
         }
 
-        public DirectLogSubmissionSettings(IConfigurationSource source)
+        public DirectLogSubmissionSettings(IConfigurationSource? source)
         {
             DirectLogSubmissionHost = source?.GetString(ConfigurationKeys.DirectLogSubmission.Host)
                                    ?? HostMetadata.Instance.Hostname;
@@ -58,9 +60,13 @@ namespace Datadog.Trace.Logging.DirectSubmission
             DirectLogSubmissionMinimumLevel = DirectSubmissionLogLevelExtensions.Parse(
                 source?.GetString(ConfigurationKeys.DirectLogSubmission.MinimumLevel), DefaultMinimumLevel);
 
-            DirectLogSubmissionGlobalTags = source?.GetDictionary(ConfigurationKeys.DirectLogSubmission.GlobalTags)
-                                                   ?.Where(kvp => !string.IsNullOrWhiteSpace(kvp.Key) && !string.IsNullOrWhiteSpace(kvp.Value))
-                                                   .ToDictionary(kvp => kvp.Key.Trim(), kvp => kvp.Value.Trim())
+            var globalTags = source?.GetDictionary(ConfigurationKeys.DirectLogSubmission.GlobalTags)
+                          ?? source?.GetDictionary(ConfigurationKeys.GlobalTags)
+                             // backwards compatibility for names used in the past
+                          ?? source?.GetDictionary("DD_TRACE_GLOBAL_TAGS");
+
+            DirectLogSubmissionGlobalTags = globalTags?.Where(kvp => !string.IsNullOrWhiteSpace(kvp.Key) && !string.IsNullOrWhiteSpace(kvp.Value))
+                                                       .ToDictionary(kvp => kvp.Key.Trim(), kvp => kvp.Value.Trim())
                                          ?? new Dictionary<string, string>();
 
             var logSubmissionIntegrations = source?.GetString(ConfigurationKeys.DirectLogSubmission.EnabledIntegrations)
@@ -106,7 +112,8 @@ namespace Datadog.Trace.Logging.DirectSubmission
         internal string DirectLogSubmissionSource { get; set; }
 
         /// <summary>
-        /// Gets or sets the global tags, which are applied to all directly submitted logs
+        /// Gets or sets the global tags, which are applied to all directly submitted logs. If not provided,
+        /// <see cref="TracerSettings.GlobalTags"/> are used instead
         /// </summary>
         /// <seealso cref="ConfigurationKeys.DirectLogSubmission.GlobalTags" />
         internal IDictionary<string, string> DirectLogSubmissionGlobalTags { get; set; }
@@ -115,7 +122,7 @@ namespace Datadog.Trace.Logging.DirectSubmission
         /// Gets or sets the url to send logs to
         /// </summary>
         /// <seealso cref="ConfigurationKeys.DirectLogSubmission.Url" />
-        internal string DirectLogSubmissionUrl { get; set; }
+        internal string? DirectLogSubmissionUrl { get; set; }
 
         /// <summary>
         /// Gets or sets the minimum level logs should have to be sent to the intake.
@@ -144,6 +151,6 @@ namespace Datadog.Trace.Logging.DirectSubmission
         /// <summary>
         /// Gets or sets the SignalFx Access Token
         /// </summary>
-        internal string SignalFxAccessToken { get; set; }
+        internal string? SignalFxAccessToken { get; set; }
     }
 }
