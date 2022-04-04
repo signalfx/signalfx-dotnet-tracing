@@ -135,26 +135,26 @@ TEST(ThreadSamplerTest, LRUCache)
     NameCache cache(max);
     for (int i = 1; i <= max; i++)
     {
-        ASSERT_EQ(NULL, cache.get(i));
+        ASSERT_EQ(NULL, cache.get(FunctionIdentifier{static_cast<unsigned>(i), 0, true}));
         auto val = new shared::WSTRING(L"Function ");
         val->append(std::to_wstring(i));
-        cache.put(i, val);
-        ASSERT_EQ(val, cache.get(i));
+        cache.put(FunctionIdentifier{static_cast<unsigned>(i), 0, true}, val);
+        ASSERT_EQ(val, cache.get(FunctionIdentifier{static_cast<unsigned>(i), 0, true}));
     }
     // Now cache is full; add another and item 1 gets kicked out
     auto* funcMaxPlus1 = new shared::WSTRING(L"Function max+1");
-    ASSERT_EQ(NULL, cache.get(max+1));
-    cache.put(max + 1, funcMaxPlus1);
-    ASSERT_EQ(NULL, cache.get(1));
-    ASSERT_EQ(funcMaxPlus1, cache.get(max+1));
+    ASSERT_EQ(NULL, cache.get(FunctionIdentifier{static_cast<unsigned>(max + 1), 0, true}));
+    cache.put(FunctionIdentifier{static_cast<unsigned>(max + 1), 0, true}, funcMaxPlus1);
+    ASSERT_EQ(NULL, cache.get(FunctionIdentifier{static_cast<unsigned>(1), 0, true}));
+    ASSERT_EQ(funcMaxPlus1, cache.get(FunctionIdentifier{static_cast<unsigned>(max + 1), 0, true}));
 
     // Put 1 back, 2 falls off and everything else is there
     const auto func1 = new shared::WSTRING(L"Function 1");
-    cache.put(1, func1);
-    ASSERT_EQ(NULL, cache.get(2));
-    ASSERT_EQ(func1, cache.get(1));
-    ASSERT_EQ(funcMaxPlus1, cache.get(max+1));
+    cache.put(FunctionIdentifier { 1, 0, true }, func1);
+    ASSERT_EQ(NULL, cache.get(FunctionIdentifier{2, 0, true}));
+    ASSERT_EQ(func1, cache.get(FunctionIdentifier{static_cast<unsigned>(1), 0, true}));
+    ASSERT_EQ(funcMaxPlus1, cache.get(FunctionIdentifier{static_cast<unsigned>(max + 1), 0, true}));
     for (int i = 3; i <= max; i++) {
-        ASSERT_EQ(true, cache.get(i) != NULL);
+        ASSERT_EQ(true, cache.get(FunctionIdentifier{static_cast<unsigned>(i), 0, true}) != NULL);
     }
 }
