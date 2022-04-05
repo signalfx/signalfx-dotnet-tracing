@@ -63,7 +63,7 @@ sign-deb:
     PROJECT: signalfx-dotnet-tracing
     ARTIFACT: files.tgz
     SIGN_TYPE: DEB
-    ARCHIVE: true
+    ARCHIVE: 'true'
     DOWNLOAD_DIR: tmp
   artifacts:
     paths:
@@ -83,7 +83,7 @@ sign-rpm:
     PROJECT: signalfx-dotnet-tracing
     ARTIFACT: files.tgz
     SIGN_TYPE: RPM
-    ARCHIVE: true
+    ARCHIVE: 'true'
     DOWNLOAD_DIR: tmp
   artifacts:
     paths:
