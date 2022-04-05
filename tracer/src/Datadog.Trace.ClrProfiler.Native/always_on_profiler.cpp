@@ -709,14 +709,7 @@ void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, Sa
     std::lock_guard<std::mutex> threadStateGuard(ts->threadStateLock);
     std::lock_guard<std::mutex> spanContextGuard(threadSpanContextLock);
 
-#ifdef _WIN32
-    LARGE_INTEGER start, end, elapsed, frequency;
-    QueryPerformanceFrequency(&frequency);
-    QueryPerformanceCounter(&start);
-#else
-    timespec start, end, elapsed;
-    clock_gettime(CLOCK_MONOTONIC, &start);
-#endif
+    const auto start = std::chrono::steady_clock::now();
 
     HRESULT hr = info10->SuspendRuntime();
     if (FAILED(hr))
@@ -741,26 +734,9 @@ void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, Sa
         Logger::Error("Could not resume runtime? HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
     }
 
-    int elapsedMicros;
-#ifdef _WIN32
-    QueryPerformanceCounter(&end);
-    elapsed.QuadPart = end.QuadPart - start.QuadPart;
-    elapsed.QuadPart *= 1000000;
-    elapsed.QuadPart /= frequency.QuadPart;
-    elapsedMicros = static_cast<int>(elapsed.QuadPart);
-#else
-    // Floating around several places as "microsecond timer on linux c"
-    clock_gettime(CLOCK_MONOTONIC, &end);
-    if ((end.tv_nsec - start.tv_nsec) < 0) {
-        elapsed.tv_sec = end.tv_sec - start.tv_sec - 1;
-        elapsed.tv_nsec = 1000000000 + end.tv_nsec - start.tv_nsec;
-    } else {
-        elapsed.tv_sec = end.tv_sec - start.tv_sec;
-        elapsed.tv_nsec = end.tv_nsec - start.tv_nsec;
-    }
-    elapsedMicros = elapsed.tv_sec * 1000000 + elapsed.tv_nsec/1000;
-#endif
-    helper.stats.microsSuspended = elapsedMicros;
+    const auto end = std::chrono::steady_clock::now();
+    const auto elapsedMicros = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    helper.stats.microsSuspended = static_cast<int>(elapsedMicros);
     helper.curWriter->WriteFinalStats(helper.stats);
     Logger::Debug("Threads sampled in ", elapsedMicros, " micros. threads=", helper.stats.numThreads,
                   " frames=", helper.stats.totalFrames, " misses=", helper.stats.nameCacheMisses);
