@@ -120,6 +120,13 @@ namespace Datadog.Trace.Configuration
         public const string HeaderTags = "SIGNALFX_TRACE_HEADER_TAGS";
 
         /// <summary>
+        /// Configuration key for a map of metadata keys to tag names.
+        /// Automatically apply GRPC metadata values as tags on traces.
+        /// </summary>
+        /// <seealso cref="TracerSettings.HeaderTags"/>
+        public const string GrpcTags = "DD_TRACE_GRPC_TAGS";
+
+        /// <summary>
         /// Configuration key for a map of services to rename.
         /// </summary>
         /// <seealso cref="TracerSettings.ServiceNameMappings"/>
