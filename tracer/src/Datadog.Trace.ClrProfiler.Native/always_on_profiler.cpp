@@ -688,7 +688,7 @@ void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, Sa
     std::lock_guard<std::mutex> threadStateGuard(ts->threadStateLock);
     std::lock_guard<std::mutex> spanContextGuard(threadSpanContextLock);
 
-    auto start = std::chrono::steady_clock::now();
+    const auto start = std::chrono::steady_clock::now();
 
     HRESULT hr = info10->SuspendRuntime();
     if (FAILED(hr))
@@ -713,8 +713,8 @@ void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, Sa
         Logger::Error("Could not resume runtime? HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
     }
 
-    auto end = std::chrono::steady_clock::now(); 
-    auto elapsedMicros = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    const auto end = std::chrono::steady_clock::now();
+    const auto elapsedMicros = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
     helper.stats.microsSuspended = static_cast<int>(elapsedMicros);
     helper.curWriter->WriteFinalStats(helper.stats);
     Logger::Debug("Threads sampled in ", elapsedMicros, " micros. threads=", helper.stats.numThreads,
