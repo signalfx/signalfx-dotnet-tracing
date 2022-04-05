@@ -1,6 +1,7 @@
-workflow:
-  rules:
-    #- if: '$CI_COMMIT_TAG =~ /^v/'
+include:
+  - project: core-ee/signing/api-integration
+    ref: develop
+    file: /templates/.sign-client.yml
 
 stages:
   - build
@@ -48,26 +49,59 @@ linux-build:
 #       - tracer/bin/artifacts/nuget/SignalFx.NET.Tracing.Azure.Site.Extension.*.nupkg
 #       - tracer/bin/artifacts/*/en-us
 
-sign-artifacts:
+sign-deb:
   stage: sign
-  image: docker.repo.splunkdev.net/ci-cd/ci-container:python-3.9
-  variables:
-    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-  cache:
-    key:
-      files:
-        - scripts/signing/requirements.txt
-    paths:
-      - .cache/pip
-  script:
-    - pip3 install -r scripts/signing/requirements.txt
-    - mkdir dist/signed
-    - python3 scripts/signing/main.py --staging-repo $STAGING_REPO --staging-user $STAGING_USER --staging-pass $STAGING_PASS --chaperone-token $CHAPERONE_TOKEN --type RPM --dest dist/signed $( ls dist/*.rpm )
-    - pushd dist && shasum -a 256 * > checksums.txt && popd
-    - python3 scripts/signing/main.py --staging-repo $STAGING_REPO --staging-user $STAGING_USER --staging-pass $STAGING_PASS --chaperone-token $CHAPERONE_TOKEN --type GPG --dest dist dist/checksums.txt
+  extends: .submit-request
   dependencies: 
-    - linux-build
+    - linux-build  
+  before_script:
+    - tar -czf files.tgz $( ls dist/*.deb )
+  after_script:
+    - mkdir dist/signed
+    - tar -C dist/signed -xzf tmp/files.tgz
+  variables:
+    PROJECT: signalfx-dotnet-tracing
+    ARTIFACT: files.tgz
+    SIGN_TYPE: DEB
+    ARCHIVE: true
+    DOWNLOAD_DIR: tmp
   artifacts:
     paths:
-      - dist/checksums.*
-      - dist/signed/*
+      - dist/signed/
+
+sign-rpm:
+  stage: sign
+  extends: .submit-request
+  dependencies: 
+    - linux-build  
+  before_script:
+    - tar -czf files.tgz $( ls dist/*.rpm )
+  after_script:
+    - mkdir dist/signed
+    - tar -C dist/signed -xzf tmp/files.tgz
+  variables:
+    PROJECT: signalfx-dotnet-tracing
+    ARTIFACT: files.tgz
+    SIGN_TYPE: RPM
+    ARCHIVE: true
+    DOWNLOAD_DIR: tmp
+  artifacts:
+    paths:
+      - dist/signed/
+
+checksums:
+  stage: sign
+  extends: .submit-request
+  dependencies: 
+    - sign-deb
+    - sign-rpm  
+  before_script:
+    - pushd dist/signed && shasum -a 256 * > checksums.txt && popd
+  variables:
+    PROJECT: signalfx-dotnet-tracing
+    ARTIFACT: dist/signed/checksums.txt
+    SIGN_TYPE: GPG
+    DOWNLOAD_DIR: dist/signed
+  artifacts:
+    paths:
+      - dist/signed/
