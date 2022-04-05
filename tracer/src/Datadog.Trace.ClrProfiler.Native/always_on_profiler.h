@@ -24,7 +24,8 @@ extern "C"
 
 namespace trace
 {
-struct SamplingStatistics {
+struct SamplingStatistics
+{
     int microsSuspended;
     int numThreads;
     int totalFrames;
@@ -113,21 +114,51 @@ private:
     void writeUInt64(uint64_t val) const;
 };
 
+struct FunctionIdentifier
+{
+    mdToken function_token;
+    ModuleID module_id;
+    bool is_valid;
+
+    bool operator==(const FunctionIdentifier& p) const
+    {
+        return function_token == p.function_token && module_id == p.module_id && is_valid == p.is_valid;
+    }
+};
+} // namespace trace
+
+template <>
+struct std::hash<trace::FunctionIdentifier>
+{
+    std::size_t operator()(const trace::FunctionIdentifier& k) const
+    {
+        using std::hash;
+        using std::size_t;
+        using std::string;
+
+        std::size_t h1 = std::hash<mdToken>()(k.function_token);
+        std::size_t h2 = std::hash<ModuleID>()(k.module_id);
+
+        return h1 ^ h2;
+    }
+};
+
+namespace trace {
 class NameCache
 {
+// TODO Splunk: cache based on mdToken (Function token) and ModuleID
+// ModuleID is volatile but it is unlikely to have exactly same pair of Function Token and ModuleId after changes.
+// If fails we should end up we Unknown(unknown) as a result
 public:
     NameCache(size_t maximumSize);
-    shared::WSTRING* get(UINT_PTR key);
-    void put(UINT_PTR key, shared::WSTRING* val);
+    shared::WSTRING* get(FunctionIdentifier key);
+    void put(FunctionIdentifier key, shared::WSTRING* val);
 
 private:
     size_t maxSize;
-    std::list<std::pair<FunctionID, shared::WSTRING*>> list;
-    std::unordered_map<FunctionID, std::list<std::pair<FunctionID, shared::WSTRING*>>::iterator> map;
+    std::list<std::pair<FunctionIdentifier, shared::WSTRING*>> list;
+    std::unordered_map<FunctionIdentifier, std::list<std::pair<FunctionIdentifier, shared::WSTRING*>>::iterator> map;
 };
-
-
-
 } // namespace trace
 
 bool ThreadSampling_ShouldProduceThreadSample();

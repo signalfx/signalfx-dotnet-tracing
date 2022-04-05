@@ -284,33 +284,50 @@ public:
     }
 
 private:
-    void GetFunctionName(FunctionID funcID, const COR_PRF_FRAME_INFO frameInfo, shared::WSTRING& result)
+    [[nodiscard]] FunctionIdentifier GetFunctionIdentifier(const FunctionID func_id, const COR_PRF_FRAME_INFO frame_info) const
+    {
+        if (func_id == 0)
+        {
+            constexpr auto zero_valid_function_identifier = FunctionIdentifier{0, 0, true};
+            return zero_valid_function_identifier;
+        }
+
+        ModuleID moduleId = 0;
+        mdToken functionToken = 0;
+        // theoretically there is a possibility to use GetFunctionInfo method, but it does not support generic methods
+        HRESULT hr = info10->GetFunctionInfo2(func_id, frame_info, nullptr, &moduleId, &functionToken, 0, nullptr, nullptr);
+        if (FAILED(hr))
+        {
+            Logger::Debug("GetFunctionInfo2 failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
+            constexpr auto zero_invalid_function_identifier = FunctionIdentifier{0, 0, false};
+            return zero_invalid_function_identifier;
+        }
+
+        return FunctionIdentifier{functionToken, moduleId, true};
+    }
+
+    void GetFunctionName(FunctionIdentifier functionIdentifier, shared::WSTRING& result)
     {
         constexpr auto unknown_list_of_arguments = WStr("(unknown)");
         constexpr auto unknown_function_name = WStr("Unknown(unknown)");
         constexpr auto name_separator = WStr(".");
 
-        if (funcID == 0)
+        if (!functionIdentifier.is_valid)
+        {
+            result.append(unknown_function_name);
+            return;
+        }
+
+        if (functionIdentifier.function_token == 0)
         {
             constexpr auto unknown_native_function_name = WStr("Unknown_Native_Function(unknown)");
             result.append(unknown_native_function_name);
             return;
         }
 
-        ModuleID moduleId = 0;
-        mdToken functionToken = 0;
-
-        // theoretically there is a possibility to use GetFunctionInfo method, but it does not support generic methods
-        HRESULT hr = info10->GetFunctionInfo2(funcID, frameInfo, nullptr, &moduleId, &functionToken, 0, nullptr, nullptr);
-        if (FAILED(hr))
-        {
-            Logger::Debug("GetFunctionInfo2 failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
-            result.append(unknown_function_name);
-            return;
-        }
-
         ComPtr<IMetaDataImport2> pIMDImport;
-        hr = info10->GetModuleMetaData(moduleId, ofRead, IID_IMetaDataImport2, reinterpret_cast<IUnknown**>(&pIMDImport));
+        HRESULT hr = info10->GetModuleMetaData(functionIdentifier.module_id, ofRead, IID_IMetaDataImport2,
+                                              reinterpret_cast<IUnknown**>(&pIMDImport));
         if (FAILED(hr))
         {
             Logger::Debug("GetModuleMetaData failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
@@ -318,7 +335,7 @@ private:
             return;
         }
 
-        const auto function_info = GetFunctionInfo(pIMDImport, functionToken);
+        const auto function_info = GetFunctionInfo(pIMDImport, functionIdentifier.function_token);
 
         if (!function_info.IsValid())
         {
@@ -369,7 +386,7 @@ private:
             return;
         }
         
-        hr = pIMDImport->EnumGenericParams(&functionGenParamsIter, functionToken, functionGenericParams,
+        hr = pIMDImport->EnumGenericParams(&functionGenParamsIter, functionIdentifier.function_token, functionGenericParams,
                                      generic_params_max_len,
                                       &functionGenParamsCount);
         pIMDImport->CloseEnum(functionGenParamsIter);
@@ -593,15 +610,19 @@ private:
 public:
     shared::WSTRING* Lookup(FunctionID fid, COR_PRF_FRAME_INFO frame)
     {
-        shared::WSTRING* answer = functionNameCache.get(fid);
+        const auto function_identifier = this->GetFunctionIdentifier(fid, frame);
+
+        // TODO Splunk: consider two layers cache. Based on FunctionID while CLR is suspended.
+        // The second one based on Function token (mdToken) and ModuleID - it can susrvive multiple CLR suspensions.
+        shared::WSTRING* answer = functionNameCache.get(function_identifier);
         if (answer != nullptr)
         {
             return answer;
         }
         stats.nameCacheMisses++;
         answer = new shared::WSTRING();
-        this->GetFunctionName(fid, frame, *answer);
-        functionNameCache.put(fid, answer);
+        this->GetFunctionName(function_identifier, *answer);
+        functionNameCache.put(function_identifier, answer);
         return answer;
     }
 };
@@ -821,7 +842,7 @@ NameCache::NameCache(size_t maximumSize) : maxSize(maximumSize)
 {
 }
 
-shared::WSTRING* NameCache::get(UINT_PTR key)
+shared::WSTRING* NameCache::get(FunctionIdentifier key)
 {
     const auto found = map.find(key);
     if (found == map.end())
@@ -834,9 +855,9 @@ shared::WSTRING* NameCache::get(UINT_PTR key)
     return found->second->second;
 }
 
-void NameCache::put(UINT_PTR key, shared::WSTRING* val)
+void NameCache::put(FunctionIdentifier key, shared::WSTRING* val)
 {
-    const auto pair = std::pair<FunctionID, shared::WSTRING*>(key, val);
+    const auto pair = std::pair(key, val);
     list.push_front(pair);
     map[key] = list.begin();
 
