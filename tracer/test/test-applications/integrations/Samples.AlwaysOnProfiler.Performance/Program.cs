@@ -1,6 +1,7 @@
 using System;
 using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Samples.AlwaysOnProfiler.Performance
 {
@@ -94,13 +95,13 @@ namespace Samples.AlwaysOnProfiler.Performance
             }
         }
 
-        public static void WebRequest()
+        public static async Task WebRequest()
         {
             try
             {
                 var hc = new HttpClient();
-                var t = hc.GetAsync("https://www.google.com/");
-                Console.WriteLine("made async request?");
+                var message = await hc.GetAsync("https://www.google.com/");
+                Console.WriteLine("made async request: " + message);
 
             }
             catch (Exception e)
@@ -109,7 +110,7 @@ namespace Samples.AlwaysOnProfiler.Performance
             }
         }
 
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             if (args.Length != 0)
             {
@@ -117,7 +118,7 @@ namespace Samples.AlwaysOnProfiler.Performance
                 UseThreads = false;
             }
 
-            WebRequest();
+            await WebRequest();
 
             var numThreads = 200;
             if (!UseThreads)

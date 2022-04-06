@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
+using System.Dynamic;
 using My.Custom.Test.Namespace;
 using Samples.AlwaysOnProfiler.Vb;
 
@@ -126,7 +126,19 @@ namespace My.Custom.Test.Namespace
     {
         public static void GenericMethodDFromGenericClass<TMethod, TMethod2>(TClass classArg, TMethod methodArg, TMethod2 additionalArg)
         {
+            dynamic test = new TestDynamicClass();
+
+            test("Param1", "Param2");
+        }
+    }
+
+    internal class TestDynamicClass : DynamicObject
+    {
+        public override bool TryInvoke(InvokeBinder binder, object[] args, out object result)
+        {
             ClassVb.MethodVb("testParam");
+            result = null;
+            return true;
         }
     }
 }
