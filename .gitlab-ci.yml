@@ -66,6 +66,8 @@ sign-deb:
     SIGN_TYPE: DEB
     OPTION: archive
     DOWNLOAD_DIR: tmp
+    REPO_NAME: releng # this env var should be not needed in future
+    REPO_PATH: signalfx-dotnet-tracing  # this env var should be not needed in future
   artifacts:
     paths:
       - dist/signed/
@@ -86,6 +88,8 @@ sign-rpm:
     SIGN_TYPE: RPM
     OPTION: archive
     DOWNLOAD_DIR: tmp
+    REPO_NAME: releng # this env var should be not needed in future
+    REPO_PATH: signalfx-dotnet-tracing  # this env var should be not needed in future
   artifacts:
     paths:
       - dist/signed/
@@ -103,6 +107,8 @@ checksums:
     ARTIFACT: dist/signed/checksums.txt
     SIGN_TYPE: GPG
     DOWNLOAD_DIR: dist/signed
+    REPO_NAME: releng # this env var should be not needed in future
+    REPO_PATH: signalfx-dotnet-tracing  # this env var should be not needed in future
   artifacts:
     paths:
       - dist/signed/
