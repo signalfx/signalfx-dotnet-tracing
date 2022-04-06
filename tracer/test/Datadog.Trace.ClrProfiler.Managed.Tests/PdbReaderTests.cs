@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -14,7 +16,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Tests
 {
     public class PdbReaderTests
     {
-        [Fact]
+        [Fact(Skip="Unstable test. Cannot read pdb file in CI. Not used in Splunk distribution")]
         public void ReadPDBs()
         {
             string assemblyFullPath = Assembly.GetExecutingAssembly().Location;
