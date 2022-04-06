@@ -171,6 +171,8 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
         info10 = nullptr;
     }
 
+    const auto metThreadSamplingRequirements = info10 != nullptr;
+
     auto pInfo = info10 != nullptr ? info10 : this->info_;
     auto work_offloader = std::make_shared<RejitWorkOffloader>(pInfo);
 
@@ -182,7 +184,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
                        COR_PRF_MONITOR_MODULE_LOADS | COR_PRF_MONITOR_ASSEMBLY_LOADS | COR_PRF_MONITOR_APPDOMAIN_LOADS |
                        COR_PRF_ENABLE_REJIT;
 
-    if (IsThreadSamplingEnabled())
+    if (IsThreadSamplingEnabled() && metThreadSamplingRequirements)
     {
         event_mask |= COR_PRF_MONITOR_THREADS | COR_PRF_ENABLE_STACK_SNAPSHOT;
     }
@@ -247,12 +249,17 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
         Logger::Error("Profiler filepath: cannot be calculated.");
         return E_FAIL;
     }
-    if (IsThreadSamplingEnabled()) {
-        if (info10 == nullptr) {
-            Logger::Error("Could not enable thread sampling: CLR version not compatible");
-        } else {
+
+    if (IsThreadSamplingEnabled())
+    {
+        if (metThreadSamplingRequirements)
+        {
             this->threadSampler = new ThreadSampler();
             this->threadSampler->StartSampling(info10);
+        }
+        else
+        {
+            Logger::Error("Could not enable thread sampling: CLR version not compatible");
         }
     }
 
