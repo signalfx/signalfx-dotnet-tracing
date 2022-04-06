@@ -48,7 +48,7 @@ static std::vector<unsigned char>* bufferB;
 static std::mutex threadSpanContextLock;
 static std::unordered_map<ThreadID, trace::ThreadSpanContext> threadSpanContextMap;
 
-static ICorProfilerInfo* profilerInfo; // After feature sets settle down, perhaps this should be refactored and have a single static instance of ThreadSampler
+static ICorProfilerInfo10* profilerInfo; // After feature sets settle down, perhaps this should be refactored and have a single static instance of ThreadSampler
 
 // Dirt-simple back pressure system to save overhead if managed code is not reading fast enough
 bool ThreadSampling_ShouldProduceThreadSample()
