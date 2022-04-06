@@ -129,13 +129,11 @@ namespace My.Custom.Test.Namespace
             dynamic test = new TestDynamicClass();
 
             test("Param1", "Param2");
-
         }
     }
 
     internal class TestDynamicClass : DynamicObject
     {
-
         public override bool TryInvoke(InvokeBinder binder, object[] args, out object result)
         {
             ClassVb.MethodVb("testParam");
