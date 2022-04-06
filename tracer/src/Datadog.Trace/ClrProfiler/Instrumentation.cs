@@ -228,7 +228,7 @@ namespace Datadog.Trace.ClrProfiler
             }
 
             // we only support Service Fabric Service Remoting instrumentation on .NET Core (including .NET 5+)
-            if (FrameworkDescription.Instance.SupportsAlwaysOnProfiler())
+            if (FrameworkDescription.Instance.IsCoreClr())
             {
                 Log.Information("Initializing ServiceFabric instrumentation");
 
@@ -254,7 +254,7 @@ namespace Datadog.Trace.ClrProfiler
             // Thread Sampling ("profiling") feature
             if (TracerManager.Instance.Settings.ThreadSamplingEnabled)
             {
-                if (FrameworkDescription.Instance.IsCoreClr())
+                if (FrameworkDescription.Instance.SupportsAlwaysOnProfiler())
                 {
                     try
                     {
