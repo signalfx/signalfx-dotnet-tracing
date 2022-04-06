@@ -1,86 +1,130 @@
-[
+﻿[
   {
-    Timestamp: 1644280171270000000,
+    Timestamp: 1649267460807000000,
     StackTrace:
-"" #1 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0xd4c
+"" #0 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x8b50
 
-	at System.Threading.ManualResetEventSlim.Wait
-	at System.Threading.Tasks.Task.SpinThenBlockingWait
-	at System.Threading.Tasks.Task.InternalWaitCore
-	at System.Threading.Tasks.Task.Wait
-	at System.Threading.Tasks.Task.Wait
-	at Datadog.Trace.TracerManager.RunShutdownTasks
-	at Datadog.Trace.LifetimeManager.RunShutdownTasks
-	at Datadog.Trace.LifetimeManager.CurrentDomain_ProcessExit
-	at System.AppContext.OnProcessExit
-	at Unknown_Native_Function
+	at System.Threading.Thread.Sleep(System.Int32)
+	at System.Threading.Thread.Sleep(System.TimeSpan)
+	at Samples.AlwaysOnProfiler.Fs.ClassFs.methodFs(System.String)
+	at Samples.AlwaysOnProfiler.Vb.ClassVb.MethodVb(System.String)
+	at My.Custom.Test.Namespace.TestDynamicClass.TryInvoke(System.Dynamic.InvokeBinder, System.Object[], System.Object&)
+	at System.Dynamic.UpdateDelegates.UpdateAndExecuteVoid3[T0, T1, T2](System.Runtime.CompilerServices.CallSite, T0, T1, T2)
+	at My.Custom.Test.Namespace.ClassENonStandardCharactersĄĘÓŁŻŹĆąęółżźśćĜЖᏳⳄʤǋₓڿଟഐቐ〣‿੮ᾭ_`1.GenericMethodDFromGenericClass[TMethod, TMethod2](TClass, TMethod, TMethod2)
+	at My.Custom.Test.Namespace.ClassD`21.MethodD(T01, T02, T03, T04, T05, T06, T07, T08, T09, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, Unknown)
+	at My.Custom.Test.Namespace.GenericClassC`1.GenericMethodCFromGenericClass[T01, T02, T03, T04, T05, T06, T07, T08, T09, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20](T01, T02, T03, T04, T05, T06, T07, T08, T09, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, Unknown)
+	at My.Custom.Test.Namespace.GenericClassC`1.GenericMethodCFromGenericClass(T)
+	at My.Custom.Test.Namespace.ClassA.InternalClassB`2.DoubleInternalClassB.TripleInternalClassB`1.MethodB[TB](System.String, TC[], TB, TD, System.Collections.Generic.IList`1[TA], System.Collections.Generic.IList`1[System.String])
+	at My.Custom.Test.Namespace.ClassA.<MethodAOthers>g__Action|4_0[T](System.String)
+	at My.Custom.Test.Namespace.ClassA.MethodAOthers[T](System.String, System.Object, My.Custom.Test.Namespace.CustomClass, My.Custom.Test.Namespace.CustomStruct, My.Custom.Test.Namespace.CustomClass[], My.Custom.Test.Namespace.CustomStruct[], System.Collections.Generic.List`1[T])
+	at My.Custom.Test.Namespace.ClassA.MethodAFloats(System.Single, System.Double)
+	at My.Custom.Test.Namespace.ClassA.MethodAInts(System.UInt16, System.Int16, System.UInt32, System.Int32, System.UInt64, System.Int64, System.IntPtr, System.UIntPtr)
+	at My.Custom.Test.Namespace.ClassA.MethodABytes(System.Boolean, System.Char, System.SByte, System.Byte)
+	at My.Custom.Test.Namespace.ClassA.MethodA()
+	at Program.<Main>$(System.String[])
+	at Unknown_Native_Function(unknown)
 
   },
   {
-    Timestamp: 1644280171270000000,
+    Timestamp: 1649267460807000000,
     StackTrace:
-"" #3 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0x4 nid=0x4ea8
+".NET ThreadPool Worker" #3 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x674c
 
-	at Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.DefaultContractResolver.CreateObjectContract
-	at Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.DefaultContractResolver.CreateContract
-	at SharedGenericFunction.GetOrAdd
-	at SharedGenericFunction.Get
-	at Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.DefaultContractResolver.ResolveContract
-	at Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.WriteStartArray
-	at Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeList
-	at Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeValue
-	at Datadog.Trace.Vendors.Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.Serialize
-	at Datadog.Trace.Vendors.Newtonsoft.Json.JsonSerializer.SerializeInternal
-	at Datadog.Trace.Agent.ZipkinSerializer.Serialize
-	at <SendTracesAsync>d__4.MoveNext
-	at AsyncStateMachineBox`1.ExecutionContextCallback
-	at System.Threading.ExecutionContext.RunInternal
-	at AsyncStateMachineBox`1.MoveNext
-	at AsyncStateMachineBox`1.MoveNext
-	at System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction
-	at System.Threading.Tasks.Task.RunContinuations
-	at System.Threading.Tasks.Task.FinishContinuations
-	at SharedGenericFunction.TrySetResult
-	at SharedGenericFunction.TrySetFromTask
-	at SharedGenericFunction.ProcessInnerTask
-	at SharedGenericFunction.ProcessCompletedOuterTask
-	at SharedGenericFunction.Invoke
-	at System.Threading.Tasks.Task.RunOrQueueCompletionAction
-	at System.Threading.Tasks.Task.RunContinuations
-	at System.Threading.Tasks.Task.FinishContinuations
-	at System.Threading.Tasks.Task.FinishStageThree
-	at System.Threading.Tasks.Task.FinishStageTwo
-	at System.Threading.Tasks.Task.ExecuteWithThreadLocal
-	at System.Threading.Tasks.Task.ExecuteEntryUnsafe
-	at System.Threading.Tasks.Task.ExecuteFromThreadPool
-	at System.Threading.ThreadPoolWorkQueue.Dispatch
-	at System.Threading._ThreadPoolWaitCallback.PerformWaitCallback
-	at Unknown_Native_Function
+	at Interop.Kernel32.GetQueuedCompletionStatus(System.IntPtr, System.Int32&, System.UIntPtr&, System.IntPtr&, System.Int32)
+	at System.Threading.LowLevelLifoSemaphore.WaitForSignal(System.Int32)
+	at System.Threading.LowLevelLifoSemaphore.Wait(System.Int32, System.Boolean)
+	at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
+	at System.Threading.Thread.StartCallback()
+	at Unknown_Native_Function(unknown)
 
   },
   {
-    Timestamp: 1644280171270000000,
+    Timestamp: 1649267460807000000,
     StackTrace:
-"" #5 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x2f4c
+".NET ThreadPool Gate" #4 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x33f0
 
-	at System.Threading.ManualResetEventSlim.Wait
-	at System.Threading.Tasks.Task.SpinThenBlockingWait
-	at System.Threading.Tasks.Task.InternalWaitCore
-	at System.Threading.Tasks.Task.Wait
-	at System.Threading.Tasks.Task.Wait
-	at Datadog.Trace.Vendors.StatsdClient.Worker.Waiter.Wait
-	at SharedGenericFunction.Dequeue
-	at SharedGenericFunction.<.ctor>b__8_0
-	at System.Threading.Tasks.Task.InnerInvoke
-	at <>c.<.cctor>b__274_0
-	at System.Threading.ExecutionContext.RunInternal
-	at System.Threading.Tasks.Task.ExecuteWithThreadLocal
-	at System.Threading.Tasks.Task.ExecuteEntryUnsafe
-	at <>c.<.cctor>b__10_0
-	at System.Threading.ThreadHelper.ThreadStart_Context
-	at System.Threading.ExecutionContext.RunInternal
-	at System.Threading.ThreadHelper.ThreadStart
-	at Unknown_Native_Function
+	at System.Threading.WaitHandle.WaitOneNoCheck(System.Int32)
+	at System.Threading.WaitHandle.WaitOne(System.Int32)
+	at System.Threading.PortableThreadPool.GateThread.GateThreadStart()
+	at System.Threading.Thread.StartCallback()
+	at Unknown_Native_Function(unknown)
+
+  },
+  {
+    Timestamp: 1649267460807000000,
+    StackTrace:
+".NET ThreadPool Worker" #5 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x3a34
+
+	at Interop.Kernel32.GetQueuedCompletionStatus(System.IntPtr, System.Int32&, System.UIntPtr&, System.IntPtr&, System.Int32)
+	at System.Threading.LowLevelLifoSemaphore.WaitForSignal(System.Int32)
+	at System.Threading.LowLevelLifoSemaphore.Wait(System.Int32, System.Boolean)
+	at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
+	at System.Threading.Thread.StartCallback()
+	at Unknown_Native_Function(unknown)
+
+  },
+  {
+    Timestamp: 1649267460807000000,
+    StackTrace:
+".NET ThreadPool Worker" #7 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0xa544
+
+	at Interop.Kernel32.GetQueuedCompletionStatus(System.IntPtr, System.Int32&, System.UIntPtr&, System.IntPtr&, System.Int32)
+	at System.Threading.LowLevelLifoSemaphore.WaitForSignal(System.Int32)
+	at System.Threading.LowLevelLifoSemaphore.Wait(System.Int32, System.Boolean)
+	at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
+	at System.Threading.Thread.StartCallback()
+	at Unknown_Native_Function(unknown)
+
+  },
+  {
+    Timestamp: 1649267460807000000,
+    StackTrace:
+".NET ThreadPool Worker" #8 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x8834
+
+	at System.Threading.Monitor.Wait(System.Object, System.Int32)
+	at System.Threading.ManualResetEventSlim.Wait(System.Int32, System.Threading.CancellationToken)
+	at System.Threading.Tasks.Task.SpinThenBlockingWait(System.Int32, System.Threading.CancellationToken)
+	at System.Threading.Tasks.Task.InternalWaitCore(System.Int32, System.Threading.CancellationToken)
+	at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(System.Threading.Tasks.Task)
+	at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+	at System.IO.Pipes.PipeStream.Read(System.Byte[], System.Int32, System.Int32)
+	at System.IO.Stream.Read(System.Span`1[System.Byte])
+	at System.IO.Pipes.PipeStream.Read(System.Span`1[System.Byte])
+	at System.IO.Pipes.PipeStream.ReadByte()
+	at System.IO.BinaryReader.ReadByte()
+	at Microsoft.Extensions.HotReload.UpdatePayload.<ReadAsync>d__14.MoveNext()
+	at System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine&)
+	at StartupHook.<ReceiveDeltas>d__4.MoveNext()
+	at System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine&)
+	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder.Start[TStateMachine](TStateMachine&)
+	at StartupHook.ReceiveDeltas(Microsoft.Extensions.HotReload.HotReloadAgent, System.IO.Pipes.NamedPipeClientStream)
+	at StartupHook.<>c__DisplayClass1_0.<<Initialize>b__0>d.MoveNext()
+	at System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine&)
+	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder.Start[TStateMachine](TStateMachine&)
+	at StartupHook.<>c__DisplayClass1_0.<Initialize>b__0()
+	at System.Threading.Tasks.Task`1.InnerInvoke()
+	at System.Threading.Tasks.Task.<>c.<.cctor>b__272_0(System.Object)
+	at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(System.Threading.Thread, System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object)
+	at System.Threading.Tasks.Task.ExecuteWithThreadLocal(System.Threading.Tasks.Task&, System.Threading.Thread)
+	at System.Threading.Tasks.Task.ExecuteEntryUnsafe(System.Threading.Thread)
+	at System.Threading.Tasks.Task.ExecuteFromThreadPool(System.Threading.Thread)
+	at System.Threading.ThreadPoolWorkQueue.Dispatch()
+	at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
+	at System.Threading.Thread.StartCallback()
+	at Unknown_Native_Function(unknown)
+
+  },
+  {
+    Timestamp: 1649267460807000000,
+    StackTrace:
+".NET ThreadPool Worker" #9 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0xbe88
+
+	at Interop.Kernel32.GetQueuedCompletionStatus(System.IntPtr, System.Int32&, System.UIntPtr&, System.IntPtr&, System.Int32)
+	at System.Threading.LowLevelLifoSemaphore.WaitForSignal(System.Int32)
+	at System.Threading.LowLevelLifoSemaphore.Wait(System.Int32, System.Boolean)
+	at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
+	at System.Threading.Thread.StartCallback()
+	at Unknown_Native_Function(unknown)
 
   }
 ]

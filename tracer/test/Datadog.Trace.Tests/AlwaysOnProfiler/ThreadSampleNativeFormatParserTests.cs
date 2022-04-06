@@ -25,7 +25,7 @@ namespace Datadog.Trace.Tests.AlwaysOnProfiler
         }
 
         public static IEnumerable<object[]> GetBufferFiles =>
-            Enumerable.Range(0, 3).Select(n => new object[] { $"Buffer{n:D6}" });
+            Enumerable.Range(0, 2).Select(n => new object[] { $"Buffer{n:D6}" });
 
         [Theory]
         [MemberData(nameof(GetBufferFiles))]
