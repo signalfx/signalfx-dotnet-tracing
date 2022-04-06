@@ -60,6 +60,23 @@ namespace Datadog.Trace.Tagging
             }
         }
 
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] GrpcTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(InstrumentationTagsProperties,
+                new Datadog.Trace.Tagging.Property<GrpcTags, string?>("span.kind", t => t.SpanKind),
+                new Datadog.Trace.Tagging.Property<GrpcTags, string?>("component", t => t.InstrumentationName),
+                new Datadog.Trace.Tagging.Property<GrpcTags, string?>("grpc.method.kind", t => t.MethodKind),
+                new Datadog.Trace.Tagging.Property<GrpcTags, string?>("grpc.method.name", t => t.MethodName),
+                new Datadog.Trace.Tagging.Property<GrpcTags, string?>("grpc.method.path", t => t.MethodPath),
+                new Datadog.Trace.Tagging.Property<GrpcTags, string?>("grpc.method.package", t => t.MethodPackage),
+                new Datadog.Trace.Tagging.Property<GrpcTags, string?>("grpc.method.service", t => t.MethodService),
+                new Datadog.Trace.Tagging.Property<GrpcTags, string?>("grpc.status.code", t => t.StatusCode)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return GrpcTagsProperties;
+        }
+
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
         {
             var count = 0;

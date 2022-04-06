@@ -162,7 +162,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Grpc.GrpcLegacy.Client
 
         private static void ExtractTemporaryHeaders(
             IMetadata metadata,
-            ulong? traceId,
+            TraceId? traceId,
             out string methodKind,
             out string? methodName,
             out string? serviceName,
