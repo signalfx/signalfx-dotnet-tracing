@@ -259,7 +259,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
         }
         else
         {
-            Logger::Error("Could not enable thread sampling: CLR version not compatible");
+            Logger::Error("Could not enable thread sampling: CLR version not supported");
         }
     }
 
