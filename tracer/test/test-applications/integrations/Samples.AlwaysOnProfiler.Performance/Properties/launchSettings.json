@@ -1,0 +1,23 @@
+{
+  "profiles": {
+    "Samples.AlwaysOnProfiler.Performance": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "COR_ENABLE_PROFILING": "1",
+        "COR_PROFILER": "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}",
+        "COR_PROFILER_PATH": "$(SolutionDir)shared\\bin\\monitoring-home\\tracer\\win-$(Platform)\\SignalFx.Tracing.ClrProfiler.Native.dll",
+
+        "CORECLR_ENABLE_PROFILING": "1",
+        "CORECLR_PROFILER": "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}",
+        "CORECLR_PROFILER_PATH": "$(SolutionDir)shared\\bin\\monitoring-home\\tracer\\win-$(Platform)\\SignalFx.Tracing.ClrProfiler.Native.dll",
+
+        "SIGNALFX_DOTNET_TRACER_HOME": "$(SolutionDir)shared\\bin\\monitoring-home\\tracer",
+        "SIGNALFX_VERSION": "1.0.0",
+
+        "SIGNALFX_PROFILER_ENABLED": "true",
+        "SIGNALFX_PROFILER_CALL_STACK_INTERVAL": "1000"
+      },
+      "nativeDebugging": true
+    }
+  }
+}
