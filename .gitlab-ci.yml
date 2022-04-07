@@ -64,7 +64,7 @@ sign-deb:
     PROJECT: signalfx-dotnet-tracing
     ARTIFACT: files.tgz
     SIGN_TYPE: DEB
-    OPTION: archive
+    OPTIONS: archive
     DOWNLOAD_DIR: tmp
     REPO_NAME: releng # this env var should be not needed in future
     REPO_PATH: signalfx-dotnet-tracing  # this env var should be not needed in future
@@ -86,7 +86,7 @@ sign-rpm:
     PROJECT: signalfx-dotnet-tracing
     ARTIFACT: files.tgz
     SIGN_TYPE: RPM
-    OPTION: archive
+    OPTIONS: archive
     DOWNLOAD_DIR: tmp
     REPO_NAME: releng # this env var should be not needed in future
     REPO_PATH: signalfx-dotnet-tracing  # this env var should be not needed in future
