@@ -33,7 +33,7 @@ Splunk APM.
 
 * .NET Core 3.1 or .NET 5.0 or higher (`ICorProfilerInfo10` available in runtime).
 * [Splunk OpenTelemetry Collector](https://github.com/signalfx/splunk-otel-collector)
-version 0.33.1 or higher.
+version 0.34.0 or higher.
 _Sending profiling data directly to ingest is not supported at this time_.
 
 # Enable the profiler
@@ -112,7 +112,7 @@ especially `SIGNALFX_PROFILER_LOGS_ENDPOINT`. They are logged at startup.
 application host/container can resolve any hostnames
 and connect to the given OTLP port (default: 4318).
 * Make sure you are running the [Splunk OpenTelemetry Collector](https://github.com/signalfx/splunk-otel-collector)
-and that the version is 0.33.1 or higher.
+and that the version is 0.34.0 or higher.
 Other collector distributions might not be able to correctly route
 the log data containing profiles.
 * Make sure that the collector is configured correctly to handle profiling data.
