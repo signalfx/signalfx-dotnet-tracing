@@ -50,6 +50,11 @@ namespace Datadog.Trace
             return false;
         }
 
+        public bool SupportsAlwaysOnProfiler()
+        {
+            return false;
+        }
+
         private static string GetNetFrameworkVersion()
         {
             string productVersion = null;

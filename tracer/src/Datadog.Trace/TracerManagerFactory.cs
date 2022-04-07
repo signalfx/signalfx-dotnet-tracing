@@ -85,7 +85,7 @@ namespace Datadog.Trace
             sampler ??= GetSampler(settings);
             var propagator = CreateCompositePropagator(settings, traceIdConvention);
             agentWriter ??= GetAgentWriter(settings, statsd, sampler);
-            scopeManager ??= new AsyncLocalScopeManager(settings.ThreadSamplingEnabled);
+            scopeManager ??= new AsyncLocalScopeManager(settings.ThreadSamplingEnabled && FrameworkDescription.Instance.SupportsAlwaysOnProfiler());
 
             if (settings.RuntimeMetricsEnabled && !DistributedTracer.Instance.IsChildTracer)
             {
