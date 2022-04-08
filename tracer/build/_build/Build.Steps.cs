@@ -114,6 +114,7 @@ partial class Build
         TargetFramework.NET461,
         TargetFramework.NETSTANDARD2_0,
         TargetFramework.NETCOREAPP3_1,
+        TargetFramework.NET6_0,
     };
 
     Target CreateRequiredDirectories => _ => _
@@ -490,6 +491,7 @@ partial class Build
         {
             // create junction for each directory
             var directories = TracerDirectory.GlobDirectories(
+                $"src/**/obj/{BuildConfiguration}",
                 $"src/**/bin/{BuildConfiguration}",
                 $"test/Datadog.Trace.TestHelpers/**/obj/{BuildConfiguration}",
                 $"test/Datadog.Trace.TestHelpers/**/bin/{BuildConfiguration}",
@@ -556,6 +558,7 @@ partial class Build
                         "netstandard2.0/",
                         "netcoreapp3.1/",
                         $"{NativeProfilerModule}.so",
+                        "net6.0/",
                         "createLogPath.sh",
                     };
 
