@@ -12,19 +12,19 @@ using namespace trace;
 TEST(ThreadSamplerTest, ThreadStateTracking)
 {
     ThreadSampler ts; // Do NOT call StartSampling on this, which will create a background thread, etc.
-    ts.ThreadAssignedToOSThread(1, 1001);
+    ts.ThreadAssignedToOsThread(1, 1001);
     ts.ThreadNameChanged(1, 6, const_cast<WCHAR*>(L"Sample"));
     ts.ThreadCreated(1);
-    ts.ThreadAssignedToOSThread(1, 1002);
+    ts.ThreadAssignedToOsThread(1, 1002);
     ts.ThreadNameChanged(2, 7, const_cast<WCHAR*>(L"Thread1"));
     ts.ThreadNameChanged(2, 6, const_cast<WCHAR*>(L"thread"));
     ts.ThreadCreated(2);
-    EXPECT_EQ(1002, ts.managedTid2state[1]->nativeId);
-    EXPECT_EQ(L"Sample", ts.managedTid2state[1]->threadName);
-    EXPECT_EQ(L"thread", ts.managedTid2state[2]->threadName);
+    EXPECT_EQ(1002, ts.managed_tid_to_state_[1]->native_id_);
+    EXPECT_EQ(L"Sample", ts.managed_tid_to_state_[1]->thread_name_);
+    EXPECT_EQ(L"thread", ts.managed_tid_to_state_[2]->thread_name_);
     ts.ThreadDestroyed(1);
     ts.ThreadDestroyed(2);
-    EXPECT_EQ(0, ts.managedTid2state.size());
+    EXPECT_EQ(0, ts.managed_tid_to_state_.size());
 }
 
 TEST(ThreadSamplerTest, BasicBufferBehavior)
@@ -34,46 +34,46 @@ TEST(ThreadSamplerTest, BasicBufferBehavior)
     for (int i = 0; i < 400; i++) {
         longThreadName.append(WStr("blah blah "));
     }
-    shared::WSTRING frame1 = WStr("SomeFairlyLongClassName::SomeMildlyLongMethodName");
-    shared::WSTRING frame2 = WStr("SomeFairlyLongClassName::ADifferentMethodName");
+    const shared::WSTRING frame1 = WStr("SomeFairlyLongClassName::SomeMildlyLongMethodName");
+    const shared::WSTRING frame2 = WStr("SomeFairlyLongClassName::ADifferentMethodName");
     ThreadSamplesBuffer tsb(&buf);
     ThreadState threadState;
-    threadState.nativeId = 1000;
-    threadState.threadName.append(longThreadName);
+    threadState.native_id_ = 1000;
+    threadState.thread_name_.append(longThreadName);
 
     tsb.StartBatch();
-    tsb.StartSample(1, &threadState, ThreadSpanContext());
+    tsb.StartSample(1, &threadState, thread_span_context());
     tsb.RecordFrame(7001, frame1);
     tsb.RecordFrame(7002, frame2);
     tsb.RecordFrame(7001, frame1);
     tsb.EndSample();
     tsb.EndBatch();
     tsb.WriteFinalStats(SamplingStatistics());
-    ASSERT_EQ(1290, tsb.buffer->size()); // not manually calculated but does depend on thread name limiting and not repeating frame strings
-    ASSERT_EQ(2, tsb.codes.size());
+    ASSERT_EQ(1290, tsb.buffer_->size()); // not manually calculated but does depend on thread name limiting and not repeating frame strings
+    ASSERT_EQ(2, tsb.codes_.size());
 }
 
 TEST(ThreadSamplerTest, BufferOverrunBehavior)
 {
     auto buf = std::vector<unsigned char>();
-    shared::WSTRING longThreadName;
+    shared::WSTRING long_thread_name;
     for (int i = 0; i < 400; i++)
     {
-        longThreadName.append(WStr("blah blah "));
+        long_thread_name.append(WStr("blah blah "));
     }
     shared::WSTRING frame1 = WStr("SomeFairlyLongClassName::SomeMildlyLongMethodName");
     shared::WSTRING frame2 = WStr("SomeFairlyLongClassName::ADifferentMethodName");
     ThreadSamplesBuffer tsb(&buf);
 
     ThreadState threadState;
-    threadState.nativeId = 1000;
-    threadState.threadName.append(longThreadName);
+    threadState.native_id_ = 1000;
+    threadState.thread_name_.append(long_thread_name);
    
     // Now span a bunch of data and ensure we don't overflow (too much)
     for (int i = 0; i < 100000; i++)
     {
         tsb.StartBatch();
-        tsb.StartSample(1, &threadState, ThreadSpanContext());
+        tsb.StartSample(1, &threadState, thread_span_context());
         tsb.RecordFrame(7001, frame1);
         tsb.RecordFrame(7002, frame2);
         tsb.RecordFrame(7001, frame1);
@@ -87,46 +87,46 @@ TEST(ThreadSamplerTest, BufferOverrunBehavior)
 
 TEST(ThreadSamplerTest, StaticBufferManagement)
 {
-    const auto bufA = new std::vector<unsigned char>();
-    bufA->resize(1);
-    std::fill(bufA->begin(), bufA->end(), 'A');
-    const auto bufB = new std::vector<unsigned char>();
-    bufB->resize(2);
-    std::fill(bufB->begin(), bufB->end(), 'B');
-    const auto bufC = new std::vector<unsigned char>();
-    bufC->resize(4);
-    std::fill(bufC->begin(), bufC->end(), 'C');
-    unsigned char readBuf[4];
-    ASSERT_EQ(true, ThreadSampling_ShouldProduceThreadSample());
-    ASSERT_EQ(0, ThreadSampling_ConsumeOneThreadSample(4, readBuf));
+    const auto buf_a = new std::vector<unsigned char>();
+    buf_a->resize(1);
+    std::fill(buf_a->begin(), buf_a->end(), 'A');
+    const auto buf_b = new std::vector<unsigned char>();
+    buf_b->resize(2);
+    std::fill(buf_b->begin(), buf_b->end(), 'B');
+    const auto buf_c = new std::vector<unsigned char>();
+    buf_c->resize(4);
+    std::fill(buf_c->begin(), buf_c->end(), 'C');
+    unsigned char read_buf[4];
+    ASSERT_EQ(true, ThreadSamplingShouldProduceThreadSample());
+    ASSERT_EQ(0, ThreadSamplingConsumeOneThreadSample(4, read_buf));
 
-    ThreadSampling_RecordProducedThreadSample(bufA);
-    ThreadSampling_RecordProducedThreadSample(bufB);
-    ASSERT_EQ(false, ThreadSampling_ShouldProduceThreadSample());
+    ThreadSamplingRecordProducedThreadSample(buf_a);
+    ThreadSamplingRecordProducedThreadSample(buf_b);
+    ASSERT_EQ(false, ThreadSamplingShouldProduceThreadSample());
 
-    ThreadSampling_RecordProducedThreadSample(bufC); // no-op (but deletes the buf)
-    ASSERT_EQ(false, ThreadSampling_ShouldProduceThreadSample());
+    ThreadSamplingRecordProducedThreadSample(buf_c); // no-op (but deletes the buf)
+    ASSERT_EQ(false, ThreadSamplingShouldProduceThreadSample());
 
-    ASSERT_EQ(1, ThreadSampling_ConsumeOneThreadSample(4, readBuf));
-    ASSERT_EQ('A', readBuf[0]);
-    ASSERT_EQ(2, ThreadSampling_ConsumeOneThreadSample(4, readBuf));
-    ASSERT_EQ('B', readBuf[0]);
-    ASSERT_EQ(0, ThreadSampling_ConsumeOneThreadSample(4, readBuf));
+    ASSERT_EQ(1, ThreadSamplingConsumeOneThreadSample(4, read_buf));
+    ASSERT_EQ('A', read_buf[0]);
+    ASSERT_EQ(2, ThreadSamplingConsumeOneThreadSample(4, read_buf));
+    ASSERT_EQ('B', read_buf[0]);
+    ASSERT_EQ(0, ThreadSamplingConsumeOneThreadSample(4, read_buf));
 
-    const auto bufD = new std::vector<unsigned char>();
-    bufD->resize(4);
-    std::fill(bufD->begin(), bufD->end(), 'D');
-    ThreadSampling_RecordProducedThreadSample(bufD);
-    ASSERT_EQ(4, ThreadSampling_ConsumeOneThreadSample(4, readBuf));
-    ASSERT_EQ('D', readBuf[0]);
+    const auto buf_d = new std::vector<unsigned char>();
+    buf_d->resize(4);
+    std::fill(buf_d->begin(), buf_d->end(), 'D');
+    ThreadSamplingRecordProducedThreadSample(buf_d);
+    ASSERT_EQ(4, ThreadSamplingConsumeOneThreadSample(4, read_buf));
+    ASSERT_EQ('D', read_buf[0]);
 
     // Finally, publish something too big for readBuf and ensure nothing explodes
-    const auto bufE = new std::vector<unsigned char>();
-    bufE->resize(5);
-    std::fill(bufE->begin(), bufE->end(), 'E');
-    ThreadSampling_RecordProducedThreadSample(bufE);
-    ASSERT_EQ(4, ThreadSampling_ConsumeOneThreadSample(4, readBuf));
-    ASSERT_EQ('E', readBuf[0]);
+    const auto buf_e = new std::vector<unsigned char>();
+    buf_e->resize(5);
+    std::fill(buf_e->begin(), buf_e->end(), 'E');
+    ThreadSamplingRecordProducedThreadSample(buf_e);
+    ASSERT_EQ(4, ThreadSamplingConsumeOneThreadSample(4, read_buf));
+    ASSERT_EQ('E', read_buf[0]);
 }
 
 TEST(ThreadSamplerTest, LRUCache)
@@ -135,26 +135,26 @@ TEST(ThreadSamplerTest, LRUCache)
     NameCache cache(max);
     for (int i = 1; i <= max; i++)
     {
-        ASSERT_EQ(NULL, cache.get(FunctionIdentifier{static_cast<unsigned>(i), 0, true}));
+        ASSERT_EQ(NULL, cache.Get(FunctionIdentifier{static_cast<unsigned>(i), 0, true}));
         auto val = new shared::WSTRING(L"Function ");
         val->append(std::to_wstring(i));
-        cache.put(FunctionIdentifier{static_cast<unsigned>(i), 0, true}, val);
-        ASSERT_EQ(val, cache.get(FunctionIdentifier{static_cast<unsigned>(i), 0, true}));
+        cache.Put(FunctionIdentifier{static_cast<unsigned>(i), 0, true}, val);
+        ASSERT_EQ(val, cache.Get(FunctionIdentifier{static_cast<unsigned>(i), 0, true}));
     }
     // Now cache is full; add another and item 1 gets kicked out
-    auto* funcMaxPlus1 = new shared::WSTRING(L"Function max+1");
-    ASSERT_EQ(NULL, cache.get(FunctionIdentifier{static_cast<unsigned>(max + 1), 0, true}));
-    cache.put(FunctionIdentifier{static_cast<unsigned>(max + 1), 0, true}, funcMaxPlus1);
-    ASSERT_EQ(NULL, cache.get(FunctionIdentifier{static_cast<unsigned>(1), 0, true}));
-    ASSERT_EQ(funcMaxPlus1, cache.get(FunctionIdentifier{static_cast<unsigned>(max + 1), 0, true}));
+    auto* func_max_plus1 = new shared::WSTRING(L"Function max+1");
+    ASSERT_EQ(NULL, cache.Get(FunctionIdentifier{static_cast<unsigned>(max + 1), 0, true}));
+    cache.Put(FunctionIdentifier{static_cast<unsigned>(max + 1), 0, true}, func_max_plus1);
+    ASSERT_EQ(NULL, cache.Get(FunctionIdentifier{static_cast<unsigned>(1), 0, true}));
+    ASSERT_EQ(func_max_plus1, cache.Get(FunctionIdentifier{static_cast<unsigned>(max + 1), 0, true}));
 
     // Put 1 back, 2 falls off and everything else is there
     const auto func1 = new shared::WSTRING(L"Function 1");
-    cache.put(FunctionIdentifier { 1, 0, true }, func1);
-    ASSERT_EQ(NULL, cache.get(FunctionIdentifier{2, 0, true}));
-    ASSERT_EQ(func1, cache.get(FunctionIdentifier{static_cast<unsigned>(1), 0, true}));
-    ASSERT_EQ(funcMaxPlus1, cache.get(FunctionIdentifier{static_cast<unsigned>(max + 1), 0, true}));
+    cache.Put(FunctionIdentifier { 1, 0, true }, func1);
+    ASSERT_EQ(NULL, cache.Get(FunctionIdentifier{2, 0, true}));
+    ASSERT_EQ(func1, cache.Get(FunctionIdentifier{static_cast<unsigned>(1), 0, true}));
+    ASSERT_EQ(func_max_plus1, cache.Get(FunctionIdentifier{static_cast<unsigned>(max + 1), 0, true}));
     for (int i = 3; i <= max; i++) {
-        ASSERT_EQ(true, cache.get(FunctionIdentifier{static_cast<unsigned>(i), 0, true}) != NULL);
+        ASSERT_EQ(true, cache.Get(FunctionIdentifier{static_cast<unsigned>(i), 0, true}) != NULL);
     }
 }

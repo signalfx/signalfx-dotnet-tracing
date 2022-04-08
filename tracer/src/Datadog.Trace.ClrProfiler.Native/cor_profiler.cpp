@@ -2713,7 +2713,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::ThreadAssignedToOSThread(ThreadID managed
 {
     if (threadSampler != NULL)
     {
-        threadSampler->ThreadAssignedToOSThread(managedThreadId, osThreadId);
+        threadSampler->ThreadAssignedToOsThread(managedThreadId, osThreadId);
     }
     return S_OK;
 }
