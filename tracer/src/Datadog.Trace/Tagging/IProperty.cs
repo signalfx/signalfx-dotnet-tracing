@@ -14,11 +14,5 @@ namespace Datadog.Trace.Tagging
         string Key { get; }
 
         Func<ITags, TResult> Getter { get; }
-
-        string Data { get; }
-
-        ulong AggregatedTotalRuntime { get; }
-
-        ulong AggregatedTotalRuntimeWithBindings { get; }
     }
 }
