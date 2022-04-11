@@ -12,8 +12,7 @@ namespace Datadog.Trace.Tagging
         private static readonly byte[] CommandBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("amqp.command");
         private static readonly byte[] DeliveryModeBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("amqp.delivery_mode");
         private static readonly byte[] ExchangeBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("amqp.exchange");
-        private static readonly byte[] RoutingKeyBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("amqp.routing_key");
-        private static readonly byte[] MessageSizeBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("message.size");
+        private static readonly byte[] RoutingKeyBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("messaging.rabbitmq.routing_key");
         private static readonly byte[] QueueBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("amqp.queue");
 
         public override string? GetTag(string key)
@@ -25,8 +24,7 @@ namespace Datadog.Trace.Tagging
                 "amqp.command" => Command,
                 "amqp.delivery_mode" => DeliveryMode,
                 "amqp.exchange" => Exchange,
-                "amqp.routing_key" => RoutingKey,
-                "message.size" => MessageSize,
+                "messaging.rabbitmq.routing_key" => RoutingKey,
                 "amqp.queue" => Queue,
                 _ => base.GetTag(key),
             };
@@ -48,11 +46,8 @@ namespace Datadog.Trace.Tagging
                 case "amqp.exchange": 
                     Exchange = value;
                     break;
-                case "amqp.routing_key": 
+                case "messaging.rabbitmq.routing_key": 
                     RoutingKey = value;
-                    break;
-                case "message.size": 
-                    MessageSize = value;
                     break;
                 case "amqp.queue": 
                     Queue = value;
@@ -61,6 +56,22 @@ namespace Datadog.Trace.Tagging
                     base.SetTag(key, value);
                     break;
             }
+        }
+
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] RabbitMQTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(MessagingTagsProperties,
+                new Datadog.Trace.Tagging.Property<RabbitMQTags, string?>("span.kind", t => t.SpanKind),
+                new Datadog.Trace.Tagging.Property<RabbitMQTags, string?>("component", t => t.InstrumentationName),
+                new Datadog.Trace.Tagging.Property<RabbitMQTags, string?>("amqp.command", t => t.Command),
+                new Datadog.Trace.Tagging.Property<RabbitMQTags, string?>("amqp.delivery_mode", t => t.DeliveryMode),
+                new Datadog.Trace.Tagging.Property<RabbitMQTags, string?>("amqp.exchange", t => t.Exchange),
+                new Datadog.Trace.Tagging.Property<RabbitMQTags, string?>("messaging.rabbitmq.routing_key", t => t.RoutingKey),
+                new Datadog.Trace.Tagging.Property<RabbitMQTags, string?>("amqp.queue", t => t.Queue)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return RabbitMQTagsProperties;
         }
 
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
@@ -100,12 +111,6 @@ namespace Datadog.Trace.Tagging
             {
                 count++;
                 WriteTag(ref bytes, ref offset, RoutingKeyBytes, RoutingKey, tagProcessors);
-            }
-
-            if (MessageSize != null)
-            {
-                count++;
-                WriteTag(ref bytes, ref offset, MessageSizeBytes, MessageSize, tagProcessors);
             }
 
             if (Queue != null)
@@ -156,15 +161,8 @@ namespace Datadog.Trace.Tagging
 
             if (RoutingKey != null)
             {
-                sb.Append("amqp.routing_key (tag):")
+                sb.Append("messaging.rabbitmq.routing_key (tag):")
                   .Append(RoutingKey)
-                  .Append(',');
-            }
-
-            if (MessageSize != null)
-            {
-                sb.Append("message.size (tag):")
-                  .Append(MessageSize)
                   .Append(',');
             }
 

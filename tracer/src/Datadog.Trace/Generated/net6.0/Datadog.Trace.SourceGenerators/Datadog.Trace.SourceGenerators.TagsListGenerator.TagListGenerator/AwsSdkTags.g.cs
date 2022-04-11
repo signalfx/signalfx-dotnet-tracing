@@ -65,6 +65,24 @@ namespace Datadog.Trace.Tagging
             }
         }
 
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] AwsSdkTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(InstrumentationTagsProperties,
+                new Datadog.Trace.Tagging.Property<AwsSdkTags, string?>("component", t => t.InstrumentationName),
+                new Datadog.Trace.Tagging.Property<AwsSdkTags, string?>("aws.agent", t => t.AgentName),
+                new Datadog.Trace.Tagging.Property<AwsSdkTags, string?>("aws.operation", t => t.Operation),
+                new Datadog.Trace.Tagging.Property<AwsSdkTags, string?>("aws.region", t => t.Region),
+                new Datadog.Trace.Tagging.Property<AwsSdkTags, string?>("aws.requestId", t => t.RequestId),
+                new Datadog.Trace.Tagging.Property<AwsSdkTags, string?>("aws.service", t => t.Service),
+                new Datadog.Trace.Tagging.Property<AwsSdkTags, string?>("http.method", t => t.HttpMethod),
+                new Datadog.Trace.Tagging.Property<AwsSdkTags, string?>("http.url", t => t.HttpUrl),
+                new Datadog.Trace.Tagging.Property<AwsSdkTags, string?>("http.status_code", t => t.HttpStatusCode)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return AwsSdkTagsProperties;
+        }
+
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
         {
             var count = 0;

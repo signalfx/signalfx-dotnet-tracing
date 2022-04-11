@@ -10,15 +10,19 @@ namespace Datadog.Trace.Tagging
         private static readonly byte[] SamplingPriorityBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("_sampling_priority_v1");
         private static readonly byte[] SamplingLimitDecisionBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("_dd.limit_psr");
         private static readonly byte[] TracesKeepRateBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("_dd.tracer_kr");
-        private static readonly byte[] EnvironmentBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("env");
+        private static readonly byte[] EnvironmentBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("deployment.environment");
         private static readonly byte[] VersionBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("version");
+        private static readonly byte[] SignalFxVersionBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("signalfx.tracing.version");
+        private static readonly byte[] SignalFxLibraryBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("signalfx.tracing.library");
 
         public override string? GetTag(string key)
         {
             return key switch
             {
-                "env" => Environment,
+                "deployment.environment" => Environment,
                 "version" => Version,
+                "signalfx.tracing.version" => SignalFxVersion,
+                "signalfx.tracing.library" => SignalFxLibrary,
                 _ => base.GetTag(key),
             };
         }
@@ -27,16 +31,35 @@ namespace Datadog.Trace.Tagging
         {
             switch(key)
             {
-                case "env": 
+                case "deployment.environment": 
                     Environment = value;
                     break;
                 case "version": 
                     Version = value;
                     break;
+                case "signalfx.tracing.version": 
+                    SignalFxVersion = value;
+                    break;
+                case "signalfx.tracing.library": 
+                    SignalFxLibrary = value;
+                    break;
                 default: 
                     base.SetTag(key, value);
                     break;
             }
+        }
+
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] CommonTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(TagsListProperties,
+                new Datadog.Trace.Tagging.Property<CommonTags, string?>("deployment.environment", t => t.Environment),
+                new Datadog.Trace.Tagging.Property<CommonTags, string?>("version", t => t.Version),
+                new Datadog.Trace.Tagging.Property<CommonTags, string?>("signalfx.tracing.version", t => t.SignalFxVersion),
+                new Datadog.Trace.Tagging.Property<CommonTags, string?>("signalfx.tracing.library", t => t.SignalFxLibrary)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return CommonTagsProperties;
         }
 
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
@@ -54,6 +77,18 @@ namespace Datadog.Trace.Tagging
                 WriteTag(ref bytes, ref offset, VersionBytes, Version, tagProcessors);
             }
 
+            if (SignalFxVersion != null)
+            {
+                count++;
+                WriteTag(ref bytes, ref offset, SignalFxVersionBytes, SignalFxVersion, tagProcessors);
+            }
+
+            if (SignalFxLibrary != null)
+            {
+                count++;
+                WriteTag(ref bytes, ref offset, SignalFxLibraryBytes, SignalFxLibrary, tagProcessors);
+            }
+
             return count + base.WriteAdditionalTags(ref bytes, ref offset, tagProcessors);
         }
 
@@ -61,7 +96,7 @@ namespace Datadog.Trace.Tagging
         {
             if (Environment != null)
             {
-                sb.Append("env (tag):")
+                sb.Append("deployment.environment (tag):")
                   .Append(Environment)
                   .Append(',');
             }
@@ -70,6 +105,20 @@ namespace Datadog.Trace.Tagging
             {
                 sb.Append("version (tag):")
                   .Append(Version)
+                  .Append(',');
+            }
+
+            if (SignalFxVersion != null)
+            {
+                sb.Append("signalfx.tracing.version (tag):")
+                  .Append(SignalFxVersion)
+                  .Append(',');
+            }
+
+            if (SignalFxLibrary != null)
+            {
+                sb.Append("signalfx.tracing.library (tag):")
+                  .Append(SignalFxLibrary)
                   .Append(',');
             }
 

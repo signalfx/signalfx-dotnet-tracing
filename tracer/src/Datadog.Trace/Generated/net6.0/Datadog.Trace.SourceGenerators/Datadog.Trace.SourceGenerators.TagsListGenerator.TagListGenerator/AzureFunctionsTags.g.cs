@@ -50,6 +50,21 @@ namespace Datadog.Trace.Tagging
             }
         }
 
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] AzureFunctionsTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(InstrumentationTagsProperties,
+                new Datadog.Trace.Tagging.Property<AzureFunctionsTags, string?>("span.kind", t => t.SpanKind),
+                new Datadog.Trace.Tagging.Property<AzureFunctionsTags, string?>("component", t => t.InstrumentationName),
+                new Datadog.Trace.Tagging.Property<AzureFunctionsTags, string?>("aas.function.name", t => t.ShortName),
+                new Datadog.Trace.Tagging.Property<AzureFunctionsTags, string?>("aas.function.method", t => t.FullName),
+                new Datadog.Trace.Tagging.Property<AzureFunctionsTags, string?>("aas.function.binding", t => t.BindingSource),
+                new Datadog.Trace.Tagging.Property<AzureFunctionsTags, string?>("aas.function.trigger", t => t.TriggerType)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return AzureFunctionsTagsProperties;
+        }
+
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
         {
             var count = 0;

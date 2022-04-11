@@ -10,9 +10,9 @@ namespace Datadog.Trace.Tagging
         private static readonly byte[] MessageQueueTimeMsBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("message.queue_time_ms");
         private static readonly byte[] SpanKindBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("span.kind");
         private static readonly byte[] InstrumentationNameBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("component");
-        private static readonly byte[] PartitionBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("kafka.partition");
-        private static readonly byte[] OffsetBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("kafka.offset");
-        private static readonly byte[] TombstoneBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("kafka.tombstone");
+        private static readonly byte[] PartitionBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("messaging.kafka.partition");
+        private static readonly byte[] OffsetBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("messaging.kafka.offset");
+        private static readonly byte[] TombstoneBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("messaging.kafka.tombstone");
 
         public override string? GetTag(string key)
         {
@@ -20,9 +20,9 @@ namespace Datadog.Trace.Tagging
             {
                 "span.kind" => SpanKind,
                 "component" => InstrumentationName,
-                "kafka.partition" => Partition,
-                "kafka.offset" => Offset,
-                "kafka.tombstone" => Tombstone,
+                "messaging.kafka.partition" => Partition,
+                "messaging.kafka.offset" => Offset,
+                "messaging.kafka.tombstone" => Tombstone,
                 _ => base.GetTag(key),
             };
         }
@@ -31,19 +31,33 @@ namespace Datadog.Trace.Tagging
         {
             switch(key)
             {
-                case "kafka.partition": 
+                case "messaging.kafka.partition": 
                     Partition = value;
                     break;
-                case "kafka.offset": 
+                case "messaging.kafka.offset": 
                     Offset = value;
                     break;
-                case "kafka.tombstone": 
+                case "messaging.kafka.tombstone": 
                     Tombstone = value;
                     break;
                 default: 
                     base.SetTag(key, value);
                     break;
             }
+        }
+
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] KafkaTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(MessagingTagsProperties,
+                new Datadog.Trace.Tagging.Property<KafkaTags, string?>("span.kind", t => t.SpanKind),
+                new Datadog.Trace.Tagging.Property<KafkaTags, string?>("component", t => t.InstrumentationName),
+                new Datadog.Trace.Tagging.Property<KafkaTags, string?>("messaging.kafka.partition", t => t.Partition),
+                new Datadog.Trace.Tagging.Property<KafkaTags, string?>("messaging.kafka.offset", t => t.Offset),
+                new Datadog.Trace.Tagging.Property<KafkaTags, string?>("messaging.kafka.tombstone", t => t.Tombstone)
+);
+
+        protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
+        {
+             return KafkaTagsProperties;
         }
 
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
@@ -100,21 +114,21 @@ namespace Datadog.Trace.Tagging
 
             if (Partition != null)
             {
-                sb.Append("kafka.partition (tag):")
+                sb.Append("messaging.kafka.partition (tag):")
                   .Append(Partition)
                   .Append(',');
             }
 
             if (Offset != null)
             {
-                sb.Append("kafka.offset (tag):")
+                sb.Append("messaging.kafka.offset (tag):")
                   .Append(Offset)
                   .Append(',');
             }
 
             if (Tombstone != null)
             {
-                sb.Append("kafka.tombstone (tag):")
+                sb.Append("messaging.kafka.tombstone (tag):")
                   .Append(Tombstone)
                   .Append(',');
             }

@@ -5,7 +5,7 @@ using Datadog.Trace.Processors;
 
 namespace Datadog.Trace.Tagging
 {
-    partial class TraceAnnotationTags
+    partial class WcfTags
     {
         private static readonly byte[] InstrumentationNameBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("component");
 
@@ -28,14 +28,14 @@ namespace Datadog.Trace.Tagging
             }
         }
 
-        protected static Datadog.Trace.Tagging.IProperty<string?>[] TraceAnnotationTagsProperties => 
-             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(CommonTagsProperties,
-                new Datadog.Trace.Tagging.Property<TraceAnnotationTags, string?>("component", t => t.InstrumentationName)
+        protected static Datadog.Trace.Tagging.IProperty<string?>[] WcfTagsProperties => 
+             Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(WebTagsProperties,
+                new Datadog.Trace.Tagging.Property<WcfTags, string?>("component", t => t.InstrumentationName)
 );
 
         protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
         {
-             return TraceAnnotationTagsProperties;
+             return WcfTagsProperties;
         }
 
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
