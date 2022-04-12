@@ -53,7 +53,7 @@ partial class Build
 
     AbsolutePath MonitoringHomeDirectory => MonitoringHome ?? (SharedDirectory / "bin" / "monitoring-home");
 
-    AbsolutePath ProfilerHomeDirectory => ProfilerHome ?? RootDirectory / ".." / "_build" / "DDProf-Deploy";
+    AbsolutePath ProfilerHomeDirectory => ProfilerHome ?? RootDirectory / "profiler" / "_build" / "DDProf-Deploy";
 
     AbsolutePath SourceDirectory => TracerDirectory / "src";
     AbsolutePath BuildDirectory => TracerDirectory / "build";
