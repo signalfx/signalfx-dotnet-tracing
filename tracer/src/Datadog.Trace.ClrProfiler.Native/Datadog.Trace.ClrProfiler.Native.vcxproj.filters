@@ -46,6 +46,9 @@
     <ClCompile Include="debugger_environment_variables_util.cpp">
       <Filter>Debugger</Filter>
     </ClCompile>
+    <ClCompile Include="probes_tracker.cpp">
+      <Filter>Debugger</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="always_on_profiler_clr_helpers.h" />
@@ -113,6 +116,9 @@
       <Filter>Debugger</Filter>
     </ClInclude>
     <ClInclude Include="debugger_environment_variables_util.h">
+      <Filter>Debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="probes_tracker.h">
       <Filter>Debugger</Filter>
     </ClInclude>
   </ItemGroup>

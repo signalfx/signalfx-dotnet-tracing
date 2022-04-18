@@ -1014,10 +1014,8 @@ HRESULT CorProfiler::TryRejitModule(ModuleID module_id)
             auto probes = debugger_instrumentation_requester->GetProbes();
             if (!probes.empty())
             {
-                const auto numReJITs =
-                    debugger_instrumentation_requester->GetPreprocessor()->RequestRejitForLoadedModules(
-                        std::vector<ModuleID>{module_id}, probes);
-                Logger::Debug("[Debugger] Total number of ReJIT Requested: ", numReJITs);
+                const auto numReJITs = debugger_instrumentation_requester->RequestRejitForLoadedModule(module_id);
+                 Logger::Debug("[Debugger] Total number of ReJIT Requested: ", numReJITs);
             }
         }
     }
@@ -1570,9 +1568,12 @@ void CorProfiler::InitializeTraceMethods(WCHAR* id, WCHAR* integration_assembly_
     }
 }
 
-void CorProfiler::InstrumentProbes(WCHAR* id, debugger::DebuggerMethodProbeDefinition* items, int size) const
+void CorProfiler::InstrumentProbes(debugger::DebuggerMethodProbeDefinition* methodProbes, int methodProbesLength,
+                            debugger::DebuggerLineProbeDefinition* lineProbes, int lineProbesLength,
+                            debugger::DebuggerRemoveProbesDefinition* removeProbes, int revertProbesLength) const
 {
-    debugger_instrumentation_requester->InstrumentProbes(id, items, size);
+    debugger_instrumentation_requester->InstrumentProbes(methodProbes, methodProbesLength, lineProbes, lineProbesLength,
+                                                  removeProbes, revertProbesLength);
 }
 
 //
@@ -3243,7 +3244,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::JITCachedFunctionSearchStarted(FunctionID
         return S_OK;
     }
 
-    // Call RequestRejit for register inliners and current NGEN module.
+    // Call RequestRejitOrRevert for register inliners and current NGEN module.
     if (rejit_handler != nullptr)
     {
         // Process the current module to detect inliners.
