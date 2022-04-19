@@ -38,7 +38,7 @@ namespace Datadog.Trace.Configuration
         public string MetricsPipeName { get; set; }
         public bool PartialFlushEnabled { get; set; }
         public int PartialFlushMinSpans { get; set; }
-        public bool SyncExport { get; set; }
+        public bool SynchExport { get; set; }
         public string TracesPipeName { get; set; }
         public int TracesPipeTimeoutMs { get; set; }
     }
