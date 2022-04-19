@@ -62,6 +62,10 @@ namespace Datadog.Trace.Configuration
                 // default value
                 ?? false;
 
+            SynchExport = source?.GetBool(ConfigurationKeys.TraceSynchExport)
+                // default value
+                ?? false;
+
             PartialFlushMinSpans = source.SafeReadInt32(
                 key: ConfigurationKeys.PartialFlushMinSpans,
                 defaultTo: 500,
@@ -120,6 +124,11 @@ namespace Datadog.Trace.Configuration
         /// Gets or sets a value indicating whether partial flush is enabled
         /// </summary>
         public bool PartialFlushEnabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to do synchronous export.
+        /// </summary>
+        public bool SynchExport { get; set; }
 
         /// <summary>
         /// Gets or sets the minimum number of closed spans in a trace before it's partially flushed
