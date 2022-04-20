@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using Datadog.Trace.Abstractions;
 using Datadog.Trace.Agent;
@@ -19,7 +18,6 @@ using Datadog.Trace.DogStatsd;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Logging.DirectSubmission;
 using Datadog.Trace.PlatformHelpers;
-using Datadog.Trace.Propagation;
 using Datadog.Trace.Propagators;
 using Datadog.Trace.RuntimeMetrics;
 using Datadog.Trace.Sampling;
@@ -83,7 +81,7 @@ namespace Datadog.Trace
                          ? (statsd ?? CreateDogStatsdClient(settings, defaultServiceName))
                          : null;
             sampler ??= GetSampler(settings);
-            var propagator = CreateCompositePropagator(settings, traceIdConvention);
+
             agentWriter ??= GetAgentWriter(settings, statsd, sampler);
             scopeManager ??= new AsyncLocalScopeManager(settings.ThreadSamplingEnabled && FrameworkDescription.Instance.SupportsAlwaysOnProfiler());
 
@@ -102,7 +100,9 @@ namespace Datadog.Trace
             telemetry ??= TelemetryFactory.CreateTelemetryController(settings);
             telemetry.RecordTracerSettings(settings, defaultServiceName, AzureAppServices.Metadata);
 
-            var tracerManager = CreateTracerManagerFrom(settings, agentWriter, sampler, propagator, scopeManager, statsd, runtimeMetrics, traceIdConvention, logSubmissionManager, telemetry, defaultServiceName);
+            SpanContextPropagator.Instance = ContextPropagators.GetSpanContextPropagator(settings.PropagationStyleInject, settings.PropagationStyleExtract);
+
+            var tracerManager = CreateTracerManagerFrom(settings, agentWriter, sampler, scopeManager, statsd, runtimeMetrics, traceIdConvention, logSubmissionManager, telemetry, defaultServiceName);
             return tracerManager;
         }
 
@@ -113,7 +113,6 @@ namespace Datadog.Trace
             ImmutableTracerSettings settings,
             IAgentWriter agentWriter,
             ISampler sampler,
-            IPropagator propagator,
             IScopeManager scopeManager,
             IDogStatsd statsd,
             RuntimeMetricsWriter runtimeMetrics,
@@ -121,7 +120,7 @@ namespace Datadog.Trace
             DirectLogSubmissionManager logSubmissionManager,
             ITelemetryController telemetry,
             string defaultServiceName)
-            => new TracerManager(settings, agentWriter, sampler, propagator, scopeManager, statsd, runtimeMetrics, traceIdConvention, logSubmissionManager, telemetry, defaultServiceName);
+            => new TracerManager(settings, agentWriter, sampler, scopeManager, statsd, runtimeMetrics, traceIdConvention, logSubmissionManager, telemetry, defaultServiceName);
 
         protected virtual ISampler GetSampler(ImmutableTracerSettings settings)
         {
@@ -167,18 +166,6 @@ namespace Datadog.Trace
                     var api = new Api(settings.ExporterSettings.AgentUri, apiRequestFactory, statsd, rates => sampler.SetDefaultSampleRates(rates), settings.ExporterSettings.PartialFlushEnabled);
                     return new AgentWriter(api, metrics, maxBufferSize: settings.TraceBufferSize);
             }
-        }
-
-        private static CompositeTextMapPropagator CreateCompositePropagator(ImmutableTracerSettings settings, ITraceIdConvention traceIdConvention)
-        {
-            var compositeProvider = new CompositePropagatorsProvider();
-            compositeProvider.RegisterProvider(new OTelPropagatorsProvider());
-
-            var propagators = compositeProvider
-               .GetPropagators(settings.Propagators, traceIdConvention)
-               .ToList();
-
-            return new CompositeTextMapPropagator(propagators);
         }
 
         private static IDogStatsd CreateDogStatsdClient(ImmutableTracerSettings settings, string serviceName)

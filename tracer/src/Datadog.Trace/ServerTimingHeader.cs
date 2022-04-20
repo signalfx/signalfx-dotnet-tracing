@@ -1,7 +1,7 @@
 // Modified by Splunk Inc.
 
 using System;
-using Datadog.Trace.Propagation;
+using Datadog.Trace.Propagators;
 
 namespace Datadog.Trace
 {
@@ -37,7 +37,7 @@ namespace Datadog.Trace
 
         private static string ToHeaderValue(SpanContext context)
         {
-            return string.Format(ServerTimingFormat, W3CSpanContextPropagator.GetFormattedTraceParent(context));
+            return string.Format(ServerTimingFormat, W3CContextPropagator.GetFormattedTraceParent(context));
         }
     }
 }

@@ -8,7 +8,6 @@
 #nullable enable
 
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using Datadog.Trace.Propagators;
 
@@ -65,7 +64,7 @@ namespace Datadog.Trace.ServiceFabric
                 // extract propagation context from message headers for distributed tracing
                 if (messageHeaders != null)
                 {
-                    spanContext = Tracer.Instance.TracerManager.Propagator.Extract(messageHeaders, static (headers, headerName) =>
+                    spanContext = SpanContextPropagator.Instance.Extract(messageHeaders, static (headers, headerName) =>
                     {
                         var headerValue = headers.TryGetHeaderValueString(headerName);
                         if (headerValue != null)

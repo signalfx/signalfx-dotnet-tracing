@@ -294,14 +294,6 @@ namespace Datadog.Trace.Configuration
         public const string Convention = "SIGNALFX_CONVENTION";
 
         /// <summary>
-        /// Configuration key for the propagators to be used.
-        /// Default is <c>B3</c>.
-        /// Supports multiple values separated with comma.
-        /// <seealso cref="TracerSettings.Propagators"/>
-        /// </summary>
-        public const string Propagators = "SIGNALFX_PROPAGATORS";
-
-        /// <summary>
         /// Configuration key for overriding the transport to use for communicating with the trace agent.
         /// Default value is <c>null</c>.
         /// Override options available: <c>datadog-tcp</c>, <c>datadog-named-pipes</c>
@@ -375,6 +367,16 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="TracerSettings.ExpandRouteTemplatesEnabled"/>
         public const string ExpandRouteTemplatesEnabled = "SIGNALFX_TRACE_EXPAND_ROUTE_TEMPLATES_ENABLED";
+
+        /// <summary>
+        /// Configuration key for setting the propagation style injection.
+        /// </summary>
+        public const string PropagationStyleInject = "SINGALFX_PROPAGATION_STYLE_INJECT";
+
+        /// <summary>
+        /// Configuration key for setting the propagation style extraction.
+        /// </summary>
+        public const string PropagationStyleExtract = "SIGNALFX_PROPAGATION_STYLE_EXTRACT";
 
         /// <summary>
         /// Configuration key for enabling automatic instrumentation on specified methods.

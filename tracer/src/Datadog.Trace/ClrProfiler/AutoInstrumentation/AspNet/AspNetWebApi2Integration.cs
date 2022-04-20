@@ -15,6 +15,7 @@ using Datadog.Trace.Configuration;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Propagation;
+using Datadog.Trace.Propagators;
 using Datadog.Trace.Tagging;
 
 namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
@@ -55,7 +56,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
                         var headers = request.Headers;
                         var headersCollection = new HttpHeadersCollection(headers);
 
-                        propagatedContext = tracer.TracerManager.Propagator.Extract(headersCollection);
+                        propagatedContext = SpanContextPropagator.Instance.Extract(headersCollection);
                         tagsFromHeaders = headersCollection.ExtractHeaderTags(tracer.Settings.HeaderTags, PropagationExtensions.HttpRequestHeadersTagPrefix);
                     }
                     catch (Exception ex)

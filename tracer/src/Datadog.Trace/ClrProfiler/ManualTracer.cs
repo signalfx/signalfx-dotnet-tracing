@@ -74,7 +74,7 @@ namespace Datadog.Trace.ClrProfiler
             }
             else
             {
-                return Tracer.Instance.TracerManager.Propagator.Extract(values, (headers, key) => new List<string> { headers[key] });
+                return SpanContextPropagator.Instance.Extract(values, (headers, key) => new List<string> { headers[key] });
             }
         }
 

@@ -5,9 +5,6 @@
 
 // Modified by Splunk Inc.
 
-using System.Globalization;
-using Datadog.Trace.Conventions;
-using Datadog.Trace.Propagation;
 using Xunit;
 
 namespace Datadog.Trace.OpenTracing.Tests
@@ -15,10 +12,10 @@ namespace Datadog.Trace.OpenTracing.Tests
     public class HttpHeaderCodecTests
     {
         // The values are duplicated here to make sure that if they are changed it will break tests
-        private const string HttpHeaderTraceId = B3HttpHeaderNames.B3TraceId;
-        private const string HttpHeaderSpanId = B3HttpHeaderNames.B3SpanId;
+        private const string HttpHeaderTraceId = "trace-id";
+        private const string HttpHeaderSpanId = "parent-id";
 
-        private readonly HttpHeadersCodec _codec = new(new B3SpanContextPropagator(new DatadogTraceIdConvention()));
+        private readonly HttpHeadersCodec _codec = new();
 
         [Fact]
         public void Extract_ValidParentAndTraceId_ProperSpanContext()
@@ -34,7 +31,7 @@ namespace Datadog.Trace.OpenTracing.Tests
 
             Assert.NotNull(spanContext);
             Assert.Equal(traceId, spanContext.Context.TraceId);
-            Assert.Equal(spanId.ToString(), spanContext.Context.SpanId.ToString("X"));
+            Assert.Equal(spanId.ToString(), spanContext.Context.SpanId.ToString());
         }
 
         [Fact]
@@ -52,7 +49,7 @@ namespace Datadog.Trace.OpenTracing.Tests
 
             Assert.NotNull(spanContext);
             Assert.Equal(traceId, spanContext.Context.TraceId);
-            Assert.Equal(spanId.ToString(), spanContext.Context.SpanId.ToString("X"));
+            Assert.Equal(spanId.ToString(), spanContext.Context.SpanId.ToString());
         }
 
         [Fact]
@@ -68,7 +65,7 @@ namespace Datadog.Trace.OpenTracing.Tests
 
             _codec.Inject(spanContext, headers);
 
-            Assert.Equal(spanId, ulong.Parse(headers.Get(HttpHeaderSpanId), NumberStyles.HexNumber));
+            Assert.Equal(spanId, ulong.Parse(headers.Get(HttpHeaderSpanId)));
             Assert.Equal(traceId.ToString(), headers.Get(HttpHeaderTraceId));
         }
     }

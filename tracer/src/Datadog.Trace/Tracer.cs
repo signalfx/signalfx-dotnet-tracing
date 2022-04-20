@@ -15,7 +15,6 @@ using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Logging;
 using Datadog.Trace.PlatformHelpers;
-using Datadog.Trace.Propagation;
 using Datadog.Trace.Sampling;
 using Datadog.Trace.Tagging;
 using Datadog.Trace.Telemetry;
@@ -227,11 +226,6 @@ namespace Datadog.Trace
         /// Gets the <see cref="ISampler"/> instance used by this <see cref="IDatadogTracer"/> instance.
         /// </summary>
         ISampler IDatadogTracer.Sampler => TracerManager.Sampler;
-
-        /// <summary>
-        /// Gets the <see cref="IPropagator"/> instance used by this <see cref="IDatadogTracer"/> instance.
-        /// </summary>
-        IPropagator IDatadogOpenTracingTracer.Propagator => TracerManager.Propagator;
 
         /// <summary>
         /// Gets the <see cref="IScopeManager"/> instance used by this <see cref="IDatadogTracer"/> instance.

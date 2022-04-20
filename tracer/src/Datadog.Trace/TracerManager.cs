@@ -19,7 +19,6 @@ using Datadog.Trace.Logging;
 using Datadog.Trace.Logging.DirectSubmission;
 using Datadog.Trace.PlatformHelpers;
 using Datadog.Trace.Processors;
-using Datadog.Trace.Propagation;
 using Datadog.Trace.RuntimeMetrics;
 using Datadog.Trace.Sampling;
 using Datadog.Trace.Telemetry;
@@ -45,13 +44,12 @@ namespace Datadog.Trace
         private static bool _globalInstanceInitialized;
         private static object _globalInstanceLock = new();
 
-        private volatile bool _isClosing = false;
+        private volatile bool _isClosing;
 
         public TracerManager(
             ImmutableTracerSettings settings,
             IAgentWriter agentWriter,
             ISampler sampler,
-            IPropagator propagator,
             IScopeManager scopeManager,
             IDogStatsd statsd,
             RuntimeMetricsWriter runtimeMetricsWriter,
@@ -64,7 +62,6 @@ namespace Datadog.Trace
             Settings = settings;
             AgentWriter = agentWriter;
             Sampler = sampler;
-            Propagator = propagator;
             ScopeManager = scopeManager;
             Statsd = statsd;
             RuntimeMetrics = runtimeMetricsWriter;
@@ -122,11 +119,6 @@ namespace Datadog.Trace
         /// Gets the <see cref="ISampler"/> instance used by this <see cref="IDatadogTracer"/> instance.
         /// </summary>
         public ISampler Sampler { get; }
-
-        /// <summary>
-        /// Gets the <see cref="IPropagator"/> instance used by this <see cref="IDatadogTracer"/> instance.
-        /// </summary>
-        public IPropagator Propagator { get; }
 
         /// <summary>
         /// Gets the <see cref="ITraceIdConvention"/> instance used by this <see cref="IDatadogTracer"/> instance.

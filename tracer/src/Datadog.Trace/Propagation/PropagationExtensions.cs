@@ -13,16 +13,6 @@ namespace Datadog.Trace.Propagation
 
         private static readonly ConcurrentDictionary<Key, string> DefaultTagMappingCache = new ConcurrentDictionary<Key, string>();
 
-        public static void Inject(this IPropagator propagator, SpanContext context, IHeadersCollection headers)
-        {
-            propagator.Inject(context, headers, InjectToHeadersCollection);
-        }
-
-        public static SpanContext Extract(this IPropagator propagator, IHeadersCollection headers)
-        {
-            return propagator.Extract(headers, ExtractFromHeadersCollection);
-        }
-
         public static IEnumerable<KeyValuePair<string, string>> ExtractHeaderTags(this IHeadersCollection headers, IEnumerable<KeyValuePair<string, string>> headerToTagMap, string defaultTagPrefix)
         {
             return ExtractHeaderTags(headers, headerToTagMap, defaultTagPrefix, string.Empty);
