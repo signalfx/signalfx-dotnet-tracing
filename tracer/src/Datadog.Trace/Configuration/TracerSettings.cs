@@ -83,10 +83,6 @@ namespace Datadog.Trace.Configuration
                                false;
 #pragma warning restore 618
 
-            LogsInjectionEnabled = source?.GetBool(ConfigurationKeys.LogsInjectionEnabled) ??
-                                   // default value
-                                   false;
-
             MaxTracesSubmittedPerSecond = source?.GetInt32(ConfigurationKeys.TraceRateLimit) ??
                                           // default value
                                           100;
@@ -273,10 +269,15 @@ namespace Datadog.Trace.Configuration
         /// <summary>
         /// Gets or sets a value indicating whether correlation identifiers are
         /// automatically injected into the logging context.
-        /// Default is <c>false</c>.
+        /// Default is <c>false</c>, unless <see cref="ConfigurationKeys.DirectLogSubmission.EnabledIntegrations"/>
+        /// enables Direct Log Submission.
         /// </summary>
         /// <seealso cref="ConfigurationKeys.LogsInjectionEnabled"/>
-        public bool LogsInjectionEnabled { get; set; }
+        public bool LogsInjectionEnabled
+        {
+            get => LogSubmissionSettings?.LogsInjectionEnabled ?? false;
+            set => LogSubmissionSettings.LogsInjectionEnabled = value;
+        }
 
         /// <summary>
         /// Gets or sets a value indicating the maximum number of traces set to AutoKeep (p1) per second.
