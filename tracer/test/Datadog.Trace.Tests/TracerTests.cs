@@ -633,7 +633,11 @@ namespace Datadog.Trace.Tests
 
             public string ServiceName { get; set; }
 
-            public ulong TraceId => 1ul;
+            public string LogicScope { get; set; }
+
+            public SpanStatus Status { get; set; }
+
+            public TraceId TraceId => TraceId.CreateFromInt(1);
 
             public ulong SpanId => 1ul;
 
