@@ -53,6 +53,8 @@ partial class Build
 
     AbsolutePath MonitoringHomeDirectory => MonitoringHome ?? (SharedDirectory / "bin" / "monitoring-home");
 
+    AbsolutePath AlwaysOnProfilerNativeDepDirectory => TestsDirectory / "bin" ;
+
     AbsolutePath ProfilerHomeDirectory => ProfilerHome ?? RootDirectory / ".." / "_build" / "DDProf-Deploy";
 
     AbsolutePath SourceDirectory => TracerDirectory / "src";
@@ -72,8 +74,10 @@ partial class Build
     };
     Project NativeProfilerProject => Solution.GetProject(Projects.ClrProfilerNative);
     Project NativeLoaderProject => Solution.GetProject(Projects.NativeLoader);
+    Project AlwaysOnProfilerNativeDepProject => Solution.GetProject(Projects.AlwaysOnProfilerNativeDep);
 
     string NativeProfilerModule => "SignalFx.Tracing.ClrProfiler.Native";
+    string AlwaysOnProfilerNativeDepModule => "Samples.AlwaysOnProfilerNativeDep";
 
     [LazyPathExecutable(name: "cmake")] readonly Lazy<Tool> CMake;
     [LazyPathExecutable(name: "make")] readonly Lazy<Tool> Make;
@@ -250,6 +254,40 @@ partial class Build
                     .SetTargetPlatform(platform)));
         });
 
+    Target CompileAlwaysOnProfilerNativeDepWindows => _ => _
+        .Unlisted()
+        .OnlyWhenStatic(() => IsWin)
+        .Executes(() =>
+        {
+            // If we're building for x64, build for x86 too
+            var platforms =
+                Equals(TargetPlatform, MSBuildTargetPlatform.x64)
+                    ? new[] { MSBuildTargetPlatform.x64, MSBuildTargetPlatform.x86 }
+                    : new[] { MSBuildTargetPlatform.x86 };
+
+            // Can't use dotnet msbuild, as needs to use the VS version of MSBuild
+            MSBuild(s => s
+                .SetTargetPath(MsBuildProject)
+                .SetConfiguration(BuildConfiguration)
+                .SetMSBuildPath()
+                .SetTargets("BuildAlwaysOnProfilerNativeDep")
+                .DisableRestore()
+                .SetMaxCpuCount(null)
+                .CombineWith(platforms, (m, platform) => m
+                    .SetTargetPlatform(platform)));
+        });
+
+    Target CompileAlwaysOnProfilerNativeDepLinux => _ => _
+        .Unlisted()
+        .OnlyWhenStatic(() => IsLinux)
+        .Executes(() => {
+            var buildDirectory = AlwaysOnProfilerNativeDepProject.Directory;
+            CMake.Value(
+                arguments: "-S .",
+                workingDirectory: buildDirectory);
+            Make.Value(workingDirectory: buildDirectory);
+        });
+
     Target CompileNativeTestsLinux => _ => _
         .Unlisted()
         .After(CompileNativeSrc)
@@ -273,7 +311,6 @@ partial class Build
             var targetFrameworks = IsWin
                 ? TargetFrameworks
                 : TargetFrameworks.Where(framework => !framework.ToString().StartsWith("net4"));
-
             // Publish Datadog.Trace.MSBuild which includes Datadog.Trace and Datadog.Trace.AspNet
             DotNetPublish(s => s
                 .SetProject(Solution.GetProject(Projects.DatadogTraceMsBuild))
@@ -291,7 +328,7 @@ partial class Build
       .OnlyWhenStatic(() => IsWin)
       .After(CompileNativeSrc, PublishManagedProfiler)
       .Executes(() =>
-       {
+      {
            foreach (var architecture in ArchitecturesForPlatform)
            {
                var source = NativeProfilerProject.Directory / "bin" / BuildConfiguration / architecture.ToString() /
@@ -300,7 +337,7 @@ partial class Build
                Logger.Info($"Copying '{source}' to '{dest}'");
                CopyFileToDirectory(source, dest, FileExistsPolicy.Overwrite);
            }
-       });
+      });
 
     Target PublishNativeProfilerWindows => _ => _
         .Unlisted()
@@ -349,7 +386,6 @@ partial class Build
                 BuildDirectory / "artifacts" / "createLogPath.sh",
                 TracerHomeDirectory,
                 FileExistsPolicy.Overwrite);
-
             // Create home directory
             CopyFileToDirectory(
                 NativeProfilerProject.Directory / "bin" / $"{NativeProfilerModule}.dylib",
@@ -363,10 +399,40 @@ partial class Build
         .DependsOn(PublishNativeProfilerLinux)
         .DependsOn(PublishNativeProfilerMacOs);
 
-    Target PublishOpenTracing => _ => _
+    Target PublishAlwaysOnProfilerNativeDepWindows => _ => _
         .Unlisted()
-        .After(CompileManagedSrc)
+        .OnlyWhenStatic(() => IsWin)
+        .DependsOn(CompileAlwaysOnProfilerNativeDepWindows)
         .Executes(() =>
+         {
+             foreach (var architecture in ArchitecturesForPlatform)
+             {
+                 // Copy native AlwaysOnProfiler dependency assets
+                 var source = AlwaysOnProfilerNativeDepProject.Directory / "bin" / BuildConfiguration / architecture.ToString() /
+                              $"{AlwaysOnProfilerNativeDepModule}.dll";
+                 var dest = AlwaysOnProfilerNativeDepDirectory / $"win-{architecture}";
+                 Logger.Info($"Copying '{source}' to '{dest}'");
+                 CopyFileToDirectory(source, dest, FileExistsPolicy.Overwrite);
+             }
+         });
+
+    Target PublishAlwaysOnProfilerNativeDepLinux => _ => _
+       .Unlisted()
+       .OnlyWhenStatic(() => IsLinux)
+       .DependsOn(CompileAlwaysOnProfilerNativeDepLinux)
+       .Executes(() =>
+       {
+       // Copy Native file
+       CopyFileToDirectory(
+           AlwaysOnProfilerNativeDepProject.Directory / "bin" / $"{AlwaysOnProfilerNativeDepModule}.so",
+           AlwaysOnProfilerNativeDepDirectory,
+           FileExistsPolicy.Overwrite);
+       });
+
+    Target PublishOpenTracing => _ => _
+       .Unlisted()
+       .After(CompileManagedSrc)
+       .Executes(() =>
         {
             var targetFrameworks = IsWin
                                        ? TargetFrameworks
@@ -820,6 +886,7 @@ partial class Build
 
     Target CompileSamples => _ => _
         .Unlisted()
+        .DependsOn(PublishAlwaysOnProfilerNativeDepWindows)
         .After(CompileDependencyLibs)
         .After(CreatePlatformlessSymlinks)
         .After(CompileFrameworkReproductions)
@@ -1017,6 +1084,7 @@ partial class Build
 
     Target CompileSamplesLinux => _ => _
         .Unlisted()
+        .DependsOn(PublishAlwaysOnProfilerNativeDepLinux)
         .After(CompileManagedSrc)
         .After(CompileRegressionDependencyLibs)
         .After(CompileDependencyLibs)

@@ -335,5 +335,13 @@ tracer/src/Datadog.Trace.ClrProfiler.Native/CMakeCache.txt
 tracer/src/Datadog.Trace.ClrProfiler.Native/cmake_install.cmake
 !tracer/src/Datadog.Trace.ClrProfiler.Native/lib/**
 
+# native sampleprofiler dependency build files
+tracer/test/test-applications/integrations/dependency-libs/Samples.AlwaysOnProfilerNativeDep/build/
+tracer/test/test-applications/integrations/dependency-libs/Samples.AlwaysOnProfilerNativeDep/Makefile
+tracer/test/test-applications/integrations/dependency-libs/Samples.AlwaysOnProfilerNativeDep/CMakeFiles/
+tracer/test/test-applications/integrations/dependency-libs/Samples.AlwaysOnProfilerNativeDep/cmake_install.cmake
+tracer/test/test-applications/integrations/dependency-libs/Samples.AlwaysOnProfilerNativeDep/CMakeCache.txt
+tracer/test/test-applications/integrations/dependency-libs/Samples.AlwaysOnProfilerNativeDep/out/
+
 .ionide/
 /devenv.bat

@@ -18,6 +18,7 @@
     <CppTestProject Include="test\**\*.vcxproj"/>
     <FsSampleLibProject Include="test\test-applications\integrations\**\*.fsproj" />
     <VbSampleLibProject Include="test\test-applications\integrations\**\*.vbproj" />
+    <AlwaysOnProfilerNativeDep Include="test\test-applications\integrations\dependency-libs\Samples.AlwaysOnProfilerNativeDep\Samples.AlwaysOnProfilerNativeDep.vcxproj" />
     <SampleLibProject Include="test\test-applications\integrations\dependency-libs\**\*.csproj" Exclude="test\test-applications\integrations\dependency-libs\**\Samples.MultiDomainHost.App.*.csproj" />
     <RegressionSampleLibProject Include="test\test-applications\regression\dependency-libs\**\Datadog.StackExchange.Redis*.csproj" />
   </ItemGroup>
@@ -92,6 +93,13 @@
   <!--  Used by CompileNativeTestsWindows-->
   <Target Name="BuildCppTests">
     <MSBuild Targets="Build" Projects="@(CppTestProject)">
+      <Output TaskParameter="TargetOutputs" ItemName="CollectedBuildOutput"/>
+    </MSBuild>
+  </Target>
+
+  <!--  Used by CompileAlwaysOnProfilerNativeDepWindows-->
+  <Target Name="BuildAlwaysOnProfilerNativeDep">
+    <MSBuild Targets="Build" Projects="@(AlwaysOnProfilerNativeDep)">
       <Output TaskParameter="TargetOutputs" ItemName="CollectedBuildOutput"/>
     </MSBuild>
   </Target>
