@@ -12,7 +12,8 @@
           "CORECLR_PROFILER_PATH": "$(ProjectDir)$(OutputPath)profiler-lib\\SignalFx.Tracing.ClrProfiler.Native.dll",
   
           "SIGNALFX_DOTNET_TRACER_HOME": "$(ProjectDir)$(OutputPath)profiler-lib",
-          "SIGNALFX_PROPAGATORS": "datadog,b3"
+          "SINGALFX_PROPAGATION_STYLE_INJECT": "DATADOG,B3",
+          "SINGALFX_PROPAGATION_STYLE_EXTRACT": "DATADOG,B3"
         },
         "nativeDebugging": true
       }

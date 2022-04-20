@@ -138,11 +138,11 @@ namespace Datadog.Trace.TestHelpers
 
             string fileName = (EnvironmentTools.GetOS(), EnvironmentTools.GetPlatform()) switch
             {
-                ("win", "X64")     => "Datadog.AutoInstrumentation.NativeLoader.x64.dll",
-                ("win", "X86")     => "Datadog.AutoInstrumentation.NativeLoader.x86.dll",
-                ("linux", "X64")   => "Datadog.AutoInstrumentation.NativeLoader.so",
+                ("win", "X64") => "Datadog.AutoInstrumentation.NativeLoader.x64.dll",
+                ("win", "X86") => "Datadog.AutoInstrumentation.NativeLoader.x86.dll",
+                ("linux", "X64") => "Datadog.AutoInstrumentation.NativeLoader.so",
                 ("linux", "Arm64") => "Datadog.AutoInstrumentation.NativeLoader.so",
-                ("osx", _)         => throw new PlatformNotSupportedException("The Native Loader is not yet supported on osx"),
+                ("osx", _) => throw new PlatformNotSupportedException("The Native Loader is not yet supported on osx"),
                 _ => throw new PlatformNotSupportedException()
             };
 
@@ -210,7 +210,8 @@ namespace Datadog.Trace.TestHelpers
                 "SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS",
                 "SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES",
                 "SIGNALFX_CONVENTION",
-                "SIGNALFX_PROPAGATORS",
+                "SINGALFX_PROPAGATION_STYLE_INJECT",
+                "SINGALFX_PROPAGATION_STYLE_EXTRACT",
 
                 // thread sampling
                 "SIGNALFX_PROFILER_LOGS_ENDPOINT",
