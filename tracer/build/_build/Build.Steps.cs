@@ -99,6 +99,7 @@ partial class Build
     {
         Solution.GetProject(Projects.DatadogTrace),
         Solution.GetProject(Projects.DatadogTraceOpenTracing),
+        Solution.GetProject(Projects.DatadogTraceAnnotations),
     };
 
     Project[] ParallelIntegrationTests => new[]

@@ -56,6 +56,7 @@ bool IsTracingDisabled();
 bool IsAzureAppServices();
 bool NeedsAgentInAAS();
 bool NeedsDogstatsdInAAS();
+bool IsTraceAnnotationEnabled();
 bool IsAzureFunctionsEnabled();
 bool IsVersionCompatibilityEnabled();
 
