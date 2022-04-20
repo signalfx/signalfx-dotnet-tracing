@@ -252,7 +252,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     break;
 
                 case HttpClientIntegrationType.Disabled:
-                    SetEnvironmentVariable("DD_DISABLED_INTEGRATIONS", "HttpMessageHandler;HttpSocketsHandler;WinHttpHandler");
+                    SetEnvironmentVariable("SIGNALFX_DISABLED_INTEGRATIONS", "HttpMessageHandler;HttpSocketsHandler;WinHttpHandler");
                     break;
                 default:
                     throw new InvalidOperationException("Unknown HttpClientIntegrationType: " + httpClientIntegrationType);
@@ -378,7 +378,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         protected void RunIntegrationDisabled(string packageVersion)
         {
             using var telemetry = this.ConfigureTelemetry();
-            SetEnvironmentVariable($"DD_TRACE_{nameof(IntegrationId.Grpc)}_ENABLED", "false");
+            SetEnvironmentVariable($"SIGNALFX_TRACE_{nameof(IntegrationId.Grpc)}_ENABLED", "false");
             using var agent = EnvironmentHelper.GetMockAgent();
             using var process = RunSampleAndWaitForExit(agent, packageVersion: packageVersion, aspNetCorePort: 0);
             var spans = agent.WaitForSpans(1, timeoutInMilliseconds: 500).Where(s => s.Type == "grpc.request").ToList();
