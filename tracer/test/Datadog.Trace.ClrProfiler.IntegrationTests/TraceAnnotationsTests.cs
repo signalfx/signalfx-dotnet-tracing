@@ -73,7 +73,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 ddTraceMethodsString += $";{type}[*,get_Name];System.Net.Http.HttpRequestMessage[set_Method]";
             }
 
-            SetEnvironmentVariable("DD_TRACE_METHODS", ddTraceMethodsString);
+            SetEnvironmentVariable("SIGNALFX_TRACE_METHODS", ddTraceMethodsString);
 
             _twoAssembliesLoaded = twoAssembliesLoaded;
         }

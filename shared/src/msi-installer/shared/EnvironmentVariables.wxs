@@ -7,7 +7,7 @@
     <ComponentGroup Id="Shared.EnvironmentVariables.Machine" Directory="INSTALLFOLDER">
       <Component Id="EnvironmentVariablesShared" Guid="{C314A305-9C24-4E46-9ECF-E5EEA703BDEA}" Win64="$(var.Win64)">
         <CreateFolder/>
-        <Environment Id="DD_NATIVELOADER_CONFIGFILE" Name="SIGNALFX_NATIVELOADER_CONFIGFILE" Action="set" Permanent="no" System="yes" Value="[INSTALLFOLDER]loader.conf" Part="all" />
+        <Environment Id="SIGNALFX_NATIVELOADER_CONFIGFILE" Name="SIGNALFX_NATIVELOADER_CONFIGFILE" Action="set" Permanent="no" System="yes" Value="[INSTALLFOLDER]loader.conf" Part="all" />
       </Component>
     </ComponentGroup>
   

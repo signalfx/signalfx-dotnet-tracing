@@ -11,7 +11,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "environmentVariables": {
-        "DD_TRACE_HEADER_TAGS": "sample.correlation.identifier, Server",
+        "SIGNALFX_TRACE_HEADER_TAGS": "sample.correlation.identifier, Server",
         "ASPNETCORE_ENVIRONMENT": "Development",
 
         "CORECLR_ENABLE_PROFILING": "1",
@@ -28,7 +28,7 @@
     "Samples.AspNetCoreMvc31": {
       "commandName": "Project",
       "environmentVariables": {
-        "DD_TRACE_HEADER_TAGS": "sample.correlation.identifier, Server",
+        "SIGNALFX_TRACE_HEADER_TAGS": "sample.correlation.identifier, Server",
         "ASPNETCORE_ENVIRONMENT": "Development",
 
         "CORECLR_ENABLE_PROFILING": "1",

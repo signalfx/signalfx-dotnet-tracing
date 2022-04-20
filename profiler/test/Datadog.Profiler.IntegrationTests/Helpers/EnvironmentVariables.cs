@@ -7,11 +7,11 @@ namespace Datadog.Profiler.IntegrationTests.Helpers
 {
     internal class EnvironmentVariables
     {
-        public const string LibDdPprofPipepline = "DD_INTERNAL_PROFILING_LIBDDPROF_ENABLED";
-        public const string ProfilingLogDir = "DD_PROFILING_LOG_DIR";
-        public const string ProfilingPprofDir = "DD_INTERNAL_PROFILING_OUTPUT_DIR";
-        public const string ProfilerInstallationFolder = "DD_TESTING_PROFILER_FOLDER";
-        public const string CodeHotSpotsEnable = "DD_PROFILING_CODEHOTSPOTS_ENABLED";
+        public const string LibDdPprofPipepline = "SIGNALFX_INTERNAL_PROFILING_LIBDDPROF_ENABLED";
+        public const string ProfilingLogDir = "SIGNALFX_PROFILING_LOG_DIR";
+        public const string ProfilingPprofDir = "SIGNALFX_INTERNAL_PROFILING_OUTPUT_DIR";
+        public const string ProfilerInstallationFolder = "SIGNALFX_TESTING_PROFILER_FOLDER";
+        public const string CodeHotSpotsEnable = "SIGNALFX_PROFILING_CODEHOTSPOTS_ENABLED";
         public const string UseNativeLoader = "USE_NATIVE_LOADER";
     }
 }

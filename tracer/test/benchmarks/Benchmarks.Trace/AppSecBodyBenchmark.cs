@@ -78,8 +78,8 @@ namespace Benchmarks.Trace
             {
                 dir = Directory.GetParent(dir).FullName;
             }
-            Environment.SetEnvironmentVariable("DD_APPSEC_ENABLED", "true");
-            Environment.SetEnvironmentVariable("DD_DOTNET_TRACER_HOME", Path.Combine(dir, "bin", "dd-tracer-home", RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) ? $"win-{(Environment.Is64BitOperatingSystem ? "x64" : "x86")}" : string.Empty));
+            Environment.SetEnvironmentVariable("SIGNALFX_APPSEC_ENABLED", "true");
+            Environment.SetEnvironmentVariable("SIGNALFX_DOTNET_TRACER_HOME", Path.Combine(dir, "bin", "dd-tracer-home", RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) ? $"win-{(Environment.Is64BitOperatingSystem ? "x64" : "x86")}" : string.Empty));
             security = Security.Instance;
 #if NETFRAMEWORK
             var ms = new MemoryStream();

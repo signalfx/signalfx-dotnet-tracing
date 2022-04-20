@@ -7,7 +7,7 @@ namespace Datadog.Trace.ContinuousProfiler
 {
     internal static class ConfigurationKeys
     {
-        public const string ProfilingEnabled = "DD_PROFILING_ENABLED";
-        public const string CodeHotspotsEnabled = "DD_PROFILING_CODEHOTSPOTS_ENABLED";
+        public const string ProfilingEnabled = "SIGNALFX_PROFILING_ENABLED";
+        public const string CodeHotspotsEnabled = "SIGNALFX_PROFILING_CODEHOTSPOTS_ENABLED";
     }
 }
