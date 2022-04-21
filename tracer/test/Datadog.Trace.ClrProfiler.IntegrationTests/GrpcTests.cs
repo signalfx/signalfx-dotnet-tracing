@@ -179,6 +179,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         private const string MetadataHeaders = "server-value1,server-value2:servermeta,client-value1,client-value2:clientmeta";
         private static readonly Regex GrpcCoreCreatedRegex = new(@"\@\d{10}\.\d{9}", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private static readonly Regex GrpcCoreFileLineRegex = new(@"""file_line""\:\d+,", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex GrpcCoreFileRegex = new(@"""file""\:"".+"",", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private readonly bool _usesAspNetCore;
 
         protected GrpcTestsBase(string sampleName, ITestOutputHelper output, bool usesAspNetCore)
@@ -282,6 +283,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 settings.AddRegexScrubber(GrpcCoreCreatedRegex, "@00000000000.000000000");
                 // Different versions of Grpc.Core will have a different file line
                 settings.AddRegexScrubber(GrpcCoreFileLineRegex, @"""file_line"":1234,");
+                // Linux vs Windows have different file paths (legacy gprc)
+                settings.AddRegexScrubber(GrpcCoreFileRegex, @"""file"":""some_file.cc"",");
                 // Depending on the exact code paths taken, the error status may be either of these:
                 settings.AddSimpleScrubber("DeadlineExceeded", "Deadline Exceeded");
                 // Keep the traces the same between http and https endpoints

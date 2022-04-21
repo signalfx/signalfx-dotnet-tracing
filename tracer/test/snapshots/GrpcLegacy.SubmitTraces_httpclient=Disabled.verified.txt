@@ -22,9 +22,9 @@
       runtime-id: Guid_1,
       servermeta: other-server-value,
       sfx.error.kind: Grpc.Core.Internal.CoreErrorDetailException,
-      sfx.error.message: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"Exception was thrown by handler.","grpc_status":2},
+      sfx.error.message: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"some_file.cc","grpc_status":2},
       sfx.error.stack:
-Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"Exception was thrown by handler.","grpc_status":2}
+Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"some_file.cc","grpc_status":2}
 ,
       signalfx.tracing.library: dotnet-tracing,
       signalfx.tracing.version: x.y.z,
@@ -94,9 +94,9 @@ Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000"
       runtime-id: Guid_1,
       servermeta: other-server-value,
       sfx.error.kind: Grpc.Core.Internal.CoreErrorDetailException,
-      sfx.error.message: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"Where did it go?","grpc_status":5},
+      sfx.error.message: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"some_file.cc","grpc_status":5},
       sfx.error.stack:
-Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"Where did it go?","grpc_status":5}
+Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"some_file.cc","grpc_status":5}
 ,
       signalfx.tracing.library: dotnet-tracing,
       signalfx.tracing.version: x.y.z,
@@ -166,9 +166,9 @@ Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000"
       runtime-id: Guid_1,
       servermeta: other-server-value,
       sfx.error.kind: Grpc.Core.Internal.CoreErrorDetailException,
-      sfx.error.message: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"","grpc_status":1},
+      sfx.error.message: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"some_file.cc","grpc_status":1},
       sfx.error.stack:
-Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"","grpc_status":1}
+Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"some_file.cc","grpc_status":1}
 ,
       signalfx.tracing.library: dotnet-tracing,
       signalfx.tracing.version: x.y.z,
@@ -238,9 +238,9 @@ Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000"
       runtime-id: Guid_1,
       servermeta: other-server-value,
       sfx.error.kind: Grpc.Core.Internal.CoreErrorDetailException,
-      sfx.error.message: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"My spices!","grpc_status":15},
+      sfx.error.message: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"some_file.cc","grpc_status":15},
       sfx.error.stack:
-Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"My spices!","grpc_status":15}
+Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"some_file.cc","grpc_status":15}
 ,
       signalfx.tracing.library: dotnet-tracing,
       signalfx.tracing.version: x.y.z,
@@ -772,9 +772,9 @@ Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000"
       grpc.status.code: 4,
       runtime-id: Guid_1,
       sfx.error.kind: Grpc.Core.Internal.CoreErrorDetailException,
-      sfx.error.message: {"created":"@00000000000.000000000","description":"Deadline Exceeded","file":"/var/local/git/grpc/src/core/ext/filters/deadline/deadline_filter.cc","file_line":1234,"grpc_status":4},
+      sfx.error.message: {"created":"@00000000000.000000000","description":"Deadline Exceeded","file":"some_file.cc","file_line":1234,"grpc_status":4},
       sfx.error.stack:
-Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Deadline Exceeded","file":"/var/local/git/grpc/src/core/ext/filters/deadline/deadline_filter.cc","file_line":1234,"grpc_status":4}
+Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Deadline Exceeded","file":"some_file.cc","file_line":1234,"grpc_status":4}
 ,
       signalfx.tracing.library: dotnet-tracing,
       signalfx.tracing.version: x.y.z,
@@ -905,9 +905,9 @@ Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000"
       grpc.status.code: 1,
       servermeta: other-server-value,
       sfx.error.kind: Grpc.Core.Internal.CoreErrorDetailException,
-      sfx.error.message: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"","grpc_status":1},
+      sfx.error.message: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"some_file.cc","grpc_status":1},
       sfx.error.stack:
-Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"","grpc_status":1}
+Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"some_file.cc","grpc_status":1}
 ,
       span.kind: client
     }
@@ -955,9 +955,9 @@ Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000"
       grpc.status.code: 15,
       servermeta: other-server-value,
       sfx.error.kind: Grpc.Core.Internal.CoreErrorDetailException,
-      sfx.error.message: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"My spices!","grpc_status":15},
+      sfx.error.message: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"some_file.cc","grpc_status":15},
       sfx.error.stack:
-Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"My spices!","grpc_status":15}
+Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"some_file.cc","grpc_status":15}
 ,
       span.kind: client
     }
@@ -1005,9 +1005,9 @@ Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000"
       grpc.status.code: 5,
       servermeta: other-server-value,
       sfx.error.kind: Grpc.Core.Internal.CoreErrorDetailException,
-      sfx.error.message: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"Where did it go?","grpc_status":5},
+      sfx.error.message: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"some_file.cc","grpc_status":5},
       sfx.error.stack:
-Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"Where did it go?","grpc_status":5}
+Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"some_file.cc","grpc_status":5}
 ,
       span.kind: client
     }
@@ -1055,9 +1055,9 @@ Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000"
       grpc.status.code: 2,
       servermeta: other-server-value,
       sfx.error.kind: Grpc.Core.Internal.CoreErrorDetailException,
-      sfx.error.message: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"Exception was thrown by handler.","grpc_status":2},
+      sfx.error.message: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"some_file.cc","grpc_status":2},
       sfx.error.stack:
-Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"Exception was thrown by handler.","grpc_status":2}
+Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"some_file.cc","grpc_status":2}
 ,
       span.kind: client
     }
@@ -1267,9 +1267,9 @@ Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000"
       grpc.request.metadata.client-value1: some-client-value,
       grpc.status.code: 4,
       sfx.error.kind: Grpc.Core.Internal.CoreErrorDetailException,
-      sfx.error.message: {"created":"@00000000000.000000000","description":"Deadline Exceeded","file":"/var/local/git/grpc/src/core/ext/filters/deadline/deadline_filter.cc","file_line":1234,"grpc_status":4},
+      sfx.error.message: {"created":"@00000000000.000000000","description":"Deadline Exceeded","file":"some_file.cc","file_line":1234,"grpc_status":4},
       sfx.error.stack:
-Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Deadline Exceeded","file":"/var/local/git/grpc/src/core/ext/filters/deadline/deadline_filter.cc","file_line":1234,"grpc_status":4}
+Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Deadline Exceeded","file":"some_file.cc","file_line":1234,"grpc_status":4}
 ,
       span.kind: client
     }
