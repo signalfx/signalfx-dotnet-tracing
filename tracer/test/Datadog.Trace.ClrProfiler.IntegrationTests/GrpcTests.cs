@@ -179,7 +179,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         private const string MetadataHeaders = "server-value1,server-value2:servermeta,client-value1,client-value2:clientmeta";
         private static readonly Regex GrpcCoreCreatedRegex = new(@"\@\d{10}\.\d{9}", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private static readonly Regex GrpcCoreFileLineRegex = new(@"""file_line""\:\d+,", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        private static readonly Regex GrpcCoreFileRegex = new(@"""file""\:"".+"",", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex GrpcCoreFileRegex = new(@"""file""\:""[^,]+,", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private readonly bool _usesAspNetCore;
 
         protected GrpcTestsBase(string sampleName, ITestOutputHelper output, bool usesAspNetCore)
