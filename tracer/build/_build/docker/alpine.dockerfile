@@ -11,6 +11,7 @@ RUN apk update \
         git \
         bash \
         make \
+        protobuf-dev \
         alpine-sdk \
         ruby \
         ruby-dev \
