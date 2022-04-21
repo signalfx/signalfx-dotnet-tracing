@@ -1039,7 +1039,7 @@ partial class Build
             var instrumentationProjects = TracerDirectory.GlobFiles("test/test-applications/instrumentation/*/*.csproj");
 
             // These samples are currently skipped.
-            var projectsToSkip = new[]
+            var projectsToSkip = new List<string>
             {
                 "Samples.Msmq",  // Doesn't run on Linux
                 "Samples.Owin.WebApi2", // Doesn't run on Linux
@@ -1059,6 +1059,11 @@ partial class Build
                 "IBM.Data.DB2.DBCommand",
                 "Sandbox.AutomaticInstrumentation", // Doesn't run on Linux
             };
+
+            if (IsAlpine)
+            {
+                projectsToSkip.Add("Samples.GrpcDotNet");
+            }
 
             // These sample projects are built using RestoreAndBuildSamplesForPackageVersions
             // so no point building them now
