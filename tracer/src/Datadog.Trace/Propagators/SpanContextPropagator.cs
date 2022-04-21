@@ -146,7 +146,6 @@ namespace Datadog.Trace.Propagators
 
             for (var i = 0; i < _extractors.Length; i++)
             {
-                Console.WriteLine(_extractors[i].GetType());
                 if (_extractors[i].TryExtract(carrier, carrierGetter, out var spanContext))
                 {
                     return spanContext;
