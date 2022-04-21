@@ -518,6 +518,7 @@ namespace Datadog.Trace.Tests
             var id = Guid.NewGuid().ToString();
             var sessionId = Guid.NewGuid().ToString();
             var role = "admin";
+            var scope = "read:message, write:files";
 
             var userDetails = new UserDetails()
             {
@@ -526,6 +527,7 @@ namespace Datadog.Trace.Tests
                 Id = id,
                 SessionId = sessionId,
                 Role = role,
+                Scope = scope,
             };
             tracer.ActiveScope?.Span.SetUser(userDetails);
 
@@ -534,6 +536,7 @@ namespace Datadog.Trace.Tests
             Assert.Equal(id, rootTestScope.Span.GetTag(Tags.User.Id));
             Assert.Equal(sessionId, rootTestScope.Span.GetTag(Tags.User.SessionId));
             Assert.Equal(role, rootTestScope.Span.GetTag(Tags.User.Role));
+            Assert.Equal(scope, rootTestScope.Span.GetTag(Tags.User.Scope));
         }
 
         [Fact]
@@ -555,6 +558,7 @@ namespace Datadog.Trace.Tests
             var id = Guid.NewGuid().ToString();
             var sessionId = Guid.NewGuid().ToString();
             var role = "admin";
+            var scope = "read:message, write:files";
 
             var userDetails = new UserDetails()
             {
@@ -563,6 +567,7 @@ namespace Datadog.Trace.Tests
                 Id = id,
                 SessionId = sessionId,
                 Role = role,
+                Scope = scope,
             };
             tracer.ActiveScope?.Span.SetUser(userDetails);
 
@@ -573,6 +578,7 @@ namespace Datadog.Trace.Tests
             Assert.Equal(id, rootTestScope.Span.GetTag(Tags.User.Id));
             Assert.Equal(sessionId, rootTestScope.Span.GetTag(Tags.User.SessionId));
             Assert.Equal(role, rootTestScope.Span.GetTag(Tags.User.Role));
+            Assert.Equal(scope, rootTestScope.Span.GetTag(Tags.User.Scope));
         }
 
         [Fact]
@@ -585,6 +591,7 @@ namespace Datadog.Trace.Tests
             var id = Guid.NewGuid().ToString();
             var sessionId = Guid.NewGuid().ToString();
             var role = "admin";
+            var scope = "read:message, write:files";
 
             var userDetails = new UserDetails()
             {
@@ -593,6 +600,7 @@ namespace Datadog.Trace.Tests
                 Id = id,
                 SessionId = sessionId,
                 Role = role,
+                Scope = scope,
             };
             testSpan.SetUser(userDetails);
 
@@ -601,6 +609,7 @@ namespace Datadog.Trace.Tests
             Assert.Equal(id, testSpan.GetTag(Tags.User.Id));
             Assert.Equal(sessionId, testSpan.GetTag(Tags.User.SessionId));
             Assert.Equal(role, testSpan.GetTag(Tags.User.Role));
+            Assert.Equal(scope, testSpan.GetTag(Tags.User.Scope));
         }
 
         [Fact]
