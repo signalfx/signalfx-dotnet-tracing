@@ -1062,7 +1062,10 @@ partial class Build
 
             if (IsAlpine)
             {
+                // Alpine has issues with the gRPC tools, filter out the affected projects.
+                // The corresponding tests are skipped on Alpine.
                 projectsToSkip.Add("Samples.GrpcDotNet");
+                projectsToSkip.Add("Samples.GrpcLegacy");
             }
 
             // These sample projects are built using RestoreAndBuildSamplesForPackageVersions
