@@ -5,11 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Condition="'$(OS)' == 'Windows_NT'" Include="..\..\..\..\..\tracer\test\bin\win-$(Platform)\Samples.AlwaysOnProfilerNativeDep.dll" Link="Samples.AlwaysOnProfilerNativeDep.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Condition="'$(OS)' == 'Windows_NT'" Include="..\..\..\..\..\tracer\test\bin\win-$(Platform)\Samples.AlwaysOnProfiler.NativeDep.dll" Link="Samples.AlwaysOnProfiler.NativeDep.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Condition="'$(OS)' != 'Windows_NT'" Include="..\..\..\..\..\tracer\test\bin\Samples.AlwaysOnProfilerNativeDep.so" Link="Samples.AlwaysOnProfilerNativeDep.so">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Condition="'$(OS)' != 'Windows_NT'" Include="..\..\..\..\..\tracer\test\bin\Samples.AlwaysOnProfiler.NativeDep.so" Link="Samples.AlwaysOnProfiler.NativeDep.so">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

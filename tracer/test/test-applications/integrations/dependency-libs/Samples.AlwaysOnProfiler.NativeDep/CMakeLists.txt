@@ -5,7 +5,7 @@ cmake_policy(SET CMP0015 NEW)
 # Project definition
 # ******************************************************
 
-project("Samples.AlwaysOnProfilerNativeDep" VERSION 0.0.1)
+project("Samples.AlwaysOnProfiler.NativeDep" VERSION 0.0.1)
 
 # ******************************************************
 # Environment detection
@@ -107,7 +107,7 @@ endif()
 # ******************************************************
 # Define shared target
 # ******************************************************
-SET(TARGET_NAME "Samples.AlwaysOnProfilerNativeDep")
+SET(TARGET_NAME "Samples.AlwaysOnProfiler.NativeDep")
 
 add_library(${TARGET_NAME} SHARED
     callbacktest.cpp

@@ -23,7 +23,7 @@ namespace My.Custom.Test.Namespace
 
         private static readonly Callback TestCallback = GenericClassC<int>.GenericMethodCFromGenericClass;
 
-        [DllImport("Samples.AlwaysOnProfilerNativeDep")]
+        [DllImport("Samples.AlwaysOnProfiler.NativeDep")]
         private static extern int SignalFxCallbackTest(Callback fp, int n);
 
         public static void MethodA()

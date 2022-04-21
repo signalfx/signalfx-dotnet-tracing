@@ -1,4 +1,0 @@
-LIBRARY "Samples.AlwaysOnProfilerNativeDep.dll"
-
-EXPORTS
-    SignalFxCallbackTest

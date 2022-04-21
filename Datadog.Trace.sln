@@ -470,7 +470,7 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Samples.AlwaysOnProfiler.Fs
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Samples.AlwaysOnProfiler.Performance", "tracer\test\test-applications\integrations\Samples.AlwaysOnProfiler.Performance\Samples.AlwaysOnProfiler.Performance.csproj", "{6B497A01-CD32-465B-9C8B-7AB5FD485BC6}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Samples.AlwaysOnProfilerNativeDep", "tracer\test\test-applications\integrations\dependency-libs\Samples.AlwaysOnProfilerNativeDep\Samples.AlwaysOnProfilerNativeDep.vcxproj", "{47DA933E-8DBC-4B03-A1D1-2BBE5F4D0D70}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Samples.AlwaysOnProfiler.NativeDep", "tracer\test\test-applications\integrations\dependency-libs\Samples.AlwaysOnProfiler.NativeDep\Samples.AlwaysOnProfiler.NativeDep.vcxproj", "{47DA933E-8DBC-4B03-A1D1-2BBE5F4D0D70}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution

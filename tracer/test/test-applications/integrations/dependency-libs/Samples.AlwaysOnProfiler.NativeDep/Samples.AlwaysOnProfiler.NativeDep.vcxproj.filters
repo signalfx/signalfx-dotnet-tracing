@@ -26,6 +26,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Directory.Build.props" />
-    <None Include="Samples.AlwaysOnProfilerNativeDep.def" />
+    <None Include="Samples.AlwaysOnProfiler.NativeDep.def" />
   </ItemGroup>
 </Project>

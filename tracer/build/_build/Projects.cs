@@ -11,7 +11,7 @@ public static class Projects
     public const string WindowsInstaller = "WindowsInstaller";
 
     public const string NativeLoader = "Datadog.AutoInstrumentation.NativeLoader";
-    public const string AlwaysOnProfilerNativeDep = "Samples.AlwaysOnProfilerNativeDep";
+    public const string AlwaysOnProfilerNativeDep = "Samples.AlwaysOnProfiler.NativeDep";
 
     public const string BenchmarksTrace = "Benchmarks.Trace";
 

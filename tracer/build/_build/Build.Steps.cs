@@ -77,7 +77,7 @@ partial class Build
     Project AlwaysOnProfilerNativeDepProject => Solution.GetProject(Projects.AlwaysOnProfilerNativeDep);
 
     string NativeProfilerModule => "SignalFx.Tracing.ClrProfiler.Native";
-    string AlwaysOnProfilerNativeDepModule => "Samples.AlwaysOnProfilerNativeDep";
+    string AlwaysOnProfilerNativeDepModule => "Samples.AlwaysOnProfiler.NativeDep";
 
     [LazyPathExecutable(name: "cmake")] readonly Lazy<Tool> CMake;
     [LazyPathExecutable(name: "make")] readonly Lazy<Tool> Make;

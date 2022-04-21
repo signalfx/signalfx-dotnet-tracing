@@ -18,7 +18,7 @@
     <CppTestProject Include="test\**\*.vcxproj"/>
     <FsSampleLibProject Include="test\test-applications\integrations\**\*.fsproj" />
     <VbSampleLibProject Include="test\test-applications\integrations\**\*.vbproj" />
-    <AlwaysOnProfilerNativeDep Include="test\test-applications\integrations\dependency-libs\Samples.AlwaysOnProfilerNativeDep\Samples.AlwaysOnProfilerNativeDep.vcxproj" />
+    <AlwaysOnProfilerNativeDep Include="test\test-applications\integrations\dependency-libs\Samples.AlwaysOnProfiler.NativeDep\Samples.AlwaysOnProfiler.NativeDep.vcxproj" />
     <SampleLibProject Include="test\test-applications\integrations\dependency-libs\**\*.csproj" Exclude="test\test-applications\integrations\dependency-libs\**\Samples.MultiDomainHost.App.*.csproj" />
     <RegressionSampleLibProject Include="test\test-applications\regression\dependency-libs\**\Datadog.StackExchange.Redis*.csproj" />
   </ItemGroup>
