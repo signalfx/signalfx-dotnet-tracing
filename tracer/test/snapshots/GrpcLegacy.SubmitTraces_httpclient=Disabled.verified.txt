@@ -1,0 +1,1297 @@
+﻿[
+  {
+    TraceId: Id_1,
+    SpanId: Id_2,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/ErroringMethod,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    Error: 1,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: unary,
+      grpc.method.name: ErroringMethod,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/ErroringMethod,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 2,
+      runtime-id: Guid_1,
+      servermeta: other-server-value,
+      sfx.error.kind: Grpc.Core.Internal.CoreErrorDetailException,
+      sfx.error.message: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"Exception was thrown by handler.","grpc_status":2},
+      sfx.error.stack:
+Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"Exception was thrown by handler.","grpc_status":2}
+,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: client
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_3,
+    SpanId: Id_4,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/ErroringMethod,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: unary,
+      grpc.method.name: ErroringMethod,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/ErroringMethod,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 2,
+      language: dotnet,
+      runtime-id: Guid_1,
+      servermeta: other-server-value,
+      sfx.error.message: Exception was thrown by handler.,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: server
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_5,
+    SpanId: Id_6,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/ErroringMethod,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    Error: 1,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: unary,
+      grpc.method.name: ErroringMethod,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/ErroringMethod,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 5,
+      runtime-id: Guid_1,
+      servermeta: other-server-value,
+      sfx.error.kind: Grpc.Core.Internal.CoreErrorDetailException,
+      sfx.error.message: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"Where did it go?","grpc_status":5},
+      sfx.error.stack:
+Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"Where did it go?","grpc_status":5}
+,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: client
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_7,
+    SpanId: Id_8,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/ErroringMethod,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: unary,
+      grpc.method.name: ErroringMethod,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/ErroringMethod,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 5,
+      language: dotnet,
+      runtime-id: Guid_1,
+      servermeta: other-server-value,
+      sfx.error.message: Where did it go?,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: server
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_9,
+    SpanId: Id_10,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/ErroringMethod,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    Error: 1,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: unary,
+      grpc.method.name: ErroringMethod,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/ErroringMethod,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 1,
+      runtime-id: Guid_1,
+      servermeta: other-server-value,
+      sfx.error.kind: Grpc.Core.Internal.CoreErrorDetailException,
+      sfx.error.message: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"","grpc_status":1},
+      sfx.error.stack:
+Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"","grpc_status":1}
+,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: client
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_11,
+    SpanId: Id_12,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/ErroringMethod,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: unary,
+      grpc.method.name: ErroringMethod,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/ErroringMethod,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 1,
+      language: dotnet,
+      runtime-id: Guid_1,
+      servermeta: other-server-value,
+      sfx.error.message: Canceled,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: server
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_13,
+    SpanId: Id_14,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/ErroringMethod,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    Error: 1,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: unary,
+      grpc.method.name: ErroringMethod,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/ErroringMethod,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 15,
+      runtime-id: Guid_1,
+      servermeta: other-server-value,
+      sfx.error.kind: Grpc.Core.Internal.CoreErrorDetailException,
+      sfx.error.message: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"My spices!","grpc_status":15},
+      sfx.error.stack:
+Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"My spices!","grpc_status":15}
+,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: client
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_15,
+    SpanId: Id_16,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/ErroringMethod,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: unary,
+      grpc.method.name: ErroringMethod,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/ErroringMethod,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 15,
+      language: dotnet,
+      runtime-id: Guid_1,
+      servermeta: other-server-value,
+      sfx.error.message: My spices!,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: server
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_17,
+    SpanId: Id_18,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/ErroringMethod,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: unary,
+      grpc.method.name: ErroringMethod,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/ErroringMethod,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 2,
+      language: dotnet,
+      runtime-id: Guid_1,
+      servermeta: other-server-value,
+      sfx.error.message: Exception was thrown by handler.,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: server
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_19,
+    SpanId: Id_20,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/ErroringMethod,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: unary,
+      grpc.method.name: ErroringMethod,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/ErroringMethod,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 5,
+      language: dotnet,
+      runtime-id: Guid_1,
+      servermeta: other-server-value,
+      sfx.error.message: Where did it go?,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: server
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_21,
+    SpanId: Id_22,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/ErroringMethod,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: unary,
+      grpc.method.name: ErroringMethod,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/ErroringMethod,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 1,
+      language: dotnet,
+      runtime-id: Guid_1,
+      servermeta: other-server-value,
+      sfx.error.message: Canceled,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: server
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_23,
+    SpanId: Id_24,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/ErroringMethod,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: unary,
+      grpc.method.name: ErroringMethod,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/ErroringMethod,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 15,
+      language: dotnet,
+      runtime-id: Guid_1,
+      servermeta: other-server-value,
+      sfx.error.message: My spices!,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: server
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_25,
+    SpanId: Id_26,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/StreamingBothWays,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: bidi_streaming,
+      grpc.method.name: StreamingBothWays,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/StreamingBothWays,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 0,
+      runtime-id: Guid_1,
+      servermeta: other-server-value,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: client
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_27,
+    SpanId: Id_28,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/StreamingBothWays,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: bidi_streaming,
+      grpc.method.name: StreamingBothWays,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/StreamingBothWays,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 0,
+      language: dotnet,
+      runtime-id: Guid_1,
+      servermeta: other-server-value,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: server
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_29,
+    SpanId: Id_30,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/StreamingFromClient,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: client_streaming,
+      grpc.method.name: StreamingFromClient,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/StreamingFromClient,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 0,
+      runtime-id: Guid_1,
+      servermeta: other-server-value,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: client
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_31,
+    SpanId: Id_32,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/StreamingFromClient,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: client_streaming,
+      grpc.method.name: StreamingFromClient,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/StreamingFromClient,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 0,
+      language: dotnet,
+      runtime-id: Guid_1,
+      servermeta: other-server-value,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: server
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_33,
+    SpanId: Id_34,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/StreamingFromServer,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: server_streaming,
+      grpc.method.name: StreamingFromServer,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/StreamingFromServer,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 0,
+      runtime-id: Guid_1,
+      servermeta: other-server-value,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: client
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_35,
+    SpanId: Id_36,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/StreamingFromServer,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: server_streaming,
+      grpc.method.name: StreamingFromServer,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/StreamingFromServer,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 0,
+      language: dotnet,
+      runtime-id: Guid_1,
+      servermeta: other-server-value,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: server
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_37,
+    SpanId: Id_38,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/Unary,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: unary,
+      grpc.method.name: Unary,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/Unary,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 0,
+      runtime-id: Guid_1,
+      servermeta: other-server-value,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: client
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_39,
+    SpanId: Id_40,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/Unary,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: unary,
+      grpc.method.name: Unary,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/Unary,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 0,
+      language: dotnet,
+      runtime-id: Guid_1,
+      servermeta: other-server-value,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: server
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_41,
+    SpanId: Id_42,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/Unary,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: unary,
+      grpc.method.name: Unary,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/Unary,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 0,
+      language: dotnet,
+      runtime-id: Guid_1,
+      servermeta: other-server-value,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: server
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_43,
+    SpanId: Id_44,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/VerySlow,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    Error: 1,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: unary,
+      grpc.method.name: VerySlow,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/VerySlow,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 4,
+      language: dotnet,
+      runtime-id: Guid_1,
+      servermeta: other-server-value,
+      sfx.error.message: Deadline Exceeded,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: server
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_45,
+    SpanId: Id_46,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/VerySlow,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    Error: 1,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: unary,
+      grpc.method.name: VerySlow,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/VerySlow,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.status.code: 4,
+      runtime-id: Guid_1,
+      sfx.error.kind: Grpc.Core.Internal.CoreErrorDetailException,
+      sfx.error.message: {"created":"@00000000000.000000000","description":"Deadline Exceeded","file":"..\..\..\src\core\ext\filters\deadline\deadline_filter.cc","file_line":1234,"grpc_status":4},
+      sfx.error.stack:
+Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Deadline Exceeded","file":"..\..\..\src\core\ext\filters\deadline\deadline_filter.cc","file_line":1234,"grpc_status":4}
+,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: client
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_47,
+    SpanId: Id_48,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/VerySlow,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    Error: 1,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: unary,
+      grpc.method.name: VerySlow,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/VerySlow,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 4,
+      language: dotnet,
+      runtime-id: Guid_1,
+      servermeta: other-server-value,
+      sfx.error.message: Deadline Exceeded,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: server
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_49,
+    SpanId: Id_50,
+    Name: SendBothStreamingRequest,
+    Resource: SendBothStreamingRequest,
+    Service: Samples.GrpcLegacy,
+    Tags: {
+      deployment.environment: integration_tests,
+      language: dotnet,
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_51,
+    SpanId: Id_52,
+    Name: SendClientStreamingRequest,
+    Resource: SendClientStreamingRequest,
+    Service: Samples.GrpcLegacy,
+    Tags: {
+      deployment.environment: integration_tests,
+      language: dotnet,
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_53,
+    SpanId: Id_54,
+    Name: SendErrors_Cancelled,
+    Resource: SendErrors_Cancelled,
+    Service: Samples.GrpcLegacy,
+    Tags: {
+      deployment.environment: integration_tests,
+      language: dotnet,
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_53,
+    SpanId: Id_55,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/ErroringMethod,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    ParentId: Id_54,
+    Error: 1,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: unary,
+      grpc.method.name: ErroringMethod,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/ErroringMethod,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 1,
+      servermeta: other-server-value,
+      sfx.error.kind: Grpc.Core.Internal.CoreErrorDetailException,
+      sfx.error.message: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"","grpc_status":1},
+      sfx.error.stack:
+Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"","grpc_status":1}
+,
+      span.kind: client
+    }
+  },
+  {
+    TraceId: Id_56,
+    SpanId: Id_57,
+    Name: SendErrors_DataLoss,
+    Resource: SendErrors_DataLoss,
+    Service: Samples.GrpcLegacy,
+    Tags: {
+      deployment.environment: integration_tests,
+      language: dotnet,
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_56,
+    SpanId: Id_58,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/ErroringMethod,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    ParentId: Id_57,
+    Error: 1,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: unary,
+      grpc.method.name: ErroringMethod,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/ErroringMethod,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 15,
+      servermeta: other-server-value,
+      sfx.error.kind: Grpc.Core.Internal.CoreErrorDetailException,
+      sfx.error.message: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"My spices!","grpc_status":15},
+      sfx.error.stack:
+Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"My spices!","grpc_status":15}
+,
+      span.kind: client
+    }
+  },
+  {
+    TraceId: Id_59,
+    SpanId: Id_60,
+    Name: SendErrors_NotFound,
+    Resource: SendErrors_NotFound,
+    Service: Samples.GrpcLegacy,
+    Tags: {
+      deployment.environment: integration_tests,
+      language: dotnet,
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_59,
+    SpanId: Id_61,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/ErroringMethod,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    ParentId: Id_60,
+    Error: 1,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: unary,
+      grpc.method.name: ErroringMethod,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/ErroringMethod,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 5,
+      servermeta: other-server-value,
+      sfx.error.kind: Grpc.Core.Internal.CoreErrorDetailException,
+      sfx.error.message: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"Where did it go?","grpc_status":5},
+      sfx.error.stack:
+Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"Where did it go?","grpc_status":5}
+,
+      span.kind: client
+    }
+  },
+  {
+    TraceId: Id_62,
+    SpanId: Id_63,
+    Name: SendErrors_Throw,
+    Resource: SendErrors_Throw,
+    Service: Samples.GrpcLegacy,
+    Tags: {
+      deployment.environment: integration_tests,
+      language: dotnet,
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_62,
+    SpanId: Id_64,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/ErroringMethod,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    ParentId: Id_63,
+    Error: 1,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: unary,
+      grpc.method.name: ErroringMethod,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/ErroringMethod,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 2,
+      servermeta: other-server-value,
+      sfx.error.kind: Grpc.Core.Internal.CoreErrorDetailException,
+      sfx.error.message: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"Exception was thrown by handler.","grpc_status":2},
+      sfx.error.stack:
+Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Error received from peer ipv4:localhost:00000","file":"..\..\..\src\core\lib\surface\call.cc","file_line":1234,"grpc_message":"Exception was thrown by handler.","grpc_status":2}
+,
+      span.kind: client
+    }
+  },
+  {
+    TraceId: Id_65,
+    SpanId: Id_66,
+    Name: SendErrorsAsync_Cancelled,
+    Resource: SendErrorsAsync_Cancelled,
+    Service: Samples.GrpcLegacy,
+    Tags: {
+      deployment.environment: integration_tests,
+      language: dotnet,
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_67,
+    SpanId: Id_68,
+    Name: SendErrorsAsync_DataLoss,
+    Resource: SendErrorsAsync_DataLoss,
+    Service: Samples.GrpcLegacy,
+    Tags: {
+      deployment.environment: integration_tests,
+      language: dotnet,
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_69,
+    SpanId: Id_70,
+    Name: SendErrorsAsync_NotFound,
+    Resource: SendErrorsAsync_NotFound,
+    Service: Samples.GrpcLegacy,
+    Tags: {
+      deployment.environment: integration_tests,
+      language: dotnet,
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_71,
+    SpanId: Id_72,
+    Name: SendErrorsAsync_Throw,
+    Resource: SendErrorsAsync_Throw,
+    Service: Samples.GrpcLegacy,
+    Tags: {
+      deployment.environment: integration_tests,
+      language: dotnet,
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_73,
+    SpanId: Id_74,
+    Name: SendServerStreamingRequest,
+    Resource: SendServerStreamingRequest,
+    Service: Samples.GrpcLegacy,
+    Tags: {
+      deployment.environment: integration_tests,
+      language: dotnet,
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_75,
+    SpanId: Id_76,
+    Name: SendUnaryRequest,
+    Resource: SendUnaryRequest,
+    Service: Samples.GrpcLegacy,
+    Tags: {
+      deployment.environment: integration_tests,
+      language: dotnet,
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_75,
+    SpanId: Id_77,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/Unary,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    ParentId: Id_76,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: unary,
+      grpc.method.name: Unary,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/Unary,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.response.metadata.server-value1: some-server-value,
+      grpc.status.code: 0,
+      servermeta: other-server-value,
+      span.kind: client
+    }
+  },
+  {
+    TraceId: Id_78,
+    SpanId: Id_79,
+    Name: SendUnaryRequestAsync,
+    Resource: SendUnaryRequestAsync,
+    Service: Samples.GrpcLegacy,
+    Tags: {
+      deployment.environment: integration_tests,
+      language: dotnet,
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_80,
+    SpanId: Id_81,
+    Name: SendVerySlowRequest,
+    Resource: SendVerySlowRequest,
+    Service: Samples.GrpcLegacy,
+    Tags: {
+      deployment.environment: integration_tests,
+      language: dotnet,
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  },
+  {
+    TraceId: Id_80,
+    SpanId: Id_82,
+    Name: grpc.request,
+    Resource: /greet.tester.Greeter/VerySlow,
+    Service: Samples.GrpcLegacy,
+    Type: grpc,
+    ParentId: Id_81,
+    Error: 1,
+    Tags: {
+      clientmeta: other-client-value,
+      component: Grpc,
+      deployment.environment: integration_tests,
+      grpc.method.kind: unary,
+      grpc.method.name: VerySlow,
+      grpc.method.package: greet.tester,
+      grpc.method.path: /greet.tester.Greeter/VerySlow,
+      grpc.method.service: Greeter,
+      grpc.request.metadata.client-value1: some-client-value,
+      grpc.status.code: 4,
+      sfx.error.kind: Grpc.Core.Internal.CoreErrorDetailException,
+      sfx.error.message: {"created":"@00000000000.000000000","description":"Deadline Exceeded","file":"..\..\..\src\core\ext\filters\deadline\deadline_filter.cc","file_line":1234,"grpc_status":4},
+      sfx.error.stack:
+Grpc.Core.Internal.CoreErrorDetailException: {"created":"@00000000000.000000000","description":"Deadline Exceeded","file":"..\..\..\src\core\ext\filters\deadline\deadline_filter.cc","file_line":1234,"grpc_status":4}
+,
+      span.kind: client
+    }
+  },
+  {
+    TraceId: Id_83,
+    SpanId: Id_84,
+    Name: SendVerySlowRequestAsync,
+    Resource: SendVerySlowRequestAsync,
+    Service: Samples.GrpcLegacy,
+    Tags: {
+      deployment.environment: integration_tests,
+      language: dotnet,
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  }
+]
