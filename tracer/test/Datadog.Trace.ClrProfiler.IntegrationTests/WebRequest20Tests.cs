@@ -23,8 +23,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         {
             SetServiceVersion("1.0.0");
             SetEnvironmentVariable("SIGNALFX_CONVENTION", "Datadog");
-            SetEnvironmentVariable("SINGALFX_PROPAGATION_STYLE_INJECT", "B3");
-            SetEnvironmentVariable("SINGALFX_PROPAGATION_STYLE_EXTRACT", "B3");
+            SetEnvironmentVariable("SIGNALFX_PROPAGATORS", "B3");
         }
 
         [SkippableFact]

@@ -210,8 +210,7 @@ namespace Datadog.Trace.TestHelpers
                 "SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS",
                 "SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES",
                 "SIGNALFX_CONVENTION",
-                "SINGALFX_PROPAGATION_STYLE_INJECT",
-                "SINGALFX_PROPAGATION_STYLE_EXTRACT",
+                "SIGNALFX_PROPAGATORS",
 
                 // thread sampling
                 "SIGNALFX_PROFILER_LOGS_ENDPOINT",

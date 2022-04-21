@@ -186,9 +186,9 @@ namespace Datadog.Trace.Configuration
             DelayWcfInstrumentationEnabled = source?.GetBool(ConfigurationKeys.FeatureFlags.DelayWcfInstrumentationEnabled)
                                             ?? false;
 
-            PropagationStyleInject = TrimSplitString(source?.GetString(ConfigurationKeys.PropagationStyleInject) ?? nameof(Propagators.ContextPropagators.Names.Datadog), ',').ToArray();
+            PropagationStyleInject = TrimSplitString(source?.GetString(ConfigurationKeys.Propagators) ?? nameof(Propagators.ContextPropagators.Names.B3), ',').ToArray();
 
-            PropagationStyleExtract = TrimSplitString(source?.GetString(ConfigurationKeys.PropagationStyleExtract) ?? nameof(Propagators.ContextPropagators.Names.Datadog), ',').ToArray();
+            PropagationStyleExtract = TrimSplitString(source?.GetString(ConfigurationKeys.Propagators) ?? nameof(Propagators.ContextPropagators.Names.B3), ',').ToArray();
 
             TagElasticsearchQueries = source?.GetBool(ConfigurationKeys.TagElasticsearchQueries) ?? true;
 

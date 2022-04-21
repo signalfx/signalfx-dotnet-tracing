@@ -6,6 +6,7 @@
 // Modified by Splunk Inc.
 
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Datadog.Trace.Agent;
@@ -159,8 +160,8 @@ namespace Datadog.Trace.OpenTracing.Tests
 
             _tracer.Inject(span.Context, BuiltinFormats.HttpHeaders, headers);
 
-            Assert.Equal(span.DDSpan.Context.TraceId.ToString(), headers.Get("trace-id"));
-            Assert.Equal(span.DDSpan.Context.SpanId, ulong.Parse(headers.Get("parent-id")));
+            Assert.Equal(span.DDSpan.Context.TraceId.ToString(), headers.Get(B3HttpHeaderNames.B3TraceId));
+            Assert.Equal(span.DDSpan.Context.SpanId, ulong.Parse(headers.Get(B3HttpHeaderNames.B3SpanId), NumberStyles.HexNumber));
         }
 
         [Fact]
@@ -171,8 +172,8 @@ namespace Datadog.Trace.OpenTracing.Tests
 
             _tracer.Inject(span.Context, BuiltinFormats.TextMap, headers);
 
-            Assert.Equal(span.DDSpan.Context.TraceId.ToString(), headers.Get("trace-id"));
-            Assert.Equal(span.DDSpan.Context.SpanId, ulong.Parse(headers.Get("parent-id")));
+            Assert.Equal(span.DDSpan.Context.TraceId.ToString(), headers.Get(B3HttpHeaderNames.B3TraceId));
+            Assert.Equal(span.DDSpan.Context.SpanId, ulong.Parse(headers.Get(B3HttpHeaderNames.B3SpanId), NumberStyles.HexNumber));
         }
 
         [Fact]
@@ -188,30 +189,30 @@ namespace Datadog.Trace.OpenTracing.Tests
         [Fact]
         public void Extract_HttpHeadersFormat_HeadersProperlySet_SpanContext()
         {
-            const ulong parentId = 10;
-            var traceId = TraceId.CreateFromInt(42);
+            const ulong spanId = 1000000000000000;
+            var traceId = TraceId.CreateRandom();
             var headers = new MockTextMap();
-            headers.Set("parent-id", parentId.ToString());
-            headers.Set("trace-id", traceId.ToString());
+            headers.Set(B3HttpHeaderNames.B3SpanId, spanId.ToString());
+            headers.Set(B3HttpHeaderNames.B3TraceId, traceId.ToString());
 
             var otSpanContext = (OpenTracingSpanContext)_tracer.Extract(BuiltinFormats.HttpHeaders, headers);
 
-            Assert.Equal(parentId, otSpanContext.Context.SpanId);
+            Assert.Equal(spanId.ToString(), otSpanContext.Context.SpanId.ToString("x16"));
             Assert.Equal(traceId, otSpanContext.Context.TraceId);
         }
 
         [Fact]
         public void Extract_TextMapFormat_HeadersProperlySet_SpanContext()
         {
-            const ulong parentId = 10;
-            var traceId = TraceId.CreateFromInt(42);
+            const ulong spanId = 1000000000000000;
+            var traceId = TraceId.CreateRandom();
             var headers = new MockTextMap();
-            headers.Set("parent-id", parentId.ToString());
-            headers.Set("trace-id", traceId.ToString());
+            headers.Set(B3HttpHeaderNames.B3SpanId, spanId.ToString());
+            headers.Set(B3HttpHeaderNames.B3TraceId, traceId.ToString());
 
             var otSpanContext = (OpenTracingSpanContext)_tracer.Extract(BuiltinFormats.TextMap, headers);
 
-            Assert.Equal(parentId, otSpanContext.Context.SpanId);
+            Assert.Equal(spanId.ToString(), otSpanContext.Context.SpanId.ToString("x16"));
             Assert.Equal(traceId, otSpanContext.Context.TraceId);
         }
 

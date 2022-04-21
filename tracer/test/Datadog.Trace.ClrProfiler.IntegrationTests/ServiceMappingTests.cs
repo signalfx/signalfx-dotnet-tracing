@@ -18,8 +18,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             : base("WebRequest", output)
         {
             SetEnvironmentVariable("SIGNALFX_TRACE_SERVICE_MAPPING", "some-trace:not-used,http-client:my-custom-client");
-            SetEnvironmentVariable("SINGALFX_PROPAGATION_STYLE_INJECT", "B3");
-            SetEnvironmentVariable("SINGALFX_PROPAGATION_STYLE_EXTRACT", "B3");
+            SetEnvironmentVariable("SIGNALFX_PROPAGATORS", "B3");
             SetServiceVersion("1.0.0");
         }
 
