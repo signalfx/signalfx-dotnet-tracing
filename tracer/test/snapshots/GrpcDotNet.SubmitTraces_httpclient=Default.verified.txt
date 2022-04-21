@@ -6,9 +6,11 @@
     Resource: SendBothStreamingRequest,
     Service: Samples.GrpcDotNet,
     Tags: {
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
-      runtime-id: Guid_1
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
     },
     Metrics: {
       process_id: 0,
@@ -22,13 +24,13 @@
     SpanId: Id_3,
     Name: grpc.request,
     Resource: /greet.tester.Greeter/StreamingBothWays,
-    Service: Samples.GrpcDotNet-grpc-client,
+    Service: Samples.GrpcDotNet,
     Type: grpc,
     ParentId: Id_2,
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       grpc.method.kind: bidi_streaming,
       grpc.method.name: StreamingBothWays,
       grpc.method.package: greet.tester,
@@ -37,40 +39,34 @@
       grpc.request.metadata.client-value1: some-client-value,
       grpc.response.metadata.server-value1: some-server-value,
       grpc.status.code: 0,
-      runtime-id: Guid_1,
       servermeta: other-server-value,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_1,
     SpanId: Id_4,
-    Name: http.request,
+    Name: POST,
+    LogicScope: http.request,
     Resource: POST localhost:00000/greet.tester.Greeter/StreamingBothWays,
-    Service: Samples.GrpcDotNet-http-client,
+    Service: Samples.GrpcDotNet,
     Type: http,
     ParentId: Id_3,
     Tags: {
       component: HttpMessageHandler,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http-client-handler-type: System.Net.Http.HttpClientHandler,
       http.method: POST,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/StreamingBothWays,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_1,
     SpanId: Id_5,
-    Name: aspnet_core.request,
+    Name: POST /greet.tester.greeter/streamingbothways,
+    LogicScope: aspnet_core.request,
     Resource: POST /greet.tester.greeter/streamingbothways,
     Service: Samples.GrpcDotNet,
     Type: web,
@@ -79,13 +75,16 @@
       aspnet_core.endpoint: gRPC - /greet.tester.Greeter/StreamingBothWays,
       aspnet_core.route: /greet.tester.greeter/streamingbothways,
       component: aspnet_core,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/StreamingBothWays,
       language: dotnet,
+      net.peer.ip: 127.0.0.1,
       runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: server
     },
     Metrics: {
@@ -106,7 +105,7 @@
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       grpc.method.kind: bidi_streaming,
       grpc.method.name: StreamingBothWays,
       grpc.method.package: greet.tester,
@@ -127,9 +126,11 @@
     Resource: SendClientStreamingRequest,
     Service: Samples.GrpcDotNet,
     Tags: {
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
-      runtime-id: Guid_1
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
     },
     Metrics: {
       process_id: 0,
@@ -143,13 +144,13 @@
     SpanId: Id_9,
     Name: grpc.request,
     Resource: /greet.tester.Greeter/StreamingFromClient,
-    Service: Samples.GrpcDotNet-grpc-client,
+    Service: Samples.GrpcDotNet,
     Type: grpc,
     ParentId: Id_8,
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       grpc.method.kind: client_streaming,
       grpc.method.name: StreamingFromClient,
       grpc.method.package: greet.tester,
@@ -158,40 +159,34 @@
       grpc.request.metadata.client-value1: some-client-value,
       grpc.response.metadata.server-value1: some-server-value,
       grpc.status.code: 0,
-      runtime-id: Guid_1,
       servermeta: other-server-value,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_7,
     SpanId: Id_10,
-    Name: http.request,
+    Name: POST,
+    LogicScope: http.request,
     Resource: POST localhost:00000/greet.tester.Greeter/StreamingFromClient,
-    Service: Samples.GrpcDotNet-http-client,
+    Service: Samples.GrpcDotNet,
     Type: http,
     ParentId: Id_9,
     Tags: {
       component: HttpMessageHandler,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http-client-handler-type: System.Net.Http.HttpClientHandler,
       http.method: POST,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/StreamingFromClient,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_7,
     SpanId: Id_11,
-    Name: aspnet_core.request,
+    Name: POST /greet.tester.greeter/streamingfromclient,
+    LogicScope: aspnet_core.request,
     Resource: POST /greet.tester.greeter/streamingfromclient,
     Service: Samples.GrpcDotNet,
     Type: web,
@@ -200,13 +195,16 @@
       aspnet_core.endpoint: gRPC - /greet.tester.Greeter/StreamingFromClient,
       aspnet_core.route: /greet.tester.greeter/streamingfromclient,
       component: aspnet_core,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/StreamingFromClient,
       language: dotnet,
+      net.peer.ip: 127.0.0.1,
       runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: server
     },
     Metrics: {
@@ -227,7 +225,7 @@
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       grpc.method.kind: client_streaming,
       grpc.method.name: StreamingFromClient,
       grpc.method.package: greet.tester,
@@ -248,9 +246,11 @@
     Resource: SendErrors_Cancelled,
     Service: Samples.GrpcDotNet,
     Tags: {
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
-      runtime-id: Guid_1
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
     },
     Metrics: {
       process_id: 0,
@@ -264,15 +264,13 @@
     SpanId: Id_15,
     Name: grpc.request,
     Resource: /greet.tester.Greeter/ErroringMethod,
-    Service: Samples.GrpcDotNet-grpc-client,
+    Service: Samples.GrpcDotNet,
     Type: grpc,
     ParentId: Id_14,
-    Error: 1,
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
-      error.msg: Canceled,
+      deployment.environment: integration_tests,
       grpc.method.kind: unary,
       grpc.method.name: ErroringMethod,
       grpc.method.package: greet.tester,
@@ -281,40 +279,35 @@
       grpc.request.metadata.client-value1: some-client-value,
       grpc.response.metadata.server-value1: some-server-value,
       grpc.status.code: 1,
-      runtime-id: Guid_1,
       servermeta: other-server-value,
+      sfx.error.message: Canceled,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_13,
     SpanId: Id_16,
-    Name: http.request,
+    Name: POST,
+    LogicScope: http.request,
     Resource: POST localhost:00000/greet.tester.Greeter/ErroringMethod,
-    Service: Samples.GrpcDotNet-http-client,
+    Service: Samples.GrpcDotNet,
     Type: http,
     ParentId: Id_15,
     Tags: {
       component: HttpMessageHandler,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http-client-handler-type: System.Net.Http.HttpClientHandler,
       http.method: POST,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/ErroringMethod,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_13,
     SpanId: Id_17,
-    Name: aspnet_core.request,
+    Name: POST /greet.tester.greeter/erroringmethod,
+    LogicScope: aspnet_core.request,
     Resource: POST /greet.tester.greeter/erroringmethod,
     Service: Samples.GrpcDotNet,
     Type: web,
@@ -323,13 +316,16 @@
       aspnet_core.endpoint: gRPC - /greet.tester.Greeter/ErroringMethod,
       aspnet_core.route: /greet.tester.greeter/erroringmethod,
       component: aspnet_core,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/ErroringMethod,
       language: dotnet,
+      net.peer.ip: 127.0.0.1,
       runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: server
     },
     Metrics: {
@@ -347,12 +343,10 @@
     Service: Samples.GrpcDotNet,
     Type: grpc,
     ParentId: Id_17,
-    Error: 1,
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
-      error.msg: Canceled,
+      deployment.environment: integration_tests,
       grpc.method.kind: unary,
       grpc.method.name: ErroringMethod,
       grpc.method.package: greet.tester,
@@ -363,6 +357,7 @@
       grpc.status.code: 1,
       language: dotnet,
       servermeta: other-server-value,
+      sfx.error.message: Canceled,
       span.kind: server
     }
   },
@@ -373,9 +368,11 @@
     Resource: SendErrors_DataLoss,
     Service: Samples.GrpcDotNet,
     Tags: {
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
-      runtime-id: Guid_1
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
     },
     Metrics: {
       process_id: 0,
@@ -389,15 +386,13 @@
     SpanId: Id_21,
     Name: grpc.request,
     Resource: /greet.tester.Greeter/ErroringMethod,
-    Service: Samples.GrpcDotNet-grpc-client,
+    Service: Samples.GrpcDotNet,
     Type: grpc,
     ParentId: Id_20,
-    Error: 1,
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
-      error.msg: Argh, my data!,
+      deployment.environment: integration_tests,
       grpc.method.kind: unary,
       grpc.method.name: ErroringMethod,
       grpc.method.package: greet.tester,
@@ -406,40 +401,35 @@
       grpc.request.metadata.client-value1: some-client-value,
       grpc.response.metadata.server-value1: some-server-value,
       grpc.status.code: 15,
-      runtime-id: Guid_1,
       servermeta: other-server-value,
+      sfx.error.message: Argh, my data!,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_19,
     SpanId: Id_22,
-    Name: http.request,
+    Name: POST,
+    LogicScope: http.request,
     Resource: POST localhost:00000/greet.tester.Greeter/ErroringMethod,
-    Service: Samples.GrpcDotNet-http-client,
+    Service: Samples.GrpcDotNet,
     Type: http,
     ParentId: Id_21,
     Tags: {
       component: HttpMessageHandler,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http-client-handler-type: System.Net.Http.HttpClientHandler,
       http.method: POST,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/ErroringMethod,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_19,
     SpanId: Id_23,
-    Name: aspnet_core.request,
+    Name: POST /greet.tester.greeter/erroringmethod,
+    LogicScope: aspnet_core.request,
     Resource: POST /greet.tester.greeter/erroringmethod,
     Service: Samples.GrpcDotNet,
     Type: web,
@@ -448,13 +438,16 @@
       aspnet_core.endpoint: gRPC - /greet.tester.Greeter/ErroringMethod,
       aspnet_core.route: /greet.tester.greeter/erroringmethod,
       component: aspnet_core,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/ErroringMethod,
       language: dotnet,
+      net.peer.ip: 127.0.0.1,
       runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: server
     },
     Metrics: {
@@ -472,12 +465,10 @@
     Service: Samples.GrpcDotNet,
     Type: grpc,
     ParentId: Id_23,
-    Error: 1,
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
-      error.msg: Argh, my data!,
+      deployment.environment: integration_tests,
       grpc.method.kind: unary,
       grpc.method.name: ErroringMethod,
       grpc.method.package: greet.tester,
@@ -488,6 +479,7 @@
       grpc.status.code: 15,
       language: dotnet,
       servermeta: other-server-value,
+      sfx.error.message: Argh, my data!,
       span.kind: server
     }
   },
@@ -498,9 +490,11 @@
     Resource: SendErrors_NotFound,
     Service: Samples.GrpcDotNet,
     Tags: {
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
-      runtime-id: Guid_1
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
     },
     Metrics: {
       process_id: 0,
@@ -514,15 +508,13 @@
     SpanId: Id_27,
     Name: grpc.request,
     Resource: /greet.tester.Greeter/ErroringMethod,
-    Service: Samples.GrpcDotNet-grpc-client,
+    Service: Samples.GrpcDotNet,
     Type: grpc,
     ParentId: Id_26,
-    Error: 1,
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
-      error.msg: Where did it go?,
+      deployment.environment: integration_tests,
       grpc.method.kind: unary,
       grpc.method.name: ErroringMethod,
       grpc.method.package: greet.tester,
@@ -531,40 +523,35 @@
       grpc.request.metadata.client-value1: some-client-value,
       grpc.response.metadata.server-value1: some-server-value,
       grpc.status.code: 5,
-      runtime-id: Guid_1,
       servermeta: other-server-value,
+      sfx.error.message: Where did it go?,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_25,
     SpanId: Id_28,
-    Name: http.request,
+    Name: POST,
+    LogicScope: http.request,
     Resource: POST localhost:00000/greet.tester.Greeter/ErroringMethod,
-    Service: Samples.GrpcDotNet-http-client,
+    Service: Samples.GrpcDotNet,
     Type: http,
     ParentId: Id_27,
     Tags: {
       component: HttpMessageHandler,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http-client-handler-type: System.Net.Http.HttpClientHandler,
       http.method: POST,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/ErroringMethod,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_25,
     SpanId: Id_29,
-    Name: aspnet_core.request,
+    Name: POST /greet.tester.greeter/erroringmethod,
+    LogicScope: aspnet_core.request,
     Resource: POST /greet.tester.greeter/erroringmethod,
     Service: Samples.GrpcDotNet,
     Type: web,
@@ -573,13 +560,16 @@
       aspnet_core.endpoint: gRPC - /greet.tester.Greeter/ErroringMethod,
       aspnet_core.route: /greet.tester.greeter/erroringmethod,
       component: aspnet_core,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/ErroringMethod,
       language: dotnet,
+      net.peer.ip: 127.0.0.1,
       runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: server
     },
     Metrics: {
@@ -597,12 +587,10 @@
     Service: Samples.GrpcDotNet,
     Type: grpc,
     ParentId: Id_29,
-    Error: 1,
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
-      error.msg: Where did it go?,
+      deployment.environment: integration_tests,
       grpc.method.kind: unary,
       grpc.method.name: ErroringMethod,
       grpc.method.package: greet.tester,
@@ -613,6 +601,7 @@
       grpc.status.code: 5,
       language: dotnet,
       servermeta: other-server-value,
+      sfx.error.message: Where did it go?,
       span.kind: server
     }
   },
@@ -623,9 +612,11 @@
     Resource: SendErrors_Throw,
     Service: Samples.GrpcDotNet,
     Tags: {
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
-      runtime-id: Guid_1
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
     },
     Metrics: {
       process_id: 0,
@@ -639,15 +630,13 @@
     SpanId: Id_33,
     Name: grpc.request,
     Resource: /greet.tester.Greeter/ErroringMethod,
-    Service: Samples.GrpcDotNet-grpc-client,
+    Service: Samples.GrpcDotNet,
     Type: grpc,
     ParentId: Id_32,
-    Error: 1,
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
-      error.msg: Exception was thrown by handler.,
+      deployment.environment: integration_tests,
       grpc.method.kind: unary,
       grpc.method.name: ErroringMethod,
       grpc.method.package: greet.tester,
@@ -656,40 +645,35 @@
       grpc.request.metadata.client-value1: some-client-value,
       grpc.response.metadata.server-value1: some-server-value,
       grpc.status.code: 2,
-      runtime-id: Guid_1,
       servermeta: other-server-value,
+      sfx.error.message: Exception was thrown by handler.,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_31,
     SpanId: Id_34,
-    Name: http.request,
+    Name: POST,
+    LogicScope: http.request,
     Resource: POST localhost:00000/greet.tester.Greeter/ErroringMethod,
-    Service: Samples.GrpcDotNet-http-client,
+    Service: Samples.GrpcDotNet,
     Type: http,
     ParentId: Id_33,
     Tags: {
       component: HttpMessageHandler,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http-client-handler-type: System.Net.Http.HttpClientHandler,
       http.method: POST,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/ErroringMethod,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_31,
     SpanId: Id_35,
-    Name: aspnet_core.request,
+    Name: POST /greet.tester.greeter/erroringmethod,
+    LogicScope: aspnet_core.request,
     Resource: POST /greet.tester.greeter/erroringmethod,
     Service: Samples.GrpcDotNet,
     Type: web,
@@ -698,13 +682,16 @@
       aspnet_core.endpoint: gRPC - /greet.tester.Greeter/ErroringMethod,
       aspnet_core.route: /greet.tester.greeter/erroringmethod,
       component: aspnet_core,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/ErroringMethod,
       language: dotnet,
+      net.peer.ip: 127.0.0.1,
       runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: server
     },
     Metrics: {
@@ -726,12 +713,7 @@
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
-      error.msg: Oh noes, my grpc!,
-      error.stack:
-System.Exception: Oh noes, my grpc!
-at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest request, ServerCallContext context),
-      error.type: System.Exception,
+      deployment.environment: integration_tests,
       grpc.method.kind: unary,
       grpc.method.name: ErroringMethod,
       grpc.method.package: greet.tester,
@@ -742,6 +724,11 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       grpc.status.code: 2,
       language: dotnet,
       servermeta: other-server-value,
+      sfx.error.kind: System.Exception,
+      sfx.error.message: Oh noes, my grpc!,
+      sfx.error.stack:
+System.Exception: Oh noes, my grpc!
+at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest request, ServerCallContext context),
       span.kind: server
     }
   },
@@ -752,9 +739,11 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
     Resource: SendErrorsAsync_Cancelled,
     Service: Samples.GrpcDotNet,
     Tags: {
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
-      runtime-id: Guid_1
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
     },
     Metrics: {
       process_id: 0,
@@ -768,15 +757,13 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
     SpanId: Id_39,
     Name: grpc.request,
     Resource: /greet.tester.Greeter/ErroringMethod,
-    Service: Samples.GrpcDotNet-grpc-client,
+    Service: Samples.GrpcDotNet,
     Type: grpc,
     ParentId: Id_38,
-    Error: 1,
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
-      error.msg: Canceled,
+      deployment.environment: integration_tests,
       grpc.method.kind: unary,
       grpc.method.name: ErroringMethod,
       grpc.method.package: greet.tester,
@@ -785,40 +772,35 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       grpc.request.metadata.client-value1: some-client-value,
       grpc.response.metadata.server-value1: some-server-value,
       grpc.status.code: 1,
-      runtime-id: Guid_1,
       servermeta: other-server-value,
+      sfx.error.message: Canceled,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_37,
     SpanId: Id_40,
-    Name: http.request,
+    Name: POST,
+    LogicScope: http.request,
     Resource: POST localhost:00000/greet.tester.Greeter/ErroringMethod,
-    Service: Samples.GrpcDotNet-http-client,
+    Service: Samples.GrpcDotNet,
     Type: http,
     ParentId: Id_39,
     Tags: {
       component: HttpMessageHandler,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http-client-handler-type: System.Net.Http.HttpClientHandler,
       http.method: POST,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/ErroringMethod,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_37,
     SpanId: Id_41,
-    Name: aspnet_core.request,
+    Name: POST /greet.tester.greeter/erroringmethod,
+    LogicScope: aspnet_core.request,
     Resource: POST /greet.tester.greeter/erroringmethod,
     Service: Samples.GrpcDotNet,
     Type: web,
@@ -827,13 +809,16 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       aspnet_core.endpoint: gRPC - /greet.tester.Greeter/ErroringMethod,
       aspnet_core.route: /greet.tester.greeter/erroringmethod,
       component: aspnet_core,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/ErroringMethod,
       language: dotnet,
+      net.peer.ip: 127.0.0.1,
       runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: server
     },
     Metrics: {
@@ -851,12 +836,10 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
     Service: Samples.GrpcDotNet,
     Type: grpc,
     ParentId: Id_41,
-    Error: 1,
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
-      error.msg: Canceled,
+      deployment.environment: integration_tests,
       grpc.method.kind: unary,
       grpc.method.name: ErroringMethod,
       grpc.method.package: greet.tester,
@@ -867,6 +850,7 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       grpc.status.code: 1,
       language: dotnet,
       servermeta: other-server-value,
+      sfx.error.message: Canceled,
       span.kind: server
     }
   },
@@ -877,9 +861,11 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
     Resource: SendErrorsAsync_DataLoss,
     Service: Samples.GrpcDotNet,
     Tags: {
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
-      runtime-id: Guid_1
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
     },
     Metrics: {
       process_id: 0,
@@ -893,15 +879,13 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
     SpanId: Id_45,
     Name: grpc.request,
     Resource: /greet.tester.Greeter/ErroringMethod,
-    Service: Samples.GrpcDotNet-grpc-client,
+    Service: Samples.GrpcDotNet,
     Type: grpc,
     ParentId: Id_44,
-    Error: 1,
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
-      error.msg: Argh, my data!,
+      deployment.environment: integration_tests,
       grpc.method.kind: unary,
       grpc.method.name: ErroringMethod,
       grpc.method.package: greet.tester,
@@ -910,40 +894,35 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       grpc.request.metadata.client-value1: some-client-value,
       grpc.response.metadata.server-value1: some-server-value,
       grpc.status.code: 15,
-      runtime-id: Guid_1,
       servermeta: other-server-value,
+      sfx.error.message: Argh, my data!,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_43,
     SpanId: Id_46,
-    Name: http.request,
+    Name: POST,
+    LogicScope: http.request,
     Resource: POST localhost:00000/greet.tester.Greeter/ErroringMethod,
-    Service: Samples.GrpcDotNet-http-client,
+    Service: Samples.GrpcDotNet,
     Type: http,
     ParentId: Id_45,
     Tags: {
       component: HttpMessageHandler,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http-client-handler-type: System.Net.Http.HttpClientHandler,
       http.method: POST,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/ErroringMethod,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_43,
     SpanId: Id_47,
-    Name: aspnet_core.request,
+    Name: POST /greet.tester.greeter/erroringmethod,
+    LogicScope: aspnet_core.request,
     Resource: POST /greet.tester.greeter/erroringmethod,
     Service: Samples.GrpcDotNet,
     Type: web,
@@ -952,13 +931,16 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       aspnet_core.endpoint: gRPC - /greet.tester.Greeter/ErroringMethod,
       aspnet_core.route: /greet.tester.greeter/erroringmethod,
       component: aspnet_core,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/ErroringMethod,
       language: dotnet,
+      net.peer.ip: 127.0.0.1,
       runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: server
     },
     Metrics: {
@@ -976,12 +958,10 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
     Service: Samples.GrpcDotNet,
     Type: grpc,
     ParentId: Id_47,
-    Error: 1,
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
-      error.msg: Argh, my data!,
+      deployment.environment: integration_tests,
       grpc.method.kind: unary,
       grpc.method.name: ErroringMethod,
       grpc.method.package: greet.tester,
@@ -992,6 +972,7 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       grpc.status.code: 15,
       language: dotnet,
       servermeta: other-server-value,
+      sfx.error.message: Argh, my data!,
       span.kind: server
     }
   },
@@ -1002,9 +983,11 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
     Resource: SendErrorsAsync_NotFound,
     Service: Samples.GrpcDotNet,
     Tags: {
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
-      runtime-id: Guid_1
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
     },
     Metrics: {
       process_id: 0,
@@ -1018,15 +1001,13 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
     SpanId: Id_51,
     Name: grpc.request,
     Resource: /greet.tester.Greeter/ErroringMethod,
-    Service: Samples.GrpcDotNet-grpc-client,
+    Service: Samples.GrpcDotNet,
     Type: grpc,
     ParentId: Id_50,
-    Error: 1,
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
-      error.msg: Where did it go?,
+      deployment.environment: integration_tests,
       grpc.method.kind: unary,
       grpc.method.name: ErroringMethod,
       grpc.method.package: greet.tester,
@@ -1035,40 +1016,35 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       grpc.request.metadata.client-value1: some-client-value,
       grpc.response.metadata.server-value1: some-server-value,
       grpc.status.code: 5,
-      runtime-id: Guid_1,
       servermeta: other-server-value,
+      sfx.error.message: Where did it go?,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_49,
     SpanId: Id_52,
-    Name: http.request,
+    Name: POST,
+    LogicScope: http.request,
     Resource: POST localhost:00000/greet.tester.Greeter/ErroringMethod,
-    Service: Samples.GrpcDotNet-http-client,
+    Service: Samples.GrpcDotNet,
     Type: http,
     ParentId: Id_51,
     Tags: {
       component: HttpMessageHandler,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http-client-handler-type: System.Net.Http.HttpClientHandler,
       http.method: POST,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/ErroringMethod,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_49,
     SpanId: Id_53,
-    Name: aspnet_core.request,
+    Name: POST /greet.tester.greeter/erroringmethod,
+    LogicScope: aspnet_core.request,
     Resource: POST /greet.tester.greeter/erroringmethod,
     Service: Samples.GrpcDotNet,
     Type: web,
@@ -1077,13 +1053,16 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       aspnet_core.endpoint: gRPC - /greet.tester.Greeter/ErroringMethod,
       aspnet_core.route: /greet.tester.greeter/erroringmethod,
       component: aspnet_core,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/ErroringMethod,
       language: dotnet,
+      net.peer.ip: 127.0.0.1,
       runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: server
     },
     Metrics: {
@@ -1101,12 +1080,10 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
     Service: Samples.GrpcDotNet,
     Type: grpc,
     ParentId: Id_53,
-    Error: 1,
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
-      error.msg: Where did it go?,
+      deployment.environment: integration_tests,
       grpc.method.kind: unary,
       grpc.method.name: ErroringMethod,
       grpc.method.package: greet.tester,
@@ -1117,6 +1094,7 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       grpc.status.code: 5,
       language: dotnet,
       servermeta: other-server-value,
+      sfx.error.message: Where did it go?,
       span.kind: server
     }
   },
@@ -1127,9 +1105,11 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
     Resource: SendErrorsAsync_Throw,
     Service: Samples.GrpcDotNet,
     Tags: {
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
-      runtime-id: Guid_1
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
     },
     Metrics: {
       process_id: 0,
@@ -1143,15 +1123,13 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
     SpanId: Id_57,
     Name: grpc.request,
     Resource: /greet.tester.Greeter/ErroringMethod,
-    Service: Samples.GrpcDotNet-grpc-client,
+    Service: Samples.GrpcDotNet,
     Type: grpc,
     ParentId: Id_56,
-    Error: 1,
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
-      error.msg: Exception was thrown by handler.,
+      deployment.environment: integration_tests,
       grpc.method.kind: unary,
       grpc.method.name: ErroringMethod,
       grpc.method.package: greet.tester,
@@ -1160,40 +1138,35 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       grpc.request.metadata.client-value1: some-client-value,
       grpc.response.metadata.server-value1: some-server-value,
       grpc.status.code: 2,
-      runtime-id: Guid_1,
       servermeta: other-server-value,
+      sfx.error.message: Exception was thrown by handler.,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_55,
     SpanId: Id_58,
-    Name: http.request,
+    Name: POST,
+    LogicScope: http.request,
     Resource: POST localhost:00000/greet.tester.Greeter/ErroringMethod,
-    Service: Samples.GrpcDotNet-http-client,
+    Service: Samples.GrpcDotNet,
     Type: http,
     ParentId: Id_57,
     Tags: {
       component: HttpMessageHandler,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http-client-handler-type: System.Net.Http.HttpClientHandler,
       http.method: POST,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/ErroringMethod,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_55,
     SpanId: Id_59,
-    Name: aspnet_core.request,
+    Name: POST /greet.tester.greeter/erroringmethod,
+    LogicScope: aspnet_core.request,
     Resource: POST /greet.tester.greeter/erroringmethod,
     Service: Samples.GrpcDotNet,
     Type: web,
@@ -1202,13 +1175,16 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       aspnet_core.endpoint: gRPC - /greet.tester.Greeter/ErroringMethod,
       aspnet_core.route: /greet.tester.greeter/erroringmethod,
       component: aspnet_core,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/ErroringMethod,
       language: dotnet,
+      net.peer.ip: 127.0.0.1,
       runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: server
     },
     Metrics: {
@@ -1230,12 +1206,7 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
-      error.msg: Oh noes, my grpc!,
-      error.stack:
-System.Exception: Oh noes, my grpc!
-at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest request, ServerCallContext context),
-      error.type: System.Exception,
+      deployment.environment: integration_tests,
       grpc.method.kind: unary,
       grpc.method.name: ErroringMethod,
       grpc.method.package: greet.tester,
@@ -1246,6 +1217,11 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       grpc.status.code: 2,
       language: dotnet,
       servermeta: other-server-value,
+      sfx.error.kind: System.Exception,
+      sfx.error.message: Oh noes, my grpc!,
+      sfx.error.stack:
+System.Exception: Oh noes, my grpc!
+at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest request, ServerCallContext context),
       span.kind: server
     }
   },
@@ -1256,9 +1232,11 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
     Resource: SendServerStreamingRequest,
     Service: Samples.GrpcDotNet,
     Tags: {
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
-      runtime-id: Guid_1
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
     },
     Metrics: {
       process_id: 0,
@@ -1272,13 +1250,13 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
     SpanId: Id_63,
     Name: grpc.request,
     Resource: /greet.tester.Greeter/StreamingFromServer,
-    Service: Samples.GrpcDotNet-grpc-client,
+    Service: Samples.GrpcDotNet,
     Type: grpc,
     ParentId: Id_62,
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       grpc.method.kind: server_streaming,
       grpc.method.name: StreamingFromServer,
       grpc.method.package: greet.tester,
@@ -1287,40 +1265,34 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       grpc.request.metadata.client-value1: some-client-value,
       grpc.response.metadata.server-value1: some-server-value,
       grpc.status.code: 0,
-      runtime-id: Guid_1,
       servermeta: other-server-value,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_61,
     SpanId: Id_64,
-    Name: http.request,
+    Name: POST,
+    LogicScope: http.request,
     Resource: POST localhost:00000/greet.tester.Greeter/StreamingFromServer,
-    Service: Samples.GrpcDotNet-http-client,
+    Service: Samples.GrpcDotNet,
     Type: http,
     ParentId: Id_63,
     Tags: {
       component: HttpMessageHandler,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http-client-handler-type: System.Net.Http.HttpClientHandler,
       http.method: POST,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/StreamingFromServer,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_61,
     SpanId: Id_65,
-    Name: aspnet_core.request,
+    Name: POST /greet.tester.greeter/streamingfromserver,
+    LogicScope: aspnet_core.request,
     Resource: POST /greet.tester.greeter/streamingfromserver,
     Service: Samples.GrpcDotNet,
     Type: web,
@@ -1329,13 +1301,16 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       aspnet_core.endpoint: gRPC - /greet.tester.Greeter/StreamingFromServer,
       aspnet_core.route: /greet.tester.greeter/streamingfromserver,
       component: aspnet_core,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/StreamingFromServer,
       language: dotnet,
+      net.peer.ip: 127.0.0.1,
       runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: server
     },
     Metrics: {
@@ -1356,7 +1331,7 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       grpc.method.kind: server_streaming,
       grpc.method.name: StreamingFromServer,
       grpc.method.package: greet.tester,
@@ -1377,9 +1352,11 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
     Resource: SendUnaryRequest,
     Service: Samples.GrpcDotNet,
     Tags: {
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
-      runtime-id: Guid_1
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
     },
     Metrics: {
       process_id: 0,
@@ -1393,13 +1370,13 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
     SpanId: Id_69,
     Name: grpc.request,
     Resource: /greet.tester.Greeter/Unary,
-    Service: Samples.GrpcDotNet-grpc-client,
+    Service: Samples.GrpcDotNet,
     Type: grpc,
     ParentId: Id_68,
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       grpc.method.kind: unary,
       grpc.method.name: Unary,
       grpc.method.package: greet.tester,
@@ -1408,40 +1385,34 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       grpc.request.metadata.client-value1: some-client-value,
       grpc.response.metadata.server-value1: some-server-value,
       grpc.status.code: 0,
-      runtime-id: Guid_1,
       servermeta: other-server-value,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_67,
     SpanId: Id_70,
-    Name: http.request,
+    Name: POST,
+    LogicScope: http.request,
     Resource: POST localhost:00000/greet.tester.Greeter/Unary,
-    Service: Samples.GrpcDotNet-http-client,
+    Service: Samples.GrpcDotNet,
     Type: http,
     ParentId: Id_69,
     Tags: {
       component: HttpMessageHandler,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http-client-handler-type: System.Net.Http.HttpClientHandler,
       http.method: POST,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/Unary,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_67,
     SpanId: Id_71,
-    Name: aspnet_core.request,
+    Name: POST /greet.tester.greeter/unary,
+    LogicScope: aspnet_core.request,
     Resource: POST /greet.tester.greeter/unary,
     Service: Samples.GrpcDotNet,
     Type: web,
@@ -1450,13 +1421,16 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       aspnet_core.endpoint: gRPC - /greet.tester.Greeter/Unary,
       aspnet_core.route: /greet.tester.greeter/unary,
       component: aspnet_core,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/Unary,
       language: dotnet,
+      net.peer.ip: 127.0.0.1,
       runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: server
     },
     Metrics: {
@@ -1477,7 +1451,7 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       grpc.method.kind: unary,
       grpc.method.name: Unary,
       grpc.method.package: greet.tester,
@@ -1498,9 +1472,11 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
     Resource: SendUnaryRequestAsync,
     Service: Samples.GrpcDotNet,
     Tags: {
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
-      runtime-id: Guid_1
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
     },
     Metrics: {
       process_id: 0,
@@ -1514,13 +1490,13 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
     SpanId: Id_75,
     Name: grpc.request,
     Resource: /greet.tester.Greeter/Unary,
-    Service: Samples.GrpcDotNet-grpc-client,
+    Service: Samples.GrpcDotNet,
     Type: grpc,
     ParentId: Id_74,
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       grpc.method.kind: unary,
       grpc.method.name: Unary,
       grpc.method.package: greet.tester,
@@ -1529,40 +1505,34 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       grpc.request.metadata.client-value1: some-client-value,
       grpc.response.metadata.server-value1: some-server-value,
       grpc.status.code: 0,
-      runtime-id: Guid_1,
       servermeta: other-server-value,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_73,
     SpanId: Id_76,
-    Name: http.request,
+    Name: POST,
+    LogicScope: http.request,
     Resource: POST localhost:00000/greet.tester.Greeter/Unary,
-    Service: Samples.GrpcDotNet-http-client,
+    Service: Samples.GrpcDotNet,
     Type: http,
     ParentId: Id_75,
     Tags: {
       component: HttpMessageHandler,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http-client-handler-type: System.Net.Http.HttpClientHandler,
       http.method: POST,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/Unary,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_73,
     SpanId: Id_77,
-    Name: aspnet_core.request,
+    Name: POST /greet.tester.greeter/unary,
+    LogicScope: aspnet_core.request,
     Resource: POST /greet.tester.greeter/unary,
     Service: Samples.GrpcDotNet,
     Type: web,
@@ -1571,13 +1541,16 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       aspnet_core.endpoint: gRPC - /greet.tester.Greeter/Unary,
       aspnet_core.route: /greet.tester.greeter/unary,
       component: aspnet_core,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/Unary,
       language: dotnet,
+      net.peer.ip: 127.0.0.1,
       runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: server
     },
     Metrics: {
@@ -1598,7 +1571,7 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       grpc.method.kind: unary,
       grpc.method.name: Unary,
       grpc.method.package: greet.tester,
@@ -1619,9 +1592,11 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
     Resource: SendVerySlowRequest,
     Service: Samples.GrpcDotNet,
     Tags: {
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
-      runtime-id: Guid_1
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
     },
     Metrics: {
       process_id: 0,
@@ -1635,15 +1610,13 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
     SpanId: Id_81,
     Name: grpc.request,
     Resource: /greet.tester.Greeter/VerySlow,
-    Service: Samples.GrpcDotNet-grpc-client,
+    Service: Samples.GrpcDotNet,
     Type: grpc,
     ParentId: Id_80,
-    Error: 1,
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
-      error.msg: Deadline Exceeded,
+      deployment.environment: integration_tests,
       grpc.method.kind: unary,
       grpc.method.name: VerySlow,
       grpc.method.package: greet.tester,
@@ -1651,39 +1624,34 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       grpc.method.service: Greeter,
       grpc.request.metadata.client-value1: some-client-value,
       grpc.status.code: 4,
-      runtime-id: Guid_1,
+      sfx.error.message: Deadline Exceeded,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_79,
     SpanId: Id_82,
-    Name: http.request,
+    Name: POST,
+    LogicScope: http.request,
     Resource: POST localhost:00000/greet.tester.Greeter/VerySlow,
-    Service: Samples.GrpcDotNet-http-client,
+    Service: Samples.GrpcDotNet,
     Type: http,
     ParentId: Id_81,
     Tags: {
       component: HttpMessageHandler,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http-client-handler-type: System.Net.Http.HttpClientHandler,
       http.method: POST,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/VerySlow,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_79,
     SpanId: Id_83,
-    Name: aspnet_core.request,
+    Name: POST /greet.tester.greeter/veryslow,
+    LogicScope: aspnet_core.request,
     Resource: POST /greet.tester.greeter/veryslow,
     Service: Samples.GrpcDotNet,
     Type: web,
@@ -1692,13 +1660,16 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       aspnet_core.endpoint: gRPC - /greet.tester.Greeter/VerySlow,
       aspnet_core.route: /greet.tester.greeter/veryslow,
       component: aspnet_core,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/VerySlow,
       language: dotnet,
+      net.peer.ip: 127.0.0.1,
       runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: server
     },
     Metrics: {
@@ -1720,8 +1691,7 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
-      error.msg: Deadline Exceeded,
+      deployment.environment: integration_tests,
       grpc.method.kind: unary,
       grpc.method.name: VerySlow,
       grpc.method.package: greet.tester,
@@ -1732,6 +1702,7 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       grpc.status.code: 4,
       language: dotnet,
       servermeta: other-server-value,
+      sfx.error.message: Deadline Exceeded,
       span.kind: server
     }
   },
@@ -1742,9 +1713,11 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
     Resource: SendVerySlowRequestAsync,
     Service: Samples.GrpcDotNet,
     Tags: {
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
-      runtime-id: Guid_1
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
     },
     Metrics: {
       process_id: 0,
@@ -1758,15 +1731,13 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
     SpanId: Id_87,
     Name: grpc.request,
     Resource: /greet.tester.Greeter/VerySlow,
-    Service: Samples.GrpcDotNet-grpc-client,
+    Service: Samples.GrpcDotNet,
     Type: grpc,
     ParentId: Id_86,
-    Error: 1,
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
-      error.msg: Deadline Exceeded,
+      deployment.environment: integration_tests,
       grpc.method.kind: unary,
       grpc.method.name: VerySlow,
       grpc.method.package: greet.tester,
@@ -1774,39 +1745,34 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       grpc.method.service: Greeter,
       grpc.request.metadata.client-value1: some-client-value,
       grpc.status.code: 4,
-      runtime-id: Guid_1,
+      sfx.error.message: Deadline Exceeded,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_85,
     SpanId: Id_88,
-    Name: http.request,
+    Name: POST,
+    LogicScope: http.request,
     Resource: POST localhost:00000/greet.tester.Greeter/VerySlow,
-    Service: Samples.GrpcDotNet-http-client,
+    Service: Samples.GrpcDotNet,
     Type: http,
     ParentId: Id_87,
     Tags: {
       component: HttpMessageHandler,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http-client-handler-type: System.Net.Http.HttpClientHandler,
       http.method: POST,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/VerySlow,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_85,
     SpanId: Id_89,
-    Name: aspnet_core.request,
+    Name: POST /greet.tester.greeter/veryslow,
+    LogicScope: aspnet_core.request,
     Resource: POST /greet.tester.greeter/veryslow,
     Service: Samples.GrpcDotNet,
     Type: web,
@@ -1815,13 +1781,16 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       aspnet_core.endpoint: gRPC - /greet.tester.Greeter/VerySlow,
       aspnet_core.route: /greet.tester.greeter/veryslow,
       component: aspnet_core,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
       http.url: http://localhost:00000/greet.tester.Greeter/VerySlow,
       language: dotnet,
+      net.peer.ip: 127.0.0.1,
       runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: server
     },
     Metrics: {
@@ -1843,8 +1812,7 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
     Tags: {
       clientmeta: other-client-value,
       component: Grpc,
-      env: integration_tests,
-      error.msg: Deadline Exceeded,
+      deployment.environment: integration_tests,
       grpc.method.kind: unary,
       grpc.method.name: VerySlow,
       grpc.method.package: greet.tester,
@@ -1855,6 +1823,7 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       grpc.status.code: 4,
       language: dotnet,
       servermeta: other-server-value,
+      sfx.error.message: Deadline Exceeded,
       span.kind: server
     }
   }

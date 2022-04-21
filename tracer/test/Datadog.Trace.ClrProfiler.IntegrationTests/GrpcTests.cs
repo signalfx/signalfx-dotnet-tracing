@@ -252,7 +252,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     break;
 
                 case HttpClientIntegrationType.Disabled:
-                    SetEnvironmentVariable("SIGNALFX_DISABLED_INTEGRATIONS", "HttpMessageHandler;HttpSocketsHandler;WinHttpHandler");
+                    SetEnvironmentVariable("SIGNALFX_DISABLED_INTEGRATIONS", "HttpMessageHandler,HttpSocketsHandler,WinHttpHandler");
                     break;
                 default:
                     throw new InvalidOperationException("Unknown HttpClientIntegrationType: " + httpClientIntegrationType);
@@ -306,7 +306,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 await VerifyHelper.VerifySpans(spans, settings)
                                   .UseTypeName(EnvironmentHelper.SampleName)
-                                  .UseTextForParameters($"httpclient={httpInstrumentationEnabled}")
+                                  .UseTextForParameters($"httpclient={httpClientIntegrationType.ToString()}")
                                   .DisableRequireUniquePrefix();
 
                 static void FixVerySlowServerSpans(IImmutableList<MockSpan> spans, HttpClientIntegrationType httpClientIntegrationType)
@@ -320,14 +320,14 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     foreach (var span in verySlowGrpcServerSpans)
                     {
                         span.Error = 1;
-                        span.Tags["error.msg"] = "Deadline Exceeded";
-                        span.Tags.Remove("error.stack");
-                        span.Tags.Remove("error.type");
+                        span.Tags["sfx.error.message"] = "Deadline Exceeded";
+                        span.Tags.Remove("sfx.error.stack");
+                        span.Tags.Remove("sfx.error.kind");
                         span.Tags["grpc.status.code"] = "4";
                     }
 
                     var verySlowAspNetCoreServerSpans = spans
-                                                 .Where(x => x.Name == "aspnet_core.request" && x.Resource.EndsWith("veryslow"))
+                                                 .Where(x => x.LogicScope == "aspnet_core.request" && x.Resource.EndsWith("veryslow"))
                                                  .ToList();
 
                     foreach (var span in verySlowAspNetCoreServerSpans)
@@ -341,16 +341,16 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     if (httpClientIntegrationType != HttpClientIntegrationType.Disabled)
                     {
                         var httpClientSpans = spans
-                                             .Where(x => x.Name == "http.request" && x.Resource.EndsWith("VerySlow"))
+                                             .Where(x => x.LogicScope == "http.request" && x.Resource.EndsWith("VerySlow"))
                                              .ToList();
                         httpClientSpans.Should().HaveCount(2);
 
                         foreach (var span in httpClientSpans)
                         {
                             span.Error = 0;
-                            span.Tags.Remove("error.msg");
-                            span.Tags.Remove("error.type");
-                            span.Tags.Remove("error.stack");
+                            span.Tags.Remove("sfx.error.message");
+                            span.Tags.Remove("sfx.error.kind");
+                            span.Tags.Remove("sfx.error.stack");
                             span.Tags["http.status_code"] = "200";
                         }
                     }
@@ -359,15 +359,15 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 static void FixVerySlowClientSpans(IImmutableList<MockSpan> spans)
                 {
                     var verySlowGrpcClientSpans = spans
-                                                 .Where(x => x.Name == "grpc.request" && x.Resource.EndsWith("VerySlow") && x.Tags["span.kind"] == "client")
+                                                 .Where(x => x.LogicScope == "grpc.request" && x.Resource.EndsWith("VerySlow") && x.Tags["span.kind"] == "client")
                                                  .ToList();
 
                     // Grpc.Core 2.45.0 started using very different paths and messages in the
                     // deadline paths. For simplicity, normalise these to something simple
                     foreach (var span in verySlowGrpcClientSpans)
                     {
-                        span.Tags["error.msg"] = "Deadline Exceeded";
-                        span.Tags.Remove("error.stack");
+                        span.Tags["sfx.error.message"] = "Deadline Exceeded";
+                        span.Tags.Remove("sfx.error.stack");
                     }
                 }
             }
