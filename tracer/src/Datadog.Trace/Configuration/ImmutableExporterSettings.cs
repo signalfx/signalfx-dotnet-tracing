@@ -47,7 +47,7 @@ namespace Datadog.Trace.Configuration
             PartialFlushEnabled = settings.PartialFlushEnabled;
             PartialFlushMinSpans = settings.PartialFlushMinSpans;
 
-            SynchExport = settings.SynchExport;
+            SyncExport = settings.SyncExport;
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace Datadog.Trace.Configuration
         /// <summary>
         /// Gets a value indicating whether exports should be synchronous.
         /// </summary>
-        public bool SynchExport { get; }
+        public bool SyncExport { get; }
 
         /// <summary>
         /// Gets the transport used to send traces to the Agent.

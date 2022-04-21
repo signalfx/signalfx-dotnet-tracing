@@ -104,6 +104,6 @@ namespace Datadog.Trace.Configuration
         /// Configuration key to do synchronous export of traces.
         /// Default is <c>false</c>
         /// </summary>
-        public const string TraceSynchExport = "SIGNALFX_TRACE_SYNCH_EXPORT";
+        public const string TraceSyncExport = "SIGNALFX_TRACE_SYNC_EXPORT";
     }
 }

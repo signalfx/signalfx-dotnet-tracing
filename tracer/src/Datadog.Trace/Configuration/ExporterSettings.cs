@@ -62,7 +62,7 @@ namespace Datadog.Trace.Configuration
                 // default value
                 ?? false;
 
-            SynchExport = source?.GetBool(ConfigurationKeys.TraceSynchExport)
+            SyncExport = source?.GetBool(ConfigurationKeys.TraceSyncExport)
                 // default value
                 ?? false;
 
@@ -128,7 +128,7 @@ namespace Datadog.Trace.Configuration
         /// <summary>
         /// Gets or sets a value indicating whether to do synchronous export.
         /// </summary>
-        public bool SynchExport { get; set; }
+        public bool SyncExport { get; set; }
 
         /// <summary>
         /// Gets or sets the minimum number of closed spans in a trace before it's partially flushed
