@@ -7,9 +7,7 @@
 
 #nullable enable
 
-#if NETCOREAPP
 using System;
-#endif
 using System.Diagnostics.CodeAnalysis;
 
 namespace Datadog.Trace.Propagators
@@ -48,19 +46,26 @@ namespace Datadog.Trace.Propagators
         {
             spanContext = null;
 
-            var rawTraceId = ParseUtility.ParseString(carrier, carrierGetter, TraceId)?.Trim();
-            var rawSpanId = ParseUtility.ParseString(carrier, carrierGetter, SpanId)?.Trim();
-            var samplingPriority = ParseUtility.ParseInt32(carrier, carrierGetter, Sampled);
-
-            if (IsValidTraceId(rawTraceId, out var traceId) && IsValidSpanId(rawSpanId))
+            try
             {
-                var parentId = ParseUtility.ParseFromHexOrDefault(rawSpanId);
+                var rawTraceId = ParseUtility.ParseString(carrier, carrierGetter, TraceId)?.Trim();
+                var rawSpanId = ParseUtility.ParseString(carrier, carrierGetter, SpanId)?.Trim();
+                var samplingPriority = ParseUtility.ParseInt32(carrier, carrierGetter, Sampled);
 
-                spanContext = new SpanContext(traceId, parentId, samplingPriority, serviceName: null, null, rawTraceId, rawSpanId);
-                return true;
+                if (IsValidTraceId(rawTraceId, out var traceId) && IsValidSpanId(rawSpanId))
+                {
+                    var parentId = ParseUtility.ParseFromHexOrDefault(rawSpanId);
+
+                    spanContext = new SpanContext(traceId, parentId, samplingPriority, serviceName: null, null, rawTraceId, rawSpanId);
+                    return true;
+                }
+
+                return false;
             }
-
-            return false;
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         private bool IsValidTraceId([NotNullWhen(true)] string? traceId, out TraceId parsedTraceId)
