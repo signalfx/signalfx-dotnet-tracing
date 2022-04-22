@@ -78,6 +78,7 @@ namespace Datadog.Trace.Tests.Configuration
                 (e, i) => e.AgentUri == i.AgentUri,
                 (e, i) => e.PartialFlushEnabled == i.PartialFlushEnabled,
                 (e, i) => e.PartialFlushMinSpans == i.PartialFlushMinSpans,
+                (e, i) => e.SyncExport == i.SyncExport,
             };
 
             var mutableProperties = typeof(ExporterSettings)
