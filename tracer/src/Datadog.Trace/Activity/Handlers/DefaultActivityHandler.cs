@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #nullable enable
 
 using System;
@@ -93,7 +95,7 @@ namespace Datadog.Trace.Activity.Handlers
 
             static Scope CreateScopeFromActivity(T activity, ulong? traceId, ulong? spanId, string? rawTraceId, string? rawSpanId)
             {
-                var span = Tracer.Instance.StartSpan(activity.OperationName, startTime: activity.StartTimeUtc, traceId: TraceId.CreateFromUlong(traceId ?? 0), spanId: spanId);
+                var span = Tracer.Instance.StartSpan(activity.OperationName, startTime: activity.StartTimeUtc, traceId: TraceId.CreateFromUlong(traceId ?? 0), spanId: spanId, rawTraceId: rawTraceId, rawSpanId: rawSpanId);
                 var scope = Tracer.Instance.ActivateSpan(span, false);
                 return scope;
             }
