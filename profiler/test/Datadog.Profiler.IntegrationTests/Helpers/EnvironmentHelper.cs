@@ -168,8 +168,8 @@ namespace Datadog.Profiler.IntegrationTests.Helpers
 
         internal string GetTestOutputPath()
         {
-            // DD_TESTING_OUPUT_DIR is set by the CI
-            var baseTestOutputDir = Environment.GetEnvironmentVariable("DD_TESTING_OUPUT_DIR") ?? Path.GetTempPath();
+            // SIGNALFX_TESTING_OUPUT_DIR is set by the CI
+            var baseTestOutputDir = Environment.GetEnvironmentVariable("SIGNALFX_TESTING_OUPUT_DIR") ?? Path.GetTempPath();
             var testOutputPath = Path.Combine(baseTestOutputDir, $"TestApplication_{_appName}{_testId}_{Process.GetCurrentProcess().Id}", _framework);
 
             return testOutputPath;
@@ -239,7 +239,7 @@ namespace Datadog.Profiler.IntegrationTests.Helpers
 
         private static string GetClrProfilerBaseDirectory()
         {
-            // DD_TESTING_PROFILER_FOLDER is set by the CI and tests with the native loader are run only in the CI
+            // SIGNALFX_TESTING_PROFILER_FOLDER is set by the CI and tests with the native loader are run only in the CI
             return Environment.GetEnvironmentVariable(EnvironmentVariables.ProfilerInstallationFolder);
         }
 
@@ -273,7 +273,7 @@ namespace Datadog.Profiler.IntegrationTests.Helpers
             var baseOutputDir = GetTestOutputPath();
             CustomEnvironmentVariables[EnvironmentVariables.ProfilingLogDir] = Path.Combine(baseOutputDir, "logs");
             // Set tracer log directory too
-            CustomEnvironmentVariables["DD_TRACE_LOG_DIRECTORY"] = Path.Combine(baseOutputDir, "logs");
+            CustomEnvironmentVariables["SIGNALFX_TRACE_LOG_DIRECTORY"] = Path.Combine(baseOutputDir, "logs");
             CustomEnvironmentVariables[EnvironmentVariables.ProfilingPprofDir] = Path.Combine(baseOutputDir, "pprofs");
         }
 

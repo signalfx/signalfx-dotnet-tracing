@@ -25,8 +25,8 @@ public:
     MOCK_METHOD(bool, IsOperationalMetricsEnabled, (), (const override));
     MOCK_METHOD(std::chrono::seconds, GetUploadInterval, (), (const override));
     MOCK_METHOD(tags const&, GetUserTags, (), (const override));
-    MOCK_METHOD(std::string const&, GetVersion, (), (const override));     // return DD_VERSION, Unspecified-Version if not specified
-    MOCK_METHOD(std::string const&, GetEnvironment, (), (const override)); // return DD_ENV, Unspecified-Env if not specified
+    MOCK_METHOD(std::string const&, GetVersion, (), (const override));     // return SIGNALFX_VERSION, Unspecified-Version if not specified
+    MOCK_METHOD(std::string const&, GetEnvironment, (), (const override)); // return SIGNALFX_ENV, Unspecified-Env if not specified
     MOCK_METHOD(std::string const&, GetHostname, (), (const override));    // return the machine hostname
     MOCK_METHOD(std::string const&, GetAgentUrl, (), (const override));
     MOCK_METHOD(std::string const&, GetAgentHost, (), (const override));
