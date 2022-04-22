@@ -83,7 +83,8 @@ namespace Datadog.Trace
 
         public void CloseSpan(Span span)
         {
-            bool ShouldTriggerPartialFlush() => Tracer.Settings.ExporterSettings.PartialFlushEnabled && _spans.Count >= Tracer.Settings.ExporterSettings.PartialFlushMinSpans;
+            bool isSync = Tracer.Settings.ExporterSettings.SyncExport;
+            bool ShouldTriggerPartialFlush() => !isSync && Tracer.Settings.ExporterSettings.PartialFlushEnabled && _spans.Count >= Tracer.Settings.ExporterSettings.PartialFlushMinSpans;
 
             if (span == RootSpan)
             {
@@ -140,6 +141,11 @@ namespace Datadog.Trace
             if (spansToWrite.Count > 0)
             {
                 Tracer.Write(spansToWrite);
+                if (isSync)
+                {
+                    var task = Datadog.Trace.Tracer.Instance.FlushAsync();
+                    task.Wait();
+                }
             }
         }
 

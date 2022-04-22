@@ -46,6 +46,8 @@ namespace Datadog.Trace.Configuration
 
             PartialFlushEnabled = settings.PartialFlushEnabled;
             PartialFlushMinSpans = settings.PartialFlushMinSpans;
+
+            SyncExport = settings.SyncExport;
         }
 
         /// <summary>
@@ -105,6 +107,11 @@ namespace Datadog.Trace.Configuration
         /// Gets the minimum number of closed spans in a trace before it's partially flushed
         /// </summary>
         public int PartialFlushMinSpans { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether exports should be synchronous.
+        /// </summary>
+        public bool SyncExport { get; }
 
         /// <summary>
         /// Gets the transport used to send traces to the Agent.
