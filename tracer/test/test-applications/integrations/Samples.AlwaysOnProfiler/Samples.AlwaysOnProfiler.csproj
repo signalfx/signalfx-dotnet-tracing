@@ -5,11 +5,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Condition="'$(OS)' == 'Windows_NT'" Include="..\..\..\..\..\tracer\test\bin\win-$(Platform)\Samples.AlwaysOnProfiler.NativeDep.dll" Link="Samples.AlwaysOnProfiler.NativeDep.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Condition="'$(OS)' != 'Windows_NT'" Include="..\..\..\..\..\tracer\test\bin\Samples.AlwaysOnProfiler.NativeDep.so" Link="Samples.AlwaysOnProfiler.NativeDep.so">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\dependency-libs\Samples.AlwaysOnProfiler.Vb\Samples.AlwaysOnProfiler.Vb.vbproj" />
   </ItemGroup>
-
 </Project>
