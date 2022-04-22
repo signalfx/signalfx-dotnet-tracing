@@ -141,7 +141,7 @@ namespace Datadog.Trace
             if (spansToWrite.Count > 0)
             {
                 Tracer.Write(spansToWrite);
-                if (synch)
+                if (isSync)
                 {
                     var task = Datadog.Trace.Tracer.Instance.FlushAsync();
                     task.Wait();
