@@ -177,7 +177,7 @@ namespace Datadog.Profiler.IntegrationTests.Helpers
 
         private static string GetProfilerGuid()
         {
-            return UseNativeLoader ? "{846F5F1C-F9AE-4B07-969E-05C26BC060D8}" : "{BD1A650D-AC5D-4896-B64F-D6FA25D6B26A}";
+            return UseNativeLoader ? "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}" : "{BD1A650D-AC5D-4896-B64F-D6FA25D6B26A}";
         }
 
         private static string GetDeployDir()
