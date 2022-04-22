@@ -6,32 +6,32 @@
   <Fragment>
     <ComponentGroup Id="Files.Managed.Net6" Directory="net6.0">
       <Component Win64="$(var.Win64)">
-        <File Id="net6_SignalFx.Tracing.dll"
+        <File Id="net60_SignalFx.Tracing.dll"
               Source="$(var.TracerHomeDirectory)\net6.0\SignalFx.Tracing.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="net6_SignalFx.Tracing.OpenTracing.dll"
+        <File Id="net60_SignalFx.Tracing.OpenTracing.dll"
               Source="$(var.TracerHomeDirectory)\net6.0\SignalFx.Tracing.OpenTracing.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="net6_SignalFx.Tracing.MSBuild.dll"
+        <File Id="net60_SignalFx.Tracing.MSBuild.dll"
               Source="$(var.TracerHomeDirectory)\net6.0\SignalFx.Tracing.MSBuild.dll"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="net6_SignalFx.Tracing.MSBuild.pdb"
+        <File Id="net60_SignalFx.Tracing.MSBuild.pdb"
               Source="$(var.TracerHomeDirectory)\net6.0\SignalFx.Tracing.MSBuild.pdb"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="net6_SignalFx.Tracing.pdb"
+        <File Id="net60_SignalFx.Tracing.pdb"
               Source="$(var.TracerHomeDirectory)\net6.0\SignalFx.Tracing.pdb"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
-        <File Id="net6_SignalFx.Tracing.OpenTracing.pdb"
+        <File Id="net60_SignalFx.Tracing.OpenTracing.pdb"
               Source="$(var.TracerHomeDirectory)\net6.0\SignalFx.Tracing.OpenTracing.pdb"
               KeyPath="yes" Checksum="yes"/>
       </Component>
