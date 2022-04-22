@@ -60,7 +60,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
         else
         {
             Logger::Info("TRACER DIAGNOSTICS - Profiler disabled in ", environment::tracing_enabled);
-            return E_FAIL;
+            return CORPROF_E_PROFILER_CANCEL_ACTIVATION;
         }
     }
 
@@ -101,7 +101,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
     {
         Logger::Info("TRACER DIAGNOSTICS - Profiler disabled: ", process_name, " not found in ",
                      environment::include_process_names, ".");
-        return E_FAIL;
+        return CORPROF_E_PROFILER_CANCEL_ACTIVATION;
     }
 
     const auto& exclude_process_names = shared::GetEnvironmentValues(environment::exclude_process_names);
@@ -111,7 +111,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
     {
         Logger::Info("TRACER DIAGNOSTICS - Profiler disabled: ", process_name, " found in ",
                      environment::exclude_process_names, ".");
-        return E_FAIL;
+        return CORPROF_E_PROFILER_CANCEL_ACTIVATION;
     }
 
     Logger::Info("Environment variables:");
@@ -135,7 +135,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
             Logger::Info(
                 "TRACER DIAGNOSTICS - Profiler disabled: ", environment::azure_app_services_app_pool_id, " ",
                 app_pool_id_value, " is recognized as an Azure App Services infrastructure process.");
-            return E_FAIL;
+            return CORPROF_E_PROFILER_CANCEL_ACTIVATION;
         }
 
         const auto& cli_telemetry_profile_value =
@@ -145,7 +145,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
         {
             Logger::Info("TRACER DIAGNOSTICS - Profiler disabled: ", app_pool_id_value,
                          " is recognized as Kudu, an Azure App Services reserved process.");
-            return E_FAIL;
+            return CORPROF_E_PROFILER_CANCEL_ACTIVATION;
         }
 
         const auto& functions_worker_runtime_value =
@@ -155,7 +155,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
         {
             Logger::Info("TRACER DIAGNOSTICS - Profiler disabled: Azure Functions are not officially "
                          "supported. Enable instrumentation with SIGNALFX_TRACE_AZURE_FUNCTIONS_ENABLED.");
-            return E_FAIL;
+            return CORPROF_E_PROFILER_CANCEL_ACTIVATION;
         }
     }
 
