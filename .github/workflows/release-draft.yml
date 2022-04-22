@@ -67,6 +67,11 @@ jobs:
         with:
           name: nuget
           path: tracer/bin/artifacts/nuget/SignalFx.NET.Tracing.Azure.Site.Extension.*.nupkg
+      - name: Upload Windows Zip package
+        uses: actions/upload-artifact@v3.0.0
+        with:
+          name: zip
+          path: tracer/bin/artifacts/windows-tracer-home.zip
 
   create-release:
     name: Create GH release
