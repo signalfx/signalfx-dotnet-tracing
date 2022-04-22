@@ -83,7 +83,7 @@ namespace Datadog.Trace
 
         public void CloseSpan(Span span)
         {
-            bool synch = Tracer.Settings.ExporterSettings.SyncExport;
+            bool isSync = Tracer.Settings.ExporterSettings.SyncExport;
             bool ShouldTriggerPartialFlush() => !synch && Tracer.Settings.ExporterSettings.PartialFlushEnabled && _spans.Count >= Tracer.Settings.ExporterSettings.PartialFlushMinSpans;
 
             if (span == RootSpan)
