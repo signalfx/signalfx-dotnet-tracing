@@ -17,8 +17,10 @@
     * Old log path: `/var/log/datadog` use `/var/log/signalfx` instead.
     * Run unit tests, commit any needed fixes, repeat until passing unit tests
     * Update version in `tracer\src\Datadog.Trace.ClrProfiler.Native\version.h` if the upstream bumped it.
-    * Update `launchSettings.json` files: change `Datadog.Trace.ClrProfiler.Native.dll` to `SignalFx.Tracing.ClrProfiler.Native.dll` for `CORECLR_PROFILER_PATH` and `COR_PROFILER_PATH`
-    * Run build via nuke and commit any needed fixes, until it passes:
+    * Update `launchSettings.json` files: change `Datadog.Trace.ClrProfiler.Native.dll` to `SignalFx.Tracing.ClrProfiler.Native.dll` for `CORECLR_PROFILER_PATH` and `COR_PROFILER_PATH`.
+    * Remove any files added under ./azure-pipelines/**/* since they are not
+    used by this repository CI.
+    * Run build via nuke and commit any needed fixes, until it passes.
 
 6. If squashing cherry-pick from upstream to pass CLA check:
     * `git rebase -i <squash_sha>^`
