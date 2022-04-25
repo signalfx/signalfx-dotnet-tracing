@@ -28,11 +28,6 @@
     <Compile Remove="DuckTyping\ObscureObject.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\..\src\Datadog.Trace\AppSec\Waf\rule-set.json">
-      <Link>rule-set.json</Link>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.12.1" />
     <PackageReference Include="JetBrains.Profiler.Api" Version="1.1.7" />
     <PackageReference Include="log4net" Version="2.0.12" />
