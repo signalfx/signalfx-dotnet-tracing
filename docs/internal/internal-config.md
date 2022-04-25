@@ -78,3 +78,4 @@ These settings should be never used by the users.
 | `SIGNALFX_TRACE_AZURE_FUNCTIONS_ENABLED` | Set to instrument within Azure functions. | `false` |
 | `SIGNALFX_TRACE_EXPAND_ROUTE_TEMPLATES_ENABLED` | Set to expand route parameters in ASP.NET and ASP.NET Core resource names. | `false` |
 | `SIGNALFX_TRACE_GRPC_TAGS` | Comma-separated list of key-value pairs automatically applied as GRPC metadata values as tags on traces. For example: `"key1:val1,key2:val2"` |  |
+| `SIGNALFX_TRACE_METHODS` | Semicolon-separated list of methods to be automatically traced. |  |
