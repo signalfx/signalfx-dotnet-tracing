@@ -12,6 +12,6 @@ namespace Datadog.Profiler.IntegrationTests.Helpers
         public const string ProfilingPprofDir = "SIGNALFX_INTERNAL_PROFILING_OUTPUT_DIR";
         public const string ProfilerInstallationFolder = "SIGNALFX_TESTING_PROFILER_FOLDER";
         public const string CodeHotSpotsEnable = "SIGNALFX_PROFILING_CODEHOTSPOTS_ENABLED";
-        public const string UseNativeLoader = "USE_NATIVE_LOADER";
+        public const string UseNativeLoader = "SIGNALFX_USE_NATIVE_LOADER";
     }
 }
