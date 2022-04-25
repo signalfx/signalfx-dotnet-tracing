@@ -20,6 +20,7 @@
     * Update `launchSettings.json` files: change `Datadog.Trace.ClrProfiler.Native.dll` to `SignalFx.Tracing.ClrProfiler.Native.dll` for `CORECLR_PROFILER_PATH` and `COR_PROFILER_PATH`.
     * Remove any files added under ./azure-pipelines/**/* since they are not
     used by this repository CI.
+    * Review any added or modified markdown files - remove and update as needed.
     * Run build via nuke and commit any needed fixes, until it passes.
 
 6. If squashing cherry-pick from upstream to pass CLA check:
