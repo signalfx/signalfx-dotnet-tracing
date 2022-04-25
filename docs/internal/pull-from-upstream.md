@@ -22,6 +22,9 @@
     used by this repository CI.
     * Review any added or modified markdown files - remove and update as needed.
     * Remove constants, tests, and code of unused features, e.g.: AppSec.
+    * Document new instrumentations and add any related configuration to proper
+    docs, typically new instrumentations are first added as "partially supported",
+    see [instrumented-libraries.md](../instrumented-libraries.md#partially-supported).
     * Run build via nuke and commit any needed fixes, until it passes.
 
 6. If squashing cherry-pick from upstream to pass CLA check:
