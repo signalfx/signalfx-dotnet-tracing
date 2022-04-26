@@ -83,7 +83,7 @@ Use following settings to configure where the telemetry data is being exported.
 | `SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED` | Enable to export traces that contain a minimum number of closed spans, as defined by `SIGNALFX_TRACE_PARTIAL_FLUSH_MIN_SPANS`. | `false` |
 | `SIGNALFX_TRACE_PARTIAL_FLUSH_MIN_SPANS` | Minimum number of closed spans in a trace before it's exported. The default value is ``500``. Requires the value of the ``SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED`` environment variable to be ``true``. | `500` |
 
-### Exporting directly to Splunk Observabilty Cloud
+### Exporting directly to Splunk Observability Cloud
 
 By default, all telemetry is
 sent to the local instance of [Splunk OpenTelemetry Collector](https://github.com/signalfx/splunk-otel-collector).
@@ -93,7 +93,7 @@ configure the following settings:
 
 | Setting | Value | Notes |
 |-|-|-|
-| `SIGNALFX_ACCESS_TOKEN` | *organization access tokens* | See [here](https://docs.splunk.com/Observability/admin/authentication-tokens/org-tokens.html) to learn how to obtain one. |
+| `SIGNALFX_ACCESS_TOKEN` | _organization access tokens_ | See [here](https://docs.splunk.com/Observability/admin/authentication-tokens/org-tokens.html) to learn how to obtain one. |
 | `SIGNALFX_REALM` | Your Observability Cloud realm | Set to send telemetry directly to Splunk Observability Cloud. If configured, metrics are sent to `https://ingest.<SIGNALFX_REALM>.signalfx.com/v2/datapoint` and traces are sent to `https://ingest.<SIGNALFX_REALM>.signalfx.com/v2/trace`. |
 | `SIGNALFX_ENDPOINT_URL` | Trace ingestion endpoint | Overrides `SIGNALFX_REALM` configuration for the traces ingestion endpoint. |
 | `SIGNALFX_METRICS_ENDPOINT_URL` | Metric ingestion endpoint | Overrides `SIGNALFX_REALM` configuration for the traces ingestion endpoint. |
