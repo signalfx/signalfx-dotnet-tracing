@@ -28,11 +28,7 @@ namespace Datadog.Trace.Agent.Transports
         public HttpClientRequest(HttpClient client, Uri endpoint)
         {
             _client = client;
-            _request = new HttpRequestMessage()
-            {
-                RequestUri = endpoint
-            };
-
+            _request = new HttpRequestMessage(HttpMethod.Post, endpoint);
             _uri = endpoint;
         }
 
@@ -57,8 +53,6 @@ namespace Datadog.Trace.Agent.Transports
 
         public async Task<IApiResponse> PostAsync(ArraySegment<byte> bytes, string contentType)
         {
-            _request.Method = HttpMethod.Post;
-
             // re-create HttpContent on every retry because some versions of HttpClient always dispose of it, so we can't reuse.
             using (var content = new ByteArrayContent(bytes.Array, bytes.Offset, bytes.Count))
             {
