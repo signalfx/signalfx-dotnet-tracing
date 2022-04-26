@@ -17,6 +17,22 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 ---
 
+## [Release 0.2.3](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.2.3)
+
+### General
+
+- The release adds experimental support for [AlwaysOn Profiling](always-on-profiling.md)
+
+### Enhancements
+
+- Add `SIGNALFX_PROFILER_LOGS_ENDPOINT` setting to configure the URL to where
+logs are exported using [OTLP/HTTP v1 log protocol](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md).
+- Add `SIGNALFX_PROFILER_ENABLED` setting that enables AlwaysOn Profiling.
+- Add `SIGNALFX_PROFILER_CALL_STACK_INTERVAL` setting that overrides default
+AlwaysOn Profiling sampling period.
+
+---
+
 ## [Release 0.2.2](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.2.2)
 
 ### General
