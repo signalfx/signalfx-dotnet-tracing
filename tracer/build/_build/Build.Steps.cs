@@ -45,7 +45,6 @@ partial class Build
     AbsolutePath SymbolsDirectory => TracerHome ?? (OutputDirectory / "symbols");
     AbsolutePath DDTracerHomeDirectory => DDTracerHome ?? (OutputDirectory / "dd-tracer-home");
     AbsolutePath ArtifactsDirectory => Artifacts ?? (OutputDirectory / "artifacts");
-    AbsolutePath WindowsTracerHomeZip => ArtifactsDirectory / "windows-tracer-home.zip";
     AbsolutePath WindowsSymbolsZip => ArtifactsDirectory / "windows-native-symbols.zip";
     AbsolutePath BuildDataDirectory => TracerDirectory / "build_data";
     AbsolutePath ToolSourceDirectory => ToolSource ?? (OutputDirectory / "runnerTool");
@@ -597,15 +596,17 @@ partial class Build
         .Requires(() => Version)
         .Executes(() =>
         {
+            const string packageName = "signalfx-dotnet-tracing";
+
             if (IsWin)
             {
-                CompressZip(TracerHomeDirectory, WindowsTracerHomeZip, fileMode: FileMode.Create);
+                var zipPath = ArtifactsDirectory / $"{packageName}-{Version}.zip";
+                CompressZip(TracerHomeDirectory, zipPath, fileMode: FileMode.Create);
             }
             else if (IsLinux)
             {
                 var fpm = Fpm.Value;
                 var gzip = GZip.Value;
-                var packageName = "signalfx-dotnet-tracing";
 
                 var workingDirectory = ArtifactsDirectory / $"linux-{LinuxArchitectureIdentifier}";
                 EnsureCleanDirectory(workingDirectory);
