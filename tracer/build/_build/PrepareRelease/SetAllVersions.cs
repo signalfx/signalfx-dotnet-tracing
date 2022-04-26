@@ -204,16 +204,9 @@ namespace PrepareRelease
                 "../shared/src/msi-installer/WindowsInstaller.wixproj",
                 WixProjReplace);
 
-            // Azure Site Extension updates
             SynchronizeVersion(
-                "../shared/src/azure-site-extension/applicationHost.xdt",
-                text => Regex.Replace(text, VersionPattern(), VersionString()));
-            SynchronizeVersion(
-                "../shared/src/azure-site-extension/Azure.Site.Extension.nuspec",
-                text => Regex.Replace(text, VersionPattern(), VersionString()));
-            SynchronizeVersion(
-                "../shared/src/azure-site-extension/install.cmd",
-                text => Regex.Replace(text, VersionPattern(), VersionString()));
+                "tools/PipelineMonitor/PipelineMonitor.csproj",
+                DatadogTraceNugetDependencyVersionReplace);
 
             Console.WriteLine($"Completed synchronizing versions to {VersionString()}");
         }
