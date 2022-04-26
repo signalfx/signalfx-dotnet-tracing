@@ -18,7 +18,10 @@ namespace Datadog.Trace.Tagging
 {
     internal abstract class TagsList : ITags
     {
+        // name of string tag dictionary
         private static readonly byte[] MetaBytes = StringEncoding.UTF8.GetBytes("meta");
+
+        // name of numeric tag dictionary
         private static readonly byte[] MetricsBytes = StringEncoding.UTF8.GetBytes("metrics");
 
         // common tags
@@ -27,13 +30,21 @@ namespace Datadog.Trace.Tagging
         private static readonly byte[] RuntimeIdValueBytes = StringEncoding.UTF8.GetBytes(Tracer.RuntimeId);
         private static readonly byte[] LanguageNameBytes = StringEncoding.UTF8.GetBytes(Trace.Tags.Language);
         private static readonly byte[] LanguageValueBytes = StringEncoding.UTF8.GetBytes(TracerConstants.Language);
+        private static readonly byte[] ProcessIdNameBytes = StringEncoding.UTF8.GetBytes(Trace.Metrics.ProcessId);
+        private static readonly byte[] ProcessIdValueBytes;
 
         private List<KeyValuePair<string, double>> _metrics;
         private List<KeyValuePair<string, string>> _tags;
 
-        protected static IProperty<string>[] TagsListProperties => Array.Empty<IProperty<string>>();
+        static TagsList()
+        {
+            double processId = DomainMetadata.Instance.ProcessId;
+            ProcessIdValueBytes = processId > 0 ? MessagePackSerializer.Serialize(processId) : null;
+        }
 
         public List<KeyValuePair<string, double>> Metrics => Volatile.Read(ref _metrics);
+
+        protected static IProperty<string>[] TagsListProperties => Array.Empty<IProperty<string>>();
 
         protected virtual List<KeyValuePair<string, string>> GetCustomTags() => Volatile.Read(ref _tags);
 
@@ -329,6 +340,17 @@ namespace Datadog.Trace.Tagging
 
             // write "well-known" span-level numeric tags (from properties)
             count += WriteAdditionalMetrics(ref bytes, ref offset, tagProcessors);
+
+            if (span.IsRootSpan)
+            {
+                // add "process_id" tag
+                if (ProcessIdValueBytes != null)
+                {
+                    count++;
+                    offset += MessagePackBinary.WriteStringBytes(ref bytes, offset, ProcessIdNameBytes);
+                    offset += MessagePackBinary.WriteRaw(ref bytes, offset, ProcessIdValueBytes);
+                }
+            }
 
             if (span.IsTopLevel && (!Ci.CIVisibility.IsRunning || !Ci.CIVisibility.Settings.Agentless))
             {

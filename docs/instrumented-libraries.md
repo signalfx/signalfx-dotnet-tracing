@@ -52,6 +52,7 @@ produce appropriate spans.
 | AzureFunctions | [Microsoft.Azure.WebJobs](https://www.nuget.org/packages/Microsoft.Azure.WebJobs/) |
 | CosmosDb | [Microsoft.Azure.Cosmos](https://www.nuget.org/packages/Microsoft.Azure.Cosmos/) |
 | Couchbase | [CouchbaseNetClient](https://www.nuget.org/packages/CouchbaseNetClient/) |
+| Grpc | [gRPC](https://grpc.io/) |
 | Msmq | [`System.Messaging`](https://docs.microsoft.com/en-us/dotnet/api/system.messaging) |
 | MsTestV2 | [Microsoft.VisualStudio.TestPlatform](https://www.nuget.org/packages/Microsoft.VisualStudio.TestPlatform/) |
 | NUnit | [NUnit](https://www.nuget.org/packages/NUnit/) |

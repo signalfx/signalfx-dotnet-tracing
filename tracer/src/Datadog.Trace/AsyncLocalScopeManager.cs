@@ -8,6 +8,8 @@
 using System;
 using System.Threading;
 using Datadog.Trace.ClrProfiler;
+using Datadog.Trace.ContinuousProfiler;
+using Datadog.Trace.Logging;
 
 namespace Datadog.Trace
 {
@@ -15,10 +17,10 @@ namespace Datadog.Trace
     {
         private readonly AsyncLocal<Scope> _activeScope;
 
-        public AsyncLocalScopeManager(bool pushScopeToNative)
+        public AsyncLocalScopeManager(bool alwaysOnProfilerEnabled = false)
         {
-            _activeScope = !pushScopeToNative
-                ? new()
+            _activeScope = !alwaysOnProfilerEnabled
+                ? CreateScope()
                 : new AsyncLocal<Scope>(
                     (AsyncLocalValueChangedArgs<Scope> args) =>
                     {
@@ -34,6 +36,7 @@ namespace Datadog.Trace
 
         // SetProfilingContext is a internal property to facilitate tests, since the native functions are not available
         // on the unit tests. However, it has a cost, since it introduces indirection, per IL it causes an extra callvirt.
+        // This is used by AlwaysOnProfiler, upstream uses this same type to update context see CreateScope().
         // TODO: Move this test to a location that the native API can be accessed, add a test helper on the native side
         // and remove this delegate.
         internal Action<ulong, ulong, ulong, int> SetProfilingContext { get; set; } = NativeMethods.SignalFxSetNativeContext;
@@ -73,6 +76,31 @@ namespace Datadog.Trace
             DistributedTracer.Instance.SetSpanContext(scope.Span.Context.Parent as SpanContext);
         }
 
+        private static AsyncLocal<Scope> CreateScope()
+        {
+            if (Profiler.Instance.ContextTracker.IsEnabled)
+            {
+                return new AsyncLocal<Scope>(OnScopeChanged);
+            }
+
+            return new AsyncLocal<Scope>();
+        }
+
+        private static void OnScopeChanged(AsyncLocalValueChangedArgs<Scope> obj)
+        {
+            if (obj.CurrentValue == null)
+            {
+                Profiler.Instance.ContextTracker.Reset();
+            }
+            else
+            {
+                Profiler.Instance.ContextTracker.Set(obj.CurrentValue.Span.RootSpanId, obj.CurrentValue.Span.SpanId);
+            }
+        }
+
+        /// <summary>
+        /// Value update handler used by SignalFx AlwaysOnProfiler
+        /// </summary>
         private void UpdateProfilerContext(Scope scope)
         {
             int managedThreadId = Thread.CurrentThread.ManagedThreadId;

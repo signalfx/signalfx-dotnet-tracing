@@ -4,7 +4,7 @@
   <!-- This will make sure, your assmebly and file versions, as well as your NuGet package version are managed correctly.                   -->
 
   <!-- * * * * * * * * * * * INPUTS. Update this section EVERY time the component is shipped/released! * * * * * * * * * * *                -->
-  <PropertyGroup>                                                                                                                      -->
+  <PropertyGroup>
     <!-- GA 1.2.0                                                                                                                           -->
     <ProductVersion>0.2.2</ProductVersion>
     <BetaVersion>1</BetaVersion>

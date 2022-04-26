@@ -32,11 +32,11 @@
     "SIGNALFX_TRACE_CALLTARGET_ENABLED": "true",
     "CORECLR_ENABLE_PROFILING": "1",
     "CORECLR_PROFILER": "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}",
-    "CORECLR_PROFILER_PATH": "$(CWD)\\..\\..\\..\\bin\\tracer-home\\win-x64\\SignalFx.Tracing.ClrProfiler.Native.dll",
-    "SIGNALFX_DOTNET_TRACER_HOME": "$(CWD)\\..\\..\\..\\bin\\tracer-home",
+    "CORECLR_PROFILER_PATH": "$(CWD)\\..\\..\\..\\..\\shared\\bin\\monitoring-home\\tracer\\win-x64\\SignalFx.Tracing.ClrProfiler.Native.dll",
+    "SIGNALFX_DOTNET_TRACER_HOME": "$(CWD)\\..\\..\\..\\..\\shared\\bin\\monitoring-home\\tracer",
     "COR_ENABLE_PROFILING": "1",
     "COR_PROFILER": "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}",
-    "COR_PROFILER_PATH": "$(CWD)\\..\\..\\..\\bin\\tracer-home\\win-x64\\SignalFx.Tracing.ClrProfiler.Native.dll"
+    "COR_PROFILER_PATH": "$(CWD)\\..\\..\\..\\..\\shared\\bin\\monitoring-home\\tracer\\win-x64\\SignalFx.Tracing.ClrProfiler.Native.dll"
   },
   "tags": {
     "runtime.architecture": "x64",

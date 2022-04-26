@@ -18,8 +18,8 @@
     <SuppressPdbOutput>True</SuppressPdbOutput>
     <DefineSolutionProperties>false</DefineSolutionProperties>
     <OutputName>signalfx-dotnet-tracing-0.2.2-$(Platform)</OutputName>
-    <TracerHomeDirectory Condition="'$(TracerHomeDirectory)' == ''">$(MSBuildThisFileDirectory)..\bin\windows-tracer-home</TracerHomeDirectory>
-    <DefineConstants>InstallerVersion=0.2.2;TracerHomeDirectory=$(TracerHomeDirectory);LibDdwafDirectory=$(LibDdwafDirectory)</DefineConstants>
+    <TracerHomeDirectory Condition="'$(TracerHomeDirectory)' == ''">$(MSBuildThisFileDirectory)..\bin\dd-tracer-home</TracerHomeDirectory>
+    <DefineConstants>InstallerVersion=0.2.2;TracerHomeDirectory=$(TracerHomeDirectory)</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DefineConstants>$(DefineConstants);Debug</DefineConstants>
@@ -38,6 +38,7 @@
     <Compile Include="Files.Managed.Net461.wxs" />
     <Compile Include="Files.Managed.NetStandard20.wxs" />
     <Compile Include="Files.Managed.Netcoreapp31.wxs" />
+    <Compile Include="Files.Managed.Net6.wxs" />
     <Compile Include="Product.wxs" />
     <Compile Include="WixUI_InstallDir_Custom.wxs" />
   </ItemGroup>

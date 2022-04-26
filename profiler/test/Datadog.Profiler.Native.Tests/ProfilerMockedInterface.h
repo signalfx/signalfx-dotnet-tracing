@@ -11,6 +11,8 @@
 #include "IMetricsSender.h"
 #include "Sample.h"
 #include "TagsHelper.h"
+#include "IApplicationStore.h"
+#include "IRuntimeIdStore.h"
 
 class MockConfiguration : public IConfiguration
 {
@@ -23,8 +25,8 @@ public:
     MOCK_METHOD(bool, IsOperationalMetricsEnabled, (), (const override));
     MOCK_METHOD(std::chrono::seconds, GetUploadInterval, (), (const override));
     MOCK_METHOD(tags const&, GetUserTags, (), (const override));
-    MOCK_METHOD(std::string const&, GetVersion, (), (const override));     // return DD_VERSION, Unspecified-Version if not specified
-    MOCK_METHOD(std::string const&, GetEnvironment, (), (const override)); // return DD_ENV, Unspecified-Env if not specified
+    MOCK_METHOD(std::string const&, GetVersion, (), (const override));     // return SIGNALFX_VERSION, Unspecified-Version if not specified
+    MOCK_METHOD(std::string const&, GetEnvironment, (), (const override)); // return SIGNALFX_ENV, Unspecified-Env if not specified
     MOCK_METHOD(std::string const&, GetHostname, (), (const override));    // return the machine hostname
     MOCK_METHOD(std::string const&, GetAgentUrl, (), (const override));
     MOCK_METHOD(std::string const&, GetAgentHost, (), (const override));
@@ -80,6 +82,18 @@ private:
     std::uint32_t _nbCallsToGauge;
 };
 
+class MockApplicationStore : public IApplicationStore
+{
+public:
+    MOCK_METHOD(const std::string&, GetName, (std::string_view runtimeId), (override));
+};
+
+class MockRuntimeIdStore : public IRuntimeIdStore
+{
+public:
+    MOCK_METHOD(const std::string&, GetId, (AppDomainID appDomainId), (override));
+};
+
 template <typename T, typename U, typename... Args>
 std::pair<std::unique_ptr<T>, U&> CreateMockForUniquePtr(Args... args)
 {
@@ -95,9 +109,9 @@ std::tuple<std::shared_ptr<ISamplesProvider>, MockSampleProvider&> CreateSamples
 std::tuple<std::unique_ptr<IExporter>, MockExporter&> CreateExporter();
 
 template <typename T>
-Sample CreateSample(const T& callstack, std::initializer_list<std::pair<std::string, std::string>> labels, std::int64_t value)
+Sample CreateSample(std::string_view runtimeId, const T& callstack, std::initializer_list<std::pair<std::string, std::string>> labels, std::int64_t value)
 {
-    Sample sample{};
+    Sample sample{runtimeId};
 
     for (auto frame = callstack.begin(); frame != callstack.end(); ++frame)
     {
