@@ -82,7 +82,7 @@ jobs:
       run: sudo gem install --no-document fpm
     - name: Build tracer home
       run: ./tracer/build.cmd BuildTracerHome PackageTracerHome
-    - name: Publish tracer-home
+    - name: Publish Tracer
       uses: actions/upload-artifact@v3.0.0
       with:
         path: ${{ env.tracerHome }}
