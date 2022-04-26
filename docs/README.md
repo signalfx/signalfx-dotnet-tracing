@@ -178,6 +178,10 @@ See [correlating-traces-with-logs.md](correlating-traces-with-logs.md).
 
 See [metrics.md](metrics.md)
 
+## AlwaysOn Profiling
+
+See [always-on-profiling.md](always-on-profiling.md)
+
 ## Troubleshooting
 
 See [troubleshooting.md](troubleshooting.md).
