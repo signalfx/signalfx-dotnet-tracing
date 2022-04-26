@@ -194,7 +194,7 @@ namespace Datadog.Trace.Logging.DirectSubmission
                 sb.Append(tagPair.Key)
                   .Append(':')
                   .Append(tagPair.Value)
-                  .Append(';');
+                  .Append(',');
             }
 
             // remove final joiner

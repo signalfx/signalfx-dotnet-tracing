@@ -5,9 +5,9 @@
       "environmentVariables": {
         "CORECLR_ENABLE_PROFILING": "1",
         "CORECLR_PROFILER": "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}",
-        "CORECLR_PROFILER_PATH": "$(SolutionDir)..\\bin\\tracer-home\\win-x64\\SignalFx.Tracing.ClrProfiler.Native.dll",
+        "CORECLR_PROFILER_PATH": "$(SolutionDir)..\\bin\\dd-tracer-home\\win-x64\\SignalFx.Tracing.ClrProfiler.Native.dll",
 
-        "SIGNALFX_DOTNET_TRACER_HOME": "$(SolutionDir)..\\bin\\tracer-home",
+        "SIGNALFX_DOTNET_TRACER_HOME": "$(SolutionDir)..\\bin\\dd-tracer-home",
 
         "DOTNET_ENVIRONMENT": "Development",
 

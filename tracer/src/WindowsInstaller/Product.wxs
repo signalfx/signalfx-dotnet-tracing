@@ -39,6 +39,7 @@
       <ComponentGroupRef Id="Files.Managed.Net461"/>
       <ComponentGroupRef Id="Files.Managed.NetStandard20"/>
       <ComponentGroupRef Id="Files.Managed.Netcoreapp31"/>
+      <ComponentGroupRef Id="Files.Managed.Net6"/>
       <ComponentGroupRef Id="EmptyFolders"/>
       <ComponentGroupRef Id="Registry"/>
       <ComponentGroupRef Id="EnvironmentVariables.Machine"/>
@@ -67,9 +68,12 @@
               <Directory Id="netstandard2.0" Name="netstandard2.0">
                 <!-- ".\netstandard2.0" -->
               </Directory>
-            <Directory Id="netcoreapp3.1" Name="netcoreapp3.1">
+              <Directory Id="netcoreapp3.1" Name="netcoreapp3.1">
                 <!-- ".\netcoreapp3.1" -->
-            </Directory>
+              </Directory>
+              <Directory Id="net6.0" Name="net6.0">
+                <!-- ".\net6.0" -->
+              </Directory>
               <Directory Id="net461.GAC" Name="net461.GAC">
                 <!-- Ignored as all of its components will be installed in the GAC -->
               </Directory>
