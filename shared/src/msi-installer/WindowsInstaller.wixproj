@@ -23,7 +23,7 @@
     <MonitoringHomeDirectory Condition="'$(MonitoringHomeDirectory)' == ''">$(MSBuildThisFileDirectory)..\..\bin\monitoring-home</MonitoringHomeDirectory>
     <TracerHomeDirectory Condition="'$(TracerHomeDirectory)' == ''">$(MSBuildThisFileDirectory)..\bin\windows-tracer-home</TracerHomeDirectory>
     <ProfilerHomeDirectory Condition="'$(ProfilerHomeDirectory)' == ''">$(MSBuildThisFileDirectory)..\bin\DDProf-Deploy</ProfilerHomeDirectory>
-    <DefineConstants>InstallerVersion=0.2.2;MonitoringHomeDirectory=$(MonitoringHomeDirectory);TracerHomeDirectory=$(TracerHomeDirectory);LibDdwafDirectory=$(LibDdwafDirectory);ProfilerHomeDirectory=$(ProfilerHomeDirectory)</DefineConstants>
+    <DefineConstants>InstallerVersion=0.2.3;MonitoringHomeDirectory=$(MonitoringHomeDirectory);TracerHomeDirectory=$(TracerHomeDirectory);LibDdwafDirectory=$(LibDdwafDirectory);ProfilerHomeDirectory=$(ProfilerHomeDirectory)</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DefineConstants>$(DefineConstants);Debug</DefineConstants>

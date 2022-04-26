@@ -2,7 +2,7 @@
 # Project definition
 # ******************************************************
 
-project("Datadog.AutoInstrumentation.Profiler.Native.Linux" VERSION 0.2.2)
+project("Datadog.AutoInstrumentation.Profiler.Native.Linux" VERSION 0.2.3)
 
 option(RUN_ASAN "Build with Clang Undefined-Behavior Sanitizer" OFF)
 

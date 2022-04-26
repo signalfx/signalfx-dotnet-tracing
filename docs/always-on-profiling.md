@@ -1,5 +1,5 @@
 
-# About the .NET thread sampler
+# About the .NET AlwaysOn Profiling
 
 > :construction: &nbsp;Status: Experimental - exported telemetry and
 > configuration settings may change.
