@@ -38,6 +38,7 @@ the metrics exporter's endpoint.
 ## [Release 0.2.1](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.2.1)
 
 ### General
+
 - Brings back support for Alpine Linux.
 
 ### Bugfixes
