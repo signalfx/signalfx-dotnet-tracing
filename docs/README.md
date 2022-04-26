@@ -2,7 +2,7 @@
 
 # SignalFx Instrumentation for .NET
 
-The SignalFx Instrumentationy for .NET provides automatic instrumentations
+The SignalFx Instrumentation for .NET provides automatic instrumentations
 for popular .NET libraries and frameworks.
 
 The SignalFx Instrumentation for .NET is a [.NET Profiler](https://docs.microsoft.com/en-us/dotnet/framework/unmanaged-api/profiling/profiling-overview)
@@ -16,7 +16,7 @@ By default:
   propagation,
 - Zipkin trace exporter is used to send spans as JSON in the [Zipkin v2 format](https://zipkin.io/zipkin-api/#/default/post_spans).
 
-The SignalFx Instrumentationy for .NET registers an OpenTracing `GlobalTracer`
+The SignalFx Instrumentation for .NET registers an OpenTracing `GlobalTracer`
 so you can support existing custom instrumentation or add custom
 instrumentation to your application later.
 
