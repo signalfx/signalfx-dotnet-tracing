@@ -92,7 +92,7 @@ namespace environment {
     const shared::WSTRING azure_app_services_functions_worker_runtime = WStr("FUNCTIONS_WORKER_RUNTIME");
 
     // Sets whether the Tracer will automatically instrument methods that are decorated with a recognized trace attribute
-    const shared::WSTRING trace_annotations_enabled = WStr("DD_TRACE_ANNOTATIONS_ENABLED");
+    const shared::WSTRING trace_annotations_enabled = WStr("SIGNALFX_TRACE_ANNOTATIONS_ENABLED");
 
     // Determine whether to instrument within azure functions.
     // Default is false until official support is announced.
