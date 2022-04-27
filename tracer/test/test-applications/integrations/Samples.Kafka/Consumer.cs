@@ -168,7 +168,7 @@ namespace Samples.Kafka
                 return Enumerable.Empty<string>();
             }
 
-            if (spanContext is null || spanContext.TraceId is 0 || spanContext.SpanId is 0)
+            if (spanContext is null || spanContext.TraceId == TraceId.Zero || spanContext.SpanId is 0)
             {
                 // For kafka brokers < 0.11.0, we can't inject custom headers, so context will not be propagated
                 var errorMessage = $"Error extracting trace context for {kafkaMessage.Key}, {consumeResult.TopicPartitionOffset}";

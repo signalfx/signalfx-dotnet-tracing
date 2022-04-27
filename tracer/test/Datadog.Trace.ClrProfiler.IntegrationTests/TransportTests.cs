@@ -1,4 +1,4 @@
-﻿// <copyright file="TransportTests.cs" company="Datadog">
+// <copyright file="TransportTests.cs" company="Datadog">
 // Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
@@ -28,9 +28,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             Enum.GetValues(typeof(TracesTransportType))
                 .Cast<TracesTransportType>()
                 .Where(x => x != TracesTransportType.WindowsNamedPipe)
-#if !NETCOREAPP3_1_OR_GREATER
-                .Where(x => x != TracesTransportType.UnixDomainSocket)
-#endif
                 .Select(x => new object[] { x });
 
         [SkippableTheory]
@@ -62,10 +59,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 => type switch
                 {
                     TracesTransportType.Default => new MockTracerAgent(),
-#if NETCOREAPP3_1_OR_GREATER
-                    TracesTransportType.UnixDomainSocket
-                        => new MockTracerAgent(new UnixDomainSocketConfig(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()), null)),
-#endif
                     _ => throw new InvalidOperationException("Unsupported transport type " + type),
                 };
 
@@ -73,7 +66,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 => type switch
                 {
                     TracesTransportType.Default => TestTransports.Tcp,
-                    TracesTransportType.UnixDomainSocket => TestTransports.Uds,
                     TracesTransportType.WindowsNamedPipe => TestTransports.WindowsNamedPipe,
                     _ => throw new InvalidOperationException("Unsupported transport type " + type),
                 };
