@@ -73,6 +73,7 @@ These settings should be never used by the users.
 |-|-|-|
 | `SIGNALFX_METRICS_EXPORTER` | Metrics exporter to be used. It is used to encode and dispatch metrics. Available values are: `SignalFx`, `StatsD`. | `SignalFx` |
 | `SIGNALFX_PROFILING_CPU_ENABLED` | Enables CPU profiling. | `false` |
+| `SIGNALFX_PROFILING_CODEHOTSPOTS_ENABLED` | Enables profiling HotSpots feature. | `false` |
 | `SIGNALFX_TRACE_ACTIVITY_LISTENER_ENABLED` | Enables experimental support for activity listener. | `false` |
 | `SIGNALFX_TRACE_ANNOTATIONS_ENABLED` | The Tracer will automatically instrument methods that are decorated with a recognized trace attribute. | `true` |
 | `SIGNALFX_TRACE_AZURE_FUNCTIONS_ENABLED` | Set to instrument within Azure functions. | `false` |
