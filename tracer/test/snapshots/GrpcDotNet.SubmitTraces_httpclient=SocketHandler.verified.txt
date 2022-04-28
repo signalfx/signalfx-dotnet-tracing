@@ -1,4 +1,4 @@
-﻿[
+[
   {
     TraceId: Id_1,
     SpanId: Id_2,
@@ -91,7 +91,7 @@
       process_id: 0,
       _dd.top_level: 1.0,
       _dd.tracer_kr: 1.0,
-      _sampling_priority_v1: 1.0
+      _sampling_priority_v1: 0.0
     }
   },
   {
@@ -211,7 +211,7 @@
       process_id: 0,
       _dd.top_level: 1.0,
       _dd.tracer_kr: 1.0,
-      _sampling_priority_v1: 1.0
+      _sampling_priority_v1: 0.0
     }
   },
   {
@@ -332,7 +332,7 @@
       process_id: 0,
       _dd.top_level: 1.0,
       _dd.tracer_kr: 1.0,
-      _sampling_priority_v1: 1.0
+      _sampling_priority_v1: 0.0
     }
   },
   {
@@ -454,7 +454,7 @@
       process_id: 0,
       _dd.top_level: 1.0,
       _dd.tracer_kr: 1.0,
-      _sampling_priority_v1: 1.0
+      _sampling_priority_v1: 0.0
     }
   },
   {
@@ -576,7 +576,7 @@
       process_id: 0,
       _dd.top_level: 1.0,
       _dd.tracer_kr: 1.0,
-      _sampling_priority_v1: 1.0
+      _sampling_priority_v1: 0.0
     }
   },
   {
@@ -698,7 +698,7 @@
       process_id: 0,
       _dd.top_level: 1.0,
       _dd.tracer_kr: 1.0,
-      _sampling_priority_v1: 1.0
+      _sampling_priority_v1: 0.0
     }
   },
   {
@@ -825,7 +825,7 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       process_id: 0,
       _dd.top_level: 1.0,
       _dd.tracer_kr: 1.0,
-      _sampling_priority_v1: 1.0
+      _sampling_priority_v1: 0.0
     }
   },
   {
@@ -947,7 +947,7 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       process_id: 0,
       _dd.top_level: 1.0,
       _dd.tracer_kr: 1.0,
-      _sampling_priority_v1: 1.0
+      _sampling_priority_v1: 0.0
     }
   },
   {
@@ -1069,7 +1069,7 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       process_id: 0,
       _dd.top_level: 1.0,
       _dd.tracer_kr: 1.0,
-      _sampling_priority_v1: 1.0
+      _sampling_priority_v1: 0.0
     }
   },
   {
@@ -1191,7 +1191,7 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       process_id: 0,
       _dd.top_level: 1.0,
       _dd.tracer_kr: 1.0,
-      _sampling_priority_v1: 1.0
+      _sampling_priority_v1: 0.0
     }
   },
   {
@@ -1317,7 +1317,7 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       process_id: 0,
       _dd.top_level: 1.0,
       _dd.tracer_kr: 1.0,
-      _sampling_priority_v1: 1.0
+      _sampling_priority_v1: 0.0
     }
   },
   {
@@ -1437,7 +1437,7 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       process_id: 0,
       _dd.top_level: 1.0,
       _dd.tracer_kr: 1.0,
-      _sampling_priority_v1: 1.0
+      _sampling_priority_v1: 0.0
     }
   },
   {
@@ -1557,7 +1557,7 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       process_id: 0,
       _dd.top_level: 1.0,
       _dd.tracer_kr: 1.0,
-      _sampling_priority_v1: 1.0
+      _sampling_priority_v1: 0.0
     }
   },
   {
@@ -1676,7 +1676,7 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       process_id: 0,
       _dd.top_level: 1.0,
       _dd.tracer_kr: 1.0,
-      _sampling_priority_v1: 1.0
+      _sampling_priority_v1: 0.0
     }
   },
   {
@@ -1797,7 +1797,7 @@ at Samples.GrpcDotNet.Services.GreeterService.ErroringMethod(CreateErrorRequest 
       process_id: 0,
       _dd.top_level: 1.0,
       _dd.tracer_kr: 1.0,
-      _sampling_priority_v1: 1.0
+      _sampling_priority_v1: 0.0
     }
   },
   {
