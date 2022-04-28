@@ -93,13 +93,19 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.CI
                         AssertTargetSpanEqual(targetSpan, "signalfx.tracing.library", "dotnet-tracing");
 
                         // check the SignalFx library version
-                        AssertTargetSpanEqual(targetSpan, "signalfx.tracing.version", "0.2.2.0");
+                        AssertTargetSpanEqual(targetSpan, "signalfx.tracing.version", "0.2.3.0");
 
                         // checks the origin tag
                         CheckOriginTag(targetSpan);
 
                         // checks the runtime id tag
                         AssertTargetSpanExists(targetSpan, Tags.RuntimeId);
+
+                        // checks the source tags
+                        AssertTargetSpanExists(targetSpan, TestTags.SourceFile);
+
+                        // checks code owners
+                        AssertTargetSpanExists(targetSpan, TestTags.CodeOwners);
 
                         // Check the Environment
                         AssertTargetSpanEqual(targetSpan, Tags.Env, "integration_tests");

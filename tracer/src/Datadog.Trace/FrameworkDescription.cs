@@ -40,7 +40,8 @@ namespace Datadog.Trace
             { ".NETFramework,Version=v4.6.1", "net461" },
             { ".NETStandard,Version=v2.0", "netstandard2.0" },
             { ".NETCoreApp,Version=v3.1", "netcoreapp3.1" },
-            { ".NETCoreApp,Version=v5.0", "net50" }
+            { ".NETCoreApp,Version=v5.0", "net5.0" },
+            { ".NETCoreApp,Version=v6.0", "net6.0" },
         };
 
         private FrameworkDescription(
