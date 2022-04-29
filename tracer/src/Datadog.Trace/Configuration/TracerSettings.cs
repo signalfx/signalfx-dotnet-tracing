@@ -188,7 +188,7 @@ namespace Datadog.Trace.Configuration
 
             PropagationStyleInject = TrimSplitString(source?.GetString(ConfigurationKeys.Propagators) ?? nameof(Propagators.ContextPropagators.Names.B3), ',').ToArray();
 
-            PropagationStyleExtract = TrimSplitString(source?.GetString(ConfigurationKeys.Propagators) ?? nameof(Propagators.ContextPropagators.Names.B3), ',').ToArray();
+            PropagationStyleExtract = PropagationStyleInject;
 
             TagElasticsearchQueries = source?.GetBool(ConfigurationKeys.TagElasticsearchQueries) ?? true;
 
