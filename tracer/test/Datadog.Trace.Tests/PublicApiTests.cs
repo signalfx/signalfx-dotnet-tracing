@@ -4,17 +4,19 @@
 // </copyright>
 
 // Modified by Splunk Inc.
+#pragma warning disable SA1402 // File may only contain a single type
+#pragma warning disable SA1649 // File name should match first type name
 
 using System;
 using System.Reflection;
-using FluentAssertions;
+using Datadog.Trace.Annotations;
 using Xunit;
 
-namespace Datadog.Trace.Tests
+namespace Datadog.Trace.Tests.PublicApiTests
 {
-    public class PublicApiTests : PublicApiTestsBase
+    public class DatadogTraceTests : PublicApiTestsBase
     {
-        public PublicApiTests()
+        public DatadogTraceTests()
             : base(typeof(Tracer).Assembly)
         {
         }
@@ -27,5 +29,13 @@ namespace Datadog.Trace.Tests
             Assert.NotNull(httpModuleType);
         }
 #endif
+    }
+
+    public class DatadogTraceAnnotationsTests : PublicApiTestsBase
+    {
+        public DatadogTraceAnnotationsTests()
+            : base(typeof(TraceAttribute).Assembly)
+        {
+        }
     }
 }

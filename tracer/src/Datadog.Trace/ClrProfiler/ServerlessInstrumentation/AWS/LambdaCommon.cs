@@ -6,10 +6,12 @@
 // Modified by Splunk Inc.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
 using Datadog.Trace.ClrProfiler.CallTarget;
+using Datadog.Trace.DuckTyping;
 using Datadog.Trace.Propagation;
 using Datadog.Trace.Vendors.Newtonsoft.Json;
 
@@ -22,16 +24,33 @@ namespace Datadog.Trace.ClrProfiler.ServerlessInstrumentation.AWS
         private const string DefaultJson = "{}";
         private const double ServerlessMaxWaitingFlushTime = 3;
 
-        internal static CallTargetState StartInvocation<TArg>(TArg payload, ILambdaExtensionRequest requestBuilder)
+        internal static CallTargetState StartInvocation<TArg>(ILambdaExtensionRequest requestBuilder, TArg payload, IDictionary<string, string> context)
         {
             var json = SerializeObject(payload);
-            NotifyExtensionStart(requestBuilder, json);
+            NotifyExtensionStart(requestBuilder, json, context);
             return new CallTargetState(CreatePlaceholderScope(Tracer.Instance, requestBuilder));
         }
 
         internal static CallTargetState StartInvocationWithoutEvent(ILambdaExtensionRequest requestBuilder)
         {
-            return StartInvocation(DefaultJson, requestBuilder);
+            return StartInvocation(requestBuilder, DefaultJson, null);
+        }
+
+        internal static CallTargetState StartInvocationOneParameter<TArg>(ILambdaExtensionRequest requestBuilder, TArg eventOrContext)
+        {
+            var dict = GetTraceContext(eventOrContext);
+            if (dict != null)
+            {
+                return StartInvocation(requestBuilder, DefaultJson, dict);
+            }
+
+            return StartInvocation(requestBuilder, eventOrContext, null);
+        }
+
+        internal static CallTargetState StartInvocationTwoParameters<TArg1, TArg2>(ILambdaExtensionRequest requestBuilder, TArg1 payload, TArg2 context)
+        {
+            var dict = GetTraceContext(context);
+            return StartInvocation(requestBuilder, payload, dict);
         }
 
         internal static CallTargetReturn<TReturn> EndInvocationSync<TReturn>(TReturn returnValue, Exception exception, Scope scope, ILambdaExtensionRequest requestBuilder)
@@ -84,10 +103,11 @@ namespace Datadog.Trace.ClrProfiler.ServerlessInstrumentation.AWS
             return scope;
         }
 
-        internal static bool SendStartInvocation(ILambdaExtensionRequest requestBuilder, string data)
+        internal static bool SendStartInvocation(ILambdaExtensionRequest requestBuilder, string data, IDictionary<string, string> context)
         {
             var request = requestBuilder.GetStartInvocationRequest();
             WriteRequestPayload(request, data);
+            WriteRequestHeaders(request, context);
             return ValidateOKStatus((HttpWebResponse)request.GetResponse());
         }
 
@@ -105,11 +125,11 @@ namespace Datadog.Trace.ClrProfiler.ServerlessInstrumentation.AWS
             return statusCode == HttpStatusCode.OK;
         }
 
-        private static void NotifyExtensionStart(ILambdaExtensionRequest requestBuilder, string json)
+        private static void NotifyExtensionStart(ILambdaExtensionRequest requestBuilder, string json, IDictionary<string, string> context)
         {
             try
             {
-                if (!SendStartInvocation(requestBuilder, json))
+                if (!SendStartInvocation(requestBuilder, json, context))
                 {
                     Serverless.Debug("Extension does not send a status 200 OK");
                 }
@@ -169,6 +189,24 @@ namespace Datadog.Trace.ClrProfiler.ServerlessInstrumentation.AWS
             Stream dataStream = request.GetRequestStream();
             dataStream.Write(byteArray, 0, byteArray.Length);
             dataStream.Close();
+        }
+
+        private static void WriteRequestHeaders(WebRequest request, IDictionary<string, string> context)
+        {
+            if (context != null)
+            {
+                foreach (KeyValuePair<string, string> kv in context)
+                {
+                    request.Headers.Add(kv.Key, kv.Value);
+                }
+            }
+        }
+
+        private static IDictionary<string, string> GetTraceContext(object obj)
+        {
+            // Datadog duck typing library
+            var proxyInstance = obj.DuckAs<ILambdaContext>();
+            return proxyInstance?.ClientContext?.Custom;
         }
     }
 }

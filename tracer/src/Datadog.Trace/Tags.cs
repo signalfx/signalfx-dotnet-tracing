@@ -541,6 +541,7 @@ namespace Datadog.Trace
             internal const string Id = "usr.id";
             internal const string SessionId = "usr.session_id";
             internal const string Role = "usr.role";
+            internal const string Scope = "usr.scope";
         }
 
         /// <summary>

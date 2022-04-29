@@ -91,6 +91,8 @@ namespace Datadog.Trace.Logging.DirectSubmission
                     : seconds.Value);
 
             SignalFxAccessToken = source?.GetString(ConfigurationKeys.SignalFxAccessToken);
+
+            LogsInjectionEnabled = source?.GetBool(ConfigurationKeys.LogsInjectionEnabled);
         }
 
         /// <summary>
@@ -152,5 +154,10 @@ namespace Datadog.Trace.Logging.DirectSubmission
         /// Gets or sets the SignalFx Access Token
         /// </summary>
         internal string? SignalFxAccessToken { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether logs injection has been explicitly enabled or disabled
+        /// </summary>
+        internal bool? LogsInjectionEnabled { get; set; }
     }
 }

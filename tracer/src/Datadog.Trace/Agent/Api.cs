@@ -35,7 +35,6 @@ namespace Datadog.Trace.Agent
         private string _agentVersion;
 
         public Api(
-            Uri baseEndpoint,
             IApiRequestFactory apiRequestFactory,
             IDogStatsd statsd,
             Action<Dictionary<string, float>> updateSampleRates,
@@ -46,11 +45,12 @@ namespace Datadog.Trace.Agent
             _log = log ?? StaticLog;
             _log.Debug("Creating new Api");
             _updateSampleRates = updateSampleRates;
-            _tracesEndpoint = new Uri(baseEndpoint, TracesPath);
             _statsd = statsd;
             _containerId = ContainerMetadata.GetContainerId();
             _apiRequestFactory = apiRequestFactory;
             _isPartialFlushEnabled = isPartialFlushEnabled;
+            _tracesEndpoint = _apiRequestFactory.GetEndpoint(TracesPath);
+            _log.Debug("Using traces endpoint {TracesEndpoint}", _tracesEndpoint.ToString());
         }
 
         public async Task<bool> SendTracesAsync(ArraySegment<byte> traces, int numberOfTraces)
