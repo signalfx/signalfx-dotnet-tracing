@@ -50,16 +50,6 @@ Parser.Default.ParseArguments<Options>(args)
                    agents.Add(agent);
                }
 
-               if (o.UnixDomainSockets || args.Length == 0)
-               {
-                   var agent = new MockTracerAgent(new UnixDomainSocketConfig(o.TracesUnixDomainSocketPath, o.MetricsUnixDomainSocketPath));
-                   Console.WriteLine($"Listening for traces on Unix Domain Socket: {agent.TracesUdsPath}");
-                   Console.WriteLine($"Listening for metrics on Unix Domain Socket: {agent.StatsUdsPath}");
-                   agent.RequestDeserialized += displayTraces;
-                   agent.MetricsReceived += displayStats;
-                   agents.Add(agent);
-               }
-
                if (o.WindowsNamedPipe) // || args.Length == 0)
                {
                    var agent = new MockTracerAgent(new WindowsPipesConfig(o.TracesPipeName, o.MetricsPipeName));
