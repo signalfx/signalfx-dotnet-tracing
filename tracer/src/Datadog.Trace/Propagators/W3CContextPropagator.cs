@@ -19,10 +19,16 @@ namespace Datadog.Trace.Propagators
         /// </summary>
         public const string TraceParent = "traceparent";
 
+        public static string GetFormattedTraceParent(SpanContext context)
+        {
+            var sampled = context.SamplingPriority > 0 ? "01" : "00";
+            return string.Format($"00-{{0}}-{{1}}-{sampled}", context.TraceId.ToString(), context.SpanId.ToString("x16"));
+        }
+
         public void Inject<TCarrier, TCarrierSetter>(SpanContext context, TCarrier carrier, TCarrierSetter carrierSetter)
             where TCarrierSetter : struct, ICarrierSetter<TCarrier>
         {
-            var traceId = IsValidTraceId(context.RawTraceId) ? context.RawTraceId : context.TraceId.ToString();
+            var traceId = IsValidTraceId(context.RawTraceId, out _) ? context.RawTraceId : context.TraceId.ToString();
             var spanId = IsValidSpanId(context.RawSpanId) ? context.RawSpanId : context.SpanId.ToString("x16");
             var sampled = context.SamplingPriority > 0 ? "01" : "00";
             carrierSetter.Set(carrier, TraceParent, $"00-{traceId}-{spanId}-{sampled}");
@@ -83,8 +89,8 @@ namespace Datadog.Trace.Propagators
 #else
                 var w3cTraceId = traceParent.Substring(3, 32);
                 var w3cSpanId = traceParent.Substring(36, 16);
-                var traceId = TraceId.CreateFromString(w3cTraceId);
-                if (traceId == TraceId.Zero)
+
+                if (!IsValidTraceId(w3cTraceId, out var traceId))
                 {
                     return false;
                 }
@@ -100,19 +106,16 @@ namespace Datadog.Trace.Propagators
             return false;
         }
 
-        private bool IsValidTraceId([NotNullWhen(true)] string? traceId)
+        private bool IsValidTraceId([NotNullWhen(true)] string? traceId, out TraceId parsedTraceId)
         {
-            if (string.IsNullOrEmpty(traceId))
+            if (traceId == null)
             {
+                parsedTraceId = Trace.TraceId.Zero;
                 return false;
             }
 
-            if (traceId!.Length != 32)
-            {
-                return false;
-            }
-
-            return true;
+            parsedTraceId = Tracer.Instance.TracerManager.TraceIdConvention.CreateFromString(traceId);
+            return parsedTraceId != TraceId.Zero;
         }
 
         private bool IsValidSpanId([NotNullWhen(true)] string? spanId)

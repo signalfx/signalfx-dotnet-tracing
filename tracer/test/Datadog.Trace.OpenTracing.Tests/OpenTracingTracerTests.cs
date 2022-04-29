@@ -11,7 +11,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Datadog.Trace.Agent;
 using Datadog.Trace.Configuration;
-using Datadog.Trace.Configuration.Types;
 using Datadog.Trace.Propagation;
 using Datadog.Trace.Sampling;
 using Datadog.Trace.TestHelpers;
@@ -31,8 +30,6 @@ namespace Datadog.Trace.OpenTracing.Tests
         {
             var settings = new TracerSettings
             {
-                // force to be a Datadog for unit tests purposes, default is B3
-                Propagators = new System.Collections.Generic.HashSet<string> { PropagatorTypes.B3 },
                 // force to be a Datadog for unit tests purposes, default is OpenTelemetry
                 Convention = ConventionType.Datadog
             };
@@ -192,30 +189,30 @@ namespace Datadog.Trace.OpenTracing.Tests
         [Fact]
         public void Extract_HttpHeadersFormat_HeadersProperlySet_SpanContext()
         {
-            const ulong parentId = 10;
-            var traceId = TraceId.CreateFromInt(42);
+            const ulong spanId = 1000000000000000;
+            var traceId = TraceId.CreateRandom();
             var headers = new MockTextMap();
-            headers.Set(B3HttpHeaderNames.B3SpanId, parentId.ToString());
+            headers.Set(B3HttpHeaderNames.B3SpanId, spanId.ToString());
             headers.Set(B3HttpHeaderNames.B3TraceId, traceId.ToString());
 
             var otSpanContext = (OpenTracingSpanContext)_tracer.Extract(BuiltinFormats.HttpHeaders, headers);
 
-            Assert.Equal(parentId, ulong.Parse(otSpanContext.Context.SpanId.ToString("X")));
+            Assert.Equal(spanId.ToString(), otSpanContext.Context.SpanId.ToString("x16"));
             Assert.Equal(traceId, otSpanContext.Context.TraceId);
         }
 
         [Fact]
         public void Extract_TextMapFormat_HeadersProperlySet_SpanContext()
         {
-            const ulong parentId = 10;
-            var traceId = TraceId.CreateFromInt(42);
+            const ulong spanId = 1000000000000000;
+            var traceId = TraceId.CreateRandom();
             var headers = new MockTextMap();
-            headers.Set(B3HttpHeaderNames.B3SpanId, parentId.ToString());
+            headers.Set(B3HttpHeaderNames.B3SpanId, spanId.ToString());
             headers.Set(B3HttpHeaderNames.B3TraceId, traceId.ToString());
 
             var otSpanContext = (OpenTracingSpanContext)_tracer.Extract(BuiltinFormats.TextMap, headers);
 
-            Assert.Equal(parentId, ulong.Parse(otSpanContext.Context.SpanId.ToString("X")));
+            Assert.Equal(spanId.ToString(), otSpanContext.Context.SpanId.ToString("x16"));
             Assert.Equal(traceId, otSpanContext.Context.TraceId);
         }
 

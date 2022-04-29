@@ -7,6 +7,7 @@
 
 using System.Collections;
 using System.Text;
+using Datadog.Trace.Propagators;
 
 namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AWS.SQS
 {
@@ -19,7 +20,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AWS.SQS
             // Consolidate headers into one JSON object with <header_name>:<value>
             var sb = Util.StringBuilderCache.Acquire(Util.StringBuilderCache.MaxBuilderSize);
             sb.Append('{');
-            var propagator = Tracer.Instance.TracerManager.Propagator;
+            var propagator = SpanContextPropagator.Instance;
             propagator.Inject(context, sb, static (StringBuilder carrier, string key, string value) => carrier.AppendFormat("\"{0}\":\"{1}\",", key, value));
             sb.Remove(startIndex: sb.Length - 1, length: 1); // Remove trailing comma
             sb.Append('}');

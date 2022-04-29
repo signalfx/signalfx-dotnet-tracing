@@ -16,6 +16,7 @@ using Datadog.Trace.Configuration;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Propagation;
+using Datadog.Trace.Propagators;
 using Datadog.Trace.Tagging;
 using Datadog.Trace.Util;
 
@@ -103,7 +104,7 @@ namespace Datadog.Trace.AspNet
                 HttpRequest httpRequest = httpContext.Request;
                 SpanContext propagatedContext = null;
                 var tagsFromHeaders = Enumerable.Empty<KeyValuePair<string, string>>();
-                var propagator = tracer.TracerManager.Propagator;
+                var propagator = SpanContextPropagator.Instance;
 
                 if (tracer.InternalActiveScope == null)
                 {

@@ -16,6 +16,7 @@ using Datadog.Trace.DuckTyping;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Propagation;
+using Datadog.Trace.Propagators;
 using Datadog.Trace.Tagging;
 
 namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
@@ -76,7 +77,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
                         try
                         {
                             var headers = webHeaderCollection.Wrap();
-                            propagatedContext = tracer.TracerManager.Propagator.Extract(headers);
+                            propagatedContext = SpanContextPropagator.Instance.Extract(headers);
                             tagsFromHeaders = headers.ExtractHeaderTags(tracer.Settings.HeaderTags, PropagationExtensions.HttpRequestHeadersTagPrefix);
                         }
                         catch (Exception ex)

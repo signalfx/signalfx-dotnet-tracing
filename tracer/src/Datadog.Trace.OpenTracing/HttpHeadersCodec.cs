@@ -8,19 +8,13 @@
 using System;
 using Datadog.Trace.Headers;
 using Datadog.Trace.Propagation;
+using Datadog.Trace.Propagators;
 using OpenTracing.Propagation;
 
 namespace Datadog.Trace.OpenTracing
 {
     internal class HttpHeadersCodec : ICodec
     {
-        private readonly IPropagator _propagator;
-
-        public HttpHeadersCodec(IPropagator propagator)
-        {
-            _propagator = propagator;
-        }
-
         public global::OpenTracing.ISpanContext Extract(object carrier)
         {
             var map = carrier as ITextMap;
@@ -31,7 +25,7 @@ namespace Datadog.Trace.OpenTracing
             }
 
             IHeadersCollection headers = new TextMapHeadersCollection(map);
-            var propagationContext = _propagator.Extract(headers);
+            var propagationContext = SpanContextPropagator.Instance.Extract(headers);
 
             return new OpenTracingSpanContext(propagationContext);
         }
@@ -49,7 +43,7 @@ namespace Datadog.Trace.OpenTracing
 
             if (context is OpenTracingSpanContext otSpanContext && otSpanContext.Context is SpanContext spanContext)
             {
-                _propagator.Inject(spanContext, headers);
+                SpanContextPropagator.Instance.Inject(spanContext, headers);
             }
             else
             {

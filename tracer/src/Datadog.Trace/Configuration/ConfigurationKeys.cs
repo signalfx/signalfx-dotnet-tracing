@@ -304,7 +304,8 @@ namespace Datadog.Trace.Configuration
         /// Configuration key for the propagators to be used.
         /// Default is <c>B3</c>.
         /// Supports multiple values separated with comma.
-        /// <seealso cref="TracerSettings.Propagators"/>
+        /// <seealso cref="TracerSettings.PropagationStyleInject"/>
+        /// <seealso cref="TracerSettings.PropagationStyleExtract"/>
         /// </summary>
         public const string Propagators = "SIGNALFX_PROPAGATORS";
 

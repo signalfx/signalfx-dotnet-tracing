@@ -6,7 +6,6 @@
 // Modified by Splunk Inc.
 
 using System;
-using Datadog.Trace.Propagation;
 
 namespace Datadog.Trace
 {
@@ -16,8 +15,6 @@ namespace Datadog.Trace
     internal interface IDatadogOpenTracingTracer
     {
         string DefaultServiceName { get; }
-
-        IPropagator Propagator { get; }
 
         IScopeManager ScopeManager { get; }
 

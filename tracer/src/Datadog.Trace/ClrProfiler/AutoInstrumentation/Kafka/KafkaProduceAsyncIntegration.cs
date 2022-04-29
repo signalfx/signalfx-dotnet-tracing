@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Threading;
 using Datadog.Trace.ClrProfiler.CallTarget;
 using Datadog.Trace.DuckTyping;
+using Datadog.Trace.Propagators;
 using Datadog.Trace.Tagging;
 
 namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
@@ -52,7 +53,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Kafka
 
             if (scope is not null)
             {
-                KafkaHelper.TryInjectHeaders<TTopicPartition, TMessage>(Tracer.Instance.TracerManager.Propagator, scope.Span.Context, message);
+                KafkaHelper.TryInjectHeaders<TTopicPartition, TMessage>(scope.Span.Context, message);
                 return new CallTargetState(scope);
             }
 

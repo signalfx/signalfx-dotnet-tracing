@@ -271,7 +271,7 @@ namespace Datadog.Trace.DiagnosticListeners
         }
 #endif
 
-        private static SpanContext ExtractPropagatedContext(IPropagator propagator, HttpRequest request)
+        private static SpanContext ExtractPropagatedContext(HttpRequest request)
         {
             try
             {
@@ -280,7 +280,7 @@ namespace Datadog.Trace.DiagnosticListeners
 
                 if (requestHeaders != null)
                 {
-                    return propagator.Extract(new HeadersCollectionAdapter(requestHeaders));
+                    return SpanContextPropagator.Instance.Extract(new HeadersCollectionAdapter(requestHeaders));
                 }
             }
             catch (Exception ex)

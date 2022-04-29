@@ -113,7 +113,6 @@ namespace Datadog.Trace.Configuration
         public bool LogsInjectionEnabled { get; }
         public int MaxTracesSubmittedPerSecond { get; }
         public Datadog.Trace.SignalFx.Metrics.MetricsExporterType MetricsExporter { get; }
-        public System.Collections.Generic.HashSet<string> Propagators { get; }
         public int RecordedValueMaxLength { get; }
         public string ServiceName { get; }
         public string ServiceVersion { get; }
@@ -190,7 +189,6 @@ namespace Datadog.Trace.Configuration
         public bool LogsInjectionEnabled { get; set; }
         public int MaxTracesSubmittedPerSecond { get; set; }
         public Datadog.Trace.SignalFx.Metrics.MetricsExporterType MetricsExporter { get; set; }
-        public System.Collections.Generic.HashSet<string> Propagators { get; set; }
         public int RecordedValueMaxLength { get; set; }
         public bool RuntimeMetricsEnabled { get; set; }
         public string ServiceName { get; set; }
@@ -469,12 +467,6 @@ namespace Datadog.Trace.Propagation
         public const string B3SpanId = "x-b3-spanid";
         public const string B3TraceId = "x-b3-traceid";
     }
-    public class B3SpanContextPropagator : Datadog.Trace.Propagation.IPropagator
-    {
-        public B3SpanContextPropagator(Datadog.Trace.Conventions.ITraceIdConvention traceIdConvention) { }
-        public virtual Datadog.Trace.SpanContext Extract<T>(T carrier, System.Func<T, string, System.Collections.Generic.IEnumerable<string>> getter) { }
-        public virtual void Inject<T>(Datadog.Trace.SpanContext context, T carrier, System.Action<T, string, string> setter) { }
-    }
     public class CommonHttpHeaderNames
     {
         public const string TracingEnabled = "x-datadog-tracing-enabled";
@@ -490,28 +482,6 @@ namespace Datadog.Trace.Propagation
         public const string TraceId = "x-datadog-trace-id";
         public const string TracingEnabled = "x-datadog-tracing-enabled";
         public const string UserAgent = "User-Agent";
-    }
-    public interface IPropagator
-    {
-        Datadog.Trace.SpanContext Extract<T>(T carrier, System.Func<T, string, System.Collections.Generic.IEnumerable<string>> getter);
-        void Inject<T>(Datadog.Trace.SpanContext context, T carrier, System.Action<T, string, string> setter);
-    }
-    public interface IPropagatorsProvider
-    {
-        bool CanProvide(string propagatorId, Datadog.Trace.Conventions.ITraceIdConvention traceIdConvention);
-        Datadog.Trace.Propagation.IPropagator GetPropagator(string propagatorId, Datadog.Trace.Conventions.ITraceIdConvention traceIdConvention);
-    }
-    public static class W3CHeaderNames
-    {
-        public const string TraceParent = "traceparent";
-        public const string TraceState = "tracestate";
-    }
-    public class W3CSpanContextPropagator : Datadog.Trace.Propagation.IPropagator
-    {
-        public W3CSpanContextPropagator(Datadog.Trace.Conventions.ITraceIdConvention traceIdConvention) { }
-        public virtual Datadog.Trace.SpanContext Extract<T>(T carrier, System.Func<T, string, System.Collections.Generic.IEnumerable<string>> getter) { }
-        public virtual void Inject<T>(Datadog.Trace.SpanContext context, T carrier, System.Action<T, string, string> setter) { }
-        public static string GetFormattedTraceParent(Datadog.Trace.SpanContext context) { }
     }
 }
 namespace Datadog.Trace.SignalFx.Metrics

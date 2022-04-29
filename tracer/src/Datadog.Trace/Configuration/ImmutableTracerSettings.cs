@@ -78,11 +78,13 @@ namespace Datadog.Trace.Configuration
             SignalFxAccessToken = settings.SignalFxAccessToken;
             Convention = settings.Convention;
             Exporter = settings.Exporter;
-            Propagators = settings.Propagators;
 
             ThreadSamplingEnabled = settings.ThreadSamplingEnabled;
             ThreadSamplingPeriod = settings.ThreadSamplingPeriod;
             LogSubmissionSettings = ImmutableDirectLogSubmissionSettings.Create(settings.LogSubmissionSettings);
+
+            PropagationStyleInject = settings.PropagationStyleInject;
+            PropagationStyleExtract = settings.PropagationStyleExtract;
 
             // we cached the static instance here, because is being used in the hotpath
             // by IsIntegrationEnabled method (called from all integrations)
@@ -321,12 +323,6 @@ namespace Datadog.Trace.Configuration
         public MetricsExporterType MetricsExporter { get; }
 
         /// <summary>
-        /// Gets the propagators be used.
-        /// <seealso cref="ConfigurationKeys.Propagators"/>
-        /// </summary>
-        public HashSet<string> Propagators { get; }
-
-        /// <summary>
         /// Gets a value indicating whether the thread sampling is enabled.
         /// </summary>
         public bool ThreadSamplingEnabled { get; }
@@ -341,6 +337,16 @@ namespace Datadog.Trace.Configuration
         /// until later in the WCF pipeline when the WCF server exception handling is established.
         /// </summary>
         internal bool DelayWcfInstrumentationEnabled { get; }
+
+        /// <summary>
+        /// Gets a value indicating the injection propagation style.
+        /// </summary>
+        internal string[] PropagationStyleInject { get; }
+
+        /// <summary>
+        /// Gets a value indicating the extraction propagation style.
+        /// </summary>
+        internal string[] PropagationStyleExtract { get; }
 
         /// <summary>
         /// Gets a value indicating the trace methods configuration.
