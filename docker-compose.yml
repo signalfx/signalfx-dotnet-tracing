@@ -146,7 +146,7 @@ services:
     - "127.0.0.1:5432:5432"
 
   mysql:
-    image: mysql/mysql-server:8.0
+    image: mysql/mysql-server:8.0.28
     environment:
     - MYSQL_DATABASE=world
     - MYSQL_ROOT_PASSWORD=mysqldb
@@ -156,7 +156,7 @@ services:
     - "127.0.0.1:3307:3306"
 
   mysql57:
-    image: mysql/mysql-server:5.7
+    image: mysql/mysql-server:5.7.38
     environment:
     - MYSQL_DATABASE=world
     - MYSQL_ROOT_PASSWORD=mysqldb
