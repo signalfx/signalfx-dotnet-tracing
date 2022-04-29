@@ -48,7 +48,7 @@ services:
       - "15672"
 
   servicestackredis_arm64:
-    image: redis:4-alpine
+    image: redis:4.0.4-alpine
     command: redis-server --bind 0.0.0.0
     ports:
     - "6379"
