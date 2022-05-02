@@ -50,8 +50,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             }
         }
 
-        // TODO Splunk - CI is failing, locally passed
-        [SkippableTheory(Skip = "TODO Splunk - CI is failing, locally passed")]
+        [SkippableTheory]
         [MemberData(nameof(GetMySql8Data))]
         [Trait("Category", "EndToEnd")]
         public void SubmitsTracesInMySql8(string packageVersion)
@@ -59,8 +58,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             SubmitsTraces(packageVersion);
         }
 
-        // TODO Splunk - CI is failing, locally passed
-        [SkippableTheory(Skip = "TODO Splunk - CI is failing, locally passed")]
+        [SkippableTheory]
         [MemberData(nameof(GetOldMySqlData))]
         [Trait("Category", "EndToEnd")]
         [Trait("Category", "ArmUnsupported")]
