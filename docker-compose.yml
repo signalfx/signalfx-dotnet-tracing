@@ -2,7 +2,7 @@ version: '3'
 services:
   # ARM64 dependencies
   aws_sqs_arm64:
-    image: softwaremill/elasticmq
+    image: softwaremill/elasticmq:1.3.7
     ports:
     - "9324"
 
@@ -22,7 +22,7 @@ services:
     command: mongod
 
   mysql_arm64:
-    image: mysql/mysql-server:8.0
+    image: mysql/mysql-server:8.0.29-aarch64
     environment:
     - MYSQL_DATABASE=world
     - MYSQL_ROOT_PASSWORD=mysqldb
@@ -41,14 +41,14 @@ services:
     - "5432"
 
   rabbitmq_arm64:
-    image: rabbitmq:3-management
+    image: rabbitmq:3.9.13-management
     command: rabbitmq-server
     ports:
       - "5672"
       - "15672"
 
   servicestackredis_arm64:
-    image: redis:4-alpine
+    image: redis:4.0.4-alpine
     command: redis-server --bind 0.0.0.0
     ports:
     - "6379"
@@ -62,37 +62,37 @@ services:
     - SA_PASSWORD=Strong!Passw0rd
 
   stackexchangeredis_arm64:
-    image: redis:4-alpine
+    image: redis:4.0.4-alpine
     command: redis-server --bind 0.0.0.0
     ports:
     - "6379"
 
 # Dependencies
   aws_sqs:
-    image: softwaremill/elasticmq
+    image: softwaremill/elasticmq:1.3.7
     ports:
     - "127.0.0.1:9324:9324"
 
   aerospike:
-    image: aerospike/aerospike-server
+    image: aerospike/aerospike-server:6.0.0.0
     ports:
     - "127.0.0.1:3000:3000"
 
   rabbitmq:
-    image: rabbitmq:3-management
+    image: rabbitmq:3.9.13-management
     command: rabbitmq-server
     ports:
       - "127.0.0.1:5672:5672"
       - "127.0.0.1:15672:15672"
 
   servicestackredis:
-    image: redis:4-alpine
+    image: redis:4.0.4-alpine
     command: redis-server --bind 0.0.0.0
     ports:
     - "127.0.0.1:6379:6379"
 
   stackexchangeredis:
-    image: redis:4-alpine
+    image: redis:4.0.4-alpine
     command: redis-server --bind 0.0.0.0
     ports:
     - "127.0.0.1:6389:6379"
@@ -166,7 +166,7 @@ services:
     - "127.0.0.1:3407:3306"
 
   sqlserver:
-    image: mcr.microsoft.com/mssql/server:latest
+    image: mcr.microsoft.com/mssql/server:2019-CU15-ubuntu-20.04
     ports:
     - "127.0.0.1:1433:1433"
     environment:
