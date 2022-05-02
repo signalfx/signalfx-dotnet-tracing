@@ -153,6 +153,9 @@ namespace Datadog.Trace.ClrProfiler
             InitializeNoNativeParts();
             var tracer = Tracer.Instance;
 
+            // before this line you should not call anything related to TracerManager.Instance
+            // otherwise you can have multiple instances of Tracer
+
             if (tracer is null)
             {
                 Log.Debug("Skipping TraceMethods initialization because Tracer.Instance was null after InitializeNoNativeParts was invoked");
@@ -172,6 +175,8 @@ namespace Datadog.Trace.ClrProfiler
                     Log.Error(ex, ex.Message);
                 }
             }
+
+            InitializeThreadSampling();
 
             Log.Debug("Initialization finished.");
         }
@@ -266,6 +271,14 @@ namespace Datadog.Trace.ClrProfiler
                 }
             }
 #endif
+
+            Log.Debug("Initialization of non native parts finished.");
+        }
+
+        private static void InitializeThreadSampling()
+        {
+            // this method should be called when Tracer.Instance is initialized
+            // otherwise it can produce multiple tracer instances
             // Thread Sampling ("profiling") feature
             if (TracerManager.Instance.Settings.ThreadSamplingEnabled)
             {
@@ -287,8 +300,6 @@ namespace Datadog.Trace.ClrProfiler
                     Log.Error("Cannot initialize thread sampling. .NET version is not supported.");
                 }
             }
-
-            Log.Debug("Initialization of non native parts finished.");
         }
 
 #if !NETFRAMEWORK
