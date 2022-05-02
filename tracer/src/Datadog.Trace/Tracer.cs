@@ -49,37 +49,6 @@ namespace Datadog.Trace
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Tracer"/> class with default settings. Replaces the
-        /// settings for all tracers in the application with the default settings.
-        /// </summary>
-        [Obsolete("This API is deprecated. Use Tracer.Instance to obtain a Tracer instance to create spans.")]
-        public Tracer()
-            : this(settings: null)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Tracer"/>
-        /// class using the specified <see cref="IConfigurationSource"/>. This constructor updates the global settings
-        /// for all <see cref="Tracer"/> instances in the application.
-        /// </summary>
-        /// <param name="settings">
-        /// A <see cref="TracerSettings"/> instance with the desired settings,
-        /// or null to use the default configuration sources. This is used to configure global settings
-        /// </param>
-        [Obsolete("This API is deprecated, as it replaces the global settings for all Tracer instances in the application. " +
-                  "If you were using this API to configure the global Tracer.Instance in code, use the static "
-                + nameof(Tracer) + "." + nameof(Configure) + "() to replace the global Tracer settings for the application")]
-        public Tracer(TracerSettings settings)
-        {
-            // TODO: Switch to immutable settings
-            Configure(settings);
-
-            // update the count of Tracer instances
-            Interlocked.Increment(ref _liveTracerCount);
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="Tracer"/> class.
         /// For testing only.
         /// Note that this API does NOT replace the global Tracer instance.
