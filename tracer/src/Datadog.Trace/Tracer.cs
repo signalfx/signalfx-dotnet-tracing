@@ -438,16 +438,21 @@ namespace Datadog.Trace
         {
             try
             {
-                var signalFxOpenTracingAssembly = Assembly.Load(new AssemblyName("SignalFx.Tracing.OpenTracing, Version=0.2.3.0, Culture=neutral, PublicKeyToken=e43a27c2023d388a"));
-                var openTracingTracerFactoryType = signalFxOpenTracingAssembly.GetType("Datadog.Trace.OpenTracing.OpenTracingTracerFactory");
-                var methodInfo = openTracingTracerFactoryType.GetMethod("RegisterGlobalTracerIfAbsent");
-                object[] args = { instance };
-                methodInfo?.Invoke(obj: null, args);
+                Assembly.Load(new AssemblyName("OpenTracing, Version=0.12.1.0, Culture=neutral, PublicKeyToken=61503406977abdaf"));
             }
             catch (Exception ex)
             {
                 Log.Information(ex, "OpenTracing integration was not loaded.");
+                return;
             }
+
+            var signalFxOpenTracingAssembly = Assembly.Load(new AssemblyName("SignalFx.Tracing.OpenTracing, Version=0.2.3.0, Culture=neutral, PublicKeyToken=e43a27c2023d388a"));
+            var openTracingTracerFactoryType = signalFxOpenTracingAssembly.GetType("Datadog.Trace.OpenTracing.OpenTracingTracerFactory");
+            var methodInfo = openTracingTracerFactoryType.GetMethod("RegisterGlobalTracerIfAbsent");
+            object[] args = { instance };
+            methodInfo?.Invoke(obj: null, args);
+
+            Log.Information("OpenTracing integration was loaded.");
         }
     }
 }
