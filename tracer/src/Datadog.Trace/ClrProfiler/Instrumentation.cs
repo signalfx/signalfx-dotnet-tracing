@@ -173,6 +173,8 @@ namespace Datadog.Trace.ClrProfiler
                 }
             }
 
+            InitializeThreadSampling();
+
             Log.Debug("Initialization finished.");
         }
 
@@ -266,6 +268,12 @@ namespace Datadog.Trace.ClrProfiler
                 }
             }
 #endif
+
+            Log.Debug("Initialization of non native parts finished.");
+        }
+
+        private static void InitializeThreadSampling()
+        {
             // Thread Sampling ("profiling") feature
             if (TracerManager.Instance.Settings.ThreadSamplingEnabled)
             {
@@ -287,8 +295,6 @@ namespace Datadog.Trace.ClrProfiler
                     Log.Error("Cannot initialize thread sampling. .NET version is not supported.");
                 }
             }
-
-            Log.Debug("Initialization of non native parts finished.");
         }
 
 #if !NETFRAMEWORK
