@@ -50,8 +50,8 @@ namespace Datadog.Trace.Propagators
                     }
 
                     var distributedContextPropagator = (IContextExtractor)new DistributedContextExtractor();
-                    var datadogPropagator = new DatadogContextPropagator();
-                    _instance ??= new SpanContextPropagator(new[] { datadogPropagator }, new[] { distributedContextPropagator, datadogPropagator });
+                    var b3Propagator = new B3ContextPropagator();
+                    _instance ??= new SpanContextPropagator(new[] { b3Propagator }, new[] { distributedContextPropagator, b3Propagator });
                     return _instance;
                 }
             }

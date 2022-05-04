@@ -13,11 +13,14 @@ jobs:
         run: git config --system core.longpaths true
 
       - name: Checkout
-        uses: actions/checkout@v3.0.0
+        uses: actions/checkout@v3.0.2
 
       - uses: actions/setup-dotnet@v2.0.0
         with:
           dotnet-version: '6.0.200'
+
+      - name: "Removing existing generated files"
+        run: Get-ChildItem –Path ".\tracer\src\Datadog.Trace\Generated" -Recurse -File | Remove-Item
 
       - name: "Regenerating package versions"
         run: .\tracer\build.ps1 BuildTracerHome

@@ -16,7 +16,6 @@ using Datadog.Trace.Configuration;
 using Datadog.Trace.Conventions;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Logging.DirectSubmission;
-using Datadog.Trace.Propagation;
 using Datadog.Trace.RuntimeMetrics;
 using Datadog.Trace.Sampling;
 using Datadog.Trace.Telemetry;
@@ -38,7 +37,6 @@ namespace Datadog.Trace.Ci
             ImmutableTracerSettings settings,
             IAgentWriter agentWriter,
             ISampler sampler,
-            IPropagator propagator,
             IScopeManager scopeManager,
             IDogStatsd statsd,
             RuntimeMetricsWriter runtimeMetrics,
@@ -47,7 +45,7 @@ namespace Datadog.Trace.Ci
             ITelemetryController telemetry,
             string defaultServiceName)
         {
-            return new CITracerManager(settings, agentWriter, sampler, propagator, scopeManager, statsd, runtimeMetrics, traceIdConvention, logSubmissionManager, telemetry, defaultServiceName);
+            return new CITracerManager(settings, agentWriter, sampler, scopeManager, statsd, runtimeMetrics, traceIdConvention, logSubmissionManager, telemetry, defaultServiceName);
         }
 
         protected override ISampler GetSampler(ImmutableTracerSettings settings)
@@ -62,7 +60,7 @@ namespace Datadog.Trace.Ci
             {
                 if (!string.IsNullOrEmpty(_settings.ApiKey))
                 {
-                    return new CIAgentlessWriter(settings, sampler, new CIWriterHttpSender(GetRequestFactory()));
+                    return new CIAgentlessWriter(new CIWriterHttpSender(GetRequestFactory(settings)));
                 }
                 else
                 {
@@ -80,17 +78,17 @@ namespace Datadog.Trace.Ci
             }
         }
 
-        private IApiRequestFactory GetRequestFactory()
+        private IApiRequestFactory GetRequestFactory(ImmutableTracerSettings settings)
         {
             IApiRequestFactory factory = null;
             TimeSpan agentlessTimeout = TimeSpan.FromSeconds(15);
 
 #if NETCOREAPP
             Log.Information("Using {FactoryType} for trace transport.", nameof(HttpClientRequestFactory));
-            factory = new HttpClientRequestFactory(AgentHttpHeaderNames.DefaultHeaders, timeout: agentlessTimeout);
+            factory = new HttpClientRequestFactory(settings.ExporterSettings.AgentUri, AgentHttpHeaderNames.DefaultHeaders, timeout: agentlessTimeout);
 #else
             Log.Information("Using {FactoryType} for trace transport.", nameof(ApiWebRequestFactory));
-            factory = new ApiWebRequestFactory(AgentHttpHeaderNames.DefaultHeaders, timeout: agentlessTimeout);
+            factory = new ApiWebRequestFactory(settings.ExporterSettings.AgentUri, AgentHttpHeaderNames.DefaultHeaders, timeout: agentlessTimeout);
 #endif
 
             if (!string.IsNullOrWhiteSpace(_settings.ProxyHttps))

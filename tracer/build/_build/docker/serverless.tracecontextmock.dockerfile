@@ -1,4 +1,4 @@
-FROM node:17-slim
+FROM node:18-slim
 WORKDIR /app
 RUN echo "\
     var http = require('http');\

@@ -71,9 +71,12 @@ These settings should be never used by the users.
 
 | Environment variable | Description | Default |
 |-|-|-|
-| `SIGNALFX_PROFILER_LOGS_ENDPOINT` | The URL to where logs are exported using [OTLP/HTTP v1 log protocol](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md) | `http://localhost:4318/v1/logs` |
 | `SIGNALFX_METRICS_EXPORTER` | Metrics exporter to be used. It is used to encode and dispatch metrics. Available values are: `SignalFx`, `StatsD`. | `SignalFx` |
-| `SIGNALFX_PROFILER_ENABLED` | Enable to activate thread sampling. | `false` |
-| `SIGNALFX_PROFILER_CALL_STACK_INTERVAL` | Sampling period. It defines how often the threads are stopped in order to fetch all stack traces. This value cannot be lower than `1000` milliseconds. | `10000` |
+| `SIGNALFX_PROFILING_CPU_ENABLED` | Enables CPU profiling. | `false` |
+| `SIGNALFX_PROFILING_CODEHOTSPOTS_ENABLED` | Enables profiling HotSpots feature. | `false` |
+| `SIGNALFX_TRACE_ACTIVITY_LISTENER_ENABLED` | Enables experimental support for activity listener. | `false` |
+| `SIGNALFX_TRACE_ANNOTATIONS_ENABLED` | The Tracer will automatically instrument methods that are decorated with a recognized trace attribute. | `true` |
 | `SIGNALFX_TRACE_AZURE_FUNCTIONS_ENABLED` | Set to instrument within Azure functions. | `false` |
 | `SIGNALFX_TRACE_EXPAND_ROUTE_TEMPLATES_ENABLED` | Set to expand route parameters in ASP.NET and ASP.NET Core resource names. | `false` |
+| `SIGNALFX_TRACE_GRPC_TAGS` | Comma-separated list of key-value pairs automatically applied as GRPC metadata values as tags on traces. For example: `"key1:val1,key2:val2"` |  |
+| `SIGNALFX_TRACE_METHODS` | Semicolon-separated list of methods to be automatically traced. |  |

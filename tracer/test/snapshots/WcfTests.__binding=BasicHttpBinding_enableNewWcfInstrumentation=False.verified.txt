@@ -22,9 +22,10 @@
       version: 1.0.0
     },
     Metrics: {
+      process_id: 0,
       _dd.top_level: 1.0,
       _dd.tracer_kr: 1.0,
-      _sampling_priority_v1: 1.0
+      _sampling_priority_v1: 0.0
     }
   },
   {
@@ -50,9 +51,10 @@
       version: 1.0.0
     },
     Metrics: {
+      process_id: 0,
       _dd.top_level: 1.0,
       _dd.tracer_kr: 1.0,
-      _sampling_priority_v1: 1.0
+      _sampling_priority_v1: 0.0
     }
   },
   {
@@ -78,9 +80,10 @@
       version: 1.0.0
     },
     Metrics: {
+      process_id: 0,
       _dd.top_level: 1.0,
       _dd.tracer_kr: 1.0,
-      _sampling_priority_v1: 1.0
+      _sampling_priority_v1: 0.0
     }
   },
   {
@@ -106,9 +109,10 @@
       version: 1.0.0
     },
     Metrics: {
+      process_id: 0,
       _dd.top_level: 1.0,
       _dd.tracer_kr: 1.0,
-      _sampling_priority_v1: 1.0
+      _sampling_priority_v1: 0.0
     }
   },
   {
@@ -134,9 +138,10 @@
       version: 1.0.0
     },
     Metrics: {
+      process_id: 0,
       _dd.top_level: 1.0,
       _dd.tracer_kr: 1.0,
-      _sampling_priority_v1: 1.0
+      _sampling_priority_v1: 0.0
     }
   },
   {
@@ -162,9 +167,10 @@
       version: 1.0.0
     },
     Metrics: {
+      process_id: 0,
       _dd.top_level: 1.0,
       _dd.tracer_kr: 1.0,
-      _sampling_priority_v1: 1.0
+      _sampling_priority_v1: 0.0
     }
   }
 ]

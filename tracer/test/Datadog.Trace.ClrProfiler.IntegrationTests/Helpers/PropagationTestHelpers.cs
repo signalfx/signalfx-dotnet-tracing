@@ -9,21 +9,12 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.Helpers
     {
         public static void AssertPropagationEnabled(MockSpan expectedSpan, ProcessResult processResult)
         {
-            // Verify DD headers
-            var ddTraceId = StringUtil.GetHeader(processResult.StandardOutput, B3HttpHeaderNames.B3TraceId);
-            var ddParentSpanId = StringUtil.GetHeader(processResult.StandardOutput, B3HttpHeaderNames.B3SpanId);
-
-            Assert.Equal(expectedSpan.TraceId.ToString(), ddTraceId);
-            Assert.Equal(expectedSpan.SpanId, ulong.Parse(ddParentSpanId, NumberStyles.HexNumber));
-
             // Verify B3 headers
             var b3TraceId = StringUtil.GetHeader(processResult.StandardOutput, B3HttpHeaderNames.B3TraceId);
             var b3SpanId = StringUtil.GetHeader(processResult.StandardOutput, B3HttpHeaderNames.B3SpanId);
-            var b3ParentSpanId = StringUtil.GetHeader(processResult.StandardOutput, B3HttpHeaderNames.B3ParentId);
 
             Assert.Equal(expectedSpan.TraceId.ToString(), b3TraceId); // TODO: With DD Trace ID Convention, it will be in DD Trace ID format
             Assert.Equal(expectedSpan.SpanId.ToString("x16", CultureInfo.InvariantCulture), b3SpanId);
-            Assert.Equal(expectedSpan.ParentId.Value.ToString("x16", CultureInfo.InvariantCulture), b3ParentSpanId);
         }
 
         public static void AssertPropagationDisabled(ProcessResult processResult)

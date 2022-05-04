@@ -17,7 +17,7 @@ jobs:
       baseImage: ${{ matrix.baseImage }}
       dotnetSdkVersion: 6.0.200
     steps:
-    - uses: actions/checkout@v3.0.0
+    - uses: actions/checkout@v3.0.2
     - name: Build Docker image
       run: |
         docker build \
@@ -47,7 +47,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - run: git config --system core.longpaths true
-      - uses: actions/checkout@v3.0.0
+      - uses: actions/checkout@v3.0.2
       - uses: actions/setup-dotnet@v2.0.0
         with:
           dotnet-version: | 
@@ -67,6 +67,11 @@ jobs:
         with:
           name: nuget
           path: tracer/bin/artifacts/nuget/SignalFx.NET.Tracing.Azure.Site.Extension.*.nupkg
+      - name: Upload Windows Zip package
+        uses: actions/upload-artifact@v3.0.0
+        with:
+          name: zip
+          path: tracer/bin/artifacts/signalfx-dotnet-tracing-*.zip
 
   create-release:
     name: Create GH release
@@ -76,7 +81,7 @@ jobs:
       contents: write
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v3.0.0
+      - uses: actions/checkout@v3.0.2
       - uses: actions/download-artifact@v3.0.0
         with:
           path: .
@@ -84,6 +89,6 @@ jobs:
         id: get_version
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\/v}
       - name: Create Release
-        run: gh release create v${{ steps.get_version.outputs.VERSION }} --draft artifacts/signalfx* artifacts/x64/en-us/*.msi  artifacts/x86/en-us/*.msi nuget/SignalFx.NET.Tracing.Azure.Site.Extension.*.nupkg
+        run: gh release create v${{ steps.get_version.outputs.VERSION }} --draft artifacts/signalfx* artifacts/x64/en-us/*.msi  artifacts/x86/en-us/*.msi zip/signalfx-dotnet-tracing-*.zip nuget/SignalFx.NET.Tracing.Azure.Site.Extension.*.nupkg
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

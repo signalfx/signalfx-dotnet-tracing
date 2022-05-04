@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
 using Datadog.Trace.Headers;
+using Datadog.Trace.Propagation;
 using Datadog.Trace.Propagators;
 using FluentAssertions;
 using Moq;
@@ -18,19 +19,18 @@ namespace Datadog.Trace.Tests
 {
     public class SpanContextPropagatorTests
     {
-        private const ulong SpanId = 2;
-        private const int SamplingPriority = SamplingPriorityValues.UserReject;
-        private const string Origin = "origin";
-        private static readonly TraceId TraceId = TraceId.CreateFromInt(1);
+        private const ulong StringSpanId = 2000000000000000;
+        private const ulong SpanId = 2305843009213693952;
+        private const int SamplingPriority = 0;
+        private static readonly TraceId TraceId = TraceId.CreateRandom();
 
         private static readonly CultureInfo InvariantCulture = CultureInfo.InvariantCulture;
 
         private static readonly KeyValuePair<string, string>[] DefaultHeaderValues =
         {
-            new("trace-id", TraceId.ToString()),
-            new("parent-id", SpanId.ToString(InvariantCulture)),
-            new("sampling-priority", SamplingPriority.ToString(InvariantCulture)),
-            new("origin", Origin),
+            new(B3HttpHeaderNames.B3TraceId, TraceId.ToString()),
+            new(B3HttpHeaderNames.B3SpanId, StringSpanId.ToString(InvariantCulture)),
+            new(B3HttpHeaderNames.B3Sampled, SamplingPriority.ToString(InvariantCulture))
         };
 
         public static TheoryData<string> GetInvalidIds() => new()
@@ -45,7 +45,7 @@ namespace Datadog.Trace.Tests
         [Fact]
         public void Inject_IHeadersCollection()
         {
-            var context = new SpanContext(TraceId, SpanId, SamplingPriority, serviceName: null, Origin);
+            var context = new SpanContext(TraceId, SpanId, SamplingPriority, serviceName: null);
             var headers = new Mock<IHeadersCollection>();
 
             SpanContextPropagator.Instance.Inject(context, headers.Object);
@@ -56,7 +56,7 @@ namespace Datadog.Trace.Tests
         [Fact]
         public void Inject_CarrierAndDelegate()
         {
-            var context = new SpanContext(TraceId, SpanId, SamplingPriority, serviceName: null, Origin);
+            var context = new SpanContext(TraceId, SpanId, SamplingPriority, serviceName: null);
 
             // using IHeadersCollection for convenience, but carrier could be any type
             var headers = new Mock<IHeadersCollection>();
@@ -75,23 +75,24 @@ namespace Datadog.Trace.Tests
             SpanContextPropagator.Instance.Inject(context, headers.Object);
 
             // null values are not set, so only traceId and spanId (the first two in the list) should be set
-            headers.Verify(h => h.Set("trace-id", TraceId.ToString()), Times.Once());
-            headers.Verify(h => h.Set("parent-id", SpanId.ToString(InvariantCulture)), Times.Once());
+            headers.Verify(h => h.Set(B3HttpHeaderNames.B3TraceId, TraceId.ToString()), Times.Once());
+            headers.Verify(h => h.Set(B3HttpHeaderNames.B3SpanId, StringSpanId.ToString(InvariantCulture)), Times.Once());
+            headers.Verify(h => h.Set(B3HttpHeaderNames.B3Sampled, "0"), Times.Once());
             headers.VerifyNoOtherCalls();
         }
 
         [Fact]
         public void Inject_InvalidSampling()
         {
-            var context = new SpanContext(TraceId, SpanId, samplingPriority: 12, serviceName: null, origin: null);
+            var context = new SpanContext(TraceId, SpanId, samplingPriority: 1, serviceName: null, origin: null);
             var headers = new Mock<IHeadersCollection>();
 
             SpanContextPropagator.Instance.Inject(context, headers.Object);
 
             // null values are not set, so only traceId and spanId (the first two in the list) should be set
-            headers.Verify(h => h.Set("trace-id", TraceId.ToString()), Times.Once());
-            headers.Verify(h => h.Set("parent-id", SpanId.ToString(InvariantCulture)), Times.Once());
-            headers.Verify(h => h.Set("sampling-priority", "12"), Times.Once());
+            headers.Verify(h => h.Set(B3HttpHeaderNames.B3TraceId, TraceId.ToString()), Times.Once());
+            headers.Verify(h => h.Set(B3HttpHeaderNames.B3SpanId, StringSpanId.ToString(InvariantCulture)), Times.Once());
+            headers.Verify(h => h.Set(B3HttpHeaderNames.B3Sampled, "1"), Times.Once());
             headers.VerifyNoOtherCalls();
         }
 
@@ -109,7 +110,6 @@ namespace Datadog.Trace.Tests
                        {
                            TraceId = TraceId,
                            SpanId = SpanId,
-                           Origin = Origin,
                            SamplingPriority = SamplingPriority,
                        });
         }
@@ -129,7 +129,6 @@ namespace Datadog.Trace.Tests
                        {
                            TraceId = TraceId,
                            SpanId = SpanId,
-                           Origin = Origin,
                            SamplingPriority = SamplingPriority,
                        });
         }
@@ -148,7 +147,6 @@ namespace Datadog.Trace.Tests
                        {
                            TraceId = TraceId,
                            SpanId = SpanId,
-                           Origin = Origin,
                            SamplingPriority = SamplingPriority,
                        });
         }
@@ -163,38 +161,19 @@ namespace Datadog.Trace.Tests
         }
 
         [Fact]
-        public void Extract_TraceIdOnly()
-        {
-            var headers = new Mock<IHeadersCollection>();
-
-            // only setup TraceId, other properties remain null/empty
-            headers.Setup(h => h.GetValues("trace-id")).Returns(new[] { TraceId.ToString() });
-            var result = SpanContextPropagator.Instance.Extract(headers.Object);
-
-            result.Should().BeEquivalentTo(new SpanContextMock { TraceId = TraceId });
-        }
-
-        [Fact]
-        public void SpanContextRoundTrip()
-        {
-            var context = new SpanContext(TraceId, SpanId, SamplingPriority, serviceName: null, Origin);
-            var result = SpanContextPropagator.Instance.Extract(context);
-
-            result.Should().NotBeSameAs(context);
-            result.Should().BeEquivalentTo(context);
-        }
-
-        [Fact]
         public void Identity()
         {
-            var context = new SpanContext(TraceId, SpanId, SamplingPriority, serviceName: null, Origin);
+            var context = new SpanContext(TraceId, SpanId, SamplingPriority, serviceName: null);
             var headers = new NameValueHeadersCollection(new NameValueCollection());
 
             SpanContextPropagator.Instance.Inject(context, headers);
             var result = SpanContextPropagator.Instance.Extract(headers);
 
+            result.Should().NotBeNull();
             result.Should().NotBeSameAs(context);
-            result.Should().BeEquivalentTo(context);
+            result.TraceId.Should().Be(context.TraceId);
+            result.SpanId.Should().Be(context.SpanId);
+            result.SamplingPriority.Should().Be(context.SamplingPriority);
         }
 
         [Theory]
@@ -204,7 +183,7 @@ namespace Datadog.Trace.Tests
             var headers = SetupMockHeadersCollection();
 
             // replace TraceId setup
-            headers.Setup(h => h.GetValues("trace-id")).Returns(new[] { traceId });
+            headers.Setup(h => h.GetValues(B3HttpHeaderNames.B3TraceId)).Returns(new[] { traceId });
 
             var result = SpanContextPropagator.Instance.Extract(headers.Object);
 
@@ -219,19 +198,11 @@ namespace Datadog.Trace.Tests
             var headers = SetupMockHeadersCollection();
 
             // replace ParentId setup
-            headers.Setup(h => h.GetValues("parent-id")).Returns(new[] { spanId });
+            headers.Setup(h => h.GetValues(B3HttpHeaderNames.B3SpanId)).Returns(new[] { spanId });
 
             var result = SpanContextPropagator.Instance.Extract(headers.Object);
 
-            result.Should()
-                  .BeEquivalentTo(
-                       new SpanContextMock
-                       {
-                           // SpanId has default value
-                           TraceId = TraceId,
-                           Origin = Origin,
-                           SamplingPriority = SamplingPriority,
-                       });
+            result.Should().BeNull();
         }
 
         [Theory]
@@ -239,7 +210,7 @@ namespace Datadog.Trace.Tests
         [InlineData("1000", 1000)]
         [InlineData("1.0", null)]
         [InlineData("1,0", null)]
-        [InlineData("sampling.priority", null)]
+        [InlineData(B3HttpHeaderNames.B3Sampled, null)]
         public void Extract_InvalidSamplingPriority(string samplingPriority, int? expectedSamplingPriority)
         {
             // if the extracted sampling priority is a valid integer, pass it along as-is,
@@ -249,7 +220,7 @@ namespace Datadog.Trace.Tests
             var headers = SetupMockHeadersCollection();
 
             // replace SamplingPriority setup
-            headers.Setup(h => h.GetValues("sampling-priority")).Returns(new[] { samplingPriority });
+            headers.Setup(h => h.GetValues(B3HttpHeaderNames.B3Sampled)).Returns(new[] { samplingPriority });
 
             object result = SpanContextPropagator.Instance.Extract(headers.Object);
 
@@ -259,7 +230,6 @@ namespace Datadog.Trace.Tests
                        {
                            TraceId = TraceId,
                            SpanId = SpanId,
-                           Origin = Origin,
                            SamplingPriority = expectedSamplingPriority,
                        });
         }

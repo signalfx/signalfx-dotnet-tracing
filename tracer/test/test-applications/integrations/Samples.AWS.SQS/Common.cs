@@ -2,9 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Amazon.SQS.Model;
 using Datadog.Trace;
 using Datadog.Trace.Propagation;
@@ -33,12 +30,12 @@ namespace Samples.AWS.SQS
                         throw new Exception($"The span context was not injected into the message properly. parent-id: {dictSpanContext[DDHttpHeaderNames.ParentId]}, trace-id: {dictSpanContext[DDHttpHeaderNames.TraceId]}, active trace-id: {Tracer.Instance.ActiveScope.Span.TraceId}");
                     }
                 }
-                else if (dictSpanContext.TryGetValue(B3HttpHeaderNames.B3ParentId, out var parentIdB3))
+                else if (dictSpanContext.TryGetValue(B3HttpHeaderNames.B3SpanId, out var spanId))
                 {
-                    if (parentIdB3 is null ||
+                    if (spanId is null ||
                     !VerifyTraceId(Tracer.Instance.ActiveScope.Span.TraceId, dictSpanContext[B3HttpHeaderNames.B3TraceId]))
                     {
-                        throw new Exception($"The span context was not injected into the message properly. parent-id: {dictSpanContext[B3HttpHeaderNames.B3ParentId]}, trace-id: {dictSpanContext[B3HttpHeaderNames.B3TraceId]}, active trace-id: {Tracer.Instance.ActiveScope.Span.TraceId}");
+                        throw new Exception($"The span context was not injected into the message properly. span-id: {dictSpanContext[B3HttpHeaderNames.B3SpanId]}, trace-id: {dictSpanContext[B3HttpHeaderNames.B3TraceId]}, active trace-id: {Tracer.Instance.ActiveScope.Span.TraceId}");
                     }
                 }
                 else

@@ -7,7 +7,6 @@
 
 using System;
 using Datadog.Trace.Configuration;
-using Datadog.Trace.Propagation;
 using Datadog.Trace.Sampling;
 
 namespace Datadog.Trace

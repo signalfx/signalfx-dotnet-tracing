@@ -47,7 +47,7 @@ namespace Datadog.Trace.TestHelpers
 
             // The Tracer is not currently utilizing the Native Loader in production. It is only being used in the Continuous Profiler beta.
             // Because of that, we don't test it in the default pipeline.
-            bool useNativeLoader = string.Equals("true", Environment.GetEnvironmentVariable("USE_NATIVE_LOADER"), StringComparison.InvariantCultureIgnoreCase);
+            bool useNativeLoader = string.Equals("true", Environment.GetEnvironmentVariable("SIGNALFX_USE_NATIVE_LOADER"), StringComparison.InvariantCultureIgnoreCase);
             ProfilerPath = useNativeLoader ? GetNativeLoaderPath() : GetTracerNativeDLLPath();
 
             var parts = _targetFramework.FrameworkName.Split(',');
@@ -138,11 +138,11 @@ namespace Datadog.Trace.TestHelpers
 
             string fileName = (EnvironmentTools.GetOS(), EnvironmentTools.GetPlatform()) switch
             {
-                ("win", "X64")     => "Datadog.AutoInstrumentation.NativeLoader.x64.dll",
-                ("win", "X86")     => "Datadog.AutoInstrumentation.NativeLoader.x86.dll",
-                ("linux", "X64")   => "Datadog.AutoInstrumentation.NativeLoader.so",
+                ("win", "X64") => "Datadog.AutoInstrumentation.NativeLoader.x64.dll",
+                ("win", "X86") => "Datadog.AutoInstrumentation.NativeLoader.x86.dll",
+                ("linux", "X64") => "Datadog.AutoInstrumentation.NativeLoader.so",
                 ("linux", "Arm64") => "Datadog.AutoInstrumentation.NativeLoader.so",
-                ("osx", _)         => throw new PlatformNotSupportedException("The Native Loader is not yet supported on osx"),
+                ("osx", _) => "Datadog.AutoInstrumentation.NativeLoader.dylib",
                 _ => throw new PlatformNotSupportedException()
             };
 

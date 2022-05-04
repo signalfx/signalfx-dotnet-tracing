@@ -10,94 +10,94 @@
   #include <codecvt>
 #endif
 
-constexpr auto max_string_length = 512UL;
+constexpr auto kMaxStringLength = 512UL;
 
-constexpr auto max_codes_per_buffer = 10 * 1000;
+constexpr auto kMaxCodesPerBuffer = 10 * 1000;
 
 // If you change this, consider ThreadSampler.cs too
-constexpr auto samples_buffer_maximum_size = 200 * 1024;
+constexpr auto kSamplesBufferMaximumSize = 200 * 1024;
 
-constexpr auto samples_buffer_default_size = 20 * 1024;
+constexpr auto kSamplesBufferDefaultSize = 20 * 1024;
 
 // If you change these, change ThreadSampler.cs too
-constexpr auto default_sample_period = 10000;
-constexpr auto minimum_sample_period = 1000;
+constexpr auto kDefaultSamplePeriod = 10000;
+constexpr auto kMinimumSamplePeriod = 1000;
 
 // FIXME make configurable (hidden)?
 // These numbers were chosen to keep total overhead under 1 MB of RAM in typical cases (name lengths being the biggest
 // variable)
-constexpr auto max_function_name_cache_size = 7000;
+constexpr auto kMaxFunctionNameCacheSize = 7000;
 
-constexpr auto param_name_max_len = 260;
-constexpr auto generic_params_max_len = 20;
-constexpr auto unknown = WStr("Unknown");
-constexpr auto params_separator = WStr(", ");
-constexpr auto generic_params_opening_brace = WStr("[");
-constexpr auto generic_params_closing_brace = WStr("]");
-constexpr auto function_params_opening_brace = WStr("(");
-constexpr auto function_params_closing_brace = WStr(")");
+constexpr auto kParamNameMaxLen = 260;
+constexpr auto kGenericParamsMaxLen = 20;
+constexpr auto kUnknown = WStr("Unknown");
+constexpr auto kParamsSeparator = WStr(", ");
+constexpr auto kGenericParamsOpeningBrace = WStr("[");
+constexpr auto kGenericParamsClosingBrace = WStr("]");
+constexpr auto kFunctionParamsOpeningBrace = WStr("(");
+constexpr auto kFunctionParamsClosingBrace = WStr(")");
 
 // If you squint you can make out that the original bones of this came from sample code provided by the dotnet project:
 // https://github.com/dotnet/samples/blob/2cf486af936261b04a438ea44779cdc26c613f98/core/profiling/stacksampling/src/sampler.cpp
 // That stack sampling project is worth reading for a simpler (though higher overhead) take on thread sampling.
 
-static std::mutex bufferLock = std::mutex();
-static std::vector<unsigned char>* bufferA;
-static std::vector<unsigned char>* bufferB;
+static std::mutex buffer_lock = std::mutex();
+static std::vector<unsigned char>* buffer_a;
+static std::vector<unsigned char>* buffer_b;
 
-static std::mutex threadSpanContextLock;
-static std::unordered_map<ThreadID, trace::ThreadSpanContext> threadSpanContextMap;
+static std::mutex thread_span_context_lock;
+static std::unordered_map<ThreadID, trace::thread_span_context> thread_span_context_map;
 
-static ICorProfilerInfo10* profilerInfo; // After feature sets settle down, perhaps this should be refactored and have a single static instance of ThreadSampler
+static ICorProfilerInfo10* profiler_info; // After feature sets settle down, perhaps this should be refactored and have a single static instance of ThreadSampler
 
 // Dirt-simple back pressure system to save overhead if managed code is not reading fast enough
-bool ThreadSampling_ShouldProduceThreadSample()
+bool ThreadSamplingShouldProduceThreadSample()
 {
-    std::lock_guard<std::mutex> guard(bufferLock);
-    return bufferA == nullptr || bufferB == nullptr;
+    std::lock_guard<std::mutex> guard(buffer_lock);
+    return buffer_a == nullptr || buffer_b == nullptr;
 }
-void ThreadSampling_RecordProducedThreadSample(std::vector<unsigned char>* buf)
+void ThreadSamplingRecordProducedThreadSample(std::vector<unsigned char>* buf)
 {
-    std::lock_guard<std::mutex> guard(bufferLock);
-    if (bufferA == nullptr) {
-        bufferA = buf;
-    } else if (bufferB == nullptr) {
-        bufferB = buf;
+    std::lock_guard<std::mutex> guard(buffer_lock);
+    if (buffer_a == nullptr) {
+        buffer_a = buf;
+    } else if (buffer_b == nullptr) {
+        buffer_b = buf;
     } else {
         trace::Logger::Warn("Unexpected buffer drop in ThreadSampling_RecordProducedThreadSample");
         delete buf; // needs to be dropped now
     }
 }
 // Can return 0 if none are pending
-int32_t ThreadSampling_ConsumeOneThreadSample(int32_t len, unsigned char* buf)
+int32_t ThreadSamplingConsumeOneThreadSample(int32_t len, unsigned char* buf)
 {
     if (len <= 0 || buf == nullptr)
     {
         trace::Logger::Warn("Unexpected 0/null buffer to ThreadSampling_ConsumeOneThreadSample");
         return 0;
     }
-    std::vector<unsigned char>* toUse = nullptr;
+    std::vector<unsigned char>* to_use = nullptr;
     {
-        std::lock_guard<std::mutex> guard(bufferLock);
-        if (bufferA != nullptr)
+        std::lock_guard<std::mutex> guard(buffer_lock);
+        if (buffer_a != nullptr)
         {
-            toUse = bufferA;
-            bufferA = nullptr;
+            to_use = buffer_a;
+            buffer_a = nullptr;
         }
-        else if (bufferB != nullptr)
+        else if (buffer_b != nullptr)
         {
-            toUse = bufferB;
-            bufferB = nullptr;
+            to_use = buffer_b;
+            buffer_b = nullptr;
         }
     }
-    if (toUse == nullptr)
+    if (to_use == nullptr)
     {
         return 0;
     }
-    const size_t toUseLen = static_cast<int>(std::min(toUse->size(), static_cast<size_t>(len)));
-    memcpy(buf, toUse->data(), toUseLen);
-    delete toUse;
-    return static_cast<int32_t>(toUseLen);
+    const size_t to_use_len = static_cast<int>(std::min(to_use->size(), static_cast<size_t>(len)));
+    memcpy(buf, to_use->data(), to_use_len);
+    delete to_use;
+    return static_cast<int32_t>(to_use_len);
 }
 
 namespace trace
@@ -125,162 +125,162 @@ namespace trace
 */
 
 // defined op codes
-constexpr auto thread_samples_start_batch = 0x01;
-constexpr auto thread_samples_start_sample = 0x02;
-constexpr auto thread_samples_end_batch = 0x06;
-constexpr auto thread_samples_final_stats = 0x07;
+constexpr auto kThreadSamplesStartBatch = 0x01;
+constexpr auto kThreadSamplesStartSample = 0x02;
+constexpr auto kThreadSamplesEndBatch = 0x06;
+constexpr auto kThreadSamplesFinalStats = 0x07;
 
-constexpr auto current_thread_samples_buffer_version = 1;
+constexpr auto kCurrentThreadSamplesBufferVersion = 1;
 
-ThreadSamplesBuffer::ThreadSamplesBuffer(std::vector<unsigned char>* buf) : buffer(buf)
+ThreadSamplesBuffer::ThreadSamplesBuffer(std::vector<unsigned char>* buf) : buffer_(buf)
 {
 }
 ThreadSamplesBuffer ::~ThreadSamplesBuffer()
 {
-    buffer = nullptr; // specifically don't delete as this is done by RecordProduced/ConsumeOneThreadSample
+    buffer_ = nullptr; // specifically don't delete as this is done by RecordProduced/ConsumeOneThreadSample
 }
 
-#define CHECK_SAMPLES_BUFFER_LENGTH() {  if (buffer->size() >= samples_buffer_maximum_size) { return; } }
+#define CHECK_SAMPLES_BUFFER_LENGTH() {  if (buffer_->size() >= kSamplesBufferMaximumSize) { return; } }
 
 void ThreadSamplesBuffer::StartBatch() const
 {
     CHECK_SAMPLES_BUFFER_LENGTH()
-    writeByte(thread_samples_start_batch);
-    writeInt(current_thread_samples_buffer_version);
+    WriteByte(kThreadSamplesStartBatch);
+    WriteInt(kCurrentThreadSamplesBufferVersion);
     const auto ms =
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-    writeUInt64(ms.count());
+    WriteUInt64(ms.count());
 }
 
-void ThreadSamplesBuffer::StartSample(ThreadID id, const ThreadState* state, const ThreadSpanContext& spanContext) const
+void ThreadSamplesBuffer::StartSample(ThreadID id, const ThreadState* state, const thread_span_context& span_context) const
 {
     CHECK_SAMPLES_BUFFER_LENGTH()
-    writeByte(thread_samples_start_sample);
-    writeInt(spanContext.managedThreadId);
-    writeInt(static_cast<int32_t>(state->nativeId));
-    writeString(state->threadName);
-    writeUInt64(spanContext.traceIdHigh);
-    writeUInt64(spanContext.traceIdLow);
-    writeUInt64(spanContext.spanId);
+    WriteByte(kThreadSamplesStartSample);
+    WriteInt(span_context.managed_thread_id_);
+    WriteInt(static_cast<int32_t>(state->native_id_));
+    WriteString(state->thread_name_);
+    WriteUInt64(span_context.trace_id_high_);
+    WriteUInt64(span_context.trace_id_low_);
+    WriteUInt64(span_context.span_id_);
     // Feature possibilities: (managed/native) thread priority, cpu/wait times, etc.
 }
 void ThreadSamplesBuffer::RecordFrame(FunctionID fid, const shared::WSTRING& frame)
 {
     CHECK_SAMPLES_BUFFER_LENGTH()
-    writeCodedFrameString(fid, frame);
+    WriteCodedFrameString(fid, frame);
 }
 void ThreadSamplesBuffer::EndSample() const
 {
     CHECK_SAMPLES_BUFFER_LENGTH()
-    writeShort(0);
+    WriteShort(0);
 }
 void ThreadSamplesBuffer::EndBatch() const
 {
     CHECK_SAMPLES_BUFFER_LENGTH()
-    writeByte(thread_samples_end_batch);
+    WriteByte(kThreadSamplesEndBatch);
 }
 void ThreadSamplesBuffer::WriteFinalStats(const SamplingStatistics& stats) const
 {
     CHECK_SAMPLES_BUFFER_LENGTH()
-    writeByte(thread_samples_final_stats);
-    writeInt(stats.microsSuspended);
-    writeInt(stats.numThreads);
-    writeInt(stats.totalFrames);
-    writeInt(stats.nameCacheMisses);
+    WriteByte(kThreadSamplesFinalStats);
+    WriteInt(stats.micros_suspended);
+    WriteInt(stats.num_threads);
+    WriteInt(stats.total_frames);
+    WriteInt(stats.name_cache_misses);
 }
 
-void ThreadSamplesBuffer::writeCodedFrameString(FunctionID fid, const shared::WSTRING& str)
+void ThreadSamplesBuffer::WriteCodedFrameString(FunctionID fid, const shared::WSTRING& str)
 {
-    const auto found = codes.find(fid);
-    if (found != codes.end())
+    const auto found = codes_.find(fid);
+    if (found != codes_.end())
     {
-        writeShort(static_cast<int16_t>(found->second));
+        WriteShort(static_cast<int16_t>(found->second));
     }
     else
     {
-        const int code = static_cast<int>(codes.size()) + 1;
-        if (codes.size() + 1 < max_codes_per_buffer)
+        const int code = static_cast<int>(codes_.size()) + 1;
+        if (codes_.size() + 1 < kMaxCodesPerBuffer)
         {
-            codes[fid] = code;
+            codes_[fid] = code;
         }
-        writeShort(static_cast<int16_t>(-code)); // note negative sign indicating definition of code
-        writeString(str);
+        WriteShort(static_cast<int16_t>(-code)); // note negative sign indicating definition of code
+        WriteString(str);
     }
 }
-void ThreadSamplesBuffer::writeShort(int16_t val) const
+void ThreadSamplesBuffer::WriteShort(int16_t val) const
 {
-    buffer->push_back(((val >> 8) & 0xFF));
-    buffer->push_back(val & 0xFF);
+    buffer_->push_back(((val >> 8) & 0xFF));
+    buffer_->push_back(val & 0xFF);
 }
-void ThreadSamplesBuffer::writeInt(int32_t val) const
+void ThreadSamplesBuffer::WriteInt(int32_t val) const
 {
-    buffer->push_back(((val >> 24) & 0xFF));
-    buffer->push_back(((val >> 16) & 0xFF));
-    buffer->push_back(((val >> 8) & 0xFF));
-    buffer->push_back(val & 0xFF);
+    buffer_->push_back(((val >> 24) & 0xFF));
+    buffer_->push_back(((val >> 16) & 0xFF));
+    buffer_->push_back(((val >> 8) & 0xFF));
+    buffer_->push_back(val & 0xFF);
 }
-void ThreadSamplesBuffer::writeString(const shared::WSTRING& str) const
+void ThreadSamplesBuffer::WriteString(const shared::WSTRING& str) const
 {
     // limit strings to a max length overall; this prevents (e.g.) thread names or
     // any other miscellaneous strings that come along from blowing things out
-    const short usedLen = static_cast<short>(std::min(str.length(), static_cast<size_t>(max_string_length)));
-    writeShort(usedLen);
+    const short used_len = static_cast<short>(std::min(str.length(), static_cast<size_t>(kMaxStringLength)));
+    WriteShort(used_len);
     // odd bit of casting since we're copying bytes, not wchars
-    const auto strBegin = reinterpret_cast<const unsigned char*>(&str.c_str()[0]);
+    const auto str_begin = reinterpret_cast<const unsigned char*>(&str.c_str()[0]);
     // possible endian-ness assumption here; unclear how the managed layer would decode on big endian platforms
-    buffer->insert(buffer->end(), strBegin, strBegin + usedLen * 2);
+    buffer_->insert(buffer_->end(), str_begin, str_begin + used_len * 2);
 }
-void ThreadSamplesBuffer::writeByte(unsigned char b) const
+void ThreadSamplesBuffer::WriteByte(unsigned char b) const
 {
-    buffer->push_back(b);
+    buffer_->push_back(b);
 }
-void ThreadSamplesBuffer::writeUInt64(uint64_t val) const
+void ThreadSamplesBuffer::WriteUInt64(uint64_t val) const
 {
-    buffer->push_back(((val >> 56) & 0xFF));
-    buffer->push_back(((val >> 48) & 0xFF));
-    buffer->push_back(((val >> 40) & 0xFF));
-    buffer->push_back(((val >> 32) & 0xFF));
-    buffer->push_back(((val >> 24) & 0xFF));
-    buffer->push_back(((val >> 16) & 0xFF));
-    buffer->push_back(((val >> 8) & 0xFF));
-    buffer->push_back(val & 0xFF);
+    buffer_->push_back(((val >> 56) & 0xFF));
+    buffer_->push_back(((val >> 48) & 0xFF));
+    buffer_->push_back(((val >> 40) & 0xFF));
+    buffer_->push_back(((val >> 32) & 0xFF));
+    buffer_->push_back(((val >> 24) & 0xFF));
+    buffer_->push_back(((val >> 16) & 0xFF));
+    buffer_->push_back(((val >> 8) & 0xFF));
+    buffer_->push_back(val & 0xFF);
 }
 
 class SamplingHelper
 {
 public:
     // These are permanent parts of the helper object
-    ICorProfilerInfo10* info10 = nullptr;
-    NameCache functionNameCache;
+    ICorProfilerInfo10* info10_ = nullptr;
+    NameCache function_name_cache_;
     // These cycle every sample and/or are owned externally
-    ThreadSamplesBuffer* curWriter = nullptr;
-    std::vector<unsigned char>* curBuffer = nullptr;
-    SamplingStatistics stats;
+    ThreadSamplesBuffer* cur_writer_ = nullptr;
+    std::vector<unsigned char>* cur_buffer_ = nullptr;
+    SamplingStatistics stats_;
 
-    SamplingHelper() : functionNameCache(max_function_name_cache_size)
+    SamplingHelper() : function_name_cache_(kMaxFunctionNameCacheSize)
     {
     }
 
     bool AllocateBuffer()
     {
-        const bool should = ThreadSampling_ShouldProduceThreadSample();
+        const bool should = ThreadSamplingShouldProduceThreadSample();
         if (!should)
         {
             return should;
         }
-        stats = SamplingStatistics();
-        curBuffer = new std::vector<unsigned char>();
-        curBuffer->reserve(samples_buffer_default_size);
-        curWriter = new ThreadSamplesBuffer(curBuffer);
+        stats_ = SamplingStatistics();
+        cur_buffer_ = new std::vector<unsigned char>();
+        cur_buffer_->reserve(kSamplesBufferDefaultSize);
+        cur_writer_ = new ThreadSamplesBuffer(cur_buffer_);
         return should;
     }
     void PublishBuffer()
     {
-        ThreadSampling_RecordProducedThreadSample(curBuffer);
-        delete curWriter;
-        curWriter = nullptr;
-        curBuffer = nullptr;
-        stats = SamplingStatistics();
+        ThreadSamplingRecordProducedThreadSample(cur_buffer_);
+        delete cur_writer_;
+        cur_writer_ = nullptr;
+        cur_buffer_ = nullptr;
+        stats_ = SamplingStatistics();
     }
 
 private:
@@ -292,10 +292,10 @@ private:
             return zero_valid_function_identifier;
         }
 
-        ModuleID moduleId = 0;
-        mdToken functionToken = 0;
+        ModuleID module_id = 0;
+        mdToken function_token = 0;
         // theoretically there is a possibility to use GetFunctionInfo method, but it does not support generic methods
-        HRESULT hr = info10->GetFunctionInfo2(func_id, frame_info, nullptr, &moduleId, &functionToken, 0, nullptr, nullptr);
+        const HRESULT hr = info10_->GetFunctionInfo2(func_id, frame_info, nullptr, &module_id, &function_token, 0, nullptr, nullptr);
         if (FAILED(hr))
         {
             Logger::Debug("GetFunctionInfo2 failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
@@ -303,31 +303,31 @@ private:
             return zero_invalid_function_identifier;
         }
 
-        return FunctionIdentifier{functionToken, moduleId, true};
+        return FunctionIdentifier{function_token, module_id, true};
     }
 
-    void GetFunctionName(FunctionIdentifier functionIdentifier, shared::WSTRING& result)
+    void GetFunctionName(FunctionIdentifier function_identifier, shared::WSTRING& result)
     {
         constexpr auto unknown_list_of_arguments = WStr("(unknown)");
         constexpr auto unknown_function_name = WStr("Unknown(unknown)");
         constexpr auto name_separator = WStr(".");
 
-        if (!functionIdentifier.is_valid)
+        if (!function_identifier.is_valid)
         {
             result.append(unknown_function_name);
             return;
         }
 
-        if (functionIdentifier.function_token == 0)
+        if (function_identifier.function_token == 0)
         {
             constexpr auto unknown_native_function_name = WStr("Unknown_Native_Function(unknown)");
             result.append(unknown_native_function_name);
             return;
         }
 
-        ComPtr<IMetaDataImport2> pIMDImport;
-        HRESULT hr = info10->GetModuleMetaData(functionIdentifier.module_id, ofRead, IID_IMetaDataImport2,
-                                              reinterpret_cast<IUnknown**>(&pIMDImport));
+        ComPtr<IMetaDataImport2> metadata_import;
+        HRESULT hr = info10_->GetModuleMetaData(function_identifier.module_id, ofRead, IID_IMetaDataImport2,
+                                              reinterpret_cast<IUnknown**>(&metadata_import));
         if (FAILED(hr))
         {
             Logger::Debug("GetModuleMetaData failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
@@ -335,7 +335,7 @@ private:
             return;
         }
 
-        const auto function_info = GetFunctionInfo(pIMDImport, functionIdentifier.function_token);
+        const auto function_info = GetFunctionInfo(metadata_import, function_identifier.function_token);
 
         if (!function_info.IsValid())
         {
@@ -366,18 +366,18 @@ private:
         result.append(function_info.name);
 
         
-        HCORENUM functionGenParamsIter = nullptr;
-        HCORENUM classGenParamsIter = nullptr;
-        mdGenericParam functionGenericParams[generic_params_max_len]{};
-        mdGenericParam classGenericParams[generic_params_max_len]{};
-        ULONG functionGenParamsCount = 0;
-        ULONG classGenParamsCount = 0;
+        HCORENUM function_gen_params_enum = nullptr;
+        HCORENUM class_gen_params_enum = nullptr;
+        mdGenericParam function_generic_params[kGenericParamsMaxLen]{};
+        mdGenericParam class_generic_params[kGenericParamsMaxLen]{};
+        ULONG function_gen_params_count = 0;
+        ULONG class_gen_params_count = 0;
 
-        mdTypeDef classToken = function_info.type.id;
+        mdTypeDef class_token = function_info.type.id;
 
-        hr = pIMDImport->EnumGenericParams(&classGenParamsIter, classToken, classGenericParams, generic_params_max_len,
-                                     &classGenParamsCount);
-        pIMDImport->CloseEnum(classGenParamsIter);
+        hr = metadata_import->EnumGenericParams(&class_gen_params_enum, class_token, class_generic_params, kGenericParamsMaxLen,
+                                     &class_gen_params_count);
+        metadata_import->CloseEnum(class_gen_params_enum);
         if (FAILED(hr))
         {
             Logger::Debug("Class generic parameters enumeration failed. HRESULT=0x", std::setfill('0'), std::setw(8),
@@ -386,10 +386,10 @@ private:
             return;
         }
         
-        hr = pIMDImport->EnumGenericParams(&functionGenParamsIter, functionIdentifier.function_token, functionGenericParams,
-                                     generic_params_max_len,
-                                      &functionGenParamsCount);
-        pIMDImport->CloseEnum(functionGenParamsIter);
+        hr = metadata_import->EnumGenericParams(&function_gen_params_enum, function_identifier.function_token, function_generic_params,
+                                     kGenericParamsMaxLen,
+                                      &function_gen_params_count);
+        metadata_import->CloseEnum(function_gen_params_enum);
         if (FAILED(hr))
         {
             Logger::Debug("Method generic parameters enumeration failed. HRESULT=0x", std::setfill('0'), std::setw(8),
@@ -398,37 +398,36 @@ private:
             return;
         }
 
-        if (functionGenParamsCount > 0)
+        if (function_gen_params_count > 0)
         {
-            result.append(generic_params_opening_brace);
-            for (ULONG i = 0; i < functionGenParamsCount; ++i)
+            result.append(kGenericParamsOpeningBrace);
+            for (ULONG i = 0; i < function_gen_params_count; ++i)
             {
                 if (i != 0)
                 {
-                    result.append(params_separator);
+                    result.append(kParamsSeparator);
                 }
 
-                WCHAR param_type_name[param_name_max_len]{};
+                WCHAR param_type_name[kParamNameMaxLen]{};
                 ULONG pch_name = 0;
-                const auto hr =
-                    pIMDImport->GetGenericParamProps(functionGenericParams[i], nullptr, nullptr, nullptr, nullptr,
-                                                     param_type_name, param_name_max_len, &pch_name);
+                hr = metadata_import->GetGenericParamProps(function_generic_params[i], nullptr, nullptr, nullptr,
+                                                           nullptr, param_type_name, kParamNameMaxLen, &pch_name);
                 if (FAILED(hr))
                 {
                     Logger::Debug("GetGenericParamProps failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
-                    result.append(unknown);
+                    result.append(kUnknown);
                 }
                 else
                 {
                     result.append(param_type_name);
                 }
             }
-            result.append(generic_params_closing_brace);
+            result.append(kGenericParamsClosingBrace);
         }
         
         // try to list arguments type
-        FunctionMethodSignature functionMethodSignature = function_info.method_signature;
-        hr = functionMethodSignature.TryParse();
+        FunctionMethodSignature function_method_signature = function_info.method_signature;
+        hr = function_method_signature.TryParse();
         if (FAILED(hr))
         {
             result.append(unknown_list_of_arguments);
@@ -436,164 +435,164 @@ private:
         }
         else
         {
-            const auto& arguments = functionMethodSignature.GetMethodArguments();
-            result.append(function_params_opening_brace);
+            const auto& arguments = function_method_signature.GetMethodArguments();
+            result.append(kFunctionParamsOpeningBrace);
             for (ULONG i = 0; i < arguments.size(); i++)
             {
                 if (i != 0)
                 {
-                    result.append(params_separator);
+                    result.append(kParamsSeparator);
                 }
 
-                auto& currentArg = arguments[i];
-                PCCOR_SIGNATURE pbCur = &currentArg.pbBase[currentArg.offset];
-                result.append(GetSigTypeTokName(pbCur, pIMDImport, classGenericParams, functionGenericParams));
+                auto& current_arg = arguments[i];
+                PCCOR_SIGNATURE pbCur = &current_arg.pbBase[current_arg.offset];
+                result.append(GetSigTypeTokName(pbCur, metadata_import, class_generic_params, function_generic_params));
             }
-            result.append(function_params_closing_brace);
+            result.append(kFunctionParamsClosingBrace);
         }
     }
 
-    shared::WSTRING ExtractParameterName(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaDataImport2>& pImport,
-                                         const mdGenericParam* genericParameters) const
+    shared::WSTRING ExtractParameterName(PCCOR_SIGNATURE& pb_cur, const ComPtr<IMetaDataImport2>& metadata_import,
+                                         const mdGenericParam* generic_parameters) const
     {
-        pbCur++;
+        pb_cur++;
         ULONG num = 0;
-        pbCur += CorSigUncompressData(pbCur, &num);
-        if (num >= generic_params_max_len)
+        pb_cur += CorSigUncompressData(pb_cur, &num);
+        if (num >= kGenericParamsMaxLen)
         {
-            return unknown;
+            return kUnknown;
         }
-        WCHAR param_type_name[param_name_max_len]{};
+        WCHAR param_type_name[kParamNameMaxLen]{};
         ULONG pch_name = 0;
-        const auto hr = pImport->GetGenericParamProps(genericParameters[num], nullptr, nullptr, nullptr, nullptr,
-                                                      param_type_name, param_name_max_len, &pch_name);
+        const auto hr = metadata_import->GetGenericParamProps(generic_parameters[num], nullptr, nullptr, nullptr, nullptr,
+                                                      param_type_name, kParamNameMaxLen, &pch_name);
         if (FAILED(hr))
         {
             Logger::Debug("GetGenericParamProps failed. HRESULT=0x", std::setfill('0'), std::setw(8),
                           std::hex, hr);
-            return unknown;
+            return kUnknown;
         }
         return param_type_name;
     }
 
-    shared::WSTRING GetSigTypeTokName(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaDataImport2>& pImport,
-                              mdGenericParam classParams[], mdGenericParam methodParams[])
+    shared::WSTRING GetSigTypeTokName(PCCOR_SIGNATURE& pb_cur, const ComPtr<IMetaDataImport2>& metadata_import,
+                              mdGenericParam class_params[], mdGenericParam method_params[])
     {
-        shared::WSTRING tokenName = shared::EmptyWStr;
+        shared::WSTRING token_name = shared::EmptyWStr;
         bool ref_flag = false;
-        if (*pbCur == ELEMENT_TYPE_BYREF)
+        if (*pb_cur == ELEMENT_TYPE_BYREF)
         {
-            pbCur++;
+            pb_cur++;
             ref_flag = true;
         }
 
-        switch (*pbCur)
+        switch (*pb_cur)
         {
             case ELEMENT_TYPE_BOOLEAN:
-                tokenName = SystemBoolean;
-                pbCur++;
+                token_name = SystemBoolean;
+                pb_cur++;
                 break;
             case ELEMENT_TYPE_CHAR:
-                tokenName = SystemChar;
-                pbCur++;
+                token_name = SystemChar;
+                pb_cur++;
                 break;
             case ELEMENT_TYPE_I1:
-                tokenName = SystemSByte;
-                pbCur++;
+                token_name = SystemSByte;
+                pb_cur++;
                 break;
             case ELEMENT_TYPE_U1:
-                tokenName = SystemByte;
-                pbCur++;
+                token_name = SystemByte;
+                pb_cur++;
                 break;
             case ELEMENT_TYPE_U2:
-                tokenName = SystemUInt16;
-                pbCur++;
+                token_name = SystemUInt16;
+                pb_cur++;
                 break;
             case ELEMENT_TYPE_I2:
-                tokenName = SystemInt16;
-                pbCur++;
+                token_name = SystemInt16;
+                pb_cur++;
                 break;
             case ELEMENT_TYPE_I4:
-                tokenName = SystemInt32;
-                pbCur++;
+                token_name = SystemInt32;
+                pb_cur++;
                 break;
             case ELEMENT_TYPE_U4:
-                tokenName = SystemUInt32;
-                pbCur++;
+                token_name = SystemUInt32;
+                pb_cur++;
                 break;
             case ELEMENT_TYPE_I8:
-                tokenName = SystemInt64;
-                pbCur++;
+                token_name = SystemInt64;
+                pb_cur++;
                 break;
             case ELEMENT_TYPE_U8:
-                tokenName = SystemUInt64;
-                pbCur++;
+                token_name = SystemUInt64;
+                pb_cur++;
                 break;
             case ELEMENT_TYPE_R4:
-                tokenName = SystemSingle;
-                pbCur++;
+                token_name = SystemSingle;
+                pb_cur++;
                 break;
             case ELEMENT_TYPE_R8:
-                tokenName = SystemDouble;
-                pbCur++;
+                token_name = SystemDouble;
+                pb_cur++;
                 break;
             case ELEMENT_TYPE_I:
-                tokenName = SystemIntPtr;
-                pbCur++;
+                token_name = SystemIntPtr;
+                pb_cur++;
                 break;
             case ELEMENT_TYPE_U:
-                tokenName = SystemUIntPtr;
-                pbCur++;
+                token_name = SystemUIntPtr;
+                pb_cur++;
                 break;
             case ELEMENT_TYPE_STRING:
-                tokenName = SystemString;
-                pbCur++;
+                token_name = SystemString;
+                pb_cur++;
                 break;
             case ELEMENT_TYPE_OBJECT:
-                tokenName = SystemObject;
-                pbCur++;
+                token_name = SystemObject;
+                pb_cur++;
                 break;
             case ELEMENT_TYPE_CLASS:
             case ELEMENT_TYPE_VALUETYPE:
             {
-                pbCur++;
+                pb_cur++;
                 mdToken token;
-                pbCur += CorSigUncompressToken(pbCur, &token);
-                tokenName = GetTypeInfo(pImport, token).name;
+                pb_cur += CorSigUncompressToken(pb_cur, &token);
+                token_name = GetTypeInfo(metadata_import, token).name;
                 break;
             }
             case ELEMENT_TYPE_SZARRAY:
             {
-                pbCur++;
-                tokenName = GetSigTypeTokName(pbCur, pImport, classParams, methodParams) + WStr("[]");
+                pb_cur++;
+                token_name = GetSigTypeTokName(pb_cur, metadata_import, class_params, method_params) + WStr("[]");
                 break;
             }
             case ELEMENT_TYPE_GENERICINST:
             {
-                pbCur++;
-                tokenName = GetSigTypeTokName(pbCur, pImport, classParams, methodParams);
-                tokenName += generic_params_opening_brace;
+                pb_cur++;
+                token_name = GetSigTypeTokName(pb_cur, metadata_import, class_params, method_params);
+                token_name += kGenericParamsOpeningBrace;
                 ULONG num = 0;
-                pbCur += CorSigUncompressData(pbCur, &num);
+                pb_cur += CorSigUncompressData(pb_cur, &num);
                 for (ULONG i = 0; i < num; i++)
                 {
-                    tokenName += GetSigTypeTokName(pbCur, pImport, classParams, methodParams);
+                    token_name += GetSigTypeTokName(pb_cur, metadata_import, class_params, method_params);
                     if (i != num - 1)
                     {
-                        tokenName += params_separator;
+                        token_name += kParamsSeparator;
                     }
                 }
-                tokenName += generic_params_closing_brace;
+                token_name += kGenericParamsClosingBrace;
                 break;
             }
             case ELEMENT_TYPE_MVAR:
             {
-                tokenName += ExtractParameterName(pbCur, pImport, methodParams);
+                token_name += ExtractParameterName(pb_cur, metadata_import, method_params);
                 break;
             }
             case ELEMENT_TYPE_VAR:
             {
-                tokenName += ExtractParameterName(pbCur, pImport, classParams);
+                token_name += ExtractParameterName(pb_cur, metadata_import, class_params);
                 break;
             }
             default:
@@ -602,9 +601,9 @@ private:
 
         if (ref_flag)
         {
-            tokenName += WStr("&");
+            token_name += WStr("&");
         }
-        return tokenName;
+        return token_name;
     }
 
 public:
@@ -614,69 +613,69 @@ public:
 
         // TODO Splunk: consider two layers cache. Based on FunctionID while CLR is suspended.
         // The second one based on Function token (mdToken) and ModuleID - it can susrvive multiple CLR suspensions.
-        shared::WSTRING* answer = functionNameCache.get(function_identifier);
+        shared::WSTRING* answer = function_name_cache_.Get(function_identifier);
         if (answer != nullptr)
         {
             return answer;
         }
-        stats.nameCacheMisses++;
+        stats_.name_cache_misses++;
         answer = new shared::WSTRING();
         this->GetFunctionName(function_identifier, *answer);
-        functionNameCache.put(function_identifier, answer);
+        function_name_cache_.Put(function_identifier, answer);
         return answer;
     }
 };
 
-HRESULT __stdcall FrameCallback(_In_ FunctionID funcId, _In_ UINT_PTR ip, _In_ COR_PRF_FRAME_INFO frameInfo,
-                                _In_ ULONG32 contextSize, _In_ BYTE context[], _In_ void* clientData)
+HRESULT __stdcall FrameCallback(_In_ FunctionID func_id, _In_ UINT_PTR ip, _In_ COR_PRF_FRAME_INFO frame_info,
+                                _In_ ULONG32 context_size, _In_ BYTE context[], _In_ void* client_data)
 {
-    const auto helper = static_cast<SamplingHelper*>(clientData);
-    helper->stats.totalFrames++;
-    const shared::WSTRING* name = helper->Lookup(funcId, frameInfo);
+    const auto helper = static_cast<SamplingHelper*>(client_data);
+    helper->stats_.total_frames++;
+    const shared::WSTRING* name = helper->Lookup(func_id, frame_info);
     // This is where line numbers could be calculated
-    helper->curWriter->RecordFrame(funcId, *name);
+    helper->cur_writer_->RecordFrame(func_id, *name);
     return S_OK;
 }
 
-// Factored out from the loop to a separate function for easier auditing and control of the threadstate lock
+// Factored out from the loop to a separate function for easier auditing and control of the thread state lock
 void CaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, SamplingHelper& helper)
 {
-    ICorProfilerThreadEnum* threadEnum = nullptr;
-    HRESULT hr = info10->EnumThreads(&threadEnum);
+    ICorProfilerThreadEnum* thread_enum = nullptr;
+    HRESULT hr = info10->EnumThreads(&thread_enum);
     if (FAILED(hr))
     {
         Logger::Debug("Could not EnumThreads. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
         return;
     }
-    ThreadID threadID;
-    ULONG numReturned = 0;
+    ThreadID thread_id;
+    ULONG num_returned = 0;
 
-    helper.curWriter->StartBatch();
+    helper.cur_writer_->StartBatch();
 
-    while ((hr = threadEnum->Next(1, &threadID, &numReturned)) == S_OK)
+    while ((hr = thread_enum->Next(1, &thread_id, &num_returned)) == S_OK)
     {
-        helper.stats.numThreads++;
-        ThreadSpanContext spanContext = threadSpanContextMap[threadID];
-        auto found = ts->managedTid2state.find(threadID);
-        if (found != ts->managedTid2state.end() && found->second != nullptr)
+        helper.stats_.num_threads++;
+        thread_span_context spanContext = thread_span_context_map[thread_id];
+        auto found = ts->managed_tid_to_state_.find(thread_id);
+        if (found != ts->managed_tid_to_state_.end() && found->second != nullptr)
         {
-            helper.curWriter->StartSample(threadID, found->second, spanContext);
+            helper.cur_writer_->StartSample(thread_id, found->second, spanContext);
         }
         else
         {
             auto unknown = ThreadState();
-            helper.curWriter->StartSample(threadID, &unknown, spanContext);
+            helper.cur_writer_->StartSample(thread_id, &unknown, spanContext);
         }
 
         // Don't reuse the hr being used for the thread enum, especially since a failed snapshot isn't fatal
-        HRESULT snapshotHr = info10->DoStackSnapshot(threadID, &FrameCallback, COR_PRF_SNAPSHOT_DEFAULT, &helper, nullptr, 0);
+        HRESULT snapshotHr = info10->DoStackSnapshot(thread_id, &FrameCallback, COR_PRF_SNAPSHOT_DEFAULT, &helper, nullptr, 0);
         if (FAILED(snapshotHr))
         {
             Logger::Debug("DoStackSnapshot failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, snapshotHr);
         }
-        helper.curWriter->EndSample();
+        helper.cur_writer_->EndSample();
     }
-    helper.curWriter->EndBatch();
+    helper.cur_writer_->EndBatch();
 }
 
 int GetSamplingPeriod()
@@ -684,7 +683,7 @@ int GetSamplingPeriod()
     const shared::WSTRING val = shared::GetEnvironmentValue(environment::thread_sampling_period);
     if (val.empty())
     {
-        return default_sample_period;
+        return kDefaultSamplePeriod;
     }
     try
     {
@@ -695,19 +694,19 @@ int GetSamplingPeriod()
         std::string str = convert.to_bytes(val);
         int parsedValue = std::stoi(str);
 #endif
-        return (int) std::max(minimum_sample_period, parsedValue);
+        return (int) std::max(kMinimumSamplePeriod, parsedValue);
     }
     catch (...)
     {
-        return default_sample_period;
+        return kDefaultSamplePeriod;
     }
 }
 
 void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, SamplingHelper & helper)
 {
     // These locks are in use by managed threads; Acquire locks before suspending the runtime to prevent deadlock
-    std::lock_guard<std::mutex> threadStateGuard(ts->threadStateLock);
-    std::lock_guard<std::mutex> spanContextGuard(threadSpanContextLock);
+    std::lock_guard<std::mutex> thread_state_guard(ts->thread_state_lock_);
+    std::lock_guard<std::mutex> span_context_guard(thread_span_context_lock);
 
     const auto start = std::chrono::steady_clock::now();
 
@@ -735,11 +734,11 @@ void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, Sa
     }
 
     const auto end = std::chrono::steady_clock::now();
-    const auto elapsedMicros = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-    helper.stats.microsSuspended = static_cast<int>(elapsedMicros);
-    helper.curWriter->WriteFinalStats(helper.stats);
-    Logger::Debug("Threads sampled in ", elapsedMicros, " micros. threads=", helper.stats.numThreads,
-                  " frames=", helper.stats.totalFrames, " misses=", helper.stats.nameCacheMisses);
+    const auto elapsed_micros = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    helper.stats_.micros_suspended = static_cast<int>(elapsed_micros);
+    helper.cur_writer_->WriteFinalStats(helper.stats_);
+    Logger::Debug("Threads sampled in ", elapsed_micros, " micros. threads=", helper.stats_.num_threads,
+                  " frames=", helper.stats_.total_frames, " misses=", helper.stats_.name_cache_misses);
 
     helper.PublishBuffer();
 }
@@ -754,17 +753,17 @@ void SleepMillis(int millis) {
 
 DWORD WINAPI SamplingThreadMain(_In_ LPVOID param)
 {
-    const int sleepMillis = GetSamplingPeriod();
+    const int sleep_millis = GetSamplingPeriod();
     const auto ts = static_cast<ThreadSampler*>(param);
     ICorProfilerInfo10* info10 = ts->info10;
     SamplingHelper helper;
-    helper.info10 = info10;
+    helper.info10_ = info10;
 
     info10->InitializeCurrentThread();
 
     while (true)
     {
-        SleepMillis(sleepMillis);
+        SleepMillis(sleep_millis);
         const bool shouldSample = helper.AllocateBuffer();
         if (!shouldSample) {
             Logger::Warn("Skipping a thread sample period, buffers are full. ** THIS WILL RESULT IN LOSS OF PROFILING DATA **");
@@ -777,7 +776,7 @@ DWORD WINAPI SamplingThreadMain(_In_ LPVOID param)
 void ThreadSampler::StartSampling(ICorProfilerInfo10* cor_profiler_info10)
 {
     Logger::Info("ThreadSampler::StartSampling");
-    profilerInfo = cor_profiler_info10;
+    profiler_info = cor_profiler_info10;
     this->info10 = cor_profiler_info10;
 #ifdef _WIN32
     CreateThread(nullptr, 0, &SamplingThreadMain, this, 0, nullptr);
@@ -787,7 +786,7 @@ void ThreadSampler::StartSampling(ICorProfilerInfo10* cor_profiler_info10)
 #endif
 }
 
-void ThreadSampler::ThreadCreated(ThreadID threadId)
+void ThreadSampler::ThreadCreated(ThreadID thread_id)
 {
     // So it seems the Thread* items can be/are called out of order.  ThreadCreated doesn't carry any valuable
     // ThreadState information so this is a deliberate nop.  The other methods will fault in ThreadStates
@@ -795,78 +794,78 @@ void ThreadSampler::ThreadCreated(ThreadID threadId)
     // Hopefully the destroyed event is not called out of order with the others... if so, the worst that happens
     // is we get an empty name string and a 0 in the native ID column
 }
-void ThreadSampler::ThreadDestroyed(ThreadID threadId)
+void ThreadSampler::ThreadDestroyed(ThreadID thread_id)
 {
     {
-        std::lock_guard<std::mutex> guard(threadStateLock);
+        std::lock_guard<std::mutex> guard(thread_state_lock_);
 
-        const ThreadState* state = managedTid2state[threadId];
+        const ThreadState* state = managed_tid_to_state_[thread_id];
 
         delete state;
 
-        managedTid2state.erase(threadId);
+        managed_tid_to_state_.erase(thread_id);
     }
     {
-        std::lock_guard<std::mutex> guard(threadSpanContextLock);
+        std::lock_guard<std::mutex> guard(thread_span_context_lock);
 
-        threadSpanContextMap.erase(threadId);
+        thread_span_context_map.erase(thread_id);
     }
 }
-void ThreadSampler::ThreadAssignedToOSThread(ThreadID threadId, DWORD osThreadId)
+void ThreadSampler::ThreadAssignedToOsThread(ThreadID thread_id, DWORD os_thread_id)
 {
-    std::lock_guard<std::mutex> guard(threadStateLock);
+    std::lock_guard<std::mutex> guard(thread_state_lock_);
 
-    ThreadState* state = managedTid2state[threadId];
+    ThreadState* state = managed_tid_to_state_[thread_id];
     if (state == nullptr)
     {
         state = new ThreadState();
-        managedTid2state[threadId] = state;
+        managed_tid_to_state_[thread_id] = state;
     }
-    state->nativeId = osThreadId;
+    state->native_id_ = os_thread_id;
 }
-void ThreadSampler::ThreadNameChanged(ThreadID threadId, ULONG cchName, WCHAR _name[])
+void ThreadSampler::ThreadNameChanged(ThreadID thread_id, ULONG cch_name, WCHAR name[])
 {
-    std::lock_guard<std::mutex> guard(threadStateLock);
+    std::lock_guard<std::mutex> guard(thread_state_lock_);
 
-    ThreadState* state = managedTid2state[threadId];
+    ThreadState* state = managed_tid_to_state_[thread_id];
     if (state == nullptr)
     {
         state = new ThreadState();
-        managedTid2state[threadId] = state;
+        managed_tid_to_state_[thread_id] = state;
     }
-    state->threadName.clear();
-    state->threadName.append(_name, cchName);
+    state->thread_name_.clear();
+    state->thread_name_.append(name, cch_name);
 }
 
-NameCache::NameCache(size_t maximumSize) : maxSize(maximumSize)
+NameCache::NameCache(const size_t maximum_size) : max_size_(maximum_size)
 {
 }
 
-shared::WSTRING* NameCache::get(FunctionIdentifier key)
+shared::WSTRING* NameCache::Get(FunctionIdentifier key)
 {
-    const auto found = map.find(key);
-    if (found == map.end())
+    const auto found = map_.find(key);
+    if (found == map_.end())
     {
         return nullptr;
     }
     // This voodoo moves the single item in the iterator to the front of the list
     // (as it is now the most-recently-used)
-    list.splice(list.begin(), list, found->second);
+    list_.splice(list_.begin(), list_, found->second);
     return found->second->second;
 }
 
-void NameCache::put(FunctionIdentifier key, shared::WSTRING* val)
+void NameCache::Put(FunctionIdentifier key, shared::WSTRING* val)
 {
     const auto pair = std::pair(key, val);
-    list.push_front(pair);
-    map[key] = list.begin();
+    list_.push_front(pair);
+    map_[key] = list_.begin();
 
-    if (map.size() > maxSize)
+    if (map_.size() > max_size_)
     {
-        const auto &lru = list.back();
+        const auto &lru = list_.back();
         delete lru.second; // FIXME consider using WSTRING directly instead of WSTRING*
-        map.erase(lru.first);
-        list.pop_back();
+        map_.erase(lru.first);
+        list_.pop_back();
     }
 }
 
@@ -876,20 +875,20 @@ extern "C"
 {
     EXPORTTHIS int32_t SignalFxReadThreadSamples(int32_t len, unsigned char* buf)
     {
-        return ThreadSampling_ConsumeOneThreadSample(len, buf);
+        return ThreadSamplingConsumeOneThreadSample(len, buf);
     }
     EXPORTTHIS void SignalFxSetNativeContext(uint64_t traceIdHigh, uint64_t traceIdLow, uint64_t spanId,
-                                                        int32_t managedThreadId)
+                                             int32_t managedThreadId)
     {
         ThreadID threadId;
-        const HRESULT hr = profilerInfo->GetCurrentThreadID(&threadId);
+        const HRESULT hr = profiler_info->GetCurrentThreadID(&threadId);
         if (FAILED(hr)) {
             trace::Logger::Debug("GetCurrentThreadID failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
             return;
         }
 
-        std::lock_guard<std::mutex> guard(threadSpanContextLock);
+        std::lock_guard<std::mutex> guard(thread_span_context_lock);
 
-        threadSpanContextMap[threadId] = trace::ThreadSpanContext(traceIdHigh, traceIdLow, spanId, managedThreadId);
+        thread_span_context_map[threadId] = trace::thread_span_context(traceIdHigh, traceIdLow, spanId, managedThreadId);
     }
 }

@@ -99,5 +99,11 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="ExporterSettings.PartialFlushMinSpans"/>
         public const string PartialFlushMinSpans = "SIGNALFX_TRACE_PARTIAL_FLUSH_MIN_SPANS";
+
+        /// <summary>
+        /// Configuration key to do synchronous export of traces.
+        /// Default is <c>false</c>
+        /// </summary>
+        public const string TraceSyncExport = "SIGNALFX_TRACE_SYNC_EXPORT";
     }
 }

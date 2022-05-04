@@ -83,10 +83,6 @@ namespace Datadog.Trace.Configuration
                                false;
 #pragma warning restore 618
 
-            LogsInjectionEnabled = source?.GetBool(ConfigurationKeys.LogsInjectionEnabled) ??
-                                   // default value
-                                   false;
-
             MaxTracesSubmittedPerSecond = source?.GetInt32(ConfigurationKeys.TraceRateLimit) ??
                                           // default value
                                           100;
@@ -138,8 +134,6 @@ namespace Datadog.Trace.Configuration
 
             Convention = source.GetTypedValue<ConventionType>(ConfigurationKeys.Convention);
 
-            Propagators = GetPropagators(source);
-
             var urlSubstringSkips = source?.GetString(ConfigurationKeys.HttpClientExcludedUrlSubstrings) ??
                                     // default value
                                     (AzureAppServices.Metadata.IsRelevant ? AzureAppServices.Metadata.DefaultHttpClientExclusions : null);
@@ -188,6 +182,10 @@ namespace Datadog.Trace.Configuration
             DelayWcfInstrumentationEnabled = source?.GetBool(ConfigurationKeys.FeatureFlags.DelayWcfInstrumentationEnabled)
                                             ?? false;
 
+            PropagationStyleInject = TrimSplitString(source?.GetString(ConfigurationKeys.Propagators) ?? nameof(Propagators.ContextPropagators.Names.B3), ',').ToArray();
+
+            PropagationStyleExtract = PropagationStyleInject;
+
             TagElasticsearchQueries = source?.GetBool(ConfigurationKeys.TagElasticsearchQueries) ?? true;
 
             // If you change this, change environment_variables.h too
@@ -199,6 +197,13 @@ namespace Datadog.Trace.Configuration
             TraceMethods = source?.GetString(ConfigurationKeys.TraceMethods) ??
                            // Default value
                            string.Empty;
+
+            var grpcTags = source?.GetDictionary(ConfigurationKeys.GrpcTags, allowOptionalMappings: true) ??
+                                  // default value (empty)
+                                  new Dictionary<string, string>();
+
+            // Filter out tags with empty keys or empty values, and trim whitespaces
+            GrpcTags = InitializeHeaderTags(grpcTags, headerTagsNormalizationFixEnabled: true);
         }
 
         /// <summary>
@@ -264,10 +269,15 @@ namespace Datadog.Trace.Configuration
         /// <summary>
         /// Gets or sets a value indicating whether correlation identifiers are
         /// automatically injected into the logging context.
-        /// Default is <c>false</c>.
+        /// Default is <c>false</c>, unless <see cref="ConfigurationKeys.DirectLogSubmission.EnabledIntegrations"/>
+        /// enables Direct Log Submission.
         /// </summary>
         /// <seealso cref="ConfigurationKeys.LogsInjectionEnabled"/>
-        public bool LogsInjectionEnabled { get; set; }
+        public bool LogsInjectionEnabled
+        {
+            get => LogSubmissionSettings?.LogsInjectionEnabled ?? false;
+            set => LogSubmissionSettings.LogsInjectionEnabled = value;
+        }
 
         /// <summary>
         /// Gets or sets a value indicating the maximum number of traces set to AutoKeep (p1) per second.
@@ -299,9 +309,16 @@ namespace Datadog.Trace.Configuration
         public IDictionary<string, string> GlobalTags { get; set; }
 
         /// <summary>
-        /// Gets or sets the map of header keys to tag names, which are applied to the root <see cref="Span"/> of incoming requests.
+        /// Gets or sets the map of header keys to tag names, which are applied to the root <see cref="Span"/>
+        /// of incoming and outgoing HTTP requests.
         /// </summary>
         public IDictionary<string, string> HeaderTags { get; set; }
+
+        /// <summary>
+        /// Gets or sets the map of metadata keys to tag names, which are applied to the root <see cref="Span"/>
+        /// of incoming and outgoing GRPC requests.
+        /// </summary>
+        public IDictionary<string, string> GrpcTags { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether internal metrics
@@ -341,13 +358,6 @@ namespace Datadog.Trace.Configuration
         public ConventionType Convention { get; set; }
 
         /// <summary>
-        /// Gets or sets the propagators be used.
-        /// Default is <c>B3</c>
-        /// <seealso cref="ConfigurationKeys.Propagators"/>
-        /// </summary>
-        public HashSet<string> Propagators { get; set; }
-
-        /// <summary>
         /// Gets or sets a value indicating whether runtime metrics
         /// are enabled and sent to DogStatsd.
         /// </summary>
@@ -381,6 +391,16 @@ namespace Datadog.Trace.Configuration
         /// until later in the WCF pipeline when the WCF server exception handling is established.
         /// </summary>
         internal bool DelayWcfInstrumentationEnabled { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating the injection propagation style.
+        /// </summary>
+        internal string[] PropagationStyleInject { get; }
+
+        /// <summary>
+        /// Gets a value indicating the extraction propagation style.
+        /// </summary>
+        internal string[] PropagationStyleExtract { get; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the diagnostic log at startup is enabled
@@ -643,18 +663,6 @@ namespace Datadog.Trace.Configuration
             }
 
             return httpErrorCodesArray;
-        }
-
-        private static HashSet<string> GetPropagators(IConfigurationSource source)
-        {
-            var propagators = source.GetStrings(ConfigurationKeys.Propagators);
-
-            if (!propagators.Any())
-            {
-                return new HashSet<string>() { PropagatorTypes.B3 };
-            }
-
-            return new HashSet<string>(propagators);
         }
 
         private static TimeSpan GetThreadSamplingPeriod(IConfigurationSource source)

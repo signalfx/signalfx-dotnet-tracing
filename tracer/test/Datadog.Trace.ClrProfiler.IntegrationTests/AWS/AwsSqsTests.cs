@@ -115,6 +115,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AWS
         public AwsSqsTests(ITestOutputHelper output)
             : base("AWS.SQS", output)
         {
+            SetEnvironmentVariable("SIGNALFX_PROPAGATORS", "B3");
         }
 
         [SkippableTheory]

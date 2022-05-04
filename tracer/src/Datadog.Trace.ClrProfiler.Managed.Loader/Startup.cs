@@ -15,7 +15,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
     /// </summary>
     public partial class Startup
     {
-        private const string AssemblyName = "SignalFx.Tracing, Version=0.2.2.0, Culture=neutral, PublicKeyToken=e43a27c2023d388a";
+        private const string AssemblyName = "SignalFx.Tracing, Version=0.2.3.0, Culture=neutral, PublicKeyToken=e43a27c2023d388a";
         private const string AzureAppServicesKey = "SIGNALFX_AZURE_APP_SERVICES";
         private const string AasCustomTracingKey = "SIGNALFX_AAS_ENABLE_CUSTOM_TRACING";
         private const string AasCustomMetricsKey = "SIGNALFX_AAS_ENABLE_CUSTOM_METRICS";

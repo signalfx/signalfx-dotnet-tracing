@@ -2,7 +2,7 @@
 
 # SignalFx Instrumentation for .NET
 
-The SignalFx Instrumentationy for .NET provides automatic instrumentations
+The SignalFx Instrumentation for .NET provides automatic instrumentations
 for popular .NET libraries and frameworks.
 
 The SignalFx Instrumentation for .NET is a [.NET Profiler](https://docs.microsoft.com/en-us/dotnet/framework/unmanaged-api/profiling/profiling-overview)
@@ -16,7 +16,7 @@ By default:
   propagation,
 - Zipkin trace exporter is used to send spans as JSON in the [Zipkin v2 format](https://zipkin.io/zipkin-api/#/default/post_spans).
 
-The SignalFx Instrumentationy for .NET registers an OpenTracing `GlobalTracer`
+The SignalFx Instrumentation for .NET registers an OpenTracing `GlobalTracer`
 so you can support existing custom instrumentation or add custom
 instrumentation to your application later.
 
@@ -90,9 +90,9 @@ page.
 | `x86_64.rpm`  | Red Hat-based Linux distributions | x64 | `rpm -ivh signalfx-dotnet-tracing.rpm` | RPM package |
 | `x64.msi`     | Windows 64-bit | x64 |  `msiexec /i signalfx-dotnet-tracing-x64.msi /quiet` | |
 | `x86.msi`     | Windows 32-bit | x86 | `msiexec /i signalfx-dotnet-tracing-x86.msi /quiet` | |
-| `tar.gz` | Linux distributions using [qlibc](https://wiki.musl-libc.org/projects-using-musl.html) | x64 | `tar -xf signalfx-dotnet-tracing.tar.gz -C /opt/signalfx` | Currently, all [officially supported Linux distribtions](https://docs.microsoft.com/dotnet/core/install/linux) except Alpine use glibc |
+| `tar.gz`      | Linux distributions using [glibc](https://www.gnu.org/software/libc) | x64 | `tar -xf signalfx-dotnet-tracing.tar.gz -C /opt/signalfx` | Currently, all [officially supported Linux distribtions](https://docs.microsoft.com/dotnet/core/install/linux) except Alpine use glibc |
 | `amd64.deb`   | Debian-based Linux distributions | x64 | `dpkg -i signalfx-dotnet-tracing.deb` | DEB package |
-| `musl.tar.gz` | x64 Linux distributions using [musl](https://wiki.musl-libc.org/projects-using-musl.html) | x64 | `tar -xf signalfx-dotnet-tracing-musl.tar.gz -C /opt/signalfx` | Alpine Linux uses musl |
+| `musl.tar.gz` | Linux distributions using [musl](https://wiki.musl-libc.org/projects-using-musl.html) | x64 | `tar -xf signalfx-dotnet-tracing-musl.tar.gz -C /opt/signalfx` | Alpine Linux uses musl |
 
 On Linux, after the installation, you can optionally create the log directory:
 
@@ -177,6 +177,10 @@ See [correlating-traces-with-logs.md](correlating-traces-with-logs.md).
 ## Metrics
 
 See [metrics.md](metrics.md)
+
+## AlwaysOn Profiling
+
+See [always-on-profiling.md](always-on-profiling.md)
 
 ## Troubleshooting
 

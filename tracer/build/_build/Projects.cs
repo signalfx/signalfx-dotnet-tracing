@@ -4,6 +4,7 @@ public static class Projects
 {
     public const string DatadogMonitoringDistribution = "Datadog.Monitoring.Distribution";
     public const string DatadogTrace = "Datadog.Trace";
+    public const string DatadogTraceAnnotations = "Datadog.Trace.Annotations";
     public const string DatadogTraceAspNet = "Datadog.Trace.AspNet";
     public const string DatadogTraceOpenTracing = "Datadog.Trace.OpenTracing";
     public const string DatadogTraceMsBuild = "Datadog.Trace.MSBuild";
@@ -11,6 +12,7 @@ public static class Projects
     public const string WindowsInstaller = "WindowsInstaller";
 
     public const string NativeLoader = "Datadog.AutoInstrumentation.NativeLoader";
+    public const string AlwaysOnProfilerNativeDep = "Samples.AlwaysOnProfiler.NativeDep";
 
     public const string BenchmarksTrace = "Benchmarks.Trace";
 

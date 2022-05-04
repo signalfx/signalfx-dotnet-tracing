@@ -64,7 +64,7 @@ namespace Datadog.Trace.Tests.AlwaysOnProfiler
                     };
                 };
 
-                var scopeManager = new AsyncLocalScopeManager(pushScopeToNative: true)
+                var scopeManager = new AsyncLocalScopeManager(alwaysOnProfilerEnabled: true)
                 {
                     SetProfilingContext = mockSetProfilingContext
                 };

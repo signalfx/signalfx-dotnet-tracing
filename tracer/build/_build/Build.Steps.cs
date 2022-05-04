@@ -45,7 +45,6 @@ partial class Build
     AbsolutePath SymbolsDirectory => TracerHome ?? (OutputDirectory / "symbols");
     AbsolutePath DDTracerHomeDirectory => DDTracerHome ?? (OutputDirectory / "dd-tracer-home");
     AbsolutePath ArtifactsDirectory => Artifacts ?? (OutputDirectory / "artifacts");
-    AbsolutePath WindowsTracerHomeZip => ArtifactsDirectory / "windows-tracer-home.zip";
     AbsolutePath WindowsSymbolsZip => ArtifactsDirectory / "windows-native-symbols.zip";
     AbsolutePath BuildDataDirectory => TracerDirectory / "build_data";
     AbsolutePath ToolSourceDirectory => ToolSource ?? (OutputDirectory / "runnerTool");
@@ -54,6 +53,8 @@ partial class Build
     AbsolutePath MonitoringHomeDirectory => MonitoringHome ?? (SharedDirectory / "bin" / "monitoring-home");
 
     AbsolutePath ProfilerHomeDirectory => ProfilerHome ?? RootDirectory / ".." / "_build" / "DDProf-Deploy";
+
+    AbsolutePath AlwaysOnProfilerNativeDepDirectory => TestsDirectory / "bin" ;
 
     AbsolutePath SourceDirectory => TracerDirectory / "src";
     AbsolutePath BuildDirectory => TracerDirectory / "build";
@@ -72,14 +73,17 @@ partial class Build
     };
     Project NativeProfilerProject => Solution.GetProject(Projects.ClrProfilerNative);
     Project NativeLoaderProject => Solution.GetProject(Projects.NativeLoader);
+    Project AlwaysOnProfilerNativeDepProject => Solution.GetProject(Projects.AlwaysOnProfilerNativeDep);
 
     string NativeProfilerModule => "SignalFx.Tracing.ClrProfiler.Native";
+    string AlwaysOnProfilerNativeDepModule => "Samples.AlwaysOnProfiler.NativeDep";
 
     [LazyPathExecutable(name: "cmake")] readonly Lazy<Tool> CMake;
     [LazyPathExecutable(name: "make")] readonly Lazy<Tool> Make;
     [LazyPathExecutable(name: "fpm")] readonly Lazy<Tool> Fpm;
     [LazyPathExecutable(name: "gzip")] readonly Lazy<Tool> GZip;
     [LazyPathExecutable(name: "cmd")] readonly Lazy<Tool> Cmd;
+    [LazyPathExecutable(name: "chmod")] readonly Lazy<Tool> Chmod;
 
     IEnumerable<MSBuildTargetPlatform> ArchitecturesForPlatform =>
         Equals(TargetPlatform, MSBuildTargetPlatform.x64)
@@ -95,6 +99,7 @@ partial class Build
     {
         Solution.GetProject(Projects.DatadogTrace),
         Solution.GetProject(Projects.DatadogTraceOpenTracing),
+        Solution.GetProject(Projects.DatadogTraceAnnotations),
     };
 
     Project[] ParallelIntegrationTests => new[]
@@ -113,6 +118,7 @@ partial class Build
         TargetFramework.NET461,
         TargetFramework.NETSTANDARD2_0,
         TargetFramework.NETCOREAPP3_1,
+        TargetFramework.NET6_0,
     };
 
     Target CreateRequiredDirectories => _ => _
@@ -250,6 +256,40 @@ partial class Build
                     .SetTargetPlatform(platform)));
         });
 
+    Target CompileAlwaysOnProfilerNativeDepWindows => _ => _
+        .Unlisted()
+        .OnlyWhenStatic(() => IsWin)
+        .Executes(() =>
+        {
+            // If we're building for x64, build for x86 too
+            var platforms =
+                Equals(TargetPlatform, MSBuildTargetPlatform.x64)
+                    ? new[] { MSBuildTargetPlatform.x64, MSBuildTargetPlatform.x86 }
+                    : new[] { MSBuildTargetPlatform.x86 };
+
+            // Can't use dotnet msbuild, as needs to use the VS version of MSBuild
+            MSBuild(s => s
+                .SetTargetPath(MsBuildProject)
+                .SetConfiguration(BuildConfiguration)
+                .SetMSBuildPath()
+                .SetTargets("BuildAlwaysOnProfilerNativeDep")
+                .DisableRestore()
+                .SetMaxCpuCount(null)
+                .CombineWith(platforms, (m, platform) => m
+                    .SetTargetPlatform(platform)));
+        });
+
+    Target CompileAlwaysOnProfilerNativeDepLinux => _ => _
+        .Unlisted()
+        .OnlyWhenStatic(() => IsLinux)
+        .Executes(() => {
+            var buildDirectory = AlwaysOnProfilerNativeDepProject.Directory;
+            CMake.Value(
+                arguments: "-S .",
+                workingDirectory: buildDirectory);
+            Make.Value(workingDirectory: buildDirectory);
+        });
+
     Target CompileNativeTestsLinux => _ => _
         .Unlisted()
         .After(CompileNativeSrc)
@@ -273,7 +313,6 @@ partial class Build
             var targetFrameworks = IsWin
                 ? TargetFrameworks
                 : TargetFrameworks.Where(framework => !framework.ToString().StartsWith("net4"));
-
             // Publish Datadog.Trace.MSBuild which includes Datadog.Trace and Datadog.Trace.AspNet
             DotNetPublish(s => s
                 .SetProject(Solution.GetProject(Projects.DatadogTraceMsBuild))
@@ -291,7 +330,7 @@ partial class Build
       .OnlyWhenStatic(() => IsWin)
       .After(CompileNativeSrc, PublishManagedProfiler)
       .Executes(() =>
-       {
+      {
            foreach (var architecture in ArchitecturesForPlatform)
            {
                var source = NativeProfilerProject.Directory / "bin" / BuildConfiguration / architecture.ToString() /
@@ -300,7 +339,7 @@ partial class Build
                Logger.Info($"Copying '{source}' to '{dest}'");
                CopyFileToDirectory(source, dest, FileExistsPolicy.Overwrite);
            }
-       });
+      });
 
     Target PublishNativeProfilerWindows => _ => _
         .Unlisted()
@@ -349,7 +388,6 @@ partial class Build
                 BuildDirectory / "artifacts" / "createLogPath.sh",
                 TracerHomeDirectory,
                 FileExistsPolicy.Overwrite);
-
             // Create home directory
             CopyFileToDirectory(
                 NativeProfilerProject.Directory / "bin" / $"{NativeProfilerModule}.dylib",
@@ -363,10 +401,40 @@ partial class Build
         .DependsOn(PublishNativeProfilerLinux)
         .DependsOn(PublishNativeProfilerMacOs);
 
-    Target PublishOpenTracing => _ => _
+    Target PublishAlwaysOnProfilerNativeDepWindows => _ => _
         .Unlisted()
-        .After(CompileManagedSrc)
+        .OnlyWhenStatic(() => IsWin)
+        .DependsOn(CompileAlwaysOnProfilerNativeDepWindows)
         .Executes(() =>
+         {
+             foreach (var architecture in ArchitecturesForPlatform)
+             {
+                 // Copy native AlwaysOnProfiler dependency assets
+                 var source = AlwaysOnProfilerNativeDepProject.Directory / "bin" / BuildConfiguration / architecture.ToString() /
+                              $"{AlwaysOnProfilerNativeDepModule}.dll";
+                 var dest = AlwaysOnProfilerNativeDepDirectory / $"win-{architecture}";
+                 Logger.Info($"Copying '{source}' to '{dest}'");
+                 CopyFileToDirectory(source, dest, FileExistsPolicy.Overwrite);
+             }
+         });
+
+    Target PublishAlwaysOnProfilerNativeDepLinux => _ => _
+       .Unlisted()
+       .OnlyWhenStatic(() => IsLinux)
+       .DependsOn(CompileAlwaysOnProfilerNativeDepLinux)
+       .Executes(() =>
+       {
+       // Copy Native file
+       CopyFileToDirectory(
+           AlwaysOnProfilerNativeDepProject.Directory / "bin" / $"{AlwaysOnProfilerNativeDepModule}.so",
+           AlwaysOnProfilerNativeDepDirectory,
+           FileExistsPolicy.Overwrite);
+       });
+
+    Target PublishOpenTracing => _ => _
+       .Unlisted()
+       .After(CompileManagedSrc)
+       .Executes(() =>
         {
             var targetFrameworks = IsWin
                                        ? TargetFrameworks
@@ -489,6 +557,7 @@ partial class Build
         {
             // create junction for each directory
             var directories = TracerDirectory.GlobDirectories(
+                $"src/**/obj/{BuildConfiguration}",
                 $"src/**/bin/{BuildConfiguration}",
                 $"test/Datadog.Trace.TestHelpers/**/obj/{BuildConfiguration}",
                 $"test/Datadog.Trace.TestHelpers/**/bin/{BuildConfiguration}",
@@ -528,15 +597,17 @@ partial class Build
         .Requires(() => Version)
         .Executes(() =>
         {
+            const string packageName = "signalfx-dotnet-tracing";
+
             if (IsWin)
             {
-                CompressZip(TracerHomeDirectory, WindowsTracerHomeZip, fileMode: FileMode.Create);
+                var zipPath = ArtifactsDirectory / $"{packageName}-{Version}.zip";
+                CompressZip(TracerHomeDirectory, zipPath, fileMode: FileMode.Create);
             }
             else if (IsLinux)
             {
                 var fpm = Fpm.Value;
                 var gzip = GZip.Value;
-                var packageName = "signalfx-dotnet-tracing";
 
                 var workingDirectory = ArtifactsDirectory / $"linux-{LinuxArchitectureIdentifier}";
                 EnsureCleanDirectory(workingDirectory);
@@ -555,6 +626,7 @@ partial class Build
                         "netstandard2.0/",
                         "netcoreapp3.1/",
                         $"{NativeProfilerModule}.so",
+                        "net6.0/",
                         "createLogPath.sh",
                     };
 
@@ -793,6 +865,7 @@ partial class Build
 
     Target CompileSamples => _ => _
         .Unlisted()
+        .DependsOn(PublishAlwaysOnProfilerNativeDepWindows)
         .After(CompileDependencyLibs)
         .After(CreatePlatformlessSymlinks)
         .After(CompileFrameworkReproductions)
@@ -990,6 +1063,7 @@ partial class Build
 
     Target CompileSamplesLinux => _ => _
         .Unlisted()
+        .DependsOn(PublishAlwaysOnProfilerNativeDepLinux)
         .After(CompileManagedSrc)
         .After(CompileRegressionDependencyLibs)
         .After(CompileDependencyLibs)
@@ -998,6 +1072,8 @@ partial class Build
         .Requires(() => Framework)
         .Executes(() =>
         {
+            MakeGrpcToolsExecutable();
+
             // There's nothing specifically linux-y here, it's just that we only build a subset of projects
             // for testing on linux.
             var sampleProjects = TracerDirectory.GlobFiles("test/test-applications/integrations/*/*.csproj");
@@ -1006,7 +1082,7 @@ partial class Build
             var instrumentationProjects = TracerDirectory.GlobFiles("test/test-applications/instrumentation/*/*.csproj");
 
             // These samples are currently skipped.
-            var projectsToSkip = new[]
+            var projectsToSkip = new List<string>
             {
                 "Samples.Msmq",  // Doesn't run on Linux
                 "Samples.Owin.WebApi2", // Doesn't run on Linux
@@ -1026,6 +1102,14 @@ partial class Build
                 "IBM.Data.DB2.DBCommand",
                 "Sandbox.AutomaticInstrumentation", // Doesn't run on Linux
             };
+
+            if (IsAlpine)
+            {
+                // Alpine has issues with the gRPC tools, filter out the affected projects.
+                // The corresponding tests are skipped on Alpine.
+                projectsToSkip.Add("Samples.GrpcDotNet");
+                projectsToSkip.Add("Samples.GrpcLegacy");
+            }
 
             // These sample projects are built using RestoreAndBuildSamplesForPackageVersions
             // so no point building them now
@@ -1066,8 +1150,6 @@ partial class Build
                         "Samples.AspNetCoreMvc30" => Framework == TargetFramework.NETCOREAPP3_0,
                         "Samples.AspNetCoreMvc31" => Framework == TargetFramework.NETCOREAPP3_1,
                         "Samples.AspNetCoreMinimalApis" => Framework == TargetFramework.NET6_0,
-                        "Samples.AspNetCore2" => Framework == TargetFramework.NETCOREAPP2_1,
-                        "Samples.AspNetCore5" => Framework == TargetFramework.NET6_0 || Framework == TargetFramework.NET5_0 || Framework == TargetFramework.NETCOREAPP3_1 || Framework == TargetFramework.NETCOREAPP3_0,
                         "Samples.GraphQL4" => Framework == TargetFramework.NETCOREAPP3_1 || Framework == TargetFramework.NET5_0 || Framework == TargetFramework.NET6_0,
                         "Samples.AWS.Lambda" => Framework == TargetFramework.NETCOREAPP3_1,
                         var name when projectsToSkip.Contains(name) => false,
@@ -1128,20 +1210,26 @@ partial class Build
 
             // /nowarn:NU1701 - Package 'x' was restored using '.NETFramework,Version=v4.6.1' instead of the project target framework '.NETCoreApp,Version=v2.1'.
             // /nowarn:NETSDK1138 - Package 'x' was restored using '.NETFramework,Version=v4.6.1' instead of the project target framework '.NETCoreApp,Version=v2.1'.
-            DotNetMSBuild(x => x
-                .SetTargetPath(MsBuildProject)
-                .SetConfiguration(BuildConfiguration)
-                .EnableNoDependencies()
-                .SetProperty("TargetFramework", Framework.ToString())
-                .SetProperty("BuildInParallel", "true")
-                .SetProperty("CheckEolTargetFramework", "false")
-                .When(IsArm64, o => o.SetProperty("IsArm64", "true"))
-                .When(IsAlpine, o => o.SetProperty("IsAlpine", "true"))
-                .SetProcessArgumentConfigurator(arg => arg.Add("/nowarn:NU1701"))
-                .When(TestAllPackageVersions, o => o.SetProperty("TestAllPackageVersions", "true"))
-                .When(IncludeMinorPackageVersions, o => o.SetProperty("IncludeMinorPackageVersions", "true"))
-                .CombineWith(targets, (c, target) => c.SetTargets(target))
-            );
+            foreach(var target in targets)
+            {
+                DotNetMSBuild(x => x
+                    .SetTargetPath(MsBuildProject)
+                    .SetTargets(target)
+                    .SetConfiguration(BuildConfiguration)
+                    .EnableNoDependencies()
+                    .SetProperty("TargetFramework", Framework.ToString())
+                    .SetProperty("BuildInParallel", "true")
+                    .SetProperty("CheckEolTargetFramework", "false")
+                    .When(IsArm64, o => o.SetProperty("IsArm64", "true"))
+                    .When(IsAlpine, o => o.SetProperty("IsAlpine", "true"))
+                    .When(!string.IsNullOrEmpty(NugetPackageDirectory), o => o.SetProperty("RestorePackagesPath", NugetPackageDirectory))
+                    .SetProcessArgumentConfigurator(arg => arg.Add("/nowarn:NU1701"))
+                    .When(TestAllPackageVersions, o => o.SetProperty("TestAllPackageVersions", "true"))
+                    .When(IncludeMinorPackageVersions, o => o.SetProperty("IncludeMinorPackageVersions", "true"))
+                );
+
+                MakeGrpcToolsExecutable(); // for use in the second target
+            }
         });
 
     Target CompileLinuxIntegrationTests => _ => _
@@ -1302,6 +1390,7 @@ partial class Build
                new(@".*at CallTargetNativeTest\.NoOp\.Noop\dArgumentsIntegration\.OnMethodEnd.*", RegexOptions.Compiled),
                new(@".*at CallTargetNativeTest\.NoOp\.Noop\dArgumentsVoidIntegration\.OnMethodBegin.*", RegexOptions.Compiled),
                new(@".*at CallTargetNativeTest\.NoOp\.Noop\dArgumentsVoidIntegration\.OnMethodEnd.*", RegexOptions.Compiled),
+               new(@".*System.Threading.ThreadAbortException: Thread was being aborted\.", RegexOptions.Compiled),
            };
 
            var logDirectory = BuildDataDirectory / "logs";
@@ -1469,6 +1558,41 @@ partial class Build
 
            Logger.Info($"Skipping log parsing, directory '{logDirectory}' not found");
        });
+
+    private void MakeGrpcToolsExecutable()
+    {
+        var packageDirectory = NugetPackageDirectory;
+        if (string.IsNullOrEmpty(NugetPackageDirectory))
+        {
+            Logger.Info("NugetPackageDirectory not set, querying for global-package location");
+            var packageLocation = "global-packages";
+            var output = DotNet($"nuget locals {packageLocation} --list");
+
+            var expected = $"{packageLocation}: ";
+            var location = output
+                              .Where(x => x.Type == OutputType.Std)
+                              .Select(x=>x.Text)
+                              .FirstOrDefault(x => x.StartsWith(expected))
+                             ?.Substring(expected.Length);
+
+            if (string.IsNullOrEmpty(location))
+            {
+                Logger.Info("Couldn't determine global-package location, skipping chmod +x on grpc.tools");
+                return;
+            }
+
+            packageDirectory = (AbsolutePath)(location);
+        }
+
+        Logger.Info($"Using '{packageDirectory}' for NuGet package location");
+
+        // GRPC runs a tool for codegen, which apparently isn't automatically marked as executable
+        var grpcTools = GlobFiles(packageDirectory / "grpc.tools", "**/tools/linux_*/*");
+        foreach (var toolPath in grpcTools)
+        {
+            Chmod.Value.Invoke(" +x " + toolPath);
+        }
+    }
 
     private AbsolutePath GetResultsDirectory(Project proj) => BuildDataDirectory / "results" / proj.Name;
 

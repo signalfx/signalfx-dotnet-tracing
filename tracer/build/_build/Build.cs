@@ -57,7 +57,7 @@ partial class Build : NukeBuild
     [Parameter("An optional suffix for the beta profiler-tracer MSI. Default is '' ")]
     readonly string BetaMsiSuffix = string.Empty;
 
-    [Parameter("The location to the find the profiler build artifacts. Default is ./../_build/DDProf-Deploy")]
+    [Parameter("The location to the find the profiler build artifacts. Default is ./profiler/_build/DDProf-Deploy")]
     readonly AbsolutePath ProfilerHome;
 
     [Parameter("The location to restore Nuget packages (optional) ")]
@@ -67,7 +67,7 @@ partial class Build : NukeBuild
     readonly bool IsAlpine = false;
 
     [Parameter("The build version. Default is latest")]
-    readonly string Version = "0.2.2";
+    readonly string Version = "0.2.3";
 
     [Parameter("Whether the build version is a prerelease(for packaging purposes). Default is latest")]
     readonly bool IsPrerelease = false;
@@ -125,7 +125,6 @@ partial class Build : NukeBuild
             EnsureCleanDirectory(NativeProfilerProject.Directory / "deps");
             EnsureCleanDirectory(BuildDataDirectory);
             EnsureCleanDirectory(ExplorationTestsDirectory);
-            DeleteFile(WindowsTracerHomeZip);
 
             void DeleteReparsePoints(string path)
             {
@@ -179,7 +178,7 @@ partial class Build : NukeBuild
     Target PackageMonitoringHomeBeta => _ => _
         .Description("Packages the already built src")
         .After(Clean, BuildTracerHome, BuildProfilerHome, BuildNativeLoader)
-        .DependsOn(BuildMsiBeta);
+        .DependsOn(BuildMsi);
 
     Target BuildAndRunManagedUnitTests => _ => _
         .Description("Builds the managed unit tests and runs them")
@@ -322,7 +321,7 @@ partial class Build : NukeBuild
                     .SetFramework(TargetFramework.NETCOREAPP3_1)
                     .EnableNoRestore()
                     .EnableNoBuild()
-                    .SetApplicationArguments("-r net472 netcoreapp3.1 -m -f * --iterationTime 2000")
+                    .SetApplicationArguments($"-r net472 netcoreapp3.1 -m -f {Filter ?? "*"} --iterationTime 2000")
                     .SetProcessEnvironmentVariable("SIGNALFX_SERVICE_NAME", "otel-trace-dotnet")
                     .SetProcessEnvironmentVariable("SIGNALFX_ENV", "CI")
                     .When(!string.IsNullOrEmpty(NugetPackageDirectory), o => o.SetPackageDirectory(NugetPackageDirectory))

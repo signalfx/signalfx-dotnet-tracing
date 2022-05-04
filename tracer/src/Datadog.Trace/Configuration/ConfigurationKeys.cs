@@ -120,6 +120,13 @@ namespace Datadog.Trace.Configuration
         public const string HeaderTags = "SIGNALFX_TRACE_HEADER_TAGS";
 
         /// <summary>
+        /// Configuration key for a map of metadata keys to tag names.
+        /// Automatically apply GRPC metadata values as tags on traces.
+        /// </summary>
+        /// <seealso cref="TracerSettings.HeaderTags"/>
+        public const string GrpcTags = "SIGNALFX_TRACE_GRPC_TAGS";
+
+        /// <summary>
         /// Configuration key for a map of services to rename.
         /// </summary>
         /// <seealso cref="TracerSettings.ServiceNameMappings"/>
@@ -297,7 +304,8 @@ namespace Datadog.Trace.Configuration
         /// Configuration key for the propagators to be used.
         /// Default is <c>B3</c>.
         /// Supports multiple values separated with comma.
-        /// <seealso cref="TracerSettings.Propagators"/>
+        /// <seealso cref="TracerSettings.PropagationStyleInject"/>
+        /// <seealso cref="TracerSettings.PropagationStyleExtract"/>
         /// </summary>
         public const string Propagators = "SIGNALFX_PROPAGATORS";
 
@@ -380,7 +388,7 @@ namespace Datadog.Trace.Configuration
         /// Configuration key for enabling automatic instrumentation on specified methods.
         /// Default value is "" (disabled).
         /// </summary>
-        public const string TraceMethods = "DD_TRACE_METHODS";
+        public const string TraceMethods = "SIGNALFX_TRACE_METHODS";
 
         /// <summary>
         /// String constants for CI Visibility configuration keys.

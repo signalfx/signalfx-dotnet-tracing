@@ -10,6 +10,7 @@ using System.Net;
 using Datadog.Trace.Agent.Transports;
 using Datadog.Trace.Propagation;
 using Datadog.Trace.Util;
+#pragma warning disable CS0618 // WebRequest, HttpWebRequest, ServicePoint, and WebClient are obsolete. Use HttpClient instead.
 
 namespace Datadog.Trace.ClrProfiler.ServerlessInstrumentation.AWS
 {

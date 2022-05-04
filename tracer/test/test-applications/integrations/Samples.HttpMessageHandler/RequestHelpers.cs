@@ -1,7 +1,6 @@
 // Modified by Splunk Inc.
 
 using System;
-using System.Collections.Concurrent;
 using System.IO;
 using System.Net.Http;
 using System.Text;
@@ -15,6 +14,7 @@ namespace Samples.HttpMessageHandler
     public static class RequestHelpers
     {
         private static readonly Encoding Utf8 = Encoding.UTF8;
+        private const string TracingEnabled = "x-datadog-tracing-enabled";
 
         public static void SendAsyncHttpClientRequests(HttpClient client, bool tracingDisabled, string url, string requestContent)
         {
@@ -25,12 +25,12 @@ namespace Samples.HttpMessageHandler
 
                 if (tracingDisabled)
                 {
-                    client.DefaultRequestHeaders.Add(CommonHttpHeaderNames.TracingEnabled, "false");
+                    client.DefaultRequestHeaders.Add(TracingEnabled, "false");
                 }
 
-                using (Tracer.Instance.StartActive("HttpClientRequestAsync"))
+                using (SampleHelpers.CreateScope("HttpClientRequestAsync"))
                 {
-                    using (Tracer.Instance.StartActive("DeleteAsync"))
+                    using (SampleHelpers.CreateScope("DeleteAsync"))
                     {
                         client.DeleteAsync(url).Wait();
                         Console.WriteLine("Received response for client.DeleteAsync(String)");
@@ -45,7 +45,7 @@ namespace Samples.HttpMessageHandler
                         Console.WriteLine("Received response for client.DeleteAsync(Uri, CancellationToken)");
                     }
 
-                    using (Tracer.Instance.StartActive("GetAsync"))
+                    using (SampleHelpers.CreateScope("GetAsync"))
                     {
                         client.GetAsync(url).Wait();
                         Console.WriteLine("Received response for client.GetAsync(String)");
@@ -72,7 +72,7 @@ namespace Samples.HttpMessageHandler
                         Console.WriteLine("Received response for client.GetAsync(Uri, HttpCompletionOption, CancellationToken)");
                     }
 
-                    using (Tracer.Instance.StartActive("GetByteArrayAsync"))
+                    using (SampleHelpers.CreateScope("GetByteArrayAsync"))
                     {
                         client.GetByteArrayAsync(url).Wait();
                         Console.WriteLine("Received response for client.GetByteArrayAsync(String)");
@@ -81,7 +81,7 @@ namespace Samples.HttpMessageHandler
                         Console.WriteLine("Received response for client.GetByteArrayAsync(Uri)");
                     }
 
-                    using (Tracer.Instance.StartActive("GetStreamAsync"))
+                    using (SampleHelpers.CreateScope("GetStreamAsync"))
                     {
                         using Stream stream1 = client.GetStreamAsync(url).Result;
                         Console.WriteLine("Received response for client.GetStreamAsync(String)");
@@ -90,7 +90,7 @@ namespace Samples.HttpMessageHandler
                         Console.WriteLine("Received response for client.GetStreamAsync(Uri)");
                     }
 
-                    using (Tracer.Instance.StartActive("GetStringAsync"))
+                    using (SampleHelpers.CreateScope("GetStringAsync"))
                     {
                         client.GetStringAsync(url).Wait();
                         Console.WriteLine("Received response for client.GetStringAsync(String)");
@@ -100,7 +100,7 @@ namespace Samples.HttpMessageHandler
                     }
 
 #if NETCOREAPP
-                    using (Tracer.Instance.StartActive("PatchAsync"))
+                    using (SampleHelpers.CreateScope("PatchAsync"))
                     {
                         client.PatchAsync(url, new StringContent(requestContent, Utf8)).Wait();
                         Console.WriteLine("Received response for client.PatchAsync(String, HttpContent)");
@@ -116,7 +116,7 @@ namespace Samples.HttpMessageHandler
                     }
 
 #endif
-                    using (Tracer.Instance.StartActive("PostAsync"))
+                    using (SampleHelpers.CreateScope("PostAsync"))
                     {
                         client.PostAsync(url, new StringContent(requestContent, Utf8)).Wait();
                         Console.WriteLine("Received response for client.PostAsync(String, HttpContent)");
@@ -131,7 +131,7 @@ namespace Samples.HttpMessageHandler
                         Console.WriteLine("Received response for client.PostAsync(Uri, HttpContent, CancellationToken)");
                     }
 
-                    using (Tracer.Instance.StartActive("PutAsync"))
+                    using (SampleHelpers.CreateScope("PutAsync"))
                     {
                         client.PutAsync(url, new StringContent(requestContent, Utf8)).Wait();
                         Console.WriteLine("Received response for client.PutAsync(String, HttpContent)");
@@ -146,7 +146,7 @@ namespace Samples.HttpMessageHandler
                         Console.WriteLine("Received response for client.PutAsync(Uri, HttpContent, CancellationToken)");
                     }
 
-                    using (Tracer.Instance.StartActive("SendAsync"))
+                    using (SampleHelpers.CreateScope("SendAsync"))
                     {
                         client.SendAsync(new HttpRequestMessage(HttpMethod.Get, url)).Wait();
                         Console.WriteLine("Received response for client.SendAsync(HttpRequestMessage)");
@@ -161,7 +161,7 @@ namespace Samples.HttpMessageHandler
                         Console.WriteLine("Received response for client.SendAsync(HttpRequestMessage, HttpCompletionOption, CancellationToken)");
                     }
 
-                    using (Tracer.Instance.StartActive("Send.Get.HttpErrorCode"))
+                    using (SampleHelpers.CreateScope("ErrorSpanBelow"))
                     {
                         client.GetAsync($"{url}HttpErrorCode").Wait();
                         Console.WriteLine("Received response for client.GetAsync Error Span");
@@ -193,9 +193,9 @@ namespace Samples.HttpMessageHandler
                 client.DefaultRequestHeaders.Add(CommonHttpHeaderNames.TracingEnabled, "false");
             }
 
-            using (Tracer.Instance.StartActive("HttpClientRequest"))
+            using (SampleHelpers.CreateScope("HttpClientRequest"))
             {
-                using (Tracer.Instance.StartActive("Send.Delete"))
+                using (SampleHelpers.CreateScope("Send.Delete"))
                 {
                     client.Send(new HttpRequestMessage(HttpMethod.Delete, url));
                     Console.WriteLine("Received response for DELETE client.Send(HttpRequestMessage)");
@@ -210,7 +210,7 @@ namespace Samples.HttpMessageHandler
                     Console.WriteLine("Received response for DELETE client.Send(HttpRequestMessage, HttpCompletionOption, CancellationToken)");
                 }
 
-                using (Tracer.Instance.StartActive("Send.Get"))
+                using (SampleHelpers.CreateScope("Send.Get"))
                 {
                     client.Send(new HttpRequestMessage(HttpMethod.Get, url));
                     Console.WriteLine("Received response for GET client.Send(HttpRequestMessage)");
@@ -225,7 +225,7 @@ namespace Samples.HttpMessageHandler
                     Console.WriteLine("Received response for GET client.Send(HttpRequestMessage, HttpCompletionOption, CancellationToken)");
                 }
 
-                using (Tracer.Instance.StartActive("Send.Patch"))
+                using (SampleHelpers.CreateScope("Send.Patch"))
                 {
                     client.Send(new HttpRequestMessage(HttpMethod.Patch, url) { Content = new StringContent(requestContent, Utf8) });
                     Console.WriteLine("Received response for PATCH client.Send(HttpRequestMessage)");
@@ -240,7 +240,7 @@ namespace Samples.HttpMessageHandler
                     Console.WriteLine("Received response for PATCH client.Send(HttpRequestMessage, HttpCompletionOption, CancellationToken)");
                 }
 
-                using (Tracer.Instance.StartActive("Send.Post"))
+                using (SampleHelpers.CreateScope("Send.Post"))
                 {
                     client.Send(new HttpRequestMessage(HttpMethod.Post, url) { Content = new StringContent(requestContent, Utf8) });
                     Console.WriteLine("Received response for POST client.Send(HttpRequestMessage)");
@@ -255,7 +255,7 @@ namespace Samples.HttpMessageHandler
                     Console.WriteLine("Received response for POST client.Send(HttpRequestMessage, HttpCompletionOption, CancellationToken)");
                 }
 
-                using (Tracer.Instance.StartActive("Send.Put"))
+                using (SampleHelpers.CreateScope("Send.Put"))
                 {
                     client.Send(new HttpRequestMessage(HttpMethod.Put, url) { Content = new StringContent(requestContent, Utf8) });
                     Console.WriteLine("Received response for PUT client.Send(HttpRequestMessage)");
@@ -270,7 +270,7 @@ namespace Samples.HttpMessageHandler
                     Console.WriteLine("Received response for PUT client.Send(HttpRequestMessage, HttpCompletionOption, CancellationToken)");
                 }
 
-                using (Tracer.Instance.StartActive("Send.Get.HttpErrorCode"))
+                using (SampleHelpers.CreateScope("ErrorSpanBelow"))
                 {
                     client.Send(new HttpRequestMessage(HttpMethod.Get, $"{url}HttpErrorCode"));
                     Console.WriteLine("Received response for client.Get Error Span");

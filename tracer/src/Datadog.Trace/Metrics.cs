@@ -44,5 +44,10 @@ namespace Datadog.Trace
         /// Records the keep rate of spans in the tracer, independent of sampling rate
         /// </summary>
         internal const string TracesKeepRate = "_dd.tracer_kr";
+
+        /// <summary>
+        /// The process id.
+        /// </summary>
+        internal const string ProcessId = "process_id";
     }
 }

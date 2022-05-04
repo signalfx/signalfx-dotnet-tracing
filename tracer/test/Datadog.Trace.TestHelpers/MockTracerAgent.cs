@@ -249,6 +249,20 @@ namespace Datadog.Trace.TestHelpers
 
                         return false;
                     });
+
+                // Ensure only one Content-Type is specified and that it is msgpack
+                AssertHeader(
+                    headers,
+                    "Content-Type",
+                    header =>
+                    {
+                        if (!header.Equals("application/msgpack"))
+                        {
+                            return false;
+                        }
+
+                        return true;
+                    });
             }
 
             if (!returnAllOperations)
@@ -335,7 +349,7 @@ namespace Datadog.Trace.TestHelpers
 
             var response = $"HTTP/1.1 200 OK";
             response += DatadogHttpValues.CrLf;
-            response += $" Date: {DateTime.UtcNow.ToString("ddd, dd MMM yyyy H:mm::ss K")}";
+            response += $"Date: {DateTime.UtcNow.ToString("ddd, dd MMM yyyy H:mm::ss K")}";
             response += DatadogHttpValues.CrLf;
             response += $"Connection: Keep-Alive";
             response += DatadogHttpValues.CrLf;
