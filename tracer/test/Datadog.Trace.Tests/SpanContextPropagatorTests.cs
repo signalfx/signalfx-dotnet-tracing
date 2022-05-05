@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
+using System.Linq;
 using Datadog.Trace.Headers;
 using Datadog.Trace.Propagation;
 using Datadog.Trace.Propagators;
@@ -30,7 +31,8 @@ namespace Datadog.Trace.Tests
         {
             new(B3HttpHeaderNames.B3TraceId, TraceId.ToString()),
             new(B3HttpHeaderNames.B3SpanId, StringSpanId.ToString(InvariantCulture)),
-            new(B3HttpHeaderNames.B3Sampled, SamplingPriority.ToString(InvariantCulture))
+            new(B3HttpHeaderNames.B3Sampled, SamplingPriority.ToString(InvariantCulture)),
+            new(W3CContextPropagator.TraceParent, FormatW3CTraceParent(TraceId, StringSpanId, SamplingPriority))
         };
 
         public static TheoryData<string> GetInvalidIds() => new()
@@ -78,6 +80,7 @@ namespace Datadog.Trace.Tests
             headers.Verify(h => h.Set(B3HttpHeaderNames.B3TraceId, TraceId.ToString()), Times.Once());
             headers.Verify(h => h.Set(B3HttpHeaderNames.B3SpanId, StringSpanId.ToString(InvariantCulture)), Times.Once());
             headers.Verify(h => h.Set(B3HttpHeaderNames.B3Sampled, "0"), Times.Once());
+            headers.Verify(h => h.Set(W3CContextPropagator.TraceParent, FormatW3CTraceParent(TraceId, SpanId, 0)), Times.Once());
             headers.VerifyNoOtherCalls();
         }
 
@@ -93,6 +96,7 @@ namespace Datadog.Trace.Tests
             headers.Verify(h => h.Set(B3HttpHeaderNames.B3TraceId, TraceId.ToString()), Times.Once());
             headers.Verify(h => h.Set(B3HttpHeaderNames.B3SpanId, StringSpanId.ToString(InvariantCulture)), Times.Once());
             headers.Verify(h => h.Set(B3HttpHeaderNames.B3Sampled, "1"), Times.Once());
+            headers.Verify(h => h.Set(W3CContextPropagator.TraceParent, FormatW3CTraceParent(TraceId, SpanId, 1)), Times.Once());
             headers.VerifyNoOtherCalls();
         }
 
@@ -184,6 +188,7 @@ namespace Datadog.Trace.Tests
 
             // replace TraceId setup
             headers.Setup(h => h.GetValues(B3HttpHeaderNames.B3TraceId)).Returns(new[] { traceId });
+            headers.Setup(h => h.GetValues(W3CContextPropagator.TraceParent)).Returns(new[] { traceId });
 
             var result = SpanContextPropagator.Instance.Extract(headers.Object);
 
@@ -199,6 +204,7 @@ namespace Datadog.Trace.Tests
 
             // replace ParentId setup
             headers.Setup(h => h.GetValues(B3HttpHeaderNames.B3SpanId)).Returns(new[] { spanId });
+            headers.Setup(h => h.GetValues(W3CContextPropagator.TraceParent)).Returns(new[] { spanId });
 
             var result = SpanContextPropagator.Instance.Extract(headers.Object);
 
@@ -275,7 +281,8 @@ namespace Datadog.Trace.Tests
         {
             var once = Times.Once();
 
-            foreach (var pair in DefaultHeaderValues)
+            // B3 is our first propagator, if we are able to fetch data we skip W3C
+            foreach (var pair in DefaultHeaderValues.Where(kv => kv.Key != W3CContextPropagator.TraceParent))
             {
                 headers.Verify(h => h.GetValues(pair.Key), once);
             }
@@ -290,12 +297,18 @@ namespace Datadog.Trace.Tests
 
             headers.Verify(h => h.TryGetValue(SpanContext.Keys.TraceId, out value), once);
 
-            foreach (var pair in DefaultHeaderValues)
+            // B3 is our first propagator, if we are able to fetch data we skip W3C
+            foreach (var pair in DefaultHeaderValues.Where(kv => kv.Key != W3CContextPropagator.TraceParent))
             {
                 headers.Verify(h => h.TryGetValue(pair.Key, out value), once);
             }
 
             headers.VerifyNoOtherCalls();
+        }
+
+        private static string FormatW3CTraceParent(TraceId traceId, ulong spanId, int samplingPriority)
+        {
+            return string.Format($"00-{{0}}-{{1}}-{{2}}", TraceId.ToString(), SpanId.ToString("x16"), samplingPriority > 0 ? "01" : "00");
         }
     }
 
