@@ -207,7 +207,7 @@
     TraceId: Id_1,
     SpanId: Id_16,
     Name: trace.annotation,
-    Resource: ExtensionMethodForTestType,
+    Resource: ExtensionMethods.ExtensionMethodForTestType,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
@@ -221,7 +221,7 @@
     TraceId: Id_1,
     SpanId: Id_17,
     Name: trace.annotation,
-    Resource: get_Name,
+    Resource: TestTypeGeneric`1.get_Name,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
@@ -234,8 +234,8 @@
   {
     TraceId: Id_1,
     SpanId: Id_18,
-    Name: overridden.attribute,
-    Resource: set_Name,
+    Name: trace.annotation,
+    Resource: TestTypeGeneric`1.set_Name,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
@@ -249,7 +249,7 @@
     TraceId: Id_1,
     SpanId: Id_19,
     Name: trace.annotation,
-    Resource: TestTypeGeneric_VoidMethod,
+    Resource: TestTypeGeneric_ResourceNameOverride_VoidMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
@@ -263,7 +263,7 @@
     TraceId: Id_1,
     SpanId: Id_20,
     Name: trace.annotation,
-    Resource: ReturnValueMethod,
+    Resource: TestTypeGeneric`1.ReturnValueMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
@@ -277,7 +277,7 @@
     TraceId: Id_1,
     SpanId: Id_21,
     Name: trace.annotation,
-    Resource: ReturnReferenceMethod,
+    Resource: TestTypeGeneric`1.ReturnReferenceMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
@@ -291,7 +291,7 @@
     TraceId: Id_1,
     SpanId: Id_22,
     Name: trace.annotation,
-    Resource: ReturnNullMethod,
+    Resource: TestTypeGeneric`1.ReturnNullMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
@@ -305,7 +305,7 @@
     TraceId: Id_1,
     SpanId: Id_23,
     Name: trace.annotation,
-    Resource: ReturnGenericMethod,
+    Resource: TestTypeGeneric`1.ReturnGenericMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
@@ -319,7 +319,7 @@
     TraceId: Id_1,
     SpanId: Id_24,
     Name: trace.annotation,
-    Resource: ReturnTaskMethod,
+    Resource: TestTypeGeneric`1.ReturnTaskMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
@@ -333,7 +333,7 @@
     TraceId: Id_1,
     SpanId: Id_25,
     Name: trace.annotation,
-    Resource: ReturnTaskTMethod,
+    Resource: TestTypeGeneric`1.ReturnTaskTMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
@@ -347,7 +347,7 @@
     TraceId: Id_1,
     SpanId: Id_26,
     Name: trace.annotation,
-    Resource: ReturnValueTaskMethod,
+    Resource: TestTypeGeneric`1.ReturnValueTaskMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
@@ -361,12 +361,12 @@
     TraceId: Id_1,
     SpanId: Id_27,
     Name: trace.annotation,
-    Resource: ReturnValueTaskTMethod,
+    Resource: TestTypeGeneric`1.ReturnValueTaskTMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -375,7 +375,7 @@
     TraceId: Id_1,
     SpanId: Id_28,
     Name: overridden.attribute,
-    Resource: TestTypeGeneric_ReturnGenericMethodAttribute,
+    Resource: TestTypeGeneric_ResourceNameOverride_ReturnGenericMethodAttribute,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
@@ -389,7 +389,7 @@
     TraceId: Id_1,
     SpanId: Id_29,
     Name: trace.annotation,
-    Resource: ExtensionMethodForTestTypeGeneric,
+    Resource: ExtensionMethods.ExtensionMethodForTestTypeGeneric,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
@@ -403,7 +403,7 @@
     TraceId: Id_1,
     SpanId: Id_30,
     Name: trace.annotation,
-    Resource: get_Name,
+    Resource: TestTypeStruct.get_Name,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
@@ -416,8 +416,8 @@
   {
     TraceId: Id_1,
     SpanId: Id_31,
-    Name: overridden.attribute,
-    Resource: TestTypeStruct_ResourceNameOverride_ReturnGenericMethodAttribute,
+    Name: trace.annotation,
+    Resource: TestTypeStruct.set_Name,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
@@ -431,7 +431,7 @@
     TraceId: Id_1,
     SpanId: Id_32,
     Name: trace.annotation,
-    Resource: TestTypeStruct_VoidMethod,
+    Resource: TestTypeStruct_ResourceNameOverride_VoidMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
@@ -445,7 +445,7 @@
     TraceId: Id_1,
     SpanId: Id_33,
     Name: trace.annotation,
-    Resource: TestTypeStatic.get_Name,
+    Resource: TestTypeStruct.ReturnValueMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
@@ -459,7 +459,7 @@
     TraceId: Id_1,
     SpanId: Id_34,
     Name: trace.annotation,
-    Resource: TestTypeStatic.set_Name,
+    Resource: TestTypeStruct.ReturnReferenceMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
@@ -473,7 +473,7 @@
     TraceId: Id_1,
     SpanId: Id_35,
     Name: trace.annotation,
-    Resource: TestTypeStatic_ResourceNameOverride_VoidMethod,
+    Resource: TestTypeStruct.ReturnNullMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
@@ -487,7 +487,7 @@
     TraceId: Id_1,
     SpanId: Id_36,
     Name: trace.annotation,
-    Resource: TestTypeStatic.ReturnValueMethod,
+    Resource: TestTypeStruct.ReturnGenericMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
@@ -501,7 +501,7 @@
     TraceId: Id_1,
     SpanId: Id_37,
     Name: trace.annotation,
-    Resource: TestTypeStatic.ReturnReferenceMethod,
+    Resource: TestTypeStruct.ReturnGenericMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
@@ -515,7 +515,7 @@
     TraceId: Id_1,
     SpanId: Id_38,
     Name: trace.annotation,
-    Resource: TestTypeStatic.ReturnNullMethod,
+    Resource: TestTypeStruct.ReturnTaskMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
@@ -529,7 +529,7 @@
     TraceId: Id_1,
     SpanId: Id_39,
     Name: trace.annotation,
-    Resource: TestTypeStatic.ReturnGenericMethod,
+    Resource: TestTypeStruct.ReturnTaskTMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
@@ -543,7 +543,7 @@
     TraceId: Id_1,
     SpanId: Id_40,
     Name: trace.annotation,
-    Resource: TestTypeStatic.ReturnGenericMethod,
+    Resource: TestTypeStruct.ReturnValueTaskMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
@@ -557,7 +557,7 @@
     TraceId: Id_1,
     SpanId: Id_41,
     Name: trace.annotation,
-    Resource: TestTypeStatic.ReturnTaskMethod,
+    Resource: TestTypeStruct.ReturnValueTaskTMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
@@ -571,12 +571,12 @@
     TraceId: Id_1,
     SpanId: Id_42,
     Name: overridden.attribute,
-    Resource: TestTypeStruct_ReturnGenericMethodAttribute,
+    Resource: TestTypeStruct_ResourceNameOverride_ReturnGenericMethodAttribute,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -585,12 +585,12 @@
     TraceId: Id_1,
     SpanId: Id_43,
     Name: trace.annotation,
-    Resource: ExtensionMethodForTestTypeTypeStruct,
+    Resource: ExtensionMethods.ExtensionMethodForTestTypeTypeStruct,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -599,12 +599,12 @@
     TraceId: Id_1,
     SpanId: Id_44,
     Name: trace.annotation,
-    Resource: get_Name,
+    Resource: TestTypeStatic.get_Name,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -612,13 +612,13 @@
   {
     TraceId: Id_1,
     SpanId: Id_45,
-    Name: overridden.attribute,
-    Resource: set_Name,
+    Name: trace.annotation,
+    Resource: TestTypeStatic.set_Name,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -627,12 +627,12 @@
     TraceId: Id_1,
     SpanId: Id_46,
     Name: trace.annotation,
-    Resource: TestTypeStatic_VoidMethod,
+    Resource: TestTypeStatic_ResourceNameOverride_VoidMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -641,12 +641,12 @@
     TraceId: Id_1,
     SpanId: Id_47,
     Name: trace.annotation,
-    Resource: ReturnValueMethod,
+    Resource: TestTypeStatic.ReturnValueMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -655,12 +655,12 @@
     TraceId: Id_1,
     SpanId: Id_48,
     Name: trace.annotation,
-    Resource: ReturnReferenceMethod,
+    Resource: TestTypeStatic.ReturnReferenceMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -669,12 +669,12 @@
     TraceId: Id_1,
     SpanId: Id_49,
     Name: trace.annotation,
-    Resource: ReturnNullMethod,
+    Resource: TestTypeStatic.ReturnNullMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -683,12 +683,12 @@
     TraceId: Id_1,
     SpanId: Id_50,
     Name: trace.annotation,
-    Resource: ReturnGenericMethod,
+    Resource: TestTypeStatic.ReturnGenericMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -697,12 +697,12 @@
     TraceId: Id_1,
     SpanId: Id_51,
     Name: trace.annotation,
-    Resource: ReturnGenericMethod,
+    Resource: TestTypeStatic.ReturnGenericMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -711,12 +711,12 @@
     TraceId: Id_1,
     SpanId: Id_52,
     Name: trace.annotation,
-    Resource: ReturnTaskMethod,
+    Resource: TestTypeStatic.ReturnTaskMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -725,7 +725,7 @@
     TraceId: Id_1,
     SpanId: Id_53,
     Name: trace.annotation,
-    Resource: ReturnTaskTMethod,
+    Resource: TestTypeStatic.ReturnTaskTMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
@@ -739,12 +739,40 @@
     TraceId: Id_1,
     SpanId: Id_54,
     Name: trace.annotation,
-    Resource: ReturnValueTaskMethod,
+    Resource: TestTypeStatic.ReturnValueTaskMethod,
     Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
+      language: dotnet,
+      version: 1.0.0
+    }
+  },
+  {
+    TraceId: Id_1,
+    SpanId: Id_55,
+    Name: trace.annotation,
+    Resource: TestTypeStatic.ReturnValueTaskTMethod,
+    Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
+    ParentId: Id_2,
+    Tags: {
+      component: trace,
+      deployment.environment: integration_tests,
+      language: dotnet,
+      version: 1.0.0
+    }
+  },
+  {
+    TraceId: Id_1,
+    SpanId: Id_56,
+    Name: overridden.attribute,
+    Resource: TestTypeStatic_ResourceNameOverride_ReturnGenericMethodAttribute,
+    Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
+    ParentId: Id_2,
+    Tags: {
+      component: trace,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -758,49 +786,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
-      language: dotnet,
-      version: 1.0.0
-    }
-  },
-  {
-    TraceId: Id_1,
-    SpanId: Id_58,
-    Name: trace.annotation,
-    Resource: ReturnValueTaskTMethod,
-    Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
-    ParentId: Id_2,
-    Tags: {
-      component: trace,
-      env: integration_tests,
-      language: dotnet,
-      version: 1.0.0
-    }
-  },
-  {
-    TraceId: Id_1,
-    SpanId: Id_59,
-    Name: overridden.attribute,
-    Resource: TestTypeStatic_ReturnGenericMethodAttribute,
-    Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
-    ParentId: Id_2,
-    Tags: {
-      component: trace,
-      env: integration_tests,
-      language: dotnet,
-      version: 1.0.0
-    }
-  },
-  {
-    TraceId: Id_1,
-    SpanId: Id_57,
-    Name: trace.annotation,
-    Resource: set_Method,
-    Service: Samples.TraceAnnotations.VersionMismatch.AfterFeature,
-    ParentId: Id_2,
-    Tags: {
-      component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -814,7 +800,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
