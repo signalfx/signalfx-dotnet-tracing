@@ -145,7 +145,8 @@ namespace My.Custom.Test.Namespace
 }
 
 // Datadog.Trace namespace will be replaced by SignalFx.Tracing by the ThreadSampleNativeFormatParser
-namespace Datadog.Trace {
+namespace Datadog.Trace
+{
     internal class TestDynamicClass : DynamicObject
     {
         public override bool TryInvoke(InvokeBinder binder, object[] args, out object result)
