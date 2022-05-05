@@ -161,7 +161,7 @@ namespace Samples
             var scopeExtractor = Activator.CreateInstance(SpanContextExtractorType);
             var genericMethod = ExtractMethod.MakeGenericMethod(carrier.GetType());
             var parentScope = genericMethod.Invoke(scopeExtractor, new object[] { carrier, getter });
-            traceId = (ulong) TraceIdProperty.Invoke(parentScope, null);
+            traceId = 1; // upstream uses ulong - we  hardcode some value to decrease number of conflicts
             spanId = (ulong) SpanIdProperty.Invoke(parentScope, null);
         }
 
