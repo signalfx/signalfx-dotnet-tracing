@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Runtime.InteropServices;
 using My.Custom.Test.Namespace;
-using Samples.AlwaysOnProfiler.Vb;
 
 ClassA.MethodA();
 
@@ -136,17 +135,23 @@ namespace My.Custom.Test.Namespace
     {
         public static void GenericMethodDFromGenericClass<TMethod, TMethod2>(TClass classArg, TMethod methodArg, TMethod2 additionalArg)
         {
-            dynamic test = new TestDynamicClass();
+            dynamic test = new Datadog.Trace.TestDynamicClass();
 
             test("Param1", "Param2");
         }
     }
 
+
+}
+
+// Datadog.Trace namespace will be replaced by SignalFx.Tracing by the ThreadSampleNativeFormatParser
+namespace Datadog.Trace
+{
     internal class TestDynamicClass : DynamicObject
     {
         public override bool TryInvoke(InvokeBinder binder, object[] args, out object result)
         {
-            ClassVb.MethodVb("testParam");
+            Samples.AlwaysOnProfiler.Vb.ClassVb.MethodVb("testParam");
             result = null;
             return true;
         }
