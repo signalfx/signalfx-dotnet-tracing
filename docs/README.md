@@ -12,8 +12,8 @@ to capture and send telemetry data (metrics, traces, and logs).
 By default:
 
 - all spans are sampled and reported,
-- [B3 headers](https://github.com/openzipkin/b3-propagation) are used for context
-  propagation,
+- [B3 headers](https://github.com/openzipkin/b3-propagation) and [W3C headers](https://docs.dapr.io/developing-applications/building-blocks/observability/w3c-tracing/w3c-tracing-overview/)
+  are used for context propagation,
 - Zipkin trace exporter is used to send spans as JSON in the [Zipkin v2 format](https://zipkin.io/zipkin-api/#/default/post_spans).
 
 The SignalFx Instrumentation for .NET registers an OpenTracing `GlobalTracer`
