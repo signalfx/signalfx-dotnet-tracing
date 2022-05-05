@@ -138,7 +138,8 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         continue;
                     }
 
-                    threadSample.StackTrace = stackTraceBuilder.ToString();
+                    // we are replacing Datadog.Trace namespace to avoid conflicts while upstream sync
+                    threadSample.StackTrace = stackTraceBuilder.Replace("Datadog.Trace.", "SignalFx.Tracing.").ToString();
                     samples.Add(threadSample);
                 }
                 else if (operationCode == OpCodes.EndBatch)

@@ -106,7 +106,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             var expectedLogRecord = "\tat System.Threading.Thread.Sleep(System.TimeSpan)\n" +
                                     "\tat Samples.AlwaysOnProfiler.Fs.ClassFs.methodFs(System.String)\n" +
                                     "\tat Samples.AlwaysOnProfiler.Vb.ClassVb.MethodVb(System.String)\n" +
-                                    "\tat My.Custom.Test.Namespace.TestDynamicClass.TryInvoke(System.Dynamic.InvokeBinder, System.Object[], System.Object\u0026)\n" +
+                                    "\tat SignalFx.Tracing.TestDynamicClass.TryInvoke(System.Dynamic.InvokeBinder, System.Object[], System.Object\u0026)\n" +
                                     "\tat System.Dynamic.UpdateDelegates.UpdateAndExecuteVoid3[T0, T1, T2](System.Runtime.CompilerServices.CallSite, T0, T1, T2)\n";
 #if NETCOREAPP3_1
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
