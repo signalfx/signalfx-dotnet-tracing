@@ -47,7 +47,7 @@ Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.cmd BuildAn
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.cmd BuildAndRunWindowsIntegrationTests --framework net5.0 ; \
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.cmd BuildAndRunWindowsIntegrationTests --framework netcoreapp3.1 ; \
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.cmd BuildAndRunWindowsIntegrationTests --framework net461 ; \
-cd tracer/test/snapshots && find . -name '*.received.txt' -exec bash -c 'mv -f $0 ${0/\.received./.verified.}' {} \; && cd -
+./tracer/build.cmd OverwriteSnapshotFiles
 ```
 
 Windows in Ubuntu WSL:
@@ -59,5 +59,5 @@ Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.sh BuildAnd
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.sh BuildAndRunLinuxIntegrationTests --framework net5.0 ; \
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.sh BuildAndRunLinuxIntegrationTests --framework netcoreapp3.1 ; \
 docker-compose down ; \
-cd tracer/test/snapshots && find . -name '*.received.txt' -exec bash -c 'mv -f $0 ${0/\.received./.verified.}' {} \; && cd -
+./tracer/build.sh OverwriteSnapshotFiles
 ```
