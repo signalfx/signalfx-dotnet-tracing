@@ -5,9 +5,9 @@ needs any adjustments. Contact @signalfx/gdi-docs team if needed.
 
 1. Use nuke target to update version:
 
-    - `nuke UpdateVersion --version {new-version-here}`
+    - `nuke UpdateVersion --NewVersion {new-version-here} --NewIsPrerelease false`
     - (for pre-releases)
-      `nuke UpdateVersion --version {new-version-here} --is-prerelease true`
+      `nuke UpdateVersion --NewVersion {new-version-here} --NewIsPrerelease true`
 
 1. Update the [CHANGELOG.md](../CHANGELOG.md) with the new release.
 
