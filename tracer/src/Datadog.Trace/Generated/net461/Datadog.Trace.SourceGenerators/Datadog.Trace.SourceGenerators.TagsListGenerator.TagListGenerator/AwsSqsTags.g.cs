@@ -2,14 +2,18 @@
 #nullable enable
 
 using Datadog.Trace.Processors;
+using Datadog.Trace.Tagging;
 
 namespace Datadog.Trace.Tagging
 {
     partial class AwsSqsTags
     {
-        private static readonly byte[] QueueNameBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("aws.queue.name");
-        private static readonly byte[] QueueUrlBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("aws.queue.url");
-        private static readonly byte[] SpanKindBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("span.kind");
+        // QueueNameBytes = System.Text.Encoding.UTF8.GetBytes("aws.queue.name");
+        private static readonly byte[] QueueNameBytes = new byte[] { 97, 119, 115, 46, 113, 117, 101, 117, 101, 46, 110, 97, 109, 101 };
+        // QueueUrlBytes = System.Text.Encoding.UTF8.GetBytes("aws.queue.url");
+        private static readonly byte[] QueueUrlBytes = new byte[] { 97, 119, 115, 46, 113, 117, 101, 117, 101, 46, 117, 114, 108 };
+        // SpanKindBytes = System.Text.Encoding.UTF8.GetBytes("span.kind");
+        private static readonly byte[] SpanKindBytes = new byte[] { 115, 112, 97, 110, 46, 107, 105, 110, 100 };
 
         public override string? GetTag(string key)
         {
@@ -43,7 +47,27 @@ namespace Datadog.Trace.Tagging
                 new Datadog.Trace.Tagging.Property<AwsSqsTags, string?>("aws.queue.name", t => t.QueueName),
                 new Datadog.Trace.Tagging.Property<AwsSqsTags, string?>("aws.queue.url", t => t.QueueUrl),
                 new Datadog.Trace.Tagging.Property<AwsSqsTags, string?>("span.kind", t => t.SpanKind)
-);
+        );
+
+        public override void EnumerateTags<TProcessor>(ref TProcessor processor)
+        {
+            if (QueueName is not null)
+            {
+                processor.Process(new TagItem<string>("aws.queue.name", QueueName, QueueNameBytes));
+            }
+
+            if (QueueUrl is not null)
+            {
+                processor.Process(new TagItem<string>("aws.queue.url", QueueUrl, QueueUrlBytes));
+            }
+
+            if (SpanKind is not null)
+            {
+                processor.Process(new TagItem<string>("span.kind", SpanKind, SpanKindBytes));
+            }
+
+            base.EnumerateTags(ref processor);
+        }
 
         protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
         {
@@ -53,19 +77,19 @@ namespace Datadog.Trace.Tagging
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
         {
             var count = 0;
-            if (QueueName != null)
+            if (QueueName is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, QueueNameBytes, QueueName, tagProcessors);
             }
 
-            if (QueueUrl != null)
+            if (QueueUrl is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, QueueUrlBytes, QueueUrl, tagProcessors);
             }
 
-            if (SpanKind != null)
+            if (SpanKind is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, SpanKindBytes, SpanKind, tagProcessors);
@@ -76,21 +100,21 @@ namespace Datadog.Trace.Tagging
 
         protected override void WriteAdditionalTags(System.Text.StringBuilder sb)
         {
-            if (QueueName != null)
+            if (QueueName is not null)
             {
                 sb.Append("aws.queue.name (tag):")
                   .Append(QueueName)
                   .Append(',');
             }
 
-            if (QueueUrl != null)
+            if (QueueUrl is not null)
             {
                 sb.Append("aws.queue.url (tag):")
                   .Append(QueueUrl)
                   .Append(',');
             }
 
-            if (SpanKind != null)
+            if (SpanKind is not null)
             {
                 sb.Append("span.kind (tag):")
                   .Append(SpanKind)

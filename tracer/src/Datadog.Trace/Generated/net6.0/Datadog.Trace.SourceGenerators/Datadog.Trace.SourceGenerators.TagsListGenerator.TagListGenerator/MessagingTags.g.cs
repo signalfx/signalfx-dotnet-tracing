@@ -2,24 +2,38 @@
 #nullable enable
 
 using Datadog.Trace.Processors;
+using Datadog.Trace.Tagging;
 
 namespace Datadog.Trace.Tagging
 {
     partial class MessagingTags
     {
-        private static readonly byte[] SystemBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("messaging.system");
-        private static readonly byte[] DestinationBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("messaging.destination");
-        private static readonly byte[] DestinationKindBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("messaging.destination_kind");
-        private static readonly byte[] TempDestinationBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("messaging.temp_destination");
-        private static readonly byte[] ProtocolBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("messaging.protocol");
-        private static readonly byte[] ProtocolVersionBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("messaging.protocol_version");
-        private static readonly byte[] UrlBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("messaging.url");
-        private static readonly byte[] OperationBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("messaging.operation");
-        private static readonly byte[] MessageIdBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("messaging.message_id");
-        private static readonly byte[] ConversationIdBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("messaging.conversation_id");
-        private static readonly byte[] ConsumerIdBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("messaging.consumer_id	");
-        private static readonly byte[] MessageSizeBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("messaging.message_payload_size_bytes");
-        private static readonly byte[] MessageSizeCompressedBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("messaging.message_payload_compressed_size_bytes");
+        // SystemBytes = System.Text.Encoding.UTF8.GetBytes("messaging.system");
+        private static readonly byte[] SystemBytes = new byte[] { 109, 101, 115, 115, 97, 103, 105, 110, 103, 46, 115, 121, 115, 116, 101, 109 };
+        // DestinationBytes = System.Text.Encoding.UTF8.GetBytes("messaging.destination");
+        private static readonly byte[] DestinationBytes = new byte[] { 109, 101, 115, 115, 97, 103, 105, 110, 103, 46, 100, 101, 115, 116, 105, 110, 97, 116, 105, 111, 110 };
+        // DestinationKindBytes = System.Text.Encoding.UTF8.GetBytes("messaging.destination_kind");
+        private static readonly byte[] DestinationKindBytes = new byte[] { 109, 101, 115, 115, 97, 103, 105, 110, 103, 46, 100, 101, 115, 116, 105, 110, 97, 116, 105, 111, 110, 95, 107, 105, 110, 100 };
+        // TempDestinationBytes = System.Text.Encoding.UTF8.GetBytes("messaging.temp_destination");
+        private static readonly byte[] TempDestinationBytes = new byte[] { 109, 101, 115, 115, 97, 103, 105, 110, 103, 46, 116, 101, 109, 112, 95, 100, 101, 115, 116, 105, 110, 97, 116, 105, 111, 110 };
+        // ProtocolBytes = System.Text.Encoding.UTF8.GetBytes("messaging.protocol");
+        private static readonly byte[] ProtocolBytes = new byte[] { 109, 101, 115, 115, 97, 103, 105, 110, 103, 46, 112, 114, 111, 116, 111, 99, 111, 108 };
+        // ProtocolVersionBytes = System.Text.Encoding.UTF8.GetBytes("messaging.protocol_version");
+        private static readonly byte[] ProtocolVersionBytes = new byte[] { 109, 101, 115, 115, 97, 103, 105, 110, 103, 46, 112, 114, 111, 116, 111, 99, 111, 108, 95, 118, 101, 114, 115, 105, 111, 110 };
+        // UrlBytes = System.Text.Encoding.UTF8.GetBytes("messaging.url");
+        private static readonly byte[] UrlBytes = new byte[] { 109, 101, 115, 115, 97, 103, 105, 110, 103, 46, 117, 114, 108 };
+        // OperationBytes = System.Text.Encoding.UTF8.GetBytes("messaging.operation");
+        private static readonly byte[] OperationBytes = new byte[] { 109, 101, 115, 115, 97, 103, 105, 110, 103, 46, 111, 112, 101, 114, 97, 116, 105, 111, 110 };
+        // MessageIdBytes = System.Text.Encoding.UTF8.GetBytes("messaging.message_id");
+        private static readonly byte[] MessageIdBytes = new byte[] { 109, 101, 115, 115, 97, 103, 105, 110, 103, 46, 109, 101, 115, 115, 97, 103, 101, 95, 105, 100 };
+        // ConversationIdBytes = System.Text.Encoding.UTF8.GetBytes("messaging.conversation_id");
+        private static readonly byte[] ConversationIdBytes = new byte[] { 109, 101, 115, 115, 97, 103, 105, 110, 103, 46, 99, 111, 110, 118, 101, 114, 115, 97, 116, 105, 111, 110, 95, 105, 100 };
+        // ConsumerIdBytes = System.Text.Encoding.UTF8.GetBytes("messaging.consumer_id	");
+        private static readonly byte[] ConsumerIdBytes = new byte[] { 109, 101, 115, 115, 97, 103, 105, 110, 103, 46, 99, 111, 110, 115, 117, 109, 101, 114, 95, 105, 100, 9 };
+        // MessageSizeBytes = System.Text.Encoding.UTF8.GetBytes("messaging.message_payload_size_bytes");
+        private static readonly byte[] MessageSizeBytes = new byte[] { 109, 101, 115, 115, 97, 103, 105, 110, 103, 46, 109, 101, 115, 115, 97, 103, 101, 95, 112, 97, 121, 108, 111, 97, 100, 95, 115, 105, 122, 101, 95, 98, 121, 116, 101, 115 };
+        // MessageSizeCompressedBytes = System.Text.Encoding.UTF8.GetBytes("messaging.message_payload_compressed_size_bytes");
+        private static readonly byte[] MessageSizeCompressedBytes = new byte[] { 109, 101, 115, 115, 97, 103, 105, 110, 103, 46, 109, 101, 115, 115, 97, 103, 101, 95, 112, 97, 121, 108, 111, 97, 100, 95, 99, 111, 109, 112, 114, 101, 115, 115, 101, 100, 95, 115, 105, 122, 101, 95, 98, 121, 116, 101, 115 };
 
         public override string? GetTag(string key)
         {
@@ -106,7 +120,77 @@ namespace Datadog.Trace.Tagging
                 new Datadog.Trace.Tagging.Property<MessagingTags, string?>("messaging.consumer_id	", t => t.ConsumerId),
                 new Datadog.Trace.Tagging.Property<MessagingTags, string?>("messaging.message_payload_size_bytes", t => t.MessageSize),
                 new Datadog.Trace.Tagging.Property<MessagingTags, string?>("messaging.message_payload_compressed_size_bytes", t => t.MessageSizeCompressed)
-);
+        );
+
+        public override void EnumerateTags<TProcessor>(ref TProcessor processor)
+        {
+            if (System is not null)
+            {
+                processor.Process(new TagItem<string>("messaging.system", System, SystemBytes));
+            }
+
+            if (Destination is not null)
+            {
+                processor.Process(new TagItem<string>("messaging.destination", Destination, DestinationBytes));
+            }
+
+            if (DestinationKind is not null)
+            {
+                processor.Process(new TagItem<string>("messaging.destination_kind", DestinationKind, DestinationKindBytes));
+            }
+
+            if (TempDestination is not null)
+            {
+                processor.Process(new TagItem<string>("messaging.temp_destination", TempDestination, TempDestinationBytes));
+            }
+
+            if (Protocol is not null)
+            {
+                processor.Process(new TagItem<string>("messaging.protocol", Protocol, ProtocolBytes));
+            }
+
+            if (ProtocolVersion is not null)
+            {
+                processor.Process(new TagItem<string>("messaging.protocol_version", ProtocolVersion, ProtocolVersionBytes));
+            }
+
+            if (Url is not null)
+            {
+                processor.Process(new TagItem<string>("messaging.url", Url, UrlBytes));
+            }
+
+            if (Operation is not null)
+            {
+                processor.Process(new TagItem<string>("messaging.operation", Operation, OperationBytes));
+            }
+
+            if (MessageId is not null)
+            {
+                processor.Process(new TagItem<string>("messaging.message_id", MessageId, MessageIdBytes));
+            }
+
+            if (ConversationId is not null)
+            {
+                processor.Process(new TagItem<string>("messaging.conversation_id", ConversationId, ConversationIdBytes));
+            }
+
+            if (ConsumerId is not null)
+            {
+                processor.Process(new TagItem<string>("messaging.consumer_id	", ConsumerId, ConsumerIdBytes));
+            }
+
+            if (MessageSize is not null)
+            {
+                processor.Process(new TagItem<string>("messaging.message_payload_size_bytes", MessageSize, MessageSizeBytes));
+            }
+
+            if (MessageSizeCompressed is not null)
+            {
+                processor.Process(new TagItem<string>("messaging.message_payload_compressed_size_bytes", MessageSizeCompressed, MessageSizeCompressedBytes));
+            }
+
+            base.EnumerateTags(ref processor);
+        }
 
         protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
         {
@@ -116,79 +200,79 @@ namespace Datadog.Trace.Tagging
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
         {
             var count = 0;
-            if (System != null)
+            if (System is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, SystemBytes, System, tagProcessors);
             }
 
-            if (Destination != null)
+            if (Destination is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, DestinationBytes, Destination, tagProcessors);
             }
 
-            if (DestinationKind != null)
+            if (DestinationKind is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, DestinationKindBytes, DestinationKind, tagProcessors);
             }
 
-            if (TempDestination != null)
+            if (TempDestination is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, TempDestinationBytes, TempDestination, tagProcessors);
             }
 
-            if (Protocol != null)
+            if (Protocol is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, ProtocolBytes, Protocol, tagProcessors);
             }
 
-            if (ProtocolVersion != null)
+            if (ProtocolVersion is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, ProtocolVersionBytes, ProtocolVersion, tagProcessors);
             }
 
-            if (Url != null)
+            if (Url is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, UrlBytes, Url, tagProcessors);
             }
 
-            if (Operation != null)
+            if (Operation is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, OperationBytes, Operation, tagProcessors);
             }
 
-            if (MessageId != null)
+            if (MessageId is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, MessageIdBytes, MessageId, tagProcessors);
             }
 
-            if (ConversationId != null)
+            if (ConversationId is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, ConversationIdBytes, ConversationId, tagProcessors);
             }
 
-            if (ConsumerId != null)
+            if (ConsumerId is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, ConsumerIdBytes, ConsumerId, tagProcessors);
             }
 
-            if (MessageSize != null)
+            if (MessageSize is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, MessageSizeBytes, MessageSize, tagProcessors);
             }
 
-            if (MessageSizeCompressed != null)
+            if (MessageSizeCompressed is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, MessageSizeCompressedBytes, MessageSizeCompressed, tagProcessors);
@@ -199,91 +283,91 @@ namespace Datadog.Trace.Tagging
 
         protected override void WriteAdditionalTags(System.Text.StringBuilder sb)
         {
-            if (System != null)
+            if (System is not null)
             {
                 sb.Append("messaging.system (tag):")
                   .Append(System)
                   .Append(',');
             }
 
-            if (Destination != null)
+            if (Destination is not null)
             {
                 sb.Append("messaging.destination (tag):")
                   .Append(Destination)
                   .Append(',');
             }
 
-            if (DestinationKind != null)
+            if (DestinationKind is not null)
             {
                 sb.Append("messaging.destination_kind (tag):")
                   .Append(DestinationKind)
                   .Append(',');
             }
 
-            if (TempDestination != null)
+            if (TempDestination is not null)
             {
                 sb.Append("messaging.temp_destination (tag):")
                   .Append(TempDestination)
                   .Append(',');
             }
 
-            if (Protocol != null)
+            if (Protocol is not null)
             {
                 sb.Append("messaging.protocol (tag):")
                   .Append(Protocol)
                   .Append(',');
             }
 
-            if (ProtocolVersion != null)
+            if (ProtocolVersion is not null)
             {
                 sb.Append("messaging.protocol_version (tag):")
                   .Append(ProtocolVersion)
                   .Append(',');
             }
 
-            if (Url != null)
+            if (Url is not null)
             {
                 sb.Append("messaging.url (tag):")
                   .Append(Url)
                   .Append(',');
             }
 
-            if (Operation != null)
+            if (Operation is not null)
             {
                 sb.Append("messaging.operation (tag):")
                   .Append(Operation)
                   .Append(',');
             }
 
-            if (MessageId != null)
+            if (MessageId is not null)
             {
                 sb.Append("messaging.message_id (tag):")
                   .Append(MessageId)
                   .Append(',');
             }
 
-            if (ConversationId != null)
+            if (ConversationId is not null)
             {
                 sb.Append("messaging.conversation_id (tag):")
                   .Append(ConversationId)
                   .Append(',');
             }
 
-            if (ConsumerId != null)
+            if (ConsumerId is not null)
             {
                 sb.Append("messaging.consumer_id	 (tag):")
                   .Append(ConsumerId)
                   .Append(',');
             }
 
-            if (MessageSize != null)
+            if (MessageSize is not null)
             {
                 sb.Append("messaging.message_payload_size_bytes (tag):")
                   .Append(MessageSize)
                   .Append(',');
             }
 
-            if (MessageSizeCompressed != null)
+            if (MessageSizeCompressed is not null)
             {
                 sb.Append("messaging.message_payload_compressed_size_bytes (tag):")
                   .Append(MessageSizeCompressed)

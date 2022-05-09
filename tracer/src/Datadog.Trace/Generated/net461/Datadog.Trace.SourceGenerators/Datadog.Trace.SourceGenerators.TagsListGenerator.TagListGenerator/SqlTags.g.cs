@@ -2,17 +2,24 @@
 #nullable enable
 
 using Datadog.Trace.Processors;
+using Datadog.Trace.Tagging;
 
 namespace Datadog.Trace.Tagging
 {
     partial class SqlTags
     {
-        private static readonly byte[] SpanKindBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("span.kind");
-        private static readonly byte[] DbTypeBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("db.system");
-        private static readonly byte[] InstrumentationNameBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("component");
-        private static readonly byte[] DbNameBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("db.name");
-        private static readonly byte[] DbUserBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("db.user");
-        private static readonly byte[] OutHostBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("net.peer.name");
+        // SpanKindBytes = System.Text.Encoding.UTF8.GetBytes("span.kind");
+        private static readonly byte[] SpanKindBytes = new byte[] { 115, 112, 97, 110, 46, 107, 105, 110, 100 };
+        // DbTypeBytes = System.Text.Encoding.UTF8.GetBytes("db.system");
+        private static readonly byte[] DbTypeBytes = new byte[] { 100, 98, 46, 115, 121, 115, 116, 101, 109 };
+        // InstrumentationNameBytes = System.Text.Encoding.UTF8.GetBytes("component");
+        private static readonly byte[] InstrumentationNameBytes = new byte[] { 99, 111, 109, 112, 111, 110, 101, 110, 116 };
+        // DbNameBytes = System.Text.Encoding.UTF8.GetBytes("db.name");
+        private static readonly byte[] DbNameBytes = new byte[] { 100, 98, 46, 110, 97, 109, 101 };
+        // DbUserBytes = System.Text.Encoding.UTF8.GetBytes("db.user");
+        private static readonly byte[] DbUserBytes = new byte[] { 100, 98, 46, 117, 115, 101, 114 };
+        // OutHostBytes = System.Text.Encoding.UTF8.GetBytes("net.peer.name");
+        private static readonly byte[] OutHostBytes = new byte[] { 110, 101, 116, 46, 112, 101, 101, 114, 46, 110, 97, 109, 101 };
 
         public override string? GetTag(string key)
         {
@@ -61,7 +68,42 @@ namespace Datadog.Trace.Tagging
                 new Datadog.Trace.Tagging.Property<SqlTags, string?>("db.name", t => t.DbName),
                 new Datadog.Trace.Tagging.Property<SqlTags, string?>("db.user", t => t.DbUser),
                 new Datadog.Trace.Tagging.Property<SqlTags, string?>("net.peer.name", t => t.OutHost)
-);
+        );
+
+        public override void EnumerateTags<TProcessor>(ref TProcessor processor)
+        {
+            if (SpanKind is not null)
+            {
+                processor.Process(new TagItem<string>("span.kind", SpanKind, SpanKindBytes));
+            }
+
+            if (DbType is not null)
+            {
+                processor.Process(new TagItem<string>("db.system", DbType, DbTypeBytes));
+            }
+
+            if (InstrumentationName is not null)
+            {
+                processor.Process(new TagItem<string>("component", InstrumentationName, InstrumentationNameBytes));
+            }
+
+            if (DbName is not null)
+            {
+                processor.Process(new TagItem<string>("db.name", DbName, DbNameBytes));
+            }
+
+            if (DbUser is not null)
+            {
+                processor.Process(new TagItem<string>("db.user", DbUser, DbUserBytes));
+            }
+
+            if (OutHost is not null)
+            {
+                processor.Process(new TagItem<string>("net.peer.name", OutHost, OutHostBytes));
+            }
+
+            base.EnumerateTags(ref processor);
+        }
 
         protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
         {
@@ -71,37 +113,37 @@ namespace Datadog.Trace.Tagging
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
         {
             var count = 0;
-            if (SpanKind != null)
+            if (SpanKind is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, SpanKindBytes, SpanKind, tagProcessors);
             }
 
-            if (DbType != null)
+            if (DbType is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, DbTypeBytes, DbType, tagProcessors);
             }
 
-            if (InstrumentationName != null)
+            if (InstrumentationName is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, InstrumentationNameBytes, InstrumentationName, tagProcessors);
             }
 
-            if (DbName != null)
+            if (DbName is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, DbNameBytes, DbName, tagProcessors);
             }
 
-            if (DbUser != null)
+            if (DbUser is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, DbUserBytes, DbUser, tagProcessors);
             }
 
-            if (OutHost != null)
+            if (OutHost is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, OutHostBytes, OutHost, tagProcessors);
@@ -112,42 +154,42 @@ namespace Datadog.Trace.Tagging
 
         protected override void WriteAdditionalTags(System.Text.StringBuilder sb)
         {
-            if (SpanKind != null)
+            if (SpanKind is not null)
             {
                 sb.Append("span.kind (tag):")
                   .Append(SpanKind)
                   .Append(',');
             }
 
-            if (DbType != null)
+            if (DbType is not null)
             {
                 sb.Append("db.system (tag):")
                   .Append(DbType)
                   .Append(',');
             }
 
-            if (InstrumentationName != null)
+            if (InstrumentationName is not null)
             {
                 sb.Append("component (tag):")
                   .Append(InstrumentationName)
                   .Append(',');
             }
 
-            if (DbName != null)
+            if (DbName is not null)
             {
                 sb.Append("db.name (tag):")
                   .Append(DbName)
                   .Append(',');
             }
 
-            if (DbUser != null)
+            if (DbUser is not null)
             {
                 sb.Append("db.user (tag):")
                   .Append(DbUser)
                   .Append(',');
             }
 
-            if (OutHost != null)
+            if (OutHost is not null)
             {
                 sb.Append("net.peer.name (tag):")
                   .Append(OutHost)

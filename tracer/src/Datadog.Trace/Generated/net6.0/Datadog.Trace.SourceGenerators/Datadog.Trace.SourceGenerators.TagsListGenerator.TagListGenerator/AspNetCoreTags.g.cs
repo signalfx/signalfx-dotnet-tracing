@@ -2,13 +2,16 @@
 #nullable enable
 
 using Datadog.Trace.Processors;
+using Datadog.Trace.Tagging;
 
 namespace Datadog.Trace.Tagging
 {
     partial class AspNetCoreTags
     {
-        private static readonly byte[] InstrumentationNameBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("component");
-        private static readonly byte[] AspNetCoreRouteBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("aspnet_core.route");
+        // InstrumentationNameBytes = System.Text.Encoding.UTF8.GetBytes("component");
+        private static readonly byte[] InstrumentationNameBytes = new byte[] { 99, 111, 109, 112, 111, 110, 101, 110, 116 };
+        // AspNetCoreRouteBytes = System.Text.Encoding.UTF8.GetBytes("aspnet_core.route");
+        private static readonly byte[] AspNetCoreRouteBytes = new byte[] { 97, 115, 112, 110, 101, 116, 95, 99, 111, 114, 101, 46, 114, 111, 117, 116, 101 };
 
         public override string? GetTag(string key)
         {
@@ -37,7 +40,22 @@ namespace Datadog.Trace.Tagging
              Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(WebTagsProperties,
                 new Datadog.Trace.Tagging.Property<AspNetCoreTags, string?>("component", t => t.InstrumentationName),
                 new Datadog.Trace.Tagging.Property<AspNetCoreTags, string?>("aspnet_core.route", t => t.AspNetCoreRoute)
-);
+        );
+
+        public override void EnumerateTags<TProcessor>(ref TProcessor processor)
+        {
+            if (InstrumentationName is not null)
+            {
+                processor.Process(new TagItem<string>("component", InstrumentationName, InstrumentationNameBytes));
+            }
+
+            if (AspNetCoreRoute is not null)
+            {
+                processor.Process(new TagItem<string>("aspnet_core.route", AspNetCoreRoute, AspNetCoreRouteBytes));
+            }
+
+            base.EnumerateTags(ref processor);
+        }
 
         protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
         {
@@ -47,13 +65,13 @@ namespace Datadog.Trace.Tagging
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
         {
             var count = 0;
-            if (InstrumentationName != null)
+            if (InstrumentationName is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, InstrumentationNameBytes, InstrumentationName, tagProcessors);
             }
 
-            if (AspNetCoreRoute != null)
+            if (AspNetCoreRoute is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, AspNetCoreRouteBytes, AspNetCoreRoute, tagProcessors);
@@ -64,14 +82,14 @@ namespace Datadog.Trace.Tagging
 
         protected override void WriteAdditionalTags(System.Text.StringBuilder sb)
         {
-            if (InstrumentationName != null)
+            if (InstrumentationName is not null)
             {
                 sb.Append("component (tag):")
                   .Append(InstrumentationName)
                   .Append(',');
             }
 
-            if (AspNetCoreRoute != null)
+            if (AspNetCoreRoute is not null)
             {
                 sb.Append("aspnet_core.route (tag):")
                   .Append(AspNetCoreRoute)
