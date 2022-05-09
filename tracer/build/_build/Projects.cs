@@ -19,5 +19,5 @@ public static class Projects
     public const string TraceIntegrationTests = "Datadog.Trace.IntegrationTests";
     public const string OpenTracingIntegrationTests = "Datadog.Trace.OpenTracing.IntegrationTests";
     public const string ClrProfilerIntegrationTests = "Datadog.Trace.ClrProfiler.IntegrationTests";
-    public const string AutomapperTest = "AutomapperTest";
+    public const string DataDogThreadTest = "DataDogThreadTest";
 }
