@@ -821,7 +821,7 @@ partial class Build
         .Requires(() => Framework)
         .Executes(() =>
         {
-            var regressionsDirectory = Solution.GetProject(Projects.AutomapperTest)
+            var regressionsDirectory = Solution.GetProject(Projects.DataDogThreadTest)
                 .Directory.Parent;
 
             var regressionLibs = GlobFiles(regressionsDirectory / "**" / "*.csproj")
@@ -1124,7 +1124,6 @@ partial class Build
                 "Samples.TracingWithoutLimits", // I think we _should_ run this one (assuming it has tests)
                 "Samples.Wcf",
                 "Samples.WebRequest.NetFramework20",
-                "AutomapperTest", // I think we _should_ run this one (assuming it has tests)
                 "DogStatsD.RaceCondition",
                 "Sandbox.ManualTracing",
                 "StackExchange.Redis.AssemblyConflict.LegacyProject",
