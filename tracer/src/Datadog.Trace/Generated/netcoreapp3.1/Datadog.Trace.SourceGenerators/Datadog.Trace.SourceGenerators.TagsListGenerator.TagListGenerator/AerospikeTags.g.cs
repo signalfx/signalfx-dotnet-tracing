@@ -2,18 +2,26 @@
 #nullable enable
 
 using Datadog.Trace.Processors;
+using Datadog.Trace.Tagging;
 
 namespace Datadog.Trace.Tagging
 {
     partial class AerospikeTags
     {
-        private static readonly byte[] SpanKindBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("span.kind");
-        private static readonly byte[] InstrumentationNameBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("component");
-        private static readonly byte[] DbTypeBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("db.system");
-        private static readonly byte[] KeyBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("db.aerospike.key");
-        private static readonly byte[] NamespaceBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("db.aerospike.namespace");
-        private static readonly byte[] SetNameBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("db.aerospike.setname");
-        private static readonly byte[] UserKeyBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("db.aerospike.userkey");
+        // SpanKindBytes = System.Text.Encoding.UTF8.GetBytes("span.kind");
+        private static readonly byte[] SpanKindBytes = new byte[] { 115, 112, 97, 110, 46, 107, 105, 110, 100 };
+        // InstrumentationNameBytes = System.Text.Encoding.UTF8.GetBytes("component");
+        private static readonly byte[] InstrumentationNameBytes = new byte[] { 99, 111, 109, 112, 111, 110, 101, 110, 116 };
+        // DbTypeBytes = System.Text.Encoding.UTF8.GetBytes("db.system");
+        private static readonly byte[] DbTypeBytes = new byte[] { 100, 98, 46, 115, 121, 115, 116, 101, 109 };
+        // KeyBytes = System.Text.Encoding.UTF8.GetBytes("db.aerospike.key");
+        private static readonly byte[] KeyBytes = new byte[] { 100, 98, 46, 97, 101, 114, 111, 115, 112, 105, 107, 101, 46, 107, 101, 121 };
+        // NamespaceBytes = System.Text.Encoding.UTF8.GetBytes("db.aerospike.namespace");
+        private static readonly byte[] NamespaceBytes = new byte[] { 100, 98, 46, 97, 101, 114, 111, 115, 112, 105, 107, 101, 46, 110, 97, 109, 101, 115, 112, 97, 99, 101 };
+        // SetNameBytes = System.Text.Encoding.UTF8.GetBytes("db.aerospike.setname");
+        private static readonly byte[] SetNameBytes = new byte[] { 100, 98, 46, 97, 101, 114, 111, 115, 112, 105, 107, 101, 46, 115, 101, 116, 110, 97, 109, 101 };
+        // UserKeyBytes = System.Text.Encoding.UTF8.GetBytes("db.aerospike.userkey");
+        private static readonly byte[] UserKeyBytes = new byte[] { 100, 98, 46, 97, 101, 114, 111, 115, 112, 105, 107, 101, 46, 117, 115, 101, 114, 107, 101, 121 };
 
         public override string? GetTag(string key)
         {
@@ -68,99 +76,91 @@ namespace Datadog.Trace.Tagging
              return AerospikeTagsProperties;
         }
 
-        protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
+        public override void EnumerateTags<TProcessor>(ref TProcessor processor)
         {
-            var count = 0;
-            if (SpanKind != null)
+            if (SpanKind is not null)
             {
-                count++;
-                WriteTag(ref bytes, ref offset, SpanKindBytes, SpanKind, tagProcessors);
+                processor.Process(new TagItem<string>("span.kind", SpanKind, SpanKindBytes));
             }
 
-            if (InstrumentationName != null)
+            if (InstrumentationName is not null)
             {
-                count++;
-                WriteTag(ref bytes, ref offset, InstrumentationNameBytes, InstrumentationName, tagProcessors);
+                processor.Process(new TagItem<string>("component", InstrumentationName, InstrumentationNameBytes));
             }
 
-            if (DbType != null)
+            if (DbType is not null)
             {
-                count++;
-                WriteTag(ref bytes, ref offset, DbTypeBytes, DbType, tagProcessors);
+                processor.Process(new TagItem<string>("db.system", DbType, DbTypeBytes));
             }
 
-            if (Key != null)
+            if (Key is not null)
             {
-                count++;
-                WriteTag(ref bytes, ref offset, KeyBytes, Key, tagProcessors);
+                processor.Process(new TagItem<string>("db.aerospike.key", Key, KeyBytes));
             }
 
-            if (Namespace != null)
+            if (Namespace is not null)
             {
-                count++;
-                WriteTag(ref bytes, ref offset, NamespaceBytes, Namespace, tagProcessors);
+                processor.Process(new TagItem<string>("db.aerospike.namespace", Namespace, NamespaceBytes));
             }
 
-            if (SetName != null)
+            if (SetName is not null)
             {
-                count++;
-                WriteTag(ref bytes, ref offset, SetNameBytes, SetName, tagProcessors);
+                processor.Process(new TagItem<string>("db.aerospike.setname", SetName, SetNameBytes));
             }
 
-            if (UserKey != null)
+            if (UserKey is not null)
             {
-                count++;
-                WriteTag(ref bytes, ref offset, UserKeyBytes, UserKey, tagProcessors);
+                processor.Process(new TagItem<string>("db.aerospike.userkey", UserKey, UserKeyBytes));
             }
 
-            return count + base.WriteAdditionalTags(ref bytes, ref offset, tagProcessors);
+            base.EnumerateTags(ref processor);
         }
 
         protected override void WriteAdditionalTags(System.Text.StringBuilder sb)
         {
-            if (SpanKind != null)
+            if (SpanKind is not null)
             {
                 sb.Append("span.kind (tag):")
                   .Append(SpanKind)
                   .Append(',');
             }
 
-            if (InstrumentationName != null)
+            if (InstrumentationName is not null)
             {
                 sb.Append("component (tag):")
                   .Append(InstrumentationName)
                   .Append(',');
             }
 
-            if (DbType != null)
+            if (DbType is not null)
             {
                 sb.Append("db.system (tag):")
                   .Append(DbType)
                   .Append(',');
             }
 
-            if (Key != null)
+            if (Key is not null)
             {
                 sb.Append("db.aerospike.key (tag):")
                   .Append(Key)
                   .Append(',');
             }
 
-            if (Namespace != null)
+            if (Namespace is not null)
             {
                 sb.Append("db.aerospike.namespace (tag):")
                   .Append(Namespace)
                   .Append(',');
             }
 
-            if (SetName != null)
+            if (SetName is not null)
             {
                 sb.Append("db.aerospike.setname (tag):")
                   .Append(SetName)
                   .Append(',');
             }
 
-            if (UserKey != null)
+            if (UserKey is not null)
             {
                 sb.Append("db.aerospike.userkey (tag):")
                   .Append(UserKey)
