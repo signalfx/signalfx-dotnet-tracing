@@ -69,6 +69,12 @@ internal static partial class DotNetSettingsExtensions
     {
         return settings.SetProcessEnvironmentVariable("SIGNALFX_SERVICE_NAME", serviceName);
     }
+
+    public static T SetLogsDirectory<T>(this T settings, AbsolutePath logsDirectory)
+        where T: ToolSettings
+    {
+        return settings.SetProcessEnvironmentVariable("SIGNALFX_TRACE_LOG_DIRECTORY", logsDirectory);
+    }
     
     public static T SetProcessEnvironmentVariables<T>(this T settings, IEnumerable<KeyValuePair<string, string>> variables)
         where T: ToolSettings
