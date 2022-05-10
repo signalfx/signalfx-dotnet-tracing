@@ -6,8 +6,10 @@
 // Modified by Splunk Inc.
 
 using System;
+using System.Collections.Generic;
 using Datadog.Trace.Agent;
 using Datadog.Trace.Configuration.Helpers;
+using Datadog.Trace.SignalFx.Metrics;
 using MetricsTransportType = Datadog.Trace.Vendors.StatsdClient.Transport.TransportType;
 
 namespace Datadog.Trace.Configuration
@@ -18,6 +20,7 @@ namespace Datadog.Trace.Configuration
     public class ExporterSettings
     {
         private int _partialFlushMinSpans;
+        private Uri _agentUri;
 
         /// <summary>
         /// The default host value for <see cref="AgentUri"/>.
@@ -51,25 +54,48 @@ namespace Datadog.Trace.Configuration
         /// <param name="source">The <see cref="IConfigurationSource"/> to use when retrieving configuration values.</param>
         public ExporterSettings(IConfigurationSource source)
         {
+            ValidationWarnings = new List<string>();
+
+            // Get values from the config
+            var endpointUrl = source?.GetString(ConfigurationKeys.EndpointUrl);
+
+            var tracesPipeName = source?.GetString(ConfigurationKeys.TracesPipeName);
+
+            var tracesPipeTimeoutMs = source?.GetInt32(ConfigurationKeys.TracesPipeTimeoutMs) ?? 0;
+
+            var agentPort = source?.GetInt32(ConfigurationKeys.AgentPort);
+
             var ingestRealm = source?.GetString(ConfigurationKeys.IngestRealm) ??
                               LocalIngestRealm;
 
-            ConfigureTraceTransport(source, ingestRealm, out var shouldUseUdpForMetrics);
-            ConfigureMetricsTransport(source, shouldUseUdpForMetrics, ingestRealm);
+            var dogStatsdPort = source?.GetInt32(ConfigurationKeys.DogStatsdPort) ?? 0;
+            var metricsPipeName = source?.GetString(ConfigurationKeys.MetricsPipeName);
+
+            ConfigureTraceTransport(endpointUrl, tracesPipeName, agentPort, ingestRealm);
+
+            MetricsExporter = source.GetTypedValue<MetricsExporterType>(ConfigurationKeys.MetricsExporter);
+            if (MetricsExporter == MetricsExporterType.SignalFx)
+            {
+                MetricsEndpointUrl = source.SafeReadUri(
+                    key: ConfigurationKeys.MetricsEndpointUrl,
+                    defaultTo: GetConfiguredMetricsEndpoint(ingestRealm),
+                    out _);
+            }
+            else
+            {
+                ConfigureStatsdMetricsTransport(endpointUrl, dogStatsdPort, metricsPipeName);
+            }
+
             ConfigureLogsTransport(source);
 
-            PartialFlushEnabled = source?.GetBool(ConfigurationKeys.PartialFlushEnabled)
-                // default value
-                ?? false;
-
-            SyncExport = source?.GetBool(ConfigurationKeys.TraceSyncExport)
-                // default value
-                ?? false;
+            TracesPipeTimeoutMs = tracesPipeTimeoutMs > 0 ? tracesPipeTimeoutMs : 500;
+            PartialFlushEnabled = source?.GetBool(ConfigurationKeys.PartialFlushEnabled) ?? false;
 
             PartialFlushMinSpans = source.SafeReadInt32(
                 key: ConfigurationKeys.PartialFlushMinSpans,
                 defaultTo: 500,
                 validators: (val) => val > 0);
+            SyncExport = source?.GetBool(ConfigurationKeys.TraceSyncExport) ?? false;
         }
 
         /// <summary>
@@ -78,7 +104,19 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="ConfigurationKeys.AgentHost"/>
         /// <seealso cref="ConfigurationKeys.AgentPort"/>
-        public Uri AgentUri { get; set; }
+        public Uri AgentUri
+        {
+            get => _agentUri;
+            set
+            {
+                SetAgentUriAndTransport(value);
+                // In the case the url was a UDS one, we do not change anything.
+                if (TracesTransport == TracesTransportType.Default)
+                {
+                    MetricsTransport = MetricsTransportType.UDP;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets the windows pipe name where the Tracer can connect to the Agent.
@@ -131,6 +169,14 @@ namespace Datadog.Trace.Configuration
         public bool SyncExport { get; set; }
 
         /// <summary>
+        /// Gets or sets the type of metrics exporter.
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.MetricsExporter"/>
+        public MetricsExporterType MetricsExporter { get; set; }
+
+        internal List<string> ValidationWarnings { get; }
+
+        /// <summary>
         /// Gets or sets the minimum number of closed spans in a trace before it's partially flushed
         /// </summary>
         public int PartialFlushMinSpans
@@ -167,52 +213,43 @@ namespace Datadog.Trace.Configuration
                        new Uri($"https://ingest.{ingestRealm}.signalfx.com/v2/datapoint");
         }
 
-        private static Uri GetConfiguredTracesEndpoint(string ingestRealm, int agentPort)
-        {
-            return IsDefaultIngestRealm(ingestRealm) ?
-                       // local collector
-                       new Uri($"http://localhost:{agentPort}/api/v2/spans", UriKind.Absolute) :
-                       // direct ingest
-                       new Uri($"https://ingest.{ingestRealm}.signalfx.com/v2/trace", UriKind.Absolute);
-        }
-
         private static bool IsDefaultIngestRealm(string ingestRealm)
         {
             return string.Equals(ingestRealm, LocalIngestRealm, StringComparison.OrdinalIgnoreCase);
         }
 
-        private void ConfigureMetricsTransport(IConfigurationSource source, bool forceMetricsOverUdp, string ingestRealm)
+        private void ConfigureStatsdMetricsTransport(string traceAgentUrl, int dogStatsdPort, string metricsPipeName)
         {
-            MetricsTransportType? metricsTransport = null;
-
-            var dogStatsdPort = source?.GetInt32(ConfigurationKeys.DogStatsdPort);
-
-            MetricsPipeName = source?.GetString(ConfigurationKeys.MetricsPipeName);
-
-            // Agent port is set to zero in places like AAS where it's needed to prevent port conflict.
-            // The agent will fail to start if it can not bind a port.
-            // If the dogstatsd port isn't explicitly configured, check for pipes or sockets.
-            if (!forceMetricsOverUdp && (dogStatsdPort == 0 || dogStatsdPort == null))
+            // Agent port is set to zero in places like AAS where it's needed to prevent port conflict
+            // The agent will fail to start if it can not bind a port, so we need to override 8126 to prevent port conflict
+            // Port 0 means it will pick some random available port
+            if (dogStatsdPort < 0)
             {
-                if (!string.IsNullOrWhiteSpace(MetricsPipeName))
-                {
-                    metricsTransport = MetricsTransportType.NamedPipe;
-                }
+                ValidationWarnings.Add("The provided dogStatsD port isn't valid, it should be positive.");
             }
 
-            if (metricsTransport == null)
+            if (!string.IsNullOrWhiteSpace(traceAgentUrl) && Uri.TryCreate(traceAgentUrl, UriKind.Absolute, out var _))
             {
-                // UDP if nothing explicit was configured or a port is set
-                DogStatsdPort = dogStatsdPort ?? DefaultDogstatsdPort;
-                metricsTransport = MetricsTransportType.UDP;
+                // No need to set AgentHost, it is taken from the AgentUri and set in ConfigureTrace
+                MetricsTransport = MetricsTransportType.UDP;
+            }
+            else if (dogStatsdPort > 0)
+            {
+                // No need to set AgentHost, it is taken from the AgentUri and set in ConfigureTrace
+                MetricsTransport = MetricsTransportType.UDP;
+            }
+            else if (!string.IsNullOrWhiteSpace(metricsPipeName))
+            {
+                MetricsTransport = MetricsTransportType.NamedPipe;
+                MetricsPipeName = metricsPipeName;
+            }
+            else
+            {
+                MetricsTransport = MetricsTransportType.UDP;
+                DogStatsdPort = DefaultDogstatsdPort;
             }
 
-            MetricsTransport = metricsTransport.Value;
-
-            MetricsEndpointUrl = source?.SafeReadUri(
-                key: ConfigurationKeys.MetricsEndpointUrl,
-                defaultTo: GetConfiguredMetricsEndpoint(ingestRealm),
-                out _);
+            DogStatsdPort = dogStatsdPort > 0 ? dogStatsdPort : DefaultDogstatsdPort;
         }
 
         private void ConfigureLogsTransport(IConfigurationSource source)
@@ -223,56 +260,96 @@ namespace Datadog.Trace.Configuration
             LogsEndpointUrl = new Uri(logsEndpointUrl);
         }
 
-        private void ConfigureTraceTransport(IConfigurationSource source, string ingestRealm, out bool forceMetricsOverUdp)
+        private void ConfigureTraceTransport(string endpointUrl, string tracesPipeName, int? agentPort, string ingestRealm)
         {
-            // Assume false, as we'll go through typical checks if this is false
-            forceMetricsOverUdp = false;
+            // Check the parameters in order of precedence
+            // For some cases, we allow falling back on another configuration (eg invalid url as the application will need to be restarted to fix it anyway).
+            // For other cases (eg a configured unix domain socket path not found), we don't fallback as the problem could be fixed outside the application.
+            if (!string.IsNullOrWhiteSpace(endpointUrl))
+            {
+                if (TrySetAgentUriAndTransport(endpointUrl))
+                {
+                    return;
+                }
+            }
 
-            TracesTransportType? traceTransport = null;
+            if (!string.IsNullOrWhiteSpace(tracesPipeName))
+            {
+                TracesTransport = TracesTransportType.WindowsNamedPipe;
+                TracesPipeName = tracesPipeName;
 
-            var agentPort = source?.GetInt32(ConfigurationKeys.AgentPort);
+                // The Uri isn't needed anymore in that case, just populating it for retro compatibility.
+                if (Uri.TryCreate($"http://{DefaultAgentHost}:{agentPort ?? DefaultAgentPort}", UriKind.Absolute, out var uri))
+                {
+                    SetAgentUriReplacingLocalhost(uri);
+                }
 
-            AgentUri = source.SafeReadUri(
-                key: ConfigurationKeys.EndpointUrl,
-                defaultTo: GetConfiguredTracesEndpoint(ingestRealm, agentPort ?? DefaultAgentPort),
-                out var defaultUsed);
+                return;
+            }
 
-            if (string.Equals(AgentUri.Host, "localhost", StringComparison.OrdinalIgnoreCase))
+            if (!IsDefaultIngestRealm(ingestRealm))
+            {
+                if (TrySetAgentUriAndTransport($"https://ingest.{ingestRealm}.signalfx.com/v2/trace"))
+                {
+                    return;
+                }
+            }
+
+            if (agentPort != null && agentPort != 0)
+            {
+                // Agent port is set to zero in places like AAS where it's needed to prevent port conflict
+                // The agent will fail to start if it can not bind a port, so we need to override 8126 to prevent port conflict
+                // Port 0 means it will pick some random available port
+
+                if (TrySetAgentUriAndTransport(DefaultAgentHost, agentPort.Value))
+                {
+                    return;
+                }
+            }
+
+            ValidationWarnings.Add("No transport configuration found, using default values");
+            TrySetAgentUriAndTransport(DefaultAgentHost, DefaultAgentPort);
+        }
+
+        private bool TrySetAgentUriAndTransport(string host, int port)
+        {
+            return TrySetAgentUriAndTransport($"http://{host}:{port}/api/v2/spans");
+        }
+
+        private bool TrySetAgentUriAndTransport(string url)
+        {
+            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
+            {
+                ValidationWarnings.Add($"The Uri: '{url}' is not valid. It won't be taken into account to send traces. Note that only absolute urls are accepted.");
+                return false;
+            }
+
+            SetAgentUriAndTransport(uri);
+            return true;
+        }
+
+        private void SetAgentUriAndTransport(Uri uri)
+        {
+            TracesTransport = TracesTransportType.Default;
+
+            SetAgentUriReplacingLocalhost(uri);
+        }
+
+        private void SetAgentUriReplacingLocalhost(Uri uri)
+        {
+            if (string.Equals(uri.Host, "localhost", StringComparison.OrdinalIgnoreCase))
             {
                 // Replace localhost with 127.0.0.1 to avoid DNS resolution.
                 // When ipv6 is enabled, localhost is first resolved to ::1, which fails
                 // because the trace agent is only bound to ipv4.
                 // This causes delays when sending traces.
-                var builder = new UriBuilder(AgentUri.AbsoluteUri) { Host = "127.0.0.1" };
-                AgentUri = builder.Uri;
+                var builder = new UriBuilder(uri) { Host = "127.0.0.1" };
+                _agentUri = builder.Uri;
             }
-
-            TracesPipeName = source?.GetString(ConfigurationKeys.TracesPipeName);
-
-            // Agent port is set to zero in places like AAS where it's needed to prevent port conflict
-            // The agent will fail to start if it can not bind a port, so we need to override 8126 to prevent port conflict
-            // Port 0 means it will pick some random available port
-            var hasExplicitHostOrPortSettings = (agentPort != null && agentPort != 0) || !defaultUsed;
-
-            if (hasExplicitHostOrPortSettings)
+            else
             {
-                // The agent host is explicitly configured, we should assume UDP for metrics
-                forceMetricsOverUdp = true;
-                traceTransport = TracesTransportType.Default;
+                _agentUri = uri;
             }
-            else if (!string.IsNullOrWhiteSpace(TracesPipeName))
-            {
-                traceTransport = TracesTransportType.WindowsNamedPipe;
-
-                TracesPipeTimeoutMs = source?.GetInt32(ConfigurationKeys.TracesPipeTimeoutMs)
-#if DEBUG
-                                   ?? 20_000;
-#else
-                    ?? 500;
-#endif
-            }
-
-            TracesTransport = traceTransport ?? TracesTransportType.Default;
         }
     }
 }
