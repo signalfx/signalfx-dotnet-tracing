@@ -405,7 +405,7 @@ jobs:
           3.1.416
           5.0.405
           6.0.200
-    - run: ./tracer/build.cmd BuildTracerHome PackageTracerHome BuildWindowsIntegrationTests -Framework ${{ matrix.framework }}
+    - run: ./tracer/build.cmd BuildTracerHome PackageTracerHome BuildWindowsIntegrationTests PublishIisSamples -Framework ${{ matrix.framework }}
     - name: docker-compose build IIS containers
       run: docker-compose build --build-arg dotnet_tracer_msi=.$relativeArtifacts/{{ matrix.platform }}/en-us/*.msi --build-arg ENABLE_32_BIT=${{ env.enable32bit }} IntegrationTests.IIS
     - name: docker-compose start IIS containers
