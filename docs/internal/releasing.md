@@ -41,3 +41,5 @@ needs any adjustments. Contact @signalfx/gdi-docs team if needed.
 
 1. [Publish](https://docs.microsoft.com/en-us/nuget/nuget-org/publish-a-package)
    the NuGet packages to the official [nuget.org feed](https://www.nuget.org/).
+
+1. Update SignalFx in [demo repository](https://github.com/signalfx/microservices-demo/blob/main/src/cartservice/Dockerfile#L38)
