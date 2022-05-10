@@ -14,6 +14,7 @@
 
 class StackSnapshotResultReusableBuffer;
 struct ManagedThreadInfo;
+class IManagedThreadList;
 
 class Windows64BitStackFramesCollector : public StackFramesCollectorBase
 {
@@ -30,7 +31,7 @@ public:
 
     void ResumeTargetThreadIfRequiredImplementation(ManagedThreadInfo* pThreadInfo, bool isTargetThreadSuspended, uint32_t* pErrorCodeHR) override;
 
-    StackSnapshotResultBuffer* CollectStackSampleImplementation(ManagedThreadInfo* pThreadInfo, uint32_t* pHR) override;
+    StackSnapshotResultBuffer* CollectStackSampleImplementation(ManagedThreadInfo* pThreadInfo, uint32_t* pHR, bool selfCollect) override;
 
 private:
     typedef NTSTATUS(__stdcall* NtQueryInformationThreadDelegate_t)(HANDLE ThreadHandle, THREADINFOCLASS ThreadInformationClass, PVOID ThreadInformation, ULONG ThreadInformationLength, PULONG ReturnLength);
@@ -50,8 +51,7 @@ private:
     // (This collector is not meant for 32 bit builds. Use the 32 bit collector instead.)
 
 public:
-    Windows64BitStackFramesCollector(ICorProfilerInfo4* const _) :
-        StackFramesCollectorBase()
+    Windows64BitStackFramesCollector(ICorProfilerInfo4* const _)
     {
         Log::Error("Windows64BitStackFramesCollector used in a 32 bit build."
                    " This was not intended. Use Windows32BitStackFramesCollector instead.");

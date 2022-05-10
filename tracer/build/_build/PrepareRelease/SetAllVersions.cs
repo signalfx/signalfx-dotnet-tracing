@@ -215,6 +215,10 @@ namespace PrepareRelease
                 "../shared/src/azure-site-extension/install.cmd",
                 text => Regex.Replace(text, VersionPattern(), VersionString()));
 
+            SynchronizeVersion(
+                "tools/PipelineMonitor/PipelineMonitor.csproj",
+                DatadogTraceNugetDependencyVersionReplace);
+
             Console.WriteLine($"Completed synchronizing versions to {VersionString()}");
         }
 

@@ -52,7 +52,13 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
 
         private static Assembly AssemblyResolve_ManagedProfilerDependencies(object sender, ResolveEventArgs args)
         {
-            var assemblyName = new AssemblyName(args.Name);
+            return ResolveAssembly(args.Name);
+        }
+
+        private static Assembly ResolveAssembly(string name)
+        {
+            var assemblyName = new AssemblyName(name);
+            StartupLogger.Debug("Assembly Resolve event received for: {0}", name);
 
             // On .NET Framework, having a non-US locale can cause mscorlib
             // to enter the AssemblyResolve event when searching for resources
@@ -67,6 +73,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
             }
 
             var path = Path.Combine(ManagedProfilerDirectory, $"{assemblyName.Name}.dll");
+            StartupLogger.Debug("Looking for: {0}", path);
 
             if (IsDatadogAssembly(path, out var cachedAssembly))
             {
@@ -74,6 +81,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
                 if (cachedAssembly is not null)
                 {
                     // The assembly is already loaded.
+                    StartupLogger.Debug("Loading from cache. [Path: {0}]", path);
                     return cachedAssembly;
                 }
 
@@ -91,6 +99,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
             }
 
             // The file doesn't exist in the Home folder.
+            StartupLogger.Debug("Assembly not found in path: {0}", path);
             return null;
         }
 

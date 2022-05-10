@@ -32,7 +32,7 @@ protected:
     virtual void PrepareForNextCollectionImplementation(void);
     virtual bool SuspendTargetThreadImplementation(ManagedThreadInfo* pThreadInfo, bool* pIsTargetThreadSuspended);
     virtual void ResumeTargetThreadIfRequiredImplementation(ManagedThreadInfo* pThreadInfo, bool isTargetThreadSuspended, uint32_t* pErrorCodeHR);
-    virtual StackSnapshotResultBuffer* CollectStackSampleImplementation(ManagedThreadInfo* pThreadInfo, uint32_t* pHR);
+    virtual StackSnapshotResultBuffer* CollectStackSampleImplementation(ManagedThreadInfo* pThreadInfo, uint32_t* pHR, bool selfCollect);
 
 public:
     virtual ~StackFramesCollectorBase();
