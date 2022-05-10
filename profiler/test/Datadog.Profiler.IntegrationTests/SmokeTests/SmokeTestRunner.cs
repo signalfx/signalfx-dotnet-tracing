@@ -27,9 +27,8 @@ namespace Datadog.Profiler.SmokeTests
             string appName,
             string framework,
             string appAssembly,
-            ITestOutputHelper output,
-            bool enableNewPipeline = false)
-            : this(appName, framework, appAssembly, commandLine: null, output, enableNewPipeline)
+            ITestOutputHelper output)
+            : this(appName, framework, appAssembly, commandLine: null, output)
         {
         }
 
@@ -38,11 +37,10 @@ namespace Datadog.Profiler.SmokeTests
             string framework,
             string appAssembly,
             string commandLine,
-            ITestOutputHelper output,
-            bool enableNewPipeline = false)
+            ITestOutputHelper output)
         {
             _output = output;
-            _testApplicationRunner = new TestApplicationRunner(appName, framework, appAssembly, output, commandLine, enableNewPipeline);
+            _testApplicationRunner = new TestApplicationRunner(appName, framework, appAssembly, output, commandLine);
         }
 
         private EnvironmentHelper EnvironmentHelper
@@ -64,14 +62,6 @@ namespace Datadog.Profiler.SmokeTests
 
         private void RunChecks(MockDatadogAgent agent)
         {
-            // Today, with the old pipeline the checks are flaky.
-            // With the new pipeline this should be fixed.
-            // So run the checks only for the new
-            if (!EnvironmentHelper.IsRunningWithNewPipeline())
-            {
-                return;
-            }
-
             CheckLogFiles();
             CheckPprofFiles();
             CheckAgent(agent);

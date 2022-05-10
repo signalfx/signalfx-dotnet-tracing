@@ -7,7 +7,6 @@ namespace Datadog.Profiler.IntegrationTests.Helpers
 {
     internal class EnvironmentVariables
     {
-        public const string LibDdPprofPipeline = "SIGNALFX_INTERNAL_PROFILING_LIBDDPROF_ENABLED";
         public const string ProfilingLogDir = "SIGNALFX_PROFILING_LOG_DIR";
         public const string ProfilingPprofDir = "SIGNALFX_INTERNAL_PROFILING_OUTPUT_DIR";
         public const string ProfilerInstallationFolder = "SIGNALFX_TESTING_PROFILER_FOLDER";
