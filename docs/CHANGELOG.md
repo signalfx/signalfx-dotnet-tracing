@@ -11,8 +11,9 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 ### General
 
-
 ### Breaking changes
+
+### Bugfixes
 
 ### Enhancements
 
