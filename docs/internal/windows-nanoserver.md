@@ -14,7 +14,7 @@ ENV CORECLR_ENABLE_PROFILING=1 \
     SIGNALFX_ENDPOINT_URL='<my-endpoint-here>'
 
 # Download SignalFx Instrumentation for .NET zip
-ARG TRACER_VERSION=0.2.3
+ARG TRACER_VERSION=0.2.4
 ADD https://github.com/signalfx/signalfx-dotnet-tracing/releases/download/v${TRACER_VERSION}/signalfx-dotnet-tracing-${TRACER_VERSION}.zip "C:/signalfx-dotnet-tracing.zip"
 
 # Extract zip to C:/signalfx/
