@@ -1048,15 +1048,6 @@ partial class Build
         .Executes(() => RunWindowsIisIntegrationTests(
                       Solution.GetProject(Projects.ClrProfilerIntegrationTests)));
 
-    Target RunWindowsSecurityIisIntegrationTests => _ => _
-        .After(BuildTracerHome)
-        .After(CompileIntegrationTests)
-        .After(CompileFrameworkReproductions)
-        .After(PublishIisSamples)
-        .Requires(() => Framework)
-        .Executes(() => RunWindowsIisIntegrationTests(
-                      Solution.GetProject(Projects.AppSecIntegrationTests)));
-
     void RunWindowsIisIntegrationTests(Project project)
     {
         EnsureResultsDirectory(project);
