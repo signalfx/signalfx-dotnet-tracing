@@ -1,5 +1,5 @@
 FROM mcr.microsoft.com/dotnet/core/runtime:2.1-stretch-slim AS base
-ARG TRACER_VERSION=0.2.3
+ARG TRACER_VERSION=0.2.4
 RUN mkdir -p /opt/signalfx
 RUN mkdir -p /var/log/signalfx/dotnet
 RUN curl -L https://github.com/signalfx/signalfx-dotnet-tracing/releases/download/v$TRACER_VERSION/signalfx-dotnet-tracing-$TRACER_VERSION.tar.gz | tar xzf - -C /opt/signalfx
