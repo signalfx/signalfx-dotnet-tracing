@@ -2,24 +2,27 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: http.request,
+    Name: GET,
+    LogicScope: http.request,
     Resource: GET localhost/function/HandlerNoParamAsync,
-    Service: Bootstrap-http-client,
+    Service: Bootstrap,
     Type: http,
     ParentId: Id_3,
     Error: 1,
     Tags: {
       component: WebRequest,
-      error.msg: Cannot assign requested address Cannot assign requested address,
-      error.stack:
+      http.method: GET,
+      http.url: http://localhost/function/HandlerNoParamAsync,
+      runtime-id: Guid_1,
+      sfx.error.kind: System.Net.WebException,
+      sfx.error.message: Cannot assign requested address Cannot assign requested address,
+      sfx.error.stack:
 System.Net.WebException: Cannot assign requested address Cannot assign requested address
 ---> System.Net.Http.HttpRequestException: Cannot assign requested address
 ---> System.Net.Sockets.SocketException (99): Cannot assign requested address
 at System.Net.Http.ConnectHelper.ConnectAsync(String host, Int32 port, CancellationToken cancellationToken),
-      error.type: System.Net.WebException,
-      http.method: GET,
-      http.url: http://localhost/function/HandlerNoParamAsync,
-      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: client
     },
     Metrics: {
@@ -32,24 +35,27 @@ at System.Net.Http.ConnectHelper.ConnectAsync(String host, Int32 port, Cancellat
   {
     TraceId: Id_1,
     SpanId: Id_4,
-    Name: http.request,
+    Name: GET,
+    LogicScope: http.request,
     Resource: GET localhost/function/HandlerNoParamSync,
-    Service: Bootstrap-http-client,
+    Service: Bootstrap,
     Type: http,
     ParentId: Id_3,
     Error: 1,
     Tags: {
       component: WebRequest,
-      error.msg: Cannot assign requested address Cannot assign requested address,
-      error.stack:
+      http.method: GET,
+      http.url: http://localhost/function/HandlerNoParamSync,
+      runtime-id: Guid_2,
+      sfx.error.kind: System.Net.WebException,
+      sfx.error.message: Cannot assign requested address Cannot assign requested address,
+      sfx.error.stack:
 System.Net.WebException: Cannot assign requested address Cannot assign requested address
 ---> System.Net.Http.HttpRequestException: Cannot assign requested address
 ---> System.Net.Sockets.SocketException (99): Cannot assign requested address
 at System.Net.Http.ConnectHelper.ConnectAsync(String host, Int32 port, CancellationToken cancellationToken),
-      error.type: System.Net.WebException,
-      http.method: GET,
-      http.url: http://localhost/function/HandlerNoParamSync,
-      runtime-id: Guid_2,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: client
     },
     Metrics: {
@@ -62,24 +68,27 @@ at System.Net.Http.ConnectHelper.ConnectAsync(String host, Int32 port, Cancellat
   {
     TraceId: Id_1,
     SpanId: Id_5,
-    Name: http.request,
+    Name: GET,
+    LogicScope: http.request,
     Resource: GET localhost/function/HandlerNoParamVoid,
-    Service: Bootstrap-http-client,
+    Service: Bootstrap,
     Type: http,
     ParentId: Id_3,
     Error: 1,
     Tags: {
       component: WebRequest,
-      error.msg: Cannot assign requested address Cannot assign requested address,
-      error.stack:
+      http.method: GET,
+      http.url: http://localhost/function/HandlerNoParamVoid,
+      runtime-id: Guid_3,
+      sfx.error.kind: System.Net.WebException,
+      sfx.error.message: Cannot assign requested address Cannot assign requested address,
+      sfx.error.stack:
 System.Net.WebException: Cannot assign requested address Cannot assign requested address
 ---> System.Net.Http.HttpRequestException: Cannot assign requested address
 ---> System.Net.Sockets.SocketException (99): Cannot assign requested address
 at System.Net.Http.ConnectHelper.ConnectAsync(String host, Int32 port, CancellationToken cancellationToken),
-      error.type: System.Net.WebException,
-      http.method: GET,
-      http.url: http://localhost/function/HandlerNoParamVoid,
-      runtime-id: Guid_3,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: client
     },
     Metrics: {
@@ -92,24 +101,27 @@ at System.Net.Http.ConnectHelper.ConnectAsync(String host, Int32 port, Cancellat
   {
     TraceId: Id_1,
     SpanId: Id_6,
-    Name: http.request,
+    Name: GET,
+    LogicScope: http.request,
     Resource: GET localhost/function/HandlerOneParamAsync,
-    Service: Bootstrap-http-client,
+    Service: Bootstrap,
     Type: http,
     ParentId: Id_3,
     Error: 1,
     Tags: {
       component: WebRequest,
-      error.msg: Cannot assign requested address Cannot assign requested address,
-      error.stack:
+      http.method: GET,
+      http.url: http://localhost/function/HandlerOneParamAsync,
+      runtime-id: Guid_4,
+      sfx.error.kind: System.Net.WebException,
+      sfx.error.message: Cannot assign requested address Cannot assign requested address,
+      sfx.error.stack:
 System.Net.WebException: Cannot assign requested address Cannot assign requested address
 ---> System.Net.Http.HttpRequestException: Cannot assign requested address
 ---> System.Net.Sockets.SocketException (99): Cannot assign requested address
 at System.Net.Http.ConnectHelper.ConnectAsync(String host, Int32 port, CancellationToken cancellationToken),
-      error.type: System.Net.WebException,
-      http.method: GET,
-      http.url: http://localhost/function/HandlerOneParamAsync,
-      runtime-id: Guid_4,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: client
     },
     Metrics: {
@@ -122,24 +134,27 @@ at System.Net.Http.ConnectHelper.ConnectAsync(String host, Int32 port, Cancellat
   {
     TraceId: Id_1,
     SpanId: Id_7,
-    Name: http.request,
+    Name: GET,
+    LogicScope: http.request,
     Resource: GET localhost/function/HandlerOneParamSync,
-    Service: Bootstrap-http-client,
+    Service: Bootstrap,
     Type: http,
     ParentId: Id_3,
     Error: 1,
     Tags: {
       component: WebRequest,
-      error.msg: Cannot assign requested address Cannot assign requested address,
-      error.stack:
+      http.method: GET,
+      http.url: http://localhost/function/HandlerOneParamSync,
+      runtime-id: Guid_5,
+      sfx.error.kind: System.Net.WebException,
+      sfx.error.message: Cannot assign requested address Cannot assign requested address,
+      sfx.error.stack:
 System.Net.WebException: Cannot assign requested address Cannot assign requested address
 ---> System.Net.Http.HttpRequestException: Cannot assign requested address
 ---> System.Net.Sockets.SocketException (99): Cannot assign requested address
 at System.Net.Http.ConnectHelper.ConnectAsync(String host, Int32 port, CancellationToken cancellationToken),
-      error.type: System.Net.WebException,
-      http.method: GET,
-      http.url: http://localhost/function/HandlerOneParamSync,
-      runtime-id: Guid_5,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: client
     },
     Metrics: {
@@ -152,24 +167,27 @@ at System.Net.Http.ConnectHelper.ConnectAsync(String host, Int32 port, Cancellat
   {
     TraceId: Id_1,
     SpanId: Id_8,
-    Name: http.request,
+    Name: GET,
+    LogicScope: http.request,
     Resource: GET localhost/function/HandlerOneParamVoid,
-    Service: Bootstrap-http-client,
+    Service: Bootstrap,
     Type: http,
     ParentId: Id_3,
     Error: 1,
     Tags: {
       component: WebRequest,
-      error.msg: Cannot assign requested address Cannot assign requested address,
-      error.stack:
+      http.method: GET,
+      http.url: http://localhost/function/HandlerOneParamVoid,
+      runtime-id: Guid_6,
+      sfx.error.kind: System.Net.WebException,
+      sfx.error.message: Cannot assign requested address Cannot assign requested address,
+      sfx.error.stack:
 System.Net.WebException: Cannot assign requested address Cannot assign requested address
 ---> System.Net.Http.HttpRequestException: Cannot assign requested address
 ---> System.Net.Sockets.SocketException (99): Cannot assign requested address
 at System.Net.Http.ConnectHelper.ConnectAsync(String host, Int32 port, CancellationToken cancellationToken),
-      error.type: System.Net.WebException,
-      http.method: GET,
-      http.url: http://localhost/function/HandlerOneParamVoid,
-      runtime-id: Guid_6,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: client
     },
     Metrics: {
@@ -182,24 +200,27 @@ at System.Net.Http.ConnectHelper.ConnectAsync(String host, Int32 port, Cancellat
   {
     TraceId: Id_1,
     SpanId: Id_9,
-    Name: http.request,
+    Name: GET,
+    LogicScope: http.request,
     Resource: GET localhost/function/HandlerTwoParamsAsync,
-    Service: Bootstrap-http-client,
+    Service: Bootstrap,
     Type: http,
     ParentId: Id_3,
     Error: 1,
     Tags: {
       component: WebRequest,
-      error.msg: Cannot assign requested address Cannot assign requested address,
-      error.stack:
+      http.method: GET,
+      http.url: http://localhost/function/HandlerTwoParamsAsync,
+      runtime-id: Guid_7,
+      sfx.error.kind: System.Net.WebException,
+      sfx.error.message: Cannot assign requested address Cannot assign requested address,
+      sfx.error.stack:
 System.Net.WebException: Cannot assign requested address Cannot assign requested address
 ---> System.Net.Http.HttpRequestException: Cannot assign requested address
 ---> System.Net.Sockets.SocketException (99): Cannot assign requested address
 at System.Net.Http.ConnectHelper.ConnectAsync(String host, Int32 port, CancellationToken cancellationToken),
-      error.type: System.Net.WebException,
-      http.method: GET,
-      http.url: http://localhost/function/HandlerTwoParamsAsync,
-      runtime-id: Guid_7,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: client
     },
     Metrics: {
@@ -212,24 +233,27 @@ at System.Net.Http.ConnectHelper.ConnectAsync(String host, Int32 port, Cancellat
   {
     TraceId: Id_1,
     SpanId: Id_10,
-    Name: http.request,
+    Name: GET,
+    LogicScope: http.request,
     Resource: GET localhost/function/HandlerTwoParamsSync,
-    Service: Bootstrap-http-client,
+    Service: Bootstrap,
     Type: http,
     ParentId: Id_3,
     Error: 1,
     Tags: {
       component: WebRequest,
-      error.msg: Cannot assign requested address Cannot assign requested address,
-      error.stack:
+      http.method: GET,
+      http.url: http://localhost/function/HandlerTwoParamsSync,
+      runtime-id: Guid_8,
+      sfx.error.kind: System.Net.WebException,
+      sfx.error.message: Cannot assign requested address Cannot assign requested address,
+      sfx.error.stack:
 System.Net.WebException: Cannot assign requested address Cannot assign requested address
 ---> System.Net.Http.HttpRequestException: Cannot assign requested address
 ---> System.Net.Sockets.SocketException (99): Cannot assign requested address
 at System.Net.Http.ConnectHelper.ConnectAsync(String host, Int32 port, CancellationToken cancellationToken),
-      error.type: System.Net.WebException,
-      http.method: GET,
-      http.url: http://localhost/function/HandlerTwoParamsSync,
-      runtime-id: Guid_8,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: client
     },
     Metrics: {
@@ -242,24 +266,27 @@ at System.Net.Http.ConnectHelper.ConnectAsync(String host, Int32 port, Cancellat
   {
     TraceId: Id_1,
     SpanId: Id_11,
-    Name: http.request,
+    Name: GET,
+    LogicScope: http.request,
     Resource: GET localhost/function/HandlerTwoParamsVoid,
-    Service: Bootstrap-http-client,
+    Service: Bootstrap,
     Type: http,
     ParentId: Id_3,
     Error: 1,
     Tags: {
       component: WebRequest,
-      error.msg: Cannot assign requested address Cannot assign requested address,
-      error.stack:
+      http.method: GET,
+      http.url: http://localhost/function/HandlerTwoParamsVoid,
+      runtime-id: Guid_9,
+      sfx.error.kind: System.Net.WebException,
+      sfx.error.message: Cannot assign requested address Cannot assign requested address,
+      sfx.error.stack:
 System.Net.WebException: Cannot assign requested address Cannot assign requested address
 ---> System.Net.Http.HttpRequestException: Cannot assign requested address
 ---> System.Net.Sockets.SocketException (99): Cannot assign requested address
 at System.Net.Http.ConnectHelper.ConnectAsync(String host, Int32 port, CancellationToken cancellationToken),
-      error.type: System.Net.WebException,
-      http.method: GET,
-      http.url: http://localhost/function/HandlerTwoParamsVoid,
-      runtime-id: Guid_9,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: client
     },
     Metrics: {
