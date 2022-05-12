@@ -5,6 +5,7 @@
 
 // Modified by Splunk Inc.
 
+using System;
 using Datadog.Trace.Agent.StreamFactories;
 using Datadog.Trace.Agent.Transports;
 using Datadog.Trace.Configuration;
@@ -25,7 +26,7 @@ namespace Datadog.Trace.Agent
             {
                 case TracesTransportType.WindowsNamedPipe:
                     Log.Information<string, string, int>("Using {FactoryType} for trace transport, with pipe name {PipeName} and timeout {Timeout}ms.", nameof(NamedPipeClientStreamFactory), settings.TracesPipeName, settings.TracesPipeTimeoutMs);
-                    return new HttpStreamRequestFactory(new NamedPipeClientStreamFactory(settings.TracesPipeName, settings.TracesPipeTimeoutMs), DatadogHttpClient.CreateTraceAgentClient());
+                    return new HttpStreamRequestFactory(new NamedPipeClientStreamFactory(settings.TracesPipeName, settings.TracesPipeTimeoutMs), DatadogHttpClient.CreateTraceAgentClient(), new Uri("http://localhost"));
                 case TracesTransportType.Default:
                 default:
 #if NETCOREAPP
