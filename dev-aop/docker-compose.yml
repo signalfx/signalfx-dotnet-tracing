@@ -1,0 +1,84 @@
+version: '3.4'
+
+services:
+  eshop-app-instrumented:
+    #TODO: local image used for now
+    image: eshop-instrumented
+    container_name: eshop-app-instrumented
+    profiles:
+      - "eshop-app-instrumented"
+    depends_on:
+      - "sqlserver"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - SIGNALFX_ENDPOINT_URL=http://otel-collector:9411/api/v2/spans
+      - SIGNALFX_PROFILER_LOGS_ENDPOINT=http://otel-collector:4318/v1/logs
+    volumes:
+      - type: volume
+        source: tmp
+        target: /tmp
+  eshop-app:
+    #TODO: local image used for now
+    image: eshop
+    container_name: eshop-app
+    profiles:
+      - "eshop-app"
+    depends_on:
+      - "sqlserver"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    volumes:
+      - type: volume
+        source: tmp
+        target: /tmp
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:latest
+    environment:
+    - ACCEPT_EULA=Y
+    # needs to be in sync with whats in connection string in sample app's appsettings file
+    - SA_PASSWORD=@someThingComplicated1234
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.50.0
+    volumes:
+      - ./otel-config.yaml:/etc/otel/config.yaml
+    command: --config /etc/otel/config.yaml
+  dotnet-counters:
+    build:
+      context: .
+      dockerfile: dotnet-counters-in-sdk.dockerfile
+    container_name: dotnet-counters
+    working_dir: /app
+    volumes:
+      # /tmp directory needs to be shared between target app and this sidecar container
+      - type: volume
+        source: tmp
+        target: /tmp
+      - ./results:/app
+    # target app and sidecar need to share the process namespace
+    pid: "container:${app_name}"
+    command: dotnet counters collect --process-id 1 --refresh-interval 1 --format json --output ${app_name}/counters.json
+      
+  StartDependencies:
+    image: andrewlock/wait-for-dependencies
+    depends_on:
+      - otel-collector
+      - sqlserver
+      - ${app_name}
+    environment:
+      - TIMEOUT_LENGTH=120
+    command: otel-collector:13133 sqlserver:1433 ${app_name}:80
+  RunWarmup:
+    image: grafana/k6
+    volumes:
+      - ./basic.js:/app/basic.js
+    command: run -e app_name=${app_name} -u 10 -i 500 /app/basic.js
+  RunTest:
+    image: grafana/k6
+    depends_on: 
+      - dotnet-counters
+    volumes:
+      - ./basic.js:/app/basic.js
+      - ./results:/results
+    command: run -e app_name=${app_name} -u 30 -i 8500 /app/basic.js --summary-export /results/${app_name}/k6-test-summary.json
+volumes:
+  tmp:
