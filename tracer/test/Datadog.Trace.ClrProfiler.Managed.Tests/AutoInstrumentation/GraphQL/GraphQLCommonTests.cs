@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Datadog.Trace.Agent;
 using Datadog.Trace.ClrProfiler.AutoInstrumentation.GraphQL;
 using Datadog.Trace.Configuration;
@@ -79,7 +79,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Tests.AutoInstrumentation.GraphQL
         {
             var tracer = new Tracer(settings, new Mock<IAgentWriter>().Object, null, null, new NoOpStatsd());
 
-            var scope = GraphQLCommon.CreateScopeFromValidate(tracer, Mock.Of<IDocument>(doc => doc.OriginalQuery == "query"));
+            var scope = GraphQLCommon.CreateScopeFromValidate(tracer, "query");
 
             var span = scope.Span;
             return span;
