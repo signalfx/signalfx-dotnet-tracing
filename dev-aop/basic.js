@@ -1,8 +1,7 @@
 import http from 'k6/http';
 import {check} from "k6";
 
-const baseUri = `http://${__ENV.app_name}:80/api`;
-// console.log(`running test against: ${baseUri}`);
+const baseUri = `http://eshop-app:80/api`;
 
 function randItem(list){
     return list[rand(list.length)];
