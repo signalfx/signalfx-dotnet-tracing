@@ -277,7 +277,7 @@ namespace Datadog.Trace.TestHelpers
 
             // set consistent env name (can be overwritten by custom environment variable)
             environmentVariables["SIGNALFX_ENV"] = "integration_tests";
-            environmentVariables[ConfigurationKeys.Telemetry.Enabled] = "false";
+            environmentVariables[ConfigurationKeys.Telemetry.Enabled] = "false"
 
             // Don't attach the profiler to these processes
             environmentVariables["SIGNALFX_PROFILER_EXCLUDE_PROCESSES"] =
@@ -501,7 +501,7 @@ namespace Datadog.Trace.TestHelpers
             TransportType = TestTransports.Tcp;
         }
 
-        public MockTracerAgent GetMockAgent(bool useStatsD = false, int? fixedPort = null)
+        public MockTracerAgent GetMockAgent(bool useStatsD = false, int? fixedPort = null, bool useTelemetry = false)
         {
             MockTracerAgent agent = null;
 
@@ -515,18 +515,18 @@ namespace Datadog.Trace.TestHelpers
             {
                 // Default
                 var agentPort = fixedPort ?? TcpPortProvider.GetOpenPort();
-                agent = new MockTracerAgent(agentPort, useSfxMetrics: useStatsD);
+                agent = new MockTracerAgent(agentPort, useSfxMetrics: useStatsD, useTelemetry: useTelemetry);
             }
 #else
             if (TransportType == TestTransports.WindowsNamedPipe)
             {
-                agent = new MockTracerAgent(new WindowsPipesConfig($"trace-{Guid.NewGuid()}", $"metrics-{Guid.NewGuid()}"));
+                agent = new MockTracerAgent(new WindowsPipesConfig($"trace-{Guid.NewGuid()}", $"metrics-{Guid.NewGuid()}") { UseDogstatsD = useStatsD, UseTelemetry = useTelemetry });
             }
             else
             {
                 // Default
                 var agentPort = fixedPort ?? TcpPortProvider.GetOpenPort();
-                agent = new MockTracerAgent(agentPort, useSfxMetrics: useStatsD);
+                agent = new MockTracerAgent(agentPort, useSfxMetrics: useStatsD, useTelemetry: useTelemetry);
             }
 #endif
 

@@ -26,6 +26,7 @@ namespace Datadog.Trace.Agent
             {
                 case TracesTransportType.WindowsNamedPipe:
                     Log.Information<string, string, int>("Using {FactoryType} for trace transport, with pipe name {PipeName} and timeout {Timeout}ms.", nameof(NamedPipeClientStreamFactory), settings.TracesPipeName, settings.TracesPipeTimeoutMs);
+                    // use http://localhost as base endpoint
                     return new HttpStreamRequestFactory(new NamedPipeClientStreamFactory(settings.TracesPipeName, settings.TracesPipeTimeoutMs), DatadogHttpClient.CreateTraceAgentClient(), new Uri("http://localhost"));
                 case TracesTransportType.Default:
                 default:
