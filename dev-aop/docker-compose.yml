@@ -13,8 +13,8 @@ services:
       - SIGNALFX_ENDPOINT_URL=http://otel-collector:9411/api/v2/spans
       - SIGNALFX_PROFILER_ENABLED=${profiler_enabled}
       - SIGNALFX_PROFILER_LOGS_ENDPOINT=http://otel-collector:4318/v1/logs
-      - ConnectionStrings__CatalogConnection=Server=sqlserver,1433;Integrated Security=true;Initial Catalog=Microsoft.eShopOnWeb.CatalogDb;User Id=sa;Password=@someThingComplicated1234;Trusted_Connection=false;
-      - ConnectionStrings__IdentityConnection=Server=sqlserver,1433;Integrated Security=true;Initial Catalog=Microsoft.eShopOnWeb.Identity;User Id=sa;Password=@someThingComplicated1234;Trusted_Connection=false;
+      - ConnectionStrings__CatalogConnection=Server=sqlserver,1433;Integrated Security=true;Initial Catalog=Microsoft.eShopOnWeb.CatalogDb;User Id=sa;Password=${test_db_pwd};Trusted_Connection=false;
+      - ConnectionStrings__IdentityConnection=Server=sqlserver,1433;Integrated Security=true;Initial Catalog=Microsoft.eShopOnWeb.Identity;User Id=sa;Password=${test_db_pwd};Trusted_Connection=false;
     volumes:
       # /tmp directory needs to be shared between target app and this sidecar container
       - type: volume
@@ -24,7 +24,7 @@ services:
     image: mcr.microsoft.com/mssql/server:latest
     environment:
     - ACCEPT_EULA=Y
-    - SA_PASSWORD=@someThingComplicated1234
+    - SA_PASSWORD=${test_db_pwd}
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.50.0
     volumes:

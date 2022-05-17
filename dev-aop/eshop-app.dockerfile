@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:3.1 AS build-env
 
 RUN git clone https://github.com/dotnet-architecture/eShopOnWeb.git
 RUN git -C ./eShopOnWeb checkout e5e9868003b2e940c731cdf34a3b8fa2a89d272c
@@ -20,17 +20,16 @@ WORKDIR /eShopOnWeb/src/Web
 RUN dotnet restore
 RUN dotnet publish -c Release -o out
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS clean-app
+FROM mcr.microsoft.com/dotnet/aspnet:3.1 AS baseline-app
 WORKDIR /app
 COPY --from=build-env /eShopOnWeb/src/Web/out ./
 
 ENTRYPOINT ["dotnet", "Web.dll"]
 
-FROM clean-app as instrumented-app
+FROM baseline-app as instrumented-app
 
 # Set up SignalFx APM
-# TODO splunk: update with release
-ARG TRACER_VERSION=0.2.4
+
 RUN mkdir -p /var/log/signalfx
 RUN mkdir -p /opt/signalfx
 
@@ -38,6 +37,9 @@ RUN apt-get update \
     && apt-get -y upgrade \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --fix-missing \
     curl
+
+# TODO splunk: update with release
+ARG TRACER_VERSION=0.2.4
 
 RUN curl -LO https://github.com/signalfx/signalfx-dotnet-tracing/releases/download/v${TRACER_VERSION}/signalfx-dotnet-tracing_${TRACER_VERSION}_amd64.deb
 RUN dpkg -i ./signalfx-dotnet-tracing_${TRACER_VERSION}_amd64.deb

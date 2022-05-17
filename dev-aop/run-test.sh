@@ -3,7 +3,7 @@ set -euox pipefail
 
 # test configurations, specified in the following format:
 # configuration short name (used to create results directory),dockerfile target to use to build the app, value of SIGNALFX_PROFILER_ENABLED flag
-configurations=("app","clean-app","0" "instrumented-app","instrumented-app","0" "profiled-app","instrumented-app","1")
+configurations=("app","baseline-app","0" "instrumented-app","instrumented-app","0" "profiled-app","instrumented-app","1")
 
 for config in ${configurations[*]}; do
   # unpack configuration
