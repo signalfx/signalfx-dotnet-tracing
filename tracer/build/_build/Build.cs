@@ -193,6 +193,7 @@ partial class Build : NukeBuild
         .After(Clean, BuildTracerHome, BuildProfilerHome)
         .DependsOn(CreateRequiredDirectories)
         .DependsOn(CompileNativeTests)
+        .DependsOn(CompileProfilerNativeSrc)
         .DependsOn(RunNativeTests);
 
     Target BuildWindowsIntegrationTests => _ => _

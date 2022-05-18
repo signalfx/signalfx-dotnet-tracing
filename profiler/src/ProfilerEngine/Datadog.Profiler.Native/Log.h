@@ -20,7 +20,7 @@ private:
     {
         inline static const std::string file_name = "dotNet-profiler-native";
 #ifdef _WIN32
-        inline static const shared::WSTRING folder_path = WStr(R"(SignalFx .NET Tracing\logDotNets)");
+        inline static const shared::WSTRING folder_path = WStr(R"(SignalFx .NET Tracing\logs\\DotNet)");
 #endif
         inline static const std::string pattern = "[%Y-%m-%d %H:%M:%S.%e | %l | PId: %P | TId: %t] %v";
         struct logging_environment

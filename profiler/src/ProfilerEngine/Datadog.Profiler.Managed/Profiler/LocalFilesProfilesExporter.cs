@@ -17,7 +17,7 @@ namespace Datadog.Profiler
 {
     internal class LocalFilesProfilesExporter
     {
-        private const string DirectoryFallbackRoot = "Datadog-APM";
+        private const string DirectoryFallbackRoot = "SignalFx .NET Tracing";
         private const string DirectoryFallbackSub = "PProf-Files";
 
         private const string TimestampTag = "{TS}";

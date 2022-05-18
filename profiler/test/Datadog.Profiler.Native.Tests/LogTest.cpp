@@ -40,13 +40,13 @@ TEST(LoggerTest, EnsureLogFilesAreFoundAtDefaultLocation)
     Log::Error(expectedString);
 
     std::string applicationNameNoExtension = fs::path(::shared::ToString(::shared::GetCurrentProcessName())).replace_extension().string();
-    std::string expectedLogFilename = "DD-DotNet-Profiler-Native-" + applicationNameNoExtension + "-" + std::to_string(::shared::GetPID()) + ".log";
+    std::string expectedLogFilename = "dotNet-profiler-native-" + applicationNameNoExtension + "-" + std::to_string(::shared::GetPID()) + ".log";
 
     fs::path expectedLogFileFullPath =
 #ifdef _WINDOWS
-        "C:\\ProgramData\\Datadog-APM\\logs\\DotNet\\" + expectedLogFilename;
+        "C:\\ProgramData\\SignalFx .NET Tracing\\logs\\DotNet\\" + expectedLogFilename;
 #else
-        "/var/log/datadog/dotnet/" + expectedLogFilename;
+        "/var/log/signalfx/dotnet/" + expectedLogFilename;
 #endif
 
     ASSERT_TRUE(fs::exists(expectedLogFileFullPath));
