@@ -502,10 +502,8 @@ struct TypeSignatureNew
     ULONG offset;
     ULONG length;
     PCCOR_SIGNATURE pbBase;
-    mdToken GetTypeTok(ComPtr<IMetaDataEmit2>& pEmit, mdAssemblyRef corLibRef) const;
+
     shared::WSTRING GetTypeTokName(ComPtr<IMetaDataImport2>& pImport) const;
-    std::tuple<unsigned, int> GetElementTypeAndFlags() const;
-    ULONG GetSignature(PCCOR_SIGNATURE& data) const;
 };
 
 struct FunctionMethodSignatureNew
@@ -513,9 +511,9 @@ struct FunctionMethodSignatureNew
 private:
     PCCOR_SIGNATURE pbBase;
     unsigned len;
-    ULONG numberOfTypeArguments = 0;
-    ULONG numberOfArguments = 0;
-    TypeSignatureNew returnValue{};
+    // ULONG numberOfTypeArguments = 0; verify if it can be removed
+    // ULONG numberOfArguments = 0;
+    // TypeSignatureNew returnValue{};
     std::vector<TypeSignatureNew> params;
 
 public:
@@ -527,39 +525,11 @@ public:
         pbBase = pb;
         len = cbBuffer;
     };
-    ULONG NumberOfTypeArguments() const
-    {
-        return numberOfTypeArguments;
-    }
-    ULONG NumberOfArguments() const
-    {
-        return numberOfArguments;
-    }
-    shared::WSTRING str() const
-    {
-        return shared::HexStr(pbBase, len);
-    }
-    TypeSignatureNew GetReturnValue() const
-    {
-        return returnValue;
-    }
     const std::vector<TypeSignatureNew>& GetMethodArguments() const
     {
         return params;
     }
     HRESULT TryParse();
-    bool operator==(const FunctionMethodSignatureNew& other) const
-    {
-        return memcmp(pbBase, other.pbBase, len);
-    }
-    CorCallingConvention CallingConvention() const
-    {
-        return CorCallingConvention(len == 0 ? 0 : pbBase[0]);
-    }
-    bool IsEmpty() const
-    {
-        return len == 0;
-    }
 };
 
 struct FunctionLocalSignature

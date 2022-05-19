@@ -890,6 +890,12 @@ shared::WSTRING TypeSignatureOld::GetTypeTokName(ComPtr<IMetaDataImport2>& pImpo
     return GetSigTypeTokNameOld(pbCur, pImport);
 }
 
+shared::WSTRING TypeSignatureNew::GetTypeTokName(ComPtr<IMetaDataImport2>& pImport) const
+{
+    PCCOR_SIGNATURE pbCur = &pbBase[offset];
+    return GetSigTypeTokNameNew(pbCur, pImport);
+}
+
 ULONG TypeSignatureOld::GetSignature(PCCOR_SIGNATURE& data) const
 {
     data = &pbBase[offset];
@@ -1197,19 +1203,13 @@ HRESULT FunctionMethodSignatureNew::TryParse()
     {
         unsigned gen_param_count;
         IfFalseRetFAIL(ParseNumber(pbCur, pbEnd, &gen_param_count));
-        numberOfTypeArguments = gen_param_count;
     }
 
     unsigned param_count;
     IfFalseRetFAIL(ParseNumber(pbCur, pbEnd, &param_count));
-    numberOfArguments = param_count;
 
-    const PCCOR_SIGNATURE pbRet = pbCur;
 
     IfFalseRetFAIL(ParseRetType(pbCur, pbEnd));
-    returnValue.pbBase = pbBase;
-    returnValue.length = (ULONG) (pbCur - pbRet);
-    returnValue.offset = (ULONG) (pbCur - pbBase - returnValue.length);
 
     auto fEncounteredSentinal = false;
     for (unsigned i = 0; i < param_count; i++)
