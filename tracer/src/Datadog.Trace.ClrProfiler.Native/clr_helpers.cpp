@@ -363,7 +363,6 @@ TypeInfoOld GetTypeInfoOld(const ComPtr<IMetaDataImport2>& metadata_import, cons
 
 TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token)
 {
-    mdToken parent_token = mdTokenNil;
     std::shared_ptr<TypeInfoNew> parentTypeInfo = nullptr;
     mdToken parent_type_token = mdTokenNil;
     WCHAR type_name[kNameMaxSize]{};
@@ -397,7 +396,7 @@ TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, cons
             }
             break;
         case mdtTypeRef:
-            hr = metadata_import->GetTypeRefProps(token, &parent_token, type_name, kNameMaxSize, &type_name_len);
+            hr = metadata_import->GetTypeRefProps(token, nullptr, type_name, kNameMaxSize, &type_name_len);
             break;
         case mdtTypeSpec:
         {
@@ -418,7 +417,7 @@ TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, cons
                 const auto baseType = GetTypeInfoNew(metadata_import, type_token);
                 return {baseType.id,        baseType.name,        token,
                         token_type,         baseType.extend_from, baseType.valueType,
-                        baseType.isGeneric, baseType.parent_type, baseType.scopeToken};
+                        baseType.isGeneric, baseType.parent_type};
             }
         }
         break;
@@ -446,7 +445,7 @@ TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, cons
     }
 
     return {token,          type_name_string, mdTypeSpecNil,  token_type,  extendsInfo,
-            type_valueType, type_isGeneric,   parentTypeInfo, parent_token};
+            type_valueType, type_isGeneric,   parentTypeInfo};
 }
 
 // Searches for an AssemblyRef whose name and version match exactly.

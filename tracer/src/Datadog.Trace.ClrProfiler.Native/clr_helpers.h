@@ -399,15 +399,14 @@ struct TypeInfoOld
 
 struct TypeInfoNew
 {
-    const mdToken id;
-    const shared::WSTRING name;
+    const mdToken id;           // needed
+    const shared::WSTRING name; // needed
     const mdTypeSpec type_spec;
     const ULONG32 token_type;
     std::shared_ptr<TypeInfoNew> extend_from;
     const bool valueType;
     const bool isGeneric;
-    std::shared_ptr<TypeInfoNew> parent_type;
-    const mdToken scopeToken;
+    std::shared_ptr<TypeInfoNew> parent_type; // needed
 
     TypeInfoNew() :
         id(0),
@@ -417,13 +416,12 @@ struct TypeInfoNew
         extend_from(nullptr),
         valueType(false),
         isGeneric(false),
-        parent_type(nullptr),
-        scopeToken(0)
+        parent_type(nullptr)
     {
     }
     TypeInfoNew(mdToken id, shared::WSTRING name, mdTypeSpec type_spec, ULONG32 token_type,
                 std::shared_ptr<TypeInfoNew> extend_from, bool valueType, bool isGeneric,
-                std::shared_ptr<TypeInfoNew> parent_type, mdToken scopeToken) :
+                std::shared_ptr<TypeInfoNew> parent_type) :
         id(id),
         name(name),
         type_spec(type_spec),
@@ -431,8 +429,7 @@ struct TypeInfoNew
         extend_from(extend_from),
         valueType(valueType),
         isGeneric(isGeneric),
-        parent_type(parent_type),
-        scopeToken(scopeToken)
+        parent_type(parent_type)
     {
     }
 
