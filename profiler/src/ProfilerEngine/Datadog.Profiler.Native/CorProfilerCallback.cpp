@@ -121,19 +121,24 @@ bool CorProfilerCallback::InitializeServices()
 
     _pManagedThreadList = RegisterService<ManagedThreadList>(_pCorProfilerInfo);
 
-    _pSymbolsResolver = RegisterService<SymbolsResolver>(_pCorProfilerInfo, _pThreadsCpuManager);
-
-    _pStackSnapshotsBufferManager = RegisterService<StackSnapshotsBufferManager>(_pThreadsCpuManager, _pSymbolsResolver);
-
     auto* pRuntimeIdStore = RegisterService<RuntimeIdStore>();
-    auto* pWallTimeProvider = RegisterService<WallTimeProvider>(_pConfiguration.get(), _pFrameStore.get(), _pAppDomainStore.get(), pRuntimeIdStore);
-    CpuTimeProvider* pCpuTimeProvider = nullptr;
-    if (_pConfiguration->IsFFLibddprofEnabled())
+    _pWallTimeProvider = RegisterService<WallTimeProvider>(_pConfiguration.get(), _pThreadsCpuManager, _pFrameStore.get(), _pAppDomainStore.get(), pRuntimeIdStore);
+
+    if (_pConfiguration->IsCpuProfilingEnabled())
     {
-        if (_pConfiguration->IsCpuProfilingEnabled())
-        {
-            pCpuTimeProvider = RegisterService<CpuTimeProvider>(_pConfiguration.get(), _pFrameStore.get(), _pAppDomainStore.get(), pRuntimeIdStore);
-        }
+        _pCpuTimeProvider = RegisterService<CpuTimeProvider>(_pConfiguration.get(), _pThreadsCpuManager, _pFrameStore.get(), _pAppDomainStore.get(), pRuntimeIdStore);
+    }
+
+    if (_pConfiguration->IsExceptionProfilingEnabled())
+    {
+        _pExceptionsProvider = RegisterService<ExceptionsProvider>(
+            _pCorProfilerInfo,
+            _pManagedThreadList,
+            _pFrameStore.get(),
+            _pConfiguration.get(),
+            _pThreadsCpuManager,
+            _pAppDomainStore.get(),
+            pRuntimeIdStore);
     }
 
     _pStackSamplerLoopManager = RegisterService<StackSamplerLoopManager>(
@@ -146,23 +151,24 @@ bool CorProfilerCallback::InitializeServices()
         _pManagedThreadList,
         _pSymbolsResolver,
         pWallTimeProvider,
-        pCpuTimeProvider
-        );
+        pCpuTimeProvider);
 
     _pApplicationStore = RegisterService<ApplicationStore>(_pConfiguration.get());
 
     // The different elements of the libddprof pipeline are created and linked together
     // i.e. the exporter is passed to the aggregator and each provider is added to the aggregator.
+    _pExporter = std::make_unique<LibddprofExporter>(_pConfiguration.get(), _pApplicationStore);
+    _pSamplesAggregator = RegisterService<SamplesAggregator>(_pConfiguration.get(), _pThreadsCpuManager, _pExporter.get(), _metricsSender.get());
+    _pSamplesAggregator->Register(_pWallTimeProvider);
 
-    if (_pConfiguration->IsFFLibddprofEnabled())
+    if (_pConfiguration->IsCpuProfilingEnabled())
     {
-        _pExporter = std::make_unique<LibddprofExporter>(_pConfiguration.get(), _pApplicationStore);
-        auto* pSamplesAggregrator = RegisterService<SamplesAggregator>(_pConfiguration.get(), _pExporter.get(), _metricsSender.get());
-        pSamplesAggregrator->Register(pWallTimeProvider);
-        if (_pConfiguration->IsCpuProfilingEnabled())
-        {
-            pSamplesAggregrator->Register(pCpuTimeProvider);
-        }
+        _pSamplesAggregator->Register(_pCpuTimeProvider);
+    }
+
+    if (_pConfiguration->IsExceptionProfilingEnabled())
+    {
+        _pSamplesAggregator->Register(_pExceptionsProvider);
     }
 
     auto started = StartServices();
@@ -647,6 +653,26 @@ HRESULT STDMETHODCALLTYPE CorProfilerCallback::Shutdown(void)
 {
     Log::Info("CorProfilerCallback::Shutdown()");
 
+    // A final .pprof should be generated before exiting
+    // All providers should be stopped and flushed before the aggregator
+    // sends the last samples to the exporter
+    _pStackSamplerLoopManager->Stop();
+
+    // Calling Stop on providers transforms the last raw samples
+    _pWallTimeProvider->Stop();
+    if (_pCpuTimeProvider != nullptr)
+    {
+        _pCpuTimeProvider->Stop();
+    }
+    if (_pExceptionsProvider != nullptr)
+    {
+        _pExceptionsProvider->Stop();
+    }
+
+    // It is now time to aggregate the remaining samples and export the last .pprof
+    _pSamplesAggregator->Stop();
+
+
     // dump all threads time
     _pThreadsCpuManager->LogCpuTimes();
 
@@ -880,13 +906,17 @@ HRESULT STDMETHODCALLTYPE CorProfilerCallback::ThreadNameChanged(ThreadID thread
         return S_OK;
     }
 
-    auto pThreadName = (cchName == 0)
-                           ? new shared::WSTRING()
-                           : new shared::WSTRING(name, cchName);
+    auto threadName = (cchName == 0)
+                           ? shared::WSTRING()
+                           : shared::WSTRING(name, cchName);
 
-    Log::Debug("CorProfilerCallback::ThreadNameChanged(threadId=0x", std::hex, threadId, std::dec, ", name=\"", *pThreadName, "\")");
+    Log::Debug("CorProfilerCallback::ThreadNameChanged(threadId=0x", std::hex, threadId, std::dec, ", name=\"", threadName, "\")");
 
-    _pManagedThreadList->SetThreadName(threadId, pThreadName);
+    DWORD osThreadId = 0;
+    _pCorProfilerInfo->GetThreadInfo(threadId, &osThreadId);
+    _pThreadsCpuManager->Map(osThreadId, threadName.c_str());
+    _pManagedThreadList->SetThreadName(threadId, std::move(threadName));
+
     return S_OK;
 }
 
