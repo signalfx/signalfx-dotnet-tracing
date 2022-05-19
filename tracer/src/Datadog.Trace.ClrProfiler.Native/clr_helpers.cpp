@@ -403,8 +403,7 @@ TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, cons
                 mdToken type_token;
                 CorSigUncompressToken(&signature[2], &type_token);
                 const auto baseType = GetTypeInfoNew(metadata_import, type_token);
-                return {baseType.id,        baseType.name,        token,
-                        token_type, baseType.parent_type};
+                return {baseType.id, baseType.name, token_type, baseType.parent_type};
             }
         }
         break;
@@ -425,7 +424,7 @@ TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, cons
 
     const auto type_name_string = shared::WSTRING(type_name);
     
-    return {token, type_name_string, mdTypeSpecNil, token_type, parentTypeInfo};
+    return {token, type_name_string, token_type, parentTypeInfo};
 }
 
 // Searches for an AssemblyRef whose name and version match exactly.
