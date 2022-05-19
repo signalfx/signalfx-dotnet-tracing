@@ -259,19 +259,17 @@ FunctionInfoNew GetFunctionInfoNew(const ComPtr<IMetaDataImport2>& metadata_impo
 
     if (is_generic)
     {
-        // use the generic constructor
         return {method_spec_token,
                 shared::WSTRING(function_name),
                 type_info,
                 MethodSignature(final_signature_bytes),
-                FunctionMethodSignature(raw_signature, raw_signature_len),
-                true};
+                FunctionMethodSignature(raw_signature, raw_signature_len)};
     }
 
     final_signature_bytes = GetSignatureByteRepresentationNew(raw_signature_len, raw_signature);
 
     return {token, shared::WSTRING(function_name), type_info, MethodSignature(final_signature_bytes),
-            FunctionMethodSignature(raw_signature, raw_signature_len), false};
+            FunctionMethodSignature(raw_signature, raw_signature_len)};
 }
 
 ModuleInfo GetModuleInfo(ICorProfilerInfo4* info, const ModuleID& module_id)

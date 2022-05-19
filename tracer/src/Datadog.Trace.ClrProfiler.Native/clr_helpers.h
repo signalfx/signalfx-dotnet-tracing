@@ -608,20 +608,18 @@ struct FunctionInfoNew
     const mdToken id;
     const shared::WSTRING name;
     const TypeInfoNew type;
-    const BOOL is_generic;
     const MethodSignature signature;
     FunctionMethodSignature method_signature;
 
-    FunctionInfoNew() : id(0), name(shared::EmptyWStr), type({}), is_generic(false), method_signature({})
+    FunctionInfoNew() : id(0), name(shared::EmptyWStr), type({}), method_signature({})
     {
     }
 
     FunctionInfoNew(mdToken id, shared::WSTRING name, TypeInfoNew type, MethodSignature signature,
-                 FunctionMethodSignature method_signature, BOOL is_generic) :
+                 FunctionMethodSignature method_signature) :
         id(id),
         name(name),
         type(type),
-        is_generic(is_generic),
         signature(signature),
         method_signature(method_signature)
     {
