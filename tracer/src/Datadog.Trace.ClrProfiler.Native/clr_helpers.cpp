@@ -209,7 +209,6 @@ FunctionInfoNew GetFunctionInfoNew(const ComPtr<IMetaDataImport2>& metadata_impo
 {
     mdToken parent_token = mdTokenNil;
     mdToken method_spec_token = mdTokenNil;
-    mdToken method_def_token = mdTokenNil;
     WCHAR function_name[kNameMaxSize]{};
     DWORD function_name_len = 0;
 
@@ -246,7 +245,6 @@ FunctionInfoNew GetFunctionInfoNew(const ComPtr<IMetaDataImport2>& metadata_impo
             std::memcpy(function_name, generic_info.name.c_str(), sizeof(WCHAR) * (generic_info.name.length() + 1));
             function_name_len = DWORD(generic_info.name.length() + 1);
             method_spec_token = token;
-            method_def_token = generic_info.id;
         }
         break;
         default:
@@ -269,7 +267,6 @@ FunctionInfoNew GetFunctionInfoNew(const ComPtr<IMetaDataImport2>& metadata_impo
                 type_info,
                 MethodSignature(final_signature_bytes),
                 MethodSignature(method_spec_signature),
-                method_def_token,
                 FunctionMethodSignature(raw_signature, raw_signature_len)};
     }
 
