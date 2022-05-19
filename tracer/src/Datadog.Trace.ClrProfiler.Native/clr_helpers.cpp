@@ -120,17 +120,6 @@ std::vector<BYTE> GetSignatureByteRepresentationOld(ULONG signature_length, PCCO
     return signature_data;
 }
 
-std::vector<BYTE> GetSignatureByteRepresentationNew(ULONG signature_length, PCCOR_SIGNATURE raw_signature)
-{
-    std::vector<BYTE> signature_data(signature_length);
-    for (ULONG i = 0; i < signature_length; i++)
-    {
-        signature_data[i] = raw_signature[i];
-    }
-
-    return signature_data;
-}
-
 FunctionInfoOld GetFunctionInfoOld(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token)
 {
     mdToken parent_token = mdTokenNil;
@@ -215,7 +204,6 @@ FunctionInfoNew GetFunctionInfoNew(const ComPtr<IMetaDataImport2>& metadata_impo
     PCCOR_SIGNATURE raw_signature;
     ULONG raw_signature_len;
     BOOL is_generic = false;
-    std::vector<BYTE> final_signature_bytes;
 
     HRESULT hr = E_FAIL;
     const auto token_type = TypeFromToken(token);
@@ -239,7 +227,6 @@ FunctionInfoNew GetFunctionInfoNew(const ComPtr<IMetaDataImport2>& metadata_impo
                 return {};
             }
             const auto generic_info = GetFunctionInfoNew(metadata_import, parent_token);
-            final_signature_bytes = generic_info.signature.data;
             std::memcpy(function_name, generic_info.name.c_str(), sizeof(WCHAR) * (generic_info.name.length() + 1));
             function_name_len = DWORD(generic_info.name.length() + 1);
             method_spec_token = token;
@@ -262,13 +249,10 @@ FunctionInfoNew GetFunctionInfoNew(const ComPtr<IMetaDataImport2>& metadata_impo
         return {method_spec_token,
                 shared::WSTRING(function_name),
                 type_info,
-                MethodSignature(final_signature_bytes),
                 FunctionMethodSignature(raw_signature, raw_signature_len)};
     }
 
-    final_signature_bytes = GetSignatureByteRepresentationNew(raw_signature_len, raw_signature);
-
-    return {token, shared::WSTRING(function_name), type_info, MethodSignature(final_signature_bytes),
+    return {token, shared::WSTRING(function_name), type_info,
             FunctionMethodSignature(raw_signature, raw_signature_len)};
 }
 

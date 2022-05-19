@@ -608,19 +608,17 @@ struct FunctionInfoNew
     const mdToken id;
     const shared::WSTRING name;
     const TypeInfoNew type;
-    const MethodSignature signature;
     FunctionMethodSignature method_signature;
 
     FunctionInfoNew() : id(0), name(shared::EmptyWStr), type({}), method_signature({})
     {
     }
 
-    FunctionInfoNew(mdToken id, shared::WSTRING name, TypeInfoNew type, MethodSignature signature,
+    FunctionInfoNew(mdToken id, shared::WSTRING name, TypeInfoNew type,
                  FunctionMethodSignature method_signature) :
         id(id),
         name(name),
         type(type),
-        signature(signature),
         method_signature(method_signature)
     {
     }
