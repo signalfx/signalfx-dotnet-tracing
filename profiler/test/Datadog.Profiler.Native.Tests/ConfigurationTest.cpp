@@ -133,12 +133,7 @@ TEST(ConfigurationTest, CheckNoDefaultPprofDirectoryWhenVariableIsNotSet)
 {
     unsetenv(EnvironmentVariables::ProfilesOutputDir);
     auto configuration = Configuration{};
-    auto expectedValue =
-#ifdef _WINDOWS
-        WStr("C:\\ProgramData\\SignalFx .NET Tracing\\Pprof-files\\DotNet");
-#else
-        WStr("/var/log/signalfx/pprof-files");
-#endif
+    auto expectedValue = shared::WSTRING();
     ASSERT_EQ(expectedValue, configuration.GetProfilesOutputDirectory());
 }
 
