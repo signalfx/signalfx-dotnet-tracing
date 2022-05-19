@@ -26,6 +26,7 @@ public:
     inline static const shared::WSTRING Tags                        = WStr("SIGNALFX_TAGS");
     inline static const shared::WSTRING NativeFramesEnabled         = WStr("SIGNALFX_PROFILING_FRAMES_NATIVE_ENABLED");
     inline static const shared::WSTRING CpuProfilingEnabled         = WStr("SIGNALFX_PROFILING_CPU_ENABLED");
+    inline static const shared::WSTRING ExceptionProfilingEnabled   = WStr("SIGNALFX_PROFILING_EXCEPTION_ENABLED");
     inline static const shared::WSTRING ProfilesOutputDir           = WStr("SIGNALFX_PROFILING_OUTPUT_DIR");
     inline static const shared::WSTRING DevelopmentConfiguration    = WStr("SIGNALFX_INTERNAL_USE_DEVELOPMENT_CONFIGURATION");
     inline static const shared::WSTRING Agentless                   = WStr("SIGNALFX_PROFILING_AGENTLESS");
