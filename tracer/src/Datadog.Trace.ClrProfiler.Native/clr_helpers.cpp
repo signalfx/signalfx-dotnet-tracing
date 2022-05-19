@@ -206,8 +206,7 @@ FunctionInfoNew GetFunctionInfoNew(const ComPtr<IMetaDataImport2>& metadata_impo
     BOOL is_generic = false;
 
     HRESULT hr = E_FAIL;
-    const auto token_type = TypeFromToken(token);
-    switch (token_type)
+    switch (const auto token_type = TypeFromToken(token))
     {
         case mdtMemberRef:
             hr = metadata_import->GetMemberRefProps(token, &parent_token, function_name, kNameMaxSize,
