@@ -1,5 +1,5 @@
 #pragma once
-#include "clr_helpers.h"
+#include "always_on_profiler_clr_helpers.h"
 #include <mutex>
 #include <cinttypes>
 #include <vector>

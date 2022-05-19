@@ -28,14 +28,6 @@ constexpr auto kMinimumSamplePeriod = 1000;
 // variable)
 constexpr auto kMaxFunctionNameCacheSize = 7000;
 
-constexpr auto kParamNameMaxLen = 260;
-constexpr auto kGenericParamsMaxLen = 20;
-constexpr auto kUnknown = WStr("Unknown");
-constexpr auto kParamsSeparator = WStr(", ");
-constexpr auto kGenericParamsOpeningBrace = WStr("[");
-constexpr auto kGenericParamsClosingBrace = WStr("]");
-constexpr auto kFunctionParamsOpeningBrace = WStr("(");
-constexpr auto kFunctionParamsClosingBrace = WStr(")");
 
 // If you squint you can make out that the original bones of this came from sample code provided by the dotnet project:
 // https://github.com/dotnet/samples/blob/2cf486af936261b04a438ea44779cdc26c613f98/core/profiling/stacksampling/src/sampler.cpp

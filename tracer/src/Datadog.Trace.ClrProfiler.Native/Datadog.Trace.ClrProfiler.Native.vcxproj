@@ -193,6 +193,7 @@
     <ClInclude Include="..\..\..\shared\src\native-src\pal.h" />
     <ClInclude Include="..\..\..\shared\src\native-src\string.h" />
     <ClInclude Include="always_on_profiler.h" />
+    <ClInclude Include="always_on_profiler_clr_helpers.h" />
     <ClInclude Include="calltarget_tokens.h" />
     <ClInclude Include="class_factory.h" />
     <ClInclude Include="com_ptr.h" />
@@ -228,6 +229,7 @@
     <ClCompile Include="..\..\..\shared\src\native-src\string.cpp" />
     <ClCompile Include="..\..\..\shared\src\native-src\util.cpp" />
     <ClCompile Include="always_on_profiler.cpp" />
+    <ClCompile Include="always_on_profiler_clr_helpers.cpp" />
     <ClCompile Include="calltarget_tokens.cpp" />
     <ClCompile Include="class_factory.cpp" />
     <ClCompile Include="clr_helpers.cpp" />

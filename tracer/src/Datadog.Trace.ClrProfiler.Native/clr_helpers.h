@@ -397,32 +397,6 @@ struct TypeInfoOld
     }
 };
 
-struct TypeInfoNew
-{
-    const mdToken id;
-    const shared::WSTRING name;
-    std::shared_ptr<TypeInfoNew> parent_type;
-
-    TypeInfoNew() :
-        id(0),
-        name(shared::EmptyWStr),
-        parent_type(nullptr)
-    {
-    }
-    TypeInfoNew(const mdToken id, const shared::WSTRING name,
-                const std::shared_ptr<TypeInfoNew> parent_type) :
-        id(id),
-        name(name),
-        parent_type(parent_type)
-    {
-    }
-
-    bool IsValid() const
-    {
-        return id != 0;
-    }
-};
-
 enum MethodArgumentTypeFlag
 {
     TypeFlagByRef = 0x01,
@@ -495,42 +469,6 @@ public:
     {
         return len == 0;
     }
-};
-
-struct TypeSignatureNew
-{
-    ULONG offset;
-    ULONG length;
-    PCCOR_SIGNATURE pbBase;
-
-    shared::WSTRING GetTypeTokName(ComPtr<IMetaDataImport2>& pImport, mdGenericParam class_params[],
-                                   mdGenericParam method_params[]) const;
-};
-
-struct FunctionMethodSignatureNew
-{
-private:
-    PCCOR_SIGNATURE pbBase;
-    unsigned len;
-    // ULONG numberOfTypeArguments = 0; verify if it can be removed
-    // ULONG numberOfArguments = 0;
-    // TypeSignatureNew returnValue{};
-    std::vector<TypeSignatureNew> params;
-
-public:
-    FunctionMethodSignatureNew() : pbBase(nullptr), len(0)
-    {
-    }
-    FunctionMethodSignatureNew(PCCOR_SIGNATURE pb, unsigned cbBuffer)
-    {
-        pbBase = pb;
-        len = cbBuffer;
-    };
-    const std::vector<TypeSignatureNew>& GetMethodArguments() const
-    {
-        return params;
-    }
-    HRESULT TryParse();
 };
 
 struct FunctionLocalSignature
@@ -619,32 +557,6 @@ struct FunctionInfoOld
     }
 };
 
-struct FunctionInfoNew
-{
-    const mdToken id;
-    const shared::WSTRING name;
-    const TypeInfoNew type;
-    FunctionMethodSignatureNew method_signature;
-
-    FunctionInfoNew() : id(0), name(shared::EmptyWStr), type({}), method_signature({})
-    {
-    }
-
-    FunctionInfoNew(mdToken id, shared::WSTRING name, TypeInfoNew type,
-                 FunctionMethodSignatureNew method_signature) :
-        id(id),
-        name(name),
-        type(type),
-        method_signature(method_signature)
-    {
-    }
-
-    bool IsValid() const
-    {
-        return id != 0;
-    }
-};
-
 RuntimeInformation GetRuntimeInformation(ICorProfilerInfo4* info);
 
 AssemblyInfo GetAssemblyInfo(ICorProfilerInfo4* info, const AssemblyID& assembly_id);
@@ -655,12 +567,10 @@ AssemblyMetadata GetReferencedAssemblyMetadata(const ComPtr<IMetaDataAssemblyImp
                                                const mdAssemblyRef& assembly_ref);
 
 FunctionInfoOld GetFunctionInfoOld(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token);
-FunctionInfoNew GetFunctionInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token);
 
 ModuleInfo GetModuleInfo(ICorProfilerInfo4* info, const ModuleID& module_id);
 
 TypeInfoOld GetTypeInfoOld(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token);
-TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token);
 
 mdAssemblyRef FindAssemblyRef(const ComPtr<IMetaDataAssemblyImport>& assembly_import,
                               const shared::WSTRING& assembly_name, const Version& version);
@@ -670,6 +580,29 @@ HRESULT GetCorLibAssemblyRef(const ComPtr<IMetaDataAssemblyEmit>& assembly_emit,
 
 bool FindTypeDefByName(const shared::WSTRING instrumentationTargetMethodTypeName, const shared::WSTRING assemblyName,
                        const ComPtr<IMetaDataImport2>& metadata_import, mdTypeDef& typeDef);
+
+// FunctionMethodSignature
+bool ParseByte(PCCOR_SIGNATURE& pbCur, PCCOR_SIGNATURE pbEnd, unsigned char* pbOut);
+bool ParseNumber(PCCOR_SIGNATURE& pbCur, PCCOR_SIGNATURE pbEnd, unsigned* pOut);
+bool ParseTypeDefOrRefEncoded(PCCOR_SIGNATURE& pbCur, PCCOR_SIGNATURE pbEnd, unsigned char* pIndexTypeOut,
+                              unsigned* pIndexOut);
+
+/*  we don't support
+    PTR CustomMod* VOID
+    PTR CustomMod* Type
+    FNPTR MethodDefSig
+    FNPTR MethodRefSig
+    ARRAY Type ArrayShape
+    SZARRAY CustomMod+ Type (but we do support SZARRAY Type)
+ */
+bool ParseType(PCCOR_SIGNATURE& pbCur, PCCOR_SIGNATURE pbEnd);
+// Param ::= CustomMod* ( TYPEDBYREF | [BYREF] Type )
+// CustomMod* TYPEDBYREF we don't support
+bool ParseParamOrLocal(PCCOR_SIGNATURE& pbCur, PCCOR_SIGNATURE pbEnd);
+// RetType ::= CustomMod* ( VOID | TYPEDBYREF | [BYREF] Type )
+// CustomMod* TYPEDBYREF we don't support
+bool ParseRetType(PCCOR_SIGNATURE& pbCur, PCCOR_SIGNATURE pbEnd);
+
 } // namespace trace
 
 #endif // DD_CLR_PROFILER_CLR_HELPERS_H_
