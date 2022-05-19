@@ -401,21 +401,18 @@ struct TypeInfoNew
 {
     const mdToken id;           // needed
     const shared::WSTRING name; // needed
-    const ULONG32 token_type;
     std::shared_ptr<TypeInfoNew> parent_type; // needed
 
     TypeInfoNew() :
         id(0),
         name(shared::EmptyWStr),
-        token_type(0),
         parent_type(nullptr)
     {
     }
-    TypeInfoNew(mdToken id, shared::WSTRING name, ULONG32 token_type,
+    TypeInfoNew(mdToken id, shared::WSTRING name,
                 std::shared_ptr<TypeInfoNew> parent_type) :
         id(id),
         name(name),
-        token_type(token_type),
         parent_type(parent_type)
     {
     }
