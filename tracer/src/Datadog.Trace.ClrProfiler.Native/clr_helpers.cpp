@@ -216,7 +216,6 @@ FunctionInfoNew GetFunctionInfoNew(const ComPtr<IMetaDataImport2>& metadata_impo
     ULONG raw_signature_len;
     BOOL is_generic = false;
     std::vector<BYTE> final_signature_bytes;
-    std::vector<BYTE> method_spec_signature;
 
     HRESULT hr = E_FAIL;
     const auto token_type = TypeFromToken(token);
@@ -241,7 +240,6 @@ FunctionInfoNew GetFunctionInfoNew(const ComPtr<IMetaDataImport2>& metadata_impo
             }
             const auto generic_info = GetFunctionInfoNew(metadata_import, parent_token);
             final_signature_bytes = generic_info.signature.data;
-            method_spec_signature = GetSignatureByteRepresentationNew(raw_signature_len, raw_signature);
             std::memcpy(function_name, generic_info.name.c_str(), sizeof(WCHAR) * (generic_info.name.length() + 1));
             function_name_len = DWORD(generic_info.name.length() + 1);
             method_spec_token = token;
@@ -261,13 +259,13 @@ FunctionInfoNew GetFunctionInfoNew(const ComPtr<IMetaDataImport2>& metadata_impo
 
     if (is_generic)
     {
-        // use the generic constructor and feed both method signatures
+        // use the generic constructor
         return {method_spec_token,
                 shared::WSTRING(function_name),
                 type_info,
                 MethodSignature(final_signature_bytes),
-                MethodSignature(method_spec_signature),
-                FunctionMethodSignature(raw_signature, raw_signature_len)};
+                FunctionMethodSignature(raw_signature, raw_signature_len),
+                true};
     }
 
     final_signature_bytes = GetSignatureByteRepresentationNew(raw_signature_len, raw_signature);
