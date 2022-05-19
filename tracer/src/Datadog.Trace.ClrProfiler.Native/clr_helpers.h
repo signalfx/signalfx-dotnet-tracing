@@ -503,7 +503,8 @@ struct TypeSignatureNew
     ULONG length;
     PCCOR_SIGNATURE pbBase;
 
-    shared::WSTRING GetTypeTokName(ComPtr<IMetaDataImport2>& pImport) const;
+    shared::WSTRING GetTypeTokName(ComPtr<IMetaDataImport2>& pImport, mdGenericParam class_params[],
+                                   mdGenericParam method_params[]) const;
 };
 
 struct FunctionMethodSignatureNew

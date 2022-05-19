@@ -746,131 +746,153 @@ shared::WSTRING GetSigTypeTokNameOld(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaD
     }
     return tokenName;
 }
+constexpr auto kParamNameMaxLen = 260;
+constexpr auto kGenericParamsMaxLen = 20;
+constexpr auto kUnknown = WStr("Unknown");
+constexpr auto kParamsSeparator = WStr(", ");
+constexpr auto kGenericParamsOpeningBrace = WStr("[");
+constexpr auto kGenericParamsClosingBrace = WStr("]");
 
-
-shared::WSTRING GetSigTypeTokNameNew(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaDataImport2>& pImport)
+shared::WSTRING ExtractParameterName(PCCOR_SIGNATURE& pb_cur, const ComPtr<IMetaDataImport2>& metadata_import,
+                                     const mdGenericParam* generic_parameters)
 {
-    shared::WSTRING tokenName = shared::EmptyWStr;
-    bool ref_flag = false;
-    if (*pbCur == ELEMENT_TYPE_BYREF)
+    pb_cur++;
+    ULONG num = 0;
+    pb_cur += CorSigUncompressData(pb_cur, &num);
+    if (num >= kGenericParamsMaxLen)
     {
-        pbCur++;
+        return kUnknown;
+    }
+    WCHAR param_type_name[kParamNameMaxLen]{};
+    ULONG pch_name = 0;
+    const auto hr = metadata_import->GetGenericParamProps(generic_parameters[num], nullptr, nullptr, nullptr, nullptr,
+                                                          param_type_name, kParamNameMaxLen, &pch_name);
+    if (FAILED(hr))
+    {
+        Logger::Debug("GetGenericParamProps failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
+        return kUnknown;
+    }
+    return param_type_name;
+}
+
+shared::WSTRING GetSigTypeTokNameNew(PCCOR_SIGNATURE& pb_cur, const ComPtr<IMetaDataImport2>& metadata_import,
+                                  mdGenericParam class_params[], mdGenericParam method_params[])
+{
+    shared::WSTRING token_name = shared::EmptyWStr;
+    bool ref_flag = false;
+    if (*pb_cur == ELEMENT_TYPE_BYREF)
+    {
+        pb_cur++;
         ref_flag = true;
     }
 
-    switch (*pbCur)
+    switch (*pb_cur)
     {
         case ELEMENT_TYPE_BOOLEAN:
-            tokenName = SystemBoolean;
-            pbCur++;
+            token_name = SystemBoolean;
+            pb_cur++;
             break;
         case ELEMENT_TYPE_CHAR:
-            tokenName = SystemChar;
-            pbCur++;
+            token_name = SystemChar;
+            pb_cur++;
             break;
         case ELEMENT_TYPE_I1:
-            tokenName = SystemSByte;
-            pbCur++;
+            token_name = SystemSByte;
+            pb_cur++;
             break;
         case ELEMENT_TYPE_U1:
-            tokenName = SystemByte;
-            pbCur++;
+            token_name = SystemByte;
+            pb_cur++;
             break;
         case ELEMENT_TYPE_U2:
-            tokenName = SystemUInt16;
-            pbCur++;
+            token_name = SystemUInt16;
+            pb_cur++;
             break;
         case ELEMENT_TYPE_I2:
-            tokenName = SystemInt16;
-            pbCur++;
+            token_name = SystemInt16;
+            pb_cur++;
             break;
         case ELEMENT_TYPE_I4:
-            tokenName = SystemInt32;
-            pbCur++;
+            token_name = SystemInt32;
+            pb_cur++;
             break;
         case ELEMENT_TYPE_U4:
-            tokenName = SystemUInt32;
-            pbCur++;
+            token_name = SystemUInt32;
+            pb_cur++;
             break;
         case ELEMENT_TYPE_I8:
-            tokenName = SystemInt64;
-            pbCur++;
+            token_name = SystemInt64;
+            pb_cur++;
             break;
         case ELEMENT_TYPE_U8:
-            tokenName = SystemUInt64;
-            pbCur++;
+            token_name = SystemUInt64;
+            pb_cur++;
             break;
         case ELEMENT_TYPE_R4:
-            tokenName = SystemSingle;
-            pbCur++;
+            token_name = SystemSingle;
+            pb_cur++;
             break;
         case ELEMENT_TYPE_R8:
-            tokenName = SystemDouble;
-            pbCur++;
+            token_name = SystemDouble;
+            pb_cur++;
             break;
         case ELEMENT_TYPE_I:
-            tokenName = SystemIntPtr;
-            pbCur++;
+            token_name = SystemIntPtr;
+            pb_cur++;
             break;
         case ELEMENT_TYPE_U:
-            tokenName = SystemUIntPtr;
-            pbCur++;
+            token_name = SystemUIntPtr;
+            pb_cur++;
             break;
         case ELEMENT_TYPE_STRING:
-            tokenName = SystemString;
-            pbCur++;
+            token_name = SystemString;
+            pb_cur++;
             break;
         case ELEMENT_TYPE_OBJECT:
-            tokenName = SystemObject;
-            pbCur++;
+            token_name = SystemObject;
+            pb_cur++;
             break;
         case ELEMENT_TYPE_CLASS:
         case ELEMENT_TYPE_VALUETYPE:
         {
-            pbCur++;
+            pb_cur++;
             mdToken token;
-            pbCur += CorSigUncompressToken(pbCur, &token);
-            tokenName = GetTypeInfoNew(pImport, token).name;
+            pb_cur += CorSigUncompressToken(pb_cur, &token);
+            token_name = GetTypeInfoNew(metadata_import, token).name;
             break;
         }
         case ELEMENT_TYPE_SZARRAY:
         {
-            pbCur++;
-            tokenName = GetSigTypeTokNameNew(pbCur, pImport) + WStr("[]");
+            pb_cur++;
+            token_name = GetSigTypeTokNameNew(pb_cur, metadata_import, class_params, method_params) + WStr("[]");
             break;
         }
         case ELEMENT_TYPE_GENERICINST:
         {
-            pbCur++;
-            tokenName = GetSigTypeTokNameNew(pbCur, pImport);
-            tokenName += WStr("[");
+            pb_cur++;
+            token_name = GetSigTypeTokNameNew(pb_cur, metadata_import, class_params, method_params);
+            token_name += kGenericParamsOpeningBrace;
             ULONG num = 0;
-            pbCur += CorSigUncompressData(pbCur, &num);
+            pb_cur += CorSigUncompressData(pb_cur, &num);
             for (ULONG i = 0; i < num; i++)
             {
-                tokenName += GetSigTypeTokNameNew(pbCur, pImport);
+                token_name += GetSigTypeTokNameNew(pb_cur, metadata_import, class_params, method_params);
                 if (i != num - 1)
                 {
-                    tokenName += WStr(",");
+                    token_name += kParamsSeparator;
                 }
             }
-            tokenName += WStr("]");
+            token_name += kGenericParamsClosingBrace;
             break;
         }
         case ELEMENT_TYPE_MVAR:
         {
-            pbCur++;
-            ULONG num = 0;
-            pbCur += CorSigUncompressData(pbCur, &num);
-            tokenName = WStr("!!") + shared::ToWSTRING(std::to_string(num));
+            token_name += ExtractParameterName(pb_cur, metadata_import, method_params);
             break;
         }
         case ELEMENT_TYPE_VAR:
         {
-            pbCur++;
-            ULONG num = 0;
-            pbCur += CorSigUncompressData(pbCur, &num);
-            tokenName = WStr("!") + shared::ToWSTRING(std::to_string(num));
+            token_name += ExtractParameterName(pb_cur, metadata_import, class_params);
             break;
         }
         default:
@@ -879,9 +901,9 @@ shared::WSTRING GetSigTypeTokNameNew(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaD
 
     if (ref_flag)
     {
-        tokenName += WStr("&");
+        token_name += WStr("&");
     }
-    return tokenName;
+    return token_name;
 }
 
 shared::WSTRING TypeSignatureOld::GetTypeTokName(ComPtr<IMetaDataImport2>& pImport) const
@@ -890,10 +912,11 @@ shared::WSTRING TypeSignatureOld::GetTypeTokName(ComPtr<IMetaDataImport2>& pImpo
     return GetSigTypeTokNameOld(pbCur, pImport);
 }
 
-shared::WSTRING TypeSignatureNew::GetTypeTokName(ComPtr<IMetaDataImport2>& pImport) const
+shared::WSTRING TypeSignatureNew::GetTypeTokName(ComPtr<IMetaDataImport2>& pImport, mdGenericParam class_params[],
+                                                 mdGenericParam method_params[]) const
 {
     PCCOR_SIGNATURE pbCur = &pbBase[offset];
-    return GetSigTypeTokNameNew(pbCur, pImport);
+    return GetSigTypeTokNameNew(pbCur, pImport, class_params, method_params);
 }
 
 ULONG TypeSignatureOld::GetSignature(PCCOR_SIGNATURE& data) const
