@@ -399,9 +399,9 @@ struct TypeInfoOld
 
 struct TypeInfoNew
 {
-    const mdToken id;           // needed
-    const shared::WSTRING name; // needed
-    std::shared_ptr<TypeInfoNew> parent_type; // needed
+    const mdToken id;
+    const shared::WSTRING name;
+    std::shared_ptr<TypeInfoNew> parent_type;
 
     TypeInfoNew() :
         id(0),
@@ -409,8 +409,8 @@ struct TypeInfoNew
         parent_type(nullptr)
     {
     }
-    TypeInfoNew(mdToken id, shared::WSTRING name,
-                std::shared_ptr<TypeInfoNew> parent_type) :
+    TypeInfoNew(const mdToken id, const shared::WSTRING name,
+                const std::shared_ptr<TypeInfoNew> parent_type) :
         id(id),
         name(name),
         parent_type(parent_type)
