@@ -891,13 +891,6 @@ shared::WSTRING TypeSignature::GetTypeTokNameOld(ComPtr<IMetaDataImport2>& pImpo
     return GetSigTypeTokNameOld(pbCur, pImport);
 }
 
-shared::WSTRING TypeSignature::GetTypeTokNameNew(ComPtr<IMetaDataImport2>& pImport) const
-{
-    PCCOR_SIGNATURE pbCur = &pbBase[offset];
-    return GetSigTypeTokNameNew(pbCur, pImport);
-}
-
-
 ULONG TypeSignature::GetSignature(PCCOR_SIGNATURE& data) const
 {
     data = &pbBase[offset];
