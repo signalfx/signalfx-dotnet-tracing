@@ -676,7 +676,7 @@ mdTypeSpec CallTargetTokens::GetTargetReturnValueTypeRef(TypeSignature* returnAr
     return returnValueTypeSpec;
 }
 
-mdToken CallTargetTokens::GetCurrentTypeRef(const TypeInfo* currentType, bool& isValueType)
+mdToken CallTargetTokens::GetCurrentTypeRef(const TypeInfoOld* currentType, bool& isValueType)
 {
     if (currentType->type_spec != mdTypeSpecNil)
     {
@@ -685,7 +685,7 @@ mdToken CallTargetTokens::GetCurrentTypeRef(const TypeInfo* currentType, bool& i
     else
     {
 
-        TypeInfo* cType = const_cast<TypeInfo*>(currentType);
+        TypeInfoOld* cType = const_cast<TypeInfoOld*>(currentType);
         while (!cType->isGeneric)
         {
 
@@ -694,7 +694,7 @@ mdToken CallTargetTokens::GetCurrentTypeRef(const TypeInfo* currentType, bool& i
                 return cType->id;
             }
 
-            cType = const_cast<TypeInfo*>(cType->parent_type.get());
+            cType = const_cast<TypeInfoOld*>(cType->parent_type.get());
         }
 
         isValueType = false;

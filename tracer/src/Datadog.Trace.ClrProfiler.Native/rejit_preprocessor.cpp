@@ -106,7 +106,7 @@ void RejitPreprocessor<RejitRequestDefinition>::ProcessTypeDefForRejit(const Rej
             Logger::Debug("    * Comparing signature for method: ", caller.type.name, ".", caller.name);
             for (unsigned int i = 0; i < numOfArgs; i++)
             {
-                const auto argumentTypeName = methodArguments[i].GetTypeTokName(metadataImport);
+                const auto argumentTypeName = methodArguments[i].GetTypeTokNameOld(metadataImport);
                 const auto integrationArgumentTypeName = target_method.signature_types[i + 1];
                 Logger::Debug("        -> ", argumentTypeName, " = ", integrationArgumentTypeName);
                 if (argumentTypeName != integrationArgumentTypeName && integrationArgumentTypeName != WStr("_"))
@@ -261,7 +261,7 @@ ULONG RejitPreprocessor<RejitRequestDefinition>::RequestRejitForLoadedModules(
                 for (; typeDefIterator != typeDefEnum.end(); typeDefIterator = ++typeDefIterator)
                 {
                     auto typeDef = *typeDefIterator;
-                    const auto typeInfo = GetTypeInfo(metadataImport, typeDef);
+                    const auto typeInfo = GetTypeInfoOld(metadataImport, typeDef);
                     bool rewriteType = false;
                     auto ancestorTypeInfo = typeInfo.extend_from.get();
 

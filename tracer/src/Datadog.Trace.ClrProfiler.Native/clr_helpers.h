@@ -353,19 +353,19 @@ struct ModuleInfo
     }
 };
 
-struct TypeInfo
+struct TypeInfoOld
 {
     const mdToken id;
     const shared::WSTRING name;
     const mdTypeSpec type_spec;
     const ULONG32 token_type;
-    std::shared_ptr<TypeInfo> extend_from;
+    std::shared_ptr<TypeInfoOld> extend_from;
     const bool valueType;
     const bool isGeneric;
-    std::shared_ptr<TypeInfo> parent_type;
+    std::shared_ptr<TypeInfoOld> parent_type;
     const mdToken scopeToken;
 
-    TypeInfo() :
+    TypeInfoOld() :
         id(0),
         name(shared::EmptyWStr),
         type_spec(0),
@@ -377,8 +377,53 @@ struct TypeInfo
         scopeToken(0)
     {
     }
-    TypeInfo(mdToken id, shared::WSTRING name, mdTypeSpec type_spec, ULONG32 token_type, std::shared_ptr<TypeInfo> extend_from,
-             bool valueType, bool isGeneric, std::shared_ptr<TypeInfo> parent_type, mdToken scopeToken) :
+    TypeInfoOld(mdToken id, shared::WSTRING name, mdTypeSpec type_spec, ULONG32 token_type, std::shared_ptr<TypeInfoOld> extend_from,
+             bool valueType, bool isGeneric, std::shared_ptr<TypeInfoOld> parent_type, mdToken scopeToken) :
+        id(id),
+        name(name),
+        type_spec(type_spec),
+        token_type(token_type),
+        extend_from(extend_from),
+        valueType(valueType),
+        isGeneric(isGeneric),
+        parent_type(parent_type),
+        scopeToken(scopeToken)
+    {
+    }
+
+    bool IsValid() const
+    {
+        return id != 0;
+    }
+};
+
+struct TypeInfoNew
+{
+    const mdToken id;
+    const shared::WSTRING name;
+    const mdTypeSpec type_spec;
+    const ULONG32 token_type;
+    std::shared_ptr<TypeInfoNew> extend_from;
+    const bool valueType;
+    const bool isGeneric;
+    std::shared_ptr<TypeInfoNew> parent_type;
+    const mdToken scopeToken;
+
+    TypeInfoNew() :
+        id(0),
+        name(shared::EmptyWStr),
+        type_spec(0),
+        token_type(0),
+        extend_from(nullptr),
+        valueType(false),
+        isGeneric(false),
+        parent_type(nullptr),
+        scopeToken(0)
+    {
+    }
+    TypeInfoNew(mdToken id, shared::WSTRING name, mdTypeSpec type_spec, ULONG32 token_type,
+                std::shared_ptr<TypeInfoNew> extend_from, bool valueType, bool isGeneric,
+                std::shared_ptr<TypeInfoNew> parent_type, mdToken scopeToken) :
         id(id),
         name(name),
         type_spec(type_spec),
@@ -412,7 +457,8 @@ struct TypeSignature
     ULONG length;
     PCCOR_SIGNATURE pbBase;
     mdToken GetTypeTok(ComPtr<IMetaDataEmit2>& pEmit, mdAssemblyRef corLibRef) const;
-    shared::WSTRING GetTypeTokName(ComPtr<IMetaDataImport2>& pImport) const;
+    shared::WSTRING GetTypeTokNameOld(ComPtr<IMetaDataImport2>& pImport) const;
+    shared::WSTRING GetTypeTokNameNew(ComPtr<IMetaDataImport2>& pImport) const;
     std::tuple<unsigned, int> GetElementTypeAndFlags() const;
     ULONG GetSignature(PCCOR_SIGNATURE& data) const;
 };
@@ -514,7 +560,7 @@ struct FunctionInfoOld
 {
     const mdToken id;
     const shared::WSTRING name;
-    const TypeInfo type;
+    const TypeInfoOld type;
     const BOOL is_generic;
     const MethodSignature signature;
     const MethodSignature function_spec_signature;
@@ -525,7 +571,7 @@ struct FunctionInfoOld
     {
     }
 
-    FunctionInfoOld(mdToken id, shared::WSTRING name, TypeInfo type, MethodSignature signature,
+    FunctionInfoOld(mdToken id, shared::WSTRING name, TypeInfoOld type, MethodSignature signature,
                  MethodSignature function_spec_signature, mdToken method_def_id,
                  FunctionMethodSignature method_signature) :
         id(id),
@@ -539,7 +585,7 @@ struct FunctionInfoOld
     {
     }
 
-    FunctionInfoOld(mdToken id, shared::WSTRING name, TypeInfo type, MethodSignature signature,
+    FunctionInfoOld(mdToken id, shared::WSTRING name, TypeInfoOld type, MethodSignature signature,
                  FunctionMethodSignature method_signature) :
         id(id),
         name(name),
@@ -561,7 +607,7 @@ struct FunctionInfoNew
 {
     const mdToken id;
     const shared::WSTRING name;
-    const TypeInfo type;
+    const TypeInfoNew type;
     const BOOL is_generic;
     const MethodSignature signature;
     const MethodSignature function_spec_signature;
@@ -572,7 +618,7 @@ struct FunctionInfoNew
     {
     }
 
-    FunctionInfoNew(mdToken id, shared::WSTRING name, TypeInfo type, MethodSignature signature,
+    FunctionInfoNew(mdToken id, shared::WSTRING name, TypeInfoNew type, MethodSignature signature,
                  MethodSignature function_spec_signature, mdToken method_def_id,
                  FunctionMethodSignature method_signature) :
         id(id),
@@ -586,7 +632,7 @@ struct FunctionInfoNew
     {
     }
 
-    FunctionInfoNew(mdToken id, shared::WSTRING name, TypeInfo type, MethodSignature signature,
+    FunctionInfoNew(mdToken id, shared::WSTRING name, TypeInfoNew type, MethodSignature signature,
                  FunctionMethodSignature method_signature) :
         id(id),
         name(name),
@@ -618,7 +664,8 @@ FunctionInfoNew GetFunctionInfoNew(const ComPtr<IMetaDataImport2>& metadata_impo
 
 ModuleInfo GetModuleInfo(ICorProfilerInfo4* info, const ModuleID& module_id);
 
-TypeInfo GetTypeInfo(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token);
+TypeInfoOld GetTypeInfoOld(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token);
+TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token);
 
 mdAssemblyRef FindAssemblyRef(const ComPtr<IMetaDataAssemblyImport>& assembly_import,
                               const shared::WSTRING& assembly_name, const Version& version);

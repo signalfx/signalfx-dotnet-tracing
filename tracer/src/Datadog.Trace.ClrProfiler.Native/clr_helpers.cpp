@@ -185,7 +185,7 @@ FunctionInfoOld GetFunctionInfoOld(const ComPtr<IMetaDataImport2>& metadata_impo
     }
 
     // parent_token could be: TypeDef, TypeRef, TypeSpec, ModuleRef, MethodDef
-    const auto type_info = GetTypeInfo(metadata_import, parent_token);
+    const auto type_info = GetTypeInfoOld(metadata_import, parent_token);
 
     if (is_generic)
     {
@@ -259,7 +259,7 @@ FunctionInfoNew GetFunctionInfoNew(const ComPtr<IMetaDataImport2>& metadata_impo
     }
 
     // parent_token could be: TypeDef, TypeRef, TypeSpec, ModuleRef, MethodDef
-    const auto type_info = GetTypeInfo(metadata_import, parent_token);
+    const auto type_info = GetTypeInfoNew(metadata_import, parent_token);
 
     if (is_generic)
     {
@@ -296,15 +296,15 @@ ModuleInfo GetModuleInfo(ICorProfilerInfo4* info, const ModuleID& module_id)
     return {module_id, shared::WSTRING(module_path), GetAssemblyInfo(info, assembly_id), module_flags};
 }
 
-TypeInfo GetTypeInfoOld(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token)
+TypeInfoOld GetTypeInfoOld(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token)
 {
     mdToken parent_token = mdTokenNil;
-    std::shared_ptr<TypeInfo> parentTypeInfo = nullptr;
+    std::shared_ptr<TypeInfoOld> parentTypeInfo = nullptr;
     mdToken parent_type_token = mdTokenNil;
     WCHAR type_name[kNameMaxSize]{};
     DWORD type_name_len = 0;
     DWORD type_flags;
-    std::shared_ptr<TypeInfo> extendsInfo = nullptr;
+    std::shared_ptr<TypeInfoOld> extendsInfo = nullptr;
     mdToken type_extends = mdTokenNil;
     bool type_valueType = false;
     bool type_isGeneric = false;
@@ -321,12 +321,12 @@ TypeInfo GetTypeInfoOld(const ComPtr<IMetaDataImport2>& metadata_import, const m
             metadata_import->GetNestedClassProps(token, &parent_type_token);
             if (parent_type_token != mdTokenNil)
             {
-                parentTypeInfo = std::make_shared<TypeInfo>(GetTypeInfo(metadata_import, parent_type_token));
+                parentTypeInfo = std::make_shared<TypeInfoOld>(GetTypeInfoOld(metadata_import, parent_type_token));
             }
 
             if (type_extends != mdTokenNil)
             {
-                extendsInfo = std::make_shared<TypeInfo>(GetTypeInfo(metadata_import, type_extends));
+                extendsInfo = std::make_shared<TypeInfoOld>(GetTypeInfoOld(metadata_import, type_extends));
                 type_valueType =
                     extendsInfo->name == WStr("System.ValueType") || extendsInfo->name == WStr("System.Enum");
             }
@@ -350,7 +350,7 @@ TypeInfo GetTypeInfoOld(const ComPtr<IMetaDataImport2>& metadata_import, const m
             {
                 mdToken type_token;
                 CorSigUncompressToken(&signature[2], &type_token);
-                const auto baseType = GetTypeInfo(metadata_import, type_token);
+                const auto baseType = GetTypeInfoOld(metadata_import, type_token);
                 return {baseType.id,        baseType.name,        token,
                         token_type,         baseType.extend_from, baseType.valueType,
                         baseType.isGeneric, baseType.parent_type, baseType.scopeToken};
@@ -384,15 +384,15 @@ TypeInfo GetTypeInfoOld(const ComPtr<IMetaDataImport2>& metadata_import, const m
             extendsInfo, type_valueType,   type_isGeneric, parentTypeInfo, parent_token};
 }
 
-TypeInfo GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token)
+TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token)
 {
     mdToken parent_token = mdTokenNil;
-    std::shared_ptr<TypeInfo> parentTypeInfo = nullptr;
+    std::shared_ptr<TypeInfoNew> parentTypeInfo = nullptr;
     mdToken parent_type_token = mdTokenNil;
     WCHAR type_name[kNameMaxSize]{};
     DWORD type_name_len = 0;
     DWORD type_flags;
-    std::shared_ptr<TypeInfo> extendsInfo = nullptr;
+    std::shared_ptr<TypeInfoNew> extendsInfo = nullptr;
     mdToken type_extends = mdTokenNil;
     bool type_valueType = false;
     bool type_isGeneric = false;
@@ -409,12 +409,12 @@ TypeInfo GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, const m
             metadata_import->GetNestedClassProps(token, &parent_type_token);
             if (parent_type_token != mdTokenNil)
             {
-                parentTypeInfo = std::make_shared<TypeInfo>(GetTypeInfo(metadata_import, parent_type_token));
+                parentTypeInfo = std::make_shared<TypeInfoNew>(GetTypeInfoNew(metadata_import, parent_type_token));
             }
 
             if (type_extends != mdTokenNil)
             {
-                extendsInfo = std::make_shared<TypeInfo>(GetTypeInfo(metadata_import, type_extends));
+                extendsInfo = std::make_shared<TypeInfoNew>(GetTypeInfoNew(metadata_import, type_extends));
                 type_valueType =
                     extendsInfo->name == WStr("System.ValueType") || extendsInfo->name == WStr("System.Enum");
             }
@@ -438,7 +438,7 @@ TypeInfo GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, const m
             {
                 mdToken type_token;
                 CorSigUncompressToken(&signature[2], &type_token);
-                const auto baseType = GetTypeInfo(metadata_import, type_token);
+                const auto baseType = GetTypeInfoNew(metadata_import, type_token);
                 return {baseType.id,        baseType.name,        token,
                         token_type,         baseType.extend_from, baseType.valueType,
                         baseType.isGeneric, baseType.parent_type, baseType.scopeToken};
@@ -658,7 +658,7 @@ mdToken TypeSignature::GetTypeTok(ComPtr<IMetaDataEmit2>& pEmit, mdAssemblyRef c
     return token;
 }
 
-shared::WSTRING GetSigTypeTokName(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaDataImport2>& pImport)
+shared::WSTRING GetSigTypeTokNameOld(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaDataImport2>& pImport)
 {
     shared::WSTRING tokenName = shared::EmptyWStr;
     bool ref_flag = false;
@@ -740,25 +740,25 @@ shared::WSTRING GetSigTypeTokName(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaData
             pbCur++;
             mdToken token;
             pbCur += CorSigUncompressToken(pbCur, &token);
-            tokenName = GetTypeInfo(pImport, token).name;
+            tokenName = GetTypeInfoOld(pImport, token).name;
             break;
         }
         case ELEMENT_TYPE_SZARRAY:
         {
             pbCur++;
-            tokenName = GetSigTypeTokName(pbCur, pImport) + WStr("[]");
+            tokenName = GetSigTypeTokNameOld(pbCur, pImport) + WStr("[]");
             break;
         }
         case ELEMENT_TYPE_GENERICINST:
         {
             pbCur++;
-            tokenName = GetSigTypeTokName(pbCur, pImport);
+            tokenName = GetSigTypeTokNameOld(pbCur, pImport);
             tokenName += WStr("[");
             ULONG num = 0;
             pbCur += CorSigUncompressData(pbCur, &num);
             for (ULONG i = 0; i < num; i++)
             {
-                tokenName += GetSigTypeTokName(pbCur, pImport);
+                tokenName += GetSigTypeTokNameOld(pbCur, pImport);
                 if (i != num - 1)
                 {
                     tokenName += WStr(",");
@@ -794,11 +794,155 @@ shared::WSTRING GetSigTypeTokName(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaData
     return tokenName;
 }
 
-shared::WSTRING TypeSignature::GetTypeTokName(ComPtr<IMetaDataImport2>& pImport) const
+
+shared::WSTRING GetSigTypeTokNameNew(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaDataImport2>& pImport)
+{
+    shared::WSTRING tokenName = shared::EmptyWStr;
+    bool ref_flag = false;
+    if (*pbCur == ELEMENT_TYPE_BYREF)
+    {
+        pbCur++;
+        ref_flag = true;
+    }
+
+    switch (*pbCur)
+    {
+        case ELEMENT_TYPE_BOOLEAN:
+            tokenName = SystemBoolean;
+            pbCur++;
+            break;
+        case ELEMENT_TYPE_CHAR:
+            tokenName = SystemChar;
+            pbCur++;
+            break;
+        case ELEMENT_TYPE_I1:
+            tokenName = SystemSByte;
+            pbCur++;
+            break;
+        case ELEMENT_TYPE_U1:
+            tokenName = SystemByte;
+            pbCur++;
+            break;
+        case ELEMENT_TYPE_U2:
+            tokenName = SystemUInt16;
+            pbCur++;
+            break;
+        case ELEMENT_TYPE_I2:
+            tokenName = SystemInt16;
+            pbCur++;
+            break;
+        case ELEMENT_TYPE_I4:
+            tokenName = SystemInt32;
+            pbCur++;
+            break;
+        case ELEMENT_TYPE_U4:
+            tokenName = SystemUInt32;
+            pbCur++;
+            break;
+        case ELEMENT_TYPE_I8:
+            tokenName = SystemInt64;
+            pbCur++;
+            break;
+        case ELEMENT_TYPE_U8:
+            tokenName = SystemUInt64;
+            pbCur++;
+            break;
+        case ELEMENT_TYPE_R4:
+            tokenName = SystemSingle;
+            pbCur++;
+            break;
+        case ELEMENT_TYPE_R8:
+            tokenName = SystemDouble;
+            pbCur++;
+            break;
+        case ELEMENT_TYPE_I:
+            tokenName = SystemIntPtr;
+            pbCur++;
+            break;
+        case ELEMENT_TYPE_U:
+            tokenName = SystemUIntPtr;
+            pbCur++;
+            break;
+        case ELEMENT_TYPE_STRING:
+            tokenName = SystemString;
+            pbCur++;
+            break;
+        case ELEMENT_TYPE_OBJECT:
+            tokenName = SystemObject;
+            pbCur++;
+            break;
+        case ELEMENT_TYPE_CLASS:
+        case ELEMENT_TYPE_VALUETYPE:
+        {
+            pbCur++;
+            mdToken token;
+            pbCur += CorSigUncompressToken(pbCur, &token);
+            tokenName = GetTypeInfoNew(pImport, token).name;
+            break;
+        }
+        case ELEMENT_TYPE_SZARRAY:
+        {
+            pbCur++;
+            tokenName = GetSigTypeTokNameNew(pbCur, pImport) + WStr("[]");
+            break;
+        }
+        case ELEMENT_TYPE_GENERICINST:
+        {
+            pbCur++;
+            tokenName = GetSigTypeTokNameNew(pbCur, pImport);
+            tokenName += WStr("[");
+            ULONG num = 0;
+            pbCur += CorSigUncompressData(pbCur, &num);
+            for (ULONG i = 0; i < num; i++)
+            {
+                tokenName += GetSigTypeTokNameNew(pbCur, pImport);
+                if (i != num - 1)
+                {
+                    tokenName += WStr(",");
+                }
+            }
+            tokenName += WStr("]");
+            break;
+        }
+        case ELEMENT_TYPE_MVAR:
+        {
+            pbCur++;
+            ULONG num = 0;
+            pbCur += CorSigUncompressData(pbCur, &num);
+            tokenName = WStr("!!") + shared::ToWSTRING(std::to_string(num));
+            break;
+        }
+        case ELEMENT_TYPE_VAR:
+        {
+            pbCur++;
+            ULONG num = 0;
+            pbCur += CorSigUncompressData(pbCur, &num);
+            tokenName = WStr("!") + shared::ToWSTRING(std::to_string(num));
+            break;
+        }
+        default:
+            break;
+    }
+
+    if (ref_flag)
+    {
+        tokenName += WStr("&");
+    }
+    return tokenName;
+}
+
+shared::WSTRING TypeSignature::GetTypeTokNameOld(ComPtr<IMetaDataImport2>& pImport) const
 {
     PCCOR_SIGNATURE pbCur = &pbBase[offset];
-    return GetSigTypeTokName(pbCur, pImport);
+    return GetSigTypeTokNameOld(pbCur, pImport);
 }
+
+shared::WSTRING TypeSignature::GetTypeTokNameNew(ComPtr<IMetaDataImport2>& pImport) const
+{
+    PCCOR_SIGNATURE pbCur = &pbBase[offset];
+    return GetSigTypeTokNameNew(pbCur, pImport);
+}
+
 
 ULONG TypeSignature::GetSignature(PCCOR_SIGNATURE& data) const
 {

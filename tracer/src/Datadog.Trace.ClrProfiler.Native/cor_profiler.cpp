@@ -1980,7 +1980,7 @@ std::string CorProfiler::GetILCodes(const std::string& title, ILRewriter* rewrit
                      cInstr->m_opcode == CEE_UNBOX_ANY || cInstr->m_opcode == CEE_NEWARR ||
                      cInstr->m_opcode == CEE_INITOBJ)
             {
-                const auto typeInfo = GetTypeInfo(metadata_import, (mdTypeRef) cInstr->m_Arg32);
+                const auto typeInfo = GetTypeInfoOld(metadata_import, (mdTypeRef) cInstr->m_Arg32);
                 orig_sstream << "  | ";
                 orig_sstream << shared::ToString(typeInfo.name);
             }
@@ -2671,7 +2671,7 @@ HRESULT CorProfiler::GenerateVoidILStartupMethod(const ModuleID module_id, mdMet
     if (IsDumpILRewriteEnabled())
     {
         mdToken token = 0;
-        TypeInfo typeInfo{};
+        TypeInfoOld typeInfo{};
         shared::WSTRING methodName = WStr("__DDVoidMethodCall__");
         FunctionInfoOld caller(token, methodName, typeInfo, MethodSignature(), FunctionMethodSignature());
         Logger::Info(

@@ -348,7 +348,7 @@ private:
         {
             // parent class is available only for internal classes.
             // See the class in the test application:  My.Custom.Test.Namespace.ClassA.InternalClassB.DoubleInternalClassB.TripleInternalClassB
-            std::shared_ptr<TypeInfo> parent_type = function_info.type.parent_type;
+            std::shared_ptr<TypeInfoNew> parent_type = function_info.type.parent_type;
             shared::WSTRING prefix = parent_type->name;
             while (parent_type->parent_type != nullptr)
             {
@@ -558,7 +558,7 @@ private:
                 pb_cur++;
                 mdToken token;
                 pb_cur += CorSigUncompressToken(pb_cur, &token);
-                token_name = GetTypeInfo(metadata_import, token).name;
+                token_name = GetTypeInfoNew(metadata_import, token).name;
                 break;
             }
             case ELEMENT_TYPE_SZARRAY:
