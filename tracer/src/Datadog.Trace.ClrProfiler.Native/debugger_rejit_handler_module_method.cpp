@@ -7,7 +7,7 @@ namespace debugger
 DebuggerRejitHandlerModuleMethod::DebuggerRejitHandlerModuleMethod(
                                                     mdMethodDef methodDef, 
                                                     RejitHandlerModule* module,
-                                                    const FunctionInfo& functionInfo,
+                                                    const FunctionInfoOld& functionInfo,
                                                     const MethodProbeDefinition& methodProbe) :
     RejitHandlerModuleMethod(methodDef, module, functionInfo),
     m_methodProbeDefinition(std::make_unique<debugger::MethodProbeDefinition>(methodProbe))

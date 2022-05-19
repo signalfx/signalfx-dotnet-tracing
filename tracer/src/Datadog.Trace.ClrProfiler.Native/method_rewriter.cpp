@@ -93,7 +93,7 @@ HRESULT TracerMethodRewriter::Rewrite(RejitHandlerModule* moduleHandler, RejitHa
 
     ModuleID module_id = moduleHandler->GetModuleId();
     ModuleMetadata& module_metadata = *moduleHandler->GetModuleMetadata();
-    FunctionInfo* caller = methodHandler->GetFunctionInfo();
+    FunctionInfoOld* caller = methodHandler->GetFunctionInfo();
     TracerTokens* tracerTokens = module_metadata.GetTracerTokens();
     mdToken function_token = caller->id;
     TypeSignature retFuncArg = caller->method_signature.GetReturnValue();

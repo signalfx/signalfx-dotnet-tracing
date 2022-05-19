@@ -510,7 +510,7 @@ public:
     }
 };
 
-struct FunctionInfo
+struct FunctionInfoOld
 {
     const mdToken id;
     const shared::WSTRING name;
@@ -521,11 +521,11 @@ struct FunctionInfo
     const mdToken method_def_id;
     FunctionMethodSignature method_signature;
 
-    FunctionInfo() : id(0), name(shared::EmptyWStr), type({}), is_generic(false), method_def_id(0), method_signature({})
+    FunctionInfoOld() : id(0), name(shared::EmptyWStr), type({}), is_generic(false), method_def_id(0), method_signature({})
     {
     }
 
-    FunctionInfo(mdToken id, shared::WSTRING name, TypeInfo type, MethodSignature signature,
+    FunctionInfoOld(mdToken id, shared::WSTRING name, TypeInfo type, MethodSignature signature,
                  MethodSignature function_spec_signature, mdToken method_def_id,
                  FunctionMethodSignature method_signature) :
         id(id),
@@ -539,7 +539,54 @@ struct FunctionInfo
     {
     }
 
-    FunctionInfo(mdToken id, shared::WSTRING name, TypeInfo type, MethodSignature signature,
+    FunctionInfoOld(mdToken id, shared::WSTRING name, TypeInfo type, MethodSignature signature,
+                 FunctionMethodSignature method_signature) :
+        id(id),
+        name(name),
+        type(type),
+        is_generic(false),
+        signature(signature),
+        method_def_id(0),
+        method_signature(method_signature)
+    {
+    }
+
+    bool IsValid() const
+    {
+        return id != 0;
+    }
+};
+
+struct FunctionInfoNew
+{
+    const mdToken id;
+    const shared::WSTRING name;
+    const TypeInfo type;
+    const BOOL is_generic;
+    const MethodSignature signature;
+    const MethodSignature function_spec_signature;
+    const mdToken method_def_id;
+    FunctionMethodSignature method_signature;
+
+    FunctionInfoNew() : id(0), name(shared::EmptyWStr), type({}), is_generic(false), method_def_id(0), method_signature({})
+    {
+    }
+
+    FunctionInfoNew(mdToken id, shared::WSTRING name, TypeInfo type, MethodSignature signature,
+                 MethodSignature function_spec_signature, mdToken method_def_id,
+                 FunctionMethodSignature method_signature) :
+        id(id),
+        name(name),
+        type(type),
+        is_generic(true),
+        signature(signature),
+        function_spec_signature(function_spec_signature),
+        method_def_id(method_def_id),
+        method_signature(method_signature)
+    {
+    }
+
+    FunctionInfoNew(mdToken id, shared::WSTRING name, TypeInfo type, MethodSignature signature,
                  FunctionMethodSignature method_signature) :
         id(id),
         name(name),
@@ -566,7 +613,8 @@ AssemblyMetadata GetAssemblyImportMetadata(const ComPtr<IMetaDataAssemblyImport>
 AssemblyMetadata GetReferencedAssemblyMetadata(const ComPtr<IMetaDataAssemblyImport>& assembly_import,
                                                const mdAssemblyRef& assembly_ref);
 
-FunctionInfo GetFunctionInfo(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token);
+FunctionInfoOld GetFunctionInfoOld(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token);
+FunctionInfoNew GetFunctionInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token);
 
 ModuleInfo GetModuleInfo(ICorProfilerInfo4* info, const ModuleID& module_id);
 

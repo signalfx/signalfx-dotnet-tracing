@@ -56,7 +56,7 @@ void RejitPreprocessor<RejitRequestDefinition>::ProcessTypeDefForRejit(const Rej
         auto methodDef = *enumIterator;
 
         // Extract the function info from the mdMethodDef
-        const auto caller = GetFunctionInfo(metadataImport, methodDef);
+        const auto caller = GetFunctionInfoOld(metadataImport, methodDef);
         if (!caller.IsValid())
         {
             Logger::Warn("    * The caller for the methoddef: ", shared::TokenStr(&methodDef), " is not valid!");
@@ -65,7 +65,7 @@ void RejitPreprocessor<RejitRequestDefinition>::ProcessTypeDefForRejit(const Rej
 
         // We create a new function info into the heap from the caller functionInfo in the stack, to
         // be used later in the ReJIT process
-        auto functionInfo = FunctionInfo(caller);
+        auto functionInfo = FunctionInfoOld(caller);
         auto hr = functionInfo.method_signature.TryParse();
         if (FAILED(hr))
         {
@@ -469,7 +469,7 @@ const bool TracerRejitPreprocessor::GetIsExactSignatureMatch(const IntegrationDe
 }
 
 const std::unique_ptr<RejitHandlerModuleMethod> TracerRejitPreprocessor::CreateMethod(const mdMethodDef methodDef, RejitHandlerModule* module,
-                                                const FunctionInfo& functionInfo,
+                                                const FunctionInfoOld& functionInfo,
                                                 const IntegrationDefinition& integrationDefinition)
 {
     return std::make_unique<TracerRejitHandlerModuleMethod>(methodDef,

@@ -335,7 +335,7 @@ private:
             return;
         }
 
-        const auto function_info = GetFunctionInfo(metadata_import, function_identifier.function_token);
+        const auto function_info = GetFunctionInfoNew(metadata_import, function_identifier.function_token);
 
         if (!function_info.IsValid())
         {

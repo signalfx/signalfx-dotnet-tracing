@@ -72,10 +72,10 @@ class CLRHelperTestBase : public ::testing::Test {
   }
 
 
-  FunctionInfo FunctionToTest(const WSTRING& type_name, const WSTRING& method_name) const {
+  FunctionInfoOld FunctionToTest(const WSTRING& type_name, const WSTRING& method_name) const {
     for (auto& type_def : EnumTypeDefs(metadata_import_)) {
       for (auto& method_def : EnumMethods(metadata_import_, type_def)) {
-        auto target = GetFunctionInfo(metadata_import_, method_def);
+        auto target = GetFunctionInfoOld(metadata_import_, method_def);
         if (target.type.name != type_name) {
           continue;
         }

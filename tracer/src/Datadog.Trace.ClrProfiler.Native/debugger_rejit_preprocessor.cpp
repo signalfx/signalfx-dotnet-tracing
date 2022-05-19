@@ -24,7 +24,7 @@ const bool DebuggerRejitPreprocessor::GetIsExactSignatureMatch(const debugger::M
 const std::unique_ptr<RejitHandlerModuleMethod> DebuggerRejitPreprocessor::CreateMethod(
                                         const mdMethodDef methodDef, 
                                         RejitHandlerModule* module,
-                                        const FunctionInfo& functionInfo,
+                                        const FunctionInfoOld& functionInfo,
                                         const MethodProbeDefinition& methodProbeDefinition)
 {
     return std::make_unique<DebuggerRejitHandlerModuleMethod>(methodDef, module, functionInfo, methodProbeDefinition);

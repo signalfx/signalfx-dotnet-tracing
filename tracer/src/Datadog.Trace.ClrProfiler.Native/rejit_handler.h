@@ -34,20 +34,20 @@ class RejitHandlerModuleMethod
 protected:
     mdMethodDef m_methodDef;
     ICorProfilerFunctionControl* m_pFunctionControl;
-    std::unique_ptr<FunctionInfo> m_functionInfo;
+    std::unique_ptr<FunctionInfoOld> m_functionInfo;
 
     RejitHandlerModule* m_module;
 
 public:
-    RejitHandlerModuleMethod(mdMethodDef methodDef, RejitHandlerModule* module, const FunctionInfo& functionInfo);
+    RejitHandlerModuleMethod(mdMethodDef methodDef, RejitHandlerModule* module, const FunctionInfoOld& functionInfo);
     mdMethodDef GetMethodDef();
     RejitHandlerModule* GetModule();
 
     ICorProfilerFunctionControl* GetFunctionControl();
     void SetFunctionControl(ICorProfilerFunctionControl* pFunctionControl);
 
-    FunctionInfo* GetFunctionInfo();
-    void SetFunctionInfo(const FunctionInfo& functionInfo);
+    FunctionInfoOld* GetFunctionInfo();
+    void SetFunctionInfo(const FunctionInfoOld& functionInfo);
 
     bool RequestRejitForInlinersInModule(ModuleID moduleId);
     virtual MethodRewriter* GetMethodRewriter() = 0;
@@ -67,7 +67,7 @@ public:
     TracerRejitHandlerModuleMethod(
                     mdMethodDef methodDef,
                     RejitHandlerModule* module,
-                    const FunctionInfo& functionInfo,
+                    const FunctionInfoOld& functionInfo,
                     const IntegrationDefinition& integrationDefinition);
     
     IntegrationDefinition* GetIntegrationDefinition();

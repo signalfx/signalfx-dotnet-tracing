@@ -11,7 +11,7 @@ namespace trace
 // RejitHandlerModuleMethod
 //
 
-RejitHandlerModuleMethod::RejitHandlerModuleMethod(mdMethodDef methodDef, RejitHandlerModule* module, const FunctionInfo& functionInfo)
+RejitHandlerModuleMethod::RejitHandlerModuleMethod(mdMethodDef methodDef, RejitHandlerModule* module, const FunctionInfoOld& functionInfo)
 {
     m_methodDef = methodDef;
     SetFunctionInfo(functionInfo);
@@ -39,14 +39,14 @@ void RejitHandlerModuleMethod::SetFunctionControl(ICorProfilerFunctionControl* p
     m_pFunctionControl = pFunctionControl;
 }
 
-FunctionInfo* RejitHandlerModuleMethod::GetFunctionInfo()
+FunctionInfoOld* RejitHandlerModuleMethod::GetFunctionInfo()
 {
     return m_functionInfo.get();
 }
 
-void RejitHandlerModuleMethod::SetFunctionInfo(const FunctionInfo& functionInfo)
+void RejitHandlerModuleMethod::SetFunctionInfo(const FunctionInfoOld& functionInfo)
 {
-    m_functionInfo = std::make_unique<FunctionInfo>(functionInfo);
+    m_functionInfo = std::make_unique<FunctionInfoOld>(functionInfo);
 }
 
 bool RejitHandlerModuleMethod::RequestRejitForInlinersInModule(ModuleID moduleId)
@@ -133,7 +133,7 @@ bool RejitHandlerModuleMethod::RequestRejitForInlinersInModule(ModuleID moduleId
 //
 
 TracerRejitHandlerModuleMethod::TracerRejitHandlerModuleMethod(
-    mdMethodDef methodDef, RejitHandlerModule* module, const FunctionInfo& functionInfo,
+    mdMethodDef methodDef, RejitHandlerModule* module, const FunctionInfoOld& functionInfo,
     const IntegrationDefinition& integrationDefinition) :
     RejitHandlerModuleMethod(methodDef, module, functionInfo),
     m_integrationDefinition(std::make_unique<IntegrationDefinition>(integrationDefinition))

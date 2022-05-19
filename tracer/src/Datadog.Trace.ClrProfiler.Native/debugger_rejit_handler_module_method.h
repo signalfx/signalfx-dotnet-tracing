@@ -20,7 +20,7 @@ private:
 public:
     DebuggerRejitHandlerModuleMethod(mdMethodDef methodDef, 
                                      RejitHandlerModule* module,
-                                     const FunctionInfo& functionInfo,
+                                     const FunctionInfoOld& functionInfo,
                                      const MethodProbeDefinition& methodProbe);
 
     MethodProbeDefinition* GetMethodProbeDefinition();
