@@ -406,10 +406,7 @@ jobs:
           5.0.405
           6.0.200
     - run: ./tracer/build.cmd BuildTracerHome PackageTracerHome BuildWindowsIntegrationTests PublishIisSamples -Framework ${{ matrix.framework }}
-    - name: docker-compose build IIS containers
-      run: docker-compose build --build-arg DOTNET_TRACER_MSI=.$relativeArtifacts/${{ matrix.platform }}/en-us/*.msi --build-arg ENABLE_32_BIT=${{ env.enable32bit }} IntegrationTests.IIS
-    - name: docker-compose start IIS containers
-      run: docker-compose up -d IntegrationTests.IIS
+    - run: docker-compose up -d IntegrationTests.IIS
     # Workaround around long name being hit in MultiDomainHostTests.WorksInsideTheGAC tests
     - name: RunWindowsIisIntegrationTests
       run: |
