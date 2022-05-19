@@ -432,7 +432,7 @@ enum MethodArgumentTypeFlag
 
 // Represents a segment inside a larger signature (Method Signature / Local Var Signature) of
 // an Argument, Local or Return Value.
-struct TypeSignature
+struct TypeSignatureOld
 {
     ULONG offset;
     ULONG length;
@@ -443,21 +443,21 @@ struct TypeSignature
     ULONG GetSignature(PCCOR_SIGNATURE& data) const;
 };
 
-struct FunctionMethodSignature
+struct FunctionMethodSignatureOld
 {
 private:
     PCCOR_SIGNATURE pbBase;
     unsigned len;
     ULONG numberOfTypeArguments = 0;
     ULONG numberOfArguments = 0;
-    TypeSignature returnValue{};
-    std::vector<TypeSignature> params;
+    TypeSignatureOld returnValue{};
+    std::vector<TypeSignatureOld> params;
 
 public:
-    FunctionMethodSignature() : pbBase(nullptr), len(0)
+    FunctionMethodSignatureOld() : pbBase(nullptr), len(0)
     {
     }
-    FunctionMethodSignature(PCCOR_SIGNATURE pb, unsigned cbBuffer)
+    FunctionMethodSignatureOld(PCCOR_SIGNATURE pb, unsigned cbBuffer)
     {
         pbBase = pb;
         len = cbBuffer;
@@ -474,16 +474,81 @@ public:
     {
         return shared::HexStr(pbBase, len);
     }
-    TypeSignature GetReturnValue() const
+    TypeSignatureOld GetReturnValue() const
     {
         return returnValue;
     }
-    const std::vector<TypeSignature>& GetMethodArguments() const
+    const std::vector<TypeSignatureOld>& GetMethodArguments() const
     {
         return params;
     }
     HRESULT TryParse();
-    bool operator==(const FunctionMethodSignature& other) const
+    bool operator==(const FunctionMethodSignatureOld& other) const
+    {
+        return memcmp(pbBase, other.pbBase, len);
+    }
+    CorCallingConvention CallingConvention() const
+    {
+        return CorCallingConvention(len == 0 ? 0 : pbBase[0]);
+    }
+    bool IsEmpty() const
+    {
+        return len == 0;
+    }
+};
+
+struct TypeSignatureNew
+{
+    ULONG offset;
+    ULONG length;
+    PCCOR_SIGNATURE pbBase;
+    mdToken GetTypeTok(ComPtr<IMetaDataEmit2>& pEmit, mdAssemblyRef corLibRef) const;
+    shared::WSTRING GetTypeTokName(ComPtr<IMetaDataImport2>& pImport) const;
+    std::tuple<unsigned, int> GetElementTypeAndFlags() const;
+    ULONG GetSignature(PCCOR_SIGNATURE& data) const;
+};
+
+struct FunctionMethodSignatureNew
+{
+private:
+    PCCOR_SIGNATURE pbBase;
+    unsigned len;
+    ULONG numberOfTypeArguments = 0;
+    ULONG numberOfArguments = 0;
+    TypeSignatureNew returnValue{};
+    std::vector<TypeSignatureNew> params;
+
+public:
+    FunctionMethodSignatureNew() : pbBase(nullptr), len(0)
+    {
+    }
+    FunctionMethodSignatureNew(PCCOR_SIGNATURE pb, unsigned cbBuffer)
+    {
+        pbBase = pb;
+        len = cbBuffer;
+    };
+    ULONG NumberOfTypeArguments() const
+    {
+        return numberOfTypeArguments;
+    }
+    ULONG NumberOfArguments() const
+    {
+        return numberOfArguments;
+    }
+    shared::WSTRING str() const
+    {
+        return shared::HexStr(pbBase, len);
+    }
+    TypeSignatureNew GetReturnValue() const
+    {
+        return returnValue;
+    }
+    const std::vector<TypeSignatureNew>& GetMethodArguments() const
+    {
+        return params;
+    }
+    HRESULT TryParse();
+    bool operator==(const FunctionMethodSignatureNew& other) const
     {
         return memcmp(pbBase, other.pbBase, len);
     }
@@ -503,13 +568,13 @@ private:
     PCCOR_SIGNATURE pbBase;
     unsigned len;
     ULONG numberOfLocals = 0;
-    std::vector<TypeSignature> locals;
+    std::vector<TypeSignatureOld> locals;
 
 public:
     FunctionLocalSignature() : pbBase(nullptr), len(0)
     {
     }
-    FunctionLocalSignature(PCCOR_SIGNATURE pb, unsigned cbBuffer, std::vector<TypeSignature>&& localsSigs) :
+    FunctionLocalSignature(PCCOR_SIGNATURE pb, unsigned cbBuffer, std::vector<TypeSignatureOld>&& localsSigs) :
         pbBase(pb), len(cbBuffer), numberOfLocals(static_cast<ULONG>(localsSigs.size())), locals(std::move(localsSigs))
     {
     }
@@ -521,11 +586,11 @@ public:
     {
         return shared::HexStr(pbBase, len);
     }
-    const std::vector<TypeSignature>& GetMethodLocals() const
+    const std::vector<TypeSignatureOld>& GetMethodLocals() const
     {
         return locals;
     }
-    static HRESULT TryParse(PCCOR_SIGNATURE pbBase, unsigned len, std::vector<TypeSignature>& locals);
+    static HRESULT TryParse(PCCOR_SIGNATURE pbBase, unsigned len, std::vector<TypeSignatureOld>& locals);
     bool operator==(const FunctionLocalSignature& other) const
     {
         return memcmp(pbBase, other.pbBase, len);
@@ -545,7 +610,7 @@ struct FunctionInfoOld
     const MethodSignature signature;
     const MethodSignature function_spec_signature;
     const mdToken method_def_id;
-    FunctionMethodSignature method_signature;
+    FunctionMethodSignatureOld method_signature;
 
     FunctionInfoOld() : id(0), name(shared::EmptyWStr), type({}), is_generic(false), method_def_id(0), method_signature({})
     {
@@ -553,7 +618,7 @@ struct FunctionInfoOld
 
     FunctionInfoOld(mdToken id, shared::WSTRING name, TypeInfoOld type, MethodSignature signature,
                  MethodSignature function_spec_signature, mdToken method_def_id,
-                 FunctionMethodSignature method_signature) :
+                 FunctionMethodSignatureOld method_signature) :
         id(id),
         name(name),
         type(type),
@@ -566,7 +631,7 @@ struct FunctionInfoOld
     }
 
     FunctionInfoOld(mdToken id, shared::WSTRING name, TypeInfoOld type, MethodSignature signature,
-                 FunctionMethodSignature method_signature) :
+                 FunctionMethodSignatureOld method_signature) :
         id(id),
         name(name),
         type(type),
@@ -588,14 +653,14 @@ struct FunctionInfoNew
     const mdToken id;
     const shared::WSTRING name;
     const TypeInfoNew type;
-    FunctionMethodSignature method_signature;
+    FunctionMethodSignatureNew method_signature;
 
     FunctionInfoNew() : id(0), name(shared::EmptyWStr), type({}), method_signature({})
     {
     }
 
     FunctionInfoNew(mdToken id, shared::WSTRING name, TypeInfoNew type,
-                 FunctionMethodSignature method_signature) :
+                 FunctionMethodSignatureNew method_signature) :
         id(id),
         name(name),
         type(type),

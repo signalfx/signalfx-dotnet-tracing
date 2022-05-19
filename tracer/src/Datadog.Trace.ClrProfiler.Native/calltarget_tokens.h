@@ -46,9 +46,9 @@ private:
     mdMemberRef GetCallTargetStateDefaultMemberRef();
     mdMemberRef GetCallTargetReturnVoidDefaultMemberRef();
     mdMemberRef GetCallTargetReturnValueDefaultMemberRef(mdTypeSpec callTargetReturnTypeSpec);
-    mdMethodSpec GetCallTargetDefaultValueMethodSpec(TypeSignature* methodArgument);
+    mdMethodSpec GetCallTargetDefaultValueMethodSpec(TypeSignatureOld* methodArgument);
 
-    HRESULT ModifyLocalSig(ILRewriter* reWriter, TypeSignature* methodReturnValue, ULONG* callTargetStateIndex,
+    HRESULT ModifyLocalSig(ILRewriter* reWriter, TypeSignatureOld* methodReturnValue, ULONG* callTargetStateIndex,
                            ULONG* exceptionIndex, ULONG* callTargetReturnIndex, ULONG* returnValueIndex,
                            mdToken* callTargetStateToken, mdToken* exceptionToken, mdToken* callTargetReturnToken);
 
@@ -63,7 +63,7 @@ protected:
 
     ModuleMetadata* GetMetadata();
     HRESULT EnsureBaseCalltargetTokens();
-    mdTypeSpec GetTargetReturnValueTypeRef(TypeSignature* returnArgument);
+    mdTypeSpec GetTargetReturnValueTypeRef(TypeSignatureOld* returnArgument);
     mdToken GetCurrentTypeRef(const TypeInfoOld* currentType, bool& isValueType);
 
     virtual const shared::WSTRING& GetCallTargetType() = 0;

@@ -156,7 +156,7 @@ TracerTokens::TracerTokens(ModuleMetadata* module_metadata_ptr, const bool enabl
 
 HRESULT TracerTokens::WriteBeginMethod(void* rewriterWrapperPtr, mdTypeRef integrationTypeRef,
                                            const TypeInfoOld* currentType,
-                                           const std::vector<TypeSignature>& methodArguments,
+                                           const std::vector<TypeSignatureOld>& methodArguments,
                                            const bool ignoreByRefInstrumentation,
                                            ILInstr** instruction)
 {
@@ -433,7 +433,7 @@ HRESULT TracerTokens::WriteEndVoidReturnMemberRef(void* rewriterWrapperPtr, mdTy
 
 // endmethod with return type
 HRESULT TracerTokens::WriteEndReturnMemberRef(void* rewriterWrapperPtr, mdTypeRef integrationTypeRef,
-                                                  const TypeInfoOld* currentType, TypeSignature* returnArgument,
+                                                  const TypeInfoOld* currentType, TypeSignatureOld* returnArgument,
                                                   ILInstr** instruction)
 {
     auto hr = EnsureBaseCalltargetTokens();

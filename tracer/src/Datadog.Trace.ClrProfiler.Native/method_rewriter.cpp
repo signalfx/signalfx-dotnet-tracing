@@ -96,15 +96,15 @@ HRESULT TracerMethodRewriter::Rewrite(RejitHandlerModule* moduleHandler, RejitHa
     FunctionInfoOld* caller = methodHandler->GetFunctionInfo();
     TracerTokens* tracerTokens = module_metadata.GetTracerTokens();
     mdToken function_token = caller->id;
-    TypeSignature retFuncArg = caller->method_signature.GetReturnValue();
+    TypeSignatureOld retFuncArg = caller->method_signature.GetReturnValue();
     IntegrationDefinition* integration_definition = tracerMethodHandler->GetIntegrationDefinition();
     bool is_integration_method = integration_definition->target_method.type.assembly.name != tracemethodintegration_assemblyname;
     bool ignoreByRefInstrumentation = !is_integration_method;
     const auto [retFuncElementType, retTypeFlags] = retFuncArg.GetElementTypeAndFlags();
     bool isVoid = (retTypeFlags & TypeFlagVoid) > 0;
     bool isStatic = !(caller->method_signature.CallingConvention() & IMAGE_CEE_CS_CALLCONV_HASTHIS);
-    std::vector<trace::TypeSignature> methodArguments = caller->method_signature.GetMethodArguments();
-    std::vector<trace::TypeSignature> traceAnnotationArguments;
+    std::vector<trace::TypeSignatureOld> methodArguments = caller->method_signature.GetMethodArguments();
+    std::vector<trace::TypeSignatureOld> traceAnnotationArguments;
     COR_SIGNATURE runtimeMethodHandleBuffer[10];
     COR_SIGNATURE runtimeTypeHandleBuffer[10];
     int numArgs = caller->method_signature.NumberOfArguments();
@@ -301,13 +301,13 @@ HRESULT TracerMethodRewriter::Rewrite(RejitHandlerModule* moduleHandler, RejitHa
             CorSigCompressToken(tracerTokens->GetRuntimeTypeHandleTypeRef(), &runtimeTypeHandleBuffer[1]);
 
         // Replace method arguments with one RuntimeMethodHandle argument and one RuntimeTypeHandle argument
-        trace::TypeSignature runtimeMethodHandleArgument{};
+        trace::TypeSignatureOld runtimeMethodHandleArgument{};
         runtimeMethodHandleArgument.pbBase = runtimeMethodHandleBuffer;
         runtimeMethodHandleArgument.length = runtimeMethodHandleTokenLength + 1;
         runtimeMethodHandleArgument.offset = 0;
         traceAnnotationArguments.push_back(runtimeMethodHandleArgument);
 
-        trace::TypeSignature runtimeTypeHandleArgument{};
+        trace::TypeSignatureOld runtimeTypeHandleArgument{};
         runtimeTypeHandleArgument.pbBase = runtimeTypeHandleBuffer;
         runtimeTypeHandleArgument.length = runtimeTypeHandleTokenLength + 1;
         runtimeTypeHandleArgument.offset = 0;

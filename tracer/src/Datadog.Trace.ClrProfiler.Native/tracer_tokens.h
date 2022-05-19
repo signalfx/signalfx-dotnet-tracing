@@ -30,14 +30,14 @@ public:
                  const bool enableCallTargetStateByRef);
 
     HRESULT WriteBeginMethod(void* rewriterWrapperPtr, mdTypeRef integrationTypeRef, const TypeInfoOld* currentType,
-                             const std::vector<TypeSignature>& methodArguments,
+                             const std::vector<TypeSignatureOld>& methodArguments,
                              const bool ignoreByRefInstrumentation, ILInstr** instruction);
 
     HRESULT WriteEndVoidReturnMemberRef(void* rewriterWrapperPtr, mdTypeRef integrationTypeRef,
                                         const TypeInfoOld* currentType, ILInstr** instruction);
 
     HRESULT WriteEndReturnMemberRef(void* rewriterWrapperPtr, mdTypeRef integrationTypeRef, const TypeInfoOld* currentType,
-                                    TypeSignature* returnArgument, ILInstr** instruction);
+                                    TypeSignatureOld* returnArgument, ILInstr** instruction);
 
     HRESULT WriteLogException(void* rewriterWrapperPtr, mdTypeRef integrationTypeRef, const TypeInfoOld* currentType,
                               ILInstr** instruction);

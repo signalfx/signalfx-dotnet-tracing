@@ -265,7 +265,7 @@ mdMemberRef CallTargetTokens::GetCallTargetReturnValueDefaultMemberRef(mdTypeSpe
     return callTargetReturnTypeGetDefault;
 }
 
-mdMethodSpec CallTargetTokens::GetCallTargetDefaultValueMethodSpec(TypeSignature* methodArgument)
+mdMethodSpec CallTargetTokens::GetCallTargetDefaultValueMethodSpec(TypeSignatureOld* methodArgument)
 {
     auto hr = EnsureBaseCalltargetTokens();
     if (FAILED(hr))
@@ -327,7 +327,7 @@ mdMethodSpec CallTargetTokens::GetCallTargetDefaultValueMethodSpec(TypeSignature
     return getDefaultMethodSpec;
 }
 
-HRESULT CallTargetTokens::ModifyLocalSig(ILRewriter* reWriter, TypeSignature* methodReturnValue,
+HRESULT CallTargetTokens::ModifyLocalSig(ILRewriter* reWriter, TypeSignatureOld* methodReturnValue,
                                          ULONG* callTargetStateIndex, ULONG* exceptionIndex,
                                          ULONG* callTargetReturnIndex, ULONG* returnValueIndex,
                                          mdToken* callTargetStateToken, mdToken* exceptionToken,
@@ -624,7 +624,7 @@ HRESULT CallTargetTokens::EnsureBaseCalltargetTokens()
     return S_OK;
 }
 
-mdTypeSpec CallTargetTokens::GetTargetReturnValueTypeRef(TypeSignature* returnArgument)
+mdTypeSpec CallTargetTokens::GetTargetReturnValueTypeRef(TypeSignatureOld* returnArgument)
 {
     auto hr = EnsureBaseCalltargetTokens();
     if (FAILED(hr))

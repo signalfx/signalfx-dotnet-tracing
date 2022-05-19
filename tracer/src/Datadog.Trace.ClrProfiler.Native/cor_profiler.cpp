@@ -2673,7 +2673,7 @@ HRESULT CorProfiler::GenerateVoidILStartupMethod(const ModuleID module_id, mdMet
         mdToken token = 0;
         TypeInfoOld typeInfo{};
         shared::WSTRING methodName = WStr("__DDVoidMethodCall__");
-        FunctionInfoOld caller(token, methodName, typeInfo, MethodSignature(), FunctionMethodSignature());
+        FunctionInfoOld caller(token, methodName, typeInfo, MethodSignature(), FunctionMethodSignatureOld());
         Logger::Info(
             GetILCodes("*** GenerateVoidILStartupMethod(): Modified Code: ", &rewriter_void, caller, metadata_import));
     }

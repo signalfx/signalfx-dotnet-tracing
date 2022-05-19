@@ -426,7 +426,7 @@ private:
         }
         
         // try to list arguments type
-        FunctionMethodSignature function_method_signature = function_info.method_signature;
+        FunctionMethodSignatureNew function_method_signature = function_info.method_signature;
         hr = function_method_signature.TryParse();
         if (FAILED(hr))
         {
