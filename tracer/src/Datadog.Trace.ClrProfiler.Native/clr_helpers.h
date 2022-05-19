@@ -404,8 +404,6 @@ struct TypeInfoNew
     const mdTypeSpec type_spec;
     const ULONG32 token_type;
     std::shared_ptr<TypeInfoNew> extend_from;
-    const bool valueType;
-    const bool isGeneric;
     std::shared_ptr<TypeInfoNew> parent_type; // needed
 
     TypeInfoNew() :
@@ -414,21 +412,17 @@ struct TypeInfoNew
         type_spec(0),
         token_type(0),
         extend_from(nullptr),
-        valueType(false),
-        isGeneric(false),
         parent_type(nullptr)
     {
     }
     TypeInfoNew(mdToken id, shared::WSTRING name, mdTypeSpec type_spec, ULONG32 token_type,
-                std::shared_ptr<TypeInfoNew> extend_from, bool valueType, bool isGeneric,
+                std::shared_ptr<TypeInfoNew> extend_from,
                 std::shared_ptr<TypeInfoNew> parent_type) :
         id(id),
         name(name),
         type_spec(type_spec),
         token_type(token_type),
         extend_from(extend_from),
-        valueType(valueType),
-        isGeneric(isGeneric),
         parent_type(parent_type)
     {
     }

@@ -370,8 +370,6 @@ TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, cons
     DWORD type_flags;
     std::shared_ptr<TypeInfoNew> extendsInfo = nullptr;
     mdToken type_extends = mdTokenNil;
-    bool type_valueType = false;
-    bool type_isGeneric = false;
 
     HRESULT hr = E_FAIL;
     const auto token_type = TypeFromToken(token);
@@ -391,8 +389,6 @@ TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, cons
             if (type_extends != mdTokenNil)
             {
                 extendsInfo = std::make_shared<TypeInfoNew>(GetTypeInfoNew(metadata_import, type_extends));
-                type_valueType =
-                    extendsInfo->name == WStr("System.ValueType") || extendsInfo->name == WStr("System.Enum");
             }
             break;
         case mdtTypeRef:
@@ -416,8 +412,8 @@ TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, cons
                 CorSigUncompressToken(&signature[2], &type_token);
                 const auto baseType = GetTypeInfoNew(metadata_import, type_token);
                 return {baseType.id,        baseType.name,        token,
-                        token_type,         baseType.extend_from, baseType.valueType,
-                        baseType.isGeneric, baseType.parent_type};
+                        token_type,         baseType.extend_from,
+                        baseType.parent_type};
             }
         }
         break;
@@ -437,15 +433,8 @@ TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, cons
     }
 
     const auto type_name_string = shared::WSTRING(type_name);
-    const auto generic_token_index = type_name_string.rfind(WStr("`"));
-    if (generic_token_index != std::string::npos)
-    {
-        const auto idxFromRight = type_name_string.length() - generic_token_index - 1;
-        type_isGeneric = idxFromRight == 1 || idxFromRight == 2;
-    }
-
-    return {token,          type_name_string, mdTypeSpecNil,  token_type,  extendsInfo,
-            type_valueType, type_isGeneric,   parentTypeInfo};
+    
+    return {token, type_name_string, mdTypeSpecNil,  token_type,  extendsInfo, parentTypeInfo};
 }
 
 // Searches for an AssemblyRef whose name and version match exactly.
