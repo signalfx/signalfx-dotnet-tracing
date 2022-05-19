@@ -3,7 +3,6 @@ using Nuke.Common.Tools.DotNet;
 using Nuke.Common.IO;
 using System.Linq;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.MSBuild;
 using static Nuke.Common.EnvironmentInfo;
