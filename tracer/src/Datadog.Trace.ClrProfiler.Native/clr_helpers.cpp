@@ -368,8 +368,6 @@ TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, cons
     WCHAR type_name[kNameMaxSize]{};
     DWORD type_name_len = 0;
     DWORD type_flags;
-    std::shared_ptr<TypeInfoNew> extendsInfo = nullptr;
-    mdToken type_extends = mdTokenNil;
 
     HRESULT hr = E_FAIL;
     const auto token_type = TypeFromToken(token);
@@ -377,18 +375,12 @@ TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, cons
     switch (token_type)
     {
         case mdtTypeDef:
-            hr = metadata_import->GetTypeDefProps(token, type_name, kNameMaxSize, &type_name_len, &type_flags,
-                                                  &type_extends);
+            hr = metadata_import->GetTypeDefProps(token, type_name, kNameMaxSize, &type_name_len, &type_flags, nullptr);
 
             metadata_import->GetNestedClassProps(token, &parent_type_token);
             if (parent_type_token != mdTokenNil)
             {
                 parentTypeInfo = std::make_shared<TypeInfoNew>(GetTypeInfoNew(metadata_import, parent_type_token));
-            }
-
-            if (type_extends != mdTokenNil)
-            {
-                extendsInfo = std::make_shared<TypeInfoNew>(GetTypeInfoNew(metadata_import, type_extends));
             }
             break;
         case mdtTypeRef:
@@ -412,8 +404,7 @@ TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, cons
                 CorSigUncompressToken(&signature[2], &type_token);
                 const auto baseType = GetTypeInfoNew(metadata_import, type_token);
                 return {baseType.id,        baseType.name,        token,
-                        token_type,         baseType.extend_from,
-                        baseType.parent_type};
+                        token_type, baseType.parent_type};
             }
         }
         break;
@@ -434,7 +425,7 @@ TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, cons
 
     const auto type_name_string = shared::WSTRING(type_name);
     
-    return {token, type_name_string, mdTypeSpecNil,  token_type,  extendsInfo, parentTypeInfo};
+    return {token, type_name_string, mdTypeSpecNil, token_type, parentTypeInfo};
 }
 
 // Searches for an AssemblyRef whose name and version match exactly.
