@@ -355,3 +355,6 @@ tracer/test/test-applications/integrations/dependency-libs/Samples.AlwaysOnProfi
 
 .ionide/
 /devenv.bat
+
+# benchmark test results directory
+/dev-aop/results
