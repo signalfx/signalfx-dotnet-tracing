@@ -630,11 +630,11 @@ struct FunctionInfoNew
     }
 
     FunctionInfoNew(mdToken id, shared::WSTRING name, TypeInfoNew type, MethodSignature signature,
-                 FunctionMethodSignature method_signature) :
+                 FunctionMethodSignature method_signature, BOOL is_generic) :
         id(id),
         name(name),
         type(type),
-        is_generic(false),
+        is_generic(is_generic),
         signature(signature),
         method_signature(method_signature)
     {
