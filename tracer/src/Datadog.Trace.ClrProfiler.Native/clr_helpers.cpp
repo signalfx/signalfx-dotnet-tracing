@@ -885,7 +885,7 @@ shared::WSTRING GetSigTypeTokNameNew(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaD
     return tokenName;
 }
 
-shared::WSTRING TypeSignature::GetTypeTokNameOld(ComPtr<IMetaDataImport2>& pImport) const
+shared::WSTRING TypeSignature::GetTypeTokName(ComPtr<IMetaDataImport2>& pImport) const
 {
     PCCOR_SIGNATURE pbCur = &pbBase[offset];
     return GetSigTypeTokNameOld(pbCur, pImport);
