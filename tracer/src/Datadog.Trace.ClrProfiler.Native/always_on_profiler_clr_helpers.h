@@ -21,30 +21,22 @@ constexpr auto kGenericParamsOpeningBrace = WStr("[");
 constexpr auto kGenericParamsClosingBrace = WStr("]");
 constexpr auto kFunctionParamsOpeningBrace = WStr("(");
 constexpr auto kFunctionParamsClosingBrace = WStr(")");
+constexpr auto name_separator = WStr(".");
 
 struct TypeInfoNew
 {
     const mdToken id;
     const shared::WSTRING name;
-    std::shared_ptr<TypeInfoNew> parent_type;
 
     TypeInfoNew() :
         id(0),
-        name(shared::EmptyWStr),
-        parent_type(nullptr)
+        name(shared::EmptyWStr)
     {
     }
-    TypeInfoNew(const mdToken id, const shared::WSTRING name,
-                const std::shared_ptr<TypeInfoNew> parent_type) :
+    TypeInfoNew(const mdToken id, const shared::WSTRING name) :
         id(id),
-        name(name),
-        parent_type(parent_type)
+        name(name)
     {
-    }
-
-    bool IsValid() const
-    {
-        return id != 0;
     }
 };
 

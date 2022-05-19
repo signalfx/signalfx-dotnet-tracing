@@ -115,7 +115,7 @@ TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, cons
                 mdToken type_token;
                 CorSigUncompressToken(&signature[2], &type_token);
                 const auto baseType = GetTypeInfoNew(metadata_import, type_token);
-                return {baseType.id, baseType.name, baseType.parent_type};
+                return {baseType.id, baseType.name};
             }
         }
         break;
@@ -131,9 +131,17 @@ TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, cons
         return {};
     }
 
-    const auto type_name_string = shared::WSTRING(type_name);
-    
-    return {token, type_name_string, parentTypeInfo};
+    shared::WSTRING type_name_string;
+
+    if (parentTypeInfo != nullptr)
+    {
+        type_name_string = parentTypeInfo->name + name_separator + shared::WSTRING(type_name);
+    }
+    else
+    {
+        type_name_string = shared::WSTRING(type_name);
+    }
+    return {token, type_name_string};
 }
 
 shared::WSTRING ExtractParameterName(PCCOR_SIGNATURE& pb_cur, const ComPtr<IMetaDataImport2>& metadata_import,

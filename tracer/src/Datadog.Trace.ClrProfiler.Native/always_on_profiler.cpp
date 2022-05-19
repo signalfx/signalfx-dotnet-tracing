@@ -302,7 +302,6 @@ private:
     {
         constexpr auto unknown_list_of_arguments = WStr("(unknown)");
         constexpr auto unknown_function_name = WStr("Unknown(unknown)");
-        constexpr auto name_separator = WStr(".");
 
         if (!function_identifier.is_valid)
         {
@@ -334,23 +333,6 @@ private:
             Logger::Debug("GetFunctionInfo failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
             result.append(unknown_function_name);
             return;
-        }
-
-        if (function_info.type.parent_type != nullptr)
-        {
-            // parent class is available only for internal classes.
-            // See the class in the test application:  My.Custom.Test.Namespace.ClassA.InternalClassB.DoubleInternalClassB.TripleInternalClassB
-            std::shared_ptr<TypeInfoNew> parent_type = function_info.type.parent_type;
-            shared::WSTRING prefix = parent_type->name;
-            while (parent_type->parent_type != nullptr)
-            {
-                // TODO splunk: address warning
-                prefix = parent_type->parent_type->name + name_separator + prefix;
-                parent_type = parent_type->parent_type;
-            }
-
-            result.append(prefix);
-            result.append(name_separator);
         }
 
         result.append(function_info.type.name);
