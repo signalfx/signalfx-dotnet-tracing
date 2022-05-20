@@ -106,12 +106,4 @@ FunctionInfoNew GetFunctionInfoNew(const ComPtr<IMetaDataImport2>& metadata_impo
 
 TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token);
 
-mdAssemblyRef FindAssemblyRef(const ComPtr<IMetaDataAssemblyImport>& assembly_import,
-                              const shared::WSTRING& assembly_name, const Version& version);
-
-HRESULT GetCorLibAssemblyRef(const ComPtr<IMetaDataAssemblyEmit>& assembly_emit, AssemblyProperty& corAssemblyProperty,
-                             mdAssemblyRef* corlib_ref);
-
-bool FindTypeDefByName(const shared::WSTRING instrumentationTargetMethodTypeName, const shared::WSTRING assemblyName,
-                       const ComPtr<IMetaDataImport2>& metadata_import, mdTypeDef& typeDef);
 } // namespace trace
