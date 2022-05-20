@@ -40,7 +40,7 @@ TEST(LoggerTest, EnsureLogFilesAreFoundAtDefaultLocation)
     Log::Error(expectedString);
 
     std::string applicationNameNoExtension = fs::path(::shared::ToString(::shared::GetCurrentProcessName())).replace_extension().string();
-    std::string expectedLogFilename = "dotNet-profiler-native-" + applicationNameNoExtension + "-" + std::to_string(::shared::GetPID()) + ".log ";
+    std::string expectedLogFilename = "dotNet-profiler-native-" + applicationNameNoExtension + "-" + std::to_string(::shared::GetPID()) + ".log";
 
     fs::path expectedLogFileFullPath =
 #ifdef _WINDOWS

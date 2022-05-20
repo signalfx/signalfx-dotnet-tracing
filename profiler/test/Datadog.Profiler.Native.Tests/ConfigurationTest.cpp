@@ -116,7 +116,7 @@ TEST(ConfigurationTest, CheckDefaultLogDirectoryWhenVariableIsNotSet)
 #ifdef _WINDOWS
         WStr("C:\\ProgramData\\SignalFx .NET Tracing\\logs\\DotNet");
 #else
-        WStr("/var/log/signalfx/");
+        WStr("/var/log/signalfx/dotnet");
 #endif
     ASSERT_EQ(expectedValue, configuration.GetLogDirectory());
 }
