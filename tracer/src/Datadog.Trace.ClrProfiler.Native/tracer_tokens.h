@@ -17,7 +17,7 @@ private:
     mdMemberRef logExceptionRef = mdMemberRefNil;
 
     HRESULT WriteBeginMethodWithArgumentsArray(void* rewriterWrapperPtr, mdTypeRef integrationTypeRef,
-                                               const TypeInfoOld* currentType, ILInstr** instruction);
+                                               const TypeInfo* currentType, ILInstr** instruction);
 
 protected:
     const shared::WSTRING& GetCallTargetType() override;
@@ -29,17 +29,17 @@ public:
     TracerTokens(ModuleMetadata* module_metadata_ptr, const bool enableByRefInstrumentation,
                  const bool enableCallTargetStateByRef);
 
-    HRESULT WriteBeginMethod(void* rewriterWrapperPtr, mdTypeRef integrationTypeRef, const TypeInfoOld* currentType,
-                             const std::vector<TypeSignatureOld>& methodArguments,
+    HRESULT WriteBeginMethod(void* rewriterWrapperPtr, mdTypeRef integrationTypeRef, const TypeInfo* currentType,
+                             const std::vector<TypeSignature>& methodArguments,
                              const bool ignoreByRefInstrumentation, ILInstr** instruction);
 
     HRESULT WriteEndVoidReturnMemberRef(void* rewriterWrapperPtr, mdTypeRef integrationTypeRef,
-                                        const TypeInfoOld* currentType, ILInstr** instruction);
+                                        const TypeInfo* currentType, ILInstr** instruction);
 
-    HRESULT WriteEndReturnMemberRef(void* rewriterWrapperPtr, mdTypeRef integrationTypeRef, const TypeInfoOld* currentType,
-                                    TypeSignatureOld* returnArgument, ILInstr** instruction);
+    HRESULT WriteEndReturnMemberRef(void* rewriterWrapperPtr, mdTypeRef integrationTypeRef, const TypeInfo* currentType,
+                                    TypeSignature* returnArgument, ILInstr** instruction);
 
-    HRESULT WriteLogException(void* rewriterWrapperPtr, mdTypeRef integrationTypeRef, const TypeInfoOld* currentType,
+    HRESULT WriteLogException(void* rewriterWrapperPtr, mdTypeRef integrationTypeRef, const TypeInfo* currentType,
                               ILInstr** instruction);
 };
 

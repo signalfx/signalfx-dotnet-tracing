@@ -353,19 +353,19 @@ struct ModuleInfo
     }
 };
 
-struct TypeInfoOld
+struct TypeInfo
 {
     const mdToken id;
     const shared::WSTRING name;
     const mdTypeSpec type_spec;
     const ULONG32 token_type;
-    std::shared_ptr<TypeInfoOld> extend_from;
+    std::shared_ptr<TypeInfo> extend_from;
     const bool valueType;
     const bool isGeneric;
-    std::shared_ptr<TypeInfoOld> parent_type;
+    std::shared_ptr<TypeInfo> parent_type;
     const mdToken scopeToken;
 
-    TypeInfoOld() :
+    TypeInfo() :
         id(0),
         name(shared::EmptyWStr),
         type_spec(0),
@@ -377,8 +377,8 @@ struct TypeInfoOld
         scopeToken(0)
     {
     }
-    TypeInfoOld(mdToken id, shared::WSTRING name, mdTypeSpec type_spec, ULONG32 token_type, std::shared_ptr<TypeInfoOld> extend_from,
-             bool valueType, bool isGeneric, std::shared_ptr<TypeInfoOld> parent_type, mdToken scopeToken) :
+    TypeInfo(mdToken id, shared::WSTRING name, mdTypeSpec type_spec, ULONG32 token_type, std::shared_ptr<TypeInfo> extend_from,
+             bool valueType, bool isGeneric, std::shared_ptr<TypeInfo> parent_type, mdToken scopeToken) :
         id(id),
         name(name),
         type_spec(type_spec),
@@ -406,7 +406,7 @@ enum MethodArgumentTypeFlag
 
 // Represents a segment inside a larger signature (Method Signature / Local Var Signature) of
 // an Argument, Local or Return Value.
-struct TypeSignatureOld
+struct TypeSignature
 {
     ULONG offset;
     ULONG length;
@@ -417,21 +417,21 @@ struct TypeSignatureOld
     ULONG GetSignature(PCCOR_SIGNATURE& data) const;
 };
 
-struct FunctionMethodSignatureOld
+struct FunctionMethodSignature
 {
 private:
     PCCOR_SIGNATURE pbBase;
     unsigned len;
     ULONG numberOfTypeArguments = 0;
     ULONG numberOfArguments = 0;
-    TypeSignatureOld returnValue{};
-    std::vector<TypeSignatureOld> params;
+    TypeSignature returnValue{};
+    std::vector<TypeSignature> params;
 
 public:
-    FunctionMethodSignatureOld() : pbBase(nullptr), len(0)
+    FunctionMethodSignature() : pbBase(nullptr), len(0)
     {
     }
-    FunctionMethodSignatureOld(PCCOR_SIGNATURE pb, unsigned cbBuffer)
+    FunctionMethodSignature(PCCOR_SIGNATURE pb, unsigned cbBuffer)
     {
         pbBase = pb;
         len = cbBuffer;
@@ -448,16 +448,16 @@ public:
     {
         return shared::HexStr(pbBase, len);
     }
-    TypeSignatureOld GetReturnValue() const
+    TypeSignature GetReturnValue() const
     {
         return returnValue;
     }
-    const std::vector<TypeSignatureOld>& GetMethodArguments() const
+    const std::vector<TypeSignature>& GetMethodArguments() const
     {
         return params;
     }
     HRESULT TryParse();
-    bool operator==(const FunctionMethodSignatureOld& other) const
+    bool operator==(const FunctionMethodSignature& other) const
     {
         return memcmp(pbBase, other.pbBase, len);
     }
@@ -477,13 +477,13 @@ private:
     PCCOR_SIGNATURE pbBase;
     unsigned len;
     ULONG numberOfLocals = 0;
-    std::vector<TypeSignatureOld> locals;
+    std::vector<TypeSignature> locals;
 
 public:
     FunctionLocalSignature() : pbBase(nullptr), len(0)
     {
     }
-    FunctionLocalSignature(PCCOR_SIGNATURE pb, unsigned cbBuffer, std::vector<TypeSignatureOld>&& localsSigs) :
+    FunctionLocalSignature(PCCOR_SIGNATURE pb, unsigned cbBuffer, std::vector<TypeSignature>&& localsSigs) :
         pbBase(pb), len(cbBuffer), numberOfLocals(static_cast<ULONG>(localsSigs.size())), locals(std::move(localsSigs))
     {
     }
@@ -495,11 +495,11 @@ public:
     {
         return shared::HexStr(pbBase, len);
     }
-    const std::vector<TypeSignatureOld>& GetMethodLocals() const
+    const std::vector<TypeSignature>& GetMethodLocals() const
     {
         return locals;
     }
-    static HRESULT TryParse(PCCOR_SIGNATURE pbBase, unsigned len, std::vector<TypeSignatureOld>& locals);
+    static HRESULT TryParse(PCCOR_SIGNATURE pbBase, unsigned len, std::vector<TypeSignature>& locals);
     bool operator==(const FunctionLocalSignature& other) const
     {
         return memcmp(pbBase, other.pbBase, len);
@@ -510,24 +510,24 @@ public:
     }
 };
 
-struct FunctionInfoOld
+struct FunctionInfo
 {
     const mdToken id;
     const shared::WSTRING name;
-    const TypeInfoOld type;
+    const TypeInfo type;
     const BOOL is_generic;
     const MethodSignature signature;
     const MethodSignature function_spec_signature;
     const mdToken method_def_id;
-    FunctionMethodSignatureOld method_signature;
+    FunctionMethodSignature method_signature;
 
-    FunctionInfoOld() : id(0), name(shared::EmptyWStr), type({}), is_generic(false), method_def_id(0), method_signature({})
+    FunctionInfo() : id(0), name(shared::EmptyWStr), type({}), is_generic(false), method_def_id(0), method_signature({})
     {
     }
 
-    FunctionInfoOld(mdToken id, shared::WSTRING name, TypeInfoOld type, MethodSignature signature,
+    FunctionInfo(mdToken id, shared::WSTRING name, TypeInfo type, MethodSignature signature,
                  MethodSignature function_spec_signature, mdToken method_def_id,
-                 FunctionMethodSignatureOld method_signature) :
+                 FunctionMethodSignature method_signature) :
         id(id),
         name(name),
         type(type),
@@ -539,8 +539,8 @@ struct FunctionInfoOld
     {
     }
 
-    FunctionInfoOld(mdToken id, shared::WSTRING name, TypeInfoOld type, MethodSignature signature,
-                 FunctionMethodSignatureOld method_signature) :
+    FunctionInfo(mdToken id, shared::WSTRING name, TypeInfo type, MethodSignature signature,
+                 FunctionMethodSignature method_signature) :
         id(id),
         name(name),
         type(type),
@@ -566,11 +566,11 @@ AssemblyMetadata GetAssemblyImportMetadata(const ComPtr<IMetaDataAssemblyImport>
 AssemblyMetadata GetReferencedAssemblyMetadata(const ComPtr<IMetaDataAssemblyImport>& assembly_import,
                                                const mdAssemblyRef& assembly_ref);
 
-FunctionInfoOld GetFunctionInfoOld(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token);
+FunctionInfo GetFunctionInfo(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token);
 
 ModuleInfo GetModuleInfo(ICorProfilerInfo4* info, const ModuleID& module_id);
 
-TypeInfoOld GetTypeInfoOld(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token);
+TypeInfo GetTypeInfo(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token);
 
 mdAssemblyRef FindAssemblyRef(const ComPtr<IMetaDataAssemblyImport>& assembly_import,
                               const shared::WSTRING& assembly_name, const Version& version);

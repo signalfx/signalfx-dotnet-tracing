@@ -13,7 +13,7 @@ class RejitHandler;
 class RejitWorkOffloader;
 class RejitHandlerModuleMethod;
 class RejitHandlerModule;
-struct FunctionInfoOld;
+struct FunctionInfo;
 
 /// <summary>
 /// Responsible to determine what are the methods that should be rejitted and prepares the metadata needed in the rewriting process.
@@ -37,7 +37,7 @@ protected:
     virtual const bool GetIsExactSignatureMatch(const RejitRequestDefinition& definition) = 0;
     virtual const std::unique_ptr<RejitHandlerModuleMethod> CreateMethod(const mdMethodDef methodDef,
                                                                          RejitHandlerModule* module,
-                                                                         const FunctionInfoOld& functionInfo,
+                                                                         const FunctionInfo& functionInfo,
                                                                          const RejitRequestDefinition& definition) = 0;
 
 public:
@@ -65,7 +65,7 @@ protected:
     virtual const bool GetIsDerived(const IntegrationDefinition& definition) final;
     virtual const bool GetIsExactSignatureMatch(const IntegrationDefinition& definition) final;
     virtual const std::unique_ptr<RejitHandlerModuleMethod>
-    CreateMethod(const mdMethodDef methodDef, RejitHandlerModule* module, const FunctionInfoOld& functionInfo,
+    CreateMethod(const mdMethodDef methodDef, RejitHandlerModule* module, const FunctionInfo& functionInfo,
                  const IntegrationDefinition& integrationDefinition) final;
 };
 

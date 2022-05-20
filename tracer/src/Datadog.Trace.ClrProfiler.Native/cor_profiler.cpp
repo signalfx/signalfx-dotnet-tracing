@@ -412,7 +412,7 @@ void CorProfiler::RewritingPInvokeMaps(const ModuleMetadata& module_metadata, co
             {
                 auto methodDef = *enumIterator;
 
-                const auto& caller = GetFunctionInfoOld(module_metadata.metadata_import, methodDef);
+                const auto& caller = GetFunctionInfo(module_metadata.metadata_import, methodDef);
                 Logger::Info("Rewriting PInvoke method: ", caller.name);
 
                 // Get the current PInvoke map to extract the flags and the entrypoint name
@@ -871,7 +871,7 @@ HRESULT CorProfiler::TryRejitModule(ModuleID module_id)
 
                                 // Matches! Let's mark the attached method for ReJIT
                                 // Extract the function info from the mdMethodDef
-                                const auto caller = GetFunctionInfoOld(metadata_import, methodDef);
+                                const auto caller = GetFunctionInfo(metadata_import, methodDef);
                                 if (!caller.IsValid())
                                 {
                                     Logger::Warn("    * The caller for the methoddef: ",
@@ -882,7 +882,7 @@ HRESULT CorProfiler::TryRejitModule(ModuleID module_id)
 
                                 // We create a new function info into the heap from the caller functionInfo in the
                                 // stack, to be used later in the ReJIT process
-                                auto functionInfo = FunctionInfoOld(caller);
+                                auto functionInfo = FunctionInfo(caller);
                                 auto hr = functionInfo.method_signature.TryParse();
                                 if (FAILED(hr))
                                 {
@@ -1114,7 +1114,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::JITCompilationStarted(FunctionID function
         enable_calltarget_state_by_ref);
 
     // get function info
-    const auto& caller = GetFunctionInfoOld(module_metadata->metadata_import, function_token);
+    const auto& caller = GetFunctionInfo(module_metadata->metadata_import, function_token);
     if (!caller.IsValid())
     {
         return S_OK;
@@ -1785,7 +1785,7 @@ HRESULT CorProfiler::RewriteForDistributedTracing(const ModuleMetadata& module_m
     if (IsDumpILRewriteEnabled())
     {
         Logger::Info(GetILCodes("After -> GetDistributedTracer. ", &getterRewriter,
-                                GetFunctionInfoOld(module_metadata.metadata_import, getDistributedTraceMethodDef),
+                                GetFunctionInfo(module_metadata.metadata_import, getDistributedTraceMethodDef),
                                 module_metadata.metadata_import));
     }
 
@@ -1828,7 +1828,7 @@ const std::string indent_values[] = {
     std::string(2 * 10, ' '),
 };
 
-std::string CorProfiler::GetILCodes(const std::string& title, ILRewriter* rewriter, const FunctionInfoOld& caller,
+std::string CorProfiler::GetILCodes(const std::string& title, ILRewriter* rewriter, const FunctionInfo& caller,
                                     const ComPtr<IMetaDataImport2>& metadata_import)
 {
     std::stringstream orig_sstream;
@@ -1959,7 +1959,7 @@ std::string CorProfiler::GetILCodes(const std::string& title, ILRewriter* rewrit
 
             if (cInstr->m_opcode == CEE_CALL || cInstr->m_opcode == CEE_CALLVIRT || cInstr->m_opcode == CEE_NEWOBJ)
             {
-                const auto memberInfo = GetFunctionInfoOld(metadata_import, (mdMemberRef) cInstr->m_Arg32);
+                const auto memberInfo = GetFunctionInfo(metadata_import, (mdMemberRef) cInstr->m_Arg32);
                 orig_sstream << "  | ";
                 orig_sstream << shared::ToString(memberInfo.type.name);
                 orig_sstream << ".";
@@ -1980,7 +1980,7 @@ std::string CorProfiler::GetILCodes(const std::string& title, ILRewriter* rewrit
                      cInstr->m_opcode == CEE_UNBOX_ANY || cInstr->m_opcode == CEE_NEWARR ||
                      cInstr->m_opcode == CEE_INITOBJ)
             {
-                const auto typeInfo = GetTypeInfoOld(metadata_import, (mdTypeRef) cInstr->m_Arg32);
+                const auto typeInfo = GetTypeInfo(metadata_import, (mdTypeRef) cInstr->m_Arg32);
                 orig_sstream << "  | ";
                 orig_sstream << shared::ToString(typeInfo.name);
             }
@@ -2029,7 +2029,7 @@ std::string CorProfiler::GetILCodes(const std::string& title, ILRewriter* rewrit
 // Startup methods
 //
 HRESULT CorProfiler::RunILStartupHook(const ComPtr<IMetaDataEmit2>& metadata_emit, const ModuleID module_id,
-                                      const mdToken function_token, const FunctionInfoOld& caller, const ModuleMetadata& module_metadata)
+                                      const mdToken function_token, const FunctionInfo& caller, const ModuleMetadata& module_metadata)
 {
     mdMethodDef ret_method_token;
     auto hr = GenerateVoidILStartupMethod(module_id, &ret_method_token);
@@ -2671,9 +2671,9 @@ HRESULT CorProfiler::GenerateVoidILStartupMethod(const ModuleID module_id, mdMet
     if (IsDumpILRewriteEnabled())
     {
         mdToken token = 0;
-        TypeInfoOld typeInfo{};
+        TypeInfo typeInfo{};
         shared::WSTRING methodName = WStr("__DDVoidMethodCall__");
-        FunctionInfoOld caller(token, methodName, typeInfo, MethodSignature(), FunctionMethodSignatureOld());
+        FunctionInfo caller(token, methodName, typeInfo, MethodSignature(), FunctionMethodSignature());
         Logger::Info(
             GetILCodes("*** GenerateVoidILStartupMethod(): Modified Code: ", &rewriter_void, caller, metadata_import));
     }

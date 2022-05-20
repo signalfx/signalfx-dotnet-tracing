@@ -109,7 +109,7 @@ AssemblyMetadata GetReferencedAssemblyMetadata(const ComPtr<IMetaDataAssemblyImp
                             assembly_metadata.usRevisionNumber);
 }
 
-std::vector<BYTE> GetSignatureByteRepresentationOld(ULONG signature_length, PCCOR_SIGNATURE raw_signature)
+std::vector<BYTE> GetSignatureByteRepresentation(ULONG signature_length, PCCOR_SIGNATURE raw_signature)
 {
     std::vector<BYTE> signature_data(signature_length);
     for (ULONG i = 0; i < signature_length; i++)
@@ -120,7 +120,7 @@ std::vector<BYTE> GetSignatureByteRepresentationOld(ULONG signature_length, PCCO
     return signature_data;
 }
 
-FunctionInfoOld GetFunctionInfoOld(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token)
+FunctionInfo GetFunctionInfo(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token)
 {
     mdToken parent_token = mdTokenNil;
     mdToken method_spec_token = mdTokenNil;
@@ -155,9 +155,9 @@ FunctionInfoOld GetFunctionInfoOld(const ComPtr<IMetaDataImport2>& metadata_impo
             {
                 return {};
             }
-            const auto generic_info = GetFunctionInfoOld(metadata_import, parent_token);
+            const auto generic_info = GetFunctionInfo(metadata_import, parent_token);
             final_signature_bytes = generic_info.signature.data;
-            method_spec_signature = GetSignatureByteRepresentationOld(raw_signature_len, raw_signature);
+            method_spec_signature = GetSignatureByteRepresentation(raw_signature_len, raw_signature);
             std::memcpy(function_name, generic_info.name.c_str(), sizeof(WCHAR) * (generic_info.name.length() + 1));
             function_name_len = DWORD(generic_info.name.length() + 1);
             method_spec_token = token;
@@ -174,7 +174,7 @@ FunctionInfoOld GetFunctionInfoOld(const ComPtr<IMetaDataImport2>& metadata_impo
     }
 
     // parent_token could be: TypeDef, TypeRef, TypeSpec, ModuleRef, MethodDef
-    const auto type_info = GetTypeInfoOld(metadata_import, parent_token);
+    const auto type_info = GetTypeInfo(metadata_import, parent_token);
 
     if (is_generic)
     {
@@ -185,13 +185,13 @@ FunctionInfoOld GetFunctionInfoOld(const ComPtr<IMetaDataImport2>& metadata_impo
                 MethodSignature(final_signature_bytes),
                 MethodSignature(method_spec_signature),
                 method_def_token,
-                FunctionMethodSignatureOld(raw_signature, raw_signature_len)};
+                FunctionMethodSignature(raw_signature, raw_signature_len)};
     }
 
-    final_signature_bytes = GetSignatureByteRepresentationOld(raw_signature_len, raw_signature);
+    final_signature_bytes = GetSignatureByteRepresentation(raw_signature_len, raw_signature);
 
     return {token, shared::WSTRING(function_name), type_info, MethodSignature(final_signature_bytes),
-            FunctionMethodSignatureOld(raw_signature, raw_signature_len)};
+            FunctionMethodSignature(raw_signature, raw_signature_len)};
 }
 
 ModuleInfo GetModuleInfo(ICorProfilerInfo4* info, const ModuleID& module_id)
@@ -211,15 +211,15 @@ ModuleInfo GetModuleInfo(ICorProfilerInfo4* info, const ModuleID& module_id)
     return {module_id, shared::WSTRING(module_path), GetAssemblyInfo(info, assembly_id), module_flags};
 }
 
-TypeInfoOld GetTypeInfoOld(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token)
+TypeInfo GetTypeInfo(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token)
 {
     mdToken parent_token = mdTokenNil;
-    std::shared_ptr<TypeInfoOld> parentTypeInfo = nullptr;
+    std::shared_ptr<TypeInfo> parentTypeInfo = nullptr;
     mdToken parent_type_token = mdTokenNil;
     WCHAR type_name[kNameMaxSize]{};
     DWORD type_name_len = 0;
     DWORD type_flags;
-    std::shared_ptr<TypeInfoOld> extendsInfo = nullptr;
+    std::shared_ptr<TypeInfo> extendsInfo = nullptr;
     mdToken type_extends = mdTokenNil;
     bool type_valueType = false;
     bool type_isGeneric = false;
@@ -236,12 +236,12 @@ TypeInfoOld GetTypeInfoOld(const ComPtr<IMetaDataImport2>& metadata_import, cons
             metadata_import->GetNestedClassProps(token, &parent_type_token);
             if (parent_type_token != mdTokenNil)
             {
-                parentTypeInfo = std::make_shared<TypeInfoOld>(GetTypeInfoOld(metadata_import, parent_type_token));
+                parentTypeInfo = std::make_shared<TypeInfo>(GetTypeInfo(metadata_import, parent_type_token));
             }
 
             if (type_extends != mdTokenNil)
             {
-                extendsInfo = std::make_shared<TypeInfoOld>(GetTypeInfoOld(metadata_import, type_extends));
+                extendsInfo = std::make_shared<TypeInfo>(GetTypeInfo(metadata_import, type_extends));
                 type_valueType =
                     extendsInfo->name == WStr("System.ValueType") || extendsInfo->name == WStr("System.Enum");
             }
@@ -265,7 +265,7 @@ TypeInfoOld GetTypeInfoOld(const ComPtr<IMetaDataImport2>& metadata_import, cons
             {
                 mdToken type_token;
                 CorSigUncompressToken(&signature[2], &type_token);
-                const auto baseType = GetTypeInfoOld(metadata_import, type_token);
+                const auto baseType = GetTypeInfo(metadata_import, type_token);
                 return {baseType.id,        baseType.name,        token,
                         token_type,         baseType.extend_from, baseType.valueType,
                         baseType.isGeneric, baseType.parent_type, baseType.scopeToken};
@@ -276,10 +276,10 @@ TypeInfoOld GetTypeInfoOld(const ComPtr<IMetaDataImport2>& metadata_import, cons
             metadata_import->GetModuleRefProps(token, type_name, kNameMaxSize, &type_name_len);
             break;
         case mdtMemberRef:
-            return GetFunctionInfoOld(metadata_import, token).type;
+            return GetFunctionInfo(metadata_import, token).type;
             break;
         case mdtMethodDef:
-            return GetFunctionInfoOld(metadata_import, token).type;
+            return GetFunctionInfo(metadata_import, token).type;
             break;
     }
     if (FAILED(hr) || type_name_len == 0)
@@ -348,7 +348,7 @@ HRESULT GetCorLibAssemblyRef(const ComPtr<IMetaDataAssemblyEmit>& assembly_emit,
 }
 
 // TypeSignature
-std::tuple<unsigned, int> TypeSignatureOld::GetElementTypeAndFlags() const
+std::tuple<unsigned, int> TypeSignature::GetElementTypeAndFlags() const
 {
     int typeFlags = 0;
     unsigned elementType;
@@ -404,7 +404,7 @@ std::tuple<unsigned, int> TypeSignatureOld::GetElementTypeAndFlags() const
     return {elementType, typeFlags};
 }
 
-mdToken TypeSignatureOld::GetTypeTok(ComPtr<IMetaDataEmit2>& pEmit, mdAssemblyRef corLibRef) const
+mdToken TypeSignature::GetTypeTok(ComPtr<IMetaDataEmit2>& pEmit, mdAssemblyRef corLibRef) const
 {
     mdToken token = mdTokenNil;
     PCCOR_SIGNATURE pbCur = &pbBase[offset];
@@ -485,7 +485,7 @@ mdToken TypeSignatureOld::GetTypeTok(ComPtr<IMetaDataEmit2>& pEmit, mdAssemblyRe
     return token;
 }
 
-shared::WSTRING GetSigTypeTokNameOld(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaDataImport2>& pImport)
+shared::WSTRING GetSigTypeTokName(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaDataImport2>& pImport)
 {
     shared::WSTRING tokenName = shared::EmptyWStr;
     bool ref_flag = false;
@@ -567,25 +567,25 @@ shared::WSTRING GetSigTypeTokNameOld(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaD
             pbCur++;
             mdToken token;
             pbCur += CorSigUncompressToken(pbCur, &token);
-            tokenName = GetTypeInfoOld(pImport, token).name;
+            tokenName = GetTypeInfo(pImport, token).name;
             break;
         }
         case ELEMENT_TYPE_SZARRAY:
         {
             pbCur++;
-            tokenName = GetSigTypeTokNameOld(pbCur, pImport) + WStr("[]");
+            tokenName = GetSigTypeTokName(pbCur, pImport) + WStr("[]");
             break;
         }
         case ELEMENT_TYPE_GENERICINST:
         {
             pbCur++;
-            tokenName = GetSigTypeTokNameOld(pbCur, pImport);
+            tokenName = GetSigTypeTokName(pbCur, pImport);
             tokenName += WStr("[");
             ULONG num = 0;
             pbCur += CorSigUncompressData(pbCur, &num);
             for (ULONG i = 0; i < num; i++)
             {
-                tokenName += GetSigTypeTokNameOld(pbCur, pImport);
+                tokenName += GetSigTypeTokName(pbCur, pImport);
                 if (i != num - 1)
                 {
                     tokenName += WStr(",");
@@ -621,13 +621,13 @@ shared::WSTRING GetSigTypeTokNameOld(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaD
     return tokenName;
 }
 
-shared::WSTRING TypeSignatureOld::GetTypeTokName(ComPtr<IMetaDataImport2>& pImport) const
+shared::WSTRING TypeSignature::GetTypeTokName(ComPtr<IMetaDataImport2>& pImport) const
 {
     PCCOR_SIGNATURE pbCur = &pbBase[offset];
-    return GetSigTypeTokNameOld(pbCur, pImport);
+    return GetSigTypeTokName(pbCur, pImport);
 }
 
-ULONG TypeSignatureOld::GetSignature(PCCOR_SIGNATURE& data) const
+ULONG TypeSignature::GetSignature(PCCOR_SIGNATURE& data) const
 {
     data = &pbBase[offset];
     return length;
@@ -867,7 +867,7 @@ bool ParseRetType(PCCOR_SIGNATURE& pbCur, PCCOR_SIGNATURE pbEnd)
     return ParseType(pbCur, pbEnd);
 }
 
-HRESULT FunctionMethodSignatureOld::TryParse()
+HRESULT FunctionMethodSignature::TryParse()
 {
     PCCOR_SIGNATURE pbCur = pbBase;
     PCCOR_SIGNATURE pbEnd = pbBase + len;
@@ -910,7 +910,7 @@ HRESULT FunctionMethodSignatureOld::TryParse()
 
         IfFalseRetFAIL(ParseParamOrLocal(pbCur, pbEnd));
 
-        TypeSignatureOld argument{};
+        TypeSignature argument{};
         argument.pbBase = pbBase;
         argument.length = (ULONG)(pbCur - pbParam);
         argument.offset = (ULONG)(pbCur - pbBase - argument.length);
@@ -966,7 +966,7 @@ bool FindTypeDefByName(const shared::WSTRING instrumentationTargetMethodTypeName
 }
 
 // FunctionLocalSignature
-HRESULT FunctionLocalSignature::TryParse(PCCOR_SIGNATURE pbBase, unsigned len, std::vector<TypeSignatureOld>& locals)
+HRESULT FunctionLocalSignature::TryParse(PCCOR_SIGNATURE pbBase, unsigned len, std::vector<TypeSignature>& locals)
 {
     PCCOR_SIGNATURE pbCur = pbBase;
     PCCOR_SIGNATURE pbEnd = pbBase + len;
@@ -994,7 +994,7 @@ HRESULT FunctionLocalSignature::TryParse(PCCOR_SIGNATURE pbBase, unsigned len, s
 
         IfFalseRetFAIL(ParseParamOrLocal(pbCur, pbEnd));
 
-        TypeSignatureOld local{};
+        TypeSignature local{};
         local.pbBase = pbBase;
         local.length = (ULONG) (pbCur - pbLocal);
         local.offset = (ULONG) (pbCur - pbBase - local.length);

@@ -83,7 +83,7 @@ TEST_F(CLRHelperTest, GetsTypeInfoFromTypeDefs) {
       L"Samples.ExampleLibrary.GenericTests.StructContainer`1"};
   std::set<std::wstring> actual;
   for (auto& type_def : EnumTypeDefs(metadata_import_)) {
-    auto type_info = GetTypeInfoOld(metadata_import_, type_def);
+    auto type_info = GetTypeInfo(metadata_import_, type_def);
     if (type_info.IsValid()) {
       actual.insert(type_info.name);
     }
@@ -139,7 +139,7 @@ TEST_F(CLRHelperTest, GetsTypeInfoFromTypeRefs) {
       L"System.ValueType"};
   std::set<std::wstring> actual;
   for (auto& type_ref : EnumTypeRefs(metadata_import_)) {
-    auto type_info = GetTypeInfoOld(metadata_import_, type_ref);
+    auto type_info = GetTypeInfo(metadata_import_, type_ref);
     if (type_info.IsValid()) {
       actual.insert(type_info.name);
     }
@@ -152,7 +152,7 @@ TEST_F(CLRHelperTest, GetsTypeInfoFromModuleRefs) {
   std::set<std::wstring> expected = {};
   std::set<std::wstring> actual;
   for (auto& module_ref : EnumModuleRefs(metadata_import_)) {
-    auto type_info = GetTypeInfoOld(metadata_import_, module_ref);
+    auto type_info = GetTypeInfo(metadata_import_, module_ref);
     actual.insert(type_info.name);
   }
   EXPECT_EQ(actual, expected);
@@ -178,7 +178,7 @@ TEST_F(CLRHelperTest, GetsTypeInfoFromMethods) {
   std::set<std::wstring> actual;
   for (auto& type_def : EnumTypeDefs(metadata_import_)) {
     for (auto& method_def : EnumMethods(metadata_import_, type_def)) {
-      auto type_info = GetTypeInfoOld(metadata_import_, method_def);
+      auto type_info = GetTypeInfo(metadata_import_, method_def);
       if (type_info.IsValid()) {
         actual.insert(type_info.name);
       }

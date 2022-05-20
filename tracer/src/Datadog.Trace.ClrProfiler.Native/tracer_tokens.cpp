@@ -28,7 +28,7 @@ static const shared::WSTRING managed_profiler_calltarget_logexception_name = WSt
 
 // slowpath BeginMethod
 HRESULT TracerTokens::WriteBeginMethodWithArgumentsArray(void* rewriterWrapperPtr, mdTypeRef integrationTypeRef,
-                                                             const TypeInfoOld* currentType, ILInstr** instruction)
+                                                             const TypeInfo* currentType, ILInstr** instruction)
 {
     auto hr = EnsureBaseCalltargetTokens();
     if (FAILED(hr))
@@ -155,8 +155,8 @@ TracerTokens::TracerTokens(ModuleMetadata* module_metadata_ptr, const bool enabl
 }
 
 HRESULT TracerTokens::WriteBeginMethod(void* rewriterWrapperPtr, mdTypeRef integrationTypeRef,
-                                           const TypeInfoOld* currentType,
-                                           const std::vector<TypeSignatureOld>& methodArguments,
+                                           const TypeInfo* currentType,
+                                           const std::vector<TypeSignature>& methodArguments,
                                            const bool ignoreByRefInstrumentation,
                                            ILInstr** instruction)
 {
@@ -323,7 +323,7 @@ HRESULT TracerTokens::WriteBeginMethod(void* rewriterWrapperPtr, mdTypeRef integ
 
 // endmethod with void return
 HRESULT TracerTokens::WriteEndVoidReturnMemberRef(void* rewriterWrapperPtr, mdTypeRef integrationTypeRef,
-                                                      const TypeInfoOld* currentType, ILInstr** instruction)
+                                                      const TypeInfo* currentType, ILInstr** instruction)
 {
     auto hr = EnsureBaseCalltargetTokens();
     if (FAILED(hr))
@@ -433,7 +433,7 @@ HRESULT TracerTokens::WriteEndVoidReturnMemberRef(void* rewriterWrapperPtr, mdTy
 
 // endmethod with return type
 HRESULT TracerTokens::WriteEndReturnMemberRef(void* rewriterWrapperPtr, mdTypeRef integrationTypeRef,
-                                                  const TypeInfoOld* currentType, TypeSignatureOld* returnArgument,
+                                                  const TypeInfo* currentType, TypeSignature* returnArgument,
                                                   ILInstr** instruction)
 {
     auto hr = EnsureBaseCalltargetTokens();
@@ -560,7 +560,7 @@ HRESULT TracerTokens::WriteEndReturnMemberRef(void* rewriterWrapperPtr, mdTypeRe
 
 // write log exception
 HRESULT TracerTokens::WriteLogException(void* rewriterWrapperPtr, mdTypeRef integrationTypeRef,
-                                            const TypeInfoOld* currentType, ILInstr** instruction)
+                                            const TypeInfo* currentType, ILInstr** instruction)
 {
     auto hr = EnsureBaseCalltargetTokens();
     if (FAILED(hr))

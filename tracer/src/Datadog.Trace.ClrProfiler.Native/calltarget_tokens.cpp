@@ -265,7 +265,7 @@ mdMemberRef CallTargetTokens::GetCallTargetReturnValueDefaultMemberRef(mdTypeSpe
     return callTargetReturnTypeGetDefault;
 }
 
-mdMethodSpec CallTargetTokens::GetCallTargetDefaultValueMethodSpec(TypeSignatureOld* methodArgument)
+mdMethodSpec CallTargetTokens::GetCallTargetDefaultValueMethodSpec(TypeSignature* methodArgument)
 {
     auto hr = EnsureBaseCalltargetTokens();
     if (FAILED(hr))
@@ -327,7 +327,7 @@ mdMethodSpec CallTargetTokens::GetCallTargetDefaultValueMethodSpec(TypeSignature
     return getDefaultMethodSpec;
 }
 
-HRESULT CallTargetTokens::ModifyLocalSig(ILRewriter* reWriter, TypeSignatureOld* methodReturnValue,
+HRESULT CallTargetTokens::ModifyLocalSig(ILRewriter* reWriter, TypeSignature* methodReturnValue,
                                          ULONG* callTargetStateIndex, ULONG* exceptionIndex,
                                          ULONG* callTargetReturnIndex, ULONG* returnValueIndex,
                                          mdToken* callTargetStateToken, mdToken* exceptionToken,
@@ -624,7 +624,7 @@ HRESULT CallTargetTokens::EnsureBaseCalltargetTokens()
     return S_OK;
 }
 
-mdTypeSpec CallTargetTokens::GetTargetReturnValueTypeRef(TypeSignatureOld* returnArgument)
+mdTypeSpec CallTargetTokens::GetTargetReturnValueTypeRef(TypeSignature* returnArgument)
 {
     auto hr = EnsureBaseCalltargetTokens();
     if (FAILED(hr))
@@ -676,7 +676,7 @@ mdTypeSpec CallTargetTokens::GetTargetReturnValueTypeRef(TypeSignatureOld* retur
     return returnValueTypeSpec;
 }
 
-mdToken CallTargetTokens::GetCurrentTypeRef(const TypeInfoOld* currentType, bool& isValueType)
+mdToken CallTargetTokens::GetCurrentTypeRef(const TypeInfo* currentType, bool& isValueType)
 {
     if (currentType->type_spec != mdTypeSpecNil)
     {
@@ -685,7 +685,7 @@ mdToken CallTargetTokens::GetCurrentTypeRef(const TypeInfoOld* currentType, bool
     else
     {
 
-        TypeInfoOld* cType = const_cast<TypeInfoOld*>(currentType);
+        TypeInfo* cType = const_cast<TypeInfo*>(currentType);
         while (!cType->isGeneric)
         {
 
@@ -694,7 +694,7 @@ mdToken CallTargetTokens::GetCurrentTypeRef(const TypeInfoOld* currentType, bool
                 return cType->id;
             }
 
-            cType = const_cast<TypeInfoOld*>(cType->parent_type.get());
+            cType = const_cast<TypeInfo*>(cType->parent_type.get());
         }
 
         isValueType = false;
@@ -734,7 +734,7 @@ mdAssemblyRef CallTargetTokens::GetCorLibAssemblyRef()
     return corLibAssemblyRef;
 }
 
-HRESULT CallTargetTokens::ModifyLocalSigAndInitialize(void* rewriterWrapperPtr, FunctionInfoOld* functionInfo,
+HRESULT CallTargetTokens::ModifyLocalSigAndInitialize(void* rewriterWrapperPtr, FunctionInfo* functionInfo,
                                                       ULONG* callTargetStateIndex, ULONG* exceptionIndex,
                                                       ULONG* callTargetReturnIndex, ULONG* returnValueIndex,
                                                       mdToken* callTargetStateToken, mdToken* exceptionToken,
