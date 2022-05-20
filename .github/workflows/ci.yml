@@ -243,6 +243,9 @@ jobs:
     - name: Install CMake 3.19.8
       if: ${{ runner.os == 'Linux' }}
       run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh -o cmakeinstall.sh && chmod +x cmakeinstall.sh && sudo ./cmakeinstall.sh --prefix=/usr/local --exclude-subdir
+    - name: Create logging path
+      if: ${{ runner.os == 'Linux' }}
+      run: sudo ./tracer/build/artifacts/createLogPath.sh
     - run: ./tracer/build.cmd BuildTracerHome BuildAndRunNativeUnitTests
 
   container-native-unit-tests:
