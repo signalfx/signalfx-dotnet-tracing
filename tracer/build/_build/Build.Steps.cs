@@ -305,7 +305,8 @@ partial class Build
         .Description("Compiles the native unit tests (native loader, profiler)")
         .DependsOn(CompileNativeTestsWindows)
         .DependsOn(CompileNativeTestsLinux)
-        .DependsOn(CompileProfilerNativeTestsWindows);
+        .DependsOn(CompileProfilerNativeTestsWindows)
+        .DependsOn(CompileProfilerNativeSrcAndTestLinux);
 
     Target PublishManagedProfiler => _ => _
         .Unlisted()
