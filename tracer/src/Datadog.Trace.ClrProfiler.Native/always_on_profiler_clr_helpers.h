@@ -23,24 +23,24 @@ constexpr auto kFunctionParamsOpeningBrace = WStr("(");
 constexpr auto kFunctionParamsClosingBrace = WStr(")");
 constexpr auto name_separator = WStr(".");
 
-struct TypeInfoNew
+struct TypeInfo
 {
     const mdToken id;
     const shared::WSTRING name;
 
-    TypeInfoNew() :
+    TypeInfo() :
         id(0),
         name(shared::EmptyWStr)
     {
     }
-    TypeInfoNew(const mdToken id, const shared::WSTRING name) :
+    TypeInfo(const mdToken id, const shared::WSTRING name) :
         id(id),
         name(name)
     {
     }
 };
 
-struct TypeSignatureNew
+struct TypeSignature
 {
     ULONG offset;
     ULONG length;
@@ -50,45 +50,45 @@ struct TypeSignatureNew
                                    mdGenericParam method_params[]) const;
 };
 
-struct FunctionMethodSignatureNew
+struct FunctionMethodSignature
 {
 private:
     PCCOR_SIGNATURE pbBase;
     unsigned len;
     // ULONG numberOfTypeArguments = 0; verify if it can be removed
     // ULONG numberOfArguments = 0;
-    // TypeSignatureNew returnValue{};
-    std::vector<TypeSignatureNew> params;
+    // TypeSignature returnValue{};
+    std::vector<TypeSignature> params;
 
 public:
-    FunctionMethodSignatureNew() : pbBase(nullptr), len(0)
+    FunctionMethodSignature() : pbBase(nullptr), len(0)
     {
     }
-    FunctionMethodSignatureNew(PCCOR_SIGNATURE pb, unsigned cbBuffer)
+    FunctionMethodSignature(PCCOR_SIGNATURE pb, unsigned cbBuffer)
     {
         pbBase = pb;
         len = cbBuffer;
     };
-    const std::vector<TypeSignatureNew>& GetMethodArguments() const
+    const std::vector<TypeSignature>& GetMethodArguments() const
     {
         return params;
     }
     HRESULT TryParse();
 };
 
-struct FunctionInfoNew
+struct FunctionInfo
 {
     const mdToken id;
     const shared::WSTRING name;
-    const TypeInfoNew type;
-    FunctionMethodSignatureNew method_signature;
+    const TypeInfo type;
+    FunctionMethodSignature method_signature;
 
-    FunctionInfoNew() : id(0), name(shared::EmptyWStr), type({}), method_signature({})
+    FunctionInfo() : id(0), name(shared::EmptyWStr), type({}), method_signature({})
     {
     }
 
-    FunctionInfoNew(mdToken id, shared::WSTRING name, TypeInfoNew type,
-                 FunctionMethodSignatureNew method_signature) :
+    FunctionInfo(mdToken id, shared::WSTRING name, TypeInfo type,
+                 FunctionMethodSignature method_signature) :
         id(id),
         name(name),
         type(type),
@@ -102,8 +102,8 @@ struct FunctionInfoNew
     }
 };
 
-FunctionInfoNew GetFunctionInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token);
+FunctionInfo GetFunctionInfo(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token);
 
-TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token);
+TypeInfo GetTypeInfo(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token);
 
 } // namespace always_on_profiler

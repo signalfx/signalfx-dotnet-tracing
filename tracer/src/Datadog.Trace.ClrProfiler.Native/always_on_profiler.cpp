@@ -326,7 +326,7 @@ private:
             return;
         }
 
-        const auto function_info = GetFunctionInfoNew(metadata_import, function_identifier.function_token);
+        const auto function_info = GetFunctionInfo(metadata_import, function_identifier.function_token);
 
         if (!function_info.IsValid())
         {
@@ -400,7 +400,7 @@ private:
         }
         
         // try to list arguments type
-        FunctionMethodSignatureNew function_method_signature = function_info.method_signature;
+        FunctionMethodSignature function_method_signature = function_info.method_signature;
         hr = function_method_signature.TryParse();
         if (FAILED(hr))
         {

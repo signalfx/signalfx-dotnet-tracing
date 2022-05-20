@@ -13,7 +13,7 @@
 
 namespace always_on_profiler
 {
-FunctionInfoNew GetFunctionInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token)
+FunctionInfo GetFunctionInfo(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token)
 {
     mdToken parent_token = mdTokenNil;
     mdToken method_spec_token = mdTokenNil;
@@ -44,7 +44,7 @@ FunctionInfoNew GetFunctionInfoNew(const ComPtr<IMetaDataImport2>& metadata_impo
             {
                 return {};
             }
-            const auto generic_info = GetFunctionInfoNew(metadata_import, parent_token);
+            const auto generic_info = GetFunctionInfo(metadata_import, parent_token);
             std::memcpy(function_name, generic_info.name.c_str(), sizeof(WCHAR) * (generic_info.name.length() + 1));
             function_name_len = DWORD(generic_info.name.length() + 1);
             method_spec_token = token;
@@ -60,23 +60,23 @@ FunctionInfoNew GetFunctionInfoNew(const ComPtr<IMetaDataImport2>& metadata_impo
     }
 
     // parent_token could be: TypeDef, TypeRef, TypeSpec, ModuleRef, MethodDef
-    const auto type_info = GetTypeInfoNew(metadata_import, parent_token);
+    const auto type_info = GetTypeInfo(metadata_import, parent_token);
 
     if (is_generic)
     {
         return {method_spec_token,
                 shared::WSTRING(function_name),
                 type_info,
-                FunctionMethodSignatureNew(raw_signature, raw_signature_len)};
+                FunctionMethodSignature(raw_signature, raw_signature_len)};
     }
 
     return {token, shared::WSTRING(function_name), type_info,
-            FunctionMethodSignatureNew(raw_signature, raw_signature_len)};
+            FunctionMethodSignature(raw_signature, raw_signature_len)};
 }
 
-TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token)
+TypeInfo GetTypeInfo(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token)
 {
-    std::shared_ptr<TypeInfoNew> parentTypeInfo = nullptr;
+    std::shared_ptr<TypeInfo> parentTypeInfo = nullptr;
     mdToken parent_type_token = mdTokenNil;
     WCHAR type_name[trace::kNameMaxSize]{};
     DWORD type_name_len = 0;
@@ -92,7 +92,7 @@ TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, cons
             metadata_import->GetNestedClassProps(token, &parent_type_token);
             if (parent_type_token != mdTokenNil)
             {
-                parentTypeInfo = std::make_shared<TypeInfoNew>(GetTypeInfoNew(metadata_import, parent_type_token));
+                parentTypeInfo = std::make_shared<TypeInfo>(GetTypeInfo(metadata_import, parent_type_token));
             }
             break;
         case mdtTypeRef:
@@ -114,7 +114,7 @@ TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, cons
             {
                 mdToken type_token;
                 CorSigUncompressToken(&signature[2], &type_token);
-                const auto baseType = GetTypeInfoNew(metadata_import, type_token);
+                const auto baseType = GetTypeInfo(metadata_import, type_token);
                 return {baseType.id, baseType.name};
             }
         }
@@ -124,7 +124,7 @@ TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, cons
             break;
         case mdtMemberRef:
         case mdtMethodDef:
-            return GetFunctionInfoNew(metadata_import, token).type;
+            return GetFunctionInfo(metadata_import, token).type;
     }
     if (FAILED(hr) || type_name_len == 0)
     {
@@ -249,7 +249,7 @@ shared::WSTRING GetSigTypeTokNameNew(PCCOR_SIGNATURE& pb_cur, const ComPtr<IMeta
             pb_cur++;
             mdToken token;
             pb_cur += CorSigUncompressToken(pb_cur, &token);
-            token_name = GetTypeInfoNew(metadata_import, token).name;
+            token_name = GetTypeInfo(metadata_import, token).name;
             break;
         }
         case ELEMENT_TYPE_SZARRAY:
@@ -297,14 +297,14 @@ shared::WSTRING GetSigTypeTokNameNew(PCCOR_SIGNATURE& pb_cur, const ComPtr<IMeta
     return token_name;
 }
 
-shared::WSTRING TypeSignatureNew::GetTypeTokName(ComPtr<IMetaDataImport2>& pImport, mdGenericParam class_params[],
+shared::WSTRING TypeSignature::GetTypeTokName(ComPtr<IMetaDataImport2>& pImport, mdGenericParam class_params[],
                                                  mdGenericParam method_params[]) const
 {
     PCCOR_SIGNATURE pbCur = &pbBase[offset];
     return GetSigTypeTokNameNew(pbCur, pImport, class_params, method_params);
 }
 
-HRESULT FunctionMethodSignatureNew::TryParse()
+HRESULT FunctionMethodSignature::TryParse()
 {
     PCCOR_SIGNATURE pbCur = pbBase;
     PCCOR_SIGNATURE pbEnd = pbBase + len;
@@ -341,7 +341,7 @@ HRESULT FunctionMethodSignatureNew::TryParse()
 
         IfFalseRetFAIL(trace::ParseParamOrLocal(pbCur, pbEnd));
 
-        TypeSignatureNew argument{};
+        TypeSignature argument{};
         argument.pbBase = pbBase;
         argument.length = (ULONG) (pbCur - pbParam);
         argument.offset = (ULONG) (pbCur - pbBase - argument.length);
