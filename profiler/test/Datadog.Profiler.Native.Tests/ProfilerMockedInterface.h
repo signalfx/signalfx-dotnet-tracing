@@ -96,7 +96,7 @@ public:
 class MockRuntimeIdStore : public IRuntimeIdStore
 {
 public:
-    MOCK_METHOD(const std::string&, GetId, (AppDomainID appDomainId), (override));
+    MOCK_METHOD(const char*, GetId, (AppDomainID appDomainId), (override));
 };
 
 template <typename T, typename U, typename... Args>
