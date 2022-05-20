@@ -96,10 +96,7 @@ const char* StackSamplerLoopManager::GetName()
 bool StackSamplerLoopManager::Start()
 {
     this->RunStackSampling();
-    if (AllowDeadlockIntervention)
-    {
-        this->RunWatcher();
-    }
+    this->RunWatcher();
 
     return true;
 }
@@ -107,10 +104,7 @@ bool StackSamplerLoopManager::Start()
 bool StackSamplerLoopManager::Stop()
 {
     GracefulShutdownStackSampling();
-    if (AllowDeadlockIntervention)
-    {
-        ShutdownWatcher();
-    }
+    ShutdownWatcher();
 
     return true;
 }
@@ -292,7 +286,10 @@ void StackSamplerLoopManager::WatcherLoopIteration()
 
     _currentStatistics->IncrDeadlockCount();
 
-    PerformDeadlockIntervention(collectionDurationNs);
+    if (AllowDeadlockIntervention)
+    {
+        PerformDeadlockIntervention(collectionDurationNs);
+    }
 }
 
 bool StackSamplerLoopManager::HasMadeProgress(FILETIME userTime, FILETIME kernelTime)
