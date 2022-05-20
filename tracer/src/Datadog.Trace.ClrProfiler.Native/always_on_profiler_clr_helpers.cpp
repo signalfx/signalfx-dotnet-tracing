@@ -11,13 +11,13 @@
 
 #include "../../../shared/src/native-src/pal.h"
 
-namespace trace
+namespace always_on_profiler
 {
 FunctionInfoNew GetFunctionInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token)
 {
     mdToken parent_token = mdTokenNil;
     mdToken method_spec_token = mdTokenNil;
-    WCHAR function_name[kNameMaxSize]{};
+    WCHAR function_name[trace::kNameMaxSize]{};
     DWORD function_name_len = 0;
 
     PCCOR_SIGNATURE raw_signature;
@@ -28,11 +28,11 @@ FunctionInfoNew GetFunctionInfoNew(const ComPtr<IMetaDataImport2>& metadata_impo
     switch (const auto token_type = TypeFromToken(token))
     {
         case mdtMemberRef:
-            hr = metadata_import->GetMemberRefProps(token, &parent_token, function_name, kNameMaxSize,
+            hr = metadata_import->GetMemberRefProps(token, &parent_token, function_name, trace::kNameMaxSize,
                                                     &function_name_len, &raw_signature, &raw_signature_len);
             break;
         case mdtMethodDef:
-            hr = metadata_import->GetMemberProps(token, &parent_token, function_name, kNameMaxSize, &function_name_len,
+            hr = metadata_import->GetMemberProps(token, &parent_token, function_name, trace::kNameMaxSize, &function_name_len,
                                                  nullptr, &raw_signature, &raw_signature_len, nullptr, nullptr, nullptr,
                                                  nullptr, nullptr);
             break;
@@ -51,7 +51,7 @@ FunctionInfoNew GetFunctionInfoNew(const ComPtr<IMetaDataImport2>& metadata_impo
         }
         break;
         default:
-            Logger::Warn("[trace::GetFunctionInfo] unknown token type: {}", token_type);
+            trace::Logger::Warn("[trace::GetFunctionInfo] unknown token type: {}", token_type);
             return {};
     }
     if (FAILED(hr) || function_name_len == 0)
@@ -78,7 +78,7 @@ TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, cons
 {
     std::shared_ptr<TypeInfoNew> parentTypeInfo = nullptr;
     mdToken parent_type_token = mdTokenNil;
-    WCHAR type_name[kNameMaxSize]{};
+    WCHAR type_name[trace::kNameMaxSize]{};
     DWORD type_name_len = 0;
     DWORD type_flags;
 
@@ -87,7 +87,7 @@ TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, cons
     switch (const auto token_type = TypeFromToken(token))
     {
         case mdtTypeDef:
-            hr = metadata_import->GetTypeDefProps(token, type_name, kNameMaxSize, &type_name_len, &type_flags, nullptr);
+            hr = metadata_import->GetTypeDefProps(token, type_name, trace::kNameMaxSize, &type_name_len, &type_flags, nullptr);
 
             metadata_import->GetNestedClassProps(token, &parent_type_token);
             if (parent_type_token != mdTokenNil)
@@ -96,7 +96,7 @@ TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, cons
             }
             break;
         case mdtTypeRef:
-            hr = metadata_import->GetTypeRefProps(token, nullptr, type_name, kNameMaxSize, &type_name_len);
+            hr = metadata_import->GetTypeRefProps(token, nullptr, type_name, trace::kNameMaxSize, &type_name_len);
             break;
         case mdtTypeSpec:
         {
@@ -120,7 +120,7 @@ TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, cons
         }
         break;
         case mdtModuleRef:
-            metadata_import->GetModuleRefProps(token, type_name, kNameMaxSize, &type_name_len);
+            metadata_import->GetModuleRefProps(token, type_name, trace::kNameMaxSize, &type_name_len);
             break;
         case mdtMemberRef:
         case mdtMethodDef:
@@ -160,7 +160,7 @@ shared::WSTRING ExtractParameterName(PCCOR_SIGNATURE& pb_cur, const ComPtr<IMeta
                                                           param_type_name, kParamNameMaxLen, &pch_name);
     if (FAILED(hr))
     {
-        Logger::Debug("GetGenericParamProps failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
+        trace::Logger::Debug("GetGenericParamProps failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
         return kUnknown;
     }
     return param_type_name;
@@ -180,67 +180,67 @@ shared::WSTRING GetSigTypeTokNameNew(PCCOR_SIGNATURE& pb_cur, const ComPtr<IMeta
     switch (*pb_cur)
     {
         case ELEMENT_TYPE_BOOLEAN:
-            token_name = SystemBoolean;
+            token_name = trace::SystemBoolean;
             pb_cur++;
             break;
         case ELEMENT_TYPE_CHAR:
-            token_name = SystemChar;
+            token_name = trace::SystemChar;
             pb_cur++;
             break;
         case ELEMENT_TYPE_I1:
-            token_name = SystemSByte;
+            token_name = trace::SystemSByte;
             pb_cur++;
             break;
         case ELEMENT_TYPE_U1:
-            token_name = SystemByte;
+            token_name = trace::SystemByte;
             pb_cur++;
             break;
         case ELEMENT_TYPE_U2:
-            token_name = SystemUInt16;
+            token_name = trace::SystemUInt16;
             pb_cur++;
             break;
         case ELEMENT_TYPE_I2:
-            token_name = SystemInt16;
+            token_name = trace::SystemInt16;
             pb_cur++;
             break;
         case ELEMENT_TYPE_I4:
-            token_name = SystemInt32;
+            token_name = trace::SystemInt32;
             pb_cur++;
             break;
         case ELEMENT_TYPE_U4:
-            token_name = SystemUInt32;
+            token_name = trace::SystemUInt32;
             pb_cur++;
             break;
         case ELEMENT_TYPE_I8:
-            token_name = SystemInt64;
+            token_name = trace::SystemInt64;
             pb_cur++;
             break;
         case ELEMENT_TYPE_U8:
-            token_name = SystemUInt64;
+            token_name = trace::SystemUInt64;
             pb_cur++;
             break;
         case ELEMENT_TYPE_R4:
-            token_name = SystemSingle;
+            token_name = trace::SystemSingle;
             pb_cur++;
             break;
         case ELEMENT_TYPE_R8:
-            token_name = SystemDouble;
+            token_name = trace::SystemDouble;
             pb_cur++;
             break;
         case ELEMENT_TYPE_I:
-            token_name = SystemIntPtr;
+            token_name = trace::SystemIntPtr;
             pb_cur++;
             break;
         case ELEMENT_TYPE_U:
-            token_name = SystemUIntPtr;
+            token_name = trace::SystemUIntPtr;
             pb_cur++;
             break;
         case ELEMENT_TYPE_STRING:
-            token_name = SystemString;
+            token_name = trace::SystemString;
             pb_cur++;
             break;
         case ELEMENT_TYPE_OBJECT:
-            token_name = SystemObject;
+            token_name = trace::SystemObject;
             pb_cur++;
             break;
         case ELEMENT_TYPE_CLASS:
@@ -310,19 +310,19 @@ HRESULT FunctionMethodSignatureNew::TryParse()
     PCCOR_SIGNATURE pbEnd = pbBase + len;
     unsigned char elem_type;
 
-    IfFalseRetFAIL(ParseByte(pbCur, pbEnd, &elem_type));
+    IfFalseRetFAIL(trace::ParseByte(pbCur, pbEnd, &elem_type));
 
     if (elem_type & IMAGE_CEE_CS_CALLCONV_GENERIC)
     {
         unsigned gen_param_count;
-        IfFalseRetFAIL(ParseNumber(pbCur, pbEnd, &gen_param_count));
+        IfFalseRetFAIL(trace::ParseNumber(pbCur, pbEnd, &gen_param_count));
     }
 
     unsigned param_count;
-    IfFalseRetFAIL(ParseNumber(pbCur, pbEnd, &param_count));
+    IfFalseRetFAIL(trace::ParseNumber(pbCur, pbEnd, &param_count));
 
 
-    IfFalseRetFAIL(ParseRetType(pbCur, pbEnd));
+    IfFalseRetFAIL(trace::ParseRetType(pbCur, pbEnd));
 
     auto fEncounteredSentinal = false;
     for (unsigned i = 0; i < param_count; i++)
@@ -339,7 +339,7 @@ HRESULT FunctionMethodSignatureNew::TryParse()
 
         const PCCOR_SIGNATURE pbParam = pbCur;
 
-        IfFalseRetFAIL(ParseParamOrLocal(pbCur, pbEnd));
+        IfFalseRetFAIL(trace::ParseParamOrLocal(pbCur, pbEnd));
 
         TypeSignatureNew argument{};
         argument.pbBase = pbBase;
@@ -351,4 +351,4 @@ HRESULT FunctionMethodSignatureNew::TryParse()
 
     return S_OK;
 }
-} // namespace trace
+} // namespace always_on_profiler

@@ -38,7 +38,7 @@ static std::vector<unsigned char>* buffer_a;
 static std::vector<unsigned char>* buffer_b;
 
 static std::mutex thread_span_context_lock;
-static std::unordered_map<ThreadID, trace::thread_span_context> thread_span_context_map;
+static std::unordered_map<ThreadID, always_on_profiler::thread_span_context> thread_span_context_map;
 
 static ICorProfilerInfo10* profiler_info; // After feature sets settle down, perhaps this should be refactored and have a single static instance of ThreadSampler
 
@@ -92,7 +92,7 @@ int32_t ThreadSamplingConsumeOneThreadSample(int32_t len, unsigned char* buf)
     return static_cast<int32_t>(to_use_len);
 }
 
-namespace trace
+namespace always_on_profiler
 {
 
 /*
@@ -124,7 +124,7 @@ constexpr auto kThreadSamplesFinalStats = 0x07;
 
 constexpr auto kCurrentThreadSamplesBufferVersion = 1;
 
-ThreadSamplesBuffer::ThreadSamplesBuffer(std::vector<unsigned char>* buf) : buffer_(buf)
+always_on_profiler::ThreadSamplesBuffer::ThreadSamplesBuffer(std::vector<unsigned char>* buf) : buffer_(buf)
 {
 }
 ThreadSamplesBuffer ::~ThreadSamplesBuffer()
@@ -290,7 +290,7 @@ private:
         const HRESULT hr = info10_->GetFunctionInfo2(func_id, frame_info, nullptr, &module_id, &function_token, 0, nullptr, nullptr);
         if (FAILED(hr))
         {
-            Logger::Debug("GetFunctionInfo2 failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
+            trace::Logger::Debug("GetFunctionInfo2 failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
             constexpr auto zero_invalid_function_identifier = FunctionIdentifier{0, 0, false};
             return zero_invalid_function_identifier;
         }
@@ -321,7 +321,7 @@ private:
                                               reinterpret_cast<IUnknown**>(&metadata_import));
         if (FAILED(hr))
         {
-            Logger::Debug("GetModuleMetaData failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
+            trace::Logger::Debug("GetModuleMetaData failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
             result.append(unknown_function_name);
             return;
         }
@@ -330,7 +330,7 @@ private:
 
         if (!function_info.IsValid())
         {
-            Logger::Debug("GetFunctionInfo failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
+            trace::Logger::Debug("GetFunctionInfo failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
             result.append(unknown_function_name);
             return;
         }
@@ -354,7 +354,7 @@ private:
         metadata_import->CloseEnum(class_gen_params_enum);
         if (FAILED(hr))
         {
-            Logger::Debug("Class generic parameters enumeration failed. HRESULT=0x", std::setfill('0'), std::setw(8),
+            trace::Logger::Debug("Class generic parameters enumeration failed. HRESULT=0x", std::setfill('0'), std::setw(8),
                           std::hex, hr);
             result.append(unknown_list_of_arguments);
             return;
@@ -366,7 +366,7 @@ private:
         metadata_import->CloseEnum(function_gen_params_enum);
         if (FAILED(hr))
         {
-            Logger::Debug("Method generic parameters enumeration failed. HRESULT=0x", std::setfill('0'), std::setw(8),
+            trace::Logger::Debug("Method generic parameters enumeration failed. HRESULT=0x", std::setfill('0'), std::setw(8),
                           std::hex, hr);
             result.append(unknown_list_of_arguments);
             return;
@@ -388,7 +388,7 @@ private:
                                                            nullptr, param_type_name, kParamNameMaxLen, &pch_name);
                 if (FAILED(hr))
                 {
-                    Logger::Debug("GetGenericParamProps failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
+                    trace::Logger::Debug("GetGenericParamProps failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
                     result.append(kUnknown);
                 }
                 else
@@ -405,7 +405,7 @@ private:
         if (FAILED(hr))
         {
             result.append(unknown_list_of_arguments);
-            Logger::Debug("FunctionMethodSignature parsing failed. HRESULT=0x", std::setfill('0'), std::setw(8),std::hex, hr);
+            trace::Logger::Debug("FunctionMethodSignature parsing failed. HRESULT=0x", std::setfill('0'), std::setw(8),std::hex, hr);
         }
         else
         {
@@ -462,7 +462,7 @@ void CaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, SamplingHelpe
     HRESULT hr = info10->EnumThreads(&thread_enum);
     if (FAILED(hr))
     {
-        Logger::Debug("Could not EnumThreads. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
+        trace::Logger::Debug("Could not EnumThreads. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
         return;
     }
     ThreadID thread_id;
@@ -489,7 +489,7 @@ void CaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, SamplingHelpe
         HRESULT snapshotHr = info10->DoStackSnapshot(thread_id, &FrameCallback, COR_PRF_SNAPSHOT_DEFAULT, &helper, nullptr, 0);
         if (FAILED(snapshotHr))
         {
-            Logger::Debug("DoStackSnapshot failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, snapshotHr);
+            trace::Logger::Debug("DoStackSnapshot failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, snapshotHr);
         }
         helper.cur_writer_->EndSample();
     }
@@ -498,7 +498,7 @@ void CaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, SamplingHelpe
 
 int GetSamplingPeriod()
 {
-    const shared::WSTRING val = shared::GetEnvironmentValue(environment::thread_sampling_period);
+    const shared::WSTRING val = shared::GetEnvironmentValue(trace::environment::thread_sampling_period);
     if (val.empty())
     {
         return kDefaultSamplePeriod;
@@ -531,16 +531,16 @@ void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, Sa
     HRESULT hr = info10->SuspendRuntime();
     if (FAILED(hr))
     {
-        Logger::Warn("Could not suspend runtime to sample threads. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
+        trace::Logger::Warn("Could not suspend runtime to sample threads. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
     }
     else
     {
         try {
             CaptureSamples(ts, info10, helper);
         } catch (const std::exception& e) {
-            Logger::Warn("Could not capture thread samples: ", e.what());
+            trace::Logger::Warn("Could not capture thread samples: ", e.what());
         } catch (...) {
-            Logger::Warn("Could not capture thread sample for unknown reasons");
+            trace::Logger::Warn("Could not capture thread sample for unknown reasons");
         }
     }
     // I don't have any proof but I sure hope that if suspending fails then it's still ok to ask to resume, with no
@@ -548,14 +548,14 @@ void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, Sa
     hr = info10->ResumeRuntime();
     if (FAILED(hr))
     {
-        Logger::Error("Could not resume runtime? HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
+        trace::Logger::Error("Could not resume runtime? HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
     }
 
     const auto end = std::chrono::steady_clock::now();
     const auto elapsed_micros = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
     helper.stats_.micros_suspended = static_cast<int>(elapsed_micros);
     helper.cur_writer_->WriteFinalStats(helper.stats_);
-    Logger::Debug("Threads sampled in ", elapsed_micros, " micros. threads=", helper.stats_.num_threads,
+    trace::Logger::Debug("Threads sampled in ", elapsed_micros, " micros. threads=", helper.stats_.num_threads,
                   " frames=", helper.stats_.total_frames, " misses=", helper.stats_.name_cache_misses);
 
     helper.PublishBuffer();
@@ -584,7 +584,7 @@ DWORD WINAPI SamplingThreadMain(_In_ LPVOID param)
         SleepMillis(sleep_millis);
         const bool shouldSample = helper.AllocateBuffer();
         if (!shouldSample) {
-            Logger::Warn("Skipping a thread sample period, buffers are full. ** THIS WILL RESULT IN LOSS OF PROFILING DATA **");
+            trace::Logger::Warn("Skipping a thread sample period, buffers are full. ** THIS WILL RESULT IN LOSS OF PROFILING DATA **");
         } else {
             PauseClrAndCaptureSamples(ts, info10, helper);
         }
@@ -593,7 +593,7 @@ DWORD WINAPI SamplingThreadMain(_In_ LPVOID param)
 
 void ThreadSampler::StartSampling(ICorProfilerInfo10* cor_profiler_info10)
 {
-    Logger::Info("ThreadSampler::StartSampling");
+    trace::Logger::Info("ThreadSampler::StartSampling");
     profiler_info = cor_profiler_info10;
     this->info10 = cor_profiler_info10;
 #ifdef _WIN32
@@ -687,7 +687,7 @@ void NameCache::Put(FunctionIdentifier key, shared::WSTRING* val)
     }
 }
 
-} // namespace trace
+} // namespace always_on_profiler
 
 extern "C"
 {
@@ -707,6 +707,6 @@ extern "C"
 
         std::lock_guard<std::mutex> guard(thread_span_context_lock);
 
-        thread_span_context_map[threadId] = trace::thread_span_context(traceIdHigh, traceIdLow, spanId, managedThreadId);
+        thread_span_context_map[threadId] = always_on_profiler::thread_span_context(traceIdHigh, traceIdLow, spanId, managedThreadId);
     }
 }

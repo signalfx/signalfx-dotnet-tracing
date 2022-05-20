@@ -11,7 +11,7 @@
 
 #include <set>
 
-namespace trace
+namespace always_on_profiler
 {
 constexpr auto kParamNameMaxLen = 260;
 constexpr auto kGenericParamsMaxLen = 20;
@@ -106,4 +106,4 @@ FunctionInfoNew GetFunctionInfoNew(const ComPtr<IMetaDataImport2>& metadata_impo
 
 TypeInfoNew GetTypeInfoNew(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token);
 
-} // namespace trace
+} // namespace always_on_profiler

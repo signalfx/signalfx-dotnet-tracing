@@ -256,7 +256,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
     {
         if (metThreadSamplingRequirements)
         {
-            this->threadSampler = new ThreadSampler();
+            this->threadSampler = new always_on_profiler::ThreadSampler();
             this->threadSampler->StartSampling(info10);
         }
         else

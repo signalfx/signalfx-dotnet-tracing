@@ -7,7 +7,7 @@
 
 #include "../../src/Datadog.Trace.ClrProfiler.Native/always_on_profiler.h"
 
-using namespace trace;
+using namespace always_on_profiler;
 
 TEST(ThreadSamplerTest, ThreadStateTracking)
 {
