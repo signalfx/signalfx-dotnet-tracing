@@ -76,6 +76,11 @@ namespace Datadog.Trace
             return Environment.Version.Major >= 5;
         }
 
+        public bool IsWindows()
+        {
+            return string.Equals(OSPlatform, OSPlatformName.Windows, StringComparison.OrdinalIgnoreCase);
+        }
+
         public override string ToString()
         {
             // examples:
