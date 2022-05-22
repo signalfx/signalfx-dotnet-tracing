@@ -2,7 +2,7 @@
   "profiles": {
     "CallTargetNativeTest": {
       "commandName": "Project",
-      "commandLineArgs": "all",
+      "commandLineArgs": "0",
       "environmentVariables": {
         "SIGNALFX_CTARGET_TESTMODE": "True",
         "SIGNALFX_DOTNET_TRACER_HOME": "$(SolutionDir)shared\\bin\\monitoring-home\\tracer",
