@@ -16,13 +16,11 @@ namespace always_on_profiler
 FunctionInfo GetFunctionInfo(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token)
 {
     mdToken parent_token = mdTokenNil;
-    mdToken method_spec_token = mdTokenNil;
     WCHAR function_name[trace::kNameMaxSize]{};
     DWORD function_name_len = 0;
 
     PCCOR_SIGNATURE raw_signature;
     ULONG raw_signature_len;
-    BOOL is_generic = false;
 
     HRESULT hr = E_FAIL;
     switch (const auto token_type = TypeFromToken(token))
@@ -39,7 +37,6 @@ FunctionInfo GetFunctionInfo(const ComPtr<IMetaDataImport2>& metadata_import, co
         case mdtMethodSpec:
         {
             hr = metadata_import->GetMethodSpecProps(token, &parent_token, &raw_signature, &raw_signature_len);
-            is_generic = true;
             if (FAILED(hr))
             {
                 return {};
@@ -47,7 +44,6 @@ FunctionInfo GetFunctionInfo(const ComPtr<IMetaDataImport2>& metadata_import, co
             const auto generic_info = GetFunctionInfo(metadata_import, parent_token);
             std::memcpy(function_name, generic_info.name.c_str(), sizeof(WCHAR) * (generic_info.name.length() + 1));
             function_name_len = DWORD(generic_info.name.length() + 1);
-            method_spec_token = token;
         }
         break;
         default:
@@ -61,14 +57,6 @@ FunctionInfo GetFunctionInfo(const ComPtr<IMetaDataImport2>& metadata_import, co
 
     // parent_token could be: TypeDef, TypeRef, TypeSpec, ModuleRef, MethodDef
     const auto type_info = GetTypeInfo(metadata_import, parent_token);
-
-    if (is_generic)
-    {
-        return {method_spec_token,
-                shared::WSTRING(function_name),
-                type_info,
-                FunctionMethodSignature(raw_signature, raw_signature_len)};
-    }
 
     return {token, shared::WSTRING(function_name), type_info,
             FunctionMethodSignature(raw_signature, raw_signature_len)};
