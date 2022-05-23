@@ -55,9 +55,6 @@ struct FunctionMethodSignature
 private:
     PCCOR_SIGNATURE pbBase;
     unsigned len;
-    // ULONG numberOfTypeArguments = 0; verify if it can be removed
-    // ULONG numberOfArguments = 0;
-    // TypeSignature returnValue{};
     std::vector<TypeSignature> params;
 
 public:
