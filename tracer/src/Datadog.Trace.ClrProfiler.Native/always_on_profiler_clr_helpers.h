@@ -11,6 +11,8 @@
 
 #include <set>
 
+// this file contains optimized, specified version of code from clr_helpers.h
+
 namespace always_on_profiler
 {
 constexpr auto kParamNameMaxLen = 260;

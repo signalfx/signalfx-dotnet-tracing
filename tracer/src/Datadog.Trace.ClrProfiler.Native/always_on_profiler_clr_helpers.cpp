@@ -11,6 +11,8 @@
 
 #include "../../../shared/src/native-src/pal.h"
 
+// this file contains optimized, specified version of code from clr_helpers.cpp
+
 namespace always_on_profiler
 {
 FunctionInfo GetFunctionInfo(const ComPtr<IMetaDataImport2>& metadata_import, const mdToken& token)
