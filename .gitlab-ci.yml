@@ -58,10 +58,10 @@ sign-deb:
   dependencies: 
     - linux-build
   before_script:
-    - cp $(ls dist/*.deb) package.deb
+    - cp -vfp $(ls dist/*.deb) package.deb
   after_script:
     - mkdir signed
-    - mv -f tmp/package.deb "signed/$(basename $(ls dist/*.deb))"
+    - mv -vf tmp/package.deb "signed/$(basename $(ls dist/*.deb))"
   variables:
     PROJECT: signalfx-dotnet-tracing
     ARTIFACT: package.deb
@@ -79,10 +79,10 @@ sign-rpm:
   dependencies: 
     - linux-build
   before_script:
-    - cp -vp $(ls dist/*.rpm) package.rpm
+    - cp -vfp $(ls dist/*.rpm) package.rpm
   after_script:
     - mkdir signed
-    - mv -f tmp/package.rpm "signed/$(basename $(ls dist/*.rpm))"
+    - mv -vf tmp/package.rpm "signed/$(basename $(ls dist/*.rpm))"
   variables:
     PROJECT: signalfx-dotnet-tracing
     ARTIFACT: package.rpm
