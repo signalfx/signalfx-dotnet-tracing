@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Datadog.Trace.Agent;
+using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Sampling;
@@ -472,10 +473,17 @@ namespace Datadog.Trace.Tests
         [Fact]
         public void RuntimeId()
         {
-            var runtimeId = Tracer.RuntimeId;
+            var runtimeId = ClrProfiler.DistributedTracer
+                .GetDistributedTracer()
+                .As<IDistributedTracer>()
+                .GetRuntimeId();
 
             // Runtime id should be stable for a given process
-            Tracer.RuntimeId.Should().Be(runtimeId);
+            ClrProfiler.DistributedTracer
+                .GetDistributedTracer()
+                .As<IDistributedTracer>()
+                .GetRuntimeId()
+                .Should().Be(runtimeId);
 
             // Runtime id should be a UUID
             Guid.TryParse(runtimeId, out _).Should().BeTrue();
