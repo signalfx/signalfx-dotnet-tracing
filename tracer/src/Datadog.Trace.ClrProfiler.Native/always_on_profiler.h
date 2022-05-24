@@ -1,5 +1,5 @@
 #pragma once
-#include "clr_helpers.h"
+#include "always_on_profiler_clr_helpers.h"
 #include <mutex>
 #include <cinttypes>
 #include <vector>
@@ -24,7 +24,7 @@ extern "C"
     // ReSharper restore CppInconsistentNaming
 }
 
-namespace trace
+namespace always_on_profiler
 {
 struct SamplingStatistics
 {
@@ -127,12 +127,12 @@ struct FunctionIdentifier
         return function_token == p.function_token && module_id == p.module_id && is_valid == p.is_valid;
     }
 };
-} // namespace trace
+} // namespace always_on_profiler
 
 template <>
-struct std::hash<trace::FunctionIdentifier>
+struct std::hash<always_on_profiler::FunctionIdentifier>
 {
-    std::size_t operator()(const trace::FunctionIdentifier& k) const noexcept
+    std::size_t operator()(const always_on_profiler::FunctionIdentifier& k) const noexcept
     {
         using std::hash;
         using std::size_t;
@@ -145,7 +145,8 @@ struct std::hash<trace::FunctionIdentifier>
     }
 };
 
-namespace trace {
+namespace always_on_profiler
+{
 class NameCache
 {
 // TODO Splunk: cache based on mdToken (Function token) and ModuleID
@@ -161,7 +162,7 @@ private:
     std::list<std::pair<FunctionIdentifier, shared::WSTRING*>> list_;
     std::unordered_map<FunctionIdentifier, std::list<std::pair<FunctionIdentifier, shared::WSTRING*>>::iterator> map_;
 };
-} // namespace trace
+} // namespace always_on_profiler
 
 bool ThreadSamplingShouldProduceThreadSample();
 void ThreadSamplingRecordProducedThreadSample(std::vector<unsigned char>* buf);
