@@ -57,15 +57,14 @@ sign-deb:
   dependencies: 
     - linux-build  
   before_script:
-    - tar -czf files.tgz $( ls dist/*.deb )
+    - cp "dist/$( ls dist/*.deb )" package.deb
   after_script:
     - mkdir dist/signed
-    - tar -C dist/signed -xzf tmp/files.tgz
+    - mv -f tmp/package.deb "dist/signed/$( ls dist/*.deb )"
   variables:
     PROJECT: signalfx-dotnet-tracing
-    ARTIFACT: files.tgz
+    ARTIFACT: package.deb
     SIGN_TYPE: DEB
-    OPTIONS: archive
     DOWNLOAD_DIR: tmp
     REPO_NAME: releng # this env var should be not needed in future
     REPO_PATH: signalfx-dotnet-tracing  # this env var should be not needed in future
@@ -79,15 +78,14 @@ sign-rpm:
   dependencies: 
     - linux-build  
   before_script:
-    - tar -czf files.tgz $( ls dist/*.rpm )
+    - cp "dist/$( ls dist/*.rpm )" package.rpm
   after_script:
     - mkdir dist/signed
-    - tar -C dist/signed -xzf tmp/files.tgz
+    - mv -f tmp/package.rpm "dist/signed/$( ls dist/*.rpm )"
   variables:
     PROJECT: signalfx-dotnet-tracing
-    ARTIFACT: files.tgz
+    ARTIFACT: package.rpm
     SIGN_TYPE: RPM
-    OPTIONS: archive
     DOWNLOAD_DIR: tmp
     REPO_NAME: releng # this env var should be not needed in future
     REPO_PATH: signalfx-dotnet-tracing  # this env var should be not needed in future
