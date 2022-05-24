@@ -8,6 +8,7 @@ stages:
   - build
   - sign
   - checksum
+  - checksums-sign
 
 linux-build:
   stage: build
