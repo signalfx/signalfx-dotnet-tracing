@@ -95,12 +95,20 @@ sign-rpm:
 
 checksums:
   stage: checksum
-  extends: .submit-request
   dependencies: 
     - sign-deb
     - sign-rpm  
-  before_script:
+  script:
     - pushd dist/signed && shasum -a 256 * > checksums.txt && popd
+  artifacts:
+    paths:
+      - dist/
+
+checksums-sign:
+  stage: checksum-sign
+  extends: .submit-request
+  dependencies: 
+    - checksums
   variables:
     PROJECT: signalfx-dotnet-tracing
     ARTIFACT: dist/signed/checksums.txt
