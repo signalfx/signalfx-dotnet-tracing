@@ -243,7 +243,7 @@ class SamplingHelper
 public:
     // These are permanent parts of the helper object
     ICorProfilerInfo10* info10_ = nullptr;
-    NameCache function_name_cache_;
+    NameCache<FunctionIdentifier> function_name_cache_;
     // These cycle every sample and/or are owned externally
     ThreadSamplesBuffer* cur_writer_ = nullptr;
     std::vector<unsigned char>* cur_buffer_ = nullptr;
@@ -486,6 +486,8 @@ void CaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, SamplingHelpe
         }
 
         // Don't reuse the hr being used for the thread enum, especially since a failed snapshot isn't fatal
+
+        //TODO PK clean volatile cache
         HRESULT snapshotHr = info10->DoStackSnapshot(thread_id, &FrameCallback, COR_PRF_SNAPSHOT_DEFAULT, &helper, nullptr, 0);
         if (FAILED(snapshotHr))
         {
@@ -655,11 +657,13 @@ void ThreadSampler::ThreadNameChanged(ThreadID thread_id, ULONG cch_name, WCHAR 
     state->thread_name_.append(name, cch_name);
 }
 
-NameCache::NameCache(const size_t maximum_size) : max_size_(maximum_size)
+template <typename TFunctionIdentifier>
+NameCache<TFunctionIdentifier>::NameCache(const size_t maximum_size) : max_size_(maximum_size)
 {
 }
 
-shared::WSTRING* NameCache::Get(FunctionIdentifier key)
+template <typename TFunctionIdentifier>
+shared::WSTRING* NameCache<TFunctionIdentifier>::Get(TFunctionIdentifier key)
 {
     const auto found = map_.find(key);
     if (found == map_.end())
@@ -672,7 +676,8 @@ shared::WSTRING* NameCache::Get(FunctionIdentifier key)
     return found->second->second;
 }
 
-void NameCache::Put(FunctionIdentifier key, shared::WSTRING* val)
+template <typename TFunctionIdentifier>
+void NameCache<TFunctionIdentifier>::Put(TFunctionIdentifier key, shared::WSTRING* val)
 {
     const auto pair = std::pair(key, val);
     list_.push_front(pair);
