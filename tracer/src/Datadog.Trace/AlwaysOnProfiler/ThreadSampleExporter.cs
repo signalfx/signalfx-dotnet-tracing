@@ -1,122 +1,38 @@
-// Modified by Splunk Inc.
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Net;
 using Datadog.Trace.Configuration;
-using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Logging;
-using Datadog.Trace.Propagation;
 using Datadog.Tracer.OpenTelemetry.Proto.Common.V1;
 using Datadog.Tracer.OpenTelemetry.Proto.Logs.V1;
 using Datadog.Tracer.OpenTelemetry.Proto.Resource.V1;
 
 namespace Datadog.Trace.AlwaysOnProfiler
 {
-    internal class ThreadSampleExporter
+    internal abstract class ThreadSampleExporter : IThreadSampleExporter
     {
-        private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(ThreadSampleExporter));
+        protected static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(SimpleThreadSampleExporter));
 
-        private readonly ReadOnlyCollection<KeyValue> _fixedLogRecordAttributes;
-        private readonly Uri _logsEndpointUrl;
-        private readonly LogsData _logsData;
-
-        internal ThreadSampleExporter(ImmutableTracerSettings tracerSettings)
+        protected ThreadSampleExporter(ImmutableTracerSettings tracerSettings)
         {
-            _fixedLogRecordAttributes = new ReadOnlyCollection<KeyValue>(new List<KeyValue>
+            FixedLogRecordAttributes = new ReadOnlyCollection<KeyValue>(new List<KeyValue>
             {
                 GdiProfilingConventions.LogRecord.Attributes.Source,
                 GdiProfilingConventions.LogRecord.Attributes.Period((long)tracerSettings.ThreadSamplingPeriod.TotalMilliseconds)
             });
 
-            _logsEndpointUrl = tracerSettings.ExporterSettings.LogsEndpointUrl;
+            LogsEndpointUrl = tracerSettings.ExporterSettings.LogsEndpointUrl;
 
-            _logsData = GdiProfilingConventions.CreateLogsData(tracerSettings.GlobalTags);
+            LogsData = GdiProfilingConventions.CreateLogsData(tracerSettings.GlobalTags);
         }
 
-        public void ExportThreadSamples(List<ThreadSample> threadSamples)
-        {
-            if (threadSamples == null || threadSamples.Count < 1)
-            {
-                return;
-            }
+        protected ReadOnlyCollection<KeyValue> FixedLogRecordAttributes { get; }
 
-            // The same _logsData instance is used on all export messages. With the exception of the list of
-            // LogRecords, the Logs property, all other fields are prepopulated. At this point the code just
-            // need to create a LogRecord for each thread sample and add it to the Logs list.
-            var logRecords = _logsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs;
+        protected Uri LogsEndpointUrl { get; }
 
-            for (var i = 0; i < threadSamples.Count; i++)
-            {
-                var threadSample = threadSamples[i];
-                var logRecord = new LogRecord
-                {
-                    Attributes =
-                    {
-                        _fixedLogRecordAttributes[0],
-                        _fixedLogRecordAttributes[1],
-                    },
-                    Body = new AnyValue { StringValue = threadSample.StackTrace },
-                    TimeUnixNano = threadSample.Timestamp,
-                };
+        protected LogsData LogsData { get; }
 
-                if (threadSample.SpanId != 0 || threadSample.TraceIdHigh != 0 || threadSample.TraceIdLow != 0)
-                {
-                    // TODO Splunk: Add tests and validate.
-                    logRecord.SpanId = BitConverter.GetBytes(threadSample.SpanId);
-                    logRecord.TraceId = BitConverter.GetBytes(threadSample.TraceIdHigh).Concat(BitConverter.GetBytes(threadSample.TraceIdLow));
-                }
-
-                logRecords.Add(logRecord);
-            }
-
-            SendLogsData();
-        }
-
-        internal void SendLogsData()
-        {
-            HttpWebRequest httpWebRequest;
-
-            try
-            {
-                httpWebRequest = WebRequest.CreateHttp(_logsEndpointUrl);
-                httpWebRequest.ContentType = "application/x-protobuf";
-                httpWebRequest.Method = "POST";
-                httpWebRequest.Headers.Add(CommonHttpHeaderNames.TracingEnabled, "false");
-
-                using var stream = httpWebRequest.GetRequestStream();
-                Vendors.ProtoBuf.Serializer.Serialize(stream, _logsData);
-                stream.Flush();
-            }
-            catch (Exception ex)
-            {
-                Log.Error("Exception preparing request to send thread samples to {0}: {1}", _logsEndpointUrl, ex);
-                return;
-            }
-            finally
-            {
-                // The exporter reuses the _logsData object, but the actual log records are not
-                // needed after serialization, release the log records so they can be garbage collected.
-                _logsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs.Clear();
-            }
-
-            try
-            {
-                using var httpWebResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-
-                if (httpWebResponse.StatusCode >= HttpStatusCode.OK && httpWebResponse.StatusCode < HttpStatusCode.MultipleChoices)
-                {
-                    return;
-                }
-
-                Log.Warning("HTTP error sending thread samples to {0}: {1}", _logsEndpointUrl, httpWebResponse.StatusCode);
-            }
-            catch (Exception ex)
-            {
-                Log.Error("Exception sending thread samples to {0}: {1}", _logsEndpointUrl, ex.Message);
-            }
-        }
+        public abstract void ExportThreadSamples(List<ThreadSample> threadSamples);
 
         /// <summary>
         /// Holds the GDI profiling semantic conventions.
