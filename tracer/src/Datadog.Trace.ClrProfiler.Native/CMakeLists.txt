@@ -5,7 +5,7 @@ cmake_policy(SET CMP0015 NEW)
 # Project definition
 # ******************************************************
 
-project("SignalFx.Tracing.ClrProfiler.Native" VERSION 0.2.3)
+project("SignalFx.Tracing.ClrProfiler.Native" VERSION 0.2.4)
 
 # ******************************************************
 # Environment detection
@@ -105,7 +105,7 @@ SET(DOTNET_TRACER_REPO_ROOT_PATH ${CMAKE_SOURCE_DIR}/../../../)
 if (NOT EXISTS ${OUTPUT_DEPS_DIR}/re2)
     add_custom_command(
         OUTPUT ${OUTPUT_DEPS_DIR}/re2
-        COMMAND git clone --quiet --depth 1 --branch 2018-10-01 https://github.com/google/re2.git && cd re2 && env ARFLAGS=\"-r -s -c\" CXXFLAGS=\"-O3 -g -fPIC\" make
+        COMMAND git clone --quiet --depth 1 --branch 2018-10-01 https://github.com/google/re2.git && cd re2 && env ARFLAGS=\"-r -s -c\" CXXFLAGS=\"-O3 -g -fPIC -D_GLIBCXX_USE_CXX11_ABI=0\" make
         WORKING_DIRECTORY ${OUTPUT_DEPS_DIR}
     )
 endif()
@@ -113,7 +113,7 @@ endif()
 if (NOT EXISTS ${OUTPUT_DEPS_DIR}/fmt)
     add_custom_command(
         OUTPUT ${OUTPUT_DEPS_DIR}/fmt
-        COMMAND git clone --quiet --depth 1 --branch 5.3.0 https://github.com/fmtlib/fmt.git && cd fmt && cmake -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DFMT_TEST=0 -DFMT_DOC=0 . && make
+        COMMAND git clone --quiet --depth 1 --branch 5.3.0 https://github.com/fmtlib/fmt.git && cd fmt && CXXFLAGS=\"-D_GLIBCXX_USE_CXX11_ABI=0\" && cmake -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DFMT_TEST=0 -DFMT_DOC=0 . && make
         WORKING_DIRECTORY ${OUTPUT_DEPS_DIR}
     )
 endif()
@@ -163,6 +163,8 @@ SET_SOURCE_FILES_PROPERTIES(
 # ******************************************************
 # Compiler options
 # ******************************************************
+
+add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 
 # Sets the compiler
 if(ISLINUX)
@@ -233,6 +235,7 @@ add_library("SignalFx.Tracing.ClrProfiler.Native.static" STATIC
         rejit_work_offloader.cpp
         environment_variables_util.cpp
         method_rewriter.cpp
+        always_on_profiler_clr_helpers.cpp
         always_on_profiler.cpp
         tracer_tokens.cpp
         ${DOTNET_TRACER_REPO_ROOT_PATH}/shared/src/native-lib/coreclr/src/pal/prebuilt/idl/corprof_i.cpp

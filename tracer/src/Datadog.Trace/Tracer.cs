@@ -124,6 +124,11 @@ namespace Datadog.Trace
                       " instance in code.")]
             set
             {
+                if (value is null)
+                {
+                    ThrowHelper.ThrowArgumentNullException("The tracer instance shouldn't be set to null as this will cause issues with automatic instrumentation.");
+                }
+
                 lock (GlobalInstanceLock)
                 {
                     // This check is probably no longer necessary, as it's the TracerManager we really care about
@@ -415,7 +420,7 @@ namespace Datadog.Trace
                 return;
             }
 
-            var signalFxOpenTracingAssembly = Assembly.Load(new AssemblyName("SignalFx.Tracing.OpenTracing, Version=0.2.3.0, Culture=neutral, PublicKeyToken=e43a27c2023d388a"));
+            var signalFxOpenTracingAssembly = Assembly.Load(new AssemblyName("SignalFx.Tracing.OpenTracing, Version=0.2.4.0, Culture=neutral, PublicKeyToken=e43a27c2023d388a"));
             var openTracingTracerFactoryType = signalFxOpenTracingAssembly.GetType("Datadog.Trace.OpenTracing.OpenTracingTracerFactory");
             var methodInfo = openTracingTracerFactoryType.GetMethod("RegisterGlobalTracerIfAbsent");
             object[] args = { instance };

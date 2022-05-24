@@ -28,9 +28,13 @@ namespace debugger
 class DebuggerMethodRewriter;
 }
 
-namespace trace
+namespace always_on_profiler
 {
 class ThreadSampler;
+}
+
+namespace trace
+{
 
 class CorProfiler : public CorProfilerBase
 {
@@ -53,7 +57,7 @@ private:
     std::unordered_set<AppDomainID> first_jit_compilation_app_domains;
     bool is_desktop_iis = false;
 
-    ThreadSampler* threadSampler;
+    always_on_profiler::ThreadSampler* threadSampler;
 
     //
     // CallTarget Members

@@ -358,3 +358,6 @@ tracer/test/test-applications/integrations/dependency-libs/Samples.AlwaysOnProfi
 
 # GitLab pipeline artifacts
 dist/
+
+# benchmark test results directory
+/dev-aop/results

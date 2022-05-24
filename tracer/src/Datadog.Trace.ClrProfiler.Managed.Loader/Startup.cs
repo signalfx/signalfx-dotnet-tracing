@@ -6,6 +6,7 @@
 // Modified by Splunk Inc.
 
 using System;
+using System.IO;
 using System.Reflection;
 
 namespace Datadog.Trace.ClrProfiler.Managed.Loader
@@ -15,7 +16,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
     /// </summary>
     public partial class Startup
     {
-        private const string AssemblyName = "SignalFx.Tracing, Version=0.2.3.0, Culture=neutral, PublicKeyToken=e43a27c2023d388a";
+        private const string AssemblyName = "SignalFx.Tracing, Version=0.2.4.0, Culture=neutral, PublicKeyToken=e43a27c2023d388a";
         private const string AzureAppServicesKey = "SIGNALFX_AZURE_APP_SERVICES";
         private const string AasCustomTracingKey = "SIGNALFX_AAS_ENABLE_CUSTOM_TRACING";
         private const string AasCustomMetricsKey = "SIGNALFX_AAS_ENABLE_CUSTOM_METRICS";
@@ -28,6 +29,7 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
         static Startup()
         {
             ManagedProfilerDirectory = ResolveManagedProfilerDirectory();
+            StartupLogger.Debug("Resolving managed profiler directory to: {0}", ManagedProfilerDirectory);
 
             try
             {
@@ -70,18 +72,43 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
         {
             try
             {
-                var assembly = Assembly.Load(AssemblyName);
+                var assembly = LoadAssembly(AssemblyName);
 
-                if (assembly != null)
+                if (assembly == null)
                 {
-                    var type = assembly.GetType(typeName, throwOnError: false);
-                    var method = type?.GetRuntimeMethod(methodName, parameters: Type.EmptyTypes);
-                    method?.Invoke(obj: null, parameters: null);
+                    StartupLogger.Log("Assembly '{0}' cannot be loaded. The managed method ({1}.{2}) cannot be invoked", AssemblyName, typeName, methodName);
+                    return;
                 }
+
+                var type = assembly.GetType(typeName, throwOnError: false);
+                var method = type?.GetRuntimeMethod(methodName, parameters: Type.EmptyTypes);
+                method?.Invoke(obj: null, parameters: null);
             }
             catch (Exception ex)
             {
                 StartupLogger.Log(ex, "Error when invoking managed method: {0}.{1}", typeName, methodName);
+            }
+        }
+
+        private static Assembly LoadAssembly(string assemblyString)
+        {
+            try
+            {
+                return Assembly.Load(assemblyString);
+            }
+            catch (FileNotFoundException ex)
+            {
+                // In some IIS scenarios the `AssemblyResolve` event doesn't get triggered and we received this exception.
+                // We will try to resolve it manually as a last chance.
+                StartupLogger.Log(ex, "Error on assembly load: {0}, Trying to solve it manually...", assemblyString);
+
+                var assembly = ResolveAssembly(assemblyString);
+                if (assembly is not null)
+                {
+                    StartupLogger.Log("Assembly resolved manually.");
+                }
+
+                return assembly;
             }
         }
 

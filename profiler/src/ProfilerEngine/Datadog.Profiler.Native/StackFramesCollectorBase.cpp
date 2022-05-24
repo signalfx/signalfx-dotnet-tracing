@@ -3,6 +3,9 @@
 
 #include "StackFramesCollectorBase.h"
 
+#include "ManagedThreadList.h"
+#include "OpSysTools.h"
+
 #include <assert.h>
 #include <chrono>
 #include <condition_variable>
@@ -110,7 +113,8 @@ void StackFramesCollectorBase::ResumeTargetThreadIfRequiredImplementation(Manage
 }
 
 StackSnapshotResultBuffer* StackFramesCollectorBase::CollectStackSampleImplementation(ManagedThreadInfo* pThreadInfo,
-                                                                                      uint32_t* pHR)
+                                                                                      uint32_t* pHR,
+                                                                                      bool selfCollect)
 {
     // The actual business logic provided by a subclass goes into the XxxImplementation(..) methods.
     // This is a fallback implementation, so that the implementing sub-class does not need to overwrite this method if it is a no-op.
@@ -192,8 +196,10 @@ StackSnapshotResultBuffer* StackFramesCollectorBase::CollectStackSample(ManagedT
     // Update state with the info for the thread that we are collecting:
     _pCurrentCollectionThreadInfo = pThreadInfo;
 
+    const auto currentThreadId = OpSysTools::GetThreadId();
+
     // Execute the actual collection:
-    StackSnapshotResultBuffer* result = CollectStackSampleImplementation(pThreadInfo, pHR);
+    StackSnapshotResultBuffer* result = CollectStackSampleImplementation(pThreadInfo, pHR, pThreadInfo->GetOsThreadId() == currentThreadId);
 
     // No longer collecting the specified thread:
     _pCurrentCollectionThreadInfo = nullptr;

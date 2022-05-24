@@ -15,6 +15,8 @@
 #include <mutex>
 #include <signal.h>
 
+class IManagedThreadList;
+
 class LinuxStackFramesCollector : public StackFramesCollectorBase
 {
 public:
@@ -31,14 +33,14 @@ protected:
     // So, for ResumeThread and SuspendThread are No Ops for this collector, and we defer to the respective baseclass No-Op methods.
 
     StackSnapshotResultBuffer* CollectStackSampleImplementation(ManagedThreadInfo* pThreadInfo,
-                                                                uint32_t* pHR) override;
+                                                                uint32_t* pHR,
+                                                                bool selfCollect) override;
 
 private:
+    void InitializeSignalHandler();
     bool SetupSignalHandler();
     void NotifyStackWalkCompleted(std::int32_t resultErrorCode);
 
-    int _signalToSend;
-    bool _isSignalHandlerSetup;
 
     std::int32_t _lastStackWalkErrorCode;
     std::condition_variable _stackWalkInProgressWaiter;
@@ -47,10 +49,15 @@ private:
 
 private:
     static bool TrySetHandlerForSignal(int signal, struct sigaction& action);
-    static char const* ErrorCodeToString(int errorCode);
-
     static void CollectStackSampleSignalHandler(int signal);
 
+    static char const* ErrorCodeToString(int errorCode);
     static std::mutex s_stackWalkInProgressMutex;
+    static std::mutex s_signalHandlerInitLock;
+    static bool s_isSignalHandlerSetup;
+    static int s_signalToSend;
+
     static LinuxStackFramesCollector* s_pInstanceCurrentlyStackWalking;
+
+    std::int32_t CollectCallStackCurrentThread();
 };

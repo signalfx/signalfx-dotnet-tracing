@@ -67,7 +67,7 @@ jobs:
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v3.0.2
-    - uses: actions/setup-dotnet@v2.0.0
+    - uses: actions/setup-dotnet@v2.1.0
       with:
         dotnet-version: | 
           2.1.818
@@ -83,31 +83,31 @@ jobs:
     - name: Build tracer home
       run: ./tracer/build.cmd BuildTracerHome PackageTracerHome
     - name: Publish Tracer
-      uses: actions/upload-artifact@v3.0.0
+      uses: actions/upload-artifact@v3.1.0
       with:
         path: ${{ env.tracerHome }}
         name: ${{ matrix.machine }}-tracer-home
     - name: Publish Windows x86 MSI
       if: ${{ runner.os == 'Windows' }}
-      uses: actions/upload-artifact@v3.0.0
+      uses: actions/upload-artifact@v3.1.0
       with:
         path: ${{ env.artifacts }}/x86/en-us
         name: windows-msi-x86
     - name: Publish Windows x64 MSI
       if: ${{ runner.os == 'Windows' }}
-      uses: actions/upload-artifact@v3.0.0
+      uses: actions/upload-artifact@v3.1.0
       with:
         path: ${{ env.artifacts }}/x64/en-us
         name: windows-msi-x64
     - name: Publish Linux x64 packages
       if: ${{ runner.os == 'Linux' }}
-      uses: actions/upload-artifact@v3.0.0
+      uses: actions/upload-artifact@v3.1.0
       with:
         path: ${{ env.artifacts }}/linux-x64
         name: linux-x64-packages
     - name: Publish NuGet packages
       if: ${{ runner.os == 'Windows' }}
-      uses: actions/upload-artifact@v3.0.0
+      uses: actions/upload-artifact@v3.1.0
       with:
         path: ${{ env.artifacts }}/nuget/SignalFx.NET.Tracing.Azure.Site.Extension.*.nupkg
         name: nuget-packages
@@ -122,7 +122,7 @@ jobs:
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v3.0.2
-    - uses: actions/setup-dotnet@v2.0.0
+    - uses: actions/setup-dotnet@v2.1.0
       with:
         dotnet-version: | 
           2.1.818
@@ -148,7 +148,7 @@ jobs:
           dd-trace-dotnet/${{ matrix.base-image }}-builder \
           dotnet /build/bin/Debug/_build.dll BuildTracerHome ZipTracerHome
     - name: Publish Linux x64-musl packages
-      uses: actions/upload-artifact@v3.0.0
+      uses: actions/upload-artifact@v3.1.0
       with:
         path: ${{ env.artifacts }}/linux-x64
         name: linux-x64-musl-packages
@@ -165,7 +165,7 @@ jobs:
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v3.0.2
-    - uses: actions/setup-dotnet@v2.0.0
+    - uses: actions/setup-dotnet@v2.1.0
       with:
         dotnet-version: | 
           2.1.818
@@ -173,7 +173,7 @@ jobs:
           5.0.405
           6.0.200
     - run: ./tracer/build.cmd BuildTracerHome BuildAndRunManagedUnitTests
-    - uses: actions/upload-artifact@v3.0.0
+    - uses: actions/upload-artifact@v3.1.0
       with:
         name: ${{ matrix.machine }}-managed-unit-tests-build_data
         path: tracer/build_data
@@ -190,7 +190,7 @@ jobs:
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v3.0.2
-    - uses: actions/setup-dotnet@v2.0.0
+    - uses: actions/setup-dotnet@v2.1.0
       with:
         dotnet-version: | 
           2.1.818
@@ -216,7 +216,7 @@ jobs:
           dd-trace-dotnet/${{ matrix.base-image }}-tester \
           dotnet /build/bin/Debug/_build.dll BuildTracerHome BuildAndRunManagedUnitTests
     - name: Publish managed tests results
-      uses: actions/upload-artifact@v3.0.0
+      uses: actions/upload-artifact@v3.1.0
       with:
         name: ${{ matrix.base-image }}-managed-unit-tests-build_data
         path: tracer/build_data
@@ -233,7 +233,7 @@ jobs:
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v3.0.2
-    - uses: actions/setup-dotnet@v2.0.0
+    - uses: actions/setup-dotnet@v2.1.0
       with:
         dotnet-version: | 
           2.1.818
@@ -255,7 +255,7 @@ jobs:
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v3.0.2
-    - uses: actions/setup-dotnet@v2.0.0
+    - uses: actions/setup-dotnet@v2.1.0
       with:
         dotnet-version: | 
           2.1.818
@@ -281,7 +281,7 @@ jobs:
           dd-trace-dotnet/${{ matrix.base-image }}-builder \
           dotnet /build/bin/Debug/_build.dll BuildTracerHome BuildAndRunNativeUnitTests
     - name: Publish native tests results
-      uses: actions/upload-artifact@v3.0.0
+      uses: actions/upload-artifact@v3.1.0
       with:
         name: ${{ matrix.base-image }}-native-unit-tests-build_data
         path: tracer/build_data
@@ -301,7 +301,7 @@ jobs:
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v3.0.2
-    - uses: actions/setup-dotnet@v2.0.0
+    - uses: actions/setup-dotnet@v2.1.0
       with:
         dotnet-version: | 
           2.1.818
@@ -322,7 +322,7 @@ jobs:
         subst y: .
         y:
         ./tracer/build.cmd BuildTracerHome ${{ matrix.target }} -Framework ${{ matrix.framework }} -TargetPlatform ${{ matrix.platform }} --PrintDriveSpace
-    - uses: actions/upload-artifact@v3.0.0
+    - uses: actions/upload-artifact@v3.1.0
       with:
         name: ${{ matrix.machine }}-integration-tests-${{ matrix.platform }}-${{ matrix.framework }}-${{ matrix.target }}-build_data
         path: tracer/build_data
@@ -340,7 +340,7 @@ jobs:
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v3.0.2
-    - uses: actions/setup-dotnet@v2.0.0
+    - uses: actions/setup-dotnet@v2.1.0
       with:
         dotnet-version: | 
           2.1.818
@@ -380,7 +380,7 @@ jobs:
     - name: docker-compose stop services
       run: docker-compose down
       if: (${{ job.status }} != 'cancelled')
-    - uses: actions/upload-artifact@v3.0.0
+    - uses: actions/upload-artifact@v3.1.0
       with:
         name: ${{ matrix.base-image }}-integration-tests-${{ matrix.framework }}-build_data
         path: tracer/build_data
@@ -398,18 +398,15 @@ jobs:
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v3.0.2
-    - uses: actions/setup-dotnet@v2.0.0
+    - uses: actions/setup-dotnet@v2.1.0
       with:
         dotnet-version: | 
           2.1.818
           3.1.416
           5.0.405
           6.0.200
-    - run: ./tracer/build.cmd BuildTracerHome PackageTracerHome BuildWindowsIntegrationTests -Framework ${{ matrix.framework }}
-    - name: docker-compose build IIS containers
-      run: docker-compose build --build-arg dotnet_tracer_msi=.$relativeArtifacts/{{ matrix.platform }}/en-us/*.msi --build-arg ENABLE_32_BIT=${{ env.enable32bit }} IntegrationTests.IIS
-    - name: docker-compose start IIS containers
-      run: docker-compose up -d IntegrationTests.IIS
+    - run: ./tracer/build.cmd BuildTracerHome PackageTracerHome BuildWindowsIntegrationTests PublishIisSamples -Framework ${{ matrix.framework }}
+    - run: docker-compose up -d IntegrationTests.IIS
     # Workaround around long name being hit in MultiDomainHostTests.WorksInsideTheGAC tests
     - name: RunWindowsIisIntegrationTests
       run: |
@@ -419,7 +416,7 @@ jobs:
     - name: docker-compose stop services
       run: docker-compose down
       if: (${{ job.status }} != 'cancelled')
-    - uses: actions/upload-artifact@v3.0.0
+    - uses: actions/upload-artifact@v3.1.0
       with:
         name: windows-iis-integration-tests-${{ matrix.platform }}-build_data
         path: tracer/build_data

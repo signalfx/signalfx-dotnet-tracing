@@ -47,7 +47,7 @@ Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.cmd BuildAn
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.cmd BuildAndRunWindowsIntegrationTests --framework net5.0 ; \
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.cmd BuildAndRunWindowsIntegrationTests --framework netcoreapp3.1 ; \
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.cmd BuildAndRunWindowsIntegrationTests --framework net461 ; \
-./tracer/build.cmd OverwriteSnaphotFiles
+./tracer/build.cmd OverwriteSnapshotFiles
 ```
 
 Windows in Ubuntu WSL:
@@ -59,5 +59,5 @@ Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.sh BuildAnd
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.sh BuildAndRunLinuxIntegrationTests --framework net5.0 ; \
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.sh BuildAndRunLinuxIntegrationTests --framework netcoreapp3.1 ; \
 docker-compose down ; \
-./tracer/build.sh OverwriteSnaphotFiles
+./tracer/build.sh OverwriteSnapshotFiles
 ```

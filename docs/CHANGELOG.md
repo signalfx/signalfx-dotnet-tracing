@@ -13,7 +13,17 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 ### Breaking changes
 
+### Bugfixes
+
 ### Enhancements
+
+---
+
+## [Release 0.2.4](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.2.4)
+
+### General
+
+- Add `W3C` as default propagator.
 
 ---
 

@@ -5,9 +5,9 @@ needs any adjustments. Contact @signalfx/gdi-docs team if needed.
 
 1. Use nuke target to update version:
 
-    - `nuke UpdateVersion --version {new-version-here}`
+    - `nuke UpdateVersion --NewVersion {new-version-here} --NewIsPrerelease false`
     - (for pre-releases)
-      `nuke UpdateVersion --version {new-version-here} --is-prerelease true`
+      `nuke UpdateVersion --NewVersion {new-version-here} --NewIsPrerelease true`
 
 1. Update the [CHANGELOG.md](../CHANGELOG.md) with the new release.
 
@@ -41,3 +41,5 @@ needs any adjustments. Contact @signalfx/gdi-docs team if needed.
 
 1. [Publish](https://docs.microsoft.com/en-us/nuget/nuget-org/publish-a-package)
    the NuGet packages to the official [nuget.org feed](https://www.nuget.org/).
+
+1. Update `TRACER_VERSION` in [demo repository](https://github.com/signalfx/microservices-demo/blob/main/src/cartservice/Dockerfile)
