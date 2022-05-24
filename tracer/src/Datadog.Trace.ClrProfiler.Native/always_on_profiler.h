@@ -156,6 +156,7 @@ public:
     explicit NameCache(size_t maximum_size);
     shared::WSTRING* Get(TFunctionIdentifier key);
     void Put(TFunctionIdentifier key, shared::WSTRING* val);
+    void Clear();
 
 private:
     size_t max_size_;
