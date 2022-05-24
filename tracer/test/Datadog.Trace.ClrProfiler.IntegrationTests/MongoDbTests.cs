@@ -26,6 +26,7 @@ using static Datadog.Trace.ExtensionMethods.DictionaryExtensions;
 
 namespace Datadog.Trace.ClrProfiler.IntegrationTests
 {
+    [Trait("RequiresDockerDependency", "true")]
     [UsesVerify]
     public class MongoDbTests : TestHelper
     {
