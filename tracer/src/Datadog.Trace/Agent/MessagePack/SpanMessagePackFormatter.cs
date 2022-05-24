@@ -7,6 +7,7 @@
 
 using System;
 using System.Runtime.CompilerServices;
+using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Processors;
 using Datadog.Trace.Tagging;
@@ -38,7 +39,7 @@ namespace Datadog.Trace.Agent.MessagePack
         private readonly byte[] _languageNameBytes = StringEncoding.UTF8.GetBytes(Trace.Tags.Language);
         private readonly byte[] _languageValueBytes = StringEncoding.UTF8.GetBytes(TracerConstants.Language);
         private readonly byte[] _runtimeIdNameBytes = StringEncoding.UTF8.GetBytes(Trace.Tags.RuntimeId);
-        private readonly byte[] _runtimeIdValueBytes = StringEncoding.UTF8.GetBytes(Tracer.RuntimeId);
+        private readonly byte[] _runtimeIdValueBytes = StringEncoding.UTF8.GetBytes(DistributedTracer.Instance.GetRuntimeId());
         private readonly byte[] _originNameBytes = StringEncoding.UTF8.GetBytes(Trace.Tags.Origin);
 
         // name of numeric tag dictionary

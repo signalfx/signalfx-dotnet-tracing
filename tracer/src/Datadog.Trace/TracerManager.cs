@@ -12,6 +12,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Datadog.Trace.Agent;
+using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Conventions;
 using Datadog.Trace.DogStatsd;
@@ -372,7 +373,7 @@ namespace Datadog.Trace
                     writer.WriteValue(instanceSettings.ExporterSettings.PartialFlushMinSpans);
 
                     writer.WritePropertyName("runtime_id");
-                    writer.WriteValue(Tracer.RuntimeId);
+                    writer.WriteValue(DistributedTracer.Instance.GetRuntimeId());
 
                     writer.WritePropertyName("agent_reachable");
                     writer.WriteValue(agentError == null);
