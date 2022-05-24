@@ -103,7 +103,7 @@ checksums:
     - pushd dist/signed && shasum -a 256 * > checksums.txt && popd
   artifacts:
     paths:
-      - dist/
+      - dist/signed/
 
 checksums-sign:
   stage: checksum-sign
@@ -119,4 +119,4 @@ checksums-sign:
     REPO_PATH: signalfx-dotnet-tracing # this env var should be not needed in future
   artifacts:
     paths:
-      - dist/
+      - dist/signed/
