@@ -42,6 +42,7 @@ package perftools.profiles;
 
 option java_package = "com.google.perftools.profiles";
 option java_outer_classname = "ProfileProto";
+option csharp_namespace = "Datadog.Tracer.Pprof.Proto.Profile.V1";
 
 message Profile {
   // A description of the samples associated with each Sample.value.
