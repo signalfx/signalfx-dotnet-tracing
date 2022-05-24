@@ -157,4 +157,11 @@ TEST(ThreadSamplerTest, LRUCache)
     for (int i = 3; i <= max; i++) {
         ASSERT_EQ(true, cache.Get(i) != NULL);
     }
+
+    // test clear cache
+    cache.Clear();
+    for (int i = 1; i <= max; i++)
+    {
+        ASSERT_EQ(NULL, cache.Get(i));
+    }
 }
