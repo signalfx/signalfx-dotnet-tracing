@@ -55,7 +55,7 @@ sign-deb:
   stage: sign
   extends: .submit-request
   dependencies: 
-    - linux-build  
+    - linux-build
   before_script:
     - cp $(ls dist/*.deb) package.deb
   after_script:
@@ -67,7 +67,7 @@ sign-deb:
     SIGN_TYPE: DEB
     DOWNLOAD_DIR: tmp
     REPO_NAME: releng # this env var should be not needed in future
-    REPO_PATH: signalfx-dotnet-tracing  # this env var should be not needed in future
+    REPO_PATH: signalfx-dotnet-tracing # this env var should be not needed in future
   artifacts:
     paths:
       - dist/signed/
@@ -76,7 +76,7 @@ sign-rpm:
   stage: sign
   extends: .submit-request
   dependencies: 
-    - linux-build  
+    - linux-build
   before_script:
     - cp $(ls dist/*.rpm) package.rpm
   after_script:
@@ -88,7 +88,7 @@ sign-rpm:
     SIGN_TYPE: RPM
     DOWNLOAD_DIR: tmp
     REPO_NAME: releng # this env var should be not needed in future
-    REPO_PATH: signalfx-dotnet-tracing  # this env var should be not needed in future
+    REPO_PATH: signalfx-dotnet-tracing # this env var should be not needed in future
   artifacts:
     paths:
       - dist/signed/
@@ -97,7 +97,7 @@ checksums:
   stage: checksum
   dependencies: 
     - sign-deb
-    - sign-rpm  
+    - sign-rpm
   script:
     - pushd dist/signed && shasum -a 256 * > checksums.txt && popd
   artifacts:
@@ -115,7 +115,7 @@ checksums-sign:
     SIGN_TYPE: GPG
     DOWNLOAD_DIR: dist/signed
     REPO_NAME: releng # this env var should be not needed in future
-    REPO_PATH: signalfx-dotnet-tracing  # this env var should be not needed in future
+    REPO_PATH: signalfx-dotnet-tracing # this env var should be not needed in future
   artifacts:
     paths:
       - dist/
