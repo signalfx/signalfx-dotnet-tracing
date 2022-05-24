@@ -15,6 +15,7 @@ using Xunit.Abstractions;
 
 namespace Datadog.Trace.ClrProfiler.IntegrationTests
 {
+    [Trait("RequiresDockerDependency", "true")]
     public class Elasticsearch5Tests : TestHelper
     {
         public Elasticsearch5Tests(ITestOutputHelper output)
