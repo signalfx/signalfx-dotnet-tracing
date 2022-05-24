@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
+using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.Processors;
 using Datadog.Trace.Util;
 using Datadog.Trace.Vendors.MessagePack;
@@ -27,7 +28,7 @@ namespace Datadog.Trace.Tagging
         // common tags
         private static readonly byte[] OriginNameBytes = StringEncoding.UTF8.GetBytes(Trace.Tags.Origin);
         private static readonly byte[] RuntimeIdNameBytes = StringEncoding.UTF8.GetBytes(Trace.Tags.RuntimeId);
-        private static readonly byte[] RuntimeIdValueBytes = StringEncoding.UTF8.GetBytes(Tracer.RuntimeId);
+        private static readonly byte[] RuntimeIdValueBytes = StringEncoding.UTF8.GetBytes(DistributedTracer.Instance.GetRuntimeId());
         private static readonly byte[] LanguageNameBytes = StringEncoding.UTF8.GetBytes(Trace.Tags.Language);
         private static readonly byte[] LanguageValueBytes = StringEncoding.UTF8.GetBytes(TracerConstants.Language);
         private static readonly byte[] ProcessIdNameBytes = StringEncoding.UTF8.GetBytes(Trace.Metrics.ProcessId);
