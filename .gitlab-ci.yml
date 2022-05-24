@@ -60,8 +60,8 @@ sign-deb:
   before_script:
     - cp $(ls dist/*.deb) package.deb
   after_script:
-    - mkdir dist/signed
-    - mv -f tmp/package.deb "dist/signed/$(basename $(ls dist/*.deb))"
+    - mkdir signed
+    - mv -f tmp/package.deb "signed/$(basename $(ls dist/*.deb))"
   variables:
     PROJECT: signalfx-dotnet-tracing
     ARTIFACT: package.deb
@@ -71,7 +71,7 @@ sign-deb:
     REPO_PATH: signalfx-dotnet-tracing # this env var should be not needed in future
   artifacts:
     paths:
-      - dist/signed/
+      - signed/
 
 sign-rpm:
   stage: sign
@@ -79,10 +79,10 @@ sign-rpm:
   dependencies: 
     - linux-build
   before_script:
-    - cp $(ls dist/*.rpm) package.rpm
+    - cp -vp $(ls dist/*.rpm) package.rpm
   after_script:
-    - mkdir dist/signed
-    - mv -f tmp/package.rpm "dist/signed/$(basename $(ls dist/*.rpm))"
+    - mkdir signed
+    - mv -f tmp/package.rpm "signed/$(basename $(ls dist/*.rpm))"
   variables:
     PROJECT: signalfx-dotnet-tracing
     ARTIFACT: package.rpm
@@ -92,31 +92,27 @@ sign-rpm:
     REPO_PATH: signalfx-dotnet-tracing # this env var should be not needed in future
   artifacts:
     paths:
-      - dist/signed/
+      - signed/
 
 checksums:
   stage: checksum
-  dependencies: 
-    - sign-deb
-    - sign-rpm
   script:
-    - pushd dist/signed && shasum -a 256 * > checksums.txt && popd
+    - cp -vnpr dist/. signed # copy artifacts that are not signed
+    - pushd signed && shasum -a 256 * > checksums.txt && popd
   artifacts:
     paths:
-      - dist/signed/
+      - signed/
 
 checksums-sign:
   stage: checksum-sign
   extends: .submit-request
-  dependencies: 
-    - checksums
   variables:
     PROJECT: signalfx-dotnet-tracing
-    ARTIFACT: dist/signed/checksums.txt
+    ARTIFACT: signed/checksums.txt
     SIGN_TYPE: GPG
-    DOWNLOAD_DIR: dist/signed
+    DOWNLOAD_DIR: signed
     REPO_NAME: releng # this env var should be not needed in future
     REPO_PATH: signalfx-dotnet-tracing # this env var should be not needed in future
   artifacts:
     paths:
-      - dist/signed/
+      - signed/
