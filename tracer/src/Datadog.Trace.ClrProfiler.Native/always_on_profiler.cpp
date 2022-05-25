@@ -671,13 +671,13 @@ void ThreadSampler::ThreadNameChanged(ThreadID thread_id, ULONG cch_name, WCHAR 
     state->thread_name_.append(name, cch_name);
 }
 
-template <typename TFunctionIdentifier>
-NameCache<TFunctionIdentifier>::NameCache(const size_t maximum_size) : max_size_(maximum_size)
+template <typename TKey>
+NameCache<TKey>::NameCache(const size_t maximum_size) : max_size_(maximum_size)
 {
 }
 
-template <typename TFunctionIdentifier>
-shared::WSTRING* NameCache<TFunctionIdentifier>::Get(TFunctionIdentifier key)
+template <typename TKey>
+shared::WSTRING* NameCache<TKey>::Get(TKey key)
 {
     const auto found = map_.find(key);
     if (found == map_.end())
@@ -690,8 +690,8 @@ shared::WSTRING* NameCache<TFunctionIdentifier>::Get(TFunctionIdentifier key)
     return found->second->second;
 }
 
-template <typename TFunctionIdentifier>
-shared::WSTRING* NameCache<TFunctionIdentifier>::Put(TFunctionIdentifier key, shared::WSTRING* val)
+template <typename TKey>
+shared::WSTRING* NameCache<TKey>::Put(TKey key, shared::WSTRING* val)
 {
     const auto pair = std::pair(key, val);
     list_.push_front(pair);
@@ -708,8 +708,8 @@ shared::WSTRING* NameCache<TFunctionIdentifier>::Put(TFunctionIdentifier key, sh
     return nullptr;
 }
 
-template <typename TFunctionIdentifier>
-void NameCache<TFunctionIdentifier>::Clear()
+template <typename TKey>
+void NameCache<TKey>::Clear()
 {
     map_.clear();
     list_.clear();
