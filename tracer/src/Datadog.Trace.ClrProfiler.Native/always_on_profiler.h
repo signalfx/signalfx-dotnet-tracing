@@ -147,22 +147,22 @@ struct std::hash<always_on_profiler::FunctionIdentifier>
 
 namespace always_on_profiler
 {
-template <typename TKey>
+template <typename TKey, typename TValue>
 class NameCache
 {
 // ModuleID is volatile but it is unlikely to have exactly same pair of Function Token and ModuleId after changes.
 // If fails we should end up we Unknown(unknown) as a result
 public:
     explicit NameCache(size_t maximum_size);
-    shared::WSTRING* Get(TKey key);
+    TValue Get(TKey key);
     // if max cache size is exceeded it return value which should be disposed
-    shared::WSTRING* Put(TKey key, shared::WSTRING* val);
+    TValue Put(TKey key, TValue val);
     void Clear();
 
 private:
     size_t max_size_;
-    std::list<std::pair<TKey, shared::WSTRING*>> list_;
-    std::unordered_map<TKey, typename std::list<std::pair<TKey, shared::WSTRING*>>::iterator> map_;
+    std::list<std::pair<TKey, TValue>> list_;
+    std::unordered_map<TKey, typename std::list<std::pair<TKey, TValue>>::iterator> map_;
 };
 } // namespace always_on_profiler
 

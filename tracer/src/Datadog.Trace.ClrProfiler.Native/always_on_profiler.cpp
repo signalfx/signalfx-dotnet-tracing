@@ -244,8 +244,8 @@ class SamplingHelper
 public:
     // These are permanent parts of the helper object
     ICorProfilerInfo10* info10_ = nullptr;
-    NameCache<FunctionIdentifier> function_name_cache_;
-    NameCache<FunctionID> volatile_function_name_cache_;
+    NameCache<FunctionIdentifier, shared::WSTRING*> function_name_cache_;
+    NameCache<FunctionID, shared::WSTRING*> volatile_function_name_cache_;
     // These cycle every sample and/or are owned externally
     ThreadSamplesBuffer* cur_writer_ = nullptr;
     std::vector<unsigned char>* cur_buffer_ = nullptr;
@@ -671,13 +671,14 @@ void ThreadSampler::ThreadNameChanged(ThreadID thread_id, ULONG cch_name, WCHAR 
     state->thread_name_.append(name, cch_name);
 }
 
-template <typename TKey>
-NameCache<TKey>::NameCache(const size_t maximum_size) : max_size_(maximum_size)
+
+template <typename TKey, typename TValue>
+NameCache<TKey, TValue>::NameCache(const size_t maximum_size) : max_size_(maximum_size)
 {
 }
 
-template <typename TKey>
-shared::WSTRING* NameCache<TKey>::Get(TKey key)
+template <typename TKey, typename TValue>
+TValue NameCache<TKey, TValue>::Get(TKey key)
 {
     const auto found = map_.find(key);
     if (found == map_.end())
@@ -690,8 +691,8 @@ shared::WSTRING* NameCache<TKey>::Get(TKey key)
     return found->second->second;
 }
 
-template <typename TKey>
-shared::WSTRING* NameCache<TKey>::Put(TKey key, shared::WSTRING* val)
+template <typename TKey, typename TValue>
+TValue NameCache<TKey, TValue>::Put(TKey key, TValue val)
 {
     const auto pair = std::pair(key, val);
     list_.push_front(pair);
@@ -708,8 +709,8 @@ shared::WSTRING* NameCache<TKey>::Put(TKey key, shared::WSTRING* val)
     return nullptr;
 }
 
-template <typename TKey>
-void NameCache<TKey>::Clear()
+template <typename TKey, typename TValue>
+void NameCache<TKey, TValue>::Clear()
 {
     map_.clear();
     list_.clear();

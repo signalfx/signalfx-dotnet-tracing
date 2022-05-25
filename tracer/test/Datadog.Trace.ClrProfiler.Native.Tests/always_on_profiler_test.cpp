@@ -132,7 +132,7 @@ TEST(ThreadSamplerTest, StaticBufferManagement)
 TEST(ThreadSamplerTest, LRUCache)
 {
     constexpr int max = 10000;
-    NameCache<FunctionID> cache(max);
+    NameCache<FunctionID, shared::WSTRING*> cache(max);
     for (int i = 1; i <= max; i++)
     {
         ASSERT_EQ(NULL, cache.Get(i));
