@@ -26,7 +26,8 @@ constexpr auto kMinimumSamplePeriod = 1000;
 // FIXME make configurable (hidden)?
 // These numbers were chosen to keep total overhead under 1 MB of RAM in typical cases (name lengths being the biggest
 // variable)
-constexpr auto kMaxFunctionNameCacheSize = 7000;
+constexpr auto kMaxFunctionNameCacheSize = 5000;
+constexpr auto kMaxVolatileFunctionNameCacheSize = 2000;
 
 
 // If you squint you can make out that the original bones of this came from sample code provided by the dotnet project:
@@ -243,13 +244,14 @@ class SamplingHelper
 public:
     // These are permanent parts of the helper object
     ICorProfilerInfo10* info10_ = nullptr;
-    NameCache function_name_cache_;
+    NameCache<FunctionIdentifier> function_name_cache_;
+    NameCache<FunctionID> volatile_function_name_cache_;
     // These cycle every sample and/or are owned externally
     ThreadSamplesBuffer* cur_writer_ = nullptr;
     std::vector<unsigned char>* cur_buffer_ = nullptr;
     SamplingStatistics stats_;
 
-    SamplingHelper() : function_name_cache_(kMaxFunctionNameCacheSize)
+    SamplingHelper() : function_name_cache_(kMaxFunctionNameCacheSize), volatile_function_name_cache_(kMaxVolatileFunctionNameCacheSize)
     {
     }
 
@@ -427,19 +429,29 @@ private:
 public:
     shared::WSTRING* Lookup(FunctionID fid, COR_PRF_FRAME_INFO frame)
     {
-        const auto function_identifier = this->GetFunctionIdentifier(fid, frame);
-
-        // TODO Splunk: consider two layers cache. Based on FunctionID while CLR is suspended.
-        // The second one based on Function token (mdToken) and ModuleID - it can susrvive multiple CLR suspensions.
-        shared::WSTRING* answer = function_name_cache_.Get(function_identifier);
+        // This method is using two layers of caching
+        // 1st layer depends on FunctionID which is volatile (and valid only within one thread suspension)
+        // 2nd layer depends on mdToken for function (which is stable) and ModuleId which could be volatile,
+        // but the pair should be stable enough to avoid any overlaps.
+        shared::WSTRING* answer = volatile_function_name_cache_.Get(fid);
         if (answer != nullptr)
         {
+            return answer;
+        }
+
+        const auto function_identifier = this->GetFunctionIdentifier(fid, frame);
+
+        answer = function_name_cache_.Get(function_identifier);
+        if (answer != nullptr)
+        {
+            volatile_function_name_cache_.Put(fid, answer);
             return answer;
         }
         stats_.name_cache_misses++;
         answer = new shared::WSTRING();
         this->GetFunctionName(function_identifier, *answer);
         function_name_cache_.Put(function_identifier, answer);
+        volatile_function_name_cache_.Put(fid, answer);
         return answer;
     }
 };
@@ -468,6 +480,7 @@ void CaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, SamplingHelpe
     ThreadID thread_id;
     ULONG num_returned = 0;
 
+    helper.volatile_function_name_cache_.Clear();
     helper.cur_writer_->StartBatch();
 
     while ((hr = thread_enum->Next(1, &thread_id, &num_returned)) == S_OK)
@@ -655,11 +668,13 @@ void ThreadSampler::ThreadNameChanged(ThreadID thread_id, ULONG cch_name, WCHAR 
     state->thread_name_.append(name, cch_name);
 }
 
-NameCache::NameCache(const size_t maximum_size) : max_size_(maximum_size)
+template <typename TFunctionIdentifier>
+NameCache<TFunctionIdentifier>::NameCache(const size_t maximum_size) : max_size_(maximum_size)
 {
 }
 
-shared::WSTRING* NameCache::Get(FunctionIdentifier key)
+template <typename TFunctionIdentifier>
+shared::WSTRING* NameCache<TFunctionIdentifier>::Get(TFunctionIdentifier key)
 {
     const auto found = map_.find(key);
     if (found == map_.end())
@@ -672,7 +687,8 @@ shared::WSTRING* NameCache::Get(FunctionIdentifier key)
     return found->second->second;
 }
 
-void NameCache::Put(FunctionIdentifier key, shared::WSTRING* val)
+template <typename TFunctionIdentifier>
+void NameCache<TFunctionIdentifier>::Put(TFunctionIdentifier key, shared::WSTRING* val)
 {
     const auto pair = std::pair(key, val);
     list_.push_front(pair);
@@ -685,6 +701,13 @@ void NameCache::Put(FunctionIdentifier key, shared::WSTRING* val)
         map_.erase(lru.first);
         list_.pop_back();
     }
+}
+
+template <typename TFunctionIdentifier>
+void NameCache<TFunctionIdentifier>::Clear()
+{
+    map_.clear();
+    list_.clear();
 }
 
 } // namespace always_on_profiler

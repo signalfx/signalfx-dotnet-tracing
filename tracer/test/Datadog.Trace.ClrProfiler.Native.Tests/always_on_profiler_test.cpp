@@ -132,29 +132,36 @@ TEST(ThreadSamplerTest, StaticBufferManagement)
 TEST(ThreadSamplerTest, LRUCache)
 {
     constexpr int max = 10000;
-    NameCache cache(max);
+    NameCache<FunctionID> cache(max);
     for (int i = 1; i <= max; i++)
     {
-        ASSERT_EQ(NULL, cache.Get(FunctionIdentifier{static_cast<unsigned>(i), 0, true}));
+        ASSERT_EQ(NULL, cache.Get(i));
         auto val = new shared::WSTRING(L"Function ");
         val->append(std::to_wstring(i));
-        cache.Put(FunctionIdentifier{static_cast<unsigned>(i), 0, true}, val);
-        ASSERT_EQ(val, cache.Get(FunctionIdentifier{static_cast<unsigned>(i), 0, true}));
+        cache.Put(i, val);
+        ASSERT_EQ(val, cache.Get(i));
     }
     // Now cache is full; add another and item 1 gets kicked out
     auto* func_max_plus1 = new shared::WSTRING(L"Function max+1");
-    ASSERT_EQ(NULL, cache.Get(FunctionIdentifier{static_cast<unsigned>(max + 1), 0, true}));
-    cache.Put(FunctionIdentifier{static_cast<unsigned>(max + 1), 0, true}, func_max_plus1);
-    ASSERT_EQ(NULL, cache.Get(FunctionIdentifier{static_cast<unsigned>(1), 0, true}));
-    ASSERT_EQ(func_max_plus1, cache.Get(FunctionIdentifier{static_cast<unsigned>(max + 1), 0, true}));
+    ASSERT_EQ(NULL, cache.Get(max + 1));
+    cache.Put(max + 1, func_max_plus1);
+    ASSERT_EQ(NULL, cache.Get(1));
+    ASSERT_EQ(func_max_plus1, cache.Get(max + 1));
 
     // Put 1 back, 2 falls off and everything else is there
     const auto func1 = new shared::WSTRING(L"Function 1");
-    cache.Put(FunctionIdentifier { 1, 0, true }, func1);
-    ASSERT_EQ(NULL, cache.Get(FunctionIdentifier{2, 0, true}));
-    ASSERT_EQ(func1, cache.Get(FunctionIdentifier{static_cast<unsigned>(1), 0, true}));
-    ASSERT_EQ(func_max_plus1, cache.Get(FunctionIdentifier{static_cast<unsigned>(max + 1), 0, true}));
+    cache.Put(1, func1);
+    ASSERT_EQ(NULL, cache.Get(2));
+    ASSERT_EQ(func1, cache.Get(1));
+    ASSERT_EQ(func_max_plus1, cache.Get(max + 1));
     for (int i = 3; i <= max; i++) {
-        ASSERT_EQ(true, cache.Get(FunctionIdentifier{static_cast<unsigned>(i), 0, true}) != NULL);
+        ASSERT_EQ(true, cache.Get(i) != NULL);
+    }
+
+    // test clear cache
+    cache.Clear();
+    for (int i = 1; i <= max; i++)
+    {
+        ASSERT_EQ(NULL, cache.Get(i));
     }
 }
