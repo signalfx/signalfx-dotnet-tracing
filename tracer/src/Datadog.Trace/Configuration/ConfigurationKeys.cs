@@ -482,6 +482,11 @@ namespace Datadog.Trace.Configuration
             /// This flag defaults to true and is here in case customers need retrocompatibility only
             /// </summary>
             public const string HeaderTagsNormalizationFixEnabled = "SIGNALFX_TRACE_HEADER_TAG_NORMALIZATION_FIX_ENABLED";
+
+            /// <summary>
+            /// Enables experimental support for activity listener
+            /// </summary>
+            public const string ActivityListenerEnabled = "SIGNALFX_TRACE_ACTIVITY_LISTENER_ENABLED";
         }
 
         internal static class AlwaysOnProfiler
@@ -521,7 +526,7 @@ namespace Datadog.Trace.Configuration
             /// telemetry is in use (otherwise telemetry is sent to the agent using
             /// <see cref="ExporterSettings.AgentUri"/> instead)
             /// </summary>
-            public const string Uri = "SIGNALFX_TRACE_TELEMETRY_URL";
+            public const string Uri = "SIGNALFX_INSTRUMENTATION_TELEMETRY_URL";
         }
     }
 }

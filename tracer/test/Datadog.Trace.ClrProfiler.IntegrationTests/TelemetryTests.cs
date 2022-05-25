@@ -23,6 +23,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         public TelemetryTests(ITestOutputHelper output)
             : base("Telemetry", output)
         {
+            SetEnvironmentVariable(ConfigurationKeys.FeatureFlags.ActivityListenerEnabled, "true");
             SetServiceVersion(ServiceVersion);
             EnableDebugMode();
         }
@@ -55,7 +56,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             agent.Telemetry.Should().BeEmpty();
         }
 
-        [SkippableFact]
+        [SkippableFact(Skip = "SignalFX does not have cloud support for telemetry.")]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         public void Telemetry_WithAgentProxy_IsSentOnAppClose()
@@ -112,7 +113,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
         private static void AssertExpectedSpans(IImmutableList<MockSpan> spans)
         {
-            spans.Should().ContainSingle(span => span.Name == "http.request");
+            spans.Should().ContainSingle(span => span.LogicScope == "http.request");
             spans.Should().ContainSingle(span => span.Name == "HttpListener.ReceivedRequest");
         }
     }
