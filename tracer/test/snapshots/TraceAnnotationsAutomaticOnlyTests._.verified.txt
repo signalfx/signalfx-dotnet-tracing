@@ -828,7 +828,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
@@ -842,7 +842,7 @@
     ParentId: Id_2,
     Tags: {
       component: trace,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
       version: 1.0.0
     }
