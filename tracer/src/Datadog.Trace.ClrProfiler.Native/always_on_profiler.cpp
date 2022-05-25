@@ -450,7 +450,10 @@ public:
         stats_.name_cache_misses++;
         answer = new shared::WSTRING();
         this->GetFunctionName(function_identifier, *answer);
-        function_name_cache_.Put(function_identifier, answer);
+
+        const auto old_value = function_name_cache_.Put(function_identifier, answer);
+        delete old_value;
+
         volatile_function_name_cache_.Put(fid, answer);
         return answer;
     }
@@ -688,7 +691,7 @@ shared::WSTRING* NameCache<TFunctionIdentifier>::Get(TFunctionIdentifier key)
 }
 
 template <typename TFunctionIdentifier>
-void NameCache<TFunctionIdentifier>::Put(TFunctionIdentifier key, shared::WSTRING* val)
+shared::WSTRING* NameCache<TFunctionIdentifier>::Put(TFunctionIdentifier key, shared::WSTRING* val)
 {
     const auto pair = std::pair(key, val);
     list_.push_front(pair);
@@ -697,10 +700,12 @@ void NameCache<TFunctionIdentifier>::Put(TFunctionIdentifier key, shared::WSTRIN
     if (map_.size() > max_size_)
     {
         const auto &lru = list_.back();
-        delete lru.second; // FIXME consider using WSTRING directly instead of WSTRING*
+        const auto old_value = lru.second;
         map_.erase(lru.first);
         list_.pop_back();
+        return old_value;
     }
+    return nullptr;
 }
 
 template <typename TFunctionIdentifier>

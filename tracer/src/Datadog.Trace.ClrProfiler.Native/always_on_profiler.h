@@ -155,7 +155,8 @@ class NameCache
 public:
     explicit NameCache(size_t maximum_size);
     shared::WSTRING* Get(TFunctionIdentifier key);
-    void Put(TFunctionIdentifier key, shared::WSTRING* val);
+    // if max cache size is exceeded it return value which should be disposed
+    shared::WSTRING* Put(TFunctionIdentifier key, shared::WSTRING* val);
     void Clear();
 
 private:
