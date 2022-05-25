@@ -446,7 +446,7 @@ partial class Build
             const string misc = "Miscellaneous";
             const string tracer = "Tracer";
             const string ciApp = "CI App";
-            const string appSec = "AppSec";
+            const string appSecMonitoring = "ASM";
             const string profiler = "Continuous Profiler";
             const string debugger = "Debugger";
             const string serverless = "Serverless";
@@ -537,7 +537,7 @@ partial class Build
                 var areaLabelToComponentMap = new Dictionary<string, string>() {
                     { "area:tracer", tracer },
                     { "area:ci-app", ciApp },
-                    { "area:app-sec", appSec },
+                    { "area:asm", appSecMonitoring },
                     { "area:profiler", profiler },
                     { "area:debugger", debugger },
                     { "area:serverless", serverless }
@@ -582,7 +582,7 @@ partial class Build
             {
                 tracer => 0,
                 ciApp => 1,
-                appSec => 2,
+                appSecMonitoring => 2,
                 profiler => 3,
                 debugger => 4,
                 serverless => 5,
