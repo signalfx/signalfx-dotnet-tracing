@@ -18,9 +18,14 @@ class Log final
 private:
     struct ProfilerLoggerPolicy
     {
-        inline static const std::string file_name = WStr("dotNet-profiler-native");
+        inline static const std::string file_name = "dotNet-profiler-native";
+        inline static const shared::WSTRING folder_path =
 #ifdef _WIN32
-        inline static const shared::WSTRING folder_path = WStr(R"(SignalFx .NET Tracing\logDotNets)");
+            WStr("C:\\ProgramData\\SignalFx .NET Tracing\\logs\\DotNet");
+#else
+            WStr("/var/log/signalfx/");
+#endif
+
         inline static const std::string pattern = "[%Y-%m-%d %H:%M:%S.%e | %l | PId: %P | TId: %t] %v";
         struct logging_environment
         {

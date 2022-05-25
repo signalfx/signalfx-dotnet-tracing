@@ -97,7 +97,7 @@ namespace Datadog.Trace.Tests.Tagging
             deserializedSpan.Tags.Count.Should().Be(customTagCount + 3);
             deserializedSpan.Tags.Should().Contain(Tags.Env, "Overridden Environment");
             deserializedSpan.Tags.Should().Contain(Tags.Language, TracerConstants.Language);
-            deserializedSpan.Tags.Should().Contain(Tags.RuntimeId, Tracer.RuntimeId);
+            deserializedSpan.Tags.Should().Contain(Tags.RuntimeId, ClrProfiler.DistributedTracer.Instance.GetRuntimeId());
 
             deserializedSpan.Metrics.Count.Should().Be(customTagCount + 3);
             deserializedSpan.Metrics.Should().Contain(Metrics.SamplingLimitDecision, 0.75);
@@ -129,7 +129,7 @@ namespace Datadog.Trace.Tests.Tagging
             deserializedSpan.Tags.Count.Should().Be(customTagCount + 3);
             deserializedSpan.Tags.Should().Contain(Tags.Env, "Overridden Environment");
             deserializedSpan.Tags.Should().Contain(Tags.Language, TracerConstants.Language);
-            deserializedSpan.Tags.Should().Contain(Tags.RuntimeId, Tracer.RuntimeId);
+            deserializedSpan.Tags.Should().Contain(Tags.RuntimeId, Datadog.Trace.ClrProfiler.DistributedTracer.Instance.GetRuntimeId());
 
             deserializedSpan.Metrics.Count.Should().Be(customTagCount + 2);
             deserializedSpan.Metrics.Should().Contain(Metrics.SamplingLimitDecision, 0.75);

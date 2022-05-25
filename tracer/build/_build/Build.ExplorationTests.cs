@@ -131,6 +131,7 @@ partial class Build
                .After(Clean, BuildTracerHome, SetUpExplorationTests)
                .Executes(() =>
                 {
+                    FileSystemTasks.EnsureExistingDirectory(TestLogsDirectory);
                     try
                     {
                         var envVariables = GetEnvironmentVariables();
@@ -139,7 +140,7 @@ partial class Build
                     }
                     finally
                     {
-                        MoveLogsToBuildData();
+                        CopyDumpsToBuildData();
                     }
                 })
         ;
@@ -148,6 +149,7 @@ partial class Build
     {
         var envVariables = new Dictionary<string, string>
         {
+            ["SIGNALFX_LOG_DIRECTORY"] = TestLogsDirectory,
             ["SIGNALFX_SERVICE_NAME"] = "exploration_tests",
             ["SIGNALFX_VERSION"] = Version
         };

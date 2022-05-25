@@ -1,4 +1,4 @@
-﻿// <copyright file="TelemetryDataBuilder.cs" company="Datadog">
+// <copyright file="TelemetryDataBuilder.cs" company="Datadog">
 // Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Util;
 
@@ -113,7 +114,7 @@ namespace Datadog.Trace.Telemetry
             return new TelemetryData(
                 requestType: requestType,
                 tracerTime: DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                runtimeId: Tracer.RuntimeId,
+                runtimeId: DistributedTracer.Instance.GetRuntimeId(),
                 seqId: sequence,
                 application: application,
                 host: host,

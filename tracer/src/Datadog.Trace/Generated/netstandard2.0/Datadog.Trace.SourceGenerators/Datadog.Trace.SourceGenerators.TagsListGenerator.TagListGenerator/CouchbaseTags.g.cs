@@ -2,18 +2,26 @@
 #nullable enable
 
 using Datadog.Trace.Processors;
+using Datadog.Trace.Tagging;
 
 namespace Datadog.Trace.Tagging
 {
     partial class CouchbaseTags
     {
-        private static readonly byte[] SpanKindBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("span.kind");
-        private static readonly byte[] InstrumentationNameBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("component");
-        private static readonly byte[] OperationCodeBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("couchbase.operation.code");
-        private static readonly byte[] BucketBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("couchbase.operation.bucket");
-        private static readonly byte[] KeyBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("couchbase.operation.key");
-        private static readonly byte[] HostBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("net.peer.name");
-        private static readonly byte[] PortBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("net.peer.port");
+        // SpanKindBytes = System.Text.Encoding.UTF8.GetBytes("span.kind");
+        private static readonly byte[] SpanKindBytes = new byte[] { 115, 112, 97, 110, 46, 107, 105, 110, 100 };
+        // InstrumentationNameBytes = System.Text.Encoding.UTF8.GetBytes("component");
+        private static readonly byte[] InstrumentationNameBytes = new byte[] { 99, 111, 109, 112, 111, 110, 101, 110, 116 };
+        // OperationCodeBytes = System.Text.Encoding.UTF8.GetBytes("couchbase.operation.code");
+        private static readonly byte[] OperationCodeBytes = new byte[] { 99, 111, 117, 99, 104, 98, 97, 115, 101, 46, 111, 112, 101, 114, 97, 116, 105, 111, 110, 46, 99, 111, 100, 101 };
+        // BucketBytes = System.Text.Encoding.UTF8.GetBytes("couchbase.operation.bucket");
+        private static readonly byte[] BucketBytes = new byte[] { 99, 111, 117, 99, 104, 98, 97, 115, 101, 46, 111, 112, 101, 114, 97, 116, 105, 111, 110, 46, 98, 117, 99, 107, 101, 116 };
+        // KeyBytes = System.Text.Encoding.UTF8.GetBytes("couchbase.operation.key");
+        private static readonly byte[] KeyBytes = new byte[] { 99, 111, 117, 99, 104, 98, 97, 115, 101, 46, 111, 112, 101, 114, 97, 116, 105, 111, 110, 46, 107, 101, 121 };
+        // HostBytes = System.Text.Encoding.UTF8.GetBytes("net.peer.name");
+        private static readonly byte[] HostBytes = new byte[] { 110, 101, 116, 46, 112, 101, 101, 114, 46, 110, 97, 109, 101 };
+        // PortBytes = System.Text.Encoding.UTF8.GetBytes("net.peer.port");
+        private static readonly byte[] PortBytes = new byte[] { 110, 101, 116, 46, 112, 101, 101, 114, 46, 112, 111, 114, 116 };
 
         public override string? GetTag(string key)
         {
@@ -64,7 +72,47 @@ namespace Datadog.Trace.Tagging
                 new Datadog.Trace.Tagging.Property<CouchbaseTags, string?>("couchbase.operation.key", t => t.Key),
                 new Datadog.Trace.Tagging.Property<CouchbaseTags, string?>("net.peer.name", t => t.Host),
                 new Datadog.Trace.Tagging.Property<CouchbaseTags, string?>("net.peer.port", t => t.Port)
-);
+        );
+
+        public override void EnumerateTags<TProcessor>(ref TProcessor processor)
+        {
+            if (SpanKind is not null)
+            {
+                processor.Process(new TagItem<string>("span.kind", SpanKind, SpanKindBytes));
+            }
+
+            if (InstrumentationName is not null)
+            {
+                processor.Process(new TagItem<string>("component", InstrumentationName, InstrumentationNameBytes));
+            }
+
+            if (OperationCode is not null)
+            {
+                processor.Process(new TagItem<string>("couchbase.operation.code", OperationCode, OperationCodeBytes));
+            }
+
+            if (Bucket is not null)
+            {
+                processor.Process(new TagItem<string>("couchbase.operation.bucket", Bucket, BucketBytes));
+            }
+
+            if (Key is not null)
+            {
+                processor.Process(new TagItem<string>("couchbase.operation.key", Key, KeyBytes));
+            }
+
+            if (Host is not null)
+            {
+                processor.Process(new TagItem<string>("net.peer.name", Host, HostBytes));
+            }
+
+            if (Port is not null)
+            {
+                processor.Process(new TagItem<string>("net.peer.port", Port, PortBytes));
+            }
+
+            base.EnumerateTags(ref processor);
+        }
 
         protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
         {
@@ -74,43 +122,43 @@ namespace Datadog.Trace.Tagging
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
         {
             var count = 0;
-            if (SpanKind != null)
+            if (SpanKind is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, SpanKindBytes, SpanKind, tagProcessors);
             }
 
-            if (InstrumentationName != null)
+            if (InstrumentationName is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, InstrumentationNameBytes, InstrumentationName, tagProcessors);
             }
 
-            if (OperationCode != null)
+            if (OperationCode is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, OperationCodeBytes, OperationCode, tagProcessors);
             }
 
-            if (Bucket != null)
+            if (Bucket is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, BucketBytes, Bucket, tagProcessors);
             }
 
-            if (Key != null)
+            if (Key is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, KeyBytes, Key, tagProcessors);
             }
 
-            if (Host != null)
+            if (Host is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, HostBytes, Host, tagProcessors);
             }
 
-            if (Port != null)
+            if (Port is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, PortBytes, Port, tagProcessors);
@@ -121,49 +169,49 @@ namespace Datadog.Trace.Tagging
 
         protected override void WriteAdditionalTags(System.Text.StringBuilder sb)
         {
-            if (SpanKind != null)
+            if (SpanKind is not null)
             {
                 sb.Append("span.kind (tag):")
                   .Append(SpanKind)
                   .Append(',');
             }
 
-            if (InstrumentationName != null)
+            if (InstrumentationName is not null)
             {
                 sb.Append("component (tag):")
                   .Append(InstrumentationName)
                   .Append(',');
             }
 
-            if (OperationCode != null)
+            if (OperationCode is not null)
             {
                 sb.Append("couchbase.operation.code (tag):")
                   .Append(OperationCode)
                   .Append(',');
             }
 
-            if (Bucket != null)
+            if (Bucket is not null)
             {
                 sb.Append("couchbase.operation.bucket (tag):")
                   .Append(Bucket)
                   .Append(',');
             }
 
-            if (Key != null)
+            if (Key is not null)
             {
                 sb.Append("couchbase.operation.key (tag):")
                   .Append(Key)
                   .Append(',');
             }
 
-            if (Host != null)
+            if (Host is not null)
             {
                 sb.Append("net.peer.name (tag):")
                   .Append(Host)
                   .Append(',');
             }
 
-            if (Port != null)
+            if (Port is not null)
             {
                 sb.Append("net.peer.port (tag):")
                   .Append(Port)
