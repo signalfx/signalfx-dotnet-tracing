@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
+using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.Processors;
 using Datadog.Trace.Util;
 using Datadog.Trace.Vendors.MessagePack;
@@ -27,7 +28,7 @@ namespace Datadog.Trace.Tagging
         // common tags
         private static readonly byte[] OriginNameBytes = StringEncoding.UTF8.GetBytes(Trace.Tags.Origin);
         private static readonly byte[] RuntimeIdNameBytes = StringEncoding.UTF8.GetBytes(Trace.Tags.RuntimeId);
-        private static readonly byte[] RuntimeIdValueBytes = StringEncoding.UTF8.GetBytes(Tracer.RuntimeId);
+        private static readonly byte[] RuntimeIdValueBytes = StringEncoding.UTF8.GetBytes(DistributedTracer.Instance.GetRuntimeId());
         private static readonly byte[] LanguageNameBytes = StringEncoding.UTF8.GetBytes(Trace.Tags.Language);
         private static readonly byte[] LanguageValueBytes = StringEncoding.UTF8.GetBytes(TracerConstants.Language);
         private static readonly byte[] ProcessIdNameBytes = StringEncoding.UTF8.GetBytes(Trace.Metrics.ProcessId);
@@ -81,6 +82,38 @@ namespace Datadog.Trace.Tagging
             }
 
             return allTags;
+        }
+
+        public virtual void EnumerateTags<TProcessor>(ref TProcessor processor)
+            where TProcessor : struct, IItemProcessor<string>
+        {
+            var tags = Volatile.Read(ref _tags);
+            if (tags is not null)
+            {
+                lock (tags)
+                {
+                    for (int i = 0; i < tags.Count; i++)
+                    {
+                        processor.Process(new TagItem<string>(tags[i].Key, tags[i].Value, null));
+                    }
+                }
+            }
+        }
+
+        public virtual void EnumerateMetrics<TProcessor>(ref TProcessor processor)
+            where TProcessor : struct, IItemProcessor<double>
+        {
+            var metrics = Volatile.Read(ref _metrics);
+            if (metrics is not null)
+            {
+                lock (metrics)
+                {
+                    for (int i = 0; i < metrics.Count; i++)
+                    {
+                        processor.Process(new TagItem<double>(metrics[i].Key, metrics[i].Value, null));
+                    }
+                }
+            }
         }
 
         protected virtual IProperty<string>[] GetAdditionalTags() => TagsListProperties;

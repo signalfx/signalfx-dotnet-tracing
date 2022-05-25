@@ -12,6 +12,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Datadog.Trace.Agent;
+using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Conventions;
 using Datadog.Trace.DogStatsd;
@@ -238,10 +239,12 @@ namespace Datadog.Trace
             }
 
             string agentError = null;
+            var instanceSettings = instance.Settings;
 
             // In AAS, the trace agent is deployed alongside the tracer and managed by the tracer
             // Disable this check as it may hit the trace agent before it is ready to receive requests and give false negatives
-            if (!AzureAppServices.Metadata.IsRelevant)
+            // Also disable if tracing is not enabled (as likely to be in an environment where agent is not available)
+            if (instanceSettings.TraceEnabled && !AzureAppServices.Metadata.IsRelevant)
             {
                 try
                 {
@@ -260,7 +263,6 @@ namespace Datadog.Trace
 
             try
             {
-                var instanceSettings = instance.Settings;
                 var stringWriter = new StringWriter();
 
                 using (var writer = new JsonTextWriter(stringWriter))
@@ -371,7 +373,7 @@ namespace Datadog.Trace
                     writer.WriteValue(instanceSettings.ExporterSettings.PartialFlushMinSpans);
 
                     writer.WritePropertyName("runtime_id");
-                    writer.WriteValue(Tracer.RuntimeId);
+                    writer.WriteValue(DistributedTracer.Instance.GetRuntimeId());
 
                     writer.WritePropertyName("agent_reachable");
                     writer.WriteValue(agentError == null);

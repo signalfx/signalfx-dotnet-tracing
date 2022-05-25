@@ -2,17 +2,24 @@
 #nullable enable
 
 using Datadog.Trace.Processors;
+using Datadog.Trace.Tagging;
 
 namespace Datadog.Trace.Tagging
 {
     partial class WebTags
     {
-        private static readonly byte[] SpanKindBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("span.kind");
-        private static readonly byte[] HttpMethodBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("http.method");
-        private static readonly byte[] HttpRequestHeadersHostBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("http.host");
-        private static readonly byte[] HttpUrlBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("http.url");
-        private static readonly byte[] PeerIpBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("net.peer.ip");
-        private static readonly byte[] HttpStatusCodeBytes = Datadog.Trace.Vendors.MessagePack.StringEncoding.UTF8.GetBytes("http.status_code");
+        // SpanKindBytes = System.Text.Encoding.UTF8.GetBytes("span.kind");
+        private static readonly byte[] SpanKindBytes = new byte[] { 115, 112, 97, 110, 46, 107, 105, 110, 100 };
+        // HttpMethodBytes = System.Text.Encoding.UTF8.GetBytes("http.method");
+        private static readonly byte[] HttpMethodBytes = new byte[] { 104, 116, 116, 112, 46, 109, 101, 116, 104, 111, 100 };
+        // HttpRequestHeadersHostBytes = System.Text.Encoding.UTF8.GetBytes("http.host");
+        private static readonly byte[] HttpRequestHeadersHostBytes = new byte[] { 104, 116, 116, 112, 46, 104, 111, 115, 116 };
+        // HttpUrlBytes = System.Text.Encoding.UTF8.GetBytes("http.url");
+        private static readonly byte[] HttpUrlBytes = new byte[] { 104, 116, 116, 112, 46, 117, 114, 108 };
+        // PeerIpBytes = System.Text.Encoding.UTF8.GetBytes("net.peer.ip");
+        private static readonly byte[] PeerIpBytes = new byte[] { 110, 101, 116, 46, 112, 101, 101, 114, 46, 105, 112 };
+        // HttpStatusCodeBytes = System.Text.Encoding.UTF8.GetBytes("http.status_code");
+        private static readonly byte[] HttpStatusCodeBytes = new byte[] { 104, 116, 116, 112, 46, 115, 116, 97, 116, 117, 115, 95, 99, 111, 100, 101 };
 
         public override string? GetTag(string key)
         {
@@ -61,7 +68,42 @@ namespace Datadog.Trace.Tagging
                 new Datadog.Trace.Tagging.Property<WebTags, string?>("http.url", t => t.HttpUrl),
                 new Datadog.Trace.Tagging.Property<WebTags, string?>("net.peer.ip", t => t.PeerIp),
                 new Datadog.Trace.Tagging.Property<WebTags, string?>("http.status_code", t => t.HttpStatusCode)
-);
+        );
+
+        public override void EnumerateTags<TProcessor>(ref TProcessor processor)
+        {
+            if (SpanKind is not null)
+            {
+                processor.Process(new TagItem<string>("span.kind", SpanKind, SpanKindBytes));
+            }
+
+            if (HttpMethod is not null)
+            {
+                processor.Process(new TagItem<string>("http.method", HttpMethod, HttpMethodBytes));
+            }
+
+            if (HttpRequestHeadersHost is not null)
+            {
+                processor.Process(new TagItem<string>("http.host", HttpRequestHeadersHost, HttpRequestHeadersHostBytes));
+            }
+
+            if (HttpUrl is not null)
+            {
+                processor.Process(new TagItem<string>("http.url", HttpUrl, HttpUrlBytes));
+            }
+
+            if (PeerIp is not null)
+            {
+                processor.Process(new TagItem<string>("net.peer.ip", PeerIp, PeerIpBytes));
+            }
+
+            if (HttpStatusCode is not null)
+            {
+                processor.Process(new TagItem<string>("http.status_code", HttpStatusCode, HttpStatusCodeBytes));
+            }
+
+            base.EnumerateTags(ref processor);
+        }
 
         protected override Datadog.Trace.Tagging.IProperty<string?>[] GetAdditionalTags()
         {
@@ -71,37 +113,37 @@ namespace Datadog.Trace.Tagging
         protected override int WriteAdditionalTags(ref byte[] bytes, ref int offset, ITagProcessor[] tagProcessors)
         {
             var count = 0;
-            if (SpanKind != null)
+            if (SpanKind is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, SpanKindBytes, SpanKind, tagProcessors);
             }
 
-            if (HttpMethod != null)
+            if (HttpMethod is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, HttpMethodBytes, HttpMethod, tagProcessors);
             }
 
-            if (HttpRequestHeadersHost != null)
+            if (HttpRequestHeadersHost is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, HttpRequestHeadersHostBytes, HttpRequestHeadersHost, tagProcessors);
             }
 
-            if (HttpUrl != null)
+            if (HttpUrl is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, HttpUrlBytes, HttpUrl, tagProcessors);
             }
 
-            if (PeerIp != null)
+            if (PeerIp is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, PeerIpBytes, PeerIp, tagProcessors);
             }
 
-            if (HttpStatusCode != null)
+            if (HttpStatusCode is not null)
             {
                 count++;
                 WriteTag(ref bytes, ref offset, HttpStatusCodeBytes, HttpStatusCode, tagProcessors);
@@ -112,42 +154,42 @@ namespace Datadog.Trace.Tagging
 
         protected override void WriteAdditionalTags(System.Text.StringBuilder sb)
         {
-            if (SpanKind != null)
+            if (SpanKind is not null)
             {
                 sb.Append("span.kind (tag):")
                   .Append(SpanKind)
                   .Append(',');
             }
 
-            if (HttpMethod != null)
+            if (HttpMethod is not null)
             {
                 sb.Append("http.method (tag):")
                   .Append(HttpMethod)
                   .Append(',');
             }
 
-            if (HttpRequestHeadersHost != null)
+            if (HttpRequestHeadersHost is not null)
             {
                 sb.Append("http.host (tag):")
                   .Append(HttpRequestHeadersHost)
                   .Append(',');
             }
 
-            if (HttpUrl != null)
+            if (HttpUrl is not null)
             {
                 sb.Append("http.url (tag):")
                   .Append(HttpUrl)
                   .Append(',');
             }
 
-            if (PeerIp != null)
+            if (PeerIp is not null)
             {
                 sb.Append("net.peer.ip (tag):")
                   .Append(PeerIp)
                   .Append(',');
             }
 
-            if (HttpStatusCode != null)
+            if (HttpStatusCode is not null)
             {
                 sb.Append("http.status_code (tag):")
                   .Append(HttpStatusCode)

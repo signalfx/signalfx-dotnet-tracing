@@ -1,4 +1,4 @@
-﻿// <copyright file="TelemetryDataBuilderTests.cs" company="Datadog">
+// <copyright file="TelemetryDataBuilderTests.cs" company="Datadog">
 // Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
@@ -105,7 +105,7 @@ namespace Datadog.Trace.Tests.Telemetry
             {
                 data.Application.Should().Be(_application);
                 data.ApiVersion.Should().NotBeNullOrEmpty();
-                data.RuntimeId.Should().Be(Tracer.RuntimeId);
+                data.RuntimeId.Should().Be(ClrProfiler.DistributedTracer.Instance.GetRuntimeId());
                 data.TracerTime.Should().BeInRange(0, DateTimeOffset.UtcNow.ToUnixTimeSeconds());
 
                 if (data.Payload is AppDependenciesLoadedPayload appDeps)
