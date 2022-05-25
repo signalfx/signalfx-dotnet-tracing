@@ -39,5 +39,5 @@ to verify the integrity of the RPM packages.
 ```bash
 curl -O https://docs.splunk.com/images/6/6b/SplunkPGPKey.pub
 rpm --import SplunkPGPKey.pub
-rpm -K signalfx-dotnet-tracing-*.rpm
+rpm --checksig signalfx-dotnet-tracing-*.rpm
 ```
