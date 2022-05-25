@@ -116,7 +116,7 @@ partial class Build
         .Executes(() => {
 
             var envVars = new Dictionary<string, string> { { "ASPNETCORE_URLS", "http://*:5003" } };
-            envVars.AddTracerEnvironmentVariables(TracerHomeDirectory);
+            envVars.AddTracerEnvironmentVariables(MonitoringHomeDirectory);
             envVars.AddExtraEnvVariables(ExtraEnvVars);
 
             string project = Solution.GetProject(SampleName)?.Path;
