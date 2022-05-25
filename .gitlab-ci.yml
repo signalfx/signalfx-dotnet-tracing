@@ -1,10 +1,14 @@
-workflow:
-  rules:
-    - if: '$CI_COMMIT_TAG =~ /^v/'
+include:
+  # repo: https://cd.splunkdev.com/core-ee/signing/api-integration/-/tree/develop/
+  - project: core-ee/signing/api-integration
+    ref: develop
+    file: /templates/.sign-client.yml
 
 stages:
   - build
-  - verify
+  - sign
+  - checksum
+  - checksum-sign
 
 linux-build:
   stage: build
@@ -48,30 +52,67 @@ linux-build:
 #       - tracer/bin/artifacts/nuget/SignalFx.NET.Tracing.Azure.Site.Extension.*.nupkg
 #       - tracer/bin/artifacts/*/en-us
 
-verify-artifacts:
-  stage: verify
-  variables:
-    dotnetSdkVersion: 6.0.200
-  script:
-    - |
-      rm .dockerignore
-    - | 
-      docker build \
-        --build-arg DOTNETSDK_VERSION=${dotnetSdkVersion} \
-        --tag splunk-trace-dotnet/checksums \
-        --file "./tracer/build/_build/docker/dotnet.dockerfile" \
-        .
-    - |
-      docker run \
-        --env artifacts=/project/dist \
-        --name checksums \
-        splunk-trace-dotnet/checksums \
-        tracer/build.sh ChecksumArtifacts
-    - |
-      docker cp checksums:/project/dist/checksums.txt dist/checksums.txt
+sign-deb:
+  stage: sign
+  extends: .submit-request
   dependencies: 
     - linux-build
+  before_script:
+    - cp -vfp $(ls dist/*.deb) package.deb
+  after_script:
+    - mkdir signed
+    - mv -vf tmp/package.deb "signed/$(basename $(ls dist/*.deb))"
+  variables:
+    PROJECT: signalfx-dotnet-tracing
+    ARTIFACT: package.deb
+    SIGN_TYPE: DEB
+    DOWNLOAD_DIR: tmp
+    REPO_NAME: releng # this env var should be not needed in future
+    REPO_PATH: signalfx-dotnet-tracing # this env var should be not needed in future
   artifacts:
     paths:
-      - dist/checksums.txt
-    
+      - signed/
+
+sign-rpm:
+  stage: sign
+  extends: .submit-request
+  dependencies: 
+    - linux-build
+  before_script:
+    - cp -vfp $(ls dist/*.rpm) package.rpm
+  after_script:
+    - mkdir signed
+    - mv -vf tmp/package.rpm "signed/$(basename $(ls dist/*.rpm))"
+  variables:
+    PROJECT: signalfx-dotnet-tracing
+    ARTIFACT: package.rpm
+    SIGN_TYPE: RPM
+    DOWNLOAD_DIR: tmp
+    REPO_NAME: releng # this env var should be not needed in future
+    REPO_PATH: signalfx-dotnet-tracing # this env var should be not needed in future
+  artifacts:
+    paths:
+      - signed/
+
+checksums:
+  stage: checksum
+  script:
+    - cp -vnpr dist/. signed # copy artifacts that are not signed
+    - pushd signed && shasum -a 256 * > checksums.txt && popd
+  artifacts:
+    paths:
+      - signed/
+
+checksums-sign:
+  stage: checksum-sign
+  extends: .submit-request
+  variables:
+    PROJECT: signalfx-dotnet-tracing
+    ARTIFACT: signed/checksums.txt
+    SIGN_TYPE: GPG
+    DOWNLOAD_DIR: signed
+    REPO_NAME: releng # this env var should be not needed in future
+    REPO_PATH: signalfx-dotnet-tracing # this env var should be not needed in future
+  artifacts:
+    paths:
+      - signed/

@@ -146,8 +146,6 @@ namespace Datadog.Trace
             }
         }
 
-        internal static string RuntimeId => DistributedTracer.Instance.GetRuntimeId();
-
         internal static int LiveTracerCount => _liveTracerCount;
 
         /// <summary>

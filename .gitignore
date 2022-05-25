@@ -356,5 +356,9 @@ tracer/test/test-applications/integrations/dependency-libs/Samples.AlwaysOnProfi
 .ionide/
 /devenv.bat
 
+# GitLab pipeline artifacts
+dist/
+signed/
+
 # benchmark test results directory
 /dev-aop/results

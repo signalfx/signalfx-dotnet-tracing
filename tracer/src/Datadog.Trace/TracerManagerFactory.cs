@@ -198,7 +198,7 @@ namespace Datadog.Trace
                                        $"lang_version:{FrameworkDescription.Instance.ProductVersion}",
                                        $"tracer_version:{TracerConstants.AssemblyVersion}",
                                        $"service:{serviceName}",
-                                       $"{Tags.RuntimeId}:{Tracer.RuntimeId}"
+                                       $"{Tags.RuntimeId}:{DistributedTracer.Instance.GetRuntimeId()}"
                                    };
 
                 if (settings.Environment != null)
