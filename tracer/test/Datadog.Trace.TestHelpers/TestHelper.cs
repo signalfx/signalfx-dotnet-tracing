@@ -451,14 +451,14 @@ namespace Datadog.Trace.TestHelpers
 
         protected void EnableTelemetry(bool enabled = true, int? standaloneAgentPort = null)
         {
-            SetEnvironmentVariable("DD_INSTRUMENTATION_TELEMETRY_ENABLED", enabled.ToString());
-            SetEnvironmentVariable("DD_INSTRUMENTATION_TELEMETRY_AGENTLESS_ENABLED", standaloneAgentPort.HasValue.ToString());
+            SetEnvironmentVariable("SIGNALFX_INSTRUMENTATION_TELEMETRY_ENABLED", enabled.ToString());
+            SetEnvironmentVariable("SIGNALFX_INSTRUMENTATION_TELEMETRY_AGENTLESS_ENABLED", standaloneAgentPort.HasValue.ToString());
 
             if (standaloneAgentPort.HasValue)
             {
-                SetEnvironmentVariable("DD_INSTRUMENTATION_TELEMETRY_URL", $"http://localhost:{standaloneAgentPort}");
+                SetEnvironmentVariable("SIGNALFX_INSTRUMENTATION_TELEMETRY_URL", $"http://localhost:{standaloneAgentPort}");
                 // API key is required for agentless
-                SetEnvironmentVariable("DD_API_KEY", "INVALID_KEY_FOR_TESTS");
+                SetEnvironmentVariable("SIGNALFX_API_KEY", "INVALID_KEY_FOR_TESTS");
             }
         }
 
