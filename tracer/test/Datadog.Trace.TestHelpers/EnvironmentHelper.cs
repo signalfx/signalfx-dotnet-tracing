@@ -45,9 +45,10 @@ namespace Datadog.Trace.TestHelpers
             _output = output;
             TracerHome = GetTracerHomePath();
 
-            // The Native loader is used only on Windows and Linux x64.
-            // We need to keep this check until all platforms/configurations are supported.
-            ProfilerPath = UseNativeLoader ? GetNativeLoaderPath() : GetTracerNativeDLLPath();
+            // The Tracer is not currently utilizing the Native Loader in production. It is only being used in the Continuous Profiler beta.
+            // Because of that, we don't test it in the default pipeline.
+            bool useNativeLoader = string.Equals("true", Environment.GetEnvironmentVariable("SIGNALFX_USE_NATIVE_LOADER"), StringComparison.InvariantCultureIgnoreCase);
+            ProfilerPath = useNativeLoader ? GetNativeLoaderPath() : GetTracerNativeDLLPath();
 
             var parts = _targetFramework.FrameworkName.Split(',');
             _runtime = parts[0];
@@ -82,8 +83,6 @@ namespace Datadog.Trace.TestHelpers
         public string TracerHome { get; }
 
         public string FullSampleName => $"{_appNamePrepend}{SampleName}";
-
-        public bool UseNativeLoader => string.Equals("true", Environment.GetEnvironmentVariable("SIGNALFX_USE_NATIVE_LOADER"), StringComparison.InvariantCultureIgnoreCase);
 
         public static bool IsNet5()
         {
@@ -141,7 +140,7 @@ namespace Datadog.Trace.TestHelpers
             {
                 ("win", "X64") => "Datadog.AutoInstrumentation.NativeLoader.x64.dll",
                 ("win", "X86") => "Datadog.AutoInstrumentation.NativeLoader.x86.dll",
-                ("linux", "X64") => "Datadog.Trace.ClrProfiler.Native.so",
+                ("linux", "X64") => "Datadog.AutoInstrumentation.NativeLoader.so",
                 ("linux", "Arm64") => "Datadog.AutoInstrumentation.NativeLoader.so",
                 ("osx", _) => "Datadog.AutoInstrumentation.NativeLoader.dylib",
                 _ => throw new PlatformNotSupportedException()
