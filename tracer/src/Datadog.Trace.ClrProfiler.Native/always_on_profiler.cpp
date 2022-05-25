@@ -429,6 +429,10 @@ private:
 public:
     shared::WSTRING* Lookup(FunctionID fid, COR_PRF_FRAME_INFO frame)
     {
+        // this method is using two layers cache
+        // 1st layer depends on FunctionID which is volatile (and valid only within one thread suspension)
+        // 2nd layers depends on mdToken for function (which is stable) and ModuleId which could be volatile,
+        // but the pair should be stable enough to avoid any overlaps.
         shared::WSTRING* answer = volatile_function_name_cache_.Get(fid);
         if (answer != nullptr)
         {
