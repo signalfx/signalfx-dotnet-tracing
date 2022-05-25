@@ -277,7 +277,7 @@ namespace Datadog.Trace.TestHelpers
 
             // set consistent env name (can be overwritten by custom environment variable)
             environmentVariables["SIGNALFX_ENV"] = "integration_tests";
-            environmentVariables[ConfigurationKeys.Telemetry.Enabled] = "false"
+            environmentVariables[ConfigurationKeys.Telemetry.Enabled] = "false";
 
             // Don't attach the profiler to these processes
             environmentVariables["SIGNALFX_PROFILER_EXCLUDE_PROCESSES"] =
