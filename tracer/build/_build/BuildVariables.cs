@@ -1,5 +1,3 @@
-// Modified by Splunk Inc.
-
 using System.Collections.Generic;
 using Nuke.Common;
 using Nuke.Common.IO;
@@ -17,25 +15,34 @@ public static class BuildVariables
         envVars.AddTracerEnvironmentVariables(tracerHomeDirectory);
     }
 
-    public static void AddTracerEnvironmentVariables(this Dictionary<string, string> envVars, AbsolutePath tracerHomeDirectory)
+    public static void AddTracerEnvironmentVariables(this Dictionary<string, string> envVars, AbsolutePath monitoringHomeDirectory)
     {
         envVars.Add("COR_ENABLE_PROFILING", "1");
         envVars.Add("COR_PROFILER", "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}");
-        envVars.Add("COR_PROFILER_PATH_32", tracerHomeDirectory / "win-x86" / "SignalFx.Tracing.ClrProfiler.Native.dll");
-        envVars.Add("COR_PROFILER_PATH_64", tracerHomeDirectory / "win-x64" / "SignalFx.Tracing.ClrProfiler.Native.dll");
-        envVars.Add("CORECLR_ENABLE_PROFILING", "1");
-        envVars.Add("CORECLR_PROFILER", "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}");
-        envVars.Add("SIGNALFX_DOTNET_TRACER_HOME", tracerHomeDirectory);
 
+        envVars.Add("COR_PROFILER_PATH_32", monitoringHomeDirectory / "SignalFx.Tracing.ClrProfiler.Native.x86.dll");
+        envVars.Add("COR_PROFILER_PATH_64", monitoringHomeDirectory / "SignalFx.Tracing.ClrProfiler.Native.x64.dll");
 
         if (EnvironmentInfo.IsWin)
         {
-            envVars.Add("CORECLR_PROFILER_PATH_32", tracerHomeDirectory / "win-x86" / "SignalFx.Tracing.ClrProfiler.Native.dll");
-            envVars.Add("CORECLR_PROFILER_PATH_64", tracerHomeDirectory / "win-x64" / "SignalFx.Tracing.ClrProfiler.Native.dll");
+            envVars.Add("SIGNALFX_DOTNET_TRACER_HOME", monitoringHomeDirectory / "tracer");
         }
         else
         {
-            envVars.Add("CORECLR_PROFILER_PATH", tracerHomeDirectory / "SignalFx.Tracing.ClrProfiler.Native.so");
+            envVars.Add("SIGNALFX_DOTNET_TRACER_HOME", monitoringHomeDirectory);
+        }
+
+        envVars.Add("CORECLR_ENABLE_PROFILING", "1");
+        envVars.Add("CORECLR_PROFILER", "{B4C89B0F-9908-4F73-9F59-0D77C5A06874}");
+
+        if (EnvironmentInfo.IsWin)
+        {
+            envVars.Add("CORECLR_PROFILER_PATH_32", monitoringHomeDirectory / "win-x86" / "SignalFx.Tracing.ClrProfiler.Native.dll");
+            envVars.Add("CORECLR_PROFILER_PATH_64", monitoringHomeDirectory / "win-x64" / "SignalFx.Tracing.ClrProfiler.Native.dll");
+        }
+        else
+        {
+            envVars.Add("CORECLR_PROFILER_PATH", monitoringHomeDirectory / "SignalFx.Tracing.ClrProfiler.Native.so");
         }
     }
 
