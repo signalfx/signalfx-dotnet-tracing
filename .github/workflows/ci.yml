@@ -391,7 +391,7 @@ jobs:
       continue-on-error: true
 
   windows-iis-integration-tests:
-    name: Windows - IIS integration tests 
+    name: Windows - Tracer IIS integration tests 
     runs-on: windows-2019
     strategy:
       matrix:
@@ -408,17 +408,12 @@ jobs:
           3.1.416
           5.0.405
           6.0.200
-    - run: ./tracer/build.cmd BuildTracerHome PackageTracerHome BuildWindowsIntegrationTests PublishIisSamples -Framework ${{ matrix.framework }}
-    - run: docker-compose up -d IntegrationTests.IIS
     # Workaround around long name being hit in MultiDomainHostTests.WorksInsideTheGAC tests
-    - name: RunWindowsIisIntegrationTests
+    - name: RunWindowsTracerIisIntegrationTests
       run: |
         subst y: .
         y:
-        ./tracer/build.cmd RunWindowsIisIntegrationTests -Framework ${{ matrix.framework }}
-    - name: docker-compose stop services
-      run: docker-compose down
-      if: (${{ job.status }} != 'cancelled')
+        ./tracer/build.cmd BuildTracerHome PackageTracerHome BuildAspNetIntegrationTests PublishIisSamples RunWindowsTracerIisIntegrationTests -Framework ${{ matrix.framework }}
     - uses: actions/upload-artifact@v3.1.0
       with:
         name: windows-iis-integration-tests-${{ matrix.platform }}-build_data
