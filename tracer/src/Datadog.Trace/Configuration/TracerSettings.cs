@@ -204,6 +204,9 @@ namespace Datadog.Trace.Configuration
 
             // Filter out tags with empty keys or empty values, and trim whitespaces
             GrpcTags = InitializeHeaderTags(grpcTags, headerTagsNormalizationFixEnabled: true);
+
+            ProfilerExportType = source?.GetString(ConfigurationKeys.ProfilerExportType)
+                              ?? "simple";
         }
 
         /// <summary>
@@ -505,6 +508,8 @@ namespace Datadog.Trace.Configuration
         /// Gets or sets a value indicating the trace methods configuration.
         /// </summary>
         internal string TraceMethods { get; set; }
+
+        internal string ProfilerExportType { get; set; } = string.Empty;
 
         /// <summary>
         /// Create a <see cref="TracerSettings"/> populated from the default sources

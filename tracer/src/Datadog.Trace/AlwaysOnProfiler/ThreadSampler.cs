@@ -43,7 +43,8 @@ namespace Datadog.Trace.AlwaysOnProfiler
         private static void SampleReadingThread()
         {
             var buffer = new byte[BufferSize];
-            var exporter = new SimpleThreadSampleExporter(_tracerSettings);
+            var exporterFactory = new ThreadSampleExporterFactory(_tracerSettings);
+            var exporter = exporterFactory.CreateThreadSampleExporter();
 
             while (true)
             {

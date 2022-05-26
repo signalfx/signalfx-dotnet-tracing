@@ -390,6 +390,8 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         public const string TraceMethods = "SIGNALFX_TRACE_METHODS";
 
+        public const string ProfilerExportType = "SIGNALFX_PROFILER_EXPORT_TYPE";
+
         /// <summary>
         /// String constants for CI Visibility configuration keys.
         /// </summary>

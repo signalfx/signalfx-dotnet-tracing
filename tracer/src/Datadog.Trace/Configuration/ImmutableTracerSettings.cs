@@ -92,6 +92,8 @@ namespace Datadog.Trace.Configuration
             _domainMetadata = DomainMetadata.Instance;
 
             ExpandRouteTemplatesEnabled = settings.ExpandRouteTemplatesEnabled || !RouteTemplateResourceNamesEnabled;
+
+            ProfilerExportType = settings.ProfilerExportType;
         }
 
         /// <summary>
@@ -353,6 +355,8 @@ namespace Datadog.Trace.Configuration
         /// Gets a value indicating the trace methods configuration.
         /// </summary>
         internal string TraceMethods { get; }
+
+        internal string ProfilerExportType { get; }
 
         /// <summary>
         /// Create a <see cref="ImmutableTracerSettings"/> populated from the default sources
