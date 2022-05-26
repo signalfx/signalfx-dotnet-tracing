@@ -4,214 +4,216 @@
 //   Input: profile.proto
 // </auto-generated>
 
+// Vendored namespaces adjusted: global::ProtoBuf. changed to global::Datadog.Trace.Vendors.ProtoBuf.
+
 #region Designer generated code
 #pragma warning disable CS0612, CS0618, CS1591, CS3021, IDE0079, IDE1006, RCS1036, RCS1057, RCS1085, RCS1192
 namespace Datadog.Tracer.Pprof.Proto.Profile.V1
 {
 
-    [global::ProtoBuf.ProtoContract()]
-    public partial class Profile : global::ProtoBuf.IExtensible
+    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
+    public partial class Profile : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+        private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
+        global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::Datadog.Trace.Vendors.ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
-        [global::ProtoBuf.ProtoMember(1, Name = @"sample_type")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(1, Name = @"sample_type")]
         public global::System.Collections.Generic.List<ValueType> SampleTypes { get; } = new global::System.Collections.Generic.List<ValueType>();
 
-        [global::ProtoBuf.ProtoMember(2, Name = @"sample")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(2, Name = @"sample")]
         public global::System.Collections.Generic.List<Sample> Samples { get; } = new global::System.Collections.Generic.List<Sample>();
 
-        [global::ProtoBuf.ProtoMember(3, Name = @"mapping")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(3, Name = @"mapping")]
         public global::System.Collections.Generic.List<Mapping> Mappings { get; } = new global::System.Collections.Generic.List<Mapping>();
 
-        [global::ProtoBuf.ProtoMember(4, Name = @"location")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(4, Name = @"location")]
         public global::System.Collections.Generic.List<Location> Locations { get; } = new global::System.Collections.Generic.List<Location>();
 
-        [global::ProtoBuf.ProtoMember(5, Name = @"function")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(5, Name = @"function")]
         public global::System.Collections.Generic.List<Function> Functions { get; } = new global::System.Collections.Generic.List<Function>();
 
-        [global::ProtoBuf.ProtoMember(6, Name = @"string_table")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(6, Name = @"string_table")]
         public global::System.Collections.Generic.List<string> StringTables { get; } = new global::System.Collections.Generic.List<string>();
 
-        [global::ProtoBuf.ProtoMember(7, Name = @"drop_frames")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(7, Name = @"drop_frames")]
         public long DropFrames { get; set; }
 
-        [global::ProtoBuf.ProtoMember(8, Name = @"keep_frames")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(8, Name = @"keep_frames")]
         public long KeepFrames { get; set; }
 
-        [global::ProtoBuf.ProtoMember(9, Name = @"time_nanos")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(9, Name = @"time_nanos")]
         public long TimeNanos { get; set; }
 
-        [global::ProtoBuf.ProtoMember(10, Name = @"duration_nanos")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(10, Name = @"duration_nanos")]
         public long DurationNanos { get; set; }
 
-        [global::ProtoBuf.ProtoMember(11, Name = @"period_type")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(11, Name = @"period_type")]
         public ValueType PeriodType { get; set; }
 
-        [global::ProtoBuf.ProtoMember(12, Name = @"period")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(12, Name = @"period")]
         public long Period { get; set; }
 
-        [global::ProtoBuf.ProtoMember(13, Name = @"comment", IsPacked = true)]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(13, Name = @"comment", IsPacked = true)]
         public long[] Comments { get; set; }
 
-        [global::ProtoBuf.ProtoMember(14, Name = @"default_sample_type")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(14, Name = @"default_sample_type")]
         public long DefaultSampleType { get; set; }
 
     }
 
-    [global::ProtoBuf.ProtoContract()]
-    public partial class ValueType : global::ProtoBuf.IExtensible
+    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
+    public partial class ValueType : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+        private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
+        global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::Datadog.Trace.Vendors.ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
-        [global::ProtoBuf.ProtoMember(1, Name = @"type")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(1, Name = @"type")]
         public long Type { get; set; }
 
-        [global::ProtoBuf.ProtoMember(2, Name = @"unit")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(2, Name = @"unit")]
         public long Unit { get; set; }
 
     }
 
-    [global::ProtoBuf.ProtoContract()]
-    public partial class Sample : global::ProtoBuf.IExtensible
+    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
+    public partial class Sample : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+        private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
+        global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::Datadog.Trace.Vendors.ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
-        [global::ProtoBuf.ProtoMember(1, Name = @"location_id", IsPacked = true)]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(1, Name = @"location_id", IsPacked = true)]
         public ulong[] LocationIds { get; set; }
 
-        [global::ProtoBuf.ProtoMember(2, Name = @"value", IsPacked = true)]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(2, Name = @"value", IsPacked = true)]
         public long[] Values { get; set; }
 
-        [global::ProtoBuf.ProtoMember(3, Name = @"label")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(3, Name = @"label")]
         public global::System.Collections.Generic.List<Label> Labels { get; } = new global::System.Collections.Generic.List<Label>();
 
     }
 
-    [global::ProtoBuf.ProtoContract()]
-    public partial class Label : global::ProtoBuf.IExtensible
+    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
+    public partial class Label : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+        private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
+        global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::Datadog.Trace.Vendors.ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
-        [global::ProtoBuf.ProtoMember(1, Name = @"key")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(1, Name = @"key")]
         public long Key { get; set; }
 
-        [global::ProtoBuf.ProtoMember(2, Name = @"str")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(2, Name = @"str")]
         public long Str { get; set; }
 
-        [global::ProtoBuf.ProtoMember(3, Name = @"num")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(3, Name = @"num")]
         public long Num { get; set; }
 
-        [global::ProtoBuf.ProtoMember(4, Name = @"num_unit")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(4, Name = @"num_unit")]
         public long NumUnit { get; set; }
 
     }
 
-    [global::ProtoBuf.ProtoContract()]
-    public partial class Mapping : global::ProtoBuf.IExtensible
+    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
+    public partial class Mapping : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+        private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
+        global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::Datadog.Trace.Vendors.ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
-        [global::ProtoBuf.ProtoMember(1, Name = @"id")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(1, Name = @"id")]
         public ulong Id { get; set; }
 
-        [global::ProtoBuf.ProtoMember(2, Name = @"memory_start")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(2, Name = @"memory_start")]
         public ulong MemoryStart { get; set; }
 
-        [global::ProtoBuf.ProtoMember(3, Name = @"memory_limit")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(3, Name = @"memory_limit")]
         public ulong MemoryLimit { get; set; }
 
-        [global::ProtoBuf.ProtoMember(4, Name = @"file_offset")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(4, Name = @"file_offset")]
         public ulong FileOffset { get; set; }
 
-        [global::ProtoBuf.ProtoMember(5, Name = @"filename")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(5, Name = @"filename")]
         public long Filename { get; set; }
 
-        [global::ProtoBuf.ProtoMember(6, Name = @"build_id")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(6, Name = @"build_id")]
         public long BuildId { get; set; }
 
-        [global::ProtoBuf.ProtoMember(7, Name = @"has_functions")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(7, Name = @"has_functions")]
         public bool HasFunctions { get; set; }
 
-        [global::ProtoBuf.ProtoMember(8, Name = @"has_filenames")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(8, Name = @"has_filenames")]
         public bool HasFilenames { get; set; }
 
-        [global::ProtoBuf.ProtoMember(9, Name = @"has_line_numbers")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(9, Name = @"has_line_numbers")]
         public bool HasLineNumbers { get; set; }
 
-        [global::ProtoBuf.ProtoMember(10, Name = @"has_inline_frames")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(10, Name = @"has_inline_frames")]
         public bool HasInlineFrames { get; set; }
 
     }
 
-    [global::ProtoBuf.ProtoContract()]
-    public partial class Location : global::ProtoBuf.IExtensible
+    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
+    public partial class Location : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+        private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
+        global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::Datadog.Trace.Vendors.ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
-        [global::ProtoBuf.ProtoMember(1, Name = @"id")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(1, Name = @"id")]
         public ulong Id { get; set; }
 
-        [global::ProtoBuf.ProtoMember(2, Name = @"mapping_id")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(2, Name = @"mapping_id")]
         public ulong MappingId { get; set; }
 
-        [global::ProtoBuf.ProtoMember(3, Name = @"address")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(3, Name = @"address")]
         public ulong Address { get; set; }
 
-        [global::ProtoBuf.ProtoMember(4, Name = @"line")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(4, Name = @"line")]
         public global::System.Collections.Generic.List<Line> Lines { get; } = new global::System.Collections.Generic.List<Line>();
 
-        [global::ProtoBuf.ProtoMember(5, Name = @"is_folded")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(5, Name = @"is_folded")]
         public bool IsFolded { get; set; }
 
     }
 
-    [global::ProtoBuf.ProtoContract()]
-    public partial class Line : global::ProtoBuf.IExtensible
+    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
+    public partial class Line : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+        private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
+        global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::Datadog.Trace.Vendors.ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
-        [global::ProtoBuf.ProtoMember(1, Name = @"function_id")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(1, Name = @"function_id")]
         public ulong FunctionId { get; set; }
 
-        [global::ProtoBuf.ProtoMember(2)]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(2)]
         public long line { get; set; }
 
     }
 
-    [global::ProtoBuf.ProtoContract()]
-    public partial class Function : global::ProtoBuf.IExtensible
+    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
+    public partial class Function : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+        private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
+        global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+            => global::Datadog.Trace.Vendors.ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
-        [global::ProtoBuf.ProtoMember(1, Name = @"id")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(1, Name = @"id")]
         public ulong Id { get; set; }
 
-        [global::ProtoBuf.ProtoMember(2, Name = @"name")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(2, Name = @"name")]
         public long Name { get; set; }
 
-        [global::ProtoBuf.ProtoMember(3, Name = @"system_name")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(3, Name = @"system_name")]
         public long SystemName { get; set; }
 
-        [global::ProtoBuf.ProtoMember(4, Name = @"filename")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(4, Name = @"filename")]
         public long Filename { get; set; }
 
-        [global::ProtoBuf.ProtoMember(5, Name = @"start_line")]
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(5, Name = @"start_line")]
         public long StartLine { get; set; }
 
     }
