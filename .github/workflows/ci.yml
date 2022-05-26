@@ -391,7 +391,7 @@ jobs:
       continue-on-error: true
 
   windows-iis-integration-tests:
-    name: Windows - Tracer IIS integration tests 
+    name: Windows - IIS integration tests 
     runs-on: windows-2019
     strategy:
       matrix:
