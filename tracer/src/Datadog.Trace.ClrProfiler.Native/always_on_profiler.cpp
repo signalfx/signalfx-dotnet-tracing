@@ -244,14 +244,16 @@ class SamplingHelper
 public:
     // These are permanent parts of the helper object
     ICorProfilerInfo10* info10_ = nullptr;
-    NameCache<FunctionIdentifier> function_name_cache_;
-    NameCache<FunctionID> volatile_function_name_cache_;
+    NameCache<FunctionIdentifier, shared::WSTRING*> function_name_cache_;
+    NameCache<FunctionID, std::pair<shared::WSTRING*, FunctionIdentifier>> volatile_function_name_cache_;
     // These cycle every sample and/or are owned externally
     ThreadSamplesBuffer* cur_writer_ = nullptr;
     std::vector<unsigned char>* cur_buffer_ = nullptr;
     SamplingStatistics stats_;
 
-    SamplingHelper() : function_name_cache_(kMaxFunctionNameCacheSize), volatile_function_name_cache_(kMaxVolatileFunctionNameCacheSize)
+    SamplingHelper() :
+        function_name_cache_(kMaxFunctionNameCacheSize, nullptr),
+        volatile_function_name_cache_(kMaxVolatileFunctionNameCacheSize, std::pair<shared::WSTRING*, FunctionIdentifier>(nullptr, {}))
     {
     }
 
@@ -433,25 +435,30 @@ public:
         // 1st layer depends on FunctionID which is volatile (and valid only within one thread suspension)
         // 2nd layer depends on mdToken for function (which is stable) and ModuleId which could be volatile,
         // but the pair should be stable enough to avoid any overlaps.
-        shared::WSTRING* answer = volatile_function_name_cache_.Get(fid);
-        if (answer != nullptr)
+
+        const std::pair<shared::WSTRING*, FunctionIdentifier> volatile_answer = volatile_function_name_cache_.Get(fid);
+        if (volatile_answer.first != nullptr)
         {
-            return answer;
+            function_name_cache_.Refresh(volatile_answer.second);
+            return volatile_answer.first;
         }
 
         const auto function_identifier = this->GetFunctionIdentifier(fid, frame);
 
-        answer = function_name_cache_.Get(function_identifier);
+        shared::WSTRING* answer = function_name_cache_.Get(function_identifier);
         if (answer != nullptr)
         {
-            volatile_function_name_cache_.Put(fid, answer);
+            volatile_function_name_cache_.Put(fid, std::pair(answer, function_identifier));
             return answer;
         }
         stats_.name_cache_misses++;
         answer = new shared::WSTRING();
         this->GetFunctionName(function_identifier, *answer);
-        function_name_cache_.Put(function_identifier, answer);
-        volatile_function_name_cache_.Put(fid, answer);
+
+        const auto old_value = function_name_cache_.Put(function_identifier, answer);
+        delete old_value;
+
+        volatile_function_name_cache_.Put(fid, std::pair(answer, function_identifier));
         return answer;
     }
 };
@@ -668,18 +675,19 @@ void ThreadSampler::ThreadNameChanged(ThreadID thread_id, ULONG cch_name, WCHAR 
     state->thread_name_.append(name, cch_name);
 }
 
-template <typename TFunctionIdentifier>
-NameCache<TFunctionIdentifier>::NameCache(const size_t maximum_size) : max_size_(maximum_size)
+
+template <typename TKey, typename TValue>
+NameCache<TKey, TValue>::NameCache(const size_t maximum_size, const TValue default_value) : max_size_(maximum_size), default_value_(default_value)
 {
 }
 
-template <typename TFunctionIdentifier>
-shared::WSTRING* NameCache<TFunctionIdentifier>::Get(TFunctionIdentifier key)
+template <typename TKey, typename TValue>
+TValue NameCache<TKey, TValue>::Get(TKey key)
 {
     const auto found = map_.find(key);
     if (found == map_.end())
     {
-        return nullptr;
+        return default_value_;
     }
     // This voodoo moves the single item in the iterator to the front of the list
     // (as it is now the most-recently-used)
@@ -687,8 +695,21 @@ shared::WSTRING* NameCache<TFunctionIdentifier>::Get(TFunctionIdentifier key)
     return found->second->second;
 }
 
-template <typename TFunctionIdentifier>
-void NameCache<TFunctionIdentifier>::Put(TFunctionIdentifier key, shared::WSTRING* val)
+template <typename TKey, typename TValue>
+void NameCache<TKey, TValue>::Refresh(TKey key)
+{
+    const auto found = map_.find(key);
+    if (found == map_.end())
+    {
+        return;
+    }
+    // This voodoo moves the single item in the iterator to the front of the list
+    // (as it is now the most-recently-used)
+    list_.splice(list_.begin(), list_, found->second);
+}
+
+template <typename TKey, typename TValue>
+TValue NameCache<TKey, TValue>::Put(TKey key, TValue val)
 {
     const auto pair = std::pair(key, val);
     list_.push_front(pair);
@@ -697,14 +718,16 @@ void NameCache<TFunctionIdentifier>::Put(TFunctionIdentifier key, shared::WSTRIN
     if (map_.size() > max_size_)
     {
         const auto &lru = list_.back();
-        delete lru.second; // FIXME consider using WSTRING directly instead of WSTRING*
+        const auto old_value = lru.second;
         map_.erase(lru.first);
         list_.pop_back();
+        return old_value;
     }
+    return default_value_;
 }
 
-template <typename TFunctionIdentifier>
-void NameCache<TFunctionIdentifier>::Clear()
+template <typename TKey, typename TValue>
+void NameCache<TKey, TValue>::Clear()
 {
     map_.clear();
     list_.clear();
