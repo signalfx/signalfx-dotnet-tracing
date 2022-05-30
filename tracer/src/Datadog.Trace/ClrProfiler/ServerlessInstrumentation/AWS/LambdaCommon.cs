@@ -89,7 +89,7 @@ namespace Datadog.Trace.ClrProfiler.ServerlessInstrumentation.AWS
             else
             {
                 Serverless.Debug($"creating the placeholder traceId = {traceId}");
-                span = tracer.StartSpan(PlaceholderOperationName, tags: null, serviceName: PlaceholderServiceName, traceId: Convert.ToUInt64(traceId), addToTraceContext: false);
+                span = tracer.StartSpan(PlaceholderOperationName, tags: null, serviceName: PlaceholderServiceName, traceId: TraceId.CreateFromString(traceId), addToTraceContext: false);
             }
 
             if (samplingPriority == null)
@@ -112,8 +112,8 @@ namespace Datadog.Trace.ClrProfiler.ServerlessInstrumentation.AWS
             WriteRequestPayload(request, data);
             WriteRequestHeaders(request, context);
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            var traceId = response.Headers.Get(HttpHeaderNames.TraceId);
-            var samplingPriority = response.Headers.Get(HttpHeaderNames.SamplingPriority);
+            var traceId = response.Headers.Get(DDHttpHeaderNames.TraceId);
+            var samplingPriority = response.Headers.Get(DDHttpHeaderNames.SamplingPriority);
             if (ValidateOKStatus(response))
             {
                 return CreatePlaceholderScope(Tracer.Instance, traceId, samplingPriority);
