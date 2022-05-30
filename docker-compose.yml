@@ -324,8 +324,8 @@ services:
       - serverless-integration-extension-mock-with-context
     command: "Samples.AWS.Lambda::Samples.AWS.Lambda.Function::HandlerNoParamSyncWithContext"
     environment:
-      - DD_TRACE_AGENT_URL=http://integrationtests:5002
-      - _DD_EXTENSION_ENDPOINT=http://serverless-integration-extension-mock-with-context:9004
+      - SIGNALFX_ENDPOINT_URL=http://integrationtests:5002
+      - _SIGNALFX_EXTENSION_ENDPOINT=http://serverless-integration-extension-mock-with-context:9004
     ports:
     - "8080"
 
@@ -337,8 +337,8 @@ services:
       - serverless-integration-extension-mock-with-context
     command: "Samples.AWS.Lambda::Samples.AWS.Lambda.Function::HandlerOneParamSyncWithContext"
     environment:
-      - DD_TRACE_AGENT_URL=http://integrationtests:5002
-      - _DD_EXTENSION_ENDPOINT=http://serverless-integration-extension-mock-with-context:9004
+      - SIGNALFX_ENDPOINT_URL=http://integrationtests:5002
+      - _SIGNALFX_EXTENSION_ENDPOINT=http://serverless-integration-extension-mock-with-context:9004
     ports:
     - "8080"
 
@@ -350,8 +350,8 @@ services:
       - serverless-integration-extension-mock-with-context
     command: "Samples.AWS.Lambda::Samples.AWS.Lambda.Function::HandlerTwoParamsSyncWithContext"
     environment:
-      - DD_TRACE_AGENT_URL=http://integrationtests:5002
-      - _DD_EXTENSION_ENDPOINT=http://serverless-integration-extension-mock-with-context:9004
+      - SIGNALFX_ENDPOINT_URL=http://integrationtests:5002
+      - _SIGNALFX_EXTENSION_ENDPOINT=http://serverless-integration-extension-mock-with-context:9004
     ports:
     - "8080"
 

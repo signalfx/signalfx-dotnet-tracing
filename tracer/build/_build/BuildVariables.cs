@@ -27,11 +27,11 @@ public static class BuildVariables
 
         if (EnvironmentInfo.IsWin)
         {
-            envVars.Add("DD_DOTNET_TRACER_HOME", monitoringHomeDirectory / "tracer");
+            envVars.Add("SIGNALFX_DOTNET_TRACER_HOME", monitoringHomeDirectory / "tracer");
         }
         else
         {
-            envVars.Add("DD_DOTNET_TRACER_HOME", monitoringHomeDirectory);
+            envVars.Add("SIGNALFX_DOTNET_TRACER_HOME", monitoringHomeDirectory);
         }
 
         envVars.Add("CORECLR_ENABLE_PROFILING", "1");
