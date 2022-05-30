@@ -31,7 +31,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             // contain logs from this sample
             SetEnvironmentVariable("SIGNALFX_TRACE_LOG_PATH", tmpFile);
 
-            // Clear any existing log path values, as these take precedence over DD_TRACE_LOG_PATH
+            // Clear any existing log path values, as these take precedence over SIGNALFX_TRACE_LOG_PATH
             SetEnvironmentVariable(Configuration.ConfigurationKeys.LogDirectory, string.Empty);
 
             using ProcessResult processResult = RunSampleAndWaitForExit(new MockTracerAgent(9696, doNotBindPorts: true));

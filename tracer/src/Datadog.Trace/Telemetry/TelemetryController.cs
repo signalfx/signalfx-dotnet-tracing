@@ -9,6 +9,7 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using Datadog.Trace.Configuration;
+using Datadog.Trace.ContinuousProfiler;
 using Datadog.Trace.Logging;
 using Datadog.Trace.PlatformHelpers;
 
@@ -73,6 +74,9 @@ namespace Datadog.Trace.Telemetry
         {
             _tracerInitialized.TrySetResult(true);
         }
+
+        public void RecordProfilerSettings(Profiler profiler)
+            => _configuration.RecordProfilerSettings(profiler);
 
         public void IntegrationRunning(IntegrationId integrationId)
             => _integrations.IntegrationRunning(integrationId);

@@ -81,7 +81,7 @@ jobs:
       if: ${{ runner.os == 'Linux' }}
       run: sudo gem install --no-document fpm
     - name: Build tracer home
-      run: ./tracer/build.cmd BuildTracerHome PackageTracerHome
+      run: ./tracer/build.cmd Clean BuildTracerHome PackageTracerHome
     - name: Publish Tracer
       uses: actions/upload-artifact@v3.1.0
       with:
@@ -146,7 +146,7 @@ jobs:
           --env artifacts=/project/${relativeArtifacts} \
           --env SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN} \
           dd-trace-dotnet/${{ matrix.base-image }}-builder \
-          dotnet /build/bin/Debug/_build.dll BuildTracerHome ZipTracerHome
+          dotnet /build/bin/Debug/_build.dll Clean BuildTracerHome ZipTracerHome
     - name: Publish Linux x64-musl packages
       uses: actions/upload-artifact@v3.1.0
       with:
@@ -172,7 +172,7 @@ jobs:
           3.1.416
           5.0.405
           6.0.200
-    - run: ./tracer/build.cmd BuildTracerHome BuildAndRunManagedUnitTests
+    - run: ./tracer/build.cmd Clean BuildTracerHome BuildAndRunManagedUnitTests
     - uses: actions/upload-artifact@v3.1.0
       with:
         name: ${{ matrix.machine }}-managed-unit-tests-build_data
@@ -214,7 +214,7 @@ jobs:
           --env artifacts=/project/${relativeArtifacts} \
           --env SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN} \
           dd-trace-dotnet/${{ matrix.base-image }}-tester \
-          dotnet /build/bin/Debug/_build.dll BuildTracerHome BuildAndRunManagedUnitTests
+          dotnet /build/bin/Debug/_build.dll Clean BuildTracerHome BuildAndRunManagedUnitTests
     - name: Publish managed tests results
       uses: actions/upload-artifact@v3.1.0
       with:
@@ -246,7 +246,7 @@ jobs:
     - name: Create logging path
       if: ${{ runner.os == 'Linux' }}
       run: sudo ./tracer/build/artifacts/createLogPath.sh
-    - run: ./tracer/build.cmd BuildTracerHome BuildAndRunNativeUnitTests
+    - run: ./tracer/build.cmd Clean BuildTracerHome BuildAndRunNativeUnitTests
 
   container-native-unit-tests:
     name: Container Native unit tests
@@ -282,7 +282,7 @@ jobs:
           --env artifacts=/project/${relativeArtifacts} \
           --env SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN} \
           dd-trace-dotnet/${{ matrix.base-image }}-builder \
-          dotnet /build/bin/Debug/_build.dll BuildTracerHome BuildAndRunNativeUnitTests
+          dotnet /build/bin/Debug/_build.dll Clean BuildTracerHome BuildAndRunNativeUnitTests
     - name: Publish native tests results
       uses: actions/upload-artifact@v3.1.0
       with:
@@ -367,7 +367,7 @@ jobs:
           --env artifacts=/project/${relativeArtifacts} \
           --env SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN} \
           dd-trace-dotnet/${{ matrix.base-image }}-builder \
-          dotnet /build/bin/Debug/_build.dll Info BuildTracerHome BuildLinuxIntegrationTests -Framework ${{ matrix.framework }}
+          dotnet /build/bin/Debug/_build.dll Info Clean BuildTracerHome BuildLinuxIntegrationTests -Framework ${{ matrix.framework }}
     - name: Build dependencies
       run: docker-compose build --build-arg SERVERLESS_ARTIFACTS_PATH=.${relativeTracerHome} serverless-lambda-no-param-sync serverless-lambda-one-param-sync serverless-lambda-two-params-sync serverless-lambda-no-param-async serverless-lambda-one-param-async serverless-lambda-two-params-async serverless-lambda-no-param-void serverless-lambda-one-param-void serverless-lambda-two-params-void
     - name: Start dependencies
@@ -397,7 +397,7 @@ jobs:
       matrix:
         platform:
         - x64
-        framework: [ netcoreapp3.1, net461 ]
+        framework: [ net461, netcoreapp3.1 ]
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v3.0.2
@@ -408,20 +408,43 @@ jobs:
           3.1.416
           5.0.405
           6.0.200
-    - run: ./tracer/build.cmd BuildTracerHome PackageTracerHome BuildWindowsIntegrationTests PublishIisSamples -Framework ${{ matrix.framework }}
+    - name: RunWindowsTracerIisIntegrationTests
+      run: ./tracer/build.cmd BuildTracerHome BuildAspNetIntegrationTests RunWindowsTracerIisIntegrationTests -Framework ${{ matrix.framework }}
+    - uses: actions/upload-artifact@v3.1.0
+      with:
+        name: windows-tracer-iis-integration-tests-${{ matrix.platform }}-build_data
+        path: tracer/build_data
+      if: (${{ job.status }} != 'cancelled')
+      continue-on-error: true
+
+  windows-msi-integration-tests:
+    name: Windows - MSI integration tests
+    runs-on: windows-2019
+    strategy:
+      matrix:
+        platform:
+        - x64
+        framework: [ net461, netcoreapp3.1 ]
+    timeout-minutes: 60
+    steps: 
+    - uses: actions/checkout@v3.0.2
+    - uses: actions/setup-dotnet@v2.1.0
+      with:
+        dotnet-version: |
+          2.1.818
+          3.1.416
+          5.0.405
+          6.0.200
+    - run: ./tracer/build.cmd BuildTracerHome PackageTracerHome BuildAspNetIntegrationTests -Framework ${{ matrix.framework }}
     - run: docker-compose up -d IntegrationTests.IIS
-    # Workaround around long name being hit in MultiDomainHostTests.WorksInsideTheGAC tests
-    - name: RunWindowsIisIntegrationTests
-      run: |
-        subst y: .
-        y:
-        ./tracer/build.cmd RunWindowsIisIntegrationTests -Framework ${{ matrix.framework }}
+    - name: RunWindowsMsiIntegrationTests
+      run: ./tracer/build.cmd RunWindowsMsiIntegrationTests -Framework ${{ matrix.framework }}
     - name: docker-compose stop services
       run: docker-compose down
       if: (${{ job.status }} != 'cancelled')
     - uses: actions/upload-artifact@v3.1.0
       with:
-        name: windows-iis-integration-tests-${{ matrix.platform }}-build_data
+        name: windows-msi-integration-tests-${{ matrix.platform }}-build_data
         path: tracer/build_data
       if: (${{ job.status }} != 'cancelled')
-      continue-on-error: true
+      continue-on-error: true 

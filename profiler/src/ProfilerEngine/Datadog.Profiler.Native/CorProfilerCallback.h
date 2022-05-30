@@ -9,6 +9,7 @@
 // end
 
 #include "ApplicationStore.h"
+#include "ExceptionsProvider.h"
 #include "IAppDomainStore.h"
 #include "IClrLifetime.h"
 #include "IConfiguration.h"
@@ -16,6 +17,7 @@
 #include "IFrameStore.h"
 #include "IMetricsSender.h"
 #include "WallTimeProvider.h"
+#include "CpuTimeProvider.h"
 #include "shared/src/native-src/string.h"
 
 #include <atomic>
@@ -25,8 +27,6 @@
 class IService;
 class IThreadsCpuManager;
 class IManagedThreadList;
-class ISymbolsResolver;
-class IStackSnapshotsBufferManager;
 class IStackSamplerLoopManager;
 class IConfiguration;
 class IExporter;
@@ -174,8 +174,6 @@ public:
 public:
     IThreadsCpuManager* GetThreadsCpuManager() { return _pThreadsCpuManager; }
     IManagedThreadList* GetManagedThreadList() { return _pManagedThreadList; }
-    ISymbolsResolver* GetSymbolsResolver() { return _pSymbolsResolver; }
-    IStackSnapshotsBufferManager* GetStackSnapshotsBufferManager() { return _pStackSnapshotsBufferManager; }
     IStackSamplerLoopManager* GetStackSamplerLoopManager() { return _pStackSamplerLoopManager; }
     IApplicationStore* GetApplicationStore() { return _pApplicationStore; }
 
@@ -189,15 +187,16 @@ private :
     std::shared_ptr<IMetricsSender> _metricsSender;
     std::atomic<bool> _isInitialized{false}; // pay attention to keeping ProfilerEngineStatus::IsProfilerEngiveActive in sync with this!
 
-    // We keep on pointer to those global services for interaction with the Managed code.
     // The pointer here are observable pointer which means that they are used only to access the data.
     // Their lifetime is managed by the _services vector.
     IThreadsCpuManager* _pThreadsCpuManager = nullptr;
-    IStackSnapshotsBufferManager* _pStackSnapshotsBufferManager = nullptr;
     IStackSamplerLoopManager* _pStackSamplerLoopManager = nullptr;
     IManagedThreadList* _pManagedThreadList = nullptr;
-    ISymbolsResolver* _pSymbolsResolver = nullptr;
     IApplicationStore* _pApplicationStore = nullptr;
+    ExceptionsProvider* _pExceptionsProvider = nullptr;
+    WallTimeProvider* _pWallTimeProvider = nullptr;
+    CpuTimeProvider* _pCpuTimeProvider = nullptr;
+    SamplesAggregator* _pSamplesAggregator = nullptr;
 
     std::vector<std::unique_ptr<IService>> _services;
 
