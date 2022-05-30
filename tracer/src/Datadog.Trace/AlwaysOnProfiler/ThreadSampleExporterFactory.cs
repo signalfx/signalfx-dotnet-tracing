@@ -22,7 +22,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 return new PprofThreadSampleExporter(_tracerSettings);
             }
 
-            return new SimpleThreadSampleExporter(_tracerSettings);
+            return new PlainTextThreadSampleExporter(_tracerSettings);
         }
     }
 }

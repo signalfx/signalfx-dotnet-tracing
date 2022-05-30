@@ -9,12 +9,13 @@ namespace Datadog.Trace.AlwaysOnProfiler
     {
         public const int TraceIdIndex = 0;
         public const int SpanIdIndex = 1;
+        public const int TimeUnitIndex = 2;
 
         private readonly Profile _profile;
 
         public ProfileBuilder()
         {
-            _profile = new Profile { StringTables = { "TRACE_ID", "SPAN_ID" } };
+            _profile = new Profile { StringTables = { "TRACE_ID", "SPAN_ID", "milliseconds" } };
         }
 
         public List<string> StringTable => _profile.StringTables;

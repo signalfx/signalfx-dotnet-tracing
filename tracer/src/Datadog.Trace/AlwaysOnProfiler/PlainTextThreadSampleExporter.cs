@@ -11,9 +11,9 @@ using Datadog.Tracer.OpenTelemetry.Proto.Logs.V1;
 
 namespace Datadog.Trace.AlwaysOnProfiler
 {
-    internal class SimpleThreadSampleExporter : ThreadSampleExporter
+    internal class PlainTextThreadSampleExporter : ThreadSampleExporter
     {
-        internal SimpleThreadSampleExporter(ImmutableTracerSettings tracerSettings)
+        internal PlainTextThreadSampleExporter(ImmutableTracerSettings tracerSettings)
         : base(tracerSettings)
         {
         }
@@ -39,6 +39,11 @@ namespace Datadog.Trace.AlwaysOnProfiler
                     {
                         FixedLogRecordAttributes[0],
                         FixedLogRecordAttributes[1],
+                        new KeyValue
+                        {
+                            Key = "profiling.data.format",
+                            Value = new AnyValue { StringValue = "text" }
+                        }
                     },
                     Body = new AnyValue { StringValue = threadSample.StackTrace },
                     TimeUnixNano = threadSample.Timestamp,
@@ -55,50 +60,6 @@ namespace Datadog.Trace.AlwaysOnProfiler
             }
 
             SendLogsData();
-        }
-
-        internal void SendLogsData()
-        {
-            HttpWebRequest httpWebRequest;
-
-            try
-            {
-                httpWebRequest = WebRequest.CreateHttp(LogsEndpointUrl);
-                httpWebRequest.ContentType = "application/x-protobuf";
-                httpWebRequest.Method = "POST";
-                httpWebRequest.Headers.Add(CommonHttpHeaderNames.TracingEnabled, "false");
-
-                using var stream = httpWebRequest.GetRequestStream();
-                Vendors.ProtoBuf.Serializer.Serialize(stream, LogsData);
-                stream.Flush();
-            }
-            catch (Exception ex)
-            {
-                Log.Error("Exception preparing request to send thread samples to {0}: {1}", LogsEndpointUrl, ex);
-                return;
-            }
-            finally
-            {
-                // The exporter reuses the _logsData object, but the actual log records are not
-                // needed after serialization, release the log records so they can be garbage collected.
-                LogsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs.Clear();
-            }
-
-            try
-            {
-                using var httpWebResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-
-                if (httpWebResponse.StatusCode >= HttpStatusCode.OK && httpWebResponse.StatusCode < HttpStatusCode.MultipleChoices)
-                {
-                    return;
-                }
-
-                Log.Warning("HTTP error sending thread samples to {0}: {1}", LogsEndpointUrl, httpWebResponse.StatusCode);
-            }
-            catch (Exception ex)
-            {
-                Log.Error("Exception sending thread samples to {0}: {1}", LogsEndpointUrl, ex.Message);
-            }
         }
     }
 }

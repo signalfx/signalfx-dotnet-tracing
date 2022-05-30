@@ -3,8 +3,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Net;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Logging;
+using Datadog.Trace.Propagation;
 using Datadog.Tracer.OpenTelemetry.Proto.Common.V1;
 using Datadog.Tracer.OpenTelemetry.Proto.Logs.V1;
 using Datadog.Tracer.OpenTelemetry.Proto.Resource.V1;
@@ -13,7 +15,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
 {
     internal abstract class ThreadSampleExporter : IThreadSampleExporter
     {
-        protected static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(SimpleThreadSampleExporter));
+        protected static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(ThreadSampleExporter));
 
         protected ThreadSampleExporter(ImmutableTracerSettings tracerSettings)
         {
@@ -35,6 +37,50 @@ namespace Datadog.Trace.AlwaysOnProfiler
         protected LogsData LogsData { get; }
 
         public abstract void ExportThreadSamples(List<ThreadSample> threadSamples);
+
+        protected void SendLogsData()
+        {
+            HttpWebRequest httpWebRequest;
+
+            try
+            {
+                httpWebRequest = WebRequest.CreateHttp(LogsEndpointUrl);
+                httpWebRequest.ContentType = "application/x-protobuf";
+                httpWebRequest.Method = "POST";
+                httpWebRequest.Headers.Add(CommonHttpHeaderNames.TracingEnabled, "false");
+
+                using var stream = httpWebRequest.GetRequestStream();
+                Vendors.ProtoBuf.Serializer.Serialize(stream, LogsData);
+                stream.Flush();
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Exception preparing request to send thread samples to {0}: {1}", LogsEndpointUrl, ex);
+                return;
+            }
+            finally
+            {
+                // The exporter reuses the _logsData object, but the actual log records are not
+                // needed after serialization, release the log records so they can be garbage collected.
+                LogsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs.Clear();
+            }
+
+            try
+            {
+                using var httpWebResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+
+                if (httpWebResponse.StatusCode >= HttpStatusCode.OK && httpWebResponse.StatusCode < HttpStatusCode.MultipleChoices)
+                {
+                    return;
+                }
+
+                Log.Warning("HTTP error sending thread samples to {0}: {1}", LogsEndpointUrl, httpWebResponse.StatusCode);
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Exception sending thread samples to {0}: {1}", LogsEndpointUrl, ex.Message);
+            }
+        }
 
         /// <summary>
         /// Holds the GDI profiling semantic conventions.

@@ -29,5 +29,16 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 Str = index
             };
         }
+
+        public static Label BuildTimeLabel(ProfileBuilder profileBuilder, ulong time)
+        {
+            profileBuilder.StringTable.Add(time.ToString());
+            return new Label
+            {
+                Key = ProfileBuilder.SpanIdIndex,
+                Num = (long)time + long.MinValue,
+                NumUnit = ProfileBuilder.TimeUnitIndex
+            };
+        }
     }
 }
