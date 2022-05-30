@@ -43,7 +43,7 @@ namespace Datadog.Trace.Tests.Propagators
             var newContext = new SpanContext(null, new TraceContext(null, null), null, traceId, spanId);
             var newHeaders = new Mock<IHeadersCollection>();
             B3Propagator.Inject(newContext, newHeaders.Object);
-            newHeaders.Verify(h => h.Set(B3ContextPropagator.TraceId, "00000000075bcd15"), Times.Once());
+            newHeaders.Verify(h => h.Set(B3ContextPropagator.TraceId, "000000000000000000000000075bcd15"), Times.Once());
             newHeaders.Verify(h => h.Set(B3ContextPropagator.SpanId, "000000003ade68b1"), Times.Once());
             newHeaders.Verify(h => h.Set(B3ContextPropagator.Sampled, "0"), Times.Once());
             newHeaders.VerifyNoOtherCalls();
@@ -52,7 +52,7 @@ namespace Datadog.Trace.Tests.Propagators
             traceContextSamplingField.SetValue(newContext.TraceContext, SamplingPriorityValues.UserKeep);
             newHeaders = new Mock<IHeadersCollection>();
             B3Propagator.Inject(newContext, newHeaders.Object);
-            newHeaders.Verify(h => h.Set(B3ContextPropagator.TraceId, "00000000075bcd15"), Times.Once());
+            newHeaders.Verify(h => h.Set(B3ContextPropagator.TraceId, "000000000000000000000000075bcd15"), Times.Once());
             newHeaders.Verify(h => h.Set(B3ContextPropagator.SpanId, "000000003ade68b1"), Times.Once());
             newHeaders.Verify(h => h.Set(B3ContextPropagator.Sampled, "1"), Times.Once());
             newHeaders.VerifyNoOtherCalls();
@@ -80,7 +80,7 @@ namespace Datadog.Trace.Tests.Propagators
             var newContext = new SpanContext(null, new TraceContext(null, null), null, traceId, spanId);
             var newHeaders = new Mock<IHeadersCollection>();
             B3Propagator.Inject(newContext, newHeaders.Object, (carrier, name, value) => carrier.Set(name, value));
-            newHeaders.Verify(h => h.Set(B3ContextPropagator.TraceId, "00000000075bcd15"), Times.Once());
+            newHeaders.Verify(h => h.Set(B3ContextPropagator.TraceId, "000000000000000000000000075bcd15"), Times.Once());
             newHeaders.Verify(h => h.Set(B3ContextPropagator.SpanId, "000000003ade68b1"), Times.Once());
             newHeaders.Verify(h => h.Set(B3ContextPropagator.Sampled, "0"), Times.Once());
             newHeaders.VerifyNoOtherCalls();
@@ -89,7 +89,7 @@ namespace Datadog.Trace.Tests.Propagators
             traceContextSamplingField.SetValue(newContext.TraceContext, SamplingPriorityValues.UserKeep);
             newHeaders = new Mock<IHeadersCollection>();
             B3Propagator.Inject(newContext, newHeaders.Object, (carrier, name, value) => carrier.Set(name, value));
-            newHeaders.Verify(h => h.Set(B3ContextPropagator.TraceId, "00000000075bcd15"), Times.Once());
+            newHeaders.Verify(h => h.Set(B3ContextPropagator.TraceId, "000000000000000000000000075bcd15"), Times.Once());
             newHeaders.Verify(h => h.Set(B3ContextPropagator.SpanId, "000000003ade68b1"), Times.Once());
             newHeaders.Verify(h => h.Set(B3ContextPropagator.Sampled, "1"), Times.Once());
             newHeaders.VerifyNoOtherCalls();
