@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Datadog.Trace.AlwaysOnProfiler.Builder;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Vendors.ProtoBuf;
@@ -25,19 +26,21 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
             foreach (var threadSample in threadSamples)
             {
-                var profileBuilder = new ProfileBuilder();
-                var sample = new Sample();
+                var pprof = new Pprof();
+                var sampleBuilder = new SampleBuilder();
 
-                sample.Labels.Add(LabelBuilder.BuildTimeLabel(profileBuilder, threadSample.Timestamp));
+                pprof.AddLabel(sampleBuilder, "source.event.time", threadSample.Timestamp);
+
                 if (threadSample.SpanId != 0 || threadSample.TraceIdHigh != 0 || threadSample.TraceIdLow != 0)
                 {
-                    sample.Labels.Add(LabelBuilder.BuildSpanIdLabel(profileBuilder, threadSample.SpanId));
-                    sample.Labels.Add(LabelBuilder.BuildTraceIdLabel(profileBuilder, threadSample.TraceIdHigh, threadSample.TraceIdLow));
+                    pprof.AddLabel(sampleBuilder, "SPAN_ID", threadSample.SpanId);
+                    pprof.AddLabel(sampleBuilder, "TRACE_ID", $"{threadSample.TraceIdHigh:x16}{threadSample.TraceIdLow:x16}");
                 }
 
-                profileBuilder.AddSample(sample);
+                // TODO Add StackTrace data to the ProfileBuilder
 
-                var data = Serialize(profileBuilder.Build());
+                pprof.ProfileBuilder.AddSample(sampleBuilder.Build());
+                var data = Serialize(pprof.ProfileBuilder.Build());
                 var logRecord = new LogRecord
                 {
                     Attributes =

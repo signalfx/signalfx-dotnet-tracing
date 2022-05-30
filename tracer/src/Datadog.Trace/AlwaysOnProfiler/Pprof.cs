@@ -19,7 +19,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
             _locationTable = new LocationTable(ProfileBuilder, _functionTable);
         }
 
-        public Builder.ProfileBuilder ProfileBuilder { get; }
+        public ProfileBuilder ProfileBuilder { get; }
 
         public long GetStringId(string str) => _stringTable.Get(str);
 
@@ -40,9 +40,9 @@ namespace Datadog.Trace.AlwaysOnProfiler
             AddLabel(sample, key, value.ToString());
         }
 
-        public void AddLabel(SampleBuilder sample, long key, long value)
+        public void AddLabel(SampleBuilder sample, string key, ulong value)
         {
-            AddLabel(sample, key.ToString(), value.ToString());
+            AddLabel(sample, key, (long)value + long.MinValue);
         }
 
         public void AddLabel(SampleBuilder sample, string name, long value)
@@ -52,7 +52,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
         private void AddLabel(SampleBuilder sample, string name, Action<Builder.LabelBuilder> setLabel)
         {
-            var labelBuilder = new Builder.LabelBuilder();
+            var labelBuilder = new LabelBuilder();
             labelBuilder.SetKey(_stringTable.Get(name));
             setLabel(labelBuilder);
             sample.AddLabel(labelBuilder.Build());
