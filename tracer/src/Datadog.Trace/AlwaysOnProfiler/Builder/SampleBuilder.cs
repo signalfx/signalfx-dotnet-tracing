@@ -9,6 +9,7 @@ namespace Datadog.Trace.AlwaysOnProfiler.Builder
         public SampleBuilder AddLabel(Label label)
         {
             _sample.Labels.Add(label);
+            return this;
         }
 
         public Sample Build() => _sample;
