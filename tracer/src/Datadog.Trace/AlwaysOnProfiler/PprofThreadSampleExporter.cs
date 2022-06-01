@@ -30,9 +30,6 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 var pprof = new Pprof();
                 var sampleBuilder = new SampleBuilder();
 
-                // TODO get allocationSize
-                // sampleBuilder.AddValue(allocationSize);
-
                 pprof.AddLabel(sampleBuilder, "source.event.time", threadSample.Timestamp);
 
                 if (threadSample.SpanId != 0 || threadSample.TraceIdHigh != 0 || threadSample.TraceIdLow != 0)
@@ -57,45 +54,17 @@ namespace Datadog.Trace.AlwaysOnProfiler
                     sampleBuilder.AddLocationId(pprof.GetLocationId("unknown", methodName, 0));
                 }
 
-                // TODO Add StackTrace data to the Profile object based on java implementation below
+                var threadInfo = threadSample.StackTrace
+                                             .Split('\n')[0]
+                                             .Trim()
+                                             .Split(' ')
+                                             .Select(pair => pair.Split('='))
+                                             .Where(keyValue => keyValue.Length == 2)
+                                             .ToDictionary(keyValue => keyValue[0], keyValue => keyValue[1]);
 
-                // String eventName = event.getEventType().getName();
-                // pprof.addLabel(sample, SOURCE_EVENT_NAME, eventName);
-                // Instant time = event.getStartTime();
-                // pprof.addLabel(sample, SOURCE_EVENT_TIME, time.toEpochMilli());
-                //
-                // RecordedThread thread = event.getThread();
-                // if (thread != null) {
-                //     if (thread.getJavaThreadId() != -1)
-                //     {
-                //         pprof.addLabel(sample, THREAD_ID, thread.getJavaThreadId());
-                //         pprof.addLabel(sample, THREAD_NAME, thread.getJavaName());
-                //     }
-                //     pprof.addLabel(sample, THREAD_OS_ID, thread.getOSThreadId());
-                // }
-                // pprof.addLabel(sample, THREAD_STATE, "RUNNABLE");
-                //
-                // if (spanContext != null && spanContext.isValid()) {
-                //     pprof.addLabel(sample, TRACE_ID, spanContext.getTraceId());
-                //     pprof.addLabel(sample, SPAN_ID, spanContext.getSpanId());
-                // }
-                // if (sampler != null) {
-                //     sampler.addAttributes(
-                //         (k, v)->pprof.addLabel(sample, k, v), (k, v)->pprof.addLabel(sample, k, v));
-                // }
-                //
-                // pprof.getProfileBuilder().addSample(sample);
-                // }
-                //
-                // private static Pprof createPprof()
-                // {
-                //     Pprof pprof = new Pprof();
-                //     Profile.Builder profile = pprof.getProfileBuilder();
-                //     profile.addSampleType(
-                //         ProfileProto.ValueType.newBuilder()
-                //             .setType(pprof.getStringId("allocationSize"))
-                //             .setUnit(pprof.getStringId("bytes"))
-                //             .build());
+                pprof.AddLabel(sampleBuilder, "thread.id", threadInfo["tid"]);
+                pprof.AddLabel(sampleBuilder, "thread.os.id", threadInfo["nid"]);
+                pprof.AddLabel(sampleBuilder, "thread.state", "RUNNABLE");
 
                 pprof.ProfileBuilder.AddSample(sampleBuilder.Build());
                 var data = Serialize(pprof.ProfileBuilder.Build());
