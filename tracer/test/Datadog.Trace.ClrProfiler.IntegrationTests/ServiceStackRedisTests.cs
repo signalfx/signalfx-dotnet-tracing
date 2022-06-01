@@ -16,6 +16,7 @@ using Xunit.Abstractions;
 
 namespace Datadog.Trace.ClrProfiler.IntegrationTests
 {
+    [Trait("RequiresDockerDependency", "true")]
     public class ServiceStackRedisTests : TestHelper
     {
         public ServiceStackRedisTests(ITestOutputHelper output)

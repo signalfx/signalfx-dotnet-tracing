@@ -13,10 +13,8 @@ using Datadog.Trace.Util;
 
 namespace Datadog.Trace.Sampling
 {
-    internal class RateLimiter : IRateLimiter
+    internal abstract class RateLimiter : IRateLimiter
     {
-        private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<RateLimiter>();
-
         private readonly ConcurrentQueue<DateTime> _intervalQueue = new ConcurrentQueue<DateTime>();
 
         private readonly int _maxTracesPerInterval;
@@ -36,6 +34,7 @@ namespace Datadog.Trace.Sampling
         public RateLimiter(int? maxTracesPerInterval)
         {
             _maxTracesPerInterval = maxTracesPerInterval ?? 100;
+
             _intervalMilliseconds = 1_000;
             _interval = TimeSpan.FromMilliseconds(_intervalMilliseconds);
             _windowBegin = Clock.UtcNow;
@@ -66,7 +65,8 @@ namespace Datadog.Trace.Sampling
 
                 if (count >= _maxTracesPerInterval)
                 {
-                    Log.Warning<string, int, int>("Dropping trace id {TraceId} with count of {Count} for last {Interval}ms.", span.TraceId.ToString(), count, _intervalMilliseconds);
+                    OnDisallowed(span, count, _intervalMilliseconds, _maxTracesPerInterval);
+
                     return false;
                 }
 
@@ -77,12 +77,13 @@ namespace Datadog.Trace.Sampling
             }
             finally
             {
-                // Always set the sample rate metric whether it was allowed or not
-                // DEV: Setting this allows us to properly compute metrics and debug the
-                //      various sample rates that are getting applied to this span
-                span.SetMetric(Metrics.SamplingLimitDecision, GetEffectiveRate());
+                OnFinally(span);
             }
         }
+
+        public abstract void OnDisallowed(Span span, int count, int intervalMs, int maxTracesPerInterval);
+
+        public abstract void OnFinally(Span span);
 
         public float GetEffectiveRate()
         {

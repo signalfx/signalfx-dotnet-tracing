@@ -14,6 +14,7 @@ using Xunit.Abstractions;
 
 namespace Datadog.Trace.ClrProfiler.IntegrationTests
 {
+    [Trait("RequiresDockerDependency", "true")]
     public class Couchbase3Tests : TestHelper
     {
         public Couchbase3Tests(ITestOutputHelper output)

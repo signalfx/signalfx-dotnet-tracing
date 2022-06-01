@@ -20,6 +20,7 @@ using Xunit.Abstractions;
 namespace Datadog.Trace.ClrProfiler.IntegrationTests.AWS
 {
     [UsesVerify]
+    [Trait("RequiresDockerDependency", "true")]
     public class AwsLambdaTests : TestHelper
     {
         public AwsLambdaTests(ITestOutputHelper output)
@@ -41,7 +42,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AWS
             using var agent = EnvironmentHelper.GetMockAgent(fixedPort: 5002);
             using (RunSampleAndWaitForExit(agent))
             {
-                var spans = agent.WaitForSpans(9, 15_000).ToArray();
+                var spans = agent.WaitForSpans(12, 15_000).ToArray();
 
                 var settings = VerifyHelper.GetSpanVerifierSettings();
                 await VerifyHelper.VerifySpans(spans, settings)
