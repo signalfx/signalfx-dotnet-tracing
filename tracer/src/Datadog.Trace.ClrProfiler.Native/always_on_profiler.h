@@ -147,20 +147,24 @@ struct std::hash<always_on_profiler::FunctionIdentifier>
 
 namespace always_on_profiler
 {
+template <typename TKey, typename TValue>
 class NameCache
 {
-// TODO Splunk: cache based on mdToken (Function token) and ModuleID
 // ModuleID is volatile but it is unlikely to have exactly same pair of Function Token and ModuleId after changes.
 // If fails we should end up we Unknown(unknown) as a result
 public:
-    explicit NameCache(size_t maximum_size);
-    shared::WSTRING* Get(FunctionIdentifier key);
-    void Put(FunctionIdentifier key, shared::WSTRING* val);
+    explicit NameCache(size_t maximum_size, TValue default_value);
+    TValue Get(TKey key);
+    void Refresh(TKey key);
+    // if max cache size is exceeded it return value which should be disposed
+    TValue Put(TKey key, TValue val);
+    void Clear();
 
 private:
+    TValue default_value_;
     size_t max_size_;
-    std::list<std::pair<FunctionIdentifier, shared::WSTRING*>> list_;
-    std::unordered_map<FunctionIdentifier, std::list<std::pair<FunctionIdentifier, shared::WSTRING*>>::iterator> map_;
+    std::list<std::pair<TKey, TValue>> list_;
+    std::unordered_map<TKey, typename std::list<std::pair<TKey, TValue>>::iterator> map_;
 };
 } // namespace always_on_profiler
 

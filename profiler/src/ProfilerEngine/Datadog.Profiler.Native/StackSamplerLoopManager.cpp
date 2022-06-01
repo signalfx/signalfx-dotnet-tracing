@@ -5,7 +5,6 @@
 #include "IClrLifetime.h"
 #include "OpSysTools.h"
 #include "OsSpecificApi.h"
-#include "SymbolsResolver.h"
 #include "ThreadsCpuManager.h"
 
 using namespace std::chrono_literals;
@@ -30,9 +29,7 @@ StackSamplerLoopManager::StackSamplerLoopManager(
     std::shared_ptr<IMetricsSender> metricsSender,
     IClrLifetime const* clrLifetime,
     IThreadsCpuManager* pThreadsCpuManager,
-    IStackSnapshotsBufferManager* pStackSnapshotsBufferManager,
     IManagedThreadList* pManagedThreadList,
-    ISymbolsResolver* pSymbolsResolver,
     ICollector<RawWallTimeSample>* pWallTimeCollector,
     ICollector<RawCpuSample>* pCpuTimeCollector
     ) :
@@ -54,9 +51,7 @@ StackSamplerLoopManager::StackSamplerLoopManager(
     _statisticsReadyToSend{nullptr},
     _pClrLifetime{clrLifetime},
     _pThreadsCpuManager{pThreadsCpuManager},
-    _pStackSnapshotsBufferManager{pStackSnapshotsBufferManager},
     _pManagedThreadList{pManagedThreadList},
-    _pSymbolsResolver{pSymbolsResolver},
     _pWallTimeCollector{pWallTimeCollector},
     _pCpuTimeCollector{pCpuTimeCollector},
     _deadlockInterventionInProgress{0}
@@ -72,13 +67,6 @@ StackSamplerLoopManager::~StackSamplerLoopManager()
 {
     // Just in case it was not called explicitely
     Stop();
-
-    StackFramesCollectorBase* pStackFramesCollector = _pStackFramesCollector;
-    if (pStackFramesCollector != nullptr)
-    {
-        delete pStackFramesCollector;
-        _pStackFramesCollector = nullptr;
-    }
 
     ICorProfilerInfo4* pCorProfilerInfo = _pCorProfilerInfo;
     if (pCorProfilerInfo != nullptr)
@@ -96,21 +84,22 @@ const char* StackSamplerLoopManager::GetName()
 bool StackSamplerLoopManager::Start()
 {
     this->RunStackSampling();
-    if (AllowDeadlockIntervention)
-    {
-        this->RunWatcher();
-    }
+    this->RunWatcher();
 
     return true;
 }
 
 bool StackSamplerLoopManager::Stop()
 {
-    GracefulShutdownStackSampling();
-    if (AllowDeadlockIntervention)
+    // allow multiple calls to Stop()
+    if (_isStopped)
     {
-        ShutdownWatcher();
+        return true;
     }
+    _isStopped = true;
+
+    GracefulShutdownStackSampling();
+    ShutdownWatcher();
 
     return true;
 }
@@ -125,12 +114,10 @@ void StackSamplerLoopManager::RunStackSampling()
         stackSamplerLoop = new StackSamplerLoop(
             _pCorProfilerInfo,
             _pConfiguration,
-            _pStackFramesCollector,
+            _pStackFramesCollector.get(),
             this,
             _pThreadsCpuManager,
-            _pStackSnapshotsBufferManager,
             _pManagedThreadList,
-            _pSymbolsResolver,
             _pWallTimeCollector,
             _pCpuTimeCollector
             );
@@ -292,7 +279,10 @@ void StackSamplerLoopManager::WatcherLoopIteration()
 
     _currentStatistics->IncrDeadlockCount();
 
-    PerformDeadlockIntervention(collectionDurationNs);
+    if (AllowDeadlockIntervention)
+    {
+        PerformDeadlockIntervention(collectionDurationNs);
+    }
 }
 
 bool StackSamplerLoopManager::HasMadeProgress(FILETIME userTime, FILETIME kernelTime)

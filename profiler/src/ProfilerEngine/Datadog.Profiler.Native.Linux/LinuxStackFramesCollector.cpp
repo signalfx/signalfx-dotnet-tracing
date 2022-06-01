@@ -14,7 +14,6 @@
 #include "Log.h"
 #include "ManagedThreadInfo.h"
 #include "ScopeFinalizer.h"
-#include "StackFrameCodeKind.h"
 #include "StackSnapshotResultReusableBuffer.h"
 
 std::mutex LinuxStackFramesCollector::s_signalHandlerInitLock;
@@ -62,9 +61,10 @@ StackSnapshotResultBuffer* LinuxStackFramesCollector::CollectStackSampleImplemen
 
         const DWORD osThreadId = pThreadInfo->GetOsThreadId();
 
+#ifndef NDEBUG
         Log::Debug("LinuxStackFramesCollector::CollectStackSampleImplementation: Sending signal ",
                    s_signalToSend, " to thread with osThreadId=", osThreadId, ".");
-
+#endif
         s_pInstanceCurrentlyStackWalking = this;
         auto scopeFinalizer = CreateScopeFinalizer(
             [] {
@@ -240,7 +240,7 @@ std::int32_t LinuxStackFramesCollector::CollectCallStackCurrentThread()
         // After every lib call that touches non-local state, check if the StackSamplerLoopManager requested this walk to abort:
         if (IsCurrentCollectionAbortRequested())
         {
-            TryAddFrame(StackFrameCodeKind::MultipleMixed, 0, 0, 0);
+            AddFakeFrame();
             return E_ABORT;
         }
 
@@ -251,7 +251,7 @@ std::int32_t LinuxStackFramesCollector::CollectCallStackCurrentThread()
             // After every lib call that touches non-local state, check if the StackSamplerLoopManager requested this walk to abort:
             if (IsCurrentCollectionAbortRequested())
             {
-                TryAddFrame(StackFrameCodeKind::MultipleMixed, 0, 0, 0);
+                AddFakeFrame();
                 return E_ABORT;
             }
 
@@ -262,7 +262,7 @@ std::int32_t LinuxStackFramesCollector::CollectCallStackCurrentThread()
                 return resultErrorCode;
             }
 
-            if (!TryAddFrame(StackFrameCodeKind::NotDetermined, 0, nativeInstructionPointer, 0))
+            if (!AddFrame(nativeInstructionPointer))
             {
                 return S_FALSE;
             }

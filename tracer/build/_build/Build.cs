@@ -90,6 +90,9 @@ partial class Build : NukeBuild
 
     [Parameter("The directory to install the tool to")]
     readonly AbsolutePath ToolDestination;
+    
+    [Parameter("Should we build and run tests that require docker. true = only docker integration tests, false = no docker integration tests, null = all", List = false)]
+    readonly bool? IncludeTestsRequiringDocker;
 
     Target Info => _ => _
         .Description("Describes the current configuration")
@@ -203,7 +206,18 @@ partial class Build : NukeBuild
         .DependsOn(CompileDependencyLibs)
         .DependsOn(CompileManagedTestHelpers)
         .DependsOn(CreatePlatformlessSymlinks)
-        .DependsOn(CompileSamples)
+        .DependsOn(CompileSamplesWindows)
+        .DependsOn(CompileIntegrationTests)
+        .DependsOn(BuildNativeLoader);
+    
+    Target BuildAspNetIntegrationTests => _ => _
+        .Unlisted()
+        .Requires(() => IsWin)
+        .Description("Builds the ASP.NET integration tests for Windows")
+        .DependsOn(CompileDependencyLibs)
+        .DependsOn(CompileManagedTestHelpers)
+        .DependsOn(CreatePlatformlessSymlinks)
+        .DependsOn(PublishIisSamples)
         .DependsOn(CompileIntegrationTests)
         .DependsOn(BuildNativeLoader);
 
@@ -230,12 +244,6 @@ partial class Build : NukeBuild
         .Description("Builds and runs the Windows regression tests")
         .DependsOn(BuildWindowsRegressionTests)
         .DependsOn(RunWindowsRegressionTests);
-
-    Target BuildAndRunWindowsIisIntegrationTests => _ => _
-        .Requires(() => IsWin)
-        .Description("Builds and runs the Windows IIS integration tests")
-        .DependsOn(BuildWindowsIntegrationTests)
-        .DependsOn(RunWindowsIisIntegrationTests);
 
     Target BuildLinuxIntegrationTests => _ => _
         .Requires(() => !IsWin)

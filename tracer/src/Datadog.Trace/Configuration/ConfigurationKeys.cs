@@ -399,13 +399,13 @@ namespace Datadog.Trace.Configuration
         {
             /// <summary>
             /// Configuration key for enabling or disabling CI Visibility.
-            /// Default is value is false (disabled).
+            /// Default value is false (disabled).
             /// </summary>
             public const string Enabled = "SIGNALFX_CIVISIBILITY_ENABLED";
 
             /// <summary>
             /// Configuration key for enabling or disabling Agentless in CI Visibility.
-            /// Default is value is false (disabled).
+            /// Default value is false (disabled).
             /// </summary>
             public const string AgentlessEnabled = "SIGNALFX_CIVISIBILITY_AGENTLESS_ENABLED";
 
@@ -416,9 +416,20 @@ namespace Datadog.Trace.Configuration
 
             /// <summary>
             /// Configuration key for enabling or disabling Logs direct submission.
-            /// Default is value is false (disabled).
+            /// Default value is false (disabled).
             /// </summary>
             public const string Logs = "SIGNALFX_CIVISIBILITY_LOGS_ENABLED";
+
+            /// <summary>
+            /// Configuration key for enabling or disabling Code Coverage in CI Visibility.
+            /// Default value is false (disabled).
+            /// </summary>
+            public const string CodeCoverage = "SIGNALFX_CIVISIBILITY_CODE_COVERAGE_ENABLED";
+
+            /// <summary>
+            /// Configuration key for re-signing assemblies after the Code Coverage modification.
+            /// </summary>
+            public const string CodeCoverageSnkFile = "SIGNALFX_CIVISIBILITY_CODE_COVERAGE_SNK_FILEPATH";
         }
 
         /// <summary>
@@ -484,6 +495,11 @@ namespace Datadog.Trace.Configuration
             /// This flag defaults to true and is here in case customers need retrocompatibility only
             /// </summary>
             public const string HeaderTagsNormalizationFixEnabled = "SIGNALFX_TRACE_HEADER_TAG_NORMALIZATION_FIX_ENABLED";
+
+            /// <summary>
+            /// Enables experimental support for activity listener
+            /// </summary>
+            public const string ActivityListenerEnabled = "SIGNALFX_TRACE_ACTIVITY_LISTENER_ENABLED";
         }
 
         internal static class AlwaysOnProfiler
@@ -512,10 +528,18 @@ namespace Datadog.Trace.Configuration
             public const string Enabled = "SIGNALFX_INSTRUMENTATION_TELEMETRY_ENABLED";
 
             /// <summary>
-            /// Configuration key for the telemetry URL where the Tracer sends telemetry.
-            /// Ignored (and <see cref="ExporterSettings.AgentUri"/> is used instead) unless <see cref="ConfigurationKeys.ApiKey"/> is set.
+            /// Configuration key for sending telemetry direct to telemetry intake. If enabled, and
+            /// <see cref="ConfigurationKeys.ApiKey"/> is set, sends telemetry direct to intake. Otherwise, sends
+            /// telemetry to Agent. Enabled by default if <see cref="ConfigurationKeys.ApiKey"/> is available.
             /// </summary>
-            public const string Uri = "SIGNALFX_TRACE_TELEMETRY_URL";
+            public const string AgentlessEnabled = "SIGNALFX_INSTRUMENTATION_TELEMETRY_AGENTLESS_ENABLED";
+
+            /// <summary>
+            /// Configuration key for the telemetry URL where the Tracer sends telemetry. Only applies when agentless
+            /// telemetry is in use (otherwise telemetry is sent to the agent using
+            /// <see cref="ExporterSettings.AgentUri"/> instead)
+            /// </summary>
+            public const string Uri = "SIGNALFX_INSTRUMENTATION_TELEMETRY_URL";
         }
     }
 }

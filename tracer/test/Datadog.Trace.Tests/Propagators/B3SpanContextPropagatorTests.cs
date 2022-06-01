@@ -5,6 +5,7 @@
 
 // Modified by Splunk Inc.
 
+using System.Reflection;
 using Datadog.Trace.Headers;
 using Datadog.Trace.Propagators;
 using FluentAssertions;
@@ -37,6 +38,24 @@ namespace Datadog.Trace.Tests.Propagators
             headers.Verify(h => h.Set(B3ContextPropagator.SpanId, "000000003ade68b1"), Times.Once());
             headers.Verify(h => h.Set(B3ContextPropagator.Sampled, "1"), Times.Once());
             headers.VerifyNoOtherCalls();
+
+            // Extract sampling from trace context
+            var newContext = new SpanContext(null, new TraceContext(null, null), null, traceId, spanId);
+            var newHeaders = new Mock<IHeadersCollection>();
+            B3Propagator.Inject(newContext, newHeaders.Object);
+            newHeaders.Verify(h => h.Set(B3ContextPropagator.TraceId, "000000000000000000000000075bcd15"), Times.Once());
+            newHeaders.Verify(h => h.Set(B3ContextPropagator.SpanId, "000000003ade68b1"), Times.Once());
+            newHeaders.Verify(h => h.Set(B3ContextPropagator.Sampled, "0"), Times.Once());
+            newHeaders.VerifyNoOtherCalls();
+
+            var traceContextSamplingField = typeof(TraceContext).GetField("_samplingPriority", BindingFlags.Instance | BindingFlags.NonPublic);
+            traceContextSamplingField.SetValue(newContext.TraceContext, SamplingPriorityValues.UserKeep);
+            newHeaders = new Mock<IHeadersCollection>();
+            B3Propagator.Inject(newContext, newHeaders.Object);
+            newHeaders.Verify(h => h.Set(B3ContextPropagator.TraceId, "000000000000000000000000075bcd15"), Times.Once());
+            newHeaders.Verify(h => h.Set(B3ContextPropagator.SpanId, "000000003ade68b1"), Times.Once());
+            newHeaders.Verify(h => h.Set(B3ContextPropagator.Sampled, "1"), Times.Once());
+            newHeaders.VerifyNoOtherCalls();
         }
 
         [Fact]
@@ -56,6 +75,24 @@ namespace Datadog.Trace.Tests.Propagators
             headers.Verify(h => h.Set(B3ContextPropagator.SpanId, "000000003ade68b1"), Times.Once());
             headers.Verify(h => h.Set(B3ContextPropagator.Sampled, "1"), Times.Once());
             headers.VerifyNoOtherCalls();
+
+            // Extract sampling from trace context
+            var newContext = new SpanContext(null, new TraceContext(null, null), null, traceId, spanId);
+            var newHeaders = new Mock<IHeadersCollection>();
+            B3Propagator.Inject(newContext, newHeaders.Object, (carrier, name, value) => carrier.Set(name, value));
+            newHeaders.Verify(h => h.Set(B3ContextPropagator.TraceId, "000000000000000000000000075bcd15"), Times.Once());
+            newHeaders.Verify(h => h.Set(B3ContextPropagator.SpanId, "000000003ade68b1"), Times.Once());
+            newHeaders.Verify(h => h.Set(B3ContextPropagator.Sampled, "0"), Times.Once());
+            newHeaders.VerifyNoOtherCalls();
+
+            var traceContextSamplingField = typeof(TraceContext).GetField("_samplingPriority", BindingFlags.Instance | BindingFlags.NonPublic);
+            traceContextSamplingField.SetValue(newContext.TraceContext, SamplingPriorityValues.UserKeep);
+            newHeaders = new Mock<IHeadersCollection>();
+            B3Propagator.Inject(newContext, newHeaders.Object, (carrier, name, value) => carrier.Set(name, value));
+            newHeaders.Verify(h => h.Set(B3ContextPropagator.TraceId, "000000000000000000000000075bcd15"), Times.Once());
+            newHeaders.Verify(h => h.Set(B3ContextPropagator.SpanId, "000000003ade68b1"), Times.Once());
+            newHeaders.Verify(h => h.Set(B3ContextPropagator.Sampled, "1"), Times.Once());
+            newHeaders.VerifyNoOtherCalls();
         }
 
         [Fact]

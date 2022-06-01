@@ -5,7 +5,7 @@
 
 // Modified by Splunk Inc.
 
-using System.IO;
+using System.Collections.Immutable;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Telemetry;
 using Datadog.Trace.TestHelpers;
@@ -17,26 +17,28 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 {
     public class TelemetryTests : TestHelper
     {
+        private const int ExpectedSpans = 3;
+        private const string ServiceVersion = "1.0.0";
+
         public TelemetryTests(ITestOutputHelper output)
             : base("Telemetry", output)
         {
+            SetEnvironmentVariable(ConfigurationKeys.FeatureFlags.ActivityListenerEnabled, "true");
+            SetServiceVersion(ServiceVersion);
+            EnableDebugMode();
         }
 
         [SkippableFact]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
-        public void Telemetry_IsSentOnAppClose()
+        public void Telemetry_Agentless_IsSentOnAppClose()
         {
-            const string expectedOperationName = "http.request";
-            const int expectedSpanCount = 1;
-            const string serviceVersion = "1.0.0";
+            using var agent = new MockTracerAgent(useTelemetry: true);
+            Output.WriteLine($"Assigned port {agent.Port} for the agentPort.");
 
-            int agentPort = TcpPortProvider.GetOpenPort();
-            Output.WriteLine($"Assigning port {agentPort} for the agentPort.");
-            using var agent = new MockTracerAgent(agentPort);
-
-            SetServiceVersion(serviceVersion);
-            using var telemetry = this.ConfigureTelemetry();
+            using var telemetry = new MockTelemetryAgent<TelemetryData>();
+            Output.WriteLine($"Assigned port {telemetry.Port} for the telemetry port.");
+            EnableTelemetry(standaloneAgentPort: telemetry.Port);
 
             int httpPort = TcpPortProvider.GetOpenPort();
             Output.WriteLine($"Assigning port {httpPort} for the httpPort.");
@@ -44,14 +46,38 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             {
                 Assert.True(processResult.ExitCode == 0, $"Process exited with code {processResult.ExitCode}");
 
-                var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
-                Assert.Equal(expectedSpanCount, spans.Count);
+                var spans = agent.WaitForSpans(ExpectedSpans);
+
+                AssertExpectedSpans(spans);
             }
 
             var data = telemetry.AssertIntegrationEnabled(IntegrationId.HttpMessageHandler);
+            AssertTelemetry(data);
+            agent.Telemetry.Should().BeEmpty();
+        }
 
-            data.Application.ServiceVersion.Should().Be(serviceVersion);
-            data.Application.ServiceName.Should().Be("Samples.Telemetry");
+        [SkippableFact(Skip = "SignalFX does not have cloud support for telemetry.")]
+        [Trait("Category", "EndToEnd")]
+        [Trait("RunOnWindows", "True")]
+        public void Telemetry_WithAgentProxy_IsSentOnAppClose()
+        {
+            using var agent = new MockTracerAgent(useTelemetry: true);
+            Output.WriteLine($"Assigned port {agent.Port} for the agentPort.");
+
+            EnableTelemetry();
+
+            int httpPort = TcpPortProvider.GetOpenPort();
+            Output.WriteLine($"Assigning port {httpPort} for the httpPort.");
+            using (ProcessResult processResult = RunSampleAndWaitForExit(agent, arguments: $"Port={httpPort}"))
+            {
+                Assert.True(processResult.ExitCode == 0, $"Process exited with code {processResult.ExitCode}");
+
+                var spans = agent.WaitForSpans(ExpectedSpans);
+                AssertExpectedSpans(spans);
+            }
+
+            var data = agent.AssertIntegrationEnabled(IntegrationId.HttpMessageHandler);
+            AssertTelemetry(data);
         }
 
         [SkippableFact]
@@ -59,21 +85,10 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("RunOnWindows", "True")]
         public void WhenDisabled_DoesntSendTelemetry()
         {
-            const string expectedOperationName = "http.request";
-            const int expectedSpanCount = 1;
-            const string serviceVersion = "1.0.0";
+            using var agent = new MockTracerAgent(useTelemetry: true);
+            Output.WriteLine($"Assigned port {agent.Port} for the agentPort.");
 
-            int agentPort = TcpPortProvider.GetOpenPort();
-            Output.WriteLine($"Assigning port {agentPort} for the agentPort.");
-            using var agent = new MockTracerAgent(agentPort);
-
-            SetServiceVersion(serviceVersion);
-            int telemetryPort = TcpPortProvider.GetOpenPort();
-            using var telemetry = new MockTelemetryAgent<TelemetryData>(telemetryPort);
-
-            SetEnvironmentVariable("SIGNALFX_INSTRUMENTATION_TELEMETRY_ENABLED", "false");
-            SetEnvironmentVariable("SIGNALFX_TRACE_TELEMETRY_URL", $"http://localhost:{telemetry.Port}");
-            SetEnvironmentVariable("SIGNALFX_API_KEY", "INVALID_KEY_FOR_TESTS");
+            EnableTelemetry(enabled: false);
 
             int httpPort = TcpPortProvider.GetOpenPort();
             Output.WriteLine($"Assigning port {httpPort} for the httpPort.");
@@ -81,13 +96,25 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             {
                 Assert.True(processResult.ExitCode == 0, $"Process exited with code {processResult.ExitCode}");
 
-                var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
-                Assert.Equal(expectedSpanCount, spans.Count);
+                var spans = agent.WaitForSpans(ExpectedSpans);
+                AssertExpectedSpans(spans);
             }
 
             // Shouldn't have any, but wait for 5s
-            telemetry.WaitForLatestTelemetry(x => true);
-            telemetry.Telemetry.Should().BeEmpty();
+            agent.WaitForLatestTelemetry(x => true);
+            agent.Telemetry.Should().BeEmpty();
+        }
+
+        private static void AssertTelemetry(TelemetryData data)
+        {
+            data.Application.ServiceVersion.Should().Be(ServiceVersion);
+            data.Application.ServiceName.Should().Be("Samples.Telemetry");
+        }
+
+        private static void AssertExpectedSpans(IImmutableList<MockSpan> spans)
+        {
+            spans.Should().ContainSingle(span => span.LogicScope == "http.request");
+            spans.Should().ContainSingle(span => span.Name == "HttpListener.ReceivedRequest");
         }
     }
 }

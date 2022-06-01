@@ -207,6 +207,24 @@ namespace Datadog.Trace.Configuration
 
             ProfilerExportType = source?.GetString(ConfigurationKeys.ProfilerExportType)
                               ?? "simple";
+
+            IsActivityListenerEnabled = source?.GetBool(ConfigurationKeys.FeatureFlags.ActivityListenerEnabled) ??
+                    // default value
+                    false;
+
+            if (IsActivityListenerEnabled)
+            {
+                // If the activities support is activated, we must enable W3C propagators
+                if (!Array.Exists(PropagationStyleExtract, key => string.Equals(key, nameof(Propagators.ContextPropagators.Names.W3C), StringComparison.OrdinalIgnoreCase)))
+                {
+                    PropagationStyleExtract = PropagationStyleExtract.Concat(nameof(Propagators.ContextPropagators.Names.W3C));
+                }
+
+                if (!Array.Exists(PropagationStyleInject, key => string.Equals(key, nameof(Propagators.ContextPropagators.Names.W3C), StringComparison.OrdinalIgnoreCase)))
+                {
+                    PropagationStyleInject = PropagationStyleInject.Concat(nameof(Propagators.ContextPropagators.Names.W3C));
+                }
+            }
         }
 
         /// <summary>
@@ -510,6 +528,11 @@ namespace Datadog.Trace.Configuration
         internal string TraceMethods { get; set; }
 
         internal string ProfilerExportType { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets a value indicating whether the activity listener is enabled or not.
+        /// </summary>
+        internal bool IsActivityListenerEnabled { get; }
 
         /// <summary>
         /// Create a <see cref="TracerSettings"/> populated from the default sources

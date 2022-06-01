@@ -34,7 +34,8 @@ namespace Datadog.Trace.Propagators
         {
             var traceId = IsValidTraceId(context.RawTraceId, out _) ? context.RawTraceId : context.TraceId.ToString();
             var spanId = IsValidSpanId(context.RawSpanId) ? context.RawSpanId : context.SpanId.ToString("x16");
-            var sampled = context.SamplingPriority > 0 ? "1" : "0";
+            var samplingPriority = context.TraceContext?.SamplingPriority ?? context.SamplingPriority;
+            var sampled = samplingPriority > 0 ? "1" : "0";
 
             carrierSetter.Set(carrier, TraceId, traceId);
             carrierSetter.Set(carrier, SpanId, spanId);

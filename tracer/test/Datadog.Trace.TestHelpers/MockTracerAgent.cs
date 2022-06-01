@@ -18,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.HttpOverStreams;
+using Datadog.Trace.Telemetry;
 using Datadog.Trace.Util;
 using Datadog.Tracer.SignalFx.Metrics.Protobuf;
 using MessagePack; // use nuget MessagePack to deserialize
@@ -37,10 +38,10 @@ namespace Datadog.Trace.TestHelpers
             throw new NotImplementedException("Windows named pipes are not yet implemented in the MockTracerAgent");
         }
 
-        public MockTracerAgent(int port = 8126, int retries = 5, bool useSfxMetrics = false, bool doNotBindPorts = false, int? requestedStatsDPort = null)
+        public MockTracerAgent(int port = 8126, int retries = 5, bool useSfxMetrics = false, bool doNotBindPorts = false, int? requestedStatsDPort = null, bool useTelemetry = false)
         {
             _cancellationTokenSource = new CancellationTokenSource();
-
+            TelemetryEnabled = useTelemetry;
             if (doNotBindPorts)
             {
                 // This is for any tests that want to use a specific port but never actually bind
@@ -178,6 +179,8 @@ namespace Datadog.Trace.TestHelpers
 
         public string Version { get; set; }
 
+        public bool TelemetryEnabled { get; }
+
         /// <summary>
         /// Gets the filters used to filter out spans we don't want to look at for a test.
         /// </summary>
@@ -190,6 +193,13 @@ namespace Datadog.Trace.TestHelpers
         public IImmutableList<DataPoint> Metrics { get; private set; } = ImmutableList<DataPoint>.Empty;
 
         public IImmutableList<NameValueCollection> RequestHeaders { get; private set; } = ImmutableList<NameValueCollection>.Empty;
+
+        /// <summary>
+        /// Gets the <see cref="Datadog.Trace.Telemetry.TelemetryData"/> requests received by the telemetry endpoint
+        /// </summary>
+        public ConcurrentStack<object> Telemetry { get; } = new();
+
+        public IImmutableList<NameValueCollection> TelemetryRequestHeaders { get; private set; } = ImmutableList<NameValueCollection>.Empty;
 
         /// <summary>
         /// Gets or sets a value indicating whether to skip deserialization of traces.
@@ -288,6 +298,37 @@ namespace Datadog.Trace.TestHelpers
             return relevantSpans;
         }
 
+        /// <summary>
+        /// Wait for the telemetry condition to be satisfied.
+        /// Note that the first telemetry that satisfies the condition is returned
+        /// To retrieve all telemetry received, use <see cref="Telemetry"/>
+        /// </summary>
+        /// <param name="hasExpectedValues">A predicate for the current telemetry.
+        /// The object passed to the func will be a <see cref="TelemetryData"/> instance</param>
+        /// <param name="timeoutInMilliseconds">The timeout</param>
+        /// <param name="sleepTime">The time between checks</param>
+        /// <returns>The telemetry that satisfied <paramref name="hasExpectedValues"/></returns>
+        public object WaitForLatestTelemetry(
+            Func<object, bool> hasExpectedValues,
+            int timeoutInMilliseconds = 5000,
+            int sleepTime = 200)
+        {
+            var deadline = DateTime.UtcNow.AddMilliseconds(timeoutInMilliseconds);
+
+            object latest = default;
+            while (DateTime.UtcNow < deadline)
+            {
+                if (Telemetry.TryPeek(out latest) && hasExpectedValues(latest))
+                {
+                    break;
+                }
+
+                Thread.Sleep(sleepTime);
+            }
+
+            return latest;
+        }
+
         public void Dispose()
         {
             // TODO splunk: shutdown gracefully
@@ -341,103 +382,6 @@ namespace Datadog.Trace.TestHelpers
             }
         }
 
-#if NETCOREAPP
-        private byte[] GetResponseBytes()
-        {
-            var responseBody = Encoding.UTF8.GetBytes("{}");
-            var contentLength64 = responseBody.LongLength;
-
-            var response = $"HTTP/1.1 200 OK";
-            response += DatadogHttpValues.CrLf;
-            response += $"Date: {DateTime.UtcNow.ToString("ddd, dd MMM yyyy H:mm::ss K")}";
-            response += DatadogHttpValues.CrLf;
-            response += $"Connection: Keep-Alive";
-            response += DatadogHttpValues.CrLf;
-            response += $"Server: dd-mock-agent";
-
-            if (Version != null)
-            {
-                response += DatadogHttpValues.CrLf;
-                response += $"Datadog-Agent-Version: {Version}";
-            }
-
-            response += DatadogHttpValues.CrLf;
-            response += $"Content-Type: application/json";
-            response += DatadogHttpValues.CrLf;
-            response += $"Content-Length: {contentLength64}";
-            response += DatadogHttpValues.CrLf;
-            response += DatadogHttpValues.CrLf;
-            response += Encoding.ASCII.GetString(responseBody);
-
-            var responseBytes = Encoding.UTF8.GetBytes(response);
-            return responseBytes;
-        }
-
-        private void HandlePotentialTraces(MockHttpParser.MockHttpRequest request)
-        {
-            if (ShouldDeserializeTraces && request.ContentLength >= 1)
-            {
-                byte[] body = null;
-                IList<IList<MockSpan>> spans = null;
-
-                try
-                {
-                    var i = 0;
-                    body = new byte[request.ContentLength];
-
-                    while (request.Body.Stream.CanRead && i < request.ContentLength)
-                    {
-                        var nextByte = request.Body.Stream.ReadByte();
-
-                        if (nextByte == -1)
-                        {
-                            break;
-                        }
-
-                        body[i] = (byte)nextByte;
-                        i++;
-                    }
-
-                    if (i < request.ContentLength)
-                    {
-                        throw new Exception($"Less bytes were sent than we counted. {i} read versus {request.ContentLength} expected.");
-                    }
-
-                    spans = MessagePackSerializer.Deserialize<IList<IList<MockSpan>>>(body);
-                    OnRequestDeserialized(spans);
-
-                    lock (this)
-                    {
-                        // we only need to lock when replacing the span collection,
-                        // not when reading it because it is immutable
-                        Spans = Spans.AddRange(spans.SelectMany(trace => trace));
-
-                        var headerCollection = new NameValueCollection();
-                        foreach (var header in request.Headers)
-                        {
-                            headerCollection.Add(header.Name, header.Value);
-                        }
-
-                        RequestHeaders = RequestHeaders.Add(headerCollection);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    var message = ex.Message.ToLowerInvariant();
-
-                    if (message.Contains("beyond the end of the stream"))
-                    {
-                        // Accept call is likely interrupted by a dispose
-                        // Swallow the exception and let the test finish
-                    }
-
-                    throw;
-                }
-            }
-        }
-
-#endif
-
         private void HandleHttpRequests()
         {
             while (_listener.IsListening)
@@ -446,32 +390,51 @@ namespace Datadog.Trace.TestHelpers
                 {
                     var ctx = _listener.GetContext();
                     OnRequestReceived(ctx);
-                    if (ShouldDeserializeTraces)
-                    {
-                        var spans = MessagePackSerializer.Deserialize<IList<IList<MockSpan>>>(ctx.Request.InputStream);
-                        OnRequestDeserialized(spans);
-
-                        lock (this)
-                        {
-                            // we only need to lock when replacing the span collection,
-                            // not when reading it because it is immutable
-                            Spans = Spans.AddRange(spans.SelectMany(trace => trace));
-                            RequestHeaders = RequestHeaders.Add(new NameValueCollection(ctx.Request.Headers));
-                        }
-                    }
 
                     if (Version != null)
                     {
                         ctx.Response.AddHeader("Datadog-Agent-Version", Version);
                     }
 
+                    if (TelemetryEnabled && (ctx.Request.Url?.AbsolutePath.StartsWith("/" + TelemetryConstants.AgentTelemetryEndpoint) ?? false))
+                    {
+                        // telemetry request
+                        var telemetry = MockTelemetryAgent<TelemetryData>.DeserializeResponse(ctx.Request.InputStream);
+                        Telemetry.Push(telemetry);
+
+                        lock (this)
+                        {
+                            TelemetryRequestHeaders = TelemetryRequestHeaders.Add(new NameValueCollection(ctx.Request.Headers));
+                        }
+
+                        ctx.Response.StatusCode = 200;
+                    }
+                    else
+                    {
+                        // assume trace request
+                        if (ShouldDeserializeTraces)
+                        {
+                            var spans = MessagePackSerializer.Deserialize<IList<IList<MockSpan>>>(ctx.Request.InputStream);
+                            OnRequestDeserialized(spans);
+
+                            lock (this)
+                            {
+                                // we only need to lock when replacing the span collection,
+                                // not when reading it because it is immutable
+                                Spans = Spans.AddRange(spans.SelectMany(trace => trace));
+                                RequestHeaders = RequestHeaders.Add(new NameValueCollection(ctx.Request.Headers));
+                            }
+                        }
+
+                        ctx.Response.ContentType = "application/json";
+                        var buffer = Encoding.UTF8.GetBytes("{}");
+                        ctx.Response.ContentLength64 = buffer.LongLength;
+                        ctx.Response.OutputStream.Write(buffer, 0, buffer.Length);
+                    }
+
                     // NOTE: HttpStreamRequest doesn't support Transfer-Encoding: Chunked
                     // (Setting content-length avoids that)
 
-                    ctx.Response.ContentType = "application/json";
-                    var buffer = Encoding.UTF8.GetBytes("{}");
-                    ctx.Response.ContentLength64 = buffer.LongLength;
-                    ctx.Response.OutputStream.Write(buffer, 0, buffer.Length);
                     ctx.Response.Close();
                 }
                 catch (HttpListenerException)

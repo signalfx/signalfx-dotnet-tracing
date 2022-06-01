@@ -33,5 +33,10 @@ namespace Datadog.Trace.Telemetry
         public const string AasSiteExtensionVersion = "aas_siteextensions_version";
         public const string AasAppType = "aas_app_type";
         public const string AasFunctionsRuntimeVersion = "aas_functions_runtime_version";
+
+        public const string ActivityListenerEnabled = "activity_listener_enabled";
+
+        public const string ProfilerLoaded = "profiler_loaded";
+        public const string CodeHotspotsEnabled = "code_hotspots_enabled";
     }
 }
