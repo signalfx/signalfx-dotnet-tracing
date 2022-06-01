@@ -116,7 +116,7 @@ namespace Datadog.Trace.Telemetry
         {
             try
             {
-                _dependencies.AssemblyLoaded(assembly.GetName());
+                _dependencies.AssemblyLoaded(assembly);
             }
             catch (Exception ex)
             {
