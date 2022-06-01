@@ -50,7 +50,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
             AddLabel(sample, name, label => label.SetNum(value));
         }
 
-        private void AddLabel(SampleBuilder sample, string name, Action<Builder.LabelBuilder> setLabel)
+        private void AddLabel(SampleBuilder sample, string name, Action<LabelBuilder> setLabel)
         {
             var labelBuilder = new LabelBuilder();
             labelBuilder.SetKey(_stringTable.Get(name));
@@ -60,11 +60,11 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
         private class StringTable
         {
-            private readonly Builder.ProfileBuilder _profileBuilder;
+            private readonly ProfileBuilder _profileBuilder;
             private readonly Dictionary<string, long> _table = new();
             private long _index;
 
-            public StringTable(Builder.ProfileBuilder profileBuilder)
+            public StringTable(ProfileBuilder profileBuilder)
             {
                 _profileBuilder = profileBuilder;
                 Get(string.Empty); // 0 is reserved for the empty string
@@ -115,12 +115,12 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
         private class FunctionTable
         {
-            private readonly Builder.ProfileBuilder _profileBuilder;
+            private readonly ProfileBuilder _profileBuilder;
             private readonly StringTable _stringTable;
             private readonly Dictionary<FunctionKey, ulong> _table = new();
             private ulong _index = 1; // 0 is reserved
 
-            public FunctionTable(Builder.ProfileBuilder profile, StringTable stringTable)
+            public FunctionTable(ProfileBuilder profile, StringTable stringTable)
             {
                 _profileBuilder = profile;
                 _stringTable = stringTable;

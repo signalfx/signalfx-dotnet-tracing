@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Datadog.Trace.AlwaysOnProfiler.Builder;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.ExtensionMethods;
@@ -29,15 +30,72 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 var pprof = new Pprof();
                 var sampleBuilder = new SampleBuilder();
 
+                // TODO get allocationSize
+                // sampleBuilder.AddValue(allocationSize);
+
                 pprof.AddLabel(sampleBuilder, "source.event.time", threadSample.Timestamp);
 
                 if (threadSample.SpanId != 0 || threadSample.TraceIdHigh != 0 || threadSample.TraceIdLow != 0)
                 {
-                    pprof.AddLabel(sampleBuilder, "SPAN_ID", threadSample.SpanId);
-                    pprof.AddLabel(sampleBuilder, "TRACE_ID", $"{threadSample.TraceIdHigh:x16}{threadSample.TraceIdLow:x16}");
+                    pprof.AddLabel(sampleBuilder, "span_id", threadSample.SpanId);
+                    pprof.AddLabel(sampleBuilder, "trace_id", $"{threadSample.TraceIdHigh:x16}{threadSample.TraceIdLow:x16}");
                 }
 
-                // TODO Add StackTrace data to the ProfileBuilder
+                // if (stackTrace.isTruncated() || stackTrace.getFrames().size() > stackDepth)
+                // {
+                pprof.AddLabel(sampleBuilder, "thread.stack.truncated", true);
+                // }
+
+                var methodNames = threadSample.StackTrace
+                                              .Split('\n')
+                                              .Select(fullName => fullName.Trim())
+                                              .Where(fullName => fullName.StartsWith("at"))
+                                              .Select(fullName => fullName.Split(' ')[1]);
+
+                foreach (var methodName in methodNames)
+                {
+                    sampleBuilder.AddLocationId(pprof.GetLocationId("unknown", methodName, 0));
+                }
+
+                // TODO Add StackTrace data to the Profile object based on java implementation below
+
+                // String eventName = event.getEventType().getName();
+                // pprof.addLabel(sample, SOURCE_EVENT_NAME, eventName);
+                // Instant time = event.getStartTime();
+                // pprof.addLabel(sample, SOURCE_EVENT_TIME, time.toEpochMilli());
+                //
+                // RecordedThread thread = event.getThread();
+                // if (thread != null) {
+                //     if (thread.getJavaThreadId() != -1)
+                //     {
+                //         pprof.addLabel(sample, THREAD_ID, thread.getJavaThreadId());
+                //         pprof.addLabel(sample, THREAD_NAME, thread.getJavaName());
+                //     }
+                //     pprof.addLabel(sample, THREAD_OS_ID, thread.getOSThreadId());
+                // }
+                // pprof.addLabel(sample, THREAD_STATE, "RUNNABLE");
+                //
+                // if (spanContext != null && spanContext.isValid()) {
+                //     pprof.addLabel(sample, TRACE_ID, spanContext.getTraceId());
+                //     pprof.addLabel(sample, SPAN_ID, spanContext.getSpanId());
+                // }
+                // if (sampler != null) {
+                //     sampler.addAttributes(
+                //         (k, v)->pprof.addLabel(sample, k, v), (k, v)->pprof.addLabel(sample, k, v));
+                // }
+                //
+                // pprof.getProfileBuilder().addSample(sample);
+                // }
+                //
+                // private static Pprof createPprof()
+                // {
+                //     Pprof pprof = new Pprof();
+                //     Profile.Builder profile = pprof.getProfileBuilder();
+                //     profile.addSampleType(
+                //         ProfileProto.ValueType.newBuilder()
+                //             .setType(pprof.getStringId("allocationSize"))
+                //             .setUnit(pprof.getStringId("bytes"))
+                //             .build());
 
                 pprof.ProfileBuilder.AddSample(sampleBuilder.Build());
                 var data = Serialize(pprof.ProfileBuilder.Build());
