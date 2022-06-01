@@ -93,6 +93,9 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         TraceIdHigh = traceIdHigh,
                         TraceIdLow = traceIdLow,
                         SpanId = spanId,
+                        ManagedId = managedId,
+                        NativeId = nativeId,
+                        ThreadName = threadName
                     };
 
                     // The stack follows the experimental GDI conventions described at
@@ -125,7 +128,9 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         if (value != null)
                         {
                             stackTraceBuilder.Append("\tat ");
-                            stackTraceBuilder.Append(value);
+                            var replacedValue = value.Replace("Datadog.Trace.", "SignalFx.Tracing.");
+                            stackTraceBuilder.Append(replacedValue);
+                            threadSample.Frames.Add(replacedValue);
                             stackTraceBuilder.Append('\n');
                         }
 
@@ -139,7 +144,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
                     }
 
                     // we are replacing Datadog.Trace namespace to avoid conflicts while upstream sync
-                    threadSample.StackTrace = stackTraceBuilder.Replace("Datadog.Trace.", "SignalFx.Tracing.").ToString();
+                    threadSample.StackTrace = stackTraceBuilder.ToString();
                     samples.Add(threadSample);
                 }
                 else if (operationCode == OpCodes.EndBatch)

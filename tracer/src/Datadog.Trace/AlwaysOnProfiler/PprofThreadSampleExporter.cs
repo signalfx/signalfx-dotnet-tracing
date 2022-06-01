@@ -43,27 +43,14 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 pprof.AddLabel(sampleBuilder, "thread.stack.truncated", true);
                 // }
 
-                var methodNames = threadSample.StackTrace
-                                              .Split('\n')
-                                              .Select(fullName => fullName.Trim())
-                                              .Where(fullName => fullName.StartsWith("at"))
-                                              .Select(fullName => fullName.Split(' ')[1]);
-
-                foreach (var methodName in methodNames)
+                foreach (var methodName in threadSample.Frames)
                 {
                     sampleBuilder.AddLocationId(pprof.GetLocationId("unknown", methodName, 0));
                 }
 
-                var threadInfo = threadSample.StackTrace
-                                             .Split('\n')[0]
-                                             .Trim()
-                                             .Split(' ')
-                                             .Select(pair => pair.Split('='))
-                                             .Where(keyValue => keyValue.Length == 2)
-                                             .ToDictionary(keyValue => keyValue[0], keyValue => keyValue[1]);
-
-                pprof.AddLabel(sampleBuilder, "thread.id", threadInfo["tid"]);
-                pprof.AddLabel(sampleBuilder, "thread.os.id", threadInfo["nid"]);
+                pprof.AddLabel(sampleBuilder, "thread.id", threadSample.ManagedId);
+                pprof.AddLabel(sampleBuilder, "thread.name", threadSample.ThreadName);
+                pprof.AddLabel(sampleBuilder, "thread.os.id", threadSample.NativeId);
                 pprof.AddLabel(sampleBuilder, "thread.state", "RUNNABLE");
 
                 pprof.ProfileBuilder.AddSample(sampleBuilder.Build());
