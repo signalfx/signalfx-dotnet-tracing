@@ -1,0 +1,54 @@
+---
+- hosts: testbox
+  become: true
+  tasks:
+    - name: Add Dotnet GPG apt Key
+      apt_key:
+        url: https://packages.microsoft.com/keys/microsoft.asc
+        state: present
+    - name: Add Dotnet Repository
+      apt_repository:
+        repo: deb https://packages.microsoft.com/debian/9/prod stretch main
+        state: present
+    - name: remove unwanted packages
+      apt:
+        state: absent
+        name:
+          - unattended-upgrades
+          - snapd
+    - name: Install docker on ubuntu
+      import_tasks: install-docker-playbook.yml
+    - name: install screen/rsync/dotnet-sdk
+      apt:
+        name:
+          - screen
+          - rsync
+          - apt-transport-https
+          - dotnet-sdk-6.0
+        update_cache: yes
+    - name: copy project src directory
+      ansible.posix.synchronize:
+        src: ../../src
+        dest: /home/splunk/
+    - name: copy run-tests script
+      ansible.builtin.template:
+        src: run-tests.sh.jinja
+        dest: /home/splunk/run-tests.sh
+        owner: splunk
+        group: users
+        mode: 0755
+    - name: build baseline-app docker image
+      ansible.builtin.command:
+        cmd: docker build -f /home/splunk/src/Docker/eshop-app.dockerfile -t eshop-app-dc --target baseline-app .
+    - name: build instrumented-app docker image
+      ansible.builtin.command:
+        cmd: docker build -f /home/splunk/src/Docker/eshop-app.dockerfile -t eshop-app-instrumented-dc --target instrumented-app .
+    - name: build k6 docker image
+      ansible.builtin.command:
+        cmd: docker build -f /home/splunk/src/Docker/k6.dockerfile -t k6-eshop .
+    - name: build test project
+      ansible.builtin.command:
+        cmd: dotnet build --configuration Release --output /home/splunk/bin /home/splunk/src/SignalFx.OverheadTest.csproj
+    - name: chown bin directory
+      ansible.builtin.command:
+        cmd: 'chown -R splunk:users bin'

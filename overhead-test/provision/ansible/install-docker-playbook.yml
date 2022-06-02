@@ -1,0 +1,38 @@
+- name: Install aptitude using apt
+  apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
+
+- name: Install required system packages
+  apt: name={{ item }} state=latest update_cache=yes
+  loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
+
+- name: Add Docker GPG apt Key
+  apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+    state: present
+
+- name: Add Docker Repository
+  apt_repository:
+    repo: deb https://download.docker.com/linux/debian stretch stable
+    state: present
+
+- name: Update apt and install docker-ce
+  apt: update_cache=yes name=docker-ce state=latest
+
+- name: Install python-pip because stretch is still on python 2.7
+  apt: name={{ item }} state=latest update_cache=yes
+  loop: [ 'python-pip']
+
+- name: Install Docker Module for Python
+  pip:
+    name: docker
+
+- name: create docker group
+  ansible.builtin.group:
+    name: docker
+    state: present
+
+- name: adding splunk user to docker group
+  user:
+    name: splunk
+    groups: docker
+    append: yes
