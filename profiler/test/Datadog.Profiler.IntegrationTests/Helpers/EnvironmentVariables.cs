@@ -14,5 +14,6 @@ namespace Datadog.Profiler.IntegrationTests.Helpers
         public const string UseNativeLoader = "SIGNALFX_USE_NATIVE_LOADER";
         public const string CpuProfilerEnabled = "SIGNALFX_PROFILING_CPU_ENABLED";
         public const string ExceptionProfilerEnabled = "SIGNALFX_PROFILING_EXCEPTION_ENABLED";
+        public const string ExceptionSampleLimit = "SIGNALFX_PROFILING_EXCEPTION_SAMPLE_LIMIT";
     }
 }
