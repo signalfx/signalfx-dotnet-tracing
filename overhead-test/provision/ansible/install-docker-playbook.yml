@@ -1,28 +1,28 @@
-- name: Install aptitude using apt
+- name: install aptitude using apt
   apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
 
-- name: Install required system packages
+- name: install required system packages
   apt: name={{ item }} state=latest update_cache=yes
   loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
 
-- name: Add Docker GPG apt Key
+- name: add docker gpg apt key
   apt_key:
     url: https://download.docker.com/linux/debian/gpg
     state: present
 
-- name: Add Docker Repository
+- name: add docker repository
   apt_repository:
     repo: deb https://download.docker.com/linux/debian stretch stable
     state: present
 
-- name: Update apt and install docker-ce
+- name: update apt and install docker-ce
   apt: update_cache=yes name=docker-ce state=latest
 
-- name: Install python-pip because stretch is still on python 2.7
+- name: install python-pip because stretch is still on python 2.7
   apt: name={{ item }} state=latest update_cache=yes
   loop: [ 'python-pip']
 
-- name: Install Docker Module for Python
+- name: install docker module for python
   pip:
     name: docker
 

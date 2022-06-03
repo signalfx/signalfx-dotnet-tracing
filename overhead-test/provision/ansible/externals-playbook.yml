@@ -15,9 +15,9 @@
         destination_port: 2375
         source: "!{{testbox_host}}"
         jump: DROP
-    - name: Install docker on ubuntu
+    - name: install docker on ubuntu
       import_tasks: install-docker-playbook.yml
-    - name: Let docker listen on external port
+    - name: let docker listen on external port
       ansible.builtin.lineinfile:
         path: /lib/systemd/system/docker.service
         search_string: 'ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock'

@@ -2,11 +2,11 @@
 - hosts: testbox
   become: true
   tasks:
-    - name: Add Dotnet GPG apt Key
+    - name: add dotnet gpg apt key
       apt_key:
         url: https://packages.microsoft.com/keys/microsoft.asc
         state: present
-    - name: Add Dotnet Repository
+    - name: add dotnet repository
       apt_repository:
         repo: deb https://packages.microsoft.com/debian/9/prod stretch main
         state: present
@@ -16,7 +16,7 @@
         name:
           - unattended-upgrades
           - snapd
-    - name: Install docker on ubuntu
+    - name: install docker on ubuntu
       import_tasks: install-docker-playbook.yml
     - name: install screen/rsync/dotnet-sdk
       apt:
