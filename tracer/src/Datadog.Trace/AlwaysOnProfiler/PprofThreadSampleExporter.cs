@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using Datadog.Trace.AlwaysOnProfiler.Builder;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.ExtensionMethods;
@@ -86,7 +87,10 @@ namespace Datadog.Trace.AlwaysOnProfiler
         private static string Serialize(Profile profile)
         {
             using var memoryStream = new MemoryStream();
-            Serializer.Serialize(memoryStream, profile);
+            using var compressionStream = new GZipStream(memoryStream, CompressionMode.Compress);
+
+            Serializer.Serialize(compressionStream, profile);
+            compressionStream.Flush();
             var byteArray = memoryStream.ToArray();
 
             return Convert.ToBase64String(byteArray);
