@@ -7,7 +7,7 @@ receivers:
     protocols:
       grpc:
       http:
-  
+
 processors:
   batch:
 
