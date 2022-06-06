@@ -2,7 +2,8 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: aspnet-webapi.request,
+    Name: GET /api/statuscode/{value},
+    LogicScope: aspnet-webapi.request,
     Resource: GET /api/statuscode/{value},
     Service: sample/my-app,
     Type: web,
@@ -10,13 +11,14 @@
     Error: 1,
     Tags: {
       aspnet.route: api/statuscode/{value},
-      env: integration_tests,
-      error.msg: The HTTP response has status code 503.,
+      deployment.environment: integration_tests,
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 503,
       http.url: http://localhost:00000/my-app/api/statuscode/503,
       language: dotnet,
+      net.peer.ip: ::1,
+      sfx.error.message: The HTTP response has status code 503.,
       span.kind: server,
       version: 1.0.0
     }
@@ -24,20 +26,22 @@
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: aspnet.request,
+    Name: GET /api/statuscode/{value},
+    LogicScope: aspnet.request,
     Resource: GET /api/statuscode/{value},
     Service: sample/my-app,
     Type: web,
     ParentId: Id_4,
     Error: 1,
     Tags: {
-      env: integration_tests,
-      error.msg: The HTTP response has status code 503.,
+      deployment.environment: integration_tests,
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 503,
-      http.url: /my-app/api/transferrequest/503,
+      http.url: http://localhost:00000/my-app/api/statuscode/503,
       language: dotnet,
+      net.peer.ip: ::1,
+      sfx.error.message: The HTTP response has status code 503.,
       span.kind: server,
       version: 1.0.0
     }
@@ -45,24 +49,28 @@
   {
     TraceId: Id_1,
     SpanId: Id_4,
-    Name: aspnet.request,
+    Name: GET /api/transferrequest/{statuscode},
+    LogicScope: aspnet.request,
     Resource: GET /api/transferrequest/{statuscode},
     Service: sample/my-app,
     Type: web,
     Error: 1,
     Tags: {
-      env: integration_tests,
-      error.msg: Oops, it broke. Specified status code was: 503,
-      error.stack:
-System.Exception: Oops, it broke. Specified status code was: 503
-at Samples.AspNetMvc5.Controllers.ApiController.BadRequestWithStatusCodeAndTransferRequest(Int32 statuscode),
-      error.type: System.Exception,
+      deployment.environment: integration_tests,
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 503,
-      http.url: /my-app/api/transferrequest/503,
+      http.url: http://localhost:00000/my-app/api/TransferRequest/503,
       language: dotnet,
+      net.peer.ip: ::1,
       runtime-id: Guid_1,
+      sfx.error.kind: System.Exception,
+      sfx.error.message: Oops, it broke. Specified status code was: 503,
+      sfx.error.stack:
+System.Exception: Oops, it broke. Specified status code was: 503
+at Samples.AspNetMvc5.Controllers.ApiController.BadRequestWithStatusCodeAndTransferRequest(Int32 statuscode),
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
       span.kind: server,
       version: 1.0.0
     },
@@ -76,7 +84,8 @@ at Samples.AspNetMvc5.Controllers.ApiController.BadRequestWithStatusCodeAndTrans
   {
     TraceId: Id_1,
     SpanId: Id_5,
-    Name: aspnet-webapi.request,
+    Name: GET /api/transferrequest/{statuscode},
+    LogicScope: aspnet-webapi.request,
     Resource: GET /api/transferrequest/{statuscode},
     Service: sample/my-app,
     Type: web,
@@ -84,17 +93,18 @@ at Samples.AspNetMvc5.Controllers.ApiController.BadRequestWithStatusCodeAndTrans
     Error: 1,
     Tags: {
       aspnet.route: api/TransferRequest/{statuscode},
-      env: integration_tests,
-      error.msg: Oops, it broke. Specified status code was: 503,
-      error.stack:
-System.Exception: Oops, it broke. Specified status code was: 503
-at Samples.AspNetMvc5.Controllers.ApiController.BadRequestWithStatusCodeAndTransferRequest(Int32 statuscode),
-      error.type: System.Exception,
+      deployment.environment: integration_tests,
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.status_code: 500,
-      http.url: http://localhost:00000/my-app/api/transferrequest/503,
+      http.url: http://localhost:00000/my-app/api/TransferRequest/503,
       language: dotnet,
+      net.peer.ip: ::1,
+      sfx.error.kind: System.Exception,
+      sfx.error.message: Oops, it broke. Specified status code was: 503,
+      sfx.error.stack:
+System.Exception: Oops, it broke. Specified status code was: 503
+at Samples.AspNetMvc5.Controllers.ApiController.BadRequestWithStatusCodeAndTransferRequest(Int32 statuscode),
       span.kind: server,
       version: 1.0.0
     }
