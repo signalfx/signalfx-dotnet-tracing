@@ -18,7 +18,7 @@ Orca is a Splunk-internal tool for provisioning cloud instances.
 
 ## Install ansible
 
-Use e.g `pip` to install [ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#)
+Use `pip` to install [ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#)
 
 ## Install jinja2 template engine
 
