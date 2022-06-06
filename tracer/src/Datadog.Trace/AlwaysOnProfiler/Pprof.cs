@@ -1,3 +1,5 @@
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Generic;
 using Datadog.Trace.AlwaysOnProfiler.Builder;
@@ -13,7 +15,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
         public Pprof()
         {
-            ProfileBuilder = new Builder.ProfileBuilder();
+            ProfileBuilder = new ProfileBuilder();
             _stringTable = new StringTable(ProfileBuilder);
             _functionTable = new FunctionTable(ProfileBuilder, _stringTable);
             _locationTable = new LocationTable(ProfileBuilder, _functionTable);
@@ -42,7 +44,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
         public void AddLabel(SampleBuilder sample, string key, ulong value)
         {
-            AddLabel(sample, key, (long)value + long.MinValue);
+            AddLabel(sample, key, (long)(value - 9223372036854775808));
         }
 
         public void AddLabel(SampleBuilder sample, string name, long value)
@@ -143,7 +145,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
         private class LocationKey
         {
-            private long _line;
+            private readonly long _line;
 
             public LocationKey(FunctionKey functionKey, long line)
             {
