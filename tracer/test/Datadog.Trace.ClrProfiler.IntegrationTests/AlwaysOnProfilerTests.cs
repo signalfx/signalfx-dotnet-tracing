@@ -129,7 +129,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             expectedLogRecord += "\tat My.Custom.Test.Namespace.ClassA.InternalClassB`2.DoubleInternalClassB.TripleInternalClassB`1.MethodB[TB](System.Int32, TC[], TB, TD, System.Collections.Generic.IList`1[TA], System.Collections.Generic.IList`1[System.String])\n" +
                                  "\tat My.Custom.Test.Namespace.ClassA.<MethodAOthers>g__Action|8_0[T](System.Int32)\n" +
                                  "\tat My.Custom.Test.Namespace.ClassA.MethodAOthers[T](System.String, System.Object, My.Custom.Test.Namespace.CustomClass, My.Custom.Test.Namespace.CustomStruct, My.Custom.Test.Namespace.CustomClass[], My.Custom.Test.Namespace.CustomStruct[], System.Collections.Generic.List`1[T])\n" +
-                                 "\tat My.Custom.Test.Namespace.ClassA.MethodAPointer(unknown)\n" + // TODO Splunk: FunctionMethodSignature::TryParse should be fixed to support pointers
+                                 "\tat My.Custom.Test.Namespace.ClassA.MethodAPointer(System.Int32*)\n" +
                                  "\tat My.Custom.Test.Namespace.ClassA.MethodAFloats(System.Single, System.Double)\n" +
                                  "\tat My.Custom.Test.Namespace.ClassA.MethodAInts(System.UInt16, System.Int16, System.UInt32, System.Int32, System.UInt64, System.Int64, System.IntPtr, System.UIntPtr)\n" +
                                  "\tat My.Custom.Test.Namespace.ClassA.MethodABytes(System.Boolean, System.Char, System.SByte, System.Byte)\n" +
