@@ -64,17 +64,24 @@ namespace My.Custom.Test.Namespace
             MethodAFloats(float.MaxValue, double.MaxValue);
         }
 
-        public static void MethodAFloats(
+        public static unsafe void MethodAFloats(
             float fl,
             double db)
         {
+            int a = 1;
+            int* pointer = &a;
+            MethodAPointer(pointer);
+        }
+
+        public static unsafe void MethodAPointer(int* pointer)
+        {
             MethodAOthers(string.Empty,
-                          new object(),
-                          new CustomClass(),
-                          new CustomStruct(),
-                          Array.Empty<CustomClass>(),
-                          Array.Empty<CustomStruct>(),
-                          new List<string>());
+                new object(),
+                new CustomClass(),
+                new CustomStruct(),
+                Array.Empty<CustomClass>(),
+                Array.Empty<CustomStruct>(),
+                new List<string>());
         }
 
         public static void MethodAOthers<T>(
