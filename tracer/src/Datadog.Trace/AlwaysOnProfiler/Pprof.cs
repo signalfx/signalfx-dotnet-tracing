@@ -42,11 +42,6 @@ namespace Datadog.Trace.AlwaysOnProfiler
             AddLabel(sample, key, value.ToString());
         }
 
-        public void AddLabel(SampleBuilder sample, string key, ulong value)
-        {
-            AddLabel(sample, key, (long)(value - 9223372036854775808));
-        }
-
         public void AddLabel(SampleBuilder sample, string name, long value)
         {
             AddLabel(sample, name, label => label.SetNum(value));

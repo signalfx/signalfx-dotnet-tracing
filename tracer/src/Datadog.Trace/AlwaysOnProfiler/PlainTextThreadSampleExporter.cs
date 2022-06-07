@@ -46,7 +46,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         }
                     },
                     Body = new AnyValue { StringValue = threadSample.StackTrace },
-                    TimeUnixNano = threadSample.Timestamp,
+                    TimeUnixNano = threadSample.Timestamp.Nanoseconds,
                 };
 
                 if (threadSample.SpanId != 0 || threadSample.TraceIdHigh != 0 || threadSample.TraceIdLow != 0)

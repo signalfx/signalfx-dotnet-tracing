@@ -30,7 +30,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 var pprof = new Pprof();
                 var sampleBuilder = new SampleBuilder();
 
-                pprof.AddLabel(sampleBuilder, "source.event.time", threadSample.Timestamp);
+                pprof.AddLabel(sampleBuilder, "source.event.time", threadSample.Timestamp.Milliseconds);
 
                 if (threadSample.SpanId != 0 || threadSample.TraceIdHigh != 0 || threadSample.TraceIdLow != 0)
                 {
@@ -68,7 +68,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         }
                     },
                     Body = new AnyValue { StringValue = data },
-                    TimeUnixNano = threadSample.Timestamp,
+                    TimeUnixNano = threadSample.Timestamp.Nanoseconds,
                 };
 
                 if (threadSample.SpanId != 0 || threadSample.TraceIdHigh != 0 || threadSample.TraceIdLow != 0)

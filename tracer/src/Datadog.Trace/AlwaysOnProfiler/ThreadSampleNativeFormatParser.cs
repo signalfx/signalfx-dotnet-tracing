@@ -42,7 +42,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
         {
             uint batchThreadIndex = 0;
             var samples = new List<ThreadSample>();
-            ulong batchTimestampNanoseconds = 0;
+            long sampleStartMillis = 0;
 
             while (_position < _length)
             {
@@ -56,8 +56,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         return null; // not able to parse
                     }
 
-                    var sampleStartMillis = ReadInt64();
-                    batchTimestampNanoseconds = (ulong)sampleStartMillis * 1_000_000u;
+                    sampleStartMillis = ReadInt64();
 
                     if (IsLogLevelDebugEnabled)
                     {
@@ -89,7 +88,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
                     var threadSample = new ThreadSample
                     {
-                        Timestamp = batchTimestampNanoseconds,
+                        Timestamp = new ThreadSample.Time(sampleStartMillis),
                         TraceIdHigh = traceIdHigh,
                         TraceIdLow = traceIdLow,
                         SpanId = spanId,

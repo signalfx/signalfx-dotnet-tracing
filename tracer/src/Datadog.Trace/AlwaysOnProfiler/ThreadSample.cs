@@ -6,7 +6,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
 {
     internal class ThreadSample
     {
-        public ulong Timestamp { get; set; }
+        public Time Timestamp { get; set; }
 
         public long SpanId { get; set; }
 
@@ -23,5 +23,18 @@ namespace Datadog.Trace.AlwaysOnProfiler
         public string StackTrace { get; set; }
 
         public IList<string> Frames { get; } = new List<string>();
+
+        internal class Time
+        {
+            public Time(long milliseconds)
+            {
+                Milliseconds = milliseconds;
+                Nanoseconds = (ulong)milliseconds * 1_000_000u;
+            }
+
+            public ulong Nanoseconds { get; }
+
+            public long Milliseconds { get; }
+        }
     }
 }
