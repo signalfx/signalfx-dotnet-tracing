@@ -87,12 +87,13 @@ namespace Datadog.Trace.AlwaysOnProfiler
         private static string Serialize(Profile profile)
         {
             using var memoryStream = new MemoryStream();
-            using var compressionStream = new GZipStream(memoryStream, CompressionMode.Compress);
+            using (var compressionStream = new GZipStream(memoryStream, CompressionMode.Compress))
+            {
+                Serializer.Serialize(compressionStream, profile);
+                compressionStream.Flush();
+            }
 
-            Serializer.Serialize(compressionStream, profile);
-            compressionStream.Flush();
             var byteArray = memoryStream.ToArray();
-
             return Convert.ToBase64String(byteArray);
         }
     }
