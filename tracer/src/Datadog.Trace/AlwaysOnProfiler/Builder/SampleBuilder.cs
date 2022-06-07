@@ -10,7 +10,7 @@ namespace Datadog.Trace.AlwaysOnProfiler.Builder
     {
         private readonly Sample _sample = new();
         private readonly IList<long> _vales = new List<long>();
-        private readonly IList<ulong> _locationIds = new List<ulong> { 0 };
+        private readonly IList<ulong> _locationIds = new List<ulong>();
 
         public SampleBuilder AddLabel(Label label)
         {
