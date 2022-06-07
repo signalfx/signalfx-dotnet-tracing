@@ -12,5 +12,6 @@ EXPORTS
     AddTraceAttributeInstrumentation
     InitializeTraceMethods
     InstrumentProbes
+    GetProbesStatuses
     SignalFxReadThreadSamples
     SignalFxSetNativeContext
