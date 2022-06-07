@@ -175,7 +175,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
         private class LocationTable
         {
-            private readonly Builder.ProfileBuilder _profileBuilder;
+            private readonly ProfileBuilder _profileBuilder;
             private readonly FunctionTable _functionTable;
             private readonly Dictionary<LocationKey, ulong> _table = new();
             private ulong _index = 1; // 0 is reserved

@@ -18,7 +18,7 @@ namespace Datadog.Trace.Tests.AlwaysOnProfiler.Builder
 
             var sample = _sampleBuilder.Build();
 
-            sample.LocationIds.Should().HaveCount(2);
+            sample.LocationIds.Should().HaveCount(1);
             sample.LocationIds.Should().Contain(100);
         }
 
