@@ -5,8 +5,6 @@
 
 // Modified by Splunk Inc.
 
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Data;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Util;
@@ -33,9 +31,6 @@ namespace Datadog.Trace.Tests.ExtensionMethods
             string expectedUserId,
             string expectedHost)
         {
-            var spanContext = new SpanContext(Mock.Of<ISpanContext>(), Mock.Of<ITraceContext>(), "test");
-            var span = new Span(spanContext, null);
-
             var commandTags = DbCommandCache.GetTagsFromDbCommand(CreateDbCommand(connectionString));
             Assert.Equal(expectedDbName, commandTags.DbName);
             Assert.Equal(expectedUserId, commandTags.DbUser);
@@ -48,7 +43,7 @@ namespace Datadog.Trace.Tests.ExtensionMethods
             const string connectionString = "Server=myServerName;Database=myDataBase;User Id=myUsername;Password=myPassword;";
             const string commandText = "SELECT * FROM Table ORDER BY id";
 
-            var spanContext = new SpanContext(Mock.Of<ISpanContext>(), Mock.Of<ITraceContext>(), "test");
+            var spanContext = new SpanContext(Mock.Of<ISpanContext>(), new TraceContext(Mock.Of<IDatadogTracer>()), "test");
             var span = new Span(spanContext, null);
 
             span.AddTagsFromDbCommand(CreateDbCommand(connectionString, commandText));
@@ -60,9 +55,6 @@ namespace Datadog.Trace.Tests.ExtensionMethods
         public void ShouldDisableCacheIfTooManyConnectionStrings()
         {
             const string connectionStringTemplate = "Server=myServerName{0};Database=myDataBase;User Id=myUsername;Password=myPassword;";
-
-            var spanContext = new SpanContext(Mock.Of<ISpanContext>(), Mock.Of<ITraceContext>(), "test");
-            var span = new Span(spanContext, null);
 
             // Fill-up the cache and test the logic with cache enabled
             for (int i = 0; i <= DbCommandCache.MaxConnectionStrings; i++)

@@ -22,8 +22,8 @@ namespace Datadog.Trace.Tests
             _exporterWriter = new ExporterWriter(_exporter.Object, new NullMetrics());
 
             var parentSpanContext = new Mock<ISpanContext>();
-            var traceContext = new Mock<ITraceContext>();
-            _spanContext = new SpanContext(parentSpanContext.Object, traceContext.Object, serviceName: null);
+            var traceContext = new TraceContext(Mock.Of<IDatadogTracer>());
+            _spanContext = new SpanContext(parentSpanContext.Object, traceContext, serviceName: null);
         }
 
         [Fact]
