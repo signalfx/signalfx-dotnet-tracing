@@ -495,6 +495,13 @@ shared::WSTRING GetSigTypeTokName(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaData
         ref_flag = true;
     }
 
+    bool pointer_flag = false;
+    if (*pbCur == ELEMENT_TYPE_PTR)
+    {
+        pbCur++;
+        pointer_flag = true;
+    }
+
     switch (*pbCur)
     {
         case ELEMENT_TYPE_BOOLEAN:
@@ -617,6 +624,10 @@ shared::WSTRING GetSigTypeTokName(PCCOR_SIGNATURE& pbCur, const ComPtr<IMetaData
     if (ref_flag)
     {
         tokenName += WStr("&");
+    }
+    if (pointer_flag)
+    {
+        tokenName += WStr("*");
     }
     return tokenName;
 }
@@ -841,6 +852,8 @@ bool ParseParamOrLocal(PCCOR_SIGNATURE& pbCur, PCCOR_SIGNATURE pbEnd)
     if (*pbCur == ELEMENT_TYPE_TYPEDBYREF) return false;
 
     if (*pbCur == ELEMENT_TYPE_BYREF) pbCur++;
+
+    if (*pbCur == ELEMENT_TYPE_PTR) pbCur++;
 
     return ParseType(pbCur, pbEnd);
 }

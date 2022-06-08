@@ -167,6 +167,13 @@ shared::WSTRING GetSigTypeTokNameNew(PCCOR_SIGNATURE& pb_cur, const ComPtr<IMeta
         ref_flag = true;
     }
 
+    bool pointer_flag = false;
+    if (*pb_cur == ELEMENT_TYPE_PTR)
+    {
+        pb_cur++;
+        pointer_flag = true;
+    }
+
     switch (*pb_cur)
     {
         case ELEMENT_TYPE_BOOLEAN:
@@ -283,6 +290,11 @@ shared::WSTRING GetSigTypeTokNameNew(PCCOR_SIGNATURE& pb_cur, const ComPtr<IMeta
     if (ref_flag)
     {
         token_name += WStr("&");
+    }
+
+    if (pointer_flag)
+    {
+        token_name += WStr("*");
     }
     return token_name;
 }

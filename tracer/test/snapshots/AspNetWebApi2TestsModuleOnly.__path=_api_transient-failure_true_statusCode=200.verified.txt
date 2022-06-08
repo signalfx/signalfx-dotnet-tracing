@@ -1,0 +1,31 @@
+[
+  {
+    TraceId: Id_1,
+    SpanId: Id_2,
+    Name: GET,
+    LogicScope: aspnet.request,
+    Resource: GET /api/transient-failure/true,
+    Service: sample,
+    Type: web,
+    Tags: {
+      deployment.environment: integration_tests,
+      http.method: GET,
+      http.request.headers.host: localhost:00000,
+      http.status_code: 200,
+      http.url: http://localhost:00000/api/transient-failure/true,
+      language: dotnet,
+      net.peer.ip: ::1,
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: server,
+      version: 1.0.0
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  }
+]

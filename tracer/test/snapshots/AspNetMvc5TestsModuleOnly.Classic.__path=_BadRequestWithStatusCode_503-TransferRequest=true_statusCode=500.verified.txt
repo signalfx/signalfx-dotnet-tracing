@@ -1,0 +1,37 @@
+[
+  {
+    TraceId: Id_1,
+    SpanId: Id_2,
+    Name: GET,
+    LogicScope: aspnet.request,
+    Resource: GET /badrequestwithstatuscode/?,
+    Service: sample,
+    Type: web,
+    Error: 1,
+    Tags: {
+      deployment.environment: integration_tests,
+      http.method: GET,
+      http.request.headers.host: localhost:00000,
+      http.status_code: 500,
+      http.url: http://localhost:00000/BadRequestWithStatusCode/503?TransferRequest=true,
+      language: dotnet,
+      net.peer.ip: ::1,
+      runtime-id: Guid_1,
+      sfx.error.kind: System.Exception,
+      sfx.error.message: Oops, it broke. Specified status code was: 503,
+      sfx.error.stack:
+System.Exception: Oops, it broke. Specified status code was: 503
+at Samples.AspNetMvc5.Controllers.HomeController.BadRequestWithStatusCode(Int32 statuscode),
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z,
+      span.kind: server,
+      version: 1.0.0
+    },
+    Metrics: {
+      process_id: 0,
+      _dd.top_level: 1.0,
+      _dd.tracer_kr: 1.0,
+      _sampling_priority_v1: 1.0
+    }
+  }
+]
