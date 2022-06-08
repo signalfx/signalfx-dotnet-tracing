@@ -38,11 +38,6 @@ namespace Datadog.Trace.AlwaysOnProfiler
                     pprof.AddLabel(sampleBuilder, "trace_id", $"{threadSample.TraceIdHigh:x16}{threadSample.TraceIdLow:x16}");
                 }
 
-                // if (stackTrace.isTruncated() || stackTrace.getFrames().size() > stackDepth)
-                // {
-                pprof.AddLabel(sampleBuilder, "thread.stack.truncated", true);
-                // }
-
                 foreach (var methodName in threadSample.Frames)
                 {
                     sampleBuilder.AddLocationId(pprof.GetLocationId("unknown", methodName, 0));
@@ -65,6 +60,11 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         {
                             Key = "profiling.data.format",
                             Value = new AnyValue { StringValue = "pprof-gzip-base64" }
+                        },
+                        new KeyValue
+                        {
+                            Key = "profiling.data.type",
+                            Value = new AnyValue { StringValue = "cpu" }
                         }
                     },
                     Body = new AnyValue { StringValue = data },
