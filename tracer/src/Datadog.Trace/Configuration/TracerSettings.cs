@@ -206,7 +206,7 @@ namespace Datadog.Trace.Configuration
             GrpcTags = InitializeHeaderTags(grpcTags, headerTagsNormalizationFixEnabled: true);
 
             ProfilerExportType = source?.GetString(ConfigurationKeys.ProfilerExportType)
-                              ?? "simple";
+                              ?? "pprof";
 
             IsActivityListenerEnabled = source?.GetBool(ConfigurationKeys.FeatureFlags.ActivityListenerEnabled) ??
                     // default value

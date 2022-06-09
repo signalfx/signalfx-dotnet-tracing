@@ -1,12 +1,16 @@
 // Modified by Splunk Inc.
 
+using System;
+using System.Threading;
 using Datadog.Trace.Configuration;
+using Datadog.Trace.Logging;
 
 namespace Datadog.Trace.AlwaysOnProfiler
 {
     internal class ThreadSampleExporterFactory
     {
-        private ImmutableTracerSettings _tracerSettings;
+        protected static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(ThreadSampleExporterFactory));
+        private readonly ImmutableTracerSettings _tracerSettings;
 
         public ThreadSampleExporterFactory(ImmutableTracerSettings tracerSettings)
         {
@@ -22,7 +26,14 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 return new PprofThreadSampleExporter(_tracerSettings);
             }
 
-            return new PlainTextThreadSampleExporter(_tracerSettings);
+            if (exporterType == "text")
+            {
+
+                return new PlainTextThreadSampleExporter(_tracerSettings);
+            }
+
+            Log.Warning("Unknown exporter type passed: {0}. Profiling will not be enabled.", exporterType);
+            throw new ArgumentException($"Exporter type {exporterType} us unknown");
         }
     }
 }

@@ -127,7 +127,10 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         if (value != null)
                         {
                             stackTraceBuilder.Append("\tat ");
+
+                            // we are replacing Datadog.Trace namespace to avoid conflicts while upstream sync
                             var replacedValue = value.Replace("Datadog.Trace.", "SignalFx.Tracing.");
+
                             stackTraceBuilder.Append(replacedValue);
                             threadSample.Frames.Add(replacedValue);
                             stackTraceBuilder.Append('\n');
@@ -142,7 +145,6 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         continue;
                     }
 
-                    // we are replacing Datadog.Trace namespace to avoid conflicts while upstream sync
                     threadSample.StackTrace = stackTraceBuilder.ToString();
                     samples.Add(threadSample);
                 }
