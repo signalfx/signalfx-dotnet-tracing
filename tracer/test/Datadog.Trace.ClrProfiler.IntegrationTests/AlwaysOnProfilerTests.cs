@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Datadog.Trace.TestHelpers;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using OpenTelemetry.TestHelpers.Proto.Collector.Logs.V1;
 using OpenTelemetry.TestHelpers.Proto.Common.V1;
 using OpenTelemetry.TestHelpers.Proto.Logs.V1;
 using VerifyXunit;
@@ -138,7 +139,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             return logRecord.Body.StringValue.Contains(expectedLogRecord);
         }
 
-        private async Task DumpLogRecords(LogsData[] logsData)
+        private async Task DumpLogRecords(ExportLogsServiceRequest[] logsData)
         {
             foreach (var data in logsData)
             {
