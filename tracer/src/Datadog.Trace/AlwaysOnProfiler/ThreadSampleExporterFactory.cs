@@ -16,7 +16,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
             _tracerSettings = tracerSettings;
         }
 
-        public IThreadSampleExporter CreateThreadSampleExporter()
+        public ThreadSampleExporter CreateThreadSampleExporter()
         {
             var exporterType = _tracerSettings.ProfilerExportType;
 

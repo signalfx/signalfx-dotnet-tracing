@@ -25,7 +25,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
         private static ImmutableTracerSettings _tracerSettings;
 
-        private static void ReadAndExportThreadSampleBatch(byte[] buffer, IThreadSampleExporter exporter)
+        private static void ReadAndExportThreadSampleBatch(byte[] buffer, ThreadSampleExporter exporter)
         {
             var read = NativeMethods.SignalFxReadThreadSamples(buffer.Length, buffer);
             if (read <= 0)

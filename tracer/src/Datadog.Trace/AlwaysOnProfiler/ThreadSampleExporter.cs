@@ -13,7 +13,7 @@ using Datadog.Tracer.OpenTelemetry.Proto.Resource.V1;
 
 namespace Datadog.Trace.AlwaysOnProfiler
 {
-    internal abstract class ThreadSampleExporter : IThreadSampleExporter
+    internal abstract class ThreadSampleExporter
     {
         protected static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(ThreadSampleExporter));
 
