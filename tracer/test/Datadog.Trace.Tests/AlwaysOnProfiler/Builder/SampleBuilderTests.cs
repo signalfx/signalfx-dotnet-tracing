@@ -1,7 +1,7 @@
 // Modified by Splunk Inc.
 
 using Datadog.Trace.AlwaysOnProfiler.Builder;
-using Datadog.Tracer.Pprof.Proto.Profile.V1;
+using Datadog.Tracer.Pprof.Proto.Profile;
 using FluentAssertions;
 using Xunit;
 

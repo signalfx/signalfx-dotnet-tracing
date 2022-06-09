@@ -1,6 +1,6 @@
 // Modified by Splunk Inc.
 
-using Datadog.Tracer.Pprof.Proto.Profile.V1;
+using Datadog.Tracer.Pprof.Proto.Profile;
 
 namespace Datadog.Trace.AlwaysOnProfiler.Builder
 {

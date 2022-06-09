@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 using Datadog.Trace.AlwaysOnProfiler.Builder;
-using Datadog.Tracer.Pprof.Proto.Profile.V1;
+using Datadog.Tracer.Pprof.Proto.Profile;
 
 namespace Datadog.Trace.AlwaysOnProfiler
 {

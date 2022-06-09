@@ -1,7 +1,6 @@
 // Modified by Splunk Inc.
 
 using System;
-using System.Threading;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Logging;
 
@@ -28,7 +27,6 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
             if (exporterType == "text")
             {
-
                 return new PlainTextThreadSampleExporter(_tracerSettings);
             }
 
