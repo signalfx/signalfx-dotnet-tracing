@@ -50,26 +50,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
                 pprof.ProfileBuilder.AddSample(sampleBuilder.Build());
                 var data = Serialize(pprof.ProfileBuilder.Build());
-                var logRecord = new LogRecord
-                {
-                    Attributes =
-                    {
-                        FixedLogRecordAttributes[0],
-                        FixedLogRecordAttributes[1],
-                        new KeyValue
-                        {
-                            Key = "profiling.data.format",
-                            Value = new AnyValue { StringValue = "pprof-gzip-base64" }
-                        },
-                        new KeyValue
-                        {
-                            Key = "profiling.data.type",
-                            Value = new AnyValue { StringValue = "cpu" }
-                        }
-                    },
-                    Body = new AnyValue { StringValue = data },
-                    TimeUnixNano = threadSample.Timestamp.Nanoseconds,
-                };
+                var logRecord = CreateLogRecord(data, threadSample.Timestamp.Nanoseconds);
 
                 if (threadSample.SpanId != 0 || threadSample.TraceIdHigh != 0 || threadSample.TraceIdLow != 0)
                 {

@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Datadog.Trace.AlwaysOnProfiler;
 using Datadog.Trace.Logging.DirectSubmission;
 using Datadog.Trace.SignalFx.Metrics;
 using Datadog.Trace.Util;
@@ -94,7 +95,7 @@ namespace Datadog.Trace.Configuration
 
             ExpandRouteTemplatesEnabled = settings.ExpandRouteTemplatesEnabled || !RouteTemplateResourceNamesEnabled;
 
-            ProfilerExportType = settings.ProfilerExportType;
+            ProfilerExportFormat = settings.ProfilerExportFormat;
         }
 
         /// <summary>
@@ -357,7 +358,7 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         internal string TraceMethods { get; }
 
-        internal string ProfilerExportType { get; }
+        internal ProfilerExportFormat ProfilerExportFormat { get; }
 
         /// <summary>
         /// Gets a value indicating whether the activity listener is enabled or not.

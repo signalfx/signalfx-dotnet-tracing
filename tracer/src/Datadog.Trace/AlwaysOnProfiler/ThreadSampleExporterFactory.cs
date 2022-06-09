@@ -18,20 +18,12 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
         public ThreadSampleExporter CreateThreadSampleExporter()
         {
-            var exporterType = _tracerSettings.ProfilerExportType;
-
-            if (exporterType == "pprof")
+            return _tracerSettings.ProfilerExportFormat switch
             {
-                return new PprofThreadSampleExporter(_tracerSettings);
-            }
-
-            if (exporterType == "text")
-            {
-                return new PlainTextThreadSampleExporter(_tracerSettings);
-            }
-
-            Log.Warning("Unknown exporter type passed: {0}. Profiling will not be enabled.", exporterType);
-            throw new ArgumentException($"Exporter type {exporterType} us unknown");
+                ProfilerExportFormat.Pprof => new PprofThreadSampleExporter(_tracerSettings),
+                ProfilerExportFormat.Text => new PlainTextThreadSampleExporter(_tracerSettings),
+                _ => throw new ArgumentOutOfRangeException(nameof(_tracerSettings.ProfilerExportFormat), _tracerSettings.ProfilerExportFormat, null)
+            };
         }
     }
 }

@@ -10,6 +10,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Datadog.Trace.AlwaysOnProfiler;
 using Datadog.Trace.Configuration.Helpers;
 using Datadog.Trace.Configuration.Types;
 using Datadog.Trace.ExtensionMethods;
@@ -205,8 +206,16 @@ namespace Datadog.Trace.Configuration
             // Filter out tags with empty keys or empty values, and trim whitespaces
             GrpcTags = InitializeHeaderTags(grpcTags, headerTagsNormalizationFixEnabled: true);
 
-            ProfilerExportType = source?.GetString(ConfigurationKeys.ProfilerExportType)
-                              ?? "pprof";
+            var stringProfileExportFormat = source?.GetString(ConfigurationKeys.AlwaysOnProfiler.ExportFormat);
+            if (Enum.TryParse(stringProfileExportFormat, out ProfilerExportFormat profilerExportFormat))
+            {
+                ProfilerExportFormat = profilerExportFormat;
+            }
+            else
+            {
+                Log.Logger.Warning("Unknown {0} passed: {1}, using {2} as a default", ConfigurationKeys.AlwaysOnProfiler.ExportFormat, stringProfileExportFormat, ProfilerExportFormat.Pprof);
+                ProfilerExportFormat = ProfilerExportFormat.Pprof;
+            }
 
             IsActivityListenerEnabled = source?.GetBool(ConfigurationKeys.FeatureFlags.ActivityListenerEnabled) ??
                     // default value
@@ -527,7 +536,7 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         internal string TraceMethods { get; set; }
 
-        internal string ProfilerExportType { get; set; } = string.Empty;
+        internal ProfilerExportFormat ProfilerExportFormat { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether the activity listener is enabled or not.

@@ -390,8 +390,6 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         public const string TraceMethods = "SIGNALFX_TRACE_METHODS";
 
-        public const string ProfilerExportType = "SIGNALFX_PROFILER_EXPORT_TYPE";
-
         /// <summary>
         /// String constants for CI Visibility configuration keys.
         /// </summary>
@@ -517,6 +515,13 @@ namespace Datadog.Trace.Configuration
             /// </summary>
             /// <seealso cref="TracerSettings.ThreadSamplingPeriod"/>
             public const string Period = "SIGNALFX_PROFILER_CALL_STACK_INTERVAL";
+
+            /// <summary>
+            /// Configuration key to set export format.
+            /// The default value is Pprof.
+            /// </summary>
+            /// <seealso cref="TracerSettings.ThreadSamplingEnabled"/>
+            public const string ExportFormat = "SIGNALFX_PROFILER_EXPORT_FORMAT";
         }
 
         internal static class Telemetry

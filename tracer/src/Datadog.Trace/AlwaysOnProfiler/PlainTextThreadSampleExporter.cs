@@ -33,21 +33,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
             for (var i = 0; i < threadSamples.Count; i++)
             {
                 var threadSample = threadSamples[i];
-                var logRecord = new LogRecord
-                {
-                    Attributes =
-                    {
-                        FixedLogRecordAttributes[0],
-                        FixedLogRecordAttributes[1],
-                        new KeyValue
-                        {
-                            Key = "profiling.data.format",
-                            Value = new AnyValue { StringValue = "text" }
-                        }
-                    },
-                    Body = new AnyValue { StringValue = threadSample.StackTrace },
-                    TimeUnixNano = threadSample.Timestamp.Nanoseconds,
-                };
+                var logRecord = CreateLogRecord(threadSample.StackTrace, threadSample.Timestamp.Nanoseconds);
 
                 if (threadSample.SpanId != 0 || threadSample.TraceIdHigh != 0 || threadSample.TraceIdLow != 0)
                 {

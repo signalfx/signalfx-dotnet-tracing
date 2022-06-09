@@ -22,7 +22,9 @@ namespace Datadog.Trace.AlwaysOnProfiler
             FixedLogRecordAttributes = new ReadOnlyCollection<KeyValue>(new List<KeyValue>
             {
                 GdiProfilingConventions.LogRecord.Attributes.Source,
-                GdiProfilingConventions.LogRecord.Attributes.Period((long)tracerSettings.ThreadSamplingPeriod.TotalMilliseconds)
+                GdiProfilingConventions.LogRecord.Attributes.Period((long)tracerSettings.ThreadSamplingPeriod.TotalMilliseconds),
+                GdiProfilingConventions.LogRecord.Attributes.Format(tracerSettings.ProfilerExportFormat),
+                GdiProfilingConventions.LogRecord.Attributes.Type
             });
 
             LogsEndpointUrl = tracerSettings.ExporterSettings.LogsEndpointUrl;
@@ -80,6 +82,22 @@ namespace Datadog.Trace.AlwaysOnProfiler
             {
                 Log.Error("Exception sending thread samples to {0}: {1}", LogsEndpointUrl, ex.Message);
             }
+        }
+
+        protected LogRecord CreateLogRecord(string body, ulong timeUnixNanoseconds)
+        {
+            return new LogRecord
+            {
+                Attributes =
+                {
+                    FixedLogRecordAttributes[0],
+                    FixedLogRecordAttributes[1],
+                    FixedLogRecordAttributes[2],
+                    FixedLogRecordAttributes[3]
+                },
+                Body = new AnyValue { StringValue = body },
+                TimeUnixNano = timeUnixNanoseconds,
+            };
         }
 
         /// <summary>
@@ -150,12 +168,35 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         Value = new AnyValue { StringValue = OpenTelemetryProfiling }
                     };
 
+                    public static readonly KeyValue Type = new()
+                    {
+                        Key = "profiling.data.type",
+                        Value = new AnyValue { StringValue = "cpu" }
+                    };
+
                     public static KeyValue Period(long periodMilliseconds)
                     {
                         return new KeyValue
                         {
                             Key = "source.event.period",
-                            Value = new AnyValue { IntValue = periodMilliseconds },
+                            Value = new AnyValue { IntValue = periodMilliseconds }
+                        };
+                    }
+
+                    public static KeyValue Format(ProfilerExportFormat profilerExportFormat)
+                    {
+                        return new KeyValue
+                        {
+                            Key = "profiling.data.format",
+                            Value = new AnyValue
+                            {
+                                StringValue = profilerExportFormat switch
+                                {
+                                    ProfilerExportFormat.Pprof => "pprof-gzip-base64",
+                                    ProfilerExportFormat.Text => "text",
+                                    _ => throw new ArgumentOutOfRangeException(nameof(profilerExportFormat), profilerExportFormat, null)
+                                }
+                            }
                         };
                     }
                 }
