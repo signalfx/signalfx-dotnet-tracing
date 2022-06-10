@@ -32,13 +32,13 @@ internal class K6ResultsCollector : IDisposable
 
         var iterationDuration = metrics![IterationDuration];
 
-        var iterationAvg = iterationDuration!["avg"]!.Value<float>();
-        var iterationP95 = iterationDuration["p(95)"]!.Value<float>();
+        var iterationAvg = iterationDuration!["avg"]!.Value<double>();
+        var iterationP95 = iterationDuration["p(95)"]!.Value<double>();
 
         var httpRequestDuration = metrics[HttpRequestDuration];
 
-        var requestAvg = httpRequestDuration!["avg"]!.Value<float>();
-        var requestP95 = httpRequestDuration["p(95)"]!.Value<float>();
+        var requestAvg = httpRequestDuration!["avg"]!.Value<double>();
+        var requestP95 = httpRequestDuration["p(95)"]!.Value<double>();
 
         return new K6Results(iterationAvg, iterationP95, requestAvg, requestP95);
     }

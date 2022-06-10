@@ -60,17 +60,17 @@ internal class CounterResultsCollector : IDisposable
             totalAllocated);
     }
 
-    private static float ComputeAverage(JToken events, string metricName)
+    private static double ComputeAverage(JToken events, string metricName)
     {
         var metricStats = ExtractValues(events, metricName);
         return metricStats.Average();
     }
 
-    private static IList<float> ExtractValues(JToken events, string metricName)
+    private static IList<double> ExtractValues(JToken events, string metricName)
     {
         return events
             .Where(token => token["name"].Value<string>() == metricName)
-            .Select(token => token["value"]!.Value<float>())
+            .Select(token => token["value"]!.Value<double>())
             .ToList();
     }
 
