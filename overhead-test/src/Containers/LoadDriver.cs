@@ -1,57 +1,86 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using DotNet.Testcontainers.Containers.Builders;
-using DotNet.Testcontainers.Containers.Modules;
-using DotNet.Testcontainers.Containers.OutputConsumers;
+using DotNet.Testcontainers.Builders;
+using DotNet.Testcontainers.Containers;
 using DotNet.Testcontainers.Networks;
-using SignalFx.OverheadTest.Utils;
+using SignalFx.OverheadTest.Configs;
+using SignalFx.OverheadTest.Results;
 
 namespace SignalFx.OverheadTest.Containers;
 
 internal class LoadDriver : IAsyncDisposable
 {
+    public const string K6ResultsFile = "k6-test-summary.json";
+
+    private const string ContainerResultsPath = $"/home/k6/{K6ResultsFile}";
+    private const string ContainerScriptPath = "/home/k6/basic.js";
+    private const string LoadDriveImageName = "grafana/k6";
+
     private readonly TestcontainersContainer _container;
     private readonly IDockerNetwork _network;
-    private readonly Stream _stream;
+    private readonly Stream _logStream;
+    private readonly Stream _resultStream;
+    private readonly string _hostScriptPath;
 
-    public LoadDriver(IDockerNetwork network, ResultsNamingConvention namingConvention)
+
+    public LoadDriver(IDockerNetwork network, NamingConvention namingConvention, TestConfig testConfig)
     {
         _network = network ?? throw new ArgumentNullException(nameof(network));
         if (namingConvention == null) throw new ArgumentNullException(nameof(namingConvention));
+        if (testConfig == null) throw new ArgumentNullException(nameof(testConfig));
 
-        _stream = File.Create(Path.Combine(namingConvention.ContainerLogs, "k6.txt"));
+        _logStream = File.Create(Path.Combine(namingConvention.ContainerLogs, "k6.txt"));
+        _resultStream = File.Create(Path.Combine(namingConvention.AgentResults, K6ResultsFile));
+
+        _hostScriptPath = Path.Combine(Directory.GetCurrentDirectory(), "K6", "basic.js");
         _container = new TestcontainersBuilder<TestcontainersContainer>()
-            .WithImage("k6-eshop")
-            .WithName($"{Constants.Prefix}-k6-load")
+            .WithImage(LoadDriveImageName)
+            .WithName($"{OverheadTest.Prefix}-k6-load")
             .WithNetwork(_network)
-            .WithCommand("run", "-u", "30", "-e", $"ESHOP_HOSTNAME={EshopApp.ContainerName}", "-i", "3000",
-                "/app/basic.js", "--summary-export", "/results/k6-test-summary.json")
-            .WithMount("K6/basic.js", "/app/basic.js")
-            .WithMount(namingConvention.AgentResults, "/results")
-            .WithOutputConsumer(Consume.RedirectStdoutAndStderrToStream(_stream, _stream))
+            .WithCommand("run",
+                "-u", testConfig.ConcurrentConnections.ToString(),
+                "-e", $"ESHOP_HOSTNAME={EshopApp.ContainerName}",
+                "-i", testConfig.Iterations.ToString(),
+                "--rps", testConfig.MaxRequestRate.ToString(),
+                ContainerScriptPath,
+                "--summary-export", ContainerResultsPath)
+            .WithBindMount(_hostScriptPath, ContainerScriptPath)
+            .WithOutputConsumer(Consume.RedirectStdoutAndStderrToStream(_logStream, _logStream))
             .Build();
     }
 
     public async ValueTask DisposeAsync()
     {
-        await _container.DisposeAsync();
-        await _stream.DisposeAsync();
+        await _container.CleanUpAsync();
+        await _logStream.DisposeAsync();
+        await _resultStream.DisposeAsync();
     }
 
     internal Task StartAsync() => _container.StartAsync();
 
-    internal Task<long> GetExitCodeAsync() => _container.GetExitCode();
+
+    internal async Task<long> StopAsync()
+    {
+        var exitCode = await _container.GetExitCode();
+
+        // for now, save container's file content locally
+        var fileContent = await _container.ReadFileAsync(ContainerResultsPath);
+        await _resultStream.WriteAsync(fileContent);
+
+        return exitCode;
+    }
 
     internal TestcontainersContainer BuildWarmup()
     {
         return new TestcontainersBuilder<TestcontainersContainer>()
-            .WithImage("grafana/k6")
-            .WithName($"{Constants.Prefix}-k6-warmup")
+            .WithAutoRemove(true)
+            .WithImage(LoadDriveImageName)
+            .WithName($"{OverheadTest.Prefix}-k6-warmup")
             .WithNetwork(_network)
             .WithCommand("run", "-u", "10", "-e", $"ESHOP_HOSTNAME={EshopApp.ContainerName}", "-i", "500",
-                "/app/basic.js")
-            .WithMount("K6/basic.js", "/app/basic.js")
+                ContainerScriptPath)
+            .WithBindMount(_hostScriptPath, ContainerScriptPath)
             .Build();
     }
 }

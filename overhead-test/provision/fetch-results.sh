@@ -3,7 +3,10 @@
 MYDIR=$(dirname $0)
 source ${MYDIR}/env.sh
 
-RESULTS=${MYDIR}/../results/
+TS=$(ssh -o "LogLevel=ERROR" -i ~/.orca/id_rsa splunk@${TESTBOX_HOST} "date -r bin/results/ '+%Y%m%d_%H%M%S'")
+echo Timestamp dir will be ${TS}
+
+RESULTS=${MYDIR}/../testresults/${TS}
 mkdir -p $RESULTS
 
 # fetches container logs and k6/counters results

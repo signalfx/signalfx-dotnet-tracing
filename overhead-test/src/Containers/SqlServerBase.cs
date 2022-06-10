@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using DotNet.Testcontainers.Containers.Modules;
-using SignalFx.OverheadTest.Utils;
+using DotNet.Testcontainers.Containers;
+using SignalFx.OverheadTest.Results;
 
 namespace SignalFx.OverheadTest.Containers;
 
@@ -12,10 +12,10 @@ internal abstract class SqlServerBase : IAsyncDisposable
     protected const string ImageName = "mcr.microsoft.com/mssql/server:2019-CU16-ubuntu-20.04";
     protected readonly Stream Stream;
 
-    protected SqlServerBase(ResultsNamingConvention resultsNamingConvention)
+    protected SqlServerBase(NamingConvention namingConvention)
     {
-        if (resultsNamingConvention == null) throw new ArgumentNullException(nameof(resultsNamingConvention));
-        Stream = File.Create(Path.Combine(resultsNamingConvention.ContainerLogs, "sqlserver.txt"));
+        if (namingConvention == null) throw new ArgumentNullException(nameof(namingConvention));
+        Stream = File.Create(Path.Combine(namingConvention.ContainerLogs, "sqlserver.txt"));
     }
 
     protected abstract string Address { get; }
@@ -31,7 +31,7 @@ internal abstract class SqlServerBase : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        await Container.DisposeAsync();
+        await Container.CleanUpAsync();
         await Stream.DisposeAsync();
     }
 
