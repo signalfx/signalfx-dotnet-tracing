@@ -17,7 +17,7 @@ namespace Datadog.Trace
             _isDataDogCompatible = false;
             Higher = (ulong)higher;
             Lower = (ulong)lower;
-            _string = $"{Higher:x16}{Lower:x16}";
+            _string = TraceIdHelper.ToString(Higher, Lower);
         }
 
         private TraceId(ulong lower)

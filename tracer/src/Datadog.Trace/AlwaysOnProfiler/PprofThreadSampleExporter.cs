@@ -33,7 +33,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 if (threadSample.SpanId != 0 || threadSample.TraceIdHigh != 0 || threadSample.TraceIdLow != 0)
                 {
                     pprof.AddLabel(sampleBuilder, "span_id", threadSample.SpanId);
-                    pprof.AddLabel(sampleBuilder, "trace_id", $"{threadSample.TraceIdHigh:x16}{threadSample.TraceIdLow:x16}");
+                    pprof.AddLabel(sampleBuilder, "trace_id", TraceIdHelper.ToString(threadSample.TraceIdHigh, threadSample.TraceIdLow));
                 }
 
                 foreach (var methodName in threadSample.Frames)
