@@ -36,7 +36,7 @@ internal class CounterResultsCollector : IDisposable
 
         var events = counters[Events];
 
-        var averageCpuTotal = ComputeAverage(events, CpuUsage);
+        var averageCpuUsage = ComputeAverage(events, CpuUsage);
 
         var averageWorkingSet = ComputeAverage(events, WorkingSet);
 
@@ -52,7 +52,7 @@ internal class CounterResultsCollector : IDisposable
         var totalAllocated = allocationRateStats.Sum() / (1024 * 1024);
 
         return new CounterResults(
-            averageCpuTotal,
+            averageCpuUsage,
             averageWorkingSet,
             averageTimeInGc,
             minHeapUsed,

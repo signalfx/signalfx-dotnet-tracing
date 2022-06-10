@@ -5,7 +5,7 @@ namespace SignalFx.OverheadTest.Results;
 // MB is preferred.
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 internal record CounterResults(
-    double AverageTotalCpuPercentage,
+    double AverageCpuUsage,
     double AverageWorkingSetMB,
     double AverageTimeInGcPercentage,
     double MinHeapUsedMB,

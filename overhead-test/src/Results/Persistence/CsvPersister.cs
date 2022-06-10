@@ -24,7 +24,7 @@ internal class CsvPersister : IAsyncDisposable
         ["iterationP95"] = perf => perf.K6Results.IterationDurationP95,
         ["requestAvg"] = perf => perf.K6Results.RequestDurationAvg,
         ["requestP95"] = perf => perf.K6Results.RequestDurationP95,
-        ["averageMachineCpuTotal"] = perf => perf.CounterResults.AverageTotalCpuPercentage, 
+        ["averageCpuUsage"] = perf => perf.CounterResults.AverageCpuUsage,
         ["averageWorkingSet"] = perf => perf.CounterResults.AverageWorkingSetMB,
         ["averageTimeSpentInGc"] = perf => perf.CounterResults.AverageTimeInGcPercentage,
         ["totalAllocatedMB"] = perf => perf.CounterResults.TotalAllocatedMB,
