@@ -18,7 +18,7 @@ internal class CsvPersister : IAsyncDisposable
     private const char FieldSeparator = ',';
     private const char FieldNameInfix = ':';
 
-    private static readonly Dictionary<string, Func<AgentPerfResults, float>> Fields = new()
+    private static readonly Dictionary<string, Func<AgentPerfResults, double>> Fields = new()
     {
         ["iterationAvg"] = perf => perf.K6Results.IterationDurationAvg,
         ["iterationP95"] = perf => perf.K6Results.IterationDurationP95,
