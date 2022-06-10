@@ -20,7 +20,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
         public string ThreadName { get; set; }
 
-        public string StackTrace { get; set; }
+        public uint ThreadIndex { get; set; }
 
         public IList<string> Frames { get; } = new List<string>();
 

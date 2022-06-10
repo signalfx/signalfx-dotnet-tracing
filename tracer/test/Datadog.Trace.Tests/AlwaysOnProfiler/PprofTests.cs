@@ -1,13 +1,8 @@
 // Modified by Splunk Inc.
 
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
 using Datadog.Trace.AlwaysOnProfiler;
 using Datadog.Trace.AlwaysOnProfiler.Builder;
-using Datadog.Trace.Vendors.ProtoBuf;
-using Datadog.Tracer.Pprof.Proto.Profile;
 using FluentAssertions;
 using Xunit;
 

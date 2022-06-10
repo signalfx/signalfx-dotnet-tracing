@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Text;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Vendors.Serilog.Events;
@@ -94,22 +93,9 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         SpanId = spanId,
                         ManagedId = managedId,
                         NativeId = nativeId,
-                        ThreadName = threadName
+                        ThreadName = threadName,
+                        ThreadIndex = threadIndex
                     };
-
-                    // The stack follows the experimental GDI conventions described at
-                    // https://github.com/signalfx/gdi-specification/blob/29cbcbc969531d50ccfd0b6a4198bb8a89cedebb/specification/semantic_conventions.md#logrecord-message-fields
-                    var stackTraceBuilder = new StringBuilder();
-                    stackTraceBuilder.AppendFormat(
-                        CultureInfo.InvariantCulture,
-                        "\"{0}\" #{1} prio=0 os_prio=0 cpu=0 elapsed=0 tid=0x{2:x} nid=0x{3:x}\n",
-                        threadName,
-                        threadIndex,
-                        managedId,
-                        nativeId);
-
-                    // TODO Splunk: APMI-2565 here should go Thread state, equivalent of"    java.lang.Thread.State: TIMED_WAITING (sleeping)"
-                    stackTraceBuilder.Append("\n");
 
                     while (code != 0)
                     {
@@ -126,14 +112,9 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
                         if (value != null)
                         {
-                            stackTraceBuilder.Append("\tat ");
-
                             // we are replacing Datadog.Trace namespace to avoid conflicts while upstream sync
                             var replacedValue = value.Replace("Datadog.Trace.", "SignalFx.Tracing.");
-
-                            stackTraceBuilder.Append(replacedValue);
                             threadSample.Frames.Add(replacedValue);
-                            stackTraceBuilder.Append('\n');
                         }
 
                         code = ReadShort();
@@ -145,7 +126,6 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         continue;
                     }
 
-                    threadSample.StackTrace = stackTraceBuilder.ToString();
                     samples.Add(threadSample);
                 }
                 else if (operationCode == OpCodes.EndBatch)

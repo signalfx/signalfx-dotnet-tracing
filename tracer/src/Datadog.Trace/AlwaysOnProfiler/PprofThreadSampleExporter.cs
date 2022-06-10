@@ -8,8 +8,6 @@ using Datadog.Trace.AlwaysOnProfiler.Builder;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Vendors.ProtoBuf;
-using Datadog.Tracer.OpenTelemetry.Proto.Common.V1;
-using Datadog.Tracer.OpenTelemetry.Proto.Logs.V1;
 using Datadog.Tracer.Pprof.Proto.Profile;
 
 namespace Datadog.Trace.AlwaysOnProfiler
