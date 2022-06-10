@@ -1,8 +1,7 @@
 ﻿using System;
-using DotNet.Testcontainers.Containers.Builders;
-using DotNet.Testcontainers.Containers.Modules;
-using DotNet.Testcontainers.Containers.OutputConsumers;
-using DotNet.Testcontainers.Containers.WaitStrategies;
+using DotNet.Testcontainers.Builders;
+using DotNet.Testcontainers.Containers;
+using SignalFx.OverheadTest.Results;
 using SignalFx.OverheadTest.Utils;
 
 namespace SignalFx.OverheadTest.Containers.Remote;
@@ -11,13 +10,13 @@ internal class RemoteSqlServer : SqlServerBase
 {
     private readonly DockerEndpoint _endpoint;
 
-    public RemoteSqlServer(DockerEndpoint endpoint, ResultsNamingConvention resultsNamingConvention) : base(
-        resultsNamingConvention)
+    public RemoteSqlServer(DockerEndpoint endpoint, NamingConvention namingConvention) : base(
+        namingConvention)
     {
         _endpoint = endpoint ?? throw new ArgumentNullException(nameof(endpoint));
         Container = new TestcontainersBuilder<TestcontainersContainer>()
             .WithImage(ImageName)
-            .WithName($"{Constants.Prefix}-remote-sqlserver")
+            .WithName($"{OverheadTest.Prefix}-remote-sqlserver")
             .WithDockerEndpoint(_endpoint.Url)
             .WithPortBinding(Port, Port)
             .WithEnvironment("ACCEPT_EULA", "Y")
