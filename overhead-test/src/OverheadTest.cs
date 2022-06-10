@@ -1,11 +1,16 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using DotNet.Testcontainers.Builders;
+using DotNet.Testcontainers.Configurations;
 using DotNet.Testcontainers.Networks;
-using DotNet.Testcontainers.Networks.Builders;
+using SignalFx.OverheadTest.Configs;
 using SignalFx.OverheadTest.Containers;
 using SignalFx.OverheadTest.Containers.Local;
 using SignalFx.OverheadTest.Containers.Remote;
+using SignalFx.OverheadTest.Results;
+using SignalFx.OverheadTest.Results.Collection;
+using SignalFx.OverheadTest.Results.Persistence;
 using SignalFx.OverheadTest.Utils;
 using Xunit;
 using Xunit.Abstractions;
@@ -14,23 +19,26 @@ namespace SignalFx.OverheadTest;
 
 public class OverheadTest : IAsyncLifetime
 {
-    private const string OverheadTestNetwork = $"{Constants.Prefix}-test-network";
+    public const string Prefix = "overhead";
+
+    private const string OverheadTestNetwork = $"{Prefix}-test-network";
     private readonly CollectorBase _collector;
 
-    private readonly string _iterationResults;
+    private readonly DirectoryInfo _iterationResults;
 
     private readonly IDockerNetwork _network;
     private readonly ITestOutputHelper _testOutputHelper;
 
     public OverheadTest(ITestOutputHelper testOutputHelper)
     {
+        TestcontainersSettings.ResourceReaperEnabled = false;
         _testOutputHelper = testOutputHelper;
 
-        _iterationResults = Path.Combine(Directory.GetCurrentDirectory(), "results",
+        var iterationResults = Path.Combine(Directory.GetCurrentDirectory(), "results",
             DateTime.UtcNow.ToString("yyyyMMddHHmmss"));
 
         // Creates directory for results specific to this run
-        Directory.CreateDirectory(_iterationResults);
+        _iterationResults = Directory.CreateDirectory(iterationResults);
 
         _network = BuildDefaultNetwork();
         _collector = CreateCollector(_iterationResults);
@@ -50,7 +58,7 @@ public class OverheadTest : IAsyncLifetime
         await _network.DeleteAsync();
     }
 
-    private CollectorBase CreateCollector(string iterationResults)
+    private CollectorBase CreateCollector(DirectoryInfo iterationResults)
     {
         return ShouldRunLocally()
             ? new LocalCollector(_network, iterationResults)
@@ -62,14 +70,14 @@ public class OverheadTest : IAsyncLifetime
     {
         _testOutputHelper.WriteLine($"----------------Starting execution: {(ShouldRunLocally() ? "local" : "remote")}");
         _testOutputHelper.WriteLine($"Directory for iteration results created at: {_iterationResults}");
-        var dotnetCounters = new DotnetCounters(_testOutputHelper);
 
-        foreach (var config in AgentConfig.GetDefaultConfigurations())
+        var testConfig = TestConfig.Default;
+        foreach (var agentConfig in testConfig.Agents)
         {
             // TestOutputHelper writes messages to test output, logged at the end of the test when run with dotnet test
-            _testOutputHelper.WriteLine($"----------------Running configuration: {config.Name}");
+            _testOutputHelper.WriteLine($"----------------Running configuration: {agentConfig.Name}");
 
-            var resultsConvention = new ResultsNamingConvention(config, _iterationResults);
+            var resultsConvention = new NamingConvention(agentConfig, _iterationResults);
 
             Directory.CreateDirectory(resultsConvention.ContainerLogs);
 
@@ -78,12 +86,12 @@ public class OverheadTest : IAsyncLifetime
             await using var sqlServer = CreateSqlServer(resultsConvention);
             await sqlServer.StartAsync();
 
-            await using var eshopApp = new EshopApp(_network, _collector, sqlServer, resultsConvention, config);
+            await using var eshopApp = new EshopApp(_network, _collector, sqlServer, resultsConvention, agentConfig);
             await eshopApp.StartAsync();
 
             _testOutputHelper.WriteLine("----------------Starting warmup.");
 
-            await using var loadDriver = new LoadDriver(_network, resultsConvention);
+            await using var loadDriver = new LoadDriver(_network, resultsConvention, testConfig);
 
             await using var warmupDriverContainer = loadDriver.BuildWarmup();
             await warmupDriverContainer.StartAsync();
@@ -94,23 +102,41 @@ public class OverheadTest : IAsyncLifetime
 
             _testOutputHelper.WriteLine($"Warmup finished with exit code: {warmupExitCode}");
 
-            // start dotnet-counters inside app container
-            dotnetCounters.StartCollecting(EshopApp.ContainerName);
+            // start dotnet-counters inside the app container
+            await eshopApp.StartCountersAsync();
+
+            var processList = await eshopApp.ListProcessesAsync();
+
+            // there should be 2 processes running inside the container: the app and dotnet-counters
+            Assert.Equal(2, processList.Count);
+            Assert.Contains(processList, s => s.Contains("dotnet Web.dll"));
+            Assert.Contains(processList, s => s.Contains("./dotnet-counters"));
 
             _testOutputHelper.WriteLine("----------------Starting driving a load on the app.");
             await loadDriver.StartAsync();
 
-            var exitCode = await loadDriver.GetExitCodeAsync();
+            var exitCode = await loadDriver.StopAsync();
 
             _testOutputHelper.WriteLine($"Load driver exited with code: {exitCode}");
+            Assert.Equal(0, exitCode);
 
             await eshopApp.StopAsync();
-
-            Assert.Equal(0, exitCode);
         }
+
+        _testOutputHelper.WriteLine("----------------Starting perf results collection.");
+        var results = await new ResultsCollector(_iterationResults).CollectResultsAsync(testConfig.Agents);
+
+        _testOutputHelper.WriteLine("----------------Persisting test results.");
+        // creates or appends to a single file, shared between different test runs
+        await using var csvPersister = new CsvPersister(_iterationResults.Parent, results);
+        await csvPersister.PersistResultsAsync();
+
+        _testOutputHelper.WriteLine("----------------Persisting test configuration.");
+        await using var configPersister = new ConfigPersister(_iterationResults.Parent);
+        await configPersister.PersistConfigurationAsync(testConfig);
     }
 
-    private SqlServerBase CreateSqlServer(ResultsNamingConvention namingConvention)
+    private SqlServerBase CreateSqlServer(NamingConvention namingConvention)
     {
         return ShouldRunLocally()
             ? new LocalSqlServer(_network, namingConvention)

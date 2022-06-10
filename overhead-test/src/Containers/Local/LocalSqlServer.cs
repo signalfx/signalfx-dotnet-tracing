@@ -1,17 +1,15 @@
 ﻿using System;
-using DotNet.Testcontainers.Containers.Builders;
-using DotNet.Testcontainers.Containers.Modules;
-using DotNet.Testcontainers.Containers.OutputConsumers;
-using DotNet.Testcontainers.Containers.WaitStrategies;
+using DotNet.Testcontainers.Builders;
+using DotNet.Testcontainers.Containers;
 using DotNet.Testcontainers.Networks;
-using SignalFx.OverheadTest.Utils;
+using SignalFx.OverheadTest.Results;
 
 namespace SignalFx.OverheadTest.Containers.Local;
 
 internal class LocalSqlServer : SqlServerBase
 {
-    public LocalSqlServer(IDockerNetwork network, ResultsNamingConvention resultsNamingConvention) : base(
-        resultsNamingConvention)
+    public LocalSqlServer(IDockerNetwork network, NamingConvention namingConvention) : base(
+        namingConvention)
     {
         Container = new TestcontainersBuilder<TestcontainersContainer>()
             .WithImage(ImageName)
@@ -24,7 +22,7 @@ internal class LocalSqlServer : SqlServerBase
             .Build();
     }
 
-    protected sealed override string Address => $"{Constants.Prefix}-local-sqlserver";
+    protected sealed override string Address => $"{OverheadTest.Prefix}-local-sqlserver";
 
     protected override TestcontainersContainer Container { get; }
 }
