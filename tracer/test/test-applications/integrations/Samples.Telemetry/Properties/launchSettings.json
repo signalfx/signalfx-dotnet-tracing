@@ -13,7 +13,8 @@
 
         "SIGNALFX_DOTNET_TRACER_HOME": "$(SolutionDir)shared\\bin\\monitoring-home\\tracer",
         "SIGNALFX_VERSION": "1.0.0",
-        "SIGNALFX_INSTRUMENTATION_TELEMETRY_ENABLED": "true"
+        "SIGNALFX_INSTRUMENTATION_TELEMETRY_ENABLED": "true",
+        "SIGNALFX_TRACE_ACTIVITY_LISTENER_ENABLED": "true"
       },
       "nativeDebugging": true
     }
