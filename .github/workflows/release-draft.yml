@@ -26,7 +26,7 @@ jobs:
           --target builder \
           --file "./tracer/build/_build/docker/${baseImage}.dockerfile" \
           "./tracer/build/_build"
-    - name: Run 'Clean BuildTracerHome ZipTracerHome' in Docker
+    - name: Run 'Clean BuildTracerHome ZipMonitoringHome' in Docker
       run: |
         docker run --rm \
           --mount type=bind,source="${GITHUB_WORKSPACE}",target=/project \
@@ -34,7 +34,7 @@ jobs:
           --env tracerHome=/shared/bin/monitoring-home/tracer \
           --env artifacts=/project/tracer/src/bin/artifacts \
           dd-trace-dotnet/${baseImage}-builder \
-          dotnet /build/bin/Debug/_build.dll Clean BuildTracerHome ZipTracerHome
+          dotnet /build/bin/Debug/_build.dll Clean BuildTracerHome ZipMonitoringHome
     - name: Upload Linux x64 packages
       uses: actions/upload-artifact@v3.1.0
       with:
