@@ -320,7 +320,7 @@ namespace Datadog.Trace
             return TracerManager.ScopeManager.Activate(span, finishOnClose);
         }
 
-        internal SpanContext CreateSpanContext(ISpanContext parent = null, string serviceName = null, ulong? traceId = null, ulong? spanId = null, string rawTraceId = null, string rawSpanId = null)
+        internal SpanContext CreateSpanContext(ISpanContext parent = null, string serviceName = null, TraceId? traceId = null, ulong? spanId = null, string rawTraceId = null, string rawSpanId = null)
         {
             // null parent means use the currently active span
             parent ??= DistributedTracer.Instance.GetSpanContext() ?? TracerManager.ScopeManager.Active?.Span?.Context;
@@ -351,7 +351,7 @@ namespace Datadog.Trace
                     {
                         // If there's an existing activity we use the same traceId (converted).
                         rawTraceId = w3CActivity.TraceId;
-                        traceId = Convert.ToUInt64(w3CActivity.TraceId.Substring(16), 16);
+                        traceId = TraceId.CreateFromString(w3CActivity.TraceId);
                     }
                 }
             }
