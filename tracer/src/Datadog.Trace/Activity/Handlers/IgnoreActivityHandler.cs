@@ -99,7 +99,7 @@ namespace Datadog.Trace.Activity.Handlers
 
                     // TraceId
                     w3cActivity.TraceId = string.IsNullOrWhiteSpace(span.Context.RawTraceId) ?
-                                              span.TraceId.Lower.ToString("x32") : span.Context.RawTraceId;
+                                              span.TraceId.ToString() : span.Context.RawTraceId;
 
                     // SpanId
                     w3cActivity.ParentSpanId = string.IsNullOrWhiteSpace(span.Context.RawSpanId) ?

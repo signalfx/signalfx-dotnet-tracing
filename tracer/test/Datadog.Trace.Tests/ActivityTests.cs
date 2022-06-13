@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Propagators;
@@ -60,12 +62,12 @@ namespace Datadog.Trace.Tests
                 // Extract values for assertions
                 var traceId = myActivity.TraceId.ToString();
                 var spanId = myActivity.SpanId.ToString();
-                var traceIdInULong = ParseUtility.ParseFromHexOrDefault(traceId.Substring(16));
+                var traceIdInTraceId =  TraceId.CreateFromString(traceId);
                 var spanIdInULong = ParseUtility.ParseFromHexOrDefault(spanId);
 
                 // Assert scope created from activity
                 scopeFromActivity = Tracer.Instance.ActiveScope;
-                scopeFromActivity.Span.TraceId.Should().Be(traceIdInULong);
+                scopeFromActivity.Span.TraceId.Should().Be(traceIdInTraceId);
                 scopeFromActivity.Span.SpanId.Should().Be(spanIdInULong);
                 ((Span)scopeFromActivity.Span).Context.RawTraceId.Should().Be(traceId);
                 scopeFromActivity.Span.OperationName.Should().Be("Custom activity");
@@ -74,7 +76,7 @@ namespace Datadog.Trace.Tests
                 using (var scope = Tracer.Instance.StartActive("New operation"))
                 {
                     // Assert TraceId and parent span id
-                    scope.Span.TraceId.Should().Be(traceIdInULong);
+                    scope.Span.TraceId.Should().Be(traceIdInTraceId);
                     ((Span)scope.Span).Context.ParentId.Should().Be(spanIdInULong);
                     ((Span)scope.Span).Context.RawTraceId.Should().Be(traceId);
 
@@ -97,7 +99,7 @@ namespace Datadog.Trace.Tests
 
                         // Assert scope created from activity
                         scopeFromChildActivity = Tracer.Instance.ActiveScope;
-                        scopeFromChildActivity.Span.TraceId.Should().Be(traceIdInULong);
+                        scopeFromChildActivity.Span.TraceId.Should().Be(traceIdInTraceId);
                         scopeFromChildActivity.Span.SpanId.Should().Be(ParseUtility.ParseFromHexOrDefault(childActivity.SpanId.ToString()));
                         ((Span)scopeFromChildActivity.Span).Context.RawTraceId.Should().Be(traceId);
                         scopeFromChildActivity.Span.OperationName.Should().Be("Child activity");
@@ -145,7 +147,7 @@ namespace Datadog.Trace.Tests
                 var traceId = scope.Span.TraceId;
                 var spanId = scope.Span.SpanId;
 
-                var hexTraceId = traceId.ToString("x32");
+                var hexTraceId = traceId.ToString();
                 var hexSpanId = spanId.ToString("x16");
 
                 // Create a new child activity as child of span
