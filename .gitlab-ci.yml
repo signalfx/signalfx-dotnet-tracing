@@ -34,7 +34,7 @@ linux-build:
         --env artifacts=/project/tracer/src/bin/artifacts \
         --name release \
         dd-trace-dotnet/${baseImage}-builder \
-        tracer/build.sh Clean BuildTracerHome ZipTracerHome
+        tracer/build.sh Clean BuildTracerHome ZipMonitoringHome
     - |
       docker cp release:/project/tracer/src/bin/artifacts/linux-x64 dist
   artifacts:

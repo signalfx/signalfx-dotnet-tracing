@@ -53,8 +53,10 @@ partial class Build
 
     AbsolutePath MonitoringHomeDirectory => MonitoringHome ?? (SharedDirectory / "bin" / "monitoring-home");
 
-    AbsolutePath ProfilerHomeDirectory => ProfilerHome ?? RootDirectory / "profiler" / "_build" / "DDProf-Deploy";
+    AbsolutePath ProfilerHomeDirectory => ProfilerHome ?? (MonitoringHomeDirectory / "continuousprofiler");
     AbsolutePath ProfilerMsBuildProject => ProfilerDirectory / "src" / "ProfilerEngine" / "Datadog.Profiler.Native.Windows" / "Datadog.Profiler.Native.Windows.WithTests.proj";
+    AbsolutePath ProfilerOutputDirectory => RootDirectory / "profiler" / "_build";
+    AbsolutePath ProfilerLinuxBuildDirectory => ProfilerOutputDirectory / "cmake";
 
     AbsolutePath AlwaysOnProfilerNativeDepDirectory => TestsDirectory / "bin" ;
 
@@ -63,8 +65,6 @@ partial class Build
     AbsolutePath TestsDirectory => TracerDirectory / "test";
     AbsolutePath DistributionHomeDirectory => Solution.GetProject(Projects.DatadogMonitoringDistribution).Directory / "home";
 
-    AbsolutePath ProfilerOutputDirectory => RootDirectory / "profiler" / "_build";
-    AbsolutePath ProfilerLinuxBuildDirectory => RootDirectory / "profiler" / "_build" / "cmake";
 
     AbsolutePath TempDirectory => (AbsolutePath)(IsWin ? Path.GetTempPath() : "/tmp/");
 
@@ -594,9 +594,9 @@ partial class Build
             CompressZip(SymbolsDirectory, WindowsSymbolsZip, fileMode: FileMode.Create);
         });
 
-    Target ZipTracerHome => _ => _
+    Target ZipMonitoringHome => _ => _
         .Unlisted()
-        .After(BuildTracerHome)
+        .After(BuildTracerHome, BuildProfilerHome, BuildNativeLoader)
         .Requires(() => Version)
         .Executes(() =>
         {
@@ -1266,7 +1266,7 @@ partial class Build
 
             // /nowarn:NU1701 - Package 'x' was restored using '.NETFramework,Version=v4.6.1' instead of the project target framework '.NETCoreApp,Version=v2.1'.
             // /nowarn:NETSDK1138 - Package 'x' was restored using '.NETFramework,Version=v4.6.1' instead of the project target framework '.NETCoreApp,Version=v2.1'.
-            foreach(var target in targets)
+            foreach (var target in targets)
             {
                 // TODO: When IncludeTestsRequiringDocker is set, only build required samples
                 DotNetMSBuild(x => x
@@ -1322,7 +1322,6 @@ partial class Build
 
     Target RunLinuxIntegrationTests => _ => _
         .After(CompileLinuxIntegrationTests)
-        .After(BuildNativeLoader)
         .Description("Runs the linux integration tests")
         .Requires(() => Framework)
         .Requires(() => !IsWin)
@@ -1671,7 +1670,7 @@ partial class Build
             var expected = $"{packageLocation}: ";
             var location = output
                               .Where(x => x.Type == OutputType.Std)
-                              .Select(x=>x.Text)
+                              .Select(x => x.Text)
                               .FirstOrDefault(x => x.StartsWith(expected))
                              ?.Substring(expected.Length);
 
