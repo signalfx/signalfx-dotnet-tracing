@@ -135,7 +135,7 @@ partial class Build
     Target Restore => _ => _
         .After(Clean)
         .Unlisted()
-        .Executes(() =>
+        .Executes(() => ControlFlow.ExecuteWithRetry(() =>
         {
             if (IsWin)
             {
@@ -155,7 +155,7 @@ partial class Build
                     .When(!string.IsNullOrEmpty(NugetPackageDirectory), o =>
                         o.SetPackageDirectory(NugetPackageDirectory)));
             }
-        });
+        }));
 
     Target CompileNativeSrcWindows => _ => _
         .Unlisted()
