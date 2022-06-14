@@ -36,6 +36,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         {
             SetEnvironmentVariable("SIGNALFX_PROFILER_ENABLED", "true");
             SetEnvironmentVariable("SIGNALFX_PROFILER_CALL_STACK_INTERVAL", "1000");
+            SetEnvironmentVariable("SIGNALFX_PROFILER_EXPORT_FORMAT", "Text");
 
             using (var agent = EnvironmentHelper.GetMockAgent())
             using (var logsCollector = EnvironmentHelper.GetMockOtelLogsCollector())
@@ -97,6 +98,18 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 {
                     Key = "source.event.period",
                     Value = new AnyValue { IntValue = 1000L }
+                });
+            expectedAttributesForLogRecord.Attributes.Add(
+                new KeyValue
+                {
+                    Key = "profiling.data.format",
+                    Value = new AnyValue { StringValue = "text" }
+                });
+            expectedAttributesForLogRecord.Attributes.Add(
+                new KeyValue
+                {
+                    Key = "profiling.data.type",
+                    Value = new AnyValue { StringValue = "cpu" }
                 });
             logRecords.Should().AllBeEquivalentTo(expectedAttributesForLogRecord, option => option.Including(x => x.Attributes));
         }
