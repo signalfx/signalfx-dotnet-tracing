@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace SignalFx.OverheadTest.Configs;
 
@@ -10,13 +8,13 @@ internal class AgentConfig
         "none",
         "no agent at all",
         BaseImageName,
-        Enumerable.Empty<KeyValuePair<string, string>>());
+        Array.Empty<EnvVar>() );
 
     public static readonly AgentConfig Instrumented = new(
         "signalfx-dotnet",
         "signalfx dotnet tracing",
         InstrumentedImageName,
-        new KeyValuePair<string, string>[]
+        new EnvVar[]
         {
             new("SIGNALFX_PROFILER_ENABLED", "0")
         });
@@ -25,7 +23,7 @@ internal class AgentConfig
         "signalfx-dotnet-with-profiling-10s",
         "signalfx dotnet with tracing and default profiling frequency (every 10s)",
         InstrumentedImageName,
-        new KeyValuePair<string, string>[]
+        new EnvVar[]
         {
             new("SIGNALFX_PROFILER_ENABLED", "1")
         });
@@ -34,7 +32,7 @@ internal class AgentConfig
         "signalfx-dotnet-with-profiling-1s",
         "signalfx dotnet with tracing and max profiling frequency (every 1s)",
         InstrumentedImageName,
-        new KeyValuePair<string, string>[]
+        new EnvVar[]
         {
             new("SIGNALFX_PROFILER_ENABLED", "1"),
             new("SIGNALFX_PROFILER_CALL_STACK_INTERVAL", "1000")
@@ -43,7 +41,7 @@ internal class AgentConfig
     private const string BaseImageName = "eshop-app-dc";
     private const string InstrumentedImageName = "eshop-app-instrumented-dc";
 
-    private AgentConfig(string name, string description, string dockerImageName, IEnumerable<KeyValuePair<string, string>> additionalEnvVars)
+    private AgentConfig(string name, string description, string dockerImageName, EnvVar[] additionalEnvVars)
     {
         Name = name ?? throw new ArgumentNullException(nameof(name));
         Description = description ?? throw new ArgumentNullException(nameof(description));
@@ -54,5 +52,17 @@ internal class AgentConfig
     public string Name { get; }
     public string Description { get; }
     public string DockerImageName { get; }
-    public IEnumerable<KeyValuePair<string, string>> AdditionalEnvVars { get; }
+    public EnvVar[] AdditionalEnvVars { get; }
+
+    internal struct EnvVar
+    {
+        public EnvVar(string name, string value)
+        {
+            Name = name ?? throw new ArgumentNullException(nameof(name));
+            Value = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        public string Name { get; }
+        public string Value { get; }
+    }
 }

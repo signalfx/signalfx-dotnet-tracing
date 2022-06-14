@@ -54,9 +54,9 @@ internal class EshopApp : IAsyncDisposable
             .WithEnvironment("Logging__LogLevel__Microsoft.Hosting.Lifetime", "Information")
             .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(AppPort))
             .WithOutputConsumer(Consume.RedirectStdoutAndStderrToStream(_logStream, _logStream));
-        foreach (var (name, value) in config.AdditionalEnvVars)
+        foreach (var envVar in config.AdditionalEnvVars)
         {
-            testcontainersBuilder = testcontainersBuilder.WithEnvironment(name, value);
+            testcontainersBuilder = testcontainersBuilder.WithEnvironment(envVar.Name, envVar.Value);
         }
         _container = testcontainersBuilder.Build();
     }
