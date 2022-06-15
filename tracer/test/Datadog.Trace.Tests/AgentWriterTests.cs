@@ -33,6 +33,18 @@ namespace Datadog.Trace.Tests
         }
 
         [Fact]
+        public void PushStats()
+        {
+            var statsAggregator = new Mock<IStatsAggregator>();
+
+            var agent = new AgentWriter(Mock.Of<IApi>(), statsAggregator.Object, statsd: null, automaticFlush: false);
+
+            agent.WriteTrace(CreateTrace(1));
+
+            statsAggregator.Verify(s => s.AddRange(It.IsAny<Span[]>(), 0, 1), Times.Once);
+        }
+
+        [Fact]
         public async Task WriteTrace_2Traces_SendToApi()
         {
             var trace = new[] { new Span(new SpanContext(TraceId.CreateFromInt(1), 1), DateTimeOffset.UtcNow) };
@@ -186,7 +198,7 @@ namespace Datadog.Trace.Tests
             var sizeOfTrace = ComputeSizeOfTrace(CreateTrace(1));
 
             // Make the buffer size big enough for a single trace
-            var agent = new AgentWriter(Mock.Of<IApi>(), statsd.Object, automaticFlush: false, (sizeOfTrace * 2) + SpanBuffer.HeaderSize - 1);
+            var agent = new AgentWriter(Mock.Of<IApi>(), statsAggregator: null, statsd.Object, automaticFlush: false, (sizeOfTrace * 2) + SpanBuffer.HeaderSize - 1);
 
             // Fill the two buffers
             agent.WriteTrace(CreateTrace(1));

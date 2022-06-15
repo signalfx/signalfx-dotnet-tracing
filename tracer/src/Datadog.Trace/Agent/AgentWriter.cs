@@ -148,29 +148,36 @@ namespace Datadog.Trace.Agent
                 .ConfigureAwait(false);
 
             _traceKeepRateCalculator.CancelUpdates();
+
+            bool success = false;
+
             if (completedTask != delay)
             {
                 await Task.WhenAny(_flushTask, Task.Delay(TimeSpan.FromSeconds(20)))
                     .ConfigureAwait(false);
 
-                if (_frontBuffer.TraceCount == 0 && _backBuffer.TraceCount == 0)
+                if (_frontBuffer.TraceCount != 0 || _backBuffer.TraceCount != 0)
                 {
-                    // All good
-                    return;
+                    // In some situations, the flush thread can exit before flushing all the threads
+                    // Force a flush for the leftover traces
+                    completedTask = await Task.WhenAny(Task.Run(() => FlushBuffers(flushAllBuffers: true)), delay)
+                        .ConfigureAwait(false);
+
+                    if (completedTask != delay)
+                    {
+                        success = true;
+                    }
                 }
-
-                // In some situations, the flush thread can exit before flushing all the threads
-                // Force a flush for the leftover traces
-                completedTask = await Task.WhenAny(Task.Run(() => FlushBuffers(flushAllBuffers: true)), delay)
-                    .ConfigureAwait(false);
-
-                if (completedTask != delay)
+                else
                 {
-                    return;
+                    success = true;
                 }
             }
 
-            Log.Warning("Could not flush all traces before process exit");
+            if (!success)
+            {
+                Log.Warning("Could not flush all traces before process exit");
+            }
         }
 
         public async Task FlushTracesAsync()

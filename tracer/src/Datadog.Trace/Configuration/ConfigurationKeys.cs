@@ -384,6 +384,23 @@ namespace Datadog.Trace.Configuration
         /// <seealso cref="TracerSettings.ExpandRouteTemplatesEnabled"/>
         public const string ExpandRouteTemplatesEnabled = "SIGNALFX_TRACE_EXPAND_ROUTE_TEMPLATES_ENABLED";
 
+        public const string ExpandRouteTemplatesEnabled = "SIGNALFX_TRACE_EXPAND_ROUTE_TEMPLATES_ENABLED";
+
+        /// <summary>
+        /// Configuration key for enabling computation of stats (aka trace metrics) on the tracer side
+        /// </summary>
+        public const string StatsComputationEnabled = "SIGNALFX_TRACE_STATS_COMPUTATION_ENABLED";
+
+        /// <summary>
+        /// Configuration key for setting the propagation style injection.
+        /// </summary>
+        public const string PropagationStyleInject = "SIGNALFX_PROPAGATION_STYLE_INJECT";
+
+        /// <summary>
+        /// Configuration key for setting the propagation style extraction.
+        /// </summary>
+        public const string PropagationStyleExtract = "SIGNALFX_PROPAGATION_STYLE_EXTRACT";
+
         /// <summary>
         /// Configuration key for enabling automatic instrumentation on specified methods.
         /// Default value is "" (disabled).
