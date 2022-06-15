@@ -44,7 +44,6 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 pprof.AddLabel(sampleBuilder, "thread.id", threadSample.ManagedId);
                 pprof.AddLabel(sampleBuilder, "thread.name", threadSample.ThreadName);
                 pprof.AddLabel(sampleBuilder, "thread.os.id", threadSample.NativeId);
-                pprof.AddLabel(sampleBuilder, "thread.state", "RUNNABLE");
 
                 pprof.ProfileBuilder.AddSample(sampleBuilder.Build());
                 var data = Serialize(pprof.ProfileBuilder.Build());
