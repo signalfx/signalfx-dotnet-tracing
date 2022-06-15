@@ -39,13 +39,12 @@ internal class EshopApp : IAsyncDisposable
         _logStream = File.Create(Path.Combine(namingConvention.ContainerLogs, "eshop-app.txt"));
         _resultStream = File.Create(Path.Combine(namingConvention.AgentResults, CounterResultsFile));
 
-        _container = new TestcontainersBuilder<TestcontainersContainer>()
+        var testcontainersBuilder = new TestcontainersBuilder<TestcontainersContainer>()
             .WithImage(config.DockerImageName)
             .WithName(ContainerName)
             .WithNetwork(network)
             .WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development")
             .WithEnvironment("SIGNALFX_ENDPOINT_URL", collector.TraceReceiverUrl)
-            .WithEnvironment("SIGNALFX_PROFILER_ENABLED", config.ProfilerEnabled)
             .WithEnvironment("SIGNALFX_PROFILER_LOGS_ENDPOINT", collector.LogsReceiverUrl)
             .WithEnvironment("ConnectionStrings__CatalogConnection", sqlServer.CatalogConnection)
             .WithEnvironment("ConnectionStrings__IdentityConnection", sqlServer.IdentityConnection)
@@ -54,8 +53,12 @@ internal class EshopApp : IAsyncDisposable
             .WithEnvironment("Logging__LogLevel__System", "Warning")
             .WithEnvironment("Logging__LogLevel__Microsoft.Hosting.Lifetime", "Information")
             .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(AppPort))
-            .WithOutputConsumer(Consume.RedirectStdoutAndStderrToStream(_logStream, _logStream))
-            .Build();
+            .WithOutputConsumer(Consume.RedirectStdoutAndStderrToStream(_logStream, _logStream));
+        foreach (var envVar in config.AdditionalEnvVars)
+        {
+            testcontainersBuilder = testcontainersBuilder.WithEnvironment(envVar.Name, envVar.Value);
+        }
+        _container = testcontainersBuilder.Build();
     }
 
     public async ValueTask DisposeAsync()

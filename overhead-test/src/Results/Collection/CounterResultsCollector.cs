@@ -18,6 +18,7 @@ internal class CounterResultsCollector : IDisposable
     private const string HeapSize = "GC Heap Size (MB)";
     private const string Events = "Events";
     private const string AllocationRate = $"Allocation Rate (B / {EshopApp.CounterUpdateInterval} sec)";
+    private const string ThreadPoolThreadCount = "ThreadPool Thread Count";
 
     private readonly StreamReader _streamReader;
 
@@ -42,35 +43,35 @@ internal class CounterResultsCollector : IDisposable
 
         var averageTimeInGc = ComputeAverage(events, PercentTimeInGc);
 
-        var heapSizeStats = ExtractValues(events, HeapSize);
+        var heapSizeStats = ExtractValues<double>(events, HeapSize);
 
-        var minHeapUsed = heapSizeStats.Min();
-        var maxHeapUsed = heapSizeStats.Max();
+        var allocationRateStats = ExtractValues<long>(events, AllocationRate);
 
-        var allocationRateStats = ExtractValues(events, AllocationRate);
+        var totalAllocated = (double)allocationRateStats.Sum() / (1024 * 1024);
 
-        var totalAllocated = allocationRateStats.Sum() / (1024 * 1024);
+        var maxThreadPoolThreadCount = ExtractValues<int>(events, ThreadPoolThreadCount).Max();
 
         return new CounterResults(
             averageCpuUsage,
             averageWorkingSet,
             averageTimeInGc,
-            minHeapUsed,
-            maxHeapUsed,
-            totalAllocated);
+            heapSizeStats.Min(),
+            heapSizeStats.Max(),
+            totalAllocated,
+            maxThreadPoolThreadCount);
     }
 
     private static double ComputeAverage(JToken events, string metricName)
     {
-        var metricStats = ExtractValues(events, metricName);
+        var metricStats = ExtractValues<double>(events, metricName);
         return metricStats.Average();
     }
 
-    private static IList<double> ExtractValues(JToken events, string metricName)
+    private static IList<T> ExtractValues<T>(JToken events, string metricName)
     {
         return events
             .Where(token => token["name"].Value<string>() == metricName)
-            .Select(token => token["value"]!.Value<double>())
+            .Select(token => token["value"]!.Value<T>())
             .ToList();
     }
 

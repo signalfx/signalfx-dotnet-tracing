@@ -9,7 +9,13 @@ internal class TestConfig
     private static TestConfig DefaultConfig()
     {
         return new TestConfig(
-            new[] { AgentConfig.Baseline, AgentConfig.Instrumented, AgentConfig.Profiled },
+            new[]
+            {
+                AgentConfig.Baseline,
+                AgentConfig.Instrumented,
+                AgentConfig.Profiled,
+                AgentConfig.ProfiledHighFrequency
+            },
             1000,
             30,
             900);
