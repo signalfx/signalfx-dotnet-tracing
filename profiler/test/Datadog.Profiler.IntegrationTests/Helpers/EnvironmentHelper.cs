@@ -121,7 +121,7 @@ namespace Datadog.Profiler.IntegrationTests.Helpers
 
             var tracerRelativePath = GetOS() switch
             {
-                "win" => Path.Combine($"win-{GetPlatform()}", "Datadog.Trace.ClrProfiler.Native.dll"),
+                "win" => Path.Combine($"win-{GetPlatform()}", "SignalFx.Tracing.ClrProfiler.Native.dll"),
                 "linux" => Path.Combine("tracer", "Datadog.Tracer.Native.so"),
                 _ => throw new PlatformNotSupportedException()
             };
