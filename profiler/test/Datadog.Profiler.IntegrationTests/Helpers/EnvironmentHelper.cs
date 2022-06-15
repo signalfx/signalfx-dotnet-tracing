@@ -301,7 +301,7 @@ namespace Datadog.Profiler.IntegrationTests.Helpers
             var fileName = GetOS() switch
             {
                 "win" => $"Datadog.AutoInstrumentation.NativeLoader.{GetPlatform()}.dll",
-                "linux" => "Datadog.Trace.ClrProfiler.Native.so",
+                "linux" => "SignalFx.Tracing.ClrProfiler.Native.so",
                 _ => throw new PlatformNotSupportedException()
             };
 
