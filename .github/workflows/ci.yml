@@ -41,7 +41,7 @@ on:
 
 env:
   buildConfiguration: Release
-  dotnetSdkVersion: 6.0.200
+  dotnetSdkVersion: 6.0.301
   relativeTracerHome: /shared/bin/monitoring-home/tracer
   relativeArtifacts: /tracer/src/bin/artifacts
   binDir: ${{ github.workspace }}/tracer/src/bin
@@ -71,9 +71,9 @@ jobs:
       with:
         dotnet-version: | 
           2.1.818
-          3.1.416
-          5.0.405
-          6.0.200
+          3.1.420
+          5.0.408
+          6.0.301
     - name: Install CMake 3.19.8
       if: ${{ runner.os == 'Linux' }}
       run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh -o cmakeinstall.sh && chmod +x cmakeinstall.sh && sudo ./cmakeinstall.sh --prefix=/usr/local --exclude-subdir
@@ -126,9 +126,9 @@ jobs:
       with:
         dotnet-version: | 
           2.1.818
-          3.1.416
-          5.0.405
-          6.0.200
+          3.1.420
+          5.0.408
+          6.0.301
     - name: Build Docker image
       run: |
         docker build \
@@ -169,9 +169,9 @@ jobs:
       with:
         dotnet-version: | 
           2.1.818
-          3.1.416
-          5.0.405
-          6.0.200
+          3.1.420
+          5.0.408
+          6.0.301
     - run: ./tracer/build.cmd Clean BuildTracerHome BuildAndRunManagedUnitTests
     - uses: actions/upload-artifact@v3.1.0
       with:
@@ -194,9 +194,9 @@ jobs:
       with:
         dotnet-version: | 
           2.1.818
-          3.1.416
-          5.0.405
-          6.0.200
+          3.1.420
+          5.0.408
+          6.0.301
     - name: Build Docker image
       run: |
         docker build \
@@ -237,9 +237,9 @@ jobs:
       with:
         dotnet-version: | 
           2.1.818
-          3.1.416
-          5.0.405
-          6.0.200
+          3.1.420
+          5.0.408
+          6.0.301
     - name: Install CMake 3.19.8
       if: ${{ runner.os == 'Linux' }}
       run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh -o cmakeinstall.sh && chmod +x cmakeinstall.sh && sudo ./cmakeinstall.sh --prefix=/usr/local --exclude-subdir
@@ -262,9 +262,9 @@ jobs:
       with:
         dotnet-version: | 
           2.1.818
-          3.1.416
-          5.0.405
-          6.0.200
+          3.1.420
+          5.0.408
+          6.0.301
     - name: Build Docker image
       run: |
         docker build \
@@ -308,9 +308,9 @@ jobs:
       with:
         dotnet-version: | 
           2.1.818
-          3.1.416
-          5.0.405
-          6.0.200
+          3.1.420
+          5.0.408
+          6.0.301
     # Cosmos is _way_ to flaky at the moment. Try enabling again at a later time
     # - name: Start CosmosDB Emulator
     #   if: ${{ matrix.target == 'BuildAndRunWindowsIntegrationTests' }}
@@ -347,9 +347,9 @@ jobs:
       with:
         dotnet-version: | 
           2.1.818
-          3.1.416
-          5.0.405
-          6.0.200
+          3.1.420
+          5.0.408
+          6.0.301
     - name: Build Docker image
       run: |
         docker build \
@@ -405,9 +405,9 @@ jobs:
       with:
         dotnet-version: | 
           2.1.818
-          3.1.416
-          5.0.405
-          6.0.200
+          3.1.420
+          5.0.408
+          6.0.301
     - name: RunWindowsTracerIisIntegrationTests
       run: ./tracer/build.cmd BuildTracerHome BuildAspNetIntegrationTests RunWindowsTracerIisIntegrationTests -Framework ${{ matrix.framework }}
     - uses: actions/upload-artifact@v3.1.0
@@ -432,9 +432,9 @@ jobs:
       with:
         dotnet-version: |
           2.1.818
-          3.1.416
-          5.0.405
-          6.0.200
+          3.1.420
+          5.0.408
+          6.0.301
     - run: ./tracer/build.cmd BuildTracerHome PackageTracerHome BuildAspNetIntegrationTests -Framework ${{ matrix.framework }}
     - run: docker-compose up -d IntegrationTests.IIS
     - name: RunWindowsMsiIntegrationTests
