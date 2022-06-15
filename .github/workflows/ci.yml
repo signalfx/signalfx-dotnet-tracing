@@ -62,7 +62,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        machine: [ windows-2019, ubuntu-20.04 ]
+        machine: [ windows-2022, ubuntu-20.04 ]
     runs-on: ${{ matrix.machine }}
     timeout-minutes: 30
     steps:
@@ -160,7 +160,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        machine: [ windows-2019, ubuntu-20.04 ]
+        machine: [ windows-2022, ubuntu-20.04 ]
     runs-on: ${{ matrix.machine }}
     timeout-minutes: 30
     steps:
@@ -228,7 +228,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        machine: [ windows-2019, ubuntu-20.04 ]
+        machine: [ windows-2022, ubuntu-20.04 ]
     runs-on: ${{ matrix.machine }}
     timeout-minutes: 30
     steps:
@@ -296,7 +296,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        machine: [ windows-2019 ]
+        machine: [ windows-2022 ]
         platform: [ x64 ]
         framework: [ net461, netcoreapp3.1, net5.0, net6.0 ]
         target: [ BuildAndRunWindowsIntegrationTests, BuildAndRunWindowsRegressionTests ]
@@ -392,7 +392,7 @@ jobs:
 
   windows-iis-integration-tests:
     name: Windows - IIS integration tests 
-    runs-on: windows-2019
+    runs-on: windows-2022
     strategy:
       matrix:
         platform:
@@ -419,7 +419,7 @@ jobs:
 
   windows-msi-integration-tests:
     name: Windows - MSI integration tests
-    runs-on: windows-2019
+    runs-on: windows-2022
     strategy:
       matrix:
         platform:
