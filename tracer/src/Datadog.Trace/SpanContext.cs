@@ -120,7 +120,9 @@ namespace Datadog.Trace
         /// <param name="serviceName">The service name to propagate to child spans.</param>
         /// <param name="traceId">Override the trace id if there's no parent.</param>
         /// <param name="spanId">The propagated span id.</param>
-        internal SpanContext(ISpanContext parent, TraceContext traceContext, string serviceName, TraceId? traceId = null, ulong? spanId = null)
+        /// <param name="rawTraceId">Raw trace id value</param>
+        /// <param name="rawSpanId">Raw span id value</param>
+        internal SpanContext(ISpanContext parent, TraceContext traceContext, string serviceName, TraceId? traceId = null, ulong? spanId = null, string rawTraceId = null, string rawSpanId = null)
             : this(parent?.TraceId ?? traceId, serviceName)
         {
             SpanId = spanId ?? SpanIdGenerator.ThreadInstance.CreateNew();
@@ -129,7 +131,14 @@ namespace Datadog.Trace
             if (parent is SpanContext spanContext)
             {
                 Origin = spanContext.Origin;
+                RawTraceId = spanContext.RawTraceId ?? rawTraceId;
             }
+            else
+            {
+                RawTraceId = rawTraceId;
+            }
+
+            RawSpanId = rawSpanId;
         }
 
         private SpanContext(TraceId? traceId, string serviceName)

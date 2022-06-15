@@ -1,14 +1,15 @@
 ﻿using System;
 using System.IO;
+using SignalFx.OverheadTest.Configs;
 
-namespace SignalFx.OverheadTest.Utils;
+namespace SignalFx.OverheadTest.Results;
 
-internal class ResultsNamingConvention
+internal class NamingConvention
 {
     private readonly AgentConfig _config;
-    private readonly string _iterationResults;
+    private readonly DirectoryInfo _iterationResults;
 
-    public ResultsNamingConvention(AgentConfig config, string iterationResults)
+    public NamingConvention(AgentConfig config, DirectoryInfo iterationResults)
     {
         _config = config ?? throw new ArgumentNullException(nameof(config));
         _iterationResults = iterationResults ?? throw new ArgumentNullException(nameof(iterationResults));
@@ -16,7 +17,7 @@ internal class ResultsNamingConvention
 
 
     internal string AgentResults =>
-        Path.Combine(_iterationResults, _config.Name);
+        Path.Combine(_iterationResults.FullName, _config.Name);
 
     public string ContainerLogs => Path.Combine(AgentResults, "containers");
 }

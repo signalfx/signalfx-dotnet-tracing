@@ -146,7 +146,7 @@ jobs:
           --env artifacts=/project/${relativeArtifacts} \
           --env SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN} \
           dd-trace-dotnet/${{ matrix.base-image }}-builder \
-          dotnet /build/bin/Debug/_build.dll Clean BuildTracerHome ZipTracerHome
+          dotnet /build/bin/Debug/_build.dll Clean BuildTracerHome ZipMonitoringHome
     - name: Publish Linux x64-musl packages
       uses: actions/upload-artifact@v3.1.0
       with:

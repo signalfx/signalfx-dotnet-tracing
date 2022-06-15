@@ -29,7 +29,6 @@ RUN curl -sSL https://aka.ms/dotnet-counters/linux-x64 --output dotnet-counters 
     && chmod +x ./dotnet-counters
 
 COPY --from=build-env /eShopOnWeb/src/Web/out ./
-
 ENTRYPOINT ["dotnet", "Web.dll"]
 
 FROM baseline-app as instrumented-app

@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #nullable enable
 
 using System;
@@ -33,7 +35,7 @@ namespace Datadog.Trace.Activity.Handlers
             var activeSpan = (Span?)Tracer.Instance.ActiveScope?.Span;
 
             // Propagate Trace and Parent Span ids
-            ulong? traceId = null;
+            TraceId? traceId = null;
             ulong? spanId = null;
             string? rawTraceId = null;
             string? rawSpanId = null;
@@ -51,7 +53,7 @@ namespace Datadog.Trace.Activity.Handlers
                     {
                         // TraceId
                         w3cActivity.TraceId = string.IsNullOrWhiteSpace(activeSpan.Context.RawTraceId) ?
-                                                  activeSpan.TraceId.Lower.ToString("x32") : activeSpan.Context.RawTraceId;
+                                                  activeSpan.TraceId.ToString() : activeSpan.Context.RawTraceId;
 
                         // SpanId
                         w3cActivity.ParentSpanId = string.IsNullOrWhiteSpace(activeSpan.Context.RawSpanId) ?
@@ -62,13 +64,13 @@ namespace Datadog.Trace.Activity.Handlers
                         w3cActivity.RawParentId = null;
 
                         // Avoid recalculation of the traceId.
-                        traceId = activeSpan.TraceId.Lower;
+                        traceId = activeSpan.TraceId;
                     }
                 }
 
                 // We convert the activity traceId and spanId to use it in the
                 // Datadog span creation.
-                traceId ??= Convert.ToUInt64(w3cActivity.TraceId.Substring(16), 16);
+                traceId = TraceId.CreateFromString(w3cActivity.TraceId);
                 spanId = Convert.ToUInt64(w3cActivity.SpanId, 16);
                 rawTraceId = w3cActivity.TraceId;
                 rawSpanId = w3cActivity.SpanId;
@@ -91,9 +93,9 @@ namespace Datadog.Trace.Activity.Handlers
                 Log.Error(ex, "Error processing the OnActivityStarted callback");
             }
 
-            static Scope CreateScopeFromActivity(T activity, ulong? traceId, ulong? spanId, string? rawTraceId, string? rawSpanId)
+            static Scope CreateScopeFromActivity(T activity, TraceId? traceId, ulong? spanId, string? rawTraceId, string? rawSpanId)
             {
-                var span = Tracer.Instance.StartSpan(activity.OperationName, startTime: activity.StartTimeUtc, traceId: TraceId.CreateFromUlong(traceId ?? 0), spanId: spanId);
+                var span = Tracer.Instance.StartSpan(activity.OperationName, startTime: activity.StartTimeUtc, traceId: traceId, spanId: spanId, rawTraceId: rawTraceId, rawSpanId: rawSpanId);
                 var scope = Tracer.Instance.ActivateSpan(span, false);
                 return scope;
             }

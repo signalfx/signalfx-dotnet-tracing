@@ -1,23 +1,23 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using DotNet.Testcontainers.Containers.Modules;
+using DotNet.Testcontainers.Containers;
 
 namespace SignalFx.OverheadTest.Containers;
 
 internal abstract class CollectorBase : IAsyncDisposable
 {
     protected const string ImageName = "otel/opentelemetry-collector-contrib:0.51.0";
-    protected const string CollectorConfigDestination = "/etc/otelcol-contrib/config.yaml";
+    protected const string ContainerCollectorConfigPath = "/etc/otelcol-contrib/config.yaml";
 
     protected const int TraceReceiverPort = 9411;
     protected const int LogReceiverPort = 4318;
     protected readonly Stream Stream;
 
-    protected CollectorBase(string resultsDirectory)
+    protected CollectorBase(DirectoryInfo resultsDirectory)
     {
         if (resultsDirectory == null) throw new ArgumentNullException(nameof(resultsDirectory));
-        Stream = File.Create(Path.Combine(resultsDirectory, "collector.txt"));
+        Stream = File.Create(Path.Combine(resultsDirectory.FullName, "collector.txt"));
     }
 
     protected abstract TestcontainersContainer Container { get; }
@@ -28,7 +28,7 @@ internal abstract class CollectorBase : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        await Container.DisposeAsync();
+        await Container.CleanUpAsync();
         await Stream.DisposeAsync();
     }
 

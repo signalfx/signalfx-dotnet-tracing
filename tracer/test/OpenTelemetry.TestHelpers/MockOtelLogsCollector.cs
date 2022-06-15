@@ -34,7 +34,7 @@ public class MockOtelLogsCollector : IDisposable
     /// </summary>
     public int Port { get; }
 
-    public ConcurrentQueue<LogsData> LogsData { get; } = new();
+    public ConcurrentQueue<ExportLogsServiceRequest> LogsData { get; } = new();
 
     public void Dispose()
     {
@@ -49,7 +49,7 @@ public class MockOtelLogsCollector : IDisposable
             {
                 var ctx = _listener.GetContext();
 
-                var logsData = ProtoBuf.Serializer.Deserialize<LogsData>(ctx.Request.InputStream);
+                var logsData = ProtoBuf.Serializer.Deserialize<ExportLogsServiceRequest>(ctx.Request.InputStream);
 
                 LogsData.Enqueue(logsData);
 
