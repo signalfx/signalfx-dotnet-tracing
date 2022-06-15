@@ -42,7 +42,7 @@
   "environmentVariables": {
     "CORECLR_ENABLE_PROFILING": "1",
     "CORECLR_PROFILER": "{846F5F1C-F9AE-4B07-969E-05C26BC060D8}",
-    "CORECLR_PROFILER_PATH_64": "$(CWD)/../../shared/bin/monitoring-home/Datadog.Trace.ClrProfiler.Native.so",
+    "CORECLR_PROFILER_PATH_64": "$(CWD)/../../shared/bin/monitoring-home/SignalFx.Tracing.ClrProfiler.Native.so",
     "SIGNALFX_DOTNET_PROFILER_HOME": "$(CWD)/../../shared/bin/monitoring-home/continuousprofiler/",
     "LD_PRELOAD": "$(CWD)/../../shared/bin/monitoring-home/continuousprofiler/Datadog.Linux.ApiWrapper.x64.so",
     "SIGNALFX_PROFILING_METRICS_FILEPATH": "metrics.json"
