@@ -211,7 +211,7 @@ namespace Datadog.Trace
                     constantTags.Add($"version:{settings.ServiceVersion}");
                 }
 
-                if (settings.MetricsExporter == MetricsExporterType.SignalFx)
+                if (settings.ExporterSettings.MetricsExporter == MetricsExporterType.SignalFx)
                 {
                     var metricExporter = new SignalFxMetricExporter(settings.ExporterSettings.MetricsEndpointUrl, settings.SignalFxAccessToken);
                     var metricSender = new SignalFxMetricSender(new AsyncSignalFxMetricWriter(metricExporter, MaxMetricsInAsyncQueue), constantTags.ToArray());
