@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -18,19 +19,25 @@ internal class CsvPersister : IAsyncDisposable
     private const char FieldSeparator = ',';
     private const char FieldNameInfix = ':';
 
-    private static readonly Dictionary<string, Func<AgentPerfResults, double>> Fields = new()
+    private static readonly Dictionary<string, Func<AgentPerfResults, string>> Fields = new()
     {
-        ["iterationAvg"] = perf => perf.K6Results.IterationDurationAvg,
-        ["iterationP95"] = perf => perf.K6Results.IterationDurationP95,
-        ["requestAvg"] = perf => perf.K6Results.RequestDurationAvg,
-        ["requestP95"] = perf => perf.K6Results.RequestDurationP95,
-        ["averageCpuUsage"] = perf => perf.CounterResults.AverageCpuUsage,
-        ["averageWorkingSet"] = perf => perf.CounterResults.AverageWorkingSetMB,
-        ["averageTimeSpentInGc"] = perf => perf.CounterResults.AverageTimeInGcPercentage,
-        ["totalAllocatedMB"] = perf => perf.CounterResults.TotalAllocatedMB,
-        ["minHeapUsed"] = perf => perf.CounterResults.MinHeapUsedMB,
-        ["maxHeapUsed"] = perf => perf.CounterResults.MaxHeapUsedMB,
+        ["iterationAvg"] = perf => StringFrom(perf.K6Results.IterationDurationAvg),
+        ["iterationP95"] = perf => StringFrom(perf.K6Results.IterationDurationP95),
+        ["requestAvg"] = perf => StringFrom(perf.K6Results.RequestDurationAvg),
+        ["requestP95"] = perf => StringFrom(perf.K6Results.RequestDurationP95),
+        ["averageCpuUsage"] = perf => StringFrom(perf.CounterResults.AverageCpuUsage),
+        ["averageWorkingSet"] = perf => StringFrom(perf.CounterResults.AverageWorkingSetMB),
+        ["averageTimeSpentInGc"] = perf => StringFrom(perf.CounterResults.AverageTimeInGcPercentage),
+        ["totalAllocatedMB"] = perf => StringFrom(perf.CounterResults.TotalAllocatedMB),
+        ["minHeapUsed"] = perf => StringFrom(perf.CounterResults.MinHeapUsedMB),
+        ["maxHeapUsed"] = perf => StringFrom(perf.CounterResults.MaxHeapUsedMB),
+        ["maxThreadPoolThreadCount"] = perf => perf.CounterResults.MaxThreadPoolThreadCount.ToString()
     };
+
+    private static string StringFrom(double val)
+    {
+        return val.ToString(CultureInfo.InvariantCulture);
+    }
 
     private readonly StreamWriter _writer;
 
@@ -53,7 +60,7 @@ internal class CsvPersister : IAsyncDisposable
     public async Task PersistResultsAsync()
     {
         var sb = new StringBuilder();
-        sb.Append((int) DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() / 1000);
+        sb.Append((int) DateTimeOffset.UtcNow.ToUnixTimeSeconds());
 
         foreach (var extractor in Fields.Values)
         {

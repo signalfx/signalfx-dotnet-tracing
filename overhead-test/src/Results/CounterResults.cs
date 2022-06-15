@@ -10,4 +10,5 @@ internal record CounterResults(
     double AverageTimeInGcPercentage,
     double MinHeapUsedMB,
     double MaxHeapUsedMB,
-    double TotalAllocatedMB);
+    double TotalAllocatedMB,
+    int MaxThreadPoolThreadCount);
