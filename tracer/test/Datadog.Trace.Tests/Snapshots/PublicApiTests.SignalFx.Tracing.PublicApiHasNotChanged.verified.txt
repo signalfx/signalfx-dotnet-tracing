@@ -46,7 +46,6 @@ namespace Datadog.Trace.Configuration
         public int DogStatsdPort { get; set; }
         public System.Uri LogsEndpointUrl { get; set; }
         public System.Uri MetricsEndpointUrl { get; set; }
-        public Datadog.Trace.SignalFx.Metrics.MetricsExporterType MetricsExporter { get; set; }
         public string MetricsPipeName { get; set; }
         public bool PartialFlushEnabled { get; set; }
         public int PartialFlushMinSpans { get; set; }
@@ -124,6 +123,7 @@ namespace Datadog.Trace.Configuration
         public bool KafkaCreateConsumerScopeEnabled { get; }
         public bool LogsInjectionEnabled { get; }
         public int MaxTracesSubmittedPerSecond { get; }
+        public Datadog.Trace.SignalFx.Metrics.MetricsExporterType MetricsExporter { get; }
         public int RecordedValueMaxLength { get; }
         public string ServiceName { get; }
         public string ServiceVersion { get; }
@@ -199,6 +199,7 @@ namespace Datadog.Trace.Configuration
         public bool KafkaCreateConsumerScopeEnabled { get; set; }
         public bool LogsInjectionEnabled { get; set; }
         public int MaxTracesSubmittedPerSecond { get; set; }
+        public Datadog.Trace.SignalFx.Metrics.MetricsExporterType MetricsExporter { get; set; }
         public int RecordedValueMaxLength { get; set; }
         public bool RuntimeMetricsEnabled { get; set; }
         public string ServiceName { get; set; }
