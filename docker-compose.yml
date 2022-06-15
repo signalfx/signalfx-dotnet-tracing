@@ -501,7 +501,7 @@ services:
       - artifacts=/project/${relativeArtifacts:-tracer/src/bin/artifacts}
       - framework=${framework:-netcoreapp3.1}
       - baseImage=${baseImage:-default}
-      - SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN:-1
+      - SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN:-1}
       - IncludeMinorPackageVersions=${IncludeMinorPackageVersions:-false}
     hostname: integrationtests
 
