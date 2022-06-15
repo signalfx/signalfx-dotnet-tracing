@@ -51,7 +51,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 await DumpLogRecords(logsData);
 
                 var containStackTraceForClassHierarchy = false;
-                var expectedStackTrace = string.Join("\n", CreateExpectedStackTrace());
+                var expectedStackTrace = string.Join("\n", CreateExpectedStackTrace().Distinct());
 
                 foreach (var data in logsData)
                 {
