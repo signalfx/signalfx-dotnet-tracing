@@ -320,6 +320,26 @@ jobs:
     #     Import-Module "C:/Program Files/Azure Cosmos DB Emulator/PSModules/Microsoft.Azure.CosmosDB.Emulator"
     #     Start-CosmosDbEmulator -Timeout 300
     # Workaround around long name being hit in MultiDomainHostTests.WorksOutsideTheGAC tests
+    - name: install Microsoft.Net.Component.4.6.1.TargetingPack
+      if: ${{ matrix.target == 'BuildAndRunWindowsRegressionTests' }}
+      run: |
+          Set-Location "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
+          $InstallPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise"
+          $componentsToAdd = @(
+            "Microsoft.Net.Component.4.6.1.TargetingPack"
+          )
+          [string]$workloadArgs = $componentsToAdd | ForEach-Object {" --add " +  $_}
+          $Arguments = ('/c', "vs_installer.exe", 'modify', '--installPath', "`"$InstallPath`"",$workloadArgs, '--quiet', '--norestart', '--nocache')
+          $process = Start-Process -FilePath cmd.exe -ArgumentList $Arguments -Wait -PassThru -WindowStyle Hidden
+          if ($process.ExitCode -eq 0)
+          {
+              Write-Host "components have been successfully added"
+          }
+          else
+          {
+              Write-Host "components were not installed"
+              exit 1
+          }
     - name: Subst for shorter path and Run Tests
       run: |
         subst y: .
@@ -408,6 +428,25 @@ jobs:
           3.1.420
           5.0.408
           6.0.301
+    - name: install Microsoft.Net.Component.4.6.1.TargetingPack
+      run: |
+          Set-Location "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
+          $InstallPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise"
+          $componentsToAdd = @(
+            "Microsoft.Net.Component.4.6.1.TargetingPack"
+          )
+          [string]$workloadArgs = $componentsToAdd | ForEach-Object {" --add " +  $_}
+          $Arguments = ('/c', "vs_installer.exe", 'modify', '--installPath', "`"$InstallPath`"",$workloadArgs, '--quiet', '--norestart', '--nocache')
+          $process = Start-Process -FilePath cmd.exe -ArgumentList $Arguments -Wait -PassThru -WindowStyle Hidden
+          if ($process.ExitCode -eq 0)
+          {
+              Write-Host "components have been successfully added"
+          }
+          else
+          {
+              Write-Host "components were not installed"
+              exit 1
+          }
     - name: RunWindowsTracerIisIntegrationTests
       run: ./tracer/build.cmd BuildTracerHome BuildAspNetIntegrationTests RunWindowsTracerIisIntegrationTests -Framework ${{ matrix.framework }}
     - uses: actions/upload-artifact@v3.1.0
@@ -435,6 +474,25 @@ jobs:
           3.1.420
           5.0.408
           6.0.301
+    - name: install Microsoft.Net.Component.4.6.1.TargetingPack
+      run: |
+          Set-Location "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
+          $InstallPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise"
+          $componentsToAdd = @(
+            "Microsoft.Net.Component.4.6.1.TargetingPack"
+          )
+          [string]$workloadArgs = $componentsToAdd | ForEach-Object {" --add " +  $_}
+          $Arguments = ('/c', "vs_installer.exe", 'modify', '--installPath', "`"$InstallPath`"",$workloadArgs, '--quiet', '--norestart', '--nocache')
+          $process = Start-Process -FilePath cmd.exe -ArgumentList $Arguments -Wait -PassThru -WindowStyle Hidden
+          if ($process.ExitCode -eq 0)
+          {
+              Write-Host "components have been successfully added"
+          }
+          else
+          {
+              Write-Host "components were not installed"
+              exit 1
+          }
     - run: ./tracer/build.cmd BuildTracerHome PackageTracerHome BuildAspNetIntegrationTests -Framework ${{ matrix.framework }}
     - run: docker-compose up -d IntegrationTests.IIS
     - name: RunWindowsMsiIntegrationTests
