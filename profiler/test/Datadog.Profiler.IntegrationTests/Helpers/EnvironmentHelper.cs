@@ -146,7 +146,7 @@ namespace Datadog.Profiler.IntegrationTests.Helpers
         {
             var profilerPath = GetNativeLoaderPath();
 
-            environmentVariables["DD_NATIVELOADER_CONFIGFILE"] = GenerateLoaderConfigFile();
+            environmentVariables["SIGNALFX_NATIVELOADER_CONFIGFILE"] = GenerateLoaderConfigFile();
 
             if (!File.Exists(profilerPath))
             {
