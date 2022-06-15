@@ -46,6 +46,7 @@ namespace Datadog.Trace.Configuration
         public int DogStatsdPort { get; set; }
         public System.Uri LogsEndpointUrl { get; set; }
         public System.Uri MetricsEndpointUrl { get; set; }
+        public Datadog.Trace.SignalFx.Metrics.MetricsExporterType MetricsExporter { get; set; }
         public string MetricsPipeName { get; set; }
         public bool PartialFlushEnabled { get; set; }
         public int PartialFlushMinSpans { get; set; }
@@ -123,7 +124,6 @@ namespace Datadog.Trace.Configuration
         public bool KafkaCreateConsumerScopeEnabled { get; }
         public bool LogsInjectionEnabled { get; }
         public int MaxTracesSubmittedPerSecond { get; }
-        public Datadog.Trace.SignalFx.Metrics.MetricsExporterType MetricsExporter { get; }
         public int RecordedValueMaxLength { get; }
         public string ServiceName { get; }
         public string ServiceVersion { get; }
@@ -199,7 +199,6 @@ namespace Datadog.Trace.Configuration
         public bool KafkaCreateConsumerScopeEnabled { get; set; }
         public bool LogsInjectionEnabled { get; set; }
         public int MaxTracesSubmittedPerSecond { get; set; }
-        public Datadog.Trace.SignalFx.Metrics.MetricsExporterType MetricsExporter { get; set; }
         public int RecordedValueMaxLength { get; set; }
         public bool RuntimeMetricsEnabled { get; set; }
         public string ServiceName { get; set; }
@@ -797,86 +796,6 @@ namespace Datadog.Tracer.OpenTelemetry.Proto.Resource.V1
         public Resource() { }
         public System.Collections.Generic.List<Datadog.Tracer.OpenTelemetry.Proto.Common.V1.KeyValue> Attributes { get; }
         public uint DroppedAttributesCount { get; set; }
-    }
-}
-namespace Datadog.Tracer.Pprof.Proto.Profile
-{
-    public class Function
-    {
-        public Function() { }
-        public long Filename { get; set; }
-        public ulong Id { get; set; }
-        public long Name { get; set; }
-        public long StartLine { get; set; }
-        public long SystemName { get; set; }
-    }
-    public class Label
-    {
-        public Label() { }
-        public long Key { get; set; }
-        public long Num { get; set; }
-        public long NumUnit { get; set; }
-        public long Str { get; set; }
-    }
-    public class Line
-    {
-        public Line() { }
-        public ulong FunctionId { get; set; }
-        public long line { get; set; }
-    }
-    public class Location
-    {
-        public Location() { }
-        public ulong Address { get; set; }
-        public ulong Id { get; set; }
-        public bool IsFolded { get; set; }
-        public System.Collections.Generic.List<Datadog.Tracer.Pprof.Proto.Profile.Line> Lines { get; }
-        public ulong MappingId { get; set; }
-    }
-    public class Mapping
-    {
-        public Mapping() { }
-        public long BuildId { get; set; }
-        public ulong FileOffset { get; set; }
-        public long Filename { get; set; }
-        public bool HasFilenames { get; set; }
-        public bool HasFunctions { get; set; }
-        public bool HasInlineFrames { get; set; }
-        public bool HasLineNumbers { get; set; }
-        public ulong Id { get; set; }
-        public ulong MemoryLimit { get; set; }
-        public ulong MemoryStart { get; set; }
-    }
-    public class Profile
-    {
-        public Profile() { }
-        public long[] Comments { get; set; }
-        public long DefaultSampleType { get; set; }
-        public long DropFrames { get; set; }
-        public long DurationNanos { get; set; }
-        public System.Collections.Generic.List<Datadog.Tracer.Pprof.Proto.Profile.Function> Functions { get; }
-        public long KeepFrames { get; set; }
-        public System.Collections.Generic.List<Datadog.Tracer.Pprof.Proto.Profile.Location> Locations { get; }
-        public System.Collections.Generic.List<Datadog.Tracer.Pprof.Proto.Profile.Mapping> Mappings { get; }
-        public long Period { get; set; }
-        public Datadog.Tracer.Pprof.Proto.Profile.ValueType PeriodType { get; set; }
-        public System.Collections.Generic.List<Datadog.Tracer.Pprof.Proto.Profile.ValueType> SampleTypes { get; }
-        public System.Collections.Generic.List<Datadog.Tracer.Pprof.Proto.Profile.Sample> Samples { get; }
-        public System.Collections.Generic.List<string> StringTables { get; }
-        public long TimeNanos { get; set; }
-    }
-    public class Sample
-    {
-        public Sample() { }
-        public System.Collections.Generic.List<Datadog.Tracer.Pprof.Proto.Profile.Label> Labels { get; }
-        public ulong[] LocationIds { get; set; }
-        public long[] Values { get; set; }
-    }
-    public class ValueType
-    {
-        public ValueType() { }
-        public long Type { get; set; }
-        public long Unit { get; set; }
     }
 }
 namespace Datadog.Tracer.SignalFx.Metrics.Protobuf
