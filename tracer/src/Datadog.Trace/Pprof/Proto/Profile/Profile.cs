@@ -12,7 +12,7 @@ namespace Datadog.Tracer.Pprof.Proto.Profile
 {
 
     [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
-    public partial class Profile : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
+    internal partial class Profile : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
         private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
         global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -63,7 +63,7 @@ namespace Datadog.Tracer.Pprof.Proto.Profile
     }
 
     [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
-    public partial class ValueType : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
+    internal partial class ValueType : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
         private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
         global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -78,7 +78,7 @@ namespace Datadog.Tracer.Pprof.Proto.Profile
     }
 
     [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
-    public partial class Sample : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
+    internal partial class Sample : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
         private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
         global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -96,7 +96,7 @@ namespace Datadog.Tracer.Pprof.Proto.Profile
     }
 
     [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
-    public partial class Label : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
+    internal partial class Label : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
         private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
         global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -117,7 +117,7 @@ namespace Datadog.Tracer.Pprof.Proto.Profile
     }
 
     [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
-    public partial class Mapping : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
+    internal partial class Mapping : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
         private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
         global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -156,7 +156,7 @@ namespace Datadog.Tracer.Pprof.Proto.Profile
     }
 
     [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
-    public partial class Location : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
+    internal partial class Location : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
         private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
         global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -180,7 +180,7 @@ namespace Datadog.Tracer.Pprof.Proto.Profile
     }
 
     [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
-    public partial class Line : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
+    internal partial class Line : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
         private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
         global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -195,7 +195,7 @@ namespace Datadog.Tracer.Pprof.Proto.Profile
     }
 
     [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
-    public partial class Function : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
+    internal partial class Function : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
         private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
         global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
