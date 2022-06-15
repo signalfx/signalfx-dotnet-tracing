@@ -54,7 +54,7 @@ at System.Web.Mvc.ActionDescriptor.ExtractParameterFromDictionary(ParameterInfo 
       deployment.environment: integration_tests,
       http.method: GET,
       http.request.headers.host: localhost:00000,
-      http.status_code: 200,
+      http.status_code: 500,
       http.url: http://localhost:00000/Home/identifier/BadValue,
       language: dotnet,
       net.peer.ip: ::1,
