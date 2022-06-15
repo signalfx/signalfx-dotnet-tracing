@@ -110,8 +110,6 @@ namespace Datadog.Trace.Configuration
 
             ServiceNameMappings = new ServiceNames(serviceNameMappings);
 
-            MetricsExporter = source.GetTypedValue<MetricsExporterType>(ConfigurationKeys.MetricsExporter);
-
             TracerMetricsEnabled = source?.GetBool(ConfigurationKeys.TracerMetricsEnabled) ??
                                    // default value
                                    false;
@@ -371,13 +369,6 @@ namespace Datadog.Trace.Configuration
         /// <seealso cref="ConfigurationKeys.Exporter"/>
         /// </summary>
         public ExporterType Exporter { get; set; }
-
-        /// <summary>
-        /// Gets or sets the name of the metrics exporter to be used. The Tracer uses it to encode and
-        /// dispatch metrics.
-        /// <seealso cref="ConfigurationKeys.MetricsExporter"/>
-        /// </summary>
-        public MetricsExporterType MetricsExporter { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the semantic convention to be used.

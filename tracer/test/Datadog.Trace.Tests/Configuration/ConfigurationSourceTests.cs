@@ -81,7 +81,7 @@ namespace Datadog.Trace.Tests.Configuration
             yield return new object[] { CreateFunc(s => s.CustomSamplingRules), null };
             yield return new object[] { CreateFunc(s => s.MaxTracesSubmittedPerSecond), 100 };
             yield return new object[] { CreateFunc(s => s.TracerMetricsEnabled), false };
-            yield return new object[] { CreateFunc(s => s.ExporterSettings.DogStatsdPort), 9943 };
+            yield return new object[] { CreateFunc(s => s.ExporterSettings.DogStatsdPort), 0 };
             yield return new object[] { CreateFunc(s => s.RecordedValueMaxLength), 12000 };
         }
 
@@ -128,11 +128,11 @@ namespace Datadog.Trace.Tests.Configuration
             yield return new object[] { ConfigurationKeys.Exporter, "Zipkin", CreateFunc(s => s.Exporter), ExporterType.Zipkin };
             yield return new object[] { ConfigurationKeys.Exporter, "unknown", CreateFunc(s => s.Exporter), ExporterType.Default };
 
-            yield return new object[] { ConfigurationKeys.MetricsExporter, null, CreateFunc(s => s.MetricsExporter), MetricsExporterType.Default };
-            yield return new object[] { ConfigurationKeys.MetricsExporter, string.Empty, CreateFunc(s => s.MetricsExporter), MetricsExporterType.Default };
-            yield return new object[] { ConfigurationKeys.MetricsExporter, "StatsD", CreateFunc(s => s.MetricsExporter), MetricsExporterType.StatsD };
-            yield return new object[] { ConfigurationKeys.MetricsExporter, "SignalFx", CreateFunc(s => s.MetricsExporter), MetricsExporterType.SignalFx };
-            yield return new object[] { ConfigurationKeys.MetricsExporter, "unknown", CreateFunc(s => s.MetricsExporter), MetricsExporterType.Default };
+            yield return new object[] { ConfigurationKeys.MetricsExporter, null, CreateFunc(s => s.ExporterSettings.MetricsExporter), MetricsExporterType.Default };
+            yield return new object[] { ConfigurationKeys.MetricsExporter, string.Empty, CreateFunc(s => s.ExporterSettings.MetricsExporter), MetricsExporterType.Default };
+            yield return new object[] { ConfigurationKeys.MetricsExporter, "StatsD", CreateFunc(s => s.ExporterSettings.MetricsExporter), MetricsExporterType.StatsD };
+            yield return new object[] { ConfigurationKeys.MetricsExporter, "SignalFx", CreateFunc(s => s.ExporterSettings.MetricsExporter), MetricsExporterType.SignalFx };
+            yield return new object[] { ConfigurationKeys.MetricsExporter, "unknown", CreateFunc(s => s.ExporterSettings.MetricsExporter), MetricsExporterType.Default };
 
             yield return new object[] { ConfigurationKeys.Convention, null, CreateFunc(s => s.Convention), ConventionType.Default };
             yield return new object[] { ConfigurationKeys.Convention, string.Empty, CreateFunc(s => s.Convention), ConventionType.Default };

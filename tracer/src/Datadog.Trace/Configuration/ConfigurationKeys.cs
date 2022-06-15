@@ -289,7 +289,7 @@ namespace Datadog.Trace.Configuration
         /// Configuration key for the exporter to be used. The Tracer uses it to encode and
         /// dispatch metrics.
         /// </summary>
-        /// <seealso cref="TracerSettings.MetricsExporter"/>
+        /// <seealso cref="ExporterSettings.MetricsExporter"/>
         public const string MetricsExporter = "SIGNALFX_METRICS_EXPORTER";
 
         /// <summary>
