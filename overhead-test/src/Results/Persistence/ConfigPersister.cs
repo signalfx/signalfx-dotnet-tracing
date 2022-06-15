@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using SignalFx.OverheadTest.Configs;
 
 namespace SignalFx.OverheadTest.Results.Persistence;
@@ -26,12 +27,24 @@ internal class ConfigPersister : IAsyncDisposable
         var serialized = JsonConvert.SerializeObject(new
         {
             // use java-overhead-tests format/names for now 
-            name = $"Release_{config.ConcurrentConnections}vu_{config.Iterations}iter",
-            description = "Multiple agent configurations compared.",
-            agents = config.Agents.Select(agent => agent.Name),
-            maxRequestRate = config.MaxRequestRate,
-            concurrentConnections = config.ConcurrentConnections,
-            totalIterations = config.Iterations
+            Name = $"Release_{config.ConcurrentConnections}vu_{config.Iterations}iter",
+            Description = "Multiple agent configurations compared.",
+            Agents = config.Agents.Select(agent => new
+            {
+                agent.Name,
+                agent.Description,
+                agent.AdditionalEnvVars
+            }),
+            MaxRequestRate = config.MaxRequestRate,
+            ConcurrentConnections = config.ConcurrentConnections,
+            TotalIterations = config.Iterations
+        }, new JsonSerializerSettings
+        {
+            ContractResolver = new DefaultContractResolver
+            {
+                NamingStrategy = new CamelCaseNamingStrategy()
+            },
+            Formatting = Formatting.Indented
         });
 
         await _streamWriter.WriteAsync(serialized);
