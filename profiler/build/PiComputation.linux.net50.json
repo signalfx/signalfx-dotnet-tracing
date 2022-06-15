@@ -16,6 +16,22 @@
         "SIGNALFX_CLR_ENABLE_NGEN": "true",
         "SIGNALFX_PROFILING_ENABLED": "1"
       }
+    },
+    {
+      "name": "Profiler_exceptions",
+      "environmentVariables": {
+        "SIGNALFX_CLR_ENABLE_NGEN": "true",
+        "SIGNALFX_PROFILING_ENABLED": "1",
+        "SIGNALFX_PROFILING_EXCEPTION_ENABLED": "1"
+      }
+    },
+    {
+      "name": "Profiler_cpu",
+      "environmentVariables": {
+        "SIGNALFX_CLR_ENABLE_NGEN": "true",
+        "SIGNALFX_PROFILING_ENABLED": "1",
+        "SIGNALFX_PROFILING_CPU_ENABLED": "1"
+      }
     }
   ],
   "processName": "dotnet",
