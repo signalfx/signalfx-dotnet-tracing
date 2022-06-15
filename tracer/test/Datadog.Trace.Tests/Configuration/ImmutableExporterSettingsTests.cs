@@ -70,6 +70,7 @@ namespace Datadog.Trace.Tests.Configuration
                 (e, i) => e.MetricsPipeName == i.MetricsPipeName,
                 (e, i) => e.TracesPipeName == i.TracesPipeName,
                 (e, i) => e.DogStatsdPort == i.DogStatsdPort,
+                (e, i) => e.MetricsExporter == i.MetricsExporter,
                 (e, i) => e.MetricsTransport == i.MetricsTransport,
                 (e, i) => e.MetricsEndpointUrl == i.MetricsEndpointUrl,
                 (e, i) => e.LogsEndpointUrl == i.LogsEndpointUrl,
@@ -78,6 +79,7 @@ namespace Datadog.Trace.Tests.Configuration
                 (e, i) => e.AgentUri == i.AgentUri,
                 (e, i) => e.PartialFlushEnabled == i.PartialFlushEnabled,
                 (e, i) => e.PartialFlushMinSpans == i.PartialFlushMinSpans,
+                (e, i) => e.ValidationWarnings.Count == i.ValidationWarnings.Count,
                 (e, i) => e.SyncExport == i.SyncExport,
             };
 
@@ -85,17 +87,17 @@ namespace Datadog.Trace.Tests.Configuration
                                    .GetProperties(Flags);
 
             // Ensure that all properties are represented
-            Assert.Equal(mutableProperties.Count(), equalityCheckers.Count);
+            Assert.Equal(mutableProperties.Length, equalityCheckers.Count);
 
             var exporterSettings = new ExporterSettings();
 
+            exporterSettings.AgentUri = new Uri("http://127.0.0.1:8282");
             exporterSettings.MetricsPipeName = "metricspipe";
             exporterSettings.TracesPipeName = "tracespipe";
             exporterSettings.DogStatsdPort = 1234;
             exporterSettings.MetricsTransport = Vendors.StatsdClient.Transport.TransportType.NamedPipe;
             exporterSettings.TracesTransport = TracesTransportType.WindowsNamedPipe;
             exporterSettings.TracesPipeTimeoutMs = 5556;
-            exporterSettings.AgentUri = new Uri("http://localhost:8282");
 
             var immutableSettings = new ImmutableExporterSettings(exporterSettings);
 

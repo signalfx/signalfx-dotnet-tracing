@@ -6,7 +6,10 @@
 // Modified by Splunk Inc.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Datadog.Trace.Agent;
+using Datadog.Trace.SignalFx.Metrics;
 
 namespace Datadog.Trace.Configuration
 {
@@ -38,6 +41,7 @@ namespace Datadog.Trace.Configuration
             TracesPipeName = settings.TracesPipeName;
             TracesPipeTimeoutMs = settings.TracesPipeTimeoutMs;
 
+            MetricsExporter = settings.MetricsExporter;
             MetricsEndpointUrl = settings.MetricsEndpointUrl;
             LogsEndpointUrl = settings.LogsEndpointUrl;
             MetricsTransport = settings.MetricsTransport;
@@ -46,6 +50,7 @@ namespace Datadog.Trace.Configuration
 
             PartialFlushEnabled = settings.PartialFlushEnabled;
             PartialFlushMinSpans = settings.PartialFlushMinSpans;
+            ValidationWarnings = settings.ValidationWarnings.ToList();
 
             SyncExport = settings.SyncExport;
         }
@@ -122,5 +127,12 @@ namespace Datadog.Trace.Configuration
         /// Gets the transport used to connect to the DogStatsD.
         /// </summary>
         internal Vendors.StatsdClient.Transport.TransportType MetricsTransport { get; }
+
+        /// <summary>
+        /// Gets the type of metrics exporter.
+        /// </summary>
+        internal MetricsExporterType MetricsExporter { get; }
+
+        internal List<string> ValidationWarnings { get; }
     }
 }
