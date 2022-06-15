@@ -550,7 +550,7 @@ std::string GetNativeLoaderFilePath()
 {
     auto native_loader_filename =
 #ifdef LINUX
-        "Datadog.Trace.ClrProfiler.Native.so";
+        "SignalFx.Tracing.ClrProfiler.Native.so";
 #elif MACOS
         "Datadog.AutoInstrumentation.NativeLoader.dylib";
 #else

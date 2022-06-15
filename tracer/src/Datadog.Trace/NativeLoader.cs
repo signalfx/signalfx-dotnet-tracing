@@ -18,8 +18,8 @@ namespace Datadog.Trace
         {
             get
             {
-                var fd = FrameworkDescription.Instance;
-                return fd.ProcessArchitecture != ProcessArchitecture.Arm && fd.ProcessArchitecture != ProcessArchitecture.Arm64;
+                // Splunk: We do not support Datadog.Profiler.Native nor Datadog.AutoInstrumentation.NativeLoader
+                return false;
             }
         }
 
