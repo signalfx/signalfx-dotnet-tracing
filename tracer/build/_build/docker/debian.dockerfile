@@ -37,6 +37,7 @@ RUN apt-get update \
         autoconf=2.69-11 \
         libtool=2.4.6-9 \
         liblzma-dev=5.2.4-1+deb10u1 \
+        gdb=8.2.1-2+b3 \
     && gem install --no-document fpm --version 1.14.1 \
     && rm -rf /var/lib/apt/lists/*
 
