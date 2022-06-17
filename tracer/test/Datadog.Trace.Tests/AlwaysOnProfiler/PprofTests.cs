@@ -23,8 +23,8 @@ namespace Datadog.Trace.Tests.AlwaysOnProfiler
             var profile = pprof.ProfileBuilder.Build();
 
             locationId1.Should().Be(1);
-            locationId2.Should().Be(1);
-            locationId3.Should().Be(2);
+            locationId2.Should().Be(2);
+            locationId3.Should().Be(3);
             profile.StringTables.Should().HaveCount(4);
             profile.StringTables.Should().ContainInOrder(new List<string> { string.Empty, "unknown", "A()", "B()" });
         }
