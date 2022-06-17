@@ -71,7 +71,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
         protected abstract string CreateBody(ThreadSample threadSample);
 
-        protected void SendLogsData()
+        private void SendLogsData()
         {
             HttpWebRequest httpWebRequest;
 
@@ -115,7 +115,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
             }
         }
 
-        protected LogRecord CreateLogRecord(string body, ulong timeUnixNanoseconds)
+        private LogRecord CreateLogRecord(string body, ulong timeUnixNanoseconds)
         {
             return new LogRecord
             {
