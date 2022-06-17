@@ -16,11 +16,11 @@ namespace Datadog.Trace.Tests.AlwaysOnProfiler
         public void GetLocationId()
         {
             var pprof = new Pprof();
-            var locationId1 = pprof.GetLocationId("unknown", "A()", 0);
-            var locationId2 = pprof.GetLocationId("unknown", "A()", 0);
-            var locationId3 = pprof.GetLocationId("unknown", "B()", 0);
+            var locationId1 = pprof.GetLocationId("A()");
+            var locationId2 = pprof.GetLocationId("A()");
+            var locationId3 = pprof.GetLocationId("B()");
 
-            var profile = pprof.ProfileBuilder.Build();
+            var profile = pprof.Profile;
 
             locationId1.Should().Be(1);
             locationId2.Should().Be(2);
@@ -40,7 +40,7 @@ namespace Datadog.Trace.Tests.AlwaysOnProfiler
             _pprof.AddLabel(sampleBuilder, "string", "value");
 
             var sample = sampleBuilder.Build();
-            var profile = _pprof.ProfileBuilder.Build();
+            var profile = _pprof.Profile;
 
             sample.Labels.Should().HaveCount(4);
             sample.Labels.Should().Contain(pair => pair.Key == 1 && pair.Num == 100L);
@@ -58,7 +58,7 @@ namespace Datadog.Trace.Tests.AlwaysOnProfiler
             var id2 = _pprof.GetStringId("Second string");
             var id3 = _pprof.GetStringId("New string");
 
-            var profile = _pprof.ProfileBuilder.Build();
+            var profile = _pprof.Profile;
 
             id1.Should().Be(1);
             id2.Should().Be(2);

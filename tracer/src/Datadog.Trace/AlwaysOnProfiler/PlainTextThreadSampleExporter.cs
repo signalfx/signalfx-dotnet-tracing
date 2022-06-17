@@ -1,11 +1,8 @@
 // Modified by Splunk Inc.
 
-using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using Datadog.Trace.Configuration;
-using Datadog.Trace.ExtensionMethods;
 
 namespace Datadog.Trace.AlwaysOnProfiler
 {
@@ -16,37 +13,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
         {
         }
 
-        public override void ExportThreadSamples(List<ThreadSample> threadSamples)
-        {
-            if (threadSamples == null || threadSamples.Count < 1)
-            {
-                return;
-            }
-
-            // The same _logsData instance is used on all export messages. With the exception of the list of
-            // LogRecords, the Logs property, all other fields are prepopulated. At this point the code just`
-            // need to create a LogRecord for each thread sample and add it to the Logs list.
-            var logRecords = LogsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs;
-
-            for (var i = 0; i < threadSamples.Count; i++)
-            {
-                var threadSample = threadSamples[i];
-                var logRecord = CreateLogRecord(GetPlainTextStackTrace(threadSample), threadSample.Timestamp.Nanoseconds);
-
-                if (threadSample.SpanId != 0 || threadSample.TraceIdHigh != 0 || threadSample.TraceIdLow != 0)
-                {
-                    // TODO Splunk: Add tests and validate.
-                    logRecord.SpanId = BitConverter.GetBytes(threadSample.SpanId);
-                    logRecord.TraceId = BitConverter.GetBytes(threadSample.TraceIdHigh).Concat(BitConverter.GetBytes(threadSample.TraceIdLow));
-                }
-
-                logRecords.Add(logRecord);
-            }
-
-            SendLogsData();
-        }
-
-        private static string GetPlainTextStackTrace(ThreadSample threadSample)
+        protected override string CreateBody(ThreadSample threadSample)
         {
             // The stack follows the experimental GDI conventions described at
             // https://github.com/signalfx/gdi-specification/blob/29cbcbc969531d50ccfd0b6a4198bb8a89cedebb/specification/semantic_conventions.md#logrecord-message-fields

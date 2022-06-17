@@ -15,17 +15,17 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
         public Pprof()
         {
-            ProfileBuilder = new ProfileBuilder();
-            _stringTable = new StringTable(ProfileBuilder);
-            _functionTable = new FunctionTable(ProfileBuilder, _stringTable);
-            _locationTable = new LocationTable(ProfileBuilder, _functionTable);
+            Profile = new Profile();
+            _stringTable = new StringTable(Profile);
+            _functionTable = new FunctionTable(Profile, _stringTable);
+            _locationTable = new LocationTable(Profile, _functionTable);
         }
 
-        public ProfileBuilder ProfileBuilder { get; }
+        public Profile Profile { get; }
 
         public long GetStringId(string str) => _stringTable.Get(str);
 
-        public ulong GetLocationId(string file, string function, long line) => _locationTable.Get(file, function, line);
+        public ulong GetLocationId(string function) => _locationTable.Get(function);
 
         public void AddLabel(SampleBuilder sample, string name, string value)
         {
@@ -34,36 +34,35 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 return;
             }
 
-            AddLabel(sample, name, label => label.SetStr(_stringTable.Get(value)));
+            AddLabel(sample, name, label => label.Str = _stringTable.Get(value));
         }
 
-        public void AddLabel(SampleBuilder sample, string key, bool value)
+        public void AddLabel(SampleBuilder sampleBuilder, string key, bool value)
         {
-            AddLabel(sample, key, value.ToString());
+            AddLabel(sampleBuilder, key, value.ToString());
         }
 
-        public void AddLabel(SampleBuilder sample, string name, long value)
+        public void AddLabel(SampleBuilder sampleBuilder, string name, long value)
         {
-            AddLabel(sample, name, label => label.SetNum(value));
+            AddLabel(sampleBuilder, name, label => label.Num = value);
         }
 
-        private void AddLabel(SampleBuilder sample, string name, Action<LabelBuilder> setLabel)
+        private void AddLabel(SampleBuilder sampleBuilder, string name, Action<Label> setLabel)
         {
-            var labelBuilder = new LabelBuilder();
-            labelBuilder.SetKey(_stringTable.Get(name));
-            setLabel(labelBuilder);
-            sample.AddLabel(labelBuilder.Build());
+            var label = new Label { Key = _stringTable.Get(name) };
+            setLabel(label);
+            sampleBuilder.AddLabel(label);
         }
 
         private class StringTable
         {
-            private readonly ProfileBuilder _profileBuilder;
+            private readonly Profile _profile;
             private readonly Dictionary<string, long> _table = new();
             private long _index;
 
-            public StringTable(ProfileBuilder profileBuilder)
+            public StringTable(Profile profile)
             {
-                _profileBuilder = profileBuilder;
+                _profile = profile;
                 Get(string.Empty); // 0 is reserved for the empty string
             }
 
@@ -74,124 +73,60 @@ namespace Datadog.Trace.AlwaysOnProfiler
                     return _table[str];
                 }
 
-                _profileBuilder.AddStringTable(str);
+                _profile.StringTables.Add(str);
                 _table[str] = _index;
                 return _index++;
             }
         }
 
-        private class FunctionKey
-        {
-            public FunctionKey(string file, string function)
-            {
-                File = file;
-                Function = function;
-            }
-
-            public string File { get; }
-
-            public string Function { get; }
-
-            public override bool Equals(object obj)
-            {
-                return Equals(obj as FunctionKey);
-            }
-
-            public bool Equals(FunctionKey other)
-            {
-                return other != null &&
-                       File == other.File &&
-                       Function == other.Function;
-            }
-
-            public override int GetHashCode()
-            {
-                return HashCode.Combine(File, Function);
-            }
-        }
-
         private class FunctionTable
         {
-            private readonly ProfileBuilder _profileBuilder;
+            private readonly Profile _profile;
             private readonly StringTable _stringTable;
-            private readonly Dictionary<FunctionKey, ulong> _table = new();
+            private readonly Dictionary<string, ulong> _table = new();
             private ulong _index = 1; // 0 is reserved
 
-            public FunctionTable(ProfileBuilder profile, StringTable stringTable)
+            public FunctionTable(Profile profile, StringTable stringTable)
             {
-                _profileBuilder = profile;
+                _profile = profile;
                 _stringTable = stringTable;
             }
 
-            public ulong Get(FunctionKey functionKey)
+            public ulong Get(string functionName)
             {
-                if (_table.ContainsKey(functionKey))
+                if (_table.ContainsKey(functionName))
                 {
-                    return _table[functionKey];
+                    return _table[functionName];
                 }
 
-                var function = new Function { Id = _index, Filename = _stringTable.Get(functionKey.File), Name = _stringTable.Get(functionKey.Function) };
+                var function = new Function { Id = _index, Filename = _stringTable.Get("unknown"), Name = _stringTable.Get(functionName) }; // for now we don't support file name
 
-                _profileBuilder.AddFunction(function);
-                _table[functionKey] = _index;
+                _profile.Functions.Add(function);
+                _table[functionName] = _index;
                 return _index++;
-            }
-        }
-
-        private class LocationKey
-        {
-            private readonly long _line;
-
-            public LocationKey(FunctionKey functionKey, long line)
-            {
-                FunctionKey = functionKey;
-                _line = line;
-            }
-
-            public FunctionKey FunctionKey { get; }
-
-            public override bool Equals(object obj)
-            {
-                return Equals(obj as LocationKey);
-            }
-
-            public bool Equals(LocationKey other)
-            {
-                return other != null &&
-                       FunctionKey.Equals(other.FunctionKey) &&
-                       _line == other._line;
-            }
-
-            public override int GetHashCode()
-            {
-                return HashCode.Combine(FunctionKey, _line);
             }
         }
 
         private class LocationTable
         {
-            private readonly ProfileBuilder _profileBuilder;
+            private readonly Profile _profile;
             private readonly FunctionTable _functionTable;
-            private readonly Dictionary<LocationKey, ulong> _table = new();
             private ulong _index = 1; // 0 is reserved
 
-            public LocationTable(Builder.ProfileBuilder profileBuilder, FunctionTable functionTable)
+            public LocationTable(Profile profile, FunctionTable functionTable)
             {
-                _profileBuilder = profileBuilder;
+                _profile = profile;
                 _functionTable = functionTable;
             }
 
-            public ulong Get(string file, string function, long line)
+            public ulong Get(string function)
             {
-                var functionKey = new FunctionKey(file, function);
-                var locationKey = new LocationKey(functionKey, line);
+                var functionKey = function;
 
-                var location = new LocationBuilder { Id = _index }
-                              .AddLine(new Line { FunctionId = _functionTable.Get(functionKey), line = line })
-                              .Build();
+                var location = new Location { Id = _index };
+                location.Lines.Add(new Line { FunctionId = _functionTable.Get(functionKey), line = 0 }); // for now we don't support line number
 
-                _profileBuilder.AddLocation(location);
-                _table[locationKey] = _index;
+                _profile.Locations.Add(location);
                 return _index++;
             }
         }
