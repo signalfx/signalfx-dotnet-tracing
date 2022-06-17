@@ -51,7 +51,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 await DumpLogRecords(logsData);
 
                 var containStackTraceForClassHierarchy = false;
-                var expectedStackTrace = string.Join("\n", CreateExpectedStackTrace().Distinct());
+                var expectedStackTrace = string.Join("\n", CreateExpectedStackTrace());
 
                 foreach (var data in logsData)
                 {
@@ -84,8 +84,13 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
         private static bool ContainStackTraceForClassHierarchy(Profile profile, string expectedStackTrace)
         {
-            var functions = profile.Functions.Select(function => profile.StringTables[(int)function.Name]);
-            var stackTrace = string.Join("\n", functions);
+            var frames = profile.Locations
+                                .SelectMany(location => location.Lines)
+                                .Select(line => line.FunctionId)
+                                .Select(functionId => profile.Functions[(int)functionId - 1])
+                                .Select(function => profile.StringTables[(int)function.Name]);
+
+            var stackTrace = string.Join("\n", frames);
             return stackTrace.Contains(expectedStackTrace);
         }
     }

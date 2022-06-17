@@ -186,11 +186,6 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 var functionKey = new FunctionKey(file, function);
                 var locationKey = new LocationKey(functionKey, line);
 
-                if (_table.ContainsKey(locationKey))
-                {
-                    return _table[locationKey];
-                }
-
                 var location = new LocationBuilder { Id = _index }
                               .AddLine(new Line { FunctionId = _functionTable.Get(functionKey), line = line })
                               .Build();
