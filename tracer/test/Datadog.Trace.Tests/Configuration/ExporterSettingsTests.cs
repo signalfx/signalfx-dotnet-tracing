@@ -296,7 +296,7 @@ public class ExporterSettingsTests
     public void InvalidPartialFlushMinSpans()
     {
         var param = -200;
-        var settingsFromSource = Setup($"DD_TRACE_PARTIAL_FLUSH_MIN_SPANS-{param}");
+        var settingsFromSource = Setup($"SIGNALFX_TRACE_PARTIAL_FLUSH_MIN_SPANS-{param}");
         settingsFromSource.PartialFlushMinSpans.Should().Be(500);
         Assert.Throws<ArgumentException>(() => new ExporterSettings() { PartialFlushMinSpans = param });
     }

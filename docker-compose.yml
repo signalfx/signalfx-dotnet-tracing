@@ -482,12 +482,35 @@ services:
     environment:
       - SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN:-1}
 
+  ProfilerIntegrationTests:
+    build:
+      context: ./tracer/build/_build/
+      dockerfile: docker/${baseImage:-debian}.dockerfile
+      args:
+        - DOTNETSDK_VERSION=${dotnetCoreSdkLatestVersion:-6.0.301}
+    image: dd-trace-dotnet/${baseImage:-debian}-tester
+    command: dotnet /build/bin/Debug/_build.dll RunProfilerLinuxIntegrationTests
+    volumes:
+      - ./:/project
+    cap_add:
+      - SYS_PTRACE
+    environment:
+      - NugetPackageDirectory=/project/${relativeNugetPackageDirectory:-packages}
+      - tracerHome=/project/${relativeTracerHome:-shared/bin/monitoring-home/tracer}
+      - profilerHome=/project/${relativeTracerHome:-shared/bin/monitoring-home/continuousprofiler}
+      - artifacts=/project/${relativeArtifacts:-tracer/src/bin/artifacts}
+      - framework=${framework:-netcoreapp3.1}
+      - baseImage=${baseImage:-default}
+      - SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN:-1}
+      - IncludeMinorPackageVersions=${IncludeMinorPackageVersions:-false}
+    hostname: integrationtests
+
   IntegrationTests:
     build:
       context: ./tracer/build/_build/
       dockerfile: docker/${baseImage:-debian}.dockerfile
       args:
-        - DOTNETSDK_VERSION=${dotnetCoreSdkLatestVersion:-6.0.200}
+        - DOTNETSDK_VERSION=${dotnetCoreSdkLatestVersion:-6.0.301}
     image: dd-trace-dotnet/${baseImage:-debian}-tester
     command: dotnet /build/bin/Debug/_build.dll RunLinuxIntegrationTests --framework ${framework:-netcoreapp3.1} --code-coverage
     volumes:
@@ -560,7 +583,7 @@ services:
       context: ./tracer/build/_build/
       dockerfile: docker/${baseImage:-debian}.dockerfile
       args:
-        - DOTNETSDK_VERSION=${dotnetCoreSdkLatestVersion:-6.0.200}
+        - DOTNETSDK_VERSION=${dotnetCoreSdkLatestVersion:-6.0.301}
     image: dd-trace-dotnet/${baseImage:-debian}-tester
     command: dotnet /build/bin/Debug/_build.dll RunExplorationTests --explorationTestUseCase ${explorationTestUseCase:-debugger} --explorationTestName ${explorationTestName:-eshoponweb} --framework ${framework:-netcoreapp3.1} --code-coverage
     volumes:
@@ -617,7 +640,7 @@ services:
       context: ./tracer/build/_build/
       dockerfile: docker/${baseImage:-debian}.dockerfile
       args:
-        - DOTNETSDK_VERSION=${dotnetCoreSdkLatestVersion:-6.0.200}
+        - DOTNETSDK_VERSION=${dotnetCoreSdkLatestVersion:-6.0.301}
     image: dd-trace-dotnet/${baseImage:-debian}-tester
     command: dotnet /build/bin/Debug/_build.dll RunLinuxIntegrationTests --framework ${framework:-netcoreapp3.1}
     volumes:

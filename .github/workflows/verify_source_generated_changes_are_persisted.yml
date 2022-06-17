@@ -6,7 +6,7 @@ on:
 
 jobs:
   verify_source_generators:
-    runs-on: windows-2019
+    runs-on: windows-2022
 
     steps:
       - name: Support longpaths
@@ -17,7 +17,7 @@ jobs:
 
       - uses: actions/setup-dotnet@v2.1.0
         with:
-          dotnet-version: '6.0.200'
+          dotnet-version: '6.0.301'
 
       - name: "Removing existing generated files"
         run: Get-ChildItem –Path ".\tracer\src\Datadog.Trace\Generated" -Recurse -File | Remove-Item

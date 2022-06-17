@@ -41,7 +41,7 @@ on:
 
 env:
   buildConfiguration: Release
-  dotnetSdkVersion: 6.0.200
+  dotnetSdkVersion: 6.0.301
   relativeTracerHome: /shared/bin/monitoring-home/tracer
   relativeArtifacts: /tracer/src/bin/artifacts
   binDir: ${{ github.workspace }}/tracer/src/bin
@@ -62,7 +62,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        machine: [ windows-2019, ubuntu-20.04 ]
+        machine: [ windows-2022, ubuntu-20.04 ]
     runs-on: ${{ matrix.machine }}
     timeout-minutes: 30
     steps:
@@ -71,9 +71,9 @@ jobs:
       with:
         dotnet-version: | 
           2.1.818
-          3.1.416
-          5.0.405
-          6.0.200
+          3.1.420
+          5.0.408
+          6.0.301
     - name: Install CMake 3.19.8
       if: ${{ runner.os == 'Linux' }}
       run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh -o cmakeinstall.sh && chmod +x cmakeinstall.sh && sudo ./cmakeinstall.sh --prefix=/usr/local --exclude-subdir
@@ -126,9 +126,9 @@ jobs:
       with:
         dotnet-version: | 
           2.1.818
-          3.1.416
-          5.0.405
-          6.0.200
+          3.1.420
+          5.0.408
+          6.0.301
     - name: Build Docker image
       run: |
         docker build \
@@ -160,7 +160,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        machine: [ windows-2019, ubuntu-20.04 ]
+        machine: [ windows-2022, ubuntu-20.04 ]
     runs-on: ${{ matrix.machine }}
     timeout-minutes: 30
     steps:
@@ -169,9 +169,9 @@ jobs:
       with:
         dotnet-version: | 
           2.1.818
-          3.1.416
-          5.0.405
-          6.0.200
+          3.1.420
+          5.0.408
+          6.0.301
     - run: ./tracer/build.cmd Clean BuildTracerHome BuildAndRunManagedUnitTests
     - uses: actions/upload-artifact@v3.1.0
       with:
@@ -194,9 +194,9 @@ jobs:
       with:
         dotnet-version: | 
           2.1.818
-          3.1.416
-          5.0.405
-          6.0.200
+          3.1.420
+          5.0.408
+          6.0.301
     - name: Build Docker image
       run: |
         docker build \
@@ -228,7 +228,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        machine: [ windows-2019, ubuntu-20.04 ]
+        machine: [ windows-2022, ubuntu-20.04 ]
     runs-on: ${{ matrix.machine }}
     timeout-minutes: 30
     steps:
@@ -237,9 +237,9 @@ jobs:
       with:
         dotnet-version: | 
           2.1.818
-          3.1.416
-          5.0.405
-          6.0.200
+          3.1.420
+          5.0.408
+          6.0.301
     - name: Install CMake 3.19.8
       if: ${{ runner.os == 'Linux' }}
       run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh -o cmakeinstall.sh && chmod +x cmakeinstall.sh && sudo ./cmakeinstall.sh --prefix=/usr/local --exclude-subdir
@@ -262,9 +262,9 @@ jobs:
       with:
         dotnet-version: | 
           2.1.818
-          3.1.416
-          5.0.405
-          6.0.200
+          3.1.420
+          5.0.408
+          6.0.301
     - name: Build Docker image
       run: |
         docker build \
@@ -296,7 +296,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        machine: [ windows-2019 ]
+        machine: [ windows-2022 ]
         platform: [ x64 ]
         framework: [ net461, netcoreapp3.1, net5.0, net6.0 ]
         target: [ BuildAndRunWindowsIntegrationTests, BuildAndRunWindowsRegressionTests ]
@@ -308,9 +308,9 @@ jobs:
       with:
         dotnet-version: | 
           2.1.818
-          3.1.416
-          5.0.405
-          6.0.200
+          3.1.420
+          5.0.408
+          6.0.301
     # Cosmos is _way_ to flaky at the moment. Try enabling again at a later time
     # - name: Start CosmosDB Emulator
     #   if: ${{ matrix.target == 'BuildAndRunWindowsIntegrationTests' }}
@@ -320,6 +320,26 @@ jobs:
     #     Import-Module "C:/Program Files/Azure Cosmos DB Emulator/PSModules/Microsoft.Azure.CosmosDB.Emulator"
     #     Start-CosmosDbEmulator -Timeout 300
     # Workaround around long name being hit in MultiDomainHostTests.WorksOutsideTheGAC tests
+    - name: install Microsoft.Net.Component.4.6.1.TargetingPack
+      if: ${{ matrix.target == 'BuildAndRunWindowsRegressionTests' }}
+      run: |
+          Set-Location "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
+          $InstallPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise"
+          $componentsToAdd = @(
+            "Microsoft.Net.Component.4.6.1.TargetingPack"
+          )
+          [string]$workloadArgs = $componentsToAdd | ForEach-Object {" --add " +  $_}
+          $Arguments = ('/c', "vs_installer.exe", 'modify', '--installPath', "`"$InstallPath`"",$workloadArgs, '--quiet', '--norestart', '--nocache')
+          $process = Start-Process -FilePath cmd.exe -ArgumentList $Arguments -Wait -PassThru -WindowStyle Hidden
+          if ($process.ExitCode -eq 0)
+          {
+              Write-Host "components have been successfully added"
+          }
+          else
+          {
+              Write-Host "components were not installed"
+              exit 1
+          }
     - name: Subst for shorter path and Run Tests
       run: |
         subst y: .
@@ -347,9 +367,9 @@ jobs:
       with:
         dotnet-version: | 
           2.1.818
-          3.1.416
-          5.0.405
-          6.0.200
+          3.1.420
+          5.0.408
+          6.0.301
     - name: Build Docker image
       run: |
         docker build \
@@ -392,7 +412,7 @@ jobs:
 
   windows-iis-integration-tests:
     name: Windows - IIS integration tests 
-    runs-on: windows-2019
+    runs-on: windows-2022
     strategy:
       matrix:
         platform:
@@ -405,9 +425,28 @@ jobs:
       with:
         dotnet-version: | 
           2.1.818
-          3.1.416
-          5.0.405
-          6.0.200
+          3.1.420
+          5.0.408
+          6.0.301
+    - name: install Microsoft.Net.Component.4.6.1.TargetingPack
+      run: |
+          Set-Location "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
+          $InstallPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise"
+          $componentsToAdd = @(
+            "Microsoft.Net.Component.4.6.1.TargetingPack"
+          )
+          [string]$workloadArgs = $componentsToAdd | ForEach-Object {" --add " +  $_}
+          $Arguments = ('/c', "vs_installer.exe", 'modify', '--installPath', "`"$InstallPath`"",$workloadArgs, '--quiet', '--norestart', '--nocache')
+          $process = Start-Process -FilePath cmd.exe -ArgumentList $Arguments -Wait -PassThru -WindowStyle Hidden
+          if ($process.ExitCode -eq 0)
+          {
+              Write-Host "components have been successfully added"
+          }
+          else
+          {
+              Write-Host "components were not installed"
+              exit 1
+          }
     - name: RunWindowsTracerIisIntegrationTests
       run: ./tracer/build.cmd BuildTracerHome BuildAspNetIntegrationTests RunWindowsTracerIisIntegrationTests -Framework ${{ matrix.framework }}
     - uses: actions/upload-artifact@v3.1.0
@@ -419,7 +458,7 @@ jobs:
 
   windows-msi-integration-tests:
     name: Windows - MSI integration tests
-    runs-on: windows-2019
+    runs-on: windows-2022
     strategy:
       matrix:
         platform:
@@ -432,9 +471,28 @@ jobs:
       with:
         dotnet-version: |
           2.1.818
-          3.1.416
-          5.0.405
-          6.0.200
+          3.1.420
+          5.0.408
+          6.0.301
+    - name: install Microsoft.Net.Component.4.6.1.TargetingPack
+      run: |
+          Set-Location "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
+          $InstallPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise"
+          $componentsToAdd = @(
+            "Microsoft.Net.Component.4.6.1.TargetingPack"
+          )
+          [string]$workloadArgs = $componentsToAdd | ForEach-Object {" --add " +  $_}
+          $Arguments = ('/c', "vs_installer.exe", 'modify', '--installPath', "`"$InstallPath`"",$workloadArgs, '--quiet', '--norestart', '--nocache')
+          $process = Start-Process -FilePath cmd.exe -ArgumentList $Arguments -Wait -PassThru -WindowStyle Hidden
+          if ($process.ExitCode -eq 0)
+          {
+              Write-Host "components have been successfully added"
+          }
+          else
+          {
+              Write-Host "components were not installed"
+              exit 1
+          }
     - run: ./tracer/build.cmd BuildTracerHome PackageTracerHome BuildAspNetIntegrationTests -Framework ${{ matrix.framework }}
     - run: docker-compose up -d IntegrationTests.IIS
     - name: RunWindowsMsiIntegrationTests

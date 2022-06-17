@@ -37,6 +37,7 @@ RUN apt-get update \
         autoconf=2.69-11 \
         libtool=2.4.6-9 \
         liblzma-dev=5.2.4-1+deb10u1 \
+        gdb=8.2.1-2+b3 \
     && gem install --no-document fpm --version 1.14.1 \
     && rm -rf /var/lib/apt/lists/*
 
@@ -78,8 +79,8 @@ RUN if [ "$(uname -m)" = "x86_64" ]; \
     && chmod +x ./dotnet-install.sh \
     && ./dotnet-install.sh --runtime $NETCORERUNTIME2_1 --version 2.1.30 --install-dir /usr/share/dotnet --no-path \
     && ./dotnet-install.sh --runtime aspnetcore --version 3.0.3 --install-dir /usr/share/dotnet --no-path \
-    && ./dotnet-install.sh --runtime aspnetcore --version 3.1.23 --install-dir /usr/share/dotnet --no-path \
-    && ./dotnet-install.sh --runtime aspnetcore --version 5.0.15 --install-dir /usr/share/dotnet --no-path \
+    && ./dotnet-install.sh --runtime aspnetcore --version 3.1.26 --install-dir /usr/share/dotnet --no-path \
+    && ./dotnet-install.sh --runtime aspnetcore --version 5.0.17 --install-dir /usr/share/dotnet --no-path \
     && rm dotnet-install.sh
 
 
