@@ -20,6 +20,8 @@ RUN apk update \
         libtool \
         automake \
         xz-dev \
+        gdb \
+        musl-dbg \
     && gem install --no-document fpm --version 1.14.1
 
 ENV IsAlpine=true
