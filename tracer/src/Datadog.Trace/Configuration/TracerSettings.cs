@@ -10,6 +10,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Datadog.Trace.AlwaysOnProfiler;
 using Datadog.Trace.Configuration.Helpers;
 using Datadog.Trace.Configuration.Types;
 using Datadog.Trace.ExtensionMethods;

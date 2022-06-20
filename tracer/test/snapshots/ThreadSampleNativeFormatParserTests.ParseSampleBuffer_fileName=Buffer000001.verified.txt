@@ -1,397 +1,446 @@
 ﻿[
   {
-    Timestamp: 1649268034960000000,
-    StackTrace:
-"" #0 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0x1 nid=0xaf84
-
-	at System.Threading.Monitor.Wait(System.Object, System.Int32)
-	at System.Threading.ManualResetEventSlim.Wait(System.Int32, System.Threading.CancellationToken)
-	at System.Threading.Tasks.Task.SpinThenBlockingWait(System.Int32, System.Threading.CancellationToken)
-	at System.Threading.Tasks.Task.InternalWaitCore(System.Int32, System.Threading.CancellationToken)
-	at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(System.Threading.Tasks.Task)
-	at System.Runtime.CompilerServices.TaskAwaiter.GetResult()
-	at Samples.AlwaysOnProfiler.Performance.Sample.<Main>(System.String[])
-	at Unknown_Native_Function(unknown)
-
+    Timestamp: {
+      Nanoseconds: 1649268034960000000,
+      Milliseconds: 1649268034960
+    },
+    ManagedId: Id_1,
+    NativeId: Id_2,
+    ThreadName: ,
+    Frames: [
+      System.Threading.Monitor.Wait(System.Object, System.Int32),
+      System.Threading.ManualResetEventSlim.Wait(System.Int32, System.Threading.CancellationToken),
+      System.Threading.Tasks.Task.SpinThenBlockingWait(System.Int32, System.Threading.CancellationToken),
+      System.Threading.Tasks.Task.InternalWaitCore(System.Int32, System.Threading.CancellationToken),
+      System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(System.Threading.Tasks.Task),
+      System.Runtime.CompilerServices.TaskAwaiter.GetResult(),
+      Samples.AlwaysOnProfiler.Performance.Sample.<Main>(System.String[]),
+      Unknown_Native_Function(unknown)
+    ]
   },
   {
-    Timestamp: 1649268034960000000,
-    StackTrace:
-".NET ThreadPool Worker" #3 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0x4 nid=0xb55c
-
-	at System.Net.Sockets.SocketPal.Connect(System.Net.Sockets.SafeSocketHandle, System.Byte[], System.Int32)
-	at System.Net.Sockets.Socket.DoConnect(System.Net.EndPoint, System.Net.Internals.SocketAddress)
-	at System.Net.Sockets.Socket.Connect(System.Net.EndPoint)
-	at System.Net.Sockets.Socket.Connect(System.Net.IPAddress[], System.Int32)
-	at System.Net.Sockets.Socket.Connect(System.String, System.Int32)
-	at System.Net.Sockets.Socket.Connect(System.Net.EndPoint)
-	at System.Net.HttpWebRequest.<>c__DisplayClass216_0.<<CreateHttpClient>b__1>d.MoveNext()
-	at System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine&)
-	at System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder`1.Start[TStateMachine](TStateMachine&)
-	at System.Net.HttpWebRequest.<>c__DisplayClass216_0.<CreateHttpClient>b__1(System.Net.Http.SocketsHttpConnectionContext, System.Threading.CancellationToken)
-	at System.Net.Http.HttpConnectionPool.<ConnectToTcpHostAsync>d__97.MoveNext()
-	at System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine&)
-	at System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder`1.Start[TStateMachine](TStateMachine&)
-	at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(System.String, System.Int32, System.Net.Http.HttpRequestMessage, System.Boolean, System.Threading.CancellationToken)
-	at System.Net.Http.HttpConnectionPool.<ConnectAsync>d__96.MoveNext()
-	at System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine&)
-	at System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder`1.Start[TStateMachine](TStateMachine&)
-	at System.Net.Http.HttpConnectionPool.ConnectAsync(System.Net.Http.HttpRequestMessage, System.Boolean, System.Threading.CancellationToken)
-	at System.Net.Http.HttpConnectionPool.<CreateHttp11ConnectionAsync>d__98.MoveNext()
-	at System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine&)
-	at System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder`1.Start[TStateMachine](TStateMachine&)
-	at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(System.Net.Http.HttpRequestMessage, System.Boolean, System.Threading.CancellationToken)
-	at System.Net.Http.HttpConnectionPool.<AddHttp11ConnectionAsync>d__73.MoveNext()
-	at System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine&)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder.Start[TStateMachine](TStateMachine&)
-	at System.Net.Http.HttpConnectionPool.AddHttp11ConnectionAsync(System.Net.Http.HttpRequestMessage)
-	at System.Net.Http.HttpConnectionPool.<>c__DisplayClass74_0.<CheckForHttp11ConnectionInjection>b__0()
-	at System.Threading.Tasks.Task`1.InnerInvoke()
-	at System.Threading.Tasks.Task.<>c.<.cctor>b__272_0(System.Object)
-	at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(System.Threading.Thread, System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object)
-	at System.Threading.Tasks.Task.ExecuteWithThreadLocal(System.Threading.Tasks.Task&, System.Threading.Thread)
-	at System.Threading.Tasks.Task.ExecuteEntryUnsafe(System.Threading.Thread)
-	at System.Threading.Tasks.Task.ExecuteFromThreadPool(System.Threading.Thread)
-	at System.Threading.ThreadPoolWorkQueue.Dispatch()
-	at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
-	at System.Threading.Thread.StartCallback()
-	at Unknown_Native_Function(unknown)
-
+    Timestamp: {
+      Nanoseconds: 1649268034960000000,
+      Milliseconds: 1649268034960
+    },
+    ManagedId: Id_3,
+    NativeId: Id_4,
+    ThreadName: .NET ThreadPool Worker,
+    ThreadIndex: 3,
+    Frames: [
+      System.Net.Sockets.SocketPal.Connect(System.Net.Sockets.SafeSocketHandle, System.Byte[], System.Int32),
+      System.Net.Sockets.Socket.DoConnect(System.Net.EndPoint, System.Net.Internals.SocketAddress),
+      System.Net.Sockets.Socket.Connect(System.Net.EndPoint),
+      System.Net.Sockets.Socket.Connect(System.Net.IPAddress[], System.Int32),
+      System.Net.Sockets.Socket.Connect(System.String, System.Int32),
+      System.Net.Sockets.Socket.Connect(System.Net.EndPoint),
+      System.Net.HttpWebRequest.<>c__DisplayClass216_0.<<CreateHttpClient>b__1>d.MoveNext(),
+      System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine&),
+      System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder`1.Start[TStateMachine](TStateMachine&),
+      System.Net.HttpWebRequest.<>c__DisplayClass216_0.<CreateHttpClient>b__1(System.Net.Http.SocketsHttpConnectionContext, System.Threading.CancellationToken),
+      System.Net.Http.HttpConnectionPool.<ConnectToTcpHostAsync>d__97.MoveNext(),
+      System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine&),
+      System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder`1.Start[TStateMachine](TStateMachine&),
+      System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(System.String, System.Int32, System.Net.Http.HttpRequestMessage, System.Boolean, System.Threading.CancellationToken),
+      System.Net.Http.HttpConnectionPool.<ConnectAsync>d__96.MoveNext(),
+      System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine&),
+      System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder`1.Start[TStateMachine](TStateMachine&),
+      System.Net.Http.HttpConnectionPool.ConnectAsync(System.Net.Http.HttpRequestMessage, System.Boolean, System.Threading.CancellationToken),
+      System.Net.Http.HttpConnectionPool.<CreateHttp11ConnectionAsync>d__98.MoveNext(),
+      System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine&),
+      System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder`1.Start[TStateMachine](TStateMachine&),
+      System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(System.Net.Http.HttpRequestMessage, System.Boolean, System.Threading.CancellationToken),
+      System.Net.Http.HttpConnectionPool.<AddHttp11ConnectionAsync>d__73.MoveNext(),
+      System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine&),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder.Start[TStateMachine](TStateMachine&),
+      System.Net.Http.HttpConnectionPool.AddHttp11ConnectionAsync(System.Net.Http.HttpRequestMessage),
+      System.Net.Http.HttpConnectionPool.<>c__DisplayClass74_0.<CheckForHttp11ConnectionInjection>b__0(),
+      System.Threading.Tasks.Task`1.InnerInvoke(),
+      System.Threading.Tasks.Task.<>c.<.cctor>b__272_0(System.Object),
+      System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(System.Threading.Thread, System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object),
+      System.Threading.Tasks.Task.ExecuteWithThreadLocal(System.Threading.Tasks.Task&, System.Threading.Thread),
+      System.Threading.Tasks.Task.ExecuteEntryUnsafe(System.Threading.Thread),
+      System.Threading.Tasks.Task.ExecuteFromThreadPool(System.Threading.Thread),
+      System.Threading.ThreadPoolWorkQueue.Dispatch(),
+      System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart(),
+      System.Threading.Thread.StartCallback(),
+      Unknown_Native_Function(unknown)
+    ]
   },
   {
-    Timestamp: 1649268034960000000,
-    StackTrace:
-".NET ThreadPool Gate" #4 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x3604
-
-	at System.Threading.WaitHandle.WaitOneNoCheck(System.Int32)
-	at System.Threading.WaitHandle.WaitOne(System.Int32)
-	at System.Threading.PortableThreadPool.GateThread.GateThreadStart()
-	at System.Threading.Thread.StartCallback()
-	at Unknown_Native_Function(unknown)
-
+    Timestamp: {
+      Nanoseconds: 1649268034960000000,
+      Milliseconds: 1649268034960
+    },
+    ManagedId: Id_5,
+    NativeId: Id_6,
+    ThreadName: .NET ThreadPool Gate,
+    ThreadIndex: 4,
+    Frames: [
+      System.Threading.WaitHandle.WaitOneNoCheck(System.Int32),
+      System.Threading.WaitHandle.WaitOne(System.Int32),
+      System.Threading.PortableThreadPool.GateThread.GateThreadStart(),
+      System.Threading.Thread.StartCallback(),
+      Unknown_Native_Function(unknown)
+    ]
   },
   {
-    Timestamp: 1649268034960000000,
-    StackTrace:
-".NET ThreadPool Worker" #5 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x3a34
-
-	at Interop.Kernel32.GetQueuedCompletionStatus(System.IntPtr, System.Int32&, System.UIntPtr&, System.IntPtr&, System.Int32)
-	at System.Threading.LowLevelLifoSemaphore.WaitForSignal(System.Int32)
-	at System.Threading.LowLevelLifoSemaphore.Wait(System.Int32, System.Boolean)
-	at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
-	at System.Threading.Thread.StartCallback()
-	at Unknown_Native_Function(unknown)
-
+    Timestamp: {
+      Nanoseconds: 1649268034960000000,
+      Milliseconds: 1649268034960
+    },
+    ManagedId: Id_5,
+    NativeId: Id_7,
+    ThreadName: .NET ThreadPool Worker,
+    ThreadIndex: 5,
+    Frames: [
+      Interop.Kernel32.GetQueuedCompletionStatus(System.IntPtr, System.Int32&, System.UIntPtr&, System.IntPtr&, System.Int32),
+      System.Threading.LowLevelLifoSemaphore.WaitForSignal(System.Int32),
+      System.Threading.LowLevelLifoSemaphore.Wait(System.Int32, System.Boolean),
+      System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart(),
+      System.Threading.Thread.StartCallback(),
+      Unknown_Native_Function(unknown)
+    ]
   },
   {
-    Timestamp: 1649268034960000000,
-    StackTrace:
-".NET ThreadPool Worker" #7 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0xc47c
-
-	at System.Threading.Monitor.Wait(System.Object, System.Int32)
-	at System.Threading.ManualResetEventSlim.Wait(System.Int32, System.Threading.CancellationToken)
-	at System.Threading.Tasks.Task.SpinThenBlockingWait(System.Int32, System.Threading.CancellationToken)
-	at System.Threading.Tasks.Task.InternalWaitCore(System.Int32, System.Threading.CancellationToken)
-	at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(System.Threading.Tasks.Task)
-	at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
-	at System.IO.Pipes.PipeStream.Read(System.Byte[], System.Int32, System.Int32)
-	at System.IO.Stream.Read(System.Span`1[System.Byte])
-	at System.IO.Pipes.PipeStream.Read(System.Span`1[System.Byte])
-	at System.IO.Pipes.PipeStream.ReadByte()
-	at System.IO.BinaryReader.ReadByte()
-	at Microsoft.Extensions.HotReload.UpdatePayload.<ReadAsync>d__14.MoveNext()
-	at System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine&)
-	at StartupHook.<ReceiveDeltas>d__4.MoveNext()
-	at System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine&)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder.Start[TStateMachine](TStateMachine&)
-	at StartupHook.ReceiveDeltas(Microsoft.Extensions.HotReload.HotReloadAgent, System.IO.Pipes.NamedPipeClientStream)
-	at StartupHook.<>c__DisplayClass1_0.<<Initialize>b__0>d.MoveNext()
-	at System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine&)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder.Start[TStateMachine](TStateMachine&)
-	at StartupHook.<>c__DisplayClass1_0.<Initialize>b__0()
-	at System.Threading.Tasks.Task`1.InnerInvoke()
-	at System.Threading.Tasks.Task.<>c.<.cctor>b__272_0(System.Object)
-	at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(System.Threading.Thread, System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object)
-	at System.Threading.Tasks.Task.ExecuteWithThreadLocal(System.Threading.Tasks.Task&, System.Threading.Thread)
-	at System.Threading.Tasks.Task.ExecuteEntryUnsafe(System.Threading.Thread)
-	at System.Threading.Tasks.Task.ExecuteFromThreadPool(System.Threading.Thread)
-	at System.Threading.ThreadPoolWorkQueue.Dispatch()
-	at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
-	at System.Threading.Thread.StartCallback()
-	at Unknown_Native_Function(unknown)
-
+    Timestamp: {
+      Nanoseconds: 1649268034960000000,
+      Milliseconds: 1649268034960
+    },
+    ManagedId: Id_5,
+    NativeId: Id_8,
+    ThreadName: .NET ThreadPool Worker,
+    ThreadIndex: 7,
+    Frames: [
+      System.Threading.Monitor.Wait(System.Object, System.Int32),
+      System.Threading.ManualResetEventSlim.Wait(System.Int32, System.Threading.CancellationToken),
+      System.Threading.Tasks.Task.SpinThenBlockingWait(System.Int32, System.Threading.CancellationToken),
+      System.Threading.Tasks.Task.InternalWaitCore(System.Int32, System.Threading.CancellationToken),
+      System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(System.Threading.Tasks.Task),
+      System.Runtime.CompilerServices.TaskAwaiter`1.GetResult(),
+      System.IO.Pipes.PipeStream.Read(System.Byte[], System.Int32, System.Int32),
+      System.IO.Stream.Read(System.Span`1[System.Byte]),
+      System.IO.Pipes.PipeStream.Read(System.Span`1[System.Byte]),
+      System.IO.Pipes.PipeStream.ReadByte(),
+      System.IO.BinaryReader.ReadByte(),
+      Microsoft.Extensions.HotReload.UpdatePayload.<ReadAsync>d__14.MoveNext(),
+      System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine&),
+      StartupHook.<ReceiveDeltas>d__4.MoveNext(),
+      System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine&),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder.Start[TStateMachine](TStateMachine&),
+      StartupHook.ReceiveDeltas(Microsoft.Extensions.HotReload.HotReloadAgent, System.IO.Pipes.NamedPipeClientStream),
+      StartupHook.<>c__DisplayClass1_0.<<Initialize>b__0>d.MoveNext(),
+      System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine&),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder.Start[TStateMachine](TStateMachine&),
+      StartupHook.<>c__DisplayClass1_0.<Initialize>b__0(),
+      System.Threading.Tasks.Task`1.InnerInvoke(),
+      System.Threading.Tasks.Task.<>c.<.cctor>b__272_0(System.Object),
+      System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(System.Threading.Thread, System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object),
+      System.Threading.Tasks.Task.ExecuteWithThreadLocal(System.Threading.Tasks.Task&, System.Threading.Thread),
+      System.Threading.Tasks.Task.ExecuteEntryUnsafe(System.Threading.Thread),
+      System.Threading.Tasks.Task.ExecuteFromThreadPool(System.Threading.Thread),
+      System.Threading.ThreadPoolWorkQueue.Dispatch(),
+      System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart(),
+      System.Threading.Thread.StartCallback(),
+      Unknown_Native_Function(unknown)
+    ]
   },
   {
-    Timestamp: 1649268034960000000,
-    StackTrace:
-".NET ThreadPool Worker" #8 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x8c78
-
-	at Interop.Kernel32.GetQueuedCompletionStatus(System.IntPtr, System.Int32&, System.UIntPtr&, System.IntPtr&, System.Int32)
-	at System.Threading.LowLevelLifoSemaphore.WaitForSignal(System.Int32)
-	at System.Threading.LowLevelLifoSemaphore.Wait(System.Int32, System.Boolean)
-	at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
-	at System.Threading.Thread.StartCallback()
-	at Unknown_Native_Function(unknown)
-
+    Timestamp: {
+      Nanoseconds: 1649268034960000000,
+      Milliseconds: 1649268034960
+    },
+    ManagedId: Id_5,
+    NativeId: Id_9,
+    ThreadName: .NET ThreadPool Worker,
+    ThreadIndex: 8,
+    Frames: [
+      Interop.Kernel32.GetQueuedCompletionStatus(System.IntPtr, System.Int32&, System.UIntPtr&, System.IntPtr&, System.Int32),
+      System.Threading.LowLevelLifoSemaphore.WaitForSignal(System.Int32),
+      System.Threading.LowLevelLifoSemaphore.Wait(System.Int32, System.Boolean),
+      System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart(),
+      System.Threading.Thread.StartCallback(),
+      Unknown_Native_Function(unknown)
+    ]
   },
   {
-    Timestamp: 1649268034960000000,
-    StackTrace:
-".NET ThreadPool Worker" #9 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xa nid=0x9b8c
-
-	at Interop.Kernel32.GetQueuedCompletionStatus(System.IntPtr, System.Int32&, System.UIntPtr&, System.IntPtr&, System.Int32)
-	at System.Threading.LowLevelLifoSemaphore.WaitForSignal(System.Int32)
-	at System.Threading.LowLevelLifoSemaphore.Wait(System.Int32, System.Boolean)
-	at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
-	at System.Threading.Thread.StartCallback()
-	at Unknown_Native_Function(unknown)
-
+    Timestamp: {
+      Nanoseconds: 1649268034960000000,
+      Milliseconds: 1649268034960
+    },
+    ManagedId: Id_10,
+    NativeId: Id_11,
+    ThreadName: .NET ThreadPool Worker,
+    ThreadIndex: 9,
+    Frames: [
+      Interop.Kernel32.GetQueuedCompletionStatus(System.IntPtr, System.Int32&, System.UIntPtr&, System.IntPtr&, System.Int32),
+      System.Threading.LowLevelLifoSemaphore.WaitForSignal(System.Int32),
+      System.Threading.LowLevelLifoSemaphore.Wait(System.Int32, System.Boolean),
+      System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart(),
+      System.Threading.Thread.StartCallback(),
+      Unknown_Native_Function(unknown)
+    ]
   },
   {
-    Timestamp: 1649268034960000000,
-    StackTrace:
-"" #12 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xd nid=0xadfc
-
-	at System.Threading.Thread.Join()
-	at Samples.AlwaysOnProfiler.Performance.Sample.<Main>d__12.MoveNext()
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(System.Object)
-	at System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(System.Threading.Thread)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext()
-	at System.Runtime.CompilerServices.TaskAwaiter.<>c.<OutputWaitEtwEvents>b__12_0(System.Action, System.Threading.Tasks.Task)
-	at System.Runtime.CompilerServices.AsyncMethodBuilderCore.ContinuationWrapper.Invoke()
-	at System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction(System.Action, System.Boolean)
-	at System.Threading.Tasks.Task.RunContinuations(System.Object)
-	at System.Threading.Tasks.Task.FinishContinuations()
-	at System.Threading.Tasks.Task`1.TrySetResult(TResult)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetExistingTaskResult(System.Threading.Tasks.Task`1[TResult], TResult)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder.SetResult()
-	at Samples.AlwaysOnProfiler.Performance.Sample.<WebRequest>d__11.MoveNext()
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(System.Object)
-	at System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(System.Threading.Thread)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext()
-	at System.Runtime.CompilerServices.TaskAwaiter.<>c.<OutputWaitEtwEvents>b__12_0(System.Action, System.Threading.Tasks.Task)
-	at System.Runtime.CompilerServices.AsyncMethodBuilderCore.ContinuationWrapper.Invoke()
-	at System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction(System.Action, System.Boolean)
-	at System.Threading.Tasks.Task.RunContinuations(System.Object)
-	at System.Threading.Tasks.Task.FinishContinuations()
-	at System.Threading.Tasks.Task`1.TrySetResult(TResult)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetExistingTaskResult(System.Threading.Tasks.Task`1[TResult], TResult)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetResult(TResult)
-	at System.Net.Http.HttpClient.<<SendAsync>g__Core|83_0>d.MoveNext()
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(System.Object)
-	at System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(System.Threading.Thread)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext()
-	at System.Runtime.CompilerServices.TaskAwaiter.<>c.<OutputWaitEtwEvents>b__12_0(System.Action, System.Threading.Tasks.Task)
-	at System.Runtime.CompilerServices.AsyncMethodBuilderCore.ContinuationWrapper.Invoke()
-	at System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction(System.Action, System.Boolean)
-	at System.Threading.Tasks.Task.RunContinuations(System.Object)
-	at System.Threading.Tasks.Task.FinishContinuations()
-	at System.Threading.Tasks.Task`1.TrySetResult(TResult)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetExistingTaskResult(System.Threading.Tasks.Task`1[TResult], TResult)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder.SetResult()
-	at System.Net.Http.HttpContent.<LoadIntoBufferAsyncCore>d__63.MoveNext()
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(System.Object)
-	at System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(System.Threading.Thread)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext()
-	at System.Runtime.CompilerServices.TaskAwaiter.<>c.<OutputWaitEtwEvents>b__12_0(System.Action, System.Threading.Tasks.Task)
-	at System.Runtime.CompilerServices.AsyncMethodBuilderCore.ContinuationWrapper.Invoke()
-	at System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction(System.Action, System.Boolean)
-	at System.Threading.Tasks.Task.RunContinuations(System.Object)
-	at System.Threading.Tasks.Task.FinishContinuations()
-	at System.Threading.Tasks.Task`1.TrySetResult(TResult)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetExistingTaskResult(System.Threading.Tasks.Task`1[TResult], TResult)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder.SetResult()
-	at System.Net.Http.HttpConnectionResponseContent.<SerializeToStreamAsync>d__6.MoveNext()
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(System.Object)
-	at System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(System.Threading.Thread)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext()
-	at System.Runtime.CompilerServices.TaskAwaiter.<>c.<OutputWaitEtwEvents>b__12_0(System.Action, System.Threading.Tasks.Task)
-	at System.Runtime.CompilerServices.AsyncMethodBuilderCore.ContinuationWrapper.Invoke()
-	at System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction(System.Action, System.Boolean)
-	at System.Threading.Tasks.Task.RunContinuations(System.Object)
-	at System.Threading.Tasks.Task.FinishContinuations()
-	at System.Threading.Tasks.Task`1.TrySetResult(TResult)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetExistingTaskResult(System.Threading.Tasks.Task`1[TResult], TResult)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder.SetResult()
-	at System.Net.Http.HttpConnection.ChunkedEncodingReadStream.<CopyToAsyncCore>d__10.MoveNext()
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(System.Object)
-	at System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(System.Threading.Thread)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext()
-	at System.Runtime.CompilerServices.TaskAwaiter.<>c.<OutputWaitEtwEvents>b__12_0(System.Action, System.Threading.Tasks.Task)
-	at System.Runtime.CompilerServices.AsyncMethodBuilderCore.ContinuationWrapper.Invoke()
-	at System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction(System.Action, System.Boolean)
-	at System.Threading.Tasks.Task.RunContinuations(System.Object)
-	at System.Threading.Tasks.Task.FinishContinuations()
-	at System.Threading.Tasks.Task`1.TrySetResult(TResult)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetExistingTaskResult(System.Threading.Tasks.Task`1[TResult], TResult)
-	at System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder.SetResult()
-	at System.Net.Http.HttpConnection.<FillAsync>d__97.MoveNext()
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(System.Object)
-	at System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(System.Threading.Thread)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext()
-	at System.Runtime.CompilerServices.TaskAwaiter.<>c.<OutputWaitEtwEvents>b__12_0(System.Action, System.Threading.Tasks.Task)
-	at System.Runtime.CompilerServices.AsyncMethodBuilderCore.ContinuationWrapper.Invoke()
-	at System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction(System.Action, System.Boolean)
-	at System.Threading.Tasks.Task.RunContinuations(System.Object)
-	at System.Threading.Tasks.Task.FinishContinuations()
-	at System.Threading.Tasks.Task`1.TrySetResult(TResult)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetExistingTaskResult(System.Threading.Tasks.Task`1[TResult], TResult)
-	at System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder`1.SetResult(TResult)
-	at System.Net.Security.SslStream.<ReadAsyncInternal>d__186`1.MoveNext()
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(System.Object)
-	at System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(System.Threading.Thread)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext()
-	at System.Runtime.CompilerServices.TaskAwaiter.<>c.<OutputWaitEtwEvents>b__12_0(System.Action, System.Threading.Tasks.Task)
-	at System.Runtime.CompilerServices.AsyncMethodBuilderCore.ContinuationWrapper.Invoke()
-	at System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction(System.Action, System.Boolean)
-	at System.Threading.Tasks.Task.RunContinuations(System.Object)
-	at System.Threading.Tasks.Task.FinishContinuations()
-	at System.Threading.Tasks.Task`1.TrySetResult(TResult)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetExistingTaskResult(System.Threading.Tasks.Task`1[TResult], TResult)
-	at System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder`1.SetResult(TResult)
-	at System.Net.Security.SslStream.<EnsureFullTlsFrameAsync>d__184`1.MoveNext()
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(System.Object)
-	at System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(System.Threading.Thread)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext()
-	at System.Threading.ThreadPool.<>c.<.cctor>b__87_0(System.Object)
-	at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.InvokeContinuation(System.Action`1[System.Object], System.Object, System.Boolean, System.Boolean)
-	at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.OnCompleted(System.Net.Sockets.SocketAsyncEventArgs)
-	at System.Net.Sockets.SocketAsyncEventArgs.OnCompletedInternal()
-	at System.Net.Sockets.SocketAsyncEventArgs.<>c.<.cctor>b__179_0(unknown)
-	at System.Threading.ThreadPoolBoundHandleOverlapped.CompletionCallback(unknown)
-	at System.Threading._IOCompletionCallback.PerformIOCompletionCallback(unknown)
-	at Unknown_Native_Function(unknown)
-
+    Timestamp: {
+      Nanoseconds: 1649268034960000000,
+      Milliseconds: 1649268034960
+    },
+    ManagedId: Id_12,
+    NativeId: Id_13,
+    ThreadName: ,
+    ThreadIndex: 12,
+    Frames: [
+      System.Threading.Thread.Join(),
+      Samples.AlwaysOnProfiler.Performance.Sample.<Main>d__12.MoveNext(),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(System.Object),
+      System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(System.Threading.Thread),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(),
+      System.Runtime.CompilerServices.TaskAwaiter.<>c.<OutputWaitEtwEvents>b__12_0(System.Action, System.Threading.Tasks.Task),
+      System.Runtime.CompilerServices.AsyncMethodBuilderCore.ContinuationWrapper.Invoke(),
+      System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction(System.Action, System.Boolean),
+      System.Threading.Tasks.Task.RunContinuations(System.Object),
+      System.Threading.Tasks.Task.FinishContinuations(),
+      System.Threading.Tasks.Task`1.TrySetResult(TResult),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetExistingTaskResult(System.Threading.Tasks.Task`1[TResult], TResult),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder.SetResult(),
+      Samples.AlwaysOnProfiler.Performance.Sample.<WebRequest>d__11.MoveNext(),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(System.Object),
+      System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(System.Threading.Thread),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(),
+      System.Runtime.CompilerServices.TaskAwaiter.<>c.<OutputWaitEtwEvents>b__12_0(System.Action, System.Threading.Tasks.Task),
+      System.Runtime.CompilerServices.AsyncMethodBuilderCore.ContinuationWrapper.Invoke(),
+      System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction(System.Action, System.Boolean),
+      System.Threading.Tasks.Task.RunContinuations(System.Object),
+      System.Threading.Tasks.Task.FinishContinuations(),
+      System.Threading.Tasks.Task`1.TrySetResult(TResult),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetExistingTaskResult(System.Threading.Tasks.Task`1[TResult], TResult),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetResult(TResult),
+      System.Net.Http.HttpClient.<<SendAsync>g__Core|83_0>d.MoveNext(),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(System.Object),
+      System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(System.Threading.Thread),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(),
+      System.Runtime.CompilerServices.TaskAwaiter.<>c.<OutputWaitEtwEvents>b__12_0(System.Action, System.Threading.Tasks.Task),
+      System.Runtime.CompilerServices.AsyncMethodBuilderCore.ContinuationWrapper.Invoke(),
+      System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction(System.Action, System.Boolean),
+      System.Threading.Tasks.Task.RunContinuations(System.Object),
+      System.Threading.Tasks.Task.FinishContinuations(),
+      System.Threading.Tasks.Task`1.TrySetResult(TResult),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetExistingTaskResult(System.Threading.Tasks.Task`1[TResult], TResult),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder.SetResult(),
+      System.Net.Http.HttpContent.<LoadIntoBufferAsyncCore>d__63.MoveNext(),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(System.Object),
+      System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(System.Threading.Thread),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(),
+      System.Runtime.CompilerServices.TaskAwaiter.<>c.<OutputWaitEtwEvents>b__12_0(System.Action, System.Threading.Tasks.Task),
+      System.Runtime.CompilerServices.AsyncMethodBuilderCore.ContinuationWrapper.Invoke(),
+      System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction(System.Action, System.Boolean),
+      System.Threading.Tasks.Task.RunContinuations(System.Object),
+      System.Threading.Tasks.Task.FinishContinuations(),
+      System.Threading.Tasks.Task`1.TrySetResult(TResult),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetExistingTaskResult(System.Threading.Tasks.Task`1[TResult], TResult),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder.SetResult(),
+      System.Net.Http.HttpConnectionResponseContent.<SerializeToStreamAsync>d__6.MoveNext(),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(System.Object),
+      System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(System.Threading.Thread),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(),
+      System.Runtime.CompilerServices.TaskAwaiter.<>c.<OutputWaitEtwEvents>b__12_0(System.Action, System.Threading.Tasks.Task),
+      System.Runtime.CompilerServices.AsyncMethodBuilderCore.ContinuationWrapper.Invoke(),
+      System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction(System.Action, System.Boolean),
+      System.Threading.Tasks.Task.RunContinuations(System.Object),
+      System.Threading.Tasks.Task.FinishContinuations(),
+      System.Threading.Tasks.Task`1.TrySetResult(TResult),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetExistingTaskResult(System.Threading.Tasks.Task`1[TResult], TResult),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder.SetResult(),
+      System.Net.Http.HttpConnection.ChunkedEncodingReadStream.<CopyToAsyncCore>d__10.MoveNext(),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(System.Object),
+      System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(System.Threading.Thread),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(),
+      System.Runtime.CompilerServices.TaskAwaiter.<>c.<OutputWaitEtwEvents>b__12_0(System.Action, System.Threading.Tasks.Task),
+      System.Runtime.CompilerServices.AsyncMethodBuilderCore.ContinuationWrapper.Invoke(),
+      System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction(System.Action, System.Boolean),
+      System.Threading.Tasks.Task.RunContinuations(System.Object),
+      System.Threading.Tasks.Task.FinishContinuations(),
+      System.Threading.Tasks.Task`1.TrySetResult(TResult),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetExistingTaskResult(System.Threading.Tasks.Task`1[TResult], TResult),
+      System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder.SetResult(),
+      System.Net.Http.HttpConnection.<FillAsync>d__97.MoveNext(),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(System.Object),
+      System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(System.Threading.Thread),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(),
+      System.Runtime.CompilerServices.TaskAwaiter.<>c.<OutputWaitEtwEvents>b__12_0(System.Action, System.Threading.Tasks.Task),
+      System.Runtime.CompilerServices.AsyncMethodBuilderCore.ContinuationWrapper.Invoke(),
+      System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction(System.Action, System.Boolean),
+      System.Threading.Tasks.Task.RunContinuations(System.Object),
+      System.Threading.Tasks.Task.FinishContinuations(),
+      System.Threading.Tasks.Task`1.TrySetResult(TResult),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetExistingTaskResult(System.Threading.Tasks.Task`1[TResult], TResult),
+      System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder`1.SetResult(TResult),
+      System.Net.Security.SslStream.<ReadAsyncInternal>d__186`1.MoveNext(),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(System.Object),
+      System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(System.Threading.Thread),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(),
+      System.Runtime.CompilerServices.TaskAwaiter.<>c.<OutputWaitEtwEvents>b__12_0(System.Action, System.Threading.Tasks.Task),
+      System.Runtime.CompilerServices.AsyncMethodBuilderCore.ContinuationWrapper.Invoke(),
+      System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction(System.Action, System.Boolean),
+      System.Threading.Tasks.Task.RunContinuations(System.Object),
+      System.Threading.Tasks.Task.FinishContinuations(),
+      System.Threading.Tasks.Task`1.TrySetResult(TResult),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetExistingTaskResult(System.Threading.Tasks.Task`1[TResult], TResult),
+      System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder`1.SetResult(TResult),
+      System.Net.Security.SslStream.<EnsureFullTlsFrameAsync>d__184`1.MoveNext(),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(System.Object),
+      System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(System.Threading.Thread),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(),
+      System.Threading.ThreadPool.<>c.<.cctor>b__87_0(System.Object),
+      System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.InvokeContinuation(System.Action`1[System.Object], System.Object, System.Boolean, System.Boolean),
+      System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.OnCompleted(System.Net.Sockets.SocketAsyncEventArgs),
+      System.Net.Sockets.SocketAsyncEventArgs.OnCompletedInternal(),
+      System.Net.Sockets.SocketAsyncEventArgs.<>c.<.cctor>b__179_0(unknown),
+      System.Threading.ThreadPoolBoundHandleOverlapped.CompletionCallback(unknown),
+      System.Threading._IOCompletionCallback.PerformIOCompletionCallback(unknown),
+      Unknown_Native_Function(unknown)
+    ]
   },
   {
-    Timestamp: 1649268034960000000,
-    StackTrace:
-"" #13 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0xa8e4
-
-	at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
-	at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(System.Threading.Tasks.Task)
-	at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(System.Threading.Tasks.Task)
-	at System.Threading.Tasks.ValueTask`1.get_Result()
-	at System.Runtime.CompilerServices.ConfiguredValueTaskAwaitable`1.ConfiguredValueTaskAwaiter.GetResult()
-	at System.Net.Http.HttpConnectionPool.<ConnectToTcpHostAsync>d__97.MoveNext()
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(System.Object)
-	at System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(System.Threading.Thread)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext()
-	at System.Runtime.CompilerServices.TaskAwaiter.<>c.<OutputWaitEtwEvents>b__12_0(System.Action, System.Threading.Tasks.Task)
-	at System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction(System.Action, System.Boolean)
-	at System.Threading.Tasks.Task.RunContinuations(System.Object)
-	at System.Threading.Tasks.Task.FinishStageThree()
-	at System.Threading.Tasks.Task.FinishStageTwo()
-	at System.Threading.Tasks.Task.FinishSlow(System.Boolean)
-	at System.Threading.Tasks.Task.TrySetException(System.Object)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetException(System.Exception, System.Threading.Tasks.Task`1[TResult]&)
-	at System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder`1.SetException(System.Exception)
-	at System.Net.HttpWebRequest.<>c__DisplayClass216_0.<<CreateHttpClient>b__1>d.MoveNext()
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(System.Object)
-	at System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(System.Threading.Thread)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext()
-	at System.Runtime.CompilerServices.TaskAwaiter.<>c.<OutputWaitEtwEvents>b__12_0(System.Action, System.Threading.Tasks.Task)
-	at System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction(System.Action, System.Boolean)
-	at System.Threading.Tasks.Task.RunContinuations(System.Object)
-	at System.Threading.Tasks.Task.FinishStageThree()
-	at System.Threading.Tasks.Task.FinishStageTwo()
-	at System.Threading.Tasks.Task.FinishSlow(System.Boolean)
-	at System.Threading.Tasks.Task.TrySetException(System.Object)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetException(System.Exception, System.Threading.Tasks.Task`1[TResult]&)
-	at System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder.SetException(System.Exception)
-	at System.Net.Sockets.Socket.<<ConnectAsync>g__WaitForConnectWithCancellation|277_0>d.MoveNext()
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(System.Object)
-	at System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(System.Threading.Thread)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext()
-	at System.Threading.ThreadPool.<>c.<.cctor>b__87_0(System.Object)
-	at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.InvokeContinuation(System.Action`1[System.Object], System.Object, System.Boolean, System.Boolean)
-	at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.OnCompleted(System.Net.Sockets.SocketAsyncEventArgs)
-	at System.Net.Sockets.SocketAsyncEventArgs.<<DnsConnectAsync>g__Core|112_0>d.MoveNext()
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(System.Object)
-	at System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(System.Threading.Thread)
-	at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext()
-	at System.Threading.ThreadPool.<>c.<.cctor>b__87_0(System.Object)
-	at System.Threading.Tasks.Sources.ManualResetValueTaskSourceCore`1.SignalCompletion()
-	at System.Threading.Tasks.Sources.ManualResetValueTaskSourceCore`1.SetResult(TResult)
-	at System.Net.Sockets.SocketAsyncEventArgs.MultiConnectSocketAsyncEventArgs.OnCompleted(System.Net.Sockets.SocketAsyncEventArgs)
-	at System.Net.Sockets.SocketAsyncEventArgs.OnCompletedInternal()
-	at System.Net.Sockets.SocketAsyncEventArgs.ExecutionCallback(System.Object)
-	at System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object)
-	at System.Threading.ExecutionContext.Run(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object)
-	at System.Net.Sockets.SocketAsyncEventArgs.HandleCompletionPortCallbackError(unknown)
-	at System.Net.Sockets.SocketAsyncEventArgs.<>c.<.cctor>b__179_0(unknown)
-	at System.Threading.ThreadPoolBoundHandleOverlapped.CompletionCallback(unknown)
-	at System.Threading._IOCompletionCallback.PerformIOCompletionCallback(unknown)
-	at Unknown_Native_Function(unknown)
-
+    Timestamp: {
+      Nanoseconds: 1649268034960000000,
+      Milliseconds: 1649268034960
+    },
+    ManagedId: Id_5,
+    NativeId: Id_14,
+    ThreadName: ,
+    ThreadIndex: 13,
+    Frames: [
+      System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw(),
+      System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(System.Threading.Tasks.Task),
+      System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(System.Threading.Tasks.Task),
+      System.Threading.Tasks.ValueTask`1.get_Result(),
+      System.Runtime.CompilerServices.ConfiguredValueTaskAwaitable`1.ConfiguredValueTaskAwaiter.GetResult(),
+      System.Net.Http.HttpConnectionPool.<ConnectToTcpHostAsync>d__97.MoveNext(),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(System.Object),
+      System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(System.Threading.Thread),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(),
+      System.Runtime.CompilerServices.TaskAwaiter.<>c.<OutputWaitEtwEvents>b__12_0(System.Action, System.Threading.Tasks.Task),
+      System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction(System.Action, System.Boolean),
+      System.Threading.Tasks.Task.RunContinuations(System.Object),
+      System.Threading.Tasks.Task.FinishStageThree(),
+      System.Threading.Tasks.Task.FinishStageTwo(),
+      System.Threading.Tasks.Task.FinishSlow(System.Boolean),
+      System.Threading.Tasks.Task.TrySetException(System.Object),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetException(System.Exception, System.Threading.Tasks.Task`1[TResult]&),
+      System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder`1.SetException(System.Exception),
+      System.Net.HttpWebRequest.<>c__DisplayClass216_0.<<CreateHttpClient>b__1>d.MoveNext(),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(System.Object),
+      System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(System.Threading.Thread),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(),
+      System.Runtime.CompilerServices.TaskAwaiter.<>c.<OutputWaitEtwEvents>b__12_0(System.Action, System.Threading.Tasks.Task),
+      System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction(System.Action, System.Boolean),
+      System.Threading.Tasks.Task.RunContinuations(System.Object),
+      System.Threading.Tasks.Task.FinishStageThree(),
+      System.Threading.Tasks.Task.FinishStageTwo(),
+      System.Threading.Tasks.Task.FinishSlow(System.Boolean),
+      System.Threading.Tasks.Task.TrySetException(System.Object),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.SetException(System.Exception, System.Threading.Tasks.Task`1[TResult]&),
+      System.Runtime.CompilerServices.AsyncValueTaskMethodBuilder.SetException(System.Exception),
+      System.Net.Sockets.Socket.<<ConnectAsync>g__WaitForConnectWithCancellation|277_0>d.MoveNext(),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(System.Object),
+      System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(System.Threading.Thread),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(),
+      System.Threading.ThreadPool.<>c.<.cctor>b__87_0(System.Object),
+      System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.InvokeContinuation(System.Action`1[System.Object], System.Object, System.Boolean, System.Boolean),
+      System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.OnCompleted(System.Net.Sockets.SocketAsyncEventArgs),
+      System.Net.Sockets.SocketAsyncEventArgs.<<DnsConnectAsync>g__Core|112_0>d.MoveNext(),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.ExecutionContextCallback(System.Object),
+      System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(System.Threading.Thread),
+      System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(),
+      System.Threading.ThreadPool.<>c.<.cctor>b__87_0(System.Object),
+      System.Threading.Tasks.Sources.ManualResetValueTaskSourceCore`1.SignalCompletion(),
+      System.Threading.Tasks.Sources.ManualResetValueTaskSourceCore`1.SetResult(TResult),
+      System.Net.Sockets.SocketAsyncEventArgs.MultiConnectSocketAsyncEventArgs.OnCompleted(System.Net.Sockets.SocketAsyncEventArgs),
+      System.Net.Sockets.SocketAsyncEventArgs.OnCompletedInternal(),
+      System.Net.Sockets.SocketAsyncEventArgs.ExecutionCallback(System.Object),
+      System.Threading.ExecutionContext.RunInternal(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object),
+      System.Threading.ExecutionContext.Run(System.Threading.ExecutionContext, System.Threading.ContextCallback, System.Object),
+      System.Net.Sockets.SocketAsyncEventArgs.HandleCompletionPortCallbackError(unknown),
+      System.Net.Sockets.SocketAsyncEventArgs.<>c.<.cctor>b__179_0(unknown),
+      System.Threading.ThreadPoolBoundHandleOverlapped.CompletionCallback(unknown),
+      System.Threading._IOCompletionCallback.PerformIOCompletionCallback(unknown),
+      Unknown_Native_Function(unknown)
+    ]
   },
   {
-    Timestamp: 1649268034960000000,
-    StackTrace:
-"My Cool Thread 0" #15 prio=0 os_prio=0 cpu=0 elapsed=0 tid=0xffffffff nid=0x6770
-
-	at System.Threading.Thread.Sleep(System.Int32)
-	at Samples.AlwaysOnProfiler.Performance.OneFinalVeryLongClassNameThatHasSomeLengthToIt.OneFinalLongMethodNameI()
-	at Samples.AlwaysOnProfiler.Performance.OneFinalVeryLongClassNameThatHasSomeLengthToIt.OneFinalLongMethodNameH()
-	at Samples.AlwaysOnProfiler.Performance.OneFinalVeryLongClassNameThatHasSomeLengthToIt.OneFinalLongMethodNameG()
-	at Samples.AlwaysOnProfiler.Performance.OneFinalVeryLongClassNameThatHasSomeLengthToIt.OneFinalLongMethodNameF()
-	at Samples.AlwaysOnProfiler.Performance.OneFinalVeryLongClassNameThatHasSomeLengthToIt.OneFinalLongMethodNameE()
-	at Samples.AlwaysOnProfiler.Performance.OneFinalVeryLongClassNameThatHasSomeLengthToIt.OneFinalLongMethodNameD()
-	at Samples.AlwaysOnProfiler.Performance.OneFinalVeryLongClassNameThatHasSomeLengthToIt.OneFinalLongMethodNameC()
-	at Samples.AlwaysOnProfiler.Performance.OneFinalVeryLongClassNameThatHasSomeLengthToIt.OneFinalLongMethodNameB()
-	at Samples.AlwaysOnProfiler.Performance.OneFinalVeryLongClassNameThatHasSomeLengthToIt.OneFinalLongMethodNameA()
-	at Samples.AlwaysOnProfiler.Performance.AmRunningOutOfCreativeWaysToSayIHaveLongClassNames.AlsoLackCreativityOnTheMethodI()
-	at Samples.AlwaysOnProfiler.Performance.AmRunningOutOfCreativeWaysToSayIHaveLongClassNames.AlsoLackCreativityOnTheMethodH()
-	at Samples.AlwaysOnProfiler.Performance.AmRunningOutOfCreativeWaysToSayIHaveLongClassNames.AlsoLackCreativityOnTheMethodG()
-	at Samples.AlwaysOnProfiler.Performance.AmRunningOutOfCreativeWaysToSayIHaveLongClassNames.AlsoLackCreativityOnTheMethodF()
-	at Samples.AlwaysOnProfiler.Performance.AmRunningOutOfCreativeWaysToSayIHaveLongClassNames.AlsoLackCreativityOnTheMethodE()
-	at Samples.AlwaysOnProfiler.Performance.AmRunningOutOfCreativeWaysToSayIHaveLongClassNames.AlsoLackCreativityOnTheMethodD()
-	at Samples.AlwaysOnProfiler.Performance.AmRunningOutOfCreativeWaysToSayIHaveLongClassNames.AlsoLackCreativityOnTheMethodC()
-	at Samples.AlwaysOnProfiler.Performance.AmRunningOutOfCreativeWaysToSayIHaveLongClassNames.AlsoLackCreativityOnTheMethodB()
-	at Samples.AlwaysOnProfiler.Performance.AmRunningOutOfCreativeWaysToSayIHaveLongClassNames.AlsoLackCreativityOnTheMethodA()
-	at Samples.AlwaysOnProfiler.Performance.AnotherVeryLongClassNameThatIAmUsingToHaveParticularlyLongNames.AnotherMethodNameWithSomeLengthI()
-	at Samples.AlwaysOnProfiler.Performance.AnotherVeryLongClassNameThatIAmUsingToHaveParticularlyLongNames.AnotherMethodNameWithSomeLengthH()
-	at Samples.AlwaysOnProfiler.Performance.AnotherVeryLongClassNameThatIAmUsingToHaveParticularlyLongNames.AnotherMethodNameWithSomeLengthG()
-	at Samples.AlwaysOnProfiler.Performance.AnotherVeryLongClassNameThatIAmUsingToHaveParticularlyLongNames.AnotherMethodNameWithSomeLengthF()
-	at Samples.AlwaysOnProfiler.Performance.AnotherVeryLongClassNameThatIAmUsingToHaveParticularlyLongNames.AnotherMethodNameWithSomeLengthE()
-	at Samples.AlwaysOnProfiler.Performance.AnotherVeryLongClassNameThatIAmUsingToHaveParticularlyLongNames.AnotherMethodNameWithSomeLengthD()
-	at Samples.AlwaysOnProfiler.Performance.AnotherVeryLongClassNameThatIAmUsingToHaveParticularlyLongNames.AnotherMethodNameWithSomeLengthC()
-	at Samples.AlwaysOnProfiler.Performance.AnotherVeryLongClassNameThatIAmUsingToHaveParticularlyLongNames.AnotherMethodNameWithSomeLengthB()
-	at Samples.AlwaysOnProfiler.Performance.AnotherVeryLongClassNameThatIAmUsingToHaveParticularlyLongNames.AnotherMethodNameWithSomeLengthA()
-	at Samples.AlwaysOnProfiler.Performance.AVeryLongClassNameThatIsNotVeryRepresentativeButFulfillsMyRequirements.SomeInternalMethodI()
-	at Samples.AlwaysOnProfiler.Performance.AVeryLongClassNameThatIsNotVeryRepresentativeButFulfillsMyRequirements.SomeInternalMethodH()
-	at Samples.AlwaysOnProfiler.Performance.AVeryLongClassNameThatIsNotVeryRepresentativeButFulfillsMyRequirements.SomeInternalMethodG()
-	at Samples.AlwaysOnProfiler.Performance.AVeryLongClassNameThatIsNotVeryRepresentativeButFulfillsMyRequirements.SomeInternalMethodF()
-	at Samples.AlwaysOnProfiler.Performance.AVeryLongClassNameThatIsNotVeryRepresentativeButFulfillsMyRequirements.SomeInternalMethodE()
-	at Samples.AlwaysOnProfiler.Performance.AVeryLongClassNameThatIsNotVeryRepresentativeButFulfillsMyRequirements.SomeInternalMethodD()
-	at Samples.AlwaysOnProfiler.Performance.AVeryLongClassNameThatIsNotVeryRepresentativeButFulfillsMyRequirements.SomeInternalMethodC()
-	at Samples.AlwaysOnProfiler.Performance.AVeryLongClassNameThatIsNotVeryRepresentativeButFulfillsMyRequirements.SomeInternalMethodB()
-	at Samples.AlwaysOnProfiler.Performance.AVeryLongClassNameThatIsNotVeryRepresentativeButFulfillsMyRequirements.SomeInternalMethodA()
-	at Samples.AlwaysOnProfiler.Performance.Sample.SomeInternalMethodI()
-	at Samples.AlwaysOnProfiler.Performance.Sample.SomeInternalMethodH()
-	at Samples.AlwaysOnProfiler.Performance.Sample.SomeInternalMethodG()
-	at Samples.AlwaysOnProfiler.Performance.Sample.SomeInternalMethodF()
-	at Samples.AlwaysOnProfiler.Performance.Sample.SomeInternalMethodE()
-	at Samples.AlwaysOnProfiler.Performance.Sample.SomeInternalMethodD()
-	at Samples.AlwaysOnProfiler.Performance.Sample.SomeInternalMethodC()
-	at Samples.AlwaysOnProfiler.Performance.Sample.SomeInternalMethodB()
-	at Samples.AlwaysOnProfiler.Performance.Sample.SomeInternalMethodA()
-	at Samples.AlwaysOnProfiler.Performance.Sample.Loop10Times()
-	at System.Threading.Thread.StartCallback()
-	at Unknown_Native_Function(unknown)
-
+    Timestamp: {
+      Nanoseconds: 1649268034960000000,
+      Milliseconds: 1649268034960
+    },
+    ManagedId: Id_5,
+    NativeId: Id_15,
+    ThreadName: My Cool Thread 0,
+    ThreadIndex: 15,
+    Frames: [
+      System.Threading.Thread.Sleep(System.Int32),
+      Samples.AlwaysOnProfiler.Performance.OneFinalVeryLongClassNameThatHasSomeLengthToIt.OneFinalLongMethodNameI(),
+      Samples.AlwaysOnProfiler.Performance.OneFinalVeryLongClassNameThatHasSomeLengthToIt.OneFinalLongMethodNameH(),
+      Samples.AlwaysOnProfiler.Performance.OneFinalVeryLongClassNameThatHasSomeLengthToIt.OneFinalLongMethodNameG(),
+      Samples.AlwaysOnProfiler.Performance.OneFinalVeryLongClassNameThatHasSomeLengthToIt.OneFinalLongMethodNameF(),
+      Samples.AlwaysOnProfiler.Performance.OneFinalVeryLongClassNameThatHasSomeLengthToIt.OneFinalLongMethodNameE(),
+      Samples.AlwaysOnProfiler.Performance.OneFinalVeryLongClassNameThatHasSomeLengthToIt.OneFinalLongMethodNameD(),
+      Samples.AlwaysOnProfiler.Performance.OneFinalVeryLongClassNameThatHasSomeLengthToIt.OneFinalLongMethodNameC(),
+      Samples.AlwaysOnProfiler.Performance.OneFinalVeryLongClassNameThatHasSomeLengthToIt.OneFinalLongMethodNameB(),
+      Samples.AlwaysOnProfiler.Performance.OneFinalVeryLongClassNameThatHasSomeLengthToIt.OneFinalLongMethodNameA(),
+      Samples.AlwaysOnProfiler.Performance.AmRunningOutOfCreativeWaysToSayIHaveLongClassNames.AlsoLackCreativityOnTheMethodI(),
+      Samples.AlwaysOnProfiler.Performance.AmRunningOutOfCreativeWaysToSayIHaveLongClassNames.AlsoLackCreativityOnTheMethodH(),
+      Samples.AlwaysOnProfiler.Performance.AmRunningOutOfCreativeWaysToSayIHaveLongClassNames.AlsoLackCreativityOnTheMethodG(),
+      Samples.AlwaysOnProfiler.Performance.AmRunningOutOfCreativeWaysToSayIHaveLongClassNames.AlsoLackCreativityOnTheMethodF(),
+      Samples.AlwaysOnProfiler.Performance.AmRunningOutOfCreativeWaysToSayIHaveLongClassNames.AlsoLackCreativityOnTheMethodE(),
+      Samples.AlwaysOnProfiler.Performance.AmRunningOutOfCreativeWaysToSayIHaveLongClassNames.AlsoLackCreativityOnTheMethodD(),
+      Samples.AlwaysOnProfiler.Performance.AmRunningOutOfCreativeWaysToSayIHaveLongClassNames.AlsoLackCreativityOnTheMethodC(),
+      Samples.AlwaysOnProfiler.Performance.AmRunningOutOfCreativeWaysToSayIHaveLongClassNames.AlsoLackCreativityOnTheMethodB(),
+      Samples.AlwaysOnProfiler.Performance.AmRunningOutOfCreativeWaysToSayIHaveLongClassNames.AlsoLackCreativityOnTheMethodA(),
+      Samples.AlwaysOnProfiler.Performance.AnotherVeryLongClassNameThatIAmUsingToHaveParticularlyLongNames.AnotherMethodNameWithSomeLengthI(),
+      Samples.AlwaysOnProfiler.Performance.AnotherVeryLongClassNameThatIAmUsingToHaveParticularlyLongNames.AnotherMethodNameWithSomeLengthH(),
+      Samples.AlwaysOnProfiler.Performance.AnotherVeryLongClassNameThatIAmUsingToHaveParticularlyLongNames.AnotherMethodNameWithSomeLengthG(),
+      Samples.AlwaysOnProfiler.Performance.AnotherVeryLongClassNameThatIAmUsingToHaveParticularlyLongNames.AnotherMethodNameWithSomeLengthF(),
+      Samples.AlwaysOnProfiler.Performance.AnotherVeryLongClassNameThatIAmUsingToHaveParticularlyLongNames.AnotherMethodNameWithSomeLengthE(),
+      Samples.AlwaysOnProfiler.Performance.AnotherVeryLongClassNameThatIAmUsingToHaveParticularlyLongNames.AnotherMethodNameWithSomeLengthD(),
+      Samples.AlwaysOnProfiler.Performance.AnotherVeryLongClassNameThatIAmUsingToHaveParticularlyLongNames.AnotherMethodNameWithSomeLengthC(),
+      Samples.AlwaysOnProfiler.Performance.AnotherVeryLongClassNameThatIAmUsingToHaveParticularlyLongNames.AnotherMethodNameWithSomeLengthB(),
+      Samples.AlwaysOnProfiler.Performance.AnotherVeryLongClassNameThatIAmUsingToHaveParticularlyLongNames.AnotherMethodNameWithSomeLengthA(),
+      Samples.AlwaysOnProfiler.Performance.AVeryLongClassNameThatIsNotVeryRepresentativeButFulfillsMyRequirements.SomeInternalMethodI(),
+      Samples.AlwaysOnProfiler.Performance.AVeryLongClassNameThatIsNotVeryRepresentativeButFulfillsMyRequirements.SomeInternalMethodH(),
+      Samples.AlwaysOnProfiler.Performance.AVeryLongClassNameThatIsNotVeryRepresentativeButFulfillsMyRequirements.SomeInternalMethodG(),
+      Samples.AlwaysOnProfiler.Performance.AVeryLongClassNameThatIsNotVeryRepresentativeButFulfillsMyRequirements.SomeInternalMethodF(),
+      Samples.AlwaysOnProfiler.Performance.AVeryLongClassNameThatIsNotVeryRepresentativeButFulfillsMyRequirements.SomeInternalMethodE(),
+      Samples.AlwaysOnProfiler.Performance.AVeryLongClassNameThatIsNotVeryRepresentativeButFulfillsMyRequirements.SomeInternalMethodD(),
+      Samples.AlwaysOnProfiler.Performance.AVeryLongClassNameThatIsNotVeryRepresentativeButFulfillsMyRequirements.SomeInternalMethodC(),
+      Samples.AlwaysOnProfiler.Performance.AVeryLongClassNameThatIsNotVeryRepresentativeButFulfillsMyRequirements.SomeInternalMethodB(),
+      Samples.AlwaysOnProfiler.Performance.AVeryLongClassNameThatIsNotVeryRepresentativeButFulfillsMyRequirements.SomeInternalMethodA(),
+      Samples.AlwaysOnProfiler.Performance.Sample.SomeInternalMethodI(),
+      Samples.AlwaysOnProfiler.Performance.Sample.SomeInternalMethodH(),
+      Samples.AlwaysOnProfiler.Performance.Sample.SomeInternalMethodG(),
+      Samples.AlwaysOnProfiler.Performance.Sample.SomeInternalMethodF(),
+      Samples.AlwaysOnProfiler.Performance.Sample.SomeInternalMethodE(),
+      Samples.AlwaysOnProfiler.Performance.Sample.SomeInternalMethodD(),
+      Samples.AlwaysOnProfiler.Performance.Sample.SomeInternalMethodC(),
+      Samples.AlwaysOnProfiler.Performance.Sample.SomeInternalMethodB(),
+      Samples.AlwaysOnProfiler.Performance.Sample.SomeInternalMethodA(),
+      Samples.AlwaysOnProfiler.Performance.Sample.Loop10Times(),
+      System.Threading.Thread.StartCallback(),
+      Unknown_Native_Function(unknown)
+    ]
   }
 ]

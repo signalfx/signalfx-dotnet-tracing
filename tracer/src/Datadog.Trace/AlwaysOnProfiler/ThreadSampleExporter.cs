@@ -14,26 +14,30 @@ using Datadog.Tracer.OpenTelemetry.Proto.Resource.V1;
 
 namespace Datadog.Trace.AlwaysOnProfiler
 {
-    internal class ThreadSampleExporter
+    internal abstract class ThreadSampleExporter
     {
-        private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(ThreadSampleExporter));
+        protected static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(ThreadSampleExporter));
 
-        private readonly ReadOnlyCollection<KeyValue> _fixedLogRecordAttributes;
-        private readonly Uri _logsEndpointUrl;
-        private readonly LogsData _logsData;
-
-        internal ThreadSampleExporter(ImmutableTracerSettings tracerSettings)
+        protected ThreadSampleExporter(ImmutableTracerSettings tracerSettings)
         {
-            _fixedLogRecordAttributes = new ReadOnlyCollection<KeyValue>(new List<KeyValue>
+            FixedLogRecordAttributes = new ReadOnlyCollection<KeyValue>(new List<KeyValue>
             {
                 GdiProfilingConventions.LogRecord.Attributes.Source,
-                GdiProfilingConventions.LogRecord.Attributes.Period((long)tracerSettings.ThreadSamplingPeriod.TotalMilliseconds)
+                GdiProfilingConventions.LogRecord.Attributes.Period((long)tracerSettings.ThreadSamplingPeriod.TotalMilliseconds),
+                GdiProfilingConventions.LogRecord.Attributes.Format(tracerSettings.ExporterSettings.ProfilerExportFormat),
+                GdiProfilingConventions.LogRecord.Attributes.Type
             });
 
-            _logsEndpointUrl = tracerSettings.ExporterSettings.LogsEndpointUrl;
+            LogsEndpointUrl = tracerSettings.ExporterSettings.LogsEndpointUrl;
 
-            _logsData = GdiProfilingConventions.CreateLogsData(tracerSettings.GlobalTags);
+            LogsData = GdiProfilingConventions.CreateLogsData(tracerSettings.GlobalTags);
         }
+
+        protected ReadOnlyCollection<KeyValue> FixedLogRecordAttributes { get; }
+
+        protected Uri LogsEndpointUrl { get; }
+
+        protected LogsData LogsData { get; }
 
         public void ExportThreadSamples(List<ThreadSample> threadSamples)
         {
@@ -43,23 +47,14 @@ namespace Datadog.Trace.AlwaysOnProfiler
             }
 
             // The same _logsData instance is used on all export messages. With the exception of the list of
-            // LogRecords, the Logs property, all other fields are prepopulated. At this point the code just
+            // LogRecords, the Logs property, all other fields are prepopulated. At this point the code just`
             // need to create a LogRecord for each thread sample and add it to the Logs list.
-            var logRecords = _logsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs;
+            var logRecords = LogsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs;
 
-            for (var i = 0; i < threadSamples.Count; i++)
+            foreach (var threadSample in threadSamples)
             {
-                var threadSample = threadSamples[i];
-                var logRecord = new LogRecord
-                {
-                    Attributes =
-                    {
-                        _fixedLogRecordAttributes[0],
-                        _fixedLogRecordAttributes[1],
-                    },
-                    Body = new AnyValue { StringValue = threadSample.StackTrace },
-                    TimeUnixNano = threadSample.Timestamp,
-                };
+                var body = CreateBody(threadSample);
+                var logRecord = CreateLogRecord(body, threadSample.Timestamp.Nanoseconds);
 
                 if (threadSample.SpanId != 0 || threadSample.TraceIdHigh != 0 || threadSample.TraceIdLow != 0)
                 {
@@ -74,31 +69,33 @@ namespace Datadog.Trace.AlwaysOnProfiler
             SendLogsData();
         }
 
-        internal void SendLogsData()
+        protected abstract string CreateBody(ThreadSample threadSample);
+
+        private void SendLogsData()
         {
             HttpWebRequest httpWebRequest;
 
             try
             {
-                httpWebRequest = WebRequest.CreateHttp(_logsEndpointUrl);
+                httpWebRequest = WebRequest.CreateHttp(LogsEndpointUrl);
                 httpWebRequest.ContentType = "application/x-protobuf";
                 httpWebRequest.Method = "POST";
                 httpWebRequest.Headers.Add(CommonHttpHeaderNames.TracingEnabled, "false");
 
                 using var stream = httpWebRequest.GetRequestStream();
-                Vendors.ProtoBuf.Serializer.Serialize(stream, _logsData);
+                Vendors.ProtoBuf.Serializer.Serialize(stream, LogsData);
                 stream.Flush();
             }
             catch (Exception ex)
             {
-                Log.Error("Exception preparing request to send thread samples to {0}: {1}", _logsEndpointUrl, ex);
+                Log.Error("Exception preparing request to send thread samples to {0}: {1}", LogsEndpointUrl, ex);
                 return;
             }
             finally
             {
                 // The exporter reuses the _logsData object, but the actual log records are not
                 // needed after serialization, release the log records so they can be garbage collected.
-                _logsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs.Clear();
+                LogsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs.Clear();
             }
 
             try
@@ -110,12 +107,28 @@ namespace Datadog.Trace.AlwaysOnProfiler
                     return;
                 }
 
-                Log.Warning("HTTP error sending thread samples to {0}: {1}", _logsEndpointUrl, httpWebResponse.StatusCode);
+                Log.Warning("HTTP error sending thread samples to {0}: {1}", LogsEndpointUrl, httpWebResponse.StatusCode);
             }
             catch (Exception ex)
             {
-                Log.Error("Exception sending thread samples to {0}: {1}", _logsEndpointUrl, ex.Message);
+                Log.Error("Exception sending thread samples to {0}: {1}", LogsEndpointUrl, ex.Message);
             }
+        }
+
+        private LogRecord CreateLogRecord(string body, ulong timeUnixNanoseconds)
+        {
+            return new LogRecord
+            {
+                Attributes =
+                {
+                    FixedLogRecordAttributes[0],
+                    FixedLogRecordAttributes[1],
+                    FixedLogRecordAttributes[2],
+                    FixedLogRecordAttributes[3]
+                },
+                Body = new AnyValue { StringValue = body },
+                TimeUnixNano = timeUnixNanoseconds,
+            };
         }
 
         /// <summary>
@@ -186,12 +199,35 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         Value = new AnyValue { StringValue = OpenTelemetryProfiling }
                     };
 
+                    public static readonly KeyValue Type = new()
+                    {
+                        Key = "profiling.data.type",
+                        Value = new AnyValue { StringValue = "cpu" }
+                    };
+
                     public static KeyValue Period(long periodMilliseconds)
                     {
                         return new KeyValue
                         {
                             Key = "source.event.period",
-                            Value = new AnyValue { IntValue = periodMilliseconds },
+                            Value = new AnyValue { IntValue = periodMilliseconds }
+                        };
+                    }
+
+                    public static KeyValue Format(ProfilerExportFormat profilerExportFormat)
+                    {
+                        return new KeyValue
+                        {
+                            Key = "profiling.data.format",
+                            Value = new AnyValue
+                            {
+                                StringValue = profilerExportFormat switch
+                                {
+                                    ProfilerExportFormat.Pprof => "pprof-gzip-base64",
+                                    ProfilerExportFormat.Text => "text",
+                                    _ => throw new ArgumentOutOfRangeException(nameof(profilerExportFormat), profilerExportFormat, null)
+                                }
+                            }
                         };
                     }
                 }

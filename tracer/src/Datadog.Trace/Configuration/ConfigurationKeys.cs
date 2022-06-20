@@ -515,6 +515,13 @@ namespace Datadog.Trace.Configuration
             /// </summary>
             /// <seealso cref="TracerSettings.ThreadSamplingPeriod"/>
             public const string Period = "SIGNALFX_PROFILER_CALL_STACK_INTERVAL";
+
+            /// <summary>
+            /// Configuration key to set export format.
+            /// The default value is Pprof.
+            /// </summary>
+            /// <seealso cref="TracerSettings.ThreadSamplingEnabled"/>
+            public const string ExportFormat = "SIGNALFX_PROFILER_EXPORT_FORMAT";
         }
 
         internal static class Telemetry

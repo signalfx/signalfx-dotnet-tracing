@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.Agent;
+using Datadog.Trace.AlwaysOnProfiler;
 using Datadog.Trace.SignalFx.Metrics;
 
 namespace Datadog.Trace.Configuration
@@ -51,6 +52,8 @@ namespace Datadog.Trace.Configuration
             PartialFlushEnabled = settings.PartialFlushEnabled;
             PartialFlushMinSpans = settings.PartialFlushMinSpans;
             ValidationWarnings = settings.ValidationWarnings.ToList();
+
+            ProfilerExportFormat = settings.ProfilerExportFormat;
 
             SyncExport = settings.SyncExport;
         }
@@ -134,5 +137,10 @@ namespace Datadog.Trace.Configuration
         internal MetricsExporterType MetricsExporter { get; }
 
         internal List<string> ValidationWarnings { get; }
+
+        /// <summary>
+        /// Gets the format in which the profiling data will be exported.
+        /// </summary>
+        internal ProfilerExportFormat ProfilerExportFormat { get; }
     }
 }
