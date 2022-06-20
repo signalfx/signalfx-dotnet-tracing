@@ -11,6 +11,8 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 ### General
 
+- Add `pprof` format support for exporting profiling data.
+
 ### Breaking changes
 
 ### Bugfixes

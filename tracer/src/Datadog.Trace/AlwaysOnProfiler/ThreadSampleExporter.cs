@@ -24,7 +24,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
             {
                 GdiProfilingConventions.LogRecord.Attributes.Source,
                 GdiProfilingConventions.LogRecord.Attributes.Period((long)tracerSettings.ThreadSamplingPeriod.TotalMilliseconds),
-                GdiProfilingConventions.LogRecord.Attributes.Format(tracerSettings.ProfilerExportFormat),
+                GdiProfilingConventions.LogRecord.Attributes.Format(tracerSettings.ExporterSettings.ProfilerExportFormat),
                 GdiProfilingConventions.LogRecord.Attributes.Type
             });
 

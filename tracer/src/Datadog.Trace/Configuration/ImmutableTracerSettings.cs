@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Datadog.Trace.AlwaysOnProfiler;
 using Datadog.Trace.Logging.DirectSubmission;
 using Datadog.Trace.Util;
 
@@ -92,8 +91,6 @@ namespace Datadog.Trace.Configuration
             _domainMetadata = DomainMetadata.Instance;
 
             ExpandRouteTemplatesEnabled = settings.ExpandRouteTemplatesEnabled || !RouteTemplateResourceNamesEnabled;
-
-            ProfilerExportFormat = settings.ProfilerExportFormat;
         }
 
         /// <summary>
@@ -349,8 +346,6 @@ namespace Datadog.Trace.Configuration
         /// Gets a value indicating the trace methods configuration.
         /// </summary>
         internal string TraceMethods { get; }
-
-        internal ProfilerExportFormat ProfilerExportFormat { get; }
 
         /// <summary>
         /// Gets a value indicating whether the activity listener is enabled or not.

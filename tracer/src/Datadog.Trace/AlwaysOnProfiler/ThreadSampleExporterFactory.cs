@@ -18,11 +18,11 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
         public ThreadSampleExporter CreateThreadSampleExporter()
         {
-            return _tracerSettings.ProfilerExportFormat switch
+            return _tracerSettings.ExporterSettings.ProfilerExportFormat switch
             {
                 ProfilerExportFormat.Pprof => new PprofThreadSampleExporter(_tracerSettings),
                 ProfilerExportFormat.Text => new PlainTextThreadSampleExporter(_tracerSettings),
-                _ => throw new ArgumentOutOfRangeException(nameof(_tracerSettings.ProfilerExportFormat), _tracerSettings.ProfilerExportFormat, null)
+                _ => throw new ArgumentOutOfRangeException(nameof(_tracerSettings.ExporterSettings.ProfilerExportFormat), _tracerSettings.ExporterSettings.ProfilerExportFormat, null)
             };
         }
     }
