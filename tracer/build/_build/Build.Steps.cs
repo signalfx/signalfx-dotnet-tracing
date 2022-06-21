@@ -42,7 +42,7 @@ partial class Build
 
     AbsolutePath OutputDirectory => TracerDirectory / "bin";
     AbsolutePath TracerHomeDirectory => TracerHome ?? (MonitoringHomeDirectory / "tracer");
-    AbsolutePath SymbolsDirectory => TracerHome ?? (OutputDirectory / "symbols");
+    AbsolutePath SymbolsDirectory => OutputDirectory / "symbols";
     AbsolutePath DDTracerHomeDirectory => DDTracerHome ?? (OutputDirectory / "dd-tracer-home");
     AbsolutePath ArtifactsDirectory => Artifacts ?? (OutputDirectory / "artifacts");
     AbsolutePath WindowsSymbolsZip => ArtifactsDirectory / "windows-native-symbols.zip";
@@ -89,6 +89,8 @@ partial class Build
     [LazyPathExecutable(name: "gzip")] readonly Lazy<Tool> GZip;
     [LazyPathExecutable(name: "cmd")] readonly Lazy<Tool> Cmd;
     [LazyPathExecutable(name: "chmod")] readonly Lazy<Tool> Chmod;
+    [LazyPathExecutable(name: "objcopy")] readonly Lazy<Tool> ExtractDebugInfo;
+    [LazyPathExecutable(name: "strip")] readonly Lazy<Tool> StripBinary;
 
     IEnumerable<MSBuildTargetPlatform> ArchitecturesForPlatform =>
         Equals(TargetPlatform, MSBuildTargetPlatform.x64)
@@ -611,11 +613,31 @@ partial class Build
             }
             else if (IsLinux)
             {
+                void ExtractDebugInfoAndStripSymbols()
+                {
+                    var files = MonitoringHomeDirectory.GlobFiles("**/*.so");
+
+                    EnsureExistingDirectory(SymbolsDirectory);
+
+                    foreach (var file in files)
+                    {
+                        var outputFile = SymbolsDirectory / Path.GetFileNameWithoutExtension(file);
+
+                        Logger.Info($"Extracting debug symbol for {file} to {outputFile}.debug");
+                        ExtractDebugInfo.Value(arguments: $"--only-keep-debug {file} {outputFile}.debug");
+
+                        Logger.Info($"Stripping out unneeded information from {file}");
+                        StripBinary.Value(arguments: $"--strip-unneeded {file}");
+                    }
+                }
+
                 var fpm = Fpm.Value;
                 var gzip = GZip.Value;
 
                 var workingDirectory = ArtifactsDirectory / $"linux-{LinuxArchitectureIdentifier}";
                 EnsureCleanDirectory(workingDirectory);
+
+                ExtractDebugInfoAndStripSymbols();
 
                 foreach (var packageType in LinuxPackageTypes)
                 {
@@ -1191,7 +1213,7 @@ partial class Build
                     (_, null) => true,
                     (_, { } p) when p.Name.Contains("Samples.AspNetCoreRazorPages") => true, // always have to build this one
                     (_, { } p) when !string.IsNullOrWhiteSpace(SampleName) && p.Name.Contains(SampleName) => true,
-                    (var required, {} p) => p.RequiresDockerDependency() == required,
+                    (var required, { } p) => p.RequiresDockerDependency() == required,
                 })
                 .Where(x =>
                 {
@@ -1453,29 +1475,6 @@ partial class Build
                 .EnableTrxLogOutput(GetResultsDirectory(project)));
         });
 
-    Target UpdateSnapshots => _ => _
-        .Description("Updates verified snapshots files with received ones")
-        .Executes(() =>
-        {
-            var snapshotsDirectory = Path.Combine(TestsDirectory, "snapshots");
-            var directory = new DirectoryInfo(snapshotsDirectory);
-            var files = directory.GetFiles("*.received*");
-
-            var suffixLength = "received".Length;
-            foreach (var file in files)
-            {
-                var source = file.FullName;
-                var fileName = Path.GetFileNameWithoutExtension(source);
-                if (!fileName.EndsWith("received"))
-                {
-                    Logger.Warn($"Skipping file '{source}' as filename did not end with 'received'");
-                    continue;
-                }
-                var trimmedName = fileName.Substring(0, fileName.Length - suffixLength);
-                var dest = Path.Combine(directory.FullName, $"{trimmedName}verified{Path.GetExtension(source)}");
-                file.MoveTo(dest, overwrite: true);
-            }
-        });
 
     Target CheckBuildLogsForErrors => _ => _
        .Unlisted()
