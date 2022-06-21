@@ -41,7 +41,7 @@ FROM base as tester
 
 # Install .NET Core runtimes using install script
 RUN curl -sSL https://dot.net/v1/dotnet-install.sh --output dotnet-install.sh \
-    && echo "760596d2e182e0edf05f4a10bd0fa266086d700fdd96438d2663f28e538912e3  dotnet-install.sh" | sha256sum -c \
+    && echo "58dba3b5071cc8d0ed97fd7b3867e2b4e2dbaf6b402f9943314ce77d999e9b47  dotnet-install.sh" | sha256sum -c \
     && chmod +x ./dotnet-install.sh \
     && ./dotnet-install.sh --runtime aspnetcore --version 2.1.30 --install-dir /usr/share/dotnet --no-path \
     && ./dotnet-install.sh --runtime aspnetcore --version 3.0.3 --install-dir /usr/share/dotnet --no-path \
