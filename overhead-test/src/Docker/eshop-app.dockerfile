@@ -44,7 +44,7 @@ RUN apt-get update \
     curl
 
 # TODO Splunk: update with release
-ARG TRACER_VERSION=0.2.4
+ARG TRACER_VERSION=0.2.5
 
 RUN curl -LO https://github.com/signalfx/signalfx-dotnet-tracing/releases/download/v${TRACER_VERSION}/signalfx-dotnet-tracing_${TRACER_VERSION}_amd64.deb
 RUN dpkg -i ./signalfx-dotnet-tracing_${TRACER_VERSION}_amd64.deb
