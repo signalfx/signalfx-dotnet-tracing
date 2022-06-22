@@ -56,7 +56,7 @@ namespace Datadog.Trace.ClrProfiler
                 return spanContext;
             }
 
-            return SpanContextPropagator.Instance.Extract(value, (headers, key) => new List<string> { headers[key] });
+            return SpanContextPropagator.Instance.Extract(value);
         }
 
         void IDistributedTracer.SetSpanContext(IReadOnlyDictionary<string, string> value)
