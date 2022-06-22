@@ -22,6 +22,7 @@ These settings should be never used by the users.
 | `SIGNALFX_LOGS_DIRECT_SUBMISSION_MAX_BATCH_SIZE` | Configuration key for the maximum number of logs to send at one time  | `1000` |
 | `SIGNALFX_LOGS_DIRECT_SUBMISSION_MAX_QUEUE_SIZE` | Configuration key for the maximum number of logs to hold in internal queue at any one time | `100000` |
 | `SIGNALFX_LOGS_DIRECT_SUBMISSION_BATCH_PERIOD_SECONDS` | Configuration key for the time in seconds to wait between checking for batches | `2` |
+| `SIGNALFX_PROFILER_EXPORT_FORMAT` | Format in which data will be exported. Available values are: `Pprof` for pprof-gzip-base64 format, and `Text` for plain text stack trace. | `PProf` |
 
 ## Unsupported upstream settings
 
