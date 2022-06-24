@@ -3,8 +3,6 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-// Modified by Splunk Inc.
-
 using System;
 using System.Collections.Generic;
 using Datadog.Trace.DuckTyping;
@@ -74,7 +72,7 @@ namespace Datadog.Trace.ClrProfiler
             }
             else
             {
-                return SpanContextPropagator.Instance.Extract(values, (headers, key) => new List<string> { headers[key] });
+                return SpanContextPropagator.Instance.Extract(values);
             }
         }
 
