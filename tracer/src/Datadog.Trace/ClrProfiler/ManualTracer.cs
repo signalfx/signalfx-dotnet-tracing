@@ -3,8 +3,6 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-// Modified by Splunk Inc.
-
 using System;
 using System.Collections.Generic;
 using Datadog.Trace.DuckTyping;
@@ -72,8 +70,10 @@ namespace Datadog.Trace.ClrProfiler
             {
                 return spanContext;
             }
-
-            return SpanContextPropagator.Instance.Extract(values);
+            else
+            {
+                return SpanContextPropagator.Instance.Extract(values);
+            }
         }
 
         void IDistributedTracer.SetSpanContext(IReadOnlyDictionary<string, string> value)

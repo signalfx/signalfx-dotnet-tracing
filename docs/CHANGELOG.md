@@ -9,6 +9,8 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 ## Unreleased
 
+- Fix context propagation on .NET Framework.
+
 ### General
 
 ### Breaking changes
