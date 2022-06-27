@@ -54,8 +54,8 @@ The following settings are common to most instrumentation scenarios:
 |-|-|-|
 | `SIGNALFX_AZURE_APP_SERVICES` | Set to indicate that the profiler is running in the context of Azure App Services. | `false` |
 | `SIGNALFX_DOTNET_TRACER_HOME` | Installation location. Must be set manually to `/opt/signalfx` when instrumenting applications on Linux or background services in Azure App Service. |  _Automatically set ONLY by the Windows installer_ |
-| `SIGNALFX_PROFILER_EXCLUDE_PROCESSES` | Sets the filename of executables the profiler cannot attach to. Supports multiple comma-separated values, for example: `MyApp.exe,dotnet.exe` |  |
-| `SIGNALFX_PROFILER_PROCESSES` | Sets the filename of executables the profiler can attach to. Supports multiple comma-separated values, for example: `MyApp.exe,dotnet.exe` |  |
+| `SIGNALFX_PROFILER_EXCLUDE_PROCESSES` | Sets the filename of executables the profiler cannot attach to. Supports multiple semicolon-separated values, for example: `MyApp.exe;dotnet.exe` |  |
+| `SIGNALFX_PROFILER_PROCESSES` | Sets the filename of executables the profiler can attach to. Supports multiple semicolon-separated values, for example: `MyApp.exe;dotnet.exe` |  |
 | `SIGNALFX_TRACE_CONFIG_FILE` | Path of the JSON configuration file. |  |
 | `SIGNALFX_TRACE_ENABLED` | Enable to activate the tracer. | `true` |
 | `SIGNALFX_RUNTIME_METRICS_ENABLED` | Enable to activate the runtime metrics. | `false` |
