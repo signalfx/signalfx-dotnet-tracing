@@ -15,9 +15,15 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 ### Bugfixes
 
-- Fix context propagation on .NET Framework.
-
 ### Enhancements
+
+---
+
+## [Release 0.2.6](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.2.6)
+
+### Bugfixes
+
+- Fix context propagation on .NET Framework.
 
 ---
 
