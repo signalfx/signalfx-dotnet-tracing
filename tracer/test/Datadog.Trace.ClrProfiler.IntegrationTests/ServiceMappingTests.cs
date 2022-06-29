@@ -25,10 +25,12 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [SkippableFact]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
+        [Trait("SupportsInstrumentationVerification", "True")]
         public void RenamesService()
         {
             var expectedSpanCount = 76;
 
+            SetInstrumentationVerification();
             const string expectedOperationName = "http.request";
             const string expectedServiceName = "my-custom-client";
 
@@ -36,7 +38,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             Output.WriteLine($"Assigning port {httpPort} for the httpPort.");
 
             using (var agent = EnvironmentHelper.GetMockAgent())
-            using (RunSampleAndWaitForExit(agent, arguments: $"Port={httpPort}"))
+            using (var processResult = RunSampleAndWaitForExit(agent, arguments: $"Port={httpPort}"))
             {
                 var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
                 Assert.Equal(expectedSpanCount, spans.Count);
@@ -51,6 +53,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     Assert.Matches("WebRequest|HttpMessageHandler", span.Tags[Tags.InstrumentationName]);
                     Assert.False(span.Tags?.ContainsKey(Tags.Version), "External service span should not have service version tag.");
                 }
+
+                VerifyInstrumentation(processResult.Process);
             }
         }
     }

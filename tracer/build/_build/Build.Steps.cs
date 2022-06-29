@@ -117,7 +117,8 @@ partial class Build
 
     Project[] ClrProfilerIntegrationTests => new[]
     {
-        Solution.GetProject(Projects.ClrProfilerIntegrationTests)
+        Solution.GetProject(Projects.ClrProfilerIntegrationTests),
+        Solution.GetProject(Projects.ToolIntegrationTests)
     };
 
     readonly IEnumerable<TargetFramework> TargetFrameworks = new[]
@@ -697,8 +698,24 @@ partial class Build
             }
         });
 
+
+    Target CompileInstrumentationVerificationLibrary => _ => _
+        .Unlisted()
+        .DependsOn(Restore)
+        .After(CompileManagedSrc)
+        .Executes(() =>
+        {
+            DotNetMSBuild(x => x
+                .SetTargetPath(MsBuildProject)
+                .SetConfiguration(BuildConfiguration)
+                .SetTargetPlatformAnyCPU()
+                .SetProperty("BuildProjectReferences", true)
+                .SetTargets("BuildInstrumentationVerificationLibrary"));
+        });
+                                                        
     Target CompileManagedTestHelpers => _ => _
         .Unlisted()
+        .DependsOn(CompileInstrumentationVerificationLibrary)
         .After(Restore)
         .After(CompileManagedSrc)
         .Executes(() =>
@@ -717,6 +734,7 @@ partial class Build
         .Unlisted()
         .After(Restore)
         .After(CompileManagedSrc)
+        .DependsOn(CompileManagedTestHelpers)
         .Executes(() =>
         {
             // Always AnyCPU

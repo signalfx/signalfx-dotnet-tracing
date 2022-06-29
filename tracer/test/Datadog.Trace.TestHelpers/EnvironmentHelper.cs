@@ -44,10 +44,7 @@ namespace Datadog.Trace.TestHelpers
             _targetFramework = Assembly.GetAssembly(anchorType).GetCustomAttribute<TargetFrameworkAttribute>();
             _output = output;
             TracerHome = GetTracerHomePath();
-
-            // The Native loader is used only on Windows and Linux x64.
-            // We need to keep this check until all platforms/configurations are supported.
-            ProfilerPath = UseNativeLoader ? GetNativeLoaderPath() : GetTracerNativeDLLPath();
+            LogDirectory = DatadogLogging.GetLogDirectory();
 
             var parts = _targetFramework.FrameworkName.Split(',');
             _runtime = parts[0];
@@ -77,7 +74,7 @@ namespace Datadog.Trace.TestHelpers
 
         public string SampleName { get; }
 
-        public string ProfilerPath { get; }
+        public string LogDirectory { get; }
 
         public string TracerHome { get; }
 
@@ -241,13 +238,13 @@ namespace Datadog.Trace.TestHelpers
             {
                 environmentVariables["CORECLR_ENABLE_PROFILING"] = profilerEnabled;
                 environmentVariables["CORECLR_PROFILER"] = EnvironmentTools.ProfilerClsId;
-                environmentVariables["CORECLR_PROFILER_PATH"] = ProfilerPath;
+                environmentVariables["CORECLR_PROFILER_PATH"] = GetProfilerPath();
             }
             else
             {
                 environmentVariables["COR_ENABLE_PROFILING"] = profilerEnabled;
                 environmentVariables["COR_PROFILER"] = EnvironmentTools.ProfilerClsId;
-                environmentVariables["COR_PROFILER_PATH"] = ProfilerPath;
+                environmentVariables["COR_PROFILER_PATH"] = GetProfilerPath();
             }
 
             if (DebugModeEnabled)
@@ -553,6 +550,40 @@ namespace Datadog.Trace.TestHelpers
             _output.WriteLine($"Assigned port {logsCollector.Port} for the logsCollectorPort.");
 
             return logsCollector;
+        }
+
+        public bool IsRunningInAzureDevOps()
+        {
+            return Environment.GetEnvironmentVariable("SYSTEM_COLLECTIONID") != null;
+        }
+
+        public bool IsScheduledBuild()
+        {
+            return IsEnvironmentVariableSet("isScheduledBuild");
+        }
+
+        private bool IsEnvironmentVariableSet(string ev)
+        {
+            if (string.IsNullOrEmpty(ev))
+            {
+                return false;
+            }
+
+            var evValue = Environment.GetEnvironmentVariable(ev);
+            if (evValue == null)
+            {
+                CustomEnvironmentVariables.TryGetValue(ev, out evValue);
+            }
+
+            return evValue == "1" || string.Equals(evValue, "true", StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        private string GetProfilerPath()
+        {
+            // The Tracer is not currently utilizing the Native Loader in production. It is only being used in the Continuous Profiler beta.
+            // Because of that, we don't test it in the default pipeline.
+            bool useNativeLoader = IsEnvironmentVariableSet(InstrumentationVerification.UseNativeLoader);
+            return useNativeLoader ? GetNativeLoaderPath() : GetTracerNativeDLLPath();
         }
     }
 }

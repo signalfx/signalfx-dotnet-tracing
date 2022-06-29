@@ -24,6 +24,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [SkippableFact]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
+        [Trait("SupportsInstrumentationVerification", "True")]
         public void MetricsDisabled()
         {
             SetEnvironmentVariable("SIGNALFX_RUNTIME_METRICS_ENABLED", "0");
@@ -40,7 +41,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [SkippableFact]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
-        public void SubmitsMetrics()
+        [Trait("SupportsInstrumentationVerification", "True")]
+        public void UdpSubmitsMetrics()
         {
             EnvironmentHelper.EnableDefaultTransport();
             RunTest();
@@ -49,6 +51,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         private void RunTest()
         {
             SetEnvironmentVariable("SIGNALFX_RUNTIME_METRICS_ENABLED", "1");
+            SetInstrumentationVerification();
 
             using var agent = EnvironmentHelper.GetMockAgent(useStatsD: true);
             Output.WriteLine($"Assigning port {agent.MetricsPort} for the SignalFx metrics.");
@@ -76,6 +79,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             }
 
             Assert.Empty(agent.Exceptions);
+            VerifyInstrumentation(processResult.Process);
         }
     }
 }
