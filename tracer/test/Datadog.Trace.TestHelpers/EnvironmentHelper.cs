@@ -31,6 +31,7 @@ namespace Datadog.Trace.TestHelpers
         private readonly bool _isCoreClr;
         private readonly string _samplesDirectory;
         private readonly TargetFrameworkAttribute _targetFramework;
+        private TestTransports _transportType = TestTransports.Tcp;
 
         public EnvironmentHelper(
             string sampleName,
@@ -63,8 +64,6 @@ namespace Datadog.Trace.TestHelpers
                           ? "Samples."
                           : string.Empty;
         }
-
-        public TestTransports TransportType { get; set; } = TestTransports.Tcp;
 
         public bool AutomaticInstrumentationEnabled { get; private set; } = true;
 
@@ -299,26 +298,37 @@ namespace Datadog.Trace.TestHelpers
 
         public void ConfigureTransportVariables(IDictionary<string, string> environmentVariables, MockTracerAgent agent)
         {
-            // use DatadogAgent exporter instead of Zipkin, because most of the integration tests use MockTracerAgent instead of MockZipkinCollector
-            environmentVariables["SIGNALFX_EXPORTER"] = "DatadogAgent";
-
-            if (TransportType == TestTransports.WindowsNamedPipe)
+            var envVars = agent switch
             {
-                string apmKey = "SIGNALFX_TRACE_PIPE_NAME";
-                string dsdKey = "SIGNALFX_DOGSTATSD_PIPE_NAME";
-
-                environmentVariables.Add(apmKey, agent.TracesUdsPath);
-                environmentVariables.Add(dsdKey, agent.StatsUdsPath);
-            }
-            else if (TransportType == TestTransports.Tcp)
-            {
-                environmentVariables["SIGNALFX_TRACE_AGENT_HOSTNAME"] = "127.0.0.1";
-                environmentVariables["SIGNALFX_TRACE_AGENT_PORT"] = agent.Port.ToString();
-
-                if (agent.MetricsPort != default(int))
+#if NETCOREAPP3_1_OR_GREATER
+                MockTracerAgent.UdsAgent uds => new Dictionary<string, string>
                 {
-                    environmentVariables["SIGNALFX_METRICS_ENDPOINT_URL"] = $"http://127.0.0.1:{agent.MetricsPort}/";
-                }
+                    { "SIGNALFX_APM_RECEIVER_SOCKET", uds.TracesUdsPath },
+                    { "SIGNALFX_DOGSTATSD_SOCKET", uds.StatsUdsPath },
+                },
+#endif
+                MockTracerAgent.NamedPipeAgent np => new Dictionary<string, string>
+                {
+                    { "SIGNALFX_TRACE_PIPE_NAME", np.TracesWindowsPipeName },
+                    { "SIGNALFX_DOGSTATSD_PIPE_NAME", np.StatsWindowsPipeName },
+                },
+                MockTracerAgent.TcpUdpAgent { StatsdPort: not 0 } tcp => new Dictionary<string, string>
+                {
+                    { "SIGNALFX_TRACE_AGENT_HOSTNAME", "127.0.0.1" },
+                    { "SIGNALFX_TRACE_AGENT_PORT", tcp.Port.ToString() },
+                    { "SIGNALFX_DOGSTATSD_PORT", tcp.StatsdPort.ToString() },
+                },
+                MockTracerAgent.TcpUdpAgent tcp => new Dictionary<string, string>
+                {
+                    { "SIGNALFX_TRACE_AGENT_HOSTNAME", "127.0.0.1" },
+                    { "SIGNALFX_TRACE_AGENT_PORT", tcp.Port.ToString() },
+                },
+                _ => throw new InvalidOperationException($"Unknown MockTracerAgent type {agent?.GetType()}")
+            };
+
+            foreach (var envVar in envVars)
+            {
+                environmentVariables[envVar.Key] = envVar.Value;
             }
         }
 
@@ -499,42 +509,72 @@ namespace Datadog.Trace.TestHelpers
 
         public void EnableWindowsNamedPipes(string tracePipeName = null, string statsPipeName = null)
         {
-            TransportType = TestTransports.WindowsNamedPipe;
+            if (!EnvironmentTools.IsWindows())
+            {
+                throw new NotSupportedException("Windows named pipes is only supported on Windows");
+            }
+
+            _transportType = TestTransports.WindowsNamedPipe;
         }
 
         public void EnableDefaultTransport()
         {
-            TransportType = TestTransports.Tcp;
+            _transportType = TestTransports.Tcp;
+        }
+
+        public void EnableUnixDomainSockets()
+        {
+#if NETCOREAPP3_1_OR_GREATER
+            _transportType = TestTransports.Uds;
+#else
+            // Unsupported
+            throw new NotSupportedException("UDS is not supported in non-netcore applications or < .NET Core 3.1 ");
+#endif
+        }
+
+        public void EnableTransport(TestTransports transport)
+        {
+            switch (transport)
+            {
+                case TestTransports.Tcp:
+                    EnableDefaultTransport();
+                    break;
+                case TestTransports.Uds:
+                    EnableUnixDomainSockets();
+                    break;
+                case TestTransports.WindowsNamedPipe:
+                    EnableWindowsNamedPipes();
+                    break;
+                default:
+                    throw new InvalidOperationException("Unknown transport " + transport.ToString());
+            }
         }
 
         public MockTracerAgent GetMockAgent(bool useStatsD = false, int? fixedPort = null, bool useTelemetry = false)
         {
             MockTracerAgent agent = null;
 
-#if NETCOREAPP
             // Decide between transports
-            if (TransportType == TestTransports.WindowsNamedPipe)
+            if (_transportType == TestTransports.Uds)
             {
-                agent = new MockTracerAgent(new WindowsPipesConfig($"trace-{Guid.NewGuid()}", $"metrics-{Guid.NewGuid()}") { UseDogstatsD = useStatsD, UseTelemetry = useTelemetry });
-            }
-            else
-            {
-                // Default
-                var agentPort = fixedPort ?? TcpPortProvider.GetOpenPort();
-                agent = new MockTracerAgent(agentPort, useSfxMetrics: useStatsD, useTelemetry: useTelemetry);
-            }
+#if NETCOREAPP3_1_OR_GREATER
+                var tracesUdsPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                var metricsUdsPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                agent = MockTracerAgent.Create(new UnixDomainSocketConfig(tracesUdsPath, metricsUdsPath) { UseDogstatsD = useStatsD, UseTelemetry = useTelemetry });
 #else
-            if (TransportType == TestTransports.WindowsNamedPipe)
+            throw new NotSupportedException("UDS is not supported in non-netcore applications or < .NET Core 3.1 ");
+#endif
+            }
+            else if (_transportType == TestTransports.WindowsNamedPipe)
             {
-                agent = new MockTracerAgent(new WindowsPipesConfig($"trace-{Guid.NewGuid()}", $"metrics-{Guid.NewGuid()}") { UseDogstatsD = useStatsD, UseTelemetry = useTelemetry });
+                agent = MockTracerAgent.Create(new WindowsPipesConfig($"trace-{Guid.NewGuid()}", $"metrics-{Guid.NewGuid()}") { UseDogstatsD = useStatsD, UseTelemetry = useTelemetry });
             }
             else
             {
                 // Default
                 var agentPort = fixedPort ?? TcpPortProvider.GetOpenPort();
-                agent = new MockTracerAgent(agentPort, useSfxMetrics: useStatsD, useTelemetry: useTelemetry);
+                agent = MockTracerAgent.Create(agentPort, useStatsd: useStatsD, useTelemetry: useTelemetry);
             }
-#endif
 
             _output.WriteLine($"Assigned port {agent.Port} for the agentPort.");
             _output.WriteLine($"Agent listener info: {agent.ListenerInfo}");

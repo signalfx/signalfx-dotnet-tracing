@@ -48,6 +48,45 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             RunTest();
         }
 
+#if NETCOREAPP3_1_OR_GREATER
+        [SkippableFact]
+        [Trait("Category", "EndToEnd")]
+        [Trait("RunOnWindows", "False")]
+        public void UdsSubmitsMetrics()
+        {
+            EnvironmentHelper.EnableUnixDomainSockets();
+            RunTest();
+        }
+#endif
+
+        [SkippableFact]
+        [Trait("Category", "EndToEnd")]
+        [Trait("RunOnWindows", "True")]
+        public void NamedPipesSubmitsMetrics()
+        {
+            if (!EnvironmentTools.IsWindows())
+            {
+                throw new SkipException("Can't use WindowsNamedPipes on non-Windows");
+            }
+
+            EnvironmentHelper.EnableWindowsNamedPipes();
+            // The server implementation of named pipes is flaky so have 3 attempts
+            var attemptsRemaining = 3;
+            while (true)
+            {
+                try
+                {
+                    attemptsRemaining--;
+                    RunTest();
+                    return;
+                }
+                catch (Exception ex) when (attemptsRemaining > 0 && ex is not SkipException)
+                {
+                    Output.WriteLine($"Error executing test. {attemptsRemaining} attempts remaining. {ex}");
+                }
+            }
+        }
+
         private void RunTest()
         {
             SetEnvironmentVariable("SIGNALFX_RUNTIME_METRICS_ENABLED", "1");
