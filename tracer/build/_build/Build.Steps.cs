@@ -345,9 +345,8 @@ partial class Build
            {
                var source = NativeProfilerProject.Directory / "bin" / BuildConfiguration / architecture.ToString() /
                             $"{NativeProfilerModule}.pdb";
-               var dest = SymbolsDirectory / $"win-{architecture}";
-               Logger.Info($"Copying '{source}' to '{dest}'");
-               CopyFileToDirectory(source, dest, FileExistsPolicy.Overwrite);
+               var dest = SymbolsDirectory / $"win-{architecture}" / Path.GetFileName(source);
+               CopyFile(source, dest, FileExistsPolicy.Overwrite);
            }
       });
 
