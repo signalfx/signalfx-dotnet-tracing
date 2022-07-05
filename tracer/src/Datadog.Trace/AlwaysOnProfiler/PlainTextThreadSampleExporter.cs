@@ -23,7 +23,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
             stackTraceBuilder.AppendFormat(
                 CultureInfo.InvariantCulture,
                 "\"{0}\" #{1} prio=0 os_prio=0 cpu=0 elapsed=0 tid=0x{2:x} nid=0x{3:x}\n",
-                threadSample.Timestamp,
+                threadSample.ThreadName,
                 threadSample.ThreadIndex,
                 threadSample.ManagedId,
                 threadSample.NativeId);
