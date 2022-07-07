@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Datadog.Trace.ClrProfiler.Managed.Loader
 {
@@ -29,14 +30,11 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
         /// </summary>
         static Startup()
         {
-            // Start a new thread so it can be filtered out for the profiling
-            var thread = new Thread(ExecuteStartup)
-            {
-                Name = "SignalFx Startup Thread",
-                IsBackground = true
-            };
-
-            thread.Start();
+            var thread = Thread.CurrentThread;
+            var oldName = thread.Name;
+            thread.Name = "SignalFx Startup Thread";
+            ExecuteStartup();
+            thread.Name = oldName;
         }
 
         internal static string ManagedProfilerDirectory { get; private set; }
@@ -79,6 +77,8 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
                 StartupLogger.Log("Invoking managed tracer.");
                 TryInvokeManagedMethod("Datadog.Trace.ClrProfiler.Instrumentation", "Initialize");
             }
+
+            AppDomain.CurrentDomain.AssemblyResolve -= AssemblyResolve_ManagedProfilerDependencies;
         }
 
         private static void TryInvokeManagedMethod(string typeName, string methodName)
