@@ -8,6 +8,7 @@
 using System;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 
 namespace Datadog.Trace.ClrProfiler.Managed.Loader
 {
@@ -27,6 +28,20 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
         /// This method also attempts to load the SignalFx.TracingTrace .NET assembly.
         /// </summary>
         static Startup()
+        {
+            // Start a new thread so it can be filtered out for the profiling
+            var thread = new Thread(ExecuteStartup)
+            {
+                Name = "SignalFx Startup Thread",
+                IsBackground = true
+            };
+
+            thread.Start();
+        }
+
+        internal static string ManagedProfilerDirectory { get; private set; }
+
+        private static void ExecuteStartup()
         {
             ManagedProfilerDirectory = ResolveManagedProfilerDirectory();
             StartupLogger.Debug("Resolving managed profiler directory to: {0}", ManagedProfilerDirectory);
@@ -65,8 +80,6 @@ namespace Datadog.Trace.ClrProfiler.Managed.Loader
                 TryInvokeManagedMethod("Datadog.Trace.ClrProfiler.Instrumentation", "Initialize");
             }
         }
-
-        internal static string ManagedProfilerDirectory { get; }
 
         private static void TryInvokeManagedMethod(string typeName, string methodName)
         {

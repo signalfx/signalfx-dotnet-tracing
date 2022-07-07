@@ -18,6 +18,11 @@ namespace Datadog.Trace.AlwaysOnProfiler
         /// </summary>
         public const string BackgroundThreadName = "SignalFx Profiling Sampler Thread";
 
+        /// <summary>
+        /// Name of the thread initializing SignalFx profiling.
+        /// </summary>
+        public const string StartupThreadName = "SignalFx Startup Thread";
+
         // If you change any of these constants, check with always_on_profiler.cpp first
         private const int BufferSize = 200 * 1024;
 

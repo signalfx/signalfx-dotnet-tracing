@@ -120,7 +120,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         code = ReadShort();
                     }
 
-                    if (threadName == ThreadSampler.BackgroundThreadName)
+                    if (threadName is ThreadSampler.BackgroundThreadName or ThreadSampler.StartupThreadName)
                     {
                         // TODO Splunk: add configuration option to include the sampler thread. By default remove it.
                         continue;
