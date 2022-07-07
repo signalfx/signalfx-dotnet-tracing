@@ -227,6 +227,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.GraphQL
             catch (Exception ex)
             {
                 Log.Error(ex, "Error creating GraphQL error message.");
+                Util.StringBuilderCache.Release(builder);
                 return "errors: []";
             }
 
