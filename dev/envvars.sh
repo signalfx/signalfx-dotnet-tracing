@@ -41,7 +41,7 @@ CURDIR=$(current_dir)
 # Enable .NET Framework Profiling API
 export COR_ENABLE_PROFILING="1"
 export COR_PROFILER="{B4C89B0F-9908-4F73-9F59-0D77C5A06874}"
-export COR_PROFILER_PATH="${CURDIR}/shared/bin/monitoring-home/tracer${OPT_DIR}SignalFx.Tracing.ClrProfiler.Native.${SUFIX}"
+export COR_PROFILER_PATH="${CURDIR}/shared/bin/monitoring-home/tracer/${OPT_DIR}SignalFx.Tracing.ClrProfiler.Native.${SUFIX}"
 
 # Enable .NET Core Profiling API
 export CORECLR_ENABLE_PROFILING="1"
