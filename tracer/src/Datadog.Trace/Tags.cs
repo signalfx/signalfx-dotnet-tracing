@@ -659,5 +659,10 @@ namespace Datadog.Trace
             /// </summary>
             public const string PeerPort = "net.peer.port";
         }
+
+        internal static class TagPropagation
+        {
+            internal const string Error = "_dd.propagation_error";
+        }
     }
 }
