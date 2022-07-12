@@ -18,7 +18,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
         public ThreadSampleExporter CreateThreadSampleExporter()
         {
-            var logSender = new OtlpHttpLogSender(_tracerSettings.ExporterSettings);
+            var logSender = new OtlpHttpLogSender(_tracerSettings.ExporterSettings.LogsEndpointUrl);
             return _tracerSettings.ExporterSettings.ProfilerExportFormat switch
             {
                 ProfilerExportFormat.Pprof => new PprofThreadSampleExporter(_tracerSettings, logSender),

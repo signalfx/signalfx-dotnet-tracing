@@ -15,6 +15,8 @@ namespace Datadog.Trace.AlwaysOnProfiler
     {
         private readonly ILogSender _logSender;
 
+        private readonly LogsData _logsData;
+
         protected ThreadSampleExporter(ImmutableTracerSettings tracerSettings, ILogSender logSender)
         {
             FixedLogRecordAttributes = new ReadOnlyCollection<KeyValue>(new List<KeyValue>
@@ -25,13 +27,11 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 GdiProfilingConventions.LogRecord.Attributes.Type
             });
 
-            LogsData = GdiProfilingConventions.CreateLogsData(tracerSettings.GlobalTags);
+            _logsData = GdiProfilingConventions.CreateLogsData(tracerSettings.GlobalTags);
             _logSender = logSender ?? throw new ArgumentNullException(nameof(logSender));
         }
 
         private ReadOnlyCollection<KeyValue> FixedLogRecordAttributes { get; }
-
-        private LogsData LogsData { get; }
 
         public void ExportThreadSamples(List<ThreadSample> threadSamples)
         {
@@ -43,7 +43,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
             // The same _logsData instance is used on all export messages. With the exception of the list of
             // LogRecords, the Logs property, all other fields are prepopulated. At this point the code just`
             // need to create a LogRecord for each thread sample and add it to the Logs list.
-            var logRecords = LogsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs;
+            var logRecords = _logsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs;
 
             foreach (var threadSample in threadSamples)
             {
@@ -61,13 +61,13 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
             try
             {
-                _logSender.Send(LogsData);
+                _logSender.Send(_logsData);
             }
             finally
             {
-                // The exporter reuses the LogsData object, but the actual log records are not
+                // The exporter reuses the _logsData object, but the actual log records are not
                 // needed after serialization, release the log records so they can be garbage collected.
-                LogsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs.Clear();
+                _logsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs.Clear();
             }
         }
 

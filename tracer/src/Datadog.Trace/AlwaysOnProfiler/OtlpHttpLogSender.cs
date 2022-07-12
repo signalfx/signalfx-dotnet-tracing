@@ -14,11 +14,11 @@ internal class OtlpHttpLogSender : ILogSender
 {
     private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(OtlpHttpLogSender));
 
-    private readonly ImmutableExporterSettings _exporterSettings;
+    private readonly Uri _logsEndpointUrl;
 
-    public OtlpHttpLogSender(ImmutableExporterSettings exporterSettings)
+    public OtlpHttpLogSender(Uri logsEndpointUrl)
     {
-        _exporterSettings = exporterSettings ?? throw new ArgumentNullException(nameof(exporterSettings));
+        _logsEndpointUrl = logsEndpointUrl ?? throw new ArgumentNullException(nameof(logsEndpointUrl));
     }
 
     public void Send(LogsData logsData)
@@ -27,7 +27,7 @@ internal class OtlpHttpLogSender : ILogSender
 
         try
         {
-            httpWebRequest = WebRequest.CreateHttp(_exporterSettings.LogsEndpointUrl);
+            httpWebRequest = WebRequest.CreateHttp(_logsEndpointUrl);
             httpWebRequest.ContentType = "application/x-protobuf";
             httpWebRequest.Method = "POST";
             httpWebRequest.Headers.Add(CommonHttpHeaderNames.TracingEnabled, "false");
@@ -38,7 +38,7 @@ internal class OtlpHttpLogSender : ILogSender
         }
         catch (Exception ex)
         {
-            Log.Error("Exception preparing request to send thread samples to {0}: {1}", _exporterSettings.LogsEndpointUrl, ex);
+            Log.Error(ex, "Exception preparing request to send thread samples to {0}", _logsEndpointUrl);
             return;
         }
 
@@ -51,11 +51,11 @@ internal class OtlpHttpLogSender : ILogSender
                 return;
             }
 
-            Log.Warning("HTTP error sending thread samples to {0}: {1}", _exporterSettings.LogsEndpointUrl, httpWebResponse.StatusCode);
+            Log.Warning("HTTP error sending thread samples to {0}: {1}", _logsEndpointUrl, httpWebResponse.StatusCode);
         }
         catch (Exception ex)
         {
-            Log.Error("Exception sending thread samples to {0}: {1}", _exporterSettings.LogsEndpointUrl, ex.Message);
+            Log.Error(ex, "Exception sending thread samples to {0}", _logsEndpointUrl);
         }
     }
 }
