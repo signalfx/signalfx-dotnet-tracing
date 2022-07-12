@@ -8,7 +8,7 @@ using Datadog.Tracer.OpenTelemetry.Proto.Logs.V1;
 namespace Datadog.Trace.AlwaysOnProfiler;
 
 /// <summary>
-/// Sends logs in binary-encoded protobuf format over http.
+/// Sends logs in binary-encoded protobuf format over HTTP.
 /// </summary>
 internal class OtlpHttpLogSender : ILogSender
 {

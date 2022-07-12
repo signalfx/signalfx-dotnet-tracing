@@ -45,7 +45,7 @@ public class ThreadSampleExporterTests
         // 987654321 in big-endian order concatenated with 1234567890 in big-endian order
         var expectedTraceBytes = new byte[16] { 0, 0, 0, 0, 58, 222, 104, 177, 0, 0, 0, 0, 73, 150, 2, 210 };
 
-        var log = testSender.SentLogs[0].ResourceLogs[0].InstrumentationLibraryLogs[0].Logs[0];
+        var log = testSender.SentLogs[0];
 
         Assert.Equal(expectedSpanBytes, log.SpanId);
         Assert.Equal(expectedTraceBytes, log.TraceId);
@@ -53,11 +53,12 @@ public class ThreadSampleExporterTests
 
     private class TestSender : ILogSender
     {
-        public IList<LogsData> SentLogs { get; } = new List<LogsData>();
+        public IList<LogRecord> SentLogs { get; } = new List<LogRecord>();
 
         public void Send(LogsData logsData)
         {
-            SentLogs.Add(logsData);
+            var logRecord = logsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs[0];
+            SentLogs.Add(logRecord);
         }
     }
 }

@@ -52,8 +52,8 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
                 if (threadSample.SpanId != 0 || threadSample.TraceIdHigh != 0 || threadSample.TraceIdLow != 0)
                 {
-                    logRecord.SpanId = GetBigEndianBytes(threadSample.SpanId);
-                    logRecord.TraceId = GetBigEndianBytes(threadSample.TraceIdHigh, threadSample.TraceIdLow);
+                    logRecord.SpanId = ToBigEndianBytes(threadSample.SpanId);
+                    logRecord.TraceId = ToBigEndianBytes(threadSample.TraceIdHigh, threadSample.TraceIdLow);
                 }
 
                 logRecords.Add(logRecord);
@@ -71,10 +71,10 @@ namespace Datadog.Trace.AlwaysOnProfiler
             }
         }
 
-        private static byte[] GetBigEndianBytes(long high, long low)
+        private static byte[] ToBigEndianBytes(long high, long low)
         {
-            var highBytes = GetBigEndianBytes(high);
-            var lowBytes = GetBigEndianBytes(low);
+            var highBytes = ToBigEndianBytes(high);
+            var lowBytes = ToBigEndianBytes(low);
 
             var finalBytes = new byte[16];
 
@@ -84,7 +84,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
             return finalBytes;
         }
 
-        private static byte[] GetBigEndianBytes(long val)
+        private static byte[] ToBigEndianBytes(long val)
         {
             var bytes = BitConverter.GetBytes(val);
             if (BitConverter.IsLittleEndian)
