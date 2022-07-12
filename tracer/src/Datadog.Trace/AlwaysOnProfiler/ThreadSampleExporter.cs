@@ -3,22 +3,21 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Net;
 using Datadog.Trace.Configuration;
-using Datadog.Trace.ExtensionMethods;
-using Datadog.Trace.Logging;
-using Datadog.Trace.Propagation;
 using Datadog.Tracer.OpenTelemetry.Proto.Common.V1;
 using Datadog.Tracer.OpenTelemetry.Proto.Logs.V1;
 using Datadog.Tracer.OpenTelemetry.Proto.Resource.V1;
+using BitConverter = System.BitConverter;
 
 namespace Datadog.Trace.AlwaysOnProfiler
 {
     internal abstract class ThreadSampleExporter
     {
-        protected static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(ThreadSampleExporter));
+        private readonly ILogSender _logSender;
 
-        protected ThreadSampleExporter(ImmutableTracerSettings tracerSettings)
+        private readonly LogsData _logsData;
+
+        protected ThreadSampleExporter(ImmutableTracerSettings tracerSettings, ILogSender logSender)
         {
             FixedLogRecordAttributes = new ReadOnlyCollection<KeyValue>(new List<KeyValue>
             {
@@ -28,16 +27,11 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 GdiProfilingConventions.LogRecord.Attributes.Type
             });
 
-            LogsEndpointUrl = tracerSettings.ExporterSettings.LogsEndpointUrl;
-
-            LogsData = GdiProfilingConventions.CreateLogsData(tracerSettings.GlobalTags);
+            _logsData = GdiProfilingConventions.CreateLogsData(tracerSettings.GlobalTags);
+            _logSender = logSender ?? throw new ArgumentNullException(nameof(logSender));
         }
 
-        protected ReadOnlyCollection<KeyValue> FixedLogRecordAttributes { get; }
-
-        protected Uri LogsEndpointUrl { get; }
-
-        protected LogsData LogsData { get; }
+        private ReadOnlyCollection<KeyValue> FixedLogRecordAttributes { get; }
 
         public void ExportThreadSamples(List<ThreadSample> threadSamples)
         {
@@ -49,7 +43,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
             // The same _logsData instance is used on all export messages. With the exception of the list of
             // LogRecords, the Logs property, all other fields are prepopulated. At this point the code just`
             // need to create a LogRecord for each thread sample and add it to the Logs list.
-            var logRecords = LogsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs;
+            var logRecords = _logsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs;
 
             foreach (var threadSample in threadSamples)
             {
@@ -58,62 +52,50 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
                 if (threadSample.SpanId != 0 || threadSample.TraceIdHigh != 0 || threadSample.TraceIdLow != 0)
                 {
-                    // TODO Splunk: Add tests and validate.
-                    logRecord.SpanId = BitConverter.GetBytes(threadSample.SpanId);
-                    logRecord.TraceId = BitConverter.GetBytes(threadSample.TraceIdHigh).Concat(BitConverter.GetBytes(threadSample.TraceIdLow));
+                    logRecord.SpanId = ToBigEndianBytes(threadSample.SpanId);
+                    logRecord.TraceId = ToBigEndianBytes(threadSample.TraceIdHigh, threadSample.TraceIdLow);
                 }
 
                 logRecords.Add(logRecord);
             }
 
-            SendLogsData();
-        }
-
-        protected abstract string CreateBody(ThreadSample threadSample);
-
-        private void SendLogsData()
-        {
-            HttpWebRequest httpWebRequest;
-
             try
             {
-                httpWebRequest = WebRequest.CreateHttp(LogsEndpointUrl);
-                httpWebRequest.ContentType = "application/x-protobuf";
-                httpWebRequest.Method = "POST";
-                httpWebRequest.Headers.Add(CommonHttpHeaderNames.TracingEnabled, "false");
-
-                using var stream = httpWebRequest.GetRequestStream();
-                Vendors.ProtoBuf.Serializer.Serialize(stream, LogsData);
-                stream.Flush();
-            }
-            catch (Exception ex)
-            {
-                Log.Error("Exception preparing request to send thread samples to {0}: {1}", LogsEndpointUrl, ex);
-                return;
+                _logSender.Send(_logsData);
             }
             finally
             {
                 // The exporter reuses the _logsData object, but the actual log records are not
                 // needed after serialization, release the log records so they can be garbage collected.
-                LogsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs.Clear();
-            }
-
-            try
-            {
-                using var httpWebResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-
-                if (httpWebResponse.StatusCode >= HttpStatusCode.OK && httpWebResponse.StatusCode < HttpStatusCode.MultipleChoices)
-                {
-                    return;
-                }
-
-                Log.Warning("HTTP error sending thread samples to {0}: {1}", LogsEndpointUrl, httpWebResponse.StatusCode);
-            }
-            catch (Exception ex)
-            {
-                Log.Error("Exception sending thread samples to {0}: {1}", LogsEndpointUrl, ex.Message);
+                _logsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs.Clear();
             }
         }
+
+        private static byte[] ToBigEndianBytes(long high, long low)
+        {
+            var highBytes = ToBigEndianBytes(high);
+            var lowBytes = ToBigEndianBytes(low);
+
+            var finalBytes = new byte[16];
+
+            highBytes.CopyTo(finalBytes, 0);
+            lowBytes.CopyTo(finalBytes, 8);
+
+            return finalBytes;
+        }
+
+        private static byte[] ToBigEndianBytes(long val)
+        {
+            var bytes = BitConverter.GetBytes(val);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(bytes);
+            }
+
+            return bytes;
+        }
+
+        protected abstract string CreateBody(ThreadSample threadSample);
 
         private LogRecord CreateLogRecord(string body, ulong timeUnixNanoseconds)
         {

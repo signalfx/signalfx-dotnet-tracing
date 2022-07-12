@@ -8,8 +8,8 @@ namespace Datadog.Trace.AlwaysOnProfiler
 {
     internal class PlainTextThreadSampleExporter : ThreadSampleExporter
     {
-        internal PlainTextThreadSampleExporter(ImmutableTracerSettings tracerSettings)
-        : base(tracerSettings)
+        internal PlainTextThreadSampleExporter(ImmutableTracerSettings tracerSettings, ILogSender logSender)
+        : base(tracerSettings, logSender)
         {
         }
 

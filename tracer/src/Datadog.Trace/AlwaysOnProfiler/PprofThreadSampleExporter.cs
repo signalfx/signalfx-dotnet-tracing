@@ -12,8 +12,8 @@ namespace Datadog.Trace.AlwaysOnProfiler
 {
     internal class PprofThreadSampleExporter : ThreadSampleExporter
     {
-        public PprofThreadSampleExporter(ImmutableTracerSettings tracerSettings)
-            : base(tracerSettings)
+        public PprofThreadSampleExporter(ImmutableTracerSettings tracerSettings, ILogSender logSender)
+            : base(tracerSettings, logSender)
         {
         }
 
