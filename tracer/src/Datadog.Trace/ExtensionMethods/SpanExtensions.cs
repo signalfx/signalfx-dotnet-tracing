@@ -144,6 +144,8 @@ namespace Datadog.Trace.ExtensionMethods
             // Check the customers http statuses that should be marked as errors
             if (tracerSettings.IsErrorStatusCode(statusCode, isServer))
             {
+                span.Error = true;
+
                 // if an error message already exists (e.g. from a previous exception), don't replace it
                 if (string.IsNullOrEmpty(span.GetTag(Tags.ErrorMsg)))
                 {
