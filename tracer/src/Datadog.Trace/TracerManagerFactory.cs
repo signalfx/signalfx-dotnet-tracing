@@ -183,8 +183,11 @@ namespace Datadog.Trace
                     return new ExporterWriter(new ZipkinExporter(settings), metrics);
                 default:
                     var apiRequestFactory = TracesTransportStrategy.Get(settings.ExporterSettings);
-                    var api = new Api(apiRequestFactory, statsd, rates => sampler.SetDefaultSampleRates(rates), settings.ExporterSettings.PartialFlushEnabled);
-                    return new AgentWriter(api, metrics, maxBufferSize: settings.TraceBufferSize);
+                    var api = new Api(apiRequestFactory, statsd, sampler.SetDefaultSampleRates, settings.ExporterSettings.PartialFlushEnabled, settings.StatsComputationEnabled);
+
+                    var statsAggregator = StatsAggregator.Create(api, settings);
+
+                    return new AgentWriter(api, statsAggregator, metrics, maxBufferSize: settings.TraceBufferSize);
             }
         }
 

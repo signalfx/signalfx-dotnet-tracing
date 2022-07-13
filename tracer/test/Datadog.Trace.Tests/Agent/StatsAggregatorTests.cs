@@ -51,7 +51,7 @@ namespace Datadog.Trace.Tests.Agent
                 while (stopwatch.Elapsed.Minutes < 1)
                 {
                     // Flush is not called if no spans are processed
-                    aggregator.Add(new Span(new SpanContext(1, 1), DateTime.UtcNow));
+                    aggregator.Add(new Span(new SpanContext(TraceId.CreateFromInt(1), 1), DateTime.UtcNow));
 
                     if (mutex.Wait(TimeSpan.FromMilliseconds(100)))
                     {
@@ -80,7 +80,7 @@ namespace Datadog.Trace.Tests.Agent
             // Dispose immediately to make Flush complete without delay
             await aggregator.DisposeAsync();
 
-            aggregator.Add(new Span(new SpanContext(1, 2), DateTimeOffset.UtcNow));
+            aggregator.Add(new Span(new SpanContext(TraceId.CreateFromInt(1), 2), DateTimeOffset.UtcNow));
 
             await aggregator.Flush();
 
@@ -114,14 +114,14 @@ namespace Datadog.Trace.Tests.Agent
             {
                 var start = DateTimeOffset.UtcNow;
 
-                var simpleSpan = new Span(new SpanContext(1, 1, serviceName: "service"), start);
+                var simpleSpan = new Span(new SpanContext(TraceId.CreateFromInt(1), 1, serviceName: "service"), start);
                 simpleSpan.SetDuration(TimeSpan.FromMilliseconds(100));
 
-                var errorSpan = new Span(new SpanContext(2, 2, serviceName: "service"), start);
+                var errorSpan = new Span(new SpanContext(TraceId.CreateFromInt(2), 2, serviceName: "service"), start);
                 errorSpan.Error = true;
                 errorSpan.SetDuration(TimeSpan.FromMilliseconds(200));
 
-                var parentSpan = new Span(new SpanContext(3, 3, serviceName: "service"), start);
+                var parentSpan = new Span(new SpanContext(TraceId.CreateFromInt(3), 3, serviceName: "service"), start);
                 parentSpan.SetDuration(TimeSpan.FromMilliseconds(300));
 
                 // childSpan shouldn't be recorded, because it's not top-level and doesn't have the Measured tag
@@ -133,7 +133,7 @@ namespace Datadog.Trace.Tests.Agent
                 measuredChildSpan.SetDuration(TimeSpan.FromMilliseconds(500));
 
                 // snapshotSpan shouldn't be recorded, because it has the PartialSnapshot metric (even though it is top-level)
-                var snapshotSpan = new Span(new SpanContext(4, 4, serviceName: "service"), start);
+                var snapshotSpan = new Span(new SpanContext(TraceId.CreateFromInt(4), 4, serviceName: "service"), start);
                 snapshotSpan.SetMetric(Tags.PartialSnapshot, 1.0);
                 snapshotSpan.SetDuration(TimeSpan.FromMilliseconds(600));
 

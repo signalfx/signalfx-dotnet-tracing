@@ -85,28 +85,6 @@ namespace Datadog.Trace.Agent
             return SendWithRetry(_tracesEndpoint, _sendTraces, state);
         }
 
-        // internal for testing
-        internal bool LogPartialFlushWarningIfRequired(string agentVersion)
-        {
-            if (agentVersion != _agentVersion)
-            {
-                _agentVersion = agentVersion;
-
-                if (_partialFlushEnabled)
-                {
-                    if (!Version.TryParse(agentVersion, out var parsedVersion) || parsedVersion < new Version(7, 26, 0))
-                    {
-                        var detectedVersion = string.IsNullOrEmpty(agentVersion) ? "{detection failed}" : agentVersion;
-
-                        _log.Warning("DATADOG TRACER DIAGNOSTICS - Partial flush should only be enabled with agent 7.26.0+ (detected version: {version})", detectedVersion);
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
-
         private async Task<bool> SendWithRetry<T>(Uri endpoint, SendCallback<T> callback, T state)
         {
             // retry up to 5 times with exponential back-off
@@ -339,7 +317,7 @@ namespace Datadog.Trace.Agent
             {
                 _agentVersion = agentVersion;
 
-                if (_isPartialFlushEnabled)
+                if (_partialFlushEnabled)
                 {
                     if (!Version.TryParse(agentVersion, out var parsedVersion) || parsedVersion < new Version(7, 26, 0))
                     {

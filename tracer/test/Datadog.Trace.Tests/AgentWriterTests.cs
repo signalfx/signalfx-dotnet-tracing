@@ -29,7 +29,7 @@ namespace Datadog.Trace.Tests
             tracer.Setup(x => x.DefaultServiceName).Returns("Default");
 
             _api = new Mock<IApi>();
-            _agentWriter = new AgentWriter(_api.Object, new NullMetrics());
+            _agentWriter = new AgentWriter(_api.Object, new NullStatsAggregator(), new NullMetrics());
         }
 
         [Fact]
@@ -37,8 +37,7 @@ namespace Datadog.Trace.Tests
         {
             var statsAggregator = new Mock<IStatsAggregator>();
 
-            var agent = new AgentWriter(Mock.Of<IApi>(), statsAggregator.Object, statsd: null, automaticFlush: false);
-
+            var agent = new AgentWriter(Mock.Of<IApi>(), statsAggregator.Object, new NullMetrics(), automaticFlush: false);
             agent.WriteTrace(CreateTrace(1));
 
             statsAggregator.Verify(s => s.AddRange(It.IsAny<Span[]>(), 0, 1), Times.Once);
@@ -71,9 +70,8 @@ namespace Datadog.Trace.Tests
         [Fact]
         public async Task FlushTwice()
         {
-            var w = new AgentWriter(_api.Object, new NullMetrics());
-            await w.FlushAndCloseAsync();
-            await w.FlushAndCloseAsync();
+            await _agentWriter.FlushAndCloseAsync();
+            await _agentWriter.FlushAndCloseAsync();
         }
 
         [Fact]
@@ -81,40 +79,34 @@ namespace Datadog.Trace.Tests
         {
             // The flush thread should be able to recover from an error when calling the API
             // Also, it should free the faulty buffer
-            var api = new Mock<IApi>();
-            var agent = new AgentWriter(api.Object, new NullMetrics());
-
             var mutex = new ManualResetEventSlim();
 
-            agent.Flushed += () => mutex.Set();
+            _agentWriter.Flushed += () => mutex.Set();
 
-            api.Setup(a => a.SendTracesAsync(It.IsAny<ArraySegment<byte>>(), It.IsAny<int>()))
+            _api.Setup(a => a.SendTracesAsync(It.IsAny<ArraySegment<byte>>(), It.IsAny<int>()))
                 .Returns(() =>
                 {
                     throw new InvalidOperationException();
                 });
 
-            agent.WriteTrace(CreateTrace(1));
+            _agentWriter.WriteTrace(CreateTrace(1));
 
             mutex.Wait();
 
-            Assert.True(agent.ActiveBuffer == agent.FrontBuffer);
-            Assert.True(agent.FrontBuffer.IsEmpty);
-            Assert.True(agent.BackBuffer.IsEmpty);
+            Assert.True(_agentWriter.ActiveBuffer == _agentWriter.FrontBuffer);
+            Assert.True(_agentWriter.FrontBuffer.IsEmpty);
+            Assert.True(_agentWriter.BackBuffer.IsEmpty);
 
-            return agent.FlushAndCloseAsync();
+            return _agentWriter.FlushAndCloseAsync();
         }
 
         [Fact]
         public Task SwitchBuffer()
         {
             // Make sure that the agent is able to switch to the secondary buffer when the primary is full/busy
-            var api = new Mock<IApi>();
-            var agent = new AgentWriter(api.Object, new NullMetrics());
-
             var barrier = new Barrier(2);
 
-            api.Setup(a => a.SendTracesAsync(It.IsAny<ArraySegment<byte>>(), It.IsAny<int>()))
+            _api.Setup(a => a.SendTracesAsync(It.IsAny<ArraySegment<byte>>(), It.IsAny<int>()))
                 .Callback(() =>
                 {
                     barrier.SignalAndWait();
@@ -122,28 +114,28 @@ namespace Datadog.Trace.Tests
                 })
                 .Returns(Task.FromResult(true));
 
-            agent.WriteTrace(CreateTrace(1));
+            _agentWriter.WriteTrace(CreateTrace(1));
 
             // Wait for the flush operation
             barrier.SignalAndWait();
 
             // At this point, the flush thread is stuck in Api.SendTracesAsync, and the frontBuffer should be active and locked
-            Assert.True(agent.ActiveBuffer == agent.FrontBuffer);
-            Assert.True(agent.FrontBuffer.IsLocked);
-            Assert.Equal(1, agent.FrontBuffer.TraceCount);
-            Assert.Equal(1, agent.FrontBuffer.SpanCount);
+            Assert.True(_agentWriter.ActiveBuffer == _agentWriter.FrontBuffer);
+            Assert.True(_agentWriter.FrontBuffer.IsLocked);
+            Assert.Equal(1, _agentWriter.FrontBuffer.TraceCount);
+            Assert.Equal(1, _agentWriter.FrontBuffer.SpanCount);
 
             var mutex = new ManualResetEventSlim();
 
-            agent.WriteTrace(CreateTrace(2));
+            _agentWriter.WriteTrace(CreateTrace(2));
 
             // Wait for the trace to be dequeued
-            WaitForDequeue(agent);
+            WaitForDequeue(_agentWriter);
 
             // Since the frontBuffer was locked, the buffers should have been swapped
-            Assert.True(agent.ActiveBuffer == agent.BackBuffer);
-            Assert.Equal(1, agent.BackBuffer.TraceCount);
-            Assert.Equal(2, agent.BackBuffer.SpanCount);
+            Assert.True(_agentWriter.ActiveBuffer == _agentWriter.BackBuffer);
+            Assert.Equal(1, _agentWriter.BackBuffer.TraceCount);
+            Assert.Equal(2, _agentWriter.BackBuffer.SpanCount);
 
             // Unblock the flush thread
             barrier.SignalAndWait();
@@ -152,25 +144,23 @@ namespace Datadog.Trace.Tests
             barrier.SignalAndWait();
 
             // Back buffer should still be active and being flushed
-            Assert.True(agent.ActiveBuffer == agent.BackBuffer);
-            Assert.True(agent.BackBuffer.IsLocked);
-            Assert.False(agent.FrontBuffer.IsLocked);
+            Assert.True(_agentWriter.ActiveBuffer == _agentWriter.BackBuffer);
+            Assert.True(_agentWriter.BackBuffer.IsLocked);
+            Assert.False(_agentWriter.FrontBuffer.IsLocked);
 
             // Unblock and exit
             barrier.Dispose();
-            return agent.FlushAndCloseAsync();
+            return _agentWriter.FlushAndCloseAsync();
         }
 
         [Fact]
         public async Task FlushBothBuffers()
         {
             // When the back buffer is full, both buffers should be flushed
-            var api = new Mock<IApi>();
-
             var sizeOfTrace = ComputeSizeOfTrace(CreateTrace(1));
 
             // Make the buffer size big enough for a single trace
-            var agent = new AgentWriter(api.Object, new NullMetrics(), automaticFlush: false, maxBufferSize: (sizeOfTrace * 2) + SpanBuffer.HeaderSize - 1);
+            var agent = new AgentWriter(_api.Object, new NullStatsAggregator(), new NullMetrics(), automaticFlush: false, maxBufferSize: (sizeOfTrace * 2) + SpanBuffer.HeaderSize - 1);
 
             agent.WriteTrace(CreateTrace(1));
             agent.WriteTrace(CreateTrace(1));
@@ -186,7 +176,7 @@ namespace Datadog.Trace.Tests
             Assert.True(agent.FrontBuffer.IsEmpty);
             Assert.True(agent.BackBuffer.IsEmpty);
 
-            api.Verify(a => a.SendTracesAsync(It.IsAny<ArraySegment<byte>>(), 1), Times.Exactly(2));
+            _api.Verify(a => a.SendTracesAsync(It.IsAny<ArraySegment<byte>>(), 1), Times.Exactly(2));
         }
 
         [Fact]
@@ -198,7 +188,7 @@ namespace Datadog.Trace.Tests
             var sizeOfTrace = ComputeSizeOfTrace(CreateTrace(1));
 
             // Make the buffer size big enough for a single trace
-            var agent = new AgentWriter(Mock.Of<IApi>(), statsAggregator: null, statsd.Object, automaticFlush: false, (sizeOfTrace * 2) + SpanBuffer.HeaderSize - 1);
+            var agent = new AgentWriter(Mock.Of<IApi>(), new NullStatsAggregator(), statsd.Object, automaticFlush: false, (sizeOfTrace * 2) + SpanBuffer.HeaderSize - 1);
 
             // Fill the two buffers
             agent.WriteTrace(CreateTrace(1));
@@ -246,25 +236,23 @@ namespace Datadog.Trace.Tests
         [Fact]
         public Task WakeUpSerializationTask()
         {
-            var agent = new AgentWriter(Mock.Of<IApi>(), new NullMetrics(), batchInterval: 0);
-
             // To reduce flackyness, first we make sure the serialization thread is started
-            WaitForDequeue(agent);
+            WaitForDequeue(_agentWriter);
 
             // Wait for the serialization thread to go to sleep
             while (true)
             {
-                if (!WaitForDequeue(agent, wakeUpThread: false, delay: 500))
+                if (!WaitForDequeue(_agentWriter, wakeUpThread: false, delay: 500))
                 {
                     break;
                 }
             }
 
             // Serialization thread is asleep, makes sure it wakes up when enqueuing a trace
-            agent.WriteTrace(CreateTrace(1));
-            Assert.True(WaitForDequeue(agent));
+            _agentWriter.WriteTrace(CreateTrace(1));
+            Assert.True(WaitForDequeue(_agentWriter));
 
-            return agent.FlushAndCloseAsync();
+            return _agentWriter.FlushAndCloseAsync();
         }
 
         [Fact]
@@ -288,7 +276,7 @@ namespace Datadog.Trace.Tests
             var api = new Mock<IApi>();
             api.Setup(x => x.SendTracesAsync(It.IsAny<ArraySegment<byte>>(), It.IsAny<int>()))
                .ReturnsAsync(() => true);
-            var agent = new AgentWriter(api.Object, new NullMetrics(), calculator, automaticFlush: false, maxBufferSize: (sizeOfTrace * 2) + SpanBuffer.HeaderSize - 1, batchInterval: 100);
+            var agent = new AgentWriter(api.Object, new NullStatsAggregator(), new NullMetrics(), calculator, automaticFlush: false, maxBufferSize: (sizeOfTrace * 2) + SpanBuffer.HeaderSize - 1, batchInterval: 100);
 
             // Fill both buffers
             agent.WriteTrace(trace);
@@ -321,7 +309,7 @@ namespace Datadog.Trace.Tests
         public void AgentWriterEnqueueFlushTasks()
         {
             var api = new Mock<IApi>();
-            var agentWriter = new AgentWriter(api.Object, metrics: null, automaticFlush: false);
+            var agentWriter = new AgentWriter(api.Object, null, metrics: null, automaticFlush: false);
             var flushTcs = new TaskCompletionSource<bool>();
             int invocation = 0;
 

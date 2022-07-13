@@ -32,7 +32,7 @@ namespace Datadog.Trace.IntegrationTests
                 StatsComputationEnabled = true,
                 ServiceVersion = "V",
                 Environment = "Test",
-                Exporter = new ExporterSettings
+                ExporterSettings = new ExporterSettings
                 {
                     AgentUri = new Uri($"http://localhost:{agent.Port}"),
                 }
@@ -80,7 +80,7 @@ namespace Datadog.Trace.IntegrationTests
                 stats.TracerVersion.Should().Be(TracerConstants.AssemblyVersion);
                 stats.AgentAggregation.Should().Be(null);
                 stats.Lang.Should().Be(TracerConstants.Language);
-                stats.RuntimeId.Should().Be(Tracer.RuntimeId);
+                stats.RuntimeId.Should().Be(string.Empty);
                 stats.Stats.Should().HaveCount(1);
 
                 var bucket = stats.Stats[0];

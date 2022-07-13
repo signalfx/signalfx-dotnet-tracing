@@ -375,6 +375,7 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         public bool RuntimeMetricsEnabled { get; set; }
 
+        /// <summary>
         /// Gets or sets a value indicating whether stats are computed on the tracer side
         /// </summary>
         public bool StatsComputationEnabled { get; set; }

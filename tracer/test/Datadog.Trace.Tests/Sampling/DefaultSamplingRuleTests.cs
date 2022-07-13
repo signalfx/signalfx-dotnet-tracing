@@ -50,8 +50,8 @@ namespace Datadog.Trace.Tests.Sampling
             const string unconfiguredService = "RogueService";
 
             var rule = new DefaultSamplingRule();
-            var span = new Span(new SpanContext(1, 1, null, serviceName: configuredService), DateTimeOffset.Now);
-            var secondSpan = new Span(new SpanContext(2, 2, null, serviceName: unconfiguredService), DateTimeOffset.Now);
+            var span = new Span(new SpanContext(TraceId.CreateFromInt(1), 1, null, serviceName: configuredService), DateTimeOffset.Now);
+            var secondSpan = new Span(new SpanContext(TraceId.CreateFromInt(2), 2, null, serviceName: unconfiguredService), DateTimeOffset.Now);
             span.SetTag(Tags.Env, configuredEnv);
             secondSpan.SetTag(Tags.Env, configuredEnv);
 

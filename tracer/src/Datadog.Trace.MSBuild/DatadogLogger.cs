@@ -395,11 +395,11 @@ namespace Datadog.Trace.MSBuild
 
             private readonly struct Context
             {
-                public readonly ulong TraceId;
+                public readonly TraceId TraceId;
                 public readonly ulong SpanId;
                 public readonly string Origin;
 
-                public Context(ulong traceId, ulong spanId, string origin)
+                public Context(TraceId traceId, ulong spanId, string origin)
                 {
                     TraceId = traceId;
                     SpanId = spanId;

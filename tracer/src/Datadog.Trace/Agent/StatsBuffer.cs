@@ -80,8 +80,9 @@ namespace Datadog.Trace.Agent
             MessagePackBinary.WriteString(stream, "TracerVersion");
             MessagePackBinary.WriteString(stream, TracerConstants.AssemblyVersion);
 
+            // Runtime ID is not used in SignalFx
             MessagePackBinary.WriteString(stream, "RuntimeID");
-            MessagePackBinary.WriteString(stream, Tracer.RuntimeId);
+            MessagePackBinary.WriteString(stream, string.Empty);
 
             MessagePackBinary.WriteString(stream, "Sequence");
             MessagePackBinary.WriteInt64(stream, _header.GetSequenceNumber());

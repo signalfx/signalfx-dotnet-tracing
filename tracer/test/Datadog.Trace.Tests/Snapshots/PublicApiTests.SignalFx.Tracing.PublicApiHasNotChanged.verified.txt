@@ -128,6 +128,7 @@ namespace Datadog.Trace.Configuration
         public string ServiceName { get; }
         public string ServiceVersion { get; }
         public bool StartupDiagnosticLogEnabled { get; }
+        public bool StatsComputationEnabled { get; }
         public bool TagElasticsearchQueries { get; }
         public bool TagRedisCommands { get; }
         public bool ThreadSamplingEnabled { get; }
@@ -205,6 +206,7 @@ namespace Datadog.Trace.Configuration
         public string ServiceVersion { get; set; }
         public string SignalFxAccessToken { get; set; }
         public bool StartupDiagnosticLogEnabled { get; set; }
+        public bool StatsComputationEnabled { get; set; }
         public bool TagElasticsearchQueries { get; set; }
         public bool TagMongoCommands { get; set; }
         public bool TagRedisCommands { get; set; }

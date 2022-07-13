@@ -384,8 +384,6 @@ namespace Datadog.Trace.Configuration
         /// <seealso cref="TracerSettings.ExpandRouteTemplatesEnabled"/>
         public const string ExpandRouteTemplatesEnabled = "SIGNALFX_TRACE_EXPAND_ROUTE_TEMPLATES_ENABLED";
 
-        public const string ExpandRouteTemplatesEnabled = "SIGNALFX_TRACE_EXPAND_ROUTE_TEMPLATES_ENABLED";
-
         /// <summary>
         /// Configuration key for enabling computation of stats (aka trace metrics) on the tracer side
         /// </summary>
