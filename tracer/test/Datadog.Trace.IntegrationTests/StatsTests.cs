@@ -29,18 +29,20 @@ namespace Datadog.Trace.IntegrationTests
 
             var settings = new TracerSettings
             {
+                Exporter = ExporterType.DatadogAgent,
                 StatsComputationEnabled = true,
                 ServiceVersion = "V",
                 Environment = "Test",
                 ExporterSettings = new ExporterSettings
                 {
-                    AgentUri = new Uri($"http://localhost:{agent.Port}"),
+                    AgentUri = new Uri($"http://localhost:{agent.Port}")
                 }
             };
 
             var immutableSettings = settings.Build();
 
-            var tracer = new Tracer(settings, agentWriter: null, sampler: null, scopeManager: null, statsd: null);
+            var tracer = Tracer.Instance;
+            Tracer.Configure(settings);
 
             Span span1;
 
