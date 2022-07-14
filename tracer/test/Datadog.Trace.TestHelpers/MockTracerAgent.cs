@@ -14,7 +14,6 @@ using System.IO;
 using System.IO.Pipes;
 using System.Linq;
 using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -49,26 +48,6 @@ namespace Datadog.Trace.TestHelpers
 
         public string ListenerInfo { get; protected set; }
 
-        /// <summary>
-        /// Gets the TCP port that this Agent is listening on.
-        /// Can be different from <see cref="MockTracerAgent(int, int, bool)"/>'s <c>initialPort</c>
-        /// parameter if listening on that port fails.
-        /// </summary>
-        public int Port { get; }
-
-        /// <summary>
-        /// Gets the port that this agent is listening for SignalFx metrics on.
-        /// </summary>
-        public int MetricsPort { get; }
-
-        public string TracesUdsPath { get; }
-
-        public string StatsUdsPath { get; }
-
-        public string TracesWindowsPipeName { get; }
-
-        public string StatsWindowsPipeName { get; }
-
         public TestTransports TransportType { get; }
 
         public string Version { get; set; }
@@ -90,6 +69,8 @@ namespace Datadog.Trace.TestHelpers
 
         public IImmutableList<NameValueCollection> RequestHeaders { get; private set; } = ImmutableList<NameValueCollection>.Empty;
 
+        public ConcurrentQueue<string> StatsdRequests { get; } = new();
+
         /// <summary>
         /// Gets the <see cref="Datadog.Trace.Telemetry.TelemetryData"/> requests received by the telemetry endpoint
         /// </summary>
@@ -106,10 +87,6 @@ namespace Datadog.Trace.TestHelpers
 
         public static TcpUdpAgent Create(int port = 8126, int retries = 5, bool useStatsd = false, bool doNotBindPorts = false, int? requestedStatsDPort = null, bool useTelemetry = false)
             => new TcpUdpAgent(port, retries, useStatsd, doNotBindPorts, requestedStatsDPort, useTelemetry);
-
-#if NETCOREAPP3_1_OR_GREATER
-        public static UdsAgent Create(UnixDomainSocketConfig config) => new UdsAgent(config);
-#endif
 
         public static NamedPipeAgent Create(WindowsPipesConfig config) => new NamedPipeAgent(config);
 
@@ -466,11 +443,11 @@ namespace Datadog.Trace.TestHelpers
         public class TcpUdpAgent : MockTracerAgent
         {
             private readonly HttpListener _listener;
-            private readonly UdpClient _udpClient;
+            private readonly HttpListener _metricsListener;
             private readonly Task _tracesListenerTask;
-            private readonly Task _statsdTask;
+            private readonly Task _metricsListenerTask;
 
-            public TcpUdpAgent(int port, int retries, bool useStatsd, bool doNotBindPorts, int? requestedStatsDPort, bool useTelemetry)
+            public TcpUdpAgent(int port, int retries, bool useSfxMetrics, bool doNotBindPorts, int? requestedStatsDPort, bool useTelemetry)
                 : base(useTelemetry, TestTransports.Tcp)
             {
                 if (doNotBindPorts)
@@ -482,40 +459,57 @@ namespace Datadog.Trace.TestHelpers
 
                 var listeners = new List<string>();
 
-                if (useStatsd)
+                if (useSfxMetrics)
                 {
+                    var metricsPort = 8226;
+                    var metricsRetries = 5;
+
                     if (requestedStatsDPort != null)
                     {
                         // This port is explicit, allow failure if not available
-                        StatsdPort = requestedStatsDPort.Value;
-                        _udpClient = new UdpClient(requestedStatsDPort.Value);
+                        var metricsListener = new HttpListener();
+                        metricsListener.Prefixes.Add($"http://127.0.0.1:{requestedStatsDPort}/");
+                        metricsListener.Prefixes.Add($"http://localhost:{requestedStatsDPort}/");
+
+                        MetricsPort = requestedStatsDPort.Value;
+                        _metricsListener = metricsListener;
+
+                        _metricsListenerTask = Task.Run(HandleMetricsHttpRequests);
                     }
                     else
                     {
-                        const int basePort = 11555;
-
-                        var retriesLeft = retries;
-
                         while (true)
                         {
+                            var metricsListener = new HttpListener();
+                            metricsListener.Prefixes.Add($"http://127.0.0.1:{metricsPort}/");
+                            metricsListener.Prefixes.Add($"http://localhost:{metricsPort}/");
+
                             try
                             {
-                                _udpClient = new UdpClient(basePort + retriesLeft);
+                                metricsListener.Start();
+
+                                // successfully listening
+                                MetricsPort = metricsPort;
+                                _metricsListener = metricsListener;
+
+                                _metricsListenerTask = Task.Run(HandleMetricsHttpRequests);
+
+                                break;
                             }
-                            catch (Exception) when (retriesLeft > 0)
+                            catch (HttpListenerException) when (metricsRetries > 0)
                             {
-                                retriesLeft--;
-                                continue;
+                                // only catch the exception if there are retries left
+                                metricsPort = TcpPortProvider.GetOpenPort();
+                                metricsRetries--;
                             }
 
-                            StatsdPort = basePort + retriesLeft;
-                            break;
+                            // always close listener if exception is thrown,
+                            // whether it was caught or not
+                            metricsListener.Close();
                         }
                     }
 
-                    _statsdTask = Task.Run(HandleStatsdRequests);
-
-                    listeners.Add($"Stats at port {StatsdPort}");
+                    listeners.Add($"Stats at port {MetricsPort}");
                 }
 
                 // try up to 5 consecutive ports before giving up
@@ -570,15 +564,16 @@ namespace Datadog.Trace.TestHelpers
             public int Port { get; }
 
             /// <summary>
-            /// Gets the UDP port for statsd
+            /// Gets the port that this agent is listening for SignalFx metrics on.
             /// </summary>
-            public int StatsdPort { get; }
+            public int MetricsPort { get; }
 
             public override void Dispose()
             {
-                base.Dispose();
+                // TODO splunk: shutdown gracefully
                 _listener?.Close();
-                _udpClient?.Close();
+                _metricsListener?.Close();
+                _cancellationTokenSource.Cancel();
             }
 
             private void HandleHttpRequests()
@@ -670,26 +665,40 @@ namespace Datadog.Trace.TestHelpers
                 }
             }
 
-            private void HandleStatsdRequests()
+            private void HandleMetricsHttpRequests()
             {
-                var endPoint = new IPEndPoint(IPAddress.Loopback, 0);
-
-                while (!_cancellationTokenSource.IsCancellationRequested)
+                while (_metricsListener.IsListening)
                 {
                     try
                     {
-                        var buffer = _udpClient.Receive(ref endPoint);
-                        var stats = Encoding.UTF8.GetString(buffer);
-                        OnMetricsReceived(stats);
-                        StatsdRequests.Enqueue(stats);
+                        var ctx = _metricsListener.GetContext();
+                        var uploadMessage = Vendors.ProtoBuf.Serializer.Deserialize<DataPointUploadMessage>(ctx.Request.InputStream);
+
+                        lock (this)
+                        {
+                            Metrics = Metrics.AddRange(uploadMessage.datapoints);
+                        }
+
+                        ctx.Response.StatusCode = 200;
+                        ctx.Response.Close();
                     }
-                    catch (Exception) when (_cancellationTokenSource.IsCancellationRequested)
+                    catch (HttpListenerException)
                     {
-                        return;
+                        // listener was stopped,
+                        // ignore to let the loop end and the method return
                     }
-                    catch (Exception ex)
+                    catch (ObjectDisposedException)
                     {
-                        Exceptions.Add(ex);
+                        // the response has been already disposed.
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        // this can occur when setting Response.ContentLength64, with the framework claiming that the response has already been submitted
+                        // for now ignore, and we'll see if this introduces downstream issues
+                    }
+                    catch (Exception) when (!_metricsListener.IsListening)
+                    {
+                        // we don't care about any exception when listener is stopped
                     }
                 }
             }
@@ -896,148 +905,5 @@ namespace Datadog.Trace.TestHelpers
                 }
             }
         }
-
-#if NETCOREAPP3_1_OR_GREATER
-        public class UdsAgent : MockTracerAgent
-        {
-            private readonly UnixDomainSocketEndPoint _tracesEndpoint;
-            private readonly Socket _udsTracesSocket;
-            private readonly UnixDomainSocketEndPoint _statsEndpoint;
-            private readonly Socket _udsStatsSocket;
-            private readonly Task _tracesListenerTask;
-            private readonly Task _statsdTask;
-
-            public UdsAgent(UnixDomainSocketConfig config)
-                : base(config.UseTelemetry, TestTransports.Uds)
-            {
-                ListenerInfo = $"Traces at {config.Traces}";
-
-                if (config.Metrics != null && config.UseDogstatsD)
-                {
-                    if (File.Exists(config.Metrics))
-                    {
-                        File.Delete(config.Metrics);
-                    }
-
-                    StatsUdsPath = config.Metrics;
-                    ListenerInfo += $", Stats at {config.Metrics}";
-                    _statsEndpoint = new UnixDomainSocketEndPoint(config.Metrics);
-
-                    _udsStatsSocket = new Socket(AddressFamily.Unix, SocketType.Dgram, ProtocolType.Unspecified);
-
-                    _udsStatsSocket.Bind(_statsEndpoint);
-                    // NOTE: Connectionless protocols don't use Listen()
-                    _statsdTask = Task.Run(HandleUdsStats);
-                }
-
-                _tracesEndpoint = new UnixDomainSocketEndPoint(config.Traces);
-
-                if (File.Exists(config.Traces))
-                {
-                    File.Delete(config.Traces);
-                }
-
-                TracesUdsPath = config.Traces;
-                _udsTracesSocket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP);
-                _udsTracesSocket.Bind(_tracesEndpoint);
-                _udsTracesSocket.Listen(1000);
-                _tracesListenerTask = Task.Run(HandleUdsTraces);
-            }
-
-            public string TracesUdsPath { get; }
-
-            public string StatsUdsPath { get; }
-
-            public override void Dispose()
-            {
-                base.Dispose();
-                if (_udsTracesSocket != null)
-                {
-                    IgnoreException(() => _udsTracesSocket.Shutdown(SocketShutdown.Both));
-                    IgnoreException(() => _udsTracesSocket.Close());
-                    IgnoreException(() => _udsTracesSocket.Dispose());
-                    IgnoreException(() => File.Delete(TracesUdsPath));
-                }
-
-                if (_udsStatsSocket != null)
-                {
-                    // In versions before net6, dispose doesn't shutdown this socket type for some reason
-                    IgnoreException(() => _udsStatsSocket.Shutdown(SocketShutdown.Both));
-                    IgnoreException(() => _udsStatsSocket.Close());
-                    IgnoreException(() => _udsStatsSocket.Dispose());
-                    IgnoreException(() => File.Delete(StatsUdsPath));
-                }
-            }
-
-            private void HandleUdsStats()
-            {
-                while (!_cancellationTokenSource.IsCancellationRequested)
-                {
-                    try
-                    {
-                        var bytesReceived = new byte[0x1000];
-                        // Connectionless protocol doesn't need Accept, Receive will block until we get something
-                        var byteCount = _udsStatsSocket.Receive(bytesReceived);
-                        var stats = Encoding.UTF8.GetString(bytesReceived, 0, byteCount);
-                        OnMetricsReceived(stats);
-                        StatsdRequests.Enqueue(stats);
-                    }
-                    catch (Exception) when (_cancellationTokenSource.IsCancellationRequested)
-                    {
-                        return;
-                    }
-                    catch (Exception ex)
-                    {
-                        Exceptions.Add(ex);
-                    }
-                }
-            }
-
-            private async Task HandleUdsTraces()
-            {
-                while (!_cancellationTokenSource.IsCancellationRequested)
-                {
-                    try
-                    {
-                        using var handler = await _udsTracesSocket.AcceptAsync();
-                        using var stream = new NetworkStream(handler);
-
-                        var request = await MockHttpParser.ReadRequest(stream);
-                        if (TelemetryEnabled && request.PathAndQuery.StartsWith("/" + TelemetryConstants.AgentTelemetryEndpoint))
-                        {
-                            HandlePotentialTelemetryData(request);
-                        }
-                        else
-                        {
-                            HandlePotentialTraces(request);
-                        }
-
-                        await stream.WriteAsync(GetResponseBytes(body: "{}"));
-
-                        handler.Shutdown(SocketShutdown.Both);
-                    }
-                    catch (SocketException ex)
-                    {
-                        var message = ex.Message.ToLowerInvariant();
-                        if (message.Contains("interrupted"))
-                        {
-                            // Accept call is likely interrupted by a dispose
-                            // Swallow the exception and let the test finish
-                            return;
-                        }
-
-                        if (message.Contains("broken") || message.Contains("forcibly closed") || message.Contains("invalid argument"))
-                        {
-                            // The application was likely shut down
-                            // Swallow the exception and let the test finish
-                            return;
-                        }
-
-                        throw;
-                    }
-                }
-            }
-        }
-#endif
     }
 }

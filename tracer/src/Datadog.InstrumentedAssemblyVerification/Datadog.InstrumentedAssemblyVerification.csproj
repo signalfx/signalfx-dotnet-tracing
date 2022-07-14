@@ -8,7 +8,7 @@
     <AnalysisLevel>none</AnalysisLevel>
     <RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
     <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)..\..\..\Datadog.Trace.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)..\..\..\SignalFx.Tracing.snk</AssemblyOriginatorKeyFile>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 

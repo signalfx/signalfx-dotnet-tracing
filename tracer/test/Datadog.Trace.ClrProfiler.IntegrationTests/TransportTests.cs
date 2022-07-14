@@ -30,9 +30,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         public static IEnumerable<object[]> Data =>
             Enum.GetValues(typeof(TracesTransportType))
                 .Cast<TracesTransportType>()
-#if !NETCOREAPP3_1_OR_GREATER
-                .Where(x => x != TracesTransportType.UnixDomainSocket)
-#endif
                 .Select(x => new object[] { x });
 
         [SkippableTheory]
@@ -99,10 +96,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 {
                     TracesTransportType.Default => MockTracerAgent.Create(),
                     TracesTransportType.WindowsNamedPipe => MockTracerAgent.Create(new WindowsPipesConfig($"trace-{Guid.NewGuid()}", $"metrics-{Guid.NewGuid()}")),
-#if NETCOREAPP3_1_OR_GREATER
-                    TracesTransportType.UnixDomainSocket
-                        => MockTracerAgent.Create(new UnixDomainSocketConfig(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()), null)),
-#endif
                     _ => throw new InvalidOperationException("Unsupported transport type " + type),
                 };
 

@@ -6,12 +6,13 @@
 // Modified by Splunk Inc.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Datadog.Trace.ClrProfiler.IntegrationTests.TestCollections;
 using Datadog.Trace.Configuration;
+using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.TestHelpers;
-using FluentAssertions;
 using FluentAssertions.Execution;
 using VerifyXunit;
 using Xunit;
@@ -79,44 +80,8 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
                 }
 
-                var spanLookup = new Dictionary<Tuple<string, string>, int>();
-                foreach (var span in spans)
-                {
-                    var key = new Tuple<string, string>(span.Resource, DictionaryExtensions.GetValueOrDefault(span.Tags, "db.statement"));
-                    if (spanLookup.ContainsKey(key))
-                    {
-                        spanLookup[key]++;
-                    }
-                    else
-                    {
-                        spanLookup[key] = 1;
-                    }
-                }
-
-                var missing = new List<Tuple<string, string>>();
-
-                foreach (var e in expected)
-                {
-                    var found = spanLookup.ContainsKey(e);
-                    if (found)
-                    {
-                        if (--spanLookup[e] <= 0)
-                        {
-                            spanLookup.Remove(e);
-                        }
-                    }
-                    else
-                    {
-                        missing.Add(e);
-                    }
-                }
-
-                foreach (var e in missing)
-                {
-                    Assert.True(false, $"no span found for `{e.Item1}`, `{e.Item2}`, remaining spans: `{string.Join(", ", spanLookup.Select(kvp => $"{kvp.Key.Item1}, {kvp.Key.Item2}").ToArray())}`");
-                }
-
                 telemetry.AssertIntegrationEnabled(IntegrationId.StackExchangeRedis);
+
                 var settings = VerifyHelper.GetSpanVerifierSettings();
                 settings.UseFileName($"{nameof(StackExchangeRedisTests)}.{calculatedVersion}");
                 settings.DisableRequireUniquePrefix();

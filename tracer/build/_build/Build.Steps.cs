@@ -117,8 +117,7 @@ partial class Build
 
     Project[] ClrProfilerIntegrationTests => new[]
     {
-        Solution.GetProject(Projects.ClrProfilerIntegrationTests),
-        Solution.GetProject(Projects.ToolIntegrationTests)
+        Solution.GetProject(Projects.ClrProfilerIntegrationTests)
     };
 
     readonly IEnumerable<TargetFramework> TargetFrameworks = new[]
@@ -635,7 +634,6 @@ partial class Build
                 var fpm = Fpm.Value;
                 var gzip = GZip.Value;
                 var chmod = Chmod.Value;
-                var packageName = "datadog-dotnet-apm";
 
                 var workingDirectory = ArtifactsDirectory / $"linux-{LinuxArchitectureIdentifier}";
                 EnsureCleanDirectory(workingDirectory);

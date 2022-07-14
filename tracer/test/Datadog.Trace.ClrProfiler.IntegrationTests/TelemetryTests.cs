@@ -159,31 +159,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             }
         }
 
-#if NETCOREAPP3_1_OR_GREATER
-        [SkippableFact]
-        [Trait("Category", "EndToEnd")]
-        [Trait("RunOnWindows", "True")]
-        public async Task WhenUsingUdsAgent_UsesUdsTelemetry()
-        {
-            EnvironmentHelper.EnableUnixDomainSockets();
-            using var agent = EnvironmentHelper.GetMockAgent(useTelemetry: true);
-
-            int httpPort = TcpPortProvider.GetOpenPort();
-            Output.WriteLine($"Assigning port {httpPort} for the httpPort.");
-            using (ProcessResult processResult = RunSampleAndWaitForExit(agent, arguments: $"Port={httpPort}"))
-            {
-                Assert.True(processResult.ExitCode == 0, $"Process exited with code {processResult.ExitCode}");
-
-                var spans = agent.WaitForSpans(ExpectedSpans);
-                await AssertExpectedSpans(spans);
-            }
-
-            var data = agent.AssertIntegrationEnabled(IntegrationId.HttpMessageHandler);
-
-            AssertTelemetry(data);
-        }
-#endif
-
         private static void AssertTelemetry(TelemetryData data)
         {
             data.Application.ServiceVersion.Should().Be(ServiceVersion);

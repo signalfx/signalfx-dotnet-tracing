@@ -29,8 +29,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         {
             SetEnvironmentVariable("SIGNALFX_RUNTIME_METRICS_ENABLED", "0");
             using var agent = EnvironmentHelper.GetMockAgent(useStatsD: true);
-            Output.WriteLine($"Assigning port {agent.Port} for the agentPort.");
-            Output.WriteLine($"Assigning port {agent.MetricsPort} for the SignalFx metrics.");
 
             using var processResult = RunSampleAndWaitForExit(agent);
             var requests = agent.Metrics;
@@ -47,17 +45,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             EnvironmentHelper.EnableDefaultTransport();
             RunTest();
         }
-
-#if NETCOREAPP3_1_OR_GREATER
-        [SkippableFact]
-        [Trait("Category", "EndToEnd")]
-        [Trait("RunOnWindows", "False")]
-        public void UdsSubmitsMetrics()
-        {
-            EnvironmentHelper.EnableUnixDomainSockets();
-            RunTest();
-        }
-#endif
 
         [SkippableFact]
         [Trait("Category", "EndToEnd")]
@@ -93,7 +80,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetInstrumentationVerification();
 
             using var agent = EnvironmentHelper.GetMockAgent(useStatsD: true);
-            Output.WriteLine($"Assigning port {agent.MetricsPort} for the SignalFx metrics.");
 
             using var processResult = RunSampleAndWaitForExit(agent);
 
