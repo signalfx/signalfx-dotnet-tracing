@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using Datadog.Trace.AlwaysOnProfiler;
 using Datadog.Trace.Configuration;
-using Datadog.Tracer.OpenTelemetry.Proto.Logs.V1;
 using Xunit;
 
 namespace Datadog.Trace.Tests.AlwaysOnProfiler;
 
-public class ThreadSampleExporterTests
+public class PlainTextThreadSampleExporterTests
 {
     [Fact]
     public void Span_context_exported_with_samples_when_converted_to_bytes_has_big_endian_order()
@@ -49,16 +48,5 @@ public class ThreadSampleExporterTests
 
         Assert.Equal(expectedSpanBytes, log.SpanId);
         Assert.Equal(expectedTraceBytes, log.TraceId);
-    }
-
-    private class TestSender : ILogSender
-    {
-        public IList<LogRecord> SentLogs { get; } = new List<LogRecord>();
-
-        public void Send(LogsData logsData)
-        {
-            var logRecord = logsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs[0];
-            SentLogs.Add(logRecord);
-        }
     }
 }

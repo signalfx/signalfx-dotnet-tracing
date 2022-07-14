@@ -7,7 +7,6 @@ using Datadog.Trace.Configuration;
 using Datadog.Tracer.OpenTelemetry.Proto.Common.V1;
 using Datadog.Tracer.OpenTelemetry.Proto.Logs.V1;
 using Datadog.Tracer.OpenTelemetry.Proto.Resource.V1;
-using BitConverter = System.BitConverter;
 
 namespace Datadog.Trace.AlwaysOnProfiler
 {
@@ -47,14 +46,8 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
             foreach (var threadSample in threadSamples)
             {
-                var body = CreateBody(threadSample);
-                var logRecord = CreateLogRecord(body, threadSample.Timestamp.Nanoseconds);
-
-                if (threadSample.SpanId != 0 || threadSample.TraceIdHigh != 0 || threadSample.TraceIdLow != 0)
-                {
-                    logRecord.SpanId = ToBigEndianBytes(threadSample.SpanId);
-                    logRecord.TraceId = ToBigEndianBytes(threadSample.TraceIdHigh, threadSample.TraceIdLow);
-                }
+                var logRecord = CreateLogRecord(threadSample.Timestamp.Nanoseconds);
+                DecorateLogRecord(logRecord, threadSample);
 
                 logRecords.Add(logRecord);
             }
@@ -71,33 +64,9 @@ namespace Datadog.Trace.AlwaysOnProfiler
             }
         }
 
-        private static byte[] ToBigEndianBytes(long high, long low)
-        {
-            var highBytes = ToBigEndianBytes(high);
-            var lowBytes = ToBigEndianBytes(low);
+        protected abstract void DecorateLogRecord(LogRecord logRecord, ThreadSample threadSample);
 
-            var finalBytes = new byte[16];
-
-            highBytes.CopyTo(finalBytes, 0);
-            lowBytes.CopyTo(finalBytes, 8);
-
-            return finalBytes;
-        }
-
-        private static byte[] ToBigEndianBytes(long val)
-        {
-            var bytes = BitConverter.GetBytes(val);
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(bytes);
-            }
-
-            return bytes;
-        }
-
-        protected abstract string CreateBody(ThreadSample threadSample);
-
-        private LogRecord CreateLogRecord(string body, ulong timeUnixNanoseconds)
+        private LogRecord CreateLogRecord(ulong timeUnixNanoseconds)
         {
             return new LogRecord
             {
@@ -108,7 +77,6 @@ namespace Datadog.Trace.AlwaysOnProfiler
                     FixedLogRecordAttributes[2],
                     FixedLogRecordAttributes[3]
                 },
-                Body = new AnyValue { StringValue = body },
                 TimeUnixNano = timeUnixNanoseconds,
             };
         }
