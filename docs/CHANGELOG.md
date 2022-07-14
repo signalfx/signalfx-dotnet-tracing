@@ -15,6 +15,8 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 ### Bugfixes
 
+- Fix span context propagation for [AlwaysOn Profiling](always-on-profiling.md)
+
 ### Enhancements
 
 ---
