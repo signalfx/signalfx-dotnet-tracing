@@ -86,8 +86,8 @@ scenarios:
       environmentVariables:
         COR_ENABLE_PROFILING: 1
         CORECLR_ENABLE_PROFILING: 1
-        DD_PROFILING_ENABLED: 1
-        DD_PROFILING_CPU_ENABLED: 1
+        SIGNALFX_PROFILING_ENABLED: 1
+        SIGNALFX_PROFILING_CPU_ENABLED: 1
         COMPlus_EnableDiagnostics: 1
     load:
       job: bombardier
