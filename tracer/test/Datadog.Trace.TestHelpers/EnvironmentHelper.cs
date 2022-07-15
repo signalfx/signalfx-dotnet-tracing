@@ -229,10 +229,16 @@ namespace Datadog.Trace.TestHelpers
             int? logsCollectorPort,
             IDictionary<string, string> environmentVariables,
             string processToProfile = null,
-            string externalRulesFile = null)
+            string externalRulesFile = null,
+            bool useDatadogExporter = false)
         {
             string profilerEnabled = AutomaticInstrumentationEnabled ? "1" : "0";
             environmentVariables["SIGNALFX_DOTNET_TRACER_HOME"] = TracerHome;
+
+            if (useDatadogExporter)
+            {
+                environmentVariables["SIGNALFX_EXPORTER"] = "DatadogAgent";
+            }
 
             if (IsCoreClr())
             {
