@@ -234,8 +234,6 @@ namespace Datadog.Trace.TestHelpers
             string profilerEnabled = AutomaticInstrumentationEnabled ? "1" : "0";
             environmentVariables["SIGNALFX_DOTNET_TRACER_HOME"] = TracerHome;
 
-            environmentVariables["SIGNALFX_EXPORTER"] = "Zipkin";
-
             if (IsCoreClr())
             {
                 environmentVariables["CORECLR_ENABLE_PROFILING"] = profilerEnabled;
@@ -301,6 +299,9 @@ namespace Datadog.Trace.TestHelpers
 
         public void ConfigureTransportVariables(IDictionary<string, string> environmentVariables, MockTracerAgent agent)
         {
+            // use DatadogAgent exporter instead of Zipkin, because most of the integration tests use MockTracerAgent instead of MockZipkinCollector
+            environmentVariables["SIGNALFX_EXPORTER"] = "DatadogAgent";
+
             var envVars = agent switch
             {
                 MockTracerAgent.NamedPipeAgent np => new Dictionary<string, string>
