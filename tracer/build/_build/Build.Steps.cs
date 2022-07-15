@@ -633,26 +633,9 @@ partial class Build
 
                 var fpm = Fpm.Value;
                 var gzip = GZip.Value;
-                var chmod = Chmod.Value;
 
                 var workingDirectory = ArtifactsDirectory / $"linux-{LinuxArchitectureIdentifier}";
                 EnsureCleanDirectory(workingDirectory);
-
-                if (!IsArm64)
-                {
-                    var tracerNativeFile = MonitoringHomeDirectory / "SignalFx.Tracing.ClrProfiler.Native.so";
-                    var newTracerNativeFile = MonitoringHomeDirectory / "tracer" / "Datadog.Tracer.Native.so";
-                    MoveFile(tracerNativeFile, newTracerNativeFile);
-
-                    // For backward compatibility, we need to rename Datadog.AutoInstrumentation.NativeLoader.so into SignalFx.Tracing.ClrProfiler.Native.so
-                    var sourceFile = MonitoringHomeDirectory / "Datadog.AutoInstrumentation.NativeLoader.so";
-                    var newName = MonitoringHomeDirectory / "SignalFx.Tracing.ClrProfiler.Native.so";
-                    RenameFile(sourceFile, newName);
-                }
-
-                // somehow the permissions are lost along the way, ensure they are correctly set here
-                var createLogPathScript = (IsArm64 ? TracerHomeDirectory : MonitoringHomeDirectory) / "createLogPath.sh";
-                chmod.Invoke("+x " + createLogPathScript);
 
                 ExtractDebugInfoAndStripSymbols();
 
