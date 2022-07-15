@@ -6,6 +6,8 @@ using System.IO.Compression;
 using Datadog.Trace.AlwaysOnProfiler.Builder;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Vendors.ProtoBuf;
+using Datadog.Tracer.OpenTelemetry.Proto.Common.V1;
+using Datadog.Tracer.OpenTelemetry.Proto.Logs.V1;
 using Datadog.Tracer.Pprof.Proto.Profile;
 
 namespace Datadog.Trace.AlwaysOnProfiler
@@ -17,7 +19,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
         {
         }
 
-        protected override string CreateBody(ThreadSample threadSample)
+        protected override void DecorateLogRecord(LogRecord logRecord, ThreadSample threadSample)
         {
             var pprof = new Pprof();
             var sampleBuilder = new SampleBuilder();
@@ -26,7 +28,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
             if (threadSample.SpanId != 0 || threadSample.TraceIdHigh != 0 || threadSample.TraceIdLow != 0)
             {
-                pprof.AddLabel(sampleBuilder, "span_id", threadSample.SpanId);
+                pprof.AddLabel(sampleBuilder, "span_id", threadSample.SpanId.ToString("x16"));
                 pprof.AddLabel(sampleBuilder, "trace_id", TraceIdHelper.ToString(threadSample.TraceIdHigh, threadSample.TraceIdLow));
             }
 
@@ -40,7 +42,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
             pprof.AddLabel(sampleBuilder, "thread.os.id", threadSample.NativeId);
 
             pprof.Profile.Samples.Add(sampleBuilder.Build());
-            return Serialize(pprof.Profile);
+            logRecord.Body = new AnyValue { StringValue = Serialize(pprof.Profile) };
         }
 
         private static string Serialize(Profile profile)
