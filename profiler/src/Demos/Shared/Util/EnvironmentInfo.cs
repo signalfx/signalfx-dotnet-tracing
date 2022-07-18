@@ -6,12 +6,12 @@
 // Modified by Splunk Inc.
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
-using Datadog.Util;
 
-namespace Datadog.TestUtil
+namespace Datadog.Demos.Util
 {
     public static class EnvironmentInfo
     {
@@ -22,7 +22,7 @@ namespace Datadog.TestUtil
         {
             try
             {
-                return Path.GetFileName(CurrentProcess.GetMainModule().FileName);
+                return Path.GetFileName(Process.GetCurrentProcess().MainModule.FileName);
             }
             catch (Exception ex)
             {
@@ -59,7 +59,12 @@ namespace Datadog.TestUtil
 
             try
             {
-                CurrentProcess.GetIdentityInfo(out processName, out machineName, out processId);
+                using (var currentProcess = Process.GetCurrentProcess())
+                {
+                    processName = currentProcess.ProcessName;
+                    machineName = currentProcess.MachineName;
+                    processId = currentProcess.Id;
+                }
             }
             catch (Exception ex)
             {
@@ -103,7 +108,7 @@ namespace Datadog.TestUtil
             str.AppendLine();
 
             str.AppendLine("    RuntimeEnvironmentInfo:");
-            str.AppendLine("        " + RuntimeEnvironmentInfo.SingeltonInstance.ToString());
+            str.AppendLine("        " + RuntimeEnvironmentInfo.Instance);
 
             str.AppendLine();
             str.AppendLine("    AppDomain.CurrentDomain.SetupInformation.TargetFrameworkName:");

@@ -7,8 +7,8 @@
 
 using System;
 using System.Diagnostics;
+using Datadog.Demos.Util;
 using Datadog.Demos.WcfService.Client.Demos.WcfService;
-using Datadog.Util;
 
 namespace Datadog.Demos.WcfService.Client
 {
@@ -96,7 +96,7 @@ namespace Datadog.Demos.WcfService.Client
 
             Console.WriteLine("    RuntimeEnvironmentInfo:");
             Console.WriteLine();
-            Console.WriteLine("        " + RuntimeEnvironmentInfo.SingeltonInstance.ToString());
+            Console.WriteLine("        " + RuntimeEnvironmentInfo.Instance);
 
             Console.WriteLine();
             Console.WriteLine("    AppDomain.CurrentDomain.SetupInformation.TargetFrameworkName:");
