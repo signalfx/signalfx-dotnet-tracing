@@ -46,7 +46,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             RunTest();
         }
 
-        [SkippableFact]
+        [SkippableFact(Skip = "Flaky test")]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         public void NamedPipesSubmitsMetrics()
