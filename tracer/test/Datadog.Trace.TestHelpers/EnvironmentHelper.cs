@@ -313,7 +313,7 @@ namespace Datadog.Trace.TestHelpers
                 {
                     { "SIGNALFX_TRACE_AGENT_HOSTNAME", "127.0.0.1" },
                     { "SIGNALFX_TRACE_AGENT_PORT", tcp.Port.ToString() },
-                    { "SIGNALFX_DOGSTATSD_PORT", tcp.MetricsPort.ToString() },
+                    { "SIGNALFX_METRICS_ENDPOINT_URL", $"http://127.0.0.1:{tcp.MetricsPort}/" },
                 },
                 MockTracerAgent.TcpUdpAgent tcp => new Dictionary<string, string>
                 {
