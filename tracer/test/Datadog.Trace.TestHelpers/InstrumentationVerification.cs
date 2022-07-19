@@ -26,7 +26,7 @@ internal static class InstrumentationVerification
     /// Configuration key for enabling or disabling the instrumentation verification.
     /// Default is value is disabled.
     /// </summary>
-    public const string InstrumentationVerificationEnabled = "SIGNALFX_WRITE_INSTRUMENTATION_TO_DISK";
+    public const string InstrumentationVerificationEnabled = "SIGNALFX_TRACE_WRITE_INSTRUMENTATION_TO_DISK";
 
     public static void VerifyInstrumentation(Process process, string logDirectory)
     {

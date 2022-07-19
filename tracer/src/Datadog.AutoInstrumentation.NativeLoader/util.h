@@ -16,7 +16,7 @@ EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 
 const std::string conf_filename = "loader.conf";
 const ::shared::WSTRING cfg_filepath_env = WStr("SIGNALFX_NATIVELOADER_CONFIGFILE");
-const ::shared::WSTRING cfg_instrumentation_verification_env = WStr("SIGNALFX_WRITE_INSTRUMENTATION_TO_DISK");
+const ::shared::WSTRING cfg_instrumentation_verification_env = WStr("SIGNALFX_TRACE_WRITE_INSTRUMENTATION_TO_DISK");
 const ::shared::WSTRING cfg_log_directory_env = WStr("SIGNALFX_TRACE_LOG_DIRECTORY");
 inline static const ::shared::WSTRING signalfx_logs_folder_path = WStr(R"(SignalFx .NET Tracer\logs)");
 
