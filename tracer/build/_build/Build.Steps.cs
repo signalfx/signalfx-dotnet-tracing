@@ -195,6 +195,7 @@ partial class Build
         .Executes(() =>
         {
             var buildDirectory = NativeProfilerProject.Directory / "build";
+            EnsureExistingDirectory(buildDirectory);
 
             CMake.Value(
                 arguments: $"-B {buildDirectory} -S {NativeProfilerProject.Directory} -DCMAKE_BUILD_TYPE=Release");
@@ -343,9 +344,8 @@ partial class Build
            {
                var source = NativeProfilerProject.Directory / "bin" / BuildConfiguration / architecture.ToString() /
                             $"{NativeProfilerModule}.pdb";
-               var dest = SymbolsDirectory / $"win-{architecture}";
-               Logger.Info($"Copying '{source}' to '{dest}'");
-               CopyFileToDirectory(source, dest, FileExistsPolicy.Overwrite);
+               var dest = SymbolsDirectory / $"win-{architecture}" / Path.GetFileName(source);
+               CopyFile(source, dest, FileExistsPolicy.Overwrite);
            }
       });
 
@@ -678,8 +678,24 @@ partial class Build
             }
         });
 
+
+    Target CompileInstrumentationVerificationLibrary => _ => _
+        .Unlisted()
+        .DependsOn(Restore)
+        .After(CompileManagedSrc)
+        .Executes(() =>
+        {
+            DotNetMSBuild(x => x
+                .SetTargetPath(MsBuildProject)
+                .SetConfiguration(BuildConfiguration)
+                .SetTargetPlatformAnyCPU()
+                .SetProperty("BuildProjectReferences", true)
+                .SetTargets("BuildInstrumentationVerificationLibrary"));
+        });
+                                                        
     Target CompileManagedTestHelpers => _ => _
         .Unlisted()
+        .DependsOn(CompileInstrumentationVerificationLibrary)
         .After(Restore)
         .After(CompileManagedSrc)
         .Executes(() =>
@@ -698,6 +714,7 @@ partial class Build
         .Unlisted()
         .After(Restore)
         .After(CompileManagedSrc)
+        .DependsOn(CompileManagedTestHelpers)
         .Executes(() =>
         {
             // Always AnyCPU

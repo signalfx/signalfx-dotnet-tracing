@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using Datadog.Trace.Configuration;
+using Datadog.Trace.Logging;
 using OpenTelemetry.TestHelpers;
 using Xunit.Abstractions;
 
@@ -31,6 +32,7 @@ namespace Datadog.Trace.TestHelpers
         private readonly bool _isCoreClr;
         private readonly string _samplesDirectory;
         private readonly TargetFrameworkAttribute _targetFramework;
+        private TestTransports _transportType = TestTransports.Tcp;
 
         public EnvironmentHelper(
             string sampleName,
@@ -44,10 +46,7 @@ namespace Datadog.Trace.TestHelpers
             _targetFramework = Assembly.GetAssembly(anchorType).GetCustomAttribute<TargetFrameworkAttribute>();
             _output = output;
             TracerHome = GetTracerHomePath();
-
-            // The Native loader is used only on Windows and Linux x64.
-            // We need to keep this check until all platforms/configurations are supported.
-            ProfilerPath = UseNativeLoader ? GetNativeLoaderPath() : GetTracerNativeDLLPath();
+            LogDirectory = DatadogLogging.GetLogDirectory();
 
             var parts = _targetFramework.FrameworkName.Split(',');
             _runtime = parts[0];
@@ -67,8 +66,6 @@ namespace Datadog.Trace.TestHelpers
                           : string.Empty;
         }
 
-        public TestTransports TransportType { get; set; } = TestTransports.Tcp;
-
         public bool AutomaticInstrumentationEnabled { get; private set; } = true;
 
         public bool DebugModeEnabled { get; set; }
@@ -77,7 +74,7 @@ namespace Datadog.Trace.TestHelpers
 
         public string SampleName { get; }
 
-        public string ProfilerPath { get; }
+        public string LogDirectory { get; }
 
         public string TracerHome { get; }
 
@@ -241,13 +238,13 @@ namespace Datadog.Trace.TestHelpers
             {
                 environmentVariables["CORECLR_ENABLE_PROFILING"] = profilerEnabled;
                 environmentVariables["CORECLR_PROFILER"] = EnvironmentTools.ProfilerClsId;
-                environmentVariables["CORECLR_PROFILER_PATH"] = ProfilerPath;
+                environmentVariables["CORECLR_PROFILER_PATH"] = GetProfilerPath();
             }
             else
             {
                 environmentVariables["COR_ENABLE_PROFILING"] = profilerEnabled;
                 environmentVariables["COR_PROFILER"] = EnvironmentTools.ProfilerClsId;
-                environmentVariables["COR_PROFILER_PATH"] = ProfilerPath;
+                environmentVariables["COR_PROFILER_PATH"] = GetProfilerPath();
             }
 
             if (DebugModeEnabled)
@@ -305,23 +302,30 @@ namespace Datadog.Trace.TestHelpers
             // use DatadogAgent exporter instead of Zipkin, because most of the integration tests use MockTracerAgent instead of MockZipkinCollector
             environmentVariables["SIGNALFX_EXPORTER"] = "DatadogAgent";
 
-            if (TransportType == TestTransports.WindowsNamedPipe)
+            var envVars = agent switch
             {
-                string apmKey = "SIGNALFX_TRACE_PIPE_NAME";
-                string dsdKey = "SIGNALFX_DOGSTATSD_PIPE_NAME";
-
-                environmentVariables.Add(apmKey, agent.TracesUdsPath);
-                environmentVariables.Add(dsdKey, agent.StatsUdsPath);
-            }
-            else if (TransportType == TestTransports.Tcp)
-            {
-                environmentVariables["SIGNALFX_TRACE_AGENT_HOSTNAME"] = "127.0.0.1";
-                environmentVariables["SIGNALFX_TRACE_AGENT_PORT"] = agent.Port.ToString();
-
-                if (agent.MetricsPort != default(int))
+                MockTracerAgent.NamedPipeAgent np => new Dictionary<string, string>
                 {
-                    environmentVariables["SIGNALFX_METRICS_ENDPOINT_URL"] = $"http://127.0.0.1:{agent.MetricsPort}/";
-                }
+                    { "SIGNALFX_TRACE_PIPE_NAME", np.TracesWindowsPipeName },
+                    { "SIGNALFX_DOGSTATSD_PIPE_NAME", np.StatsWindowsPipeName },
+                },
+                MockTracerAgent.TcpUdpAgent { MetricsPort: not 0 } tcp => new Dictionary<string, string>
+                {
+                    { "SIGNALFX_TRACE_AGENT_HOSTNAME", "127.0.0.1" },
+                    { "SIGNALFX_TRACE_AGENT_PORT", tcp.Port.ToString() },
+                    { "SIGNALFX_METRICS_ENDPOINT_URL", $"http://127.0.0.1:{tcp.MetricsPort}/" },
+                },
+                MockTracerAgent.TcpUdpAgent tcp => new Dictionary<string, string>
+                {
+                    { "SIGNALFX_TRACE_AGENT_HOSTNAME", "127.0.0.1" },
+                    { "SIGNALFX_TRACE_AGENT_PORT", tcp.Port.ToString() },
+                },
+                _ => throw new InvalidOperationException($"Unknown MockTracerAgent type {agent?.GetType()}")
+            };
+
+            foreach (var envVar in envVars)
+            {
+                environmentVariables[envVar.Key] = envVar.Value;
             }
         }
 
@@ -502,47 +506,51 @@ namespace Datadog.Trace.TestHelpers
 
         public void EnableWindowsNamedPipes(string tracePipeName = null, string statsPipeName = null)
         {
-            TransportType = TestTransports.WindowsNamedPipe;
+            if (!EnvironmentTools.IsWindows())
+            {
+                throw new NotSupportedException("Windows named pipes is only supported on Windows");
+            }
+
+            _transportType = TestTransports.WindowsNamedPipe;
         }
 
         public void EnableDefaultTransport()
         {
-            TransportType = TestTransports.Tcp;
+            _transportType = TestTransports.Tcp;
+        }
+
+        public void EnableTransport(TestTransports transport)
+        {
+            switch (transport)
+            {
+                case TestTransports.Tcp:
+                    EnableDefaultTransport();
+                    break;
+                case TestTransports.WindowsNamedPipe:
+                    EnableWindowsNamedPipes();
+                    break;
+                default:
+                    throw new InvalidOperationException("Unknown transport " + transport.ToString());
+            }
         }
 
         public MockTracerAgent GetMockAgent(bool useStatsD = false, int? fixedPort = null, bool useTelemetry = false)
         {
-            MockTracerAgent agent = null;
-
-#if NETCOREAPP
             // Decide between transports
-            if (TransportType == TestTransports.WindowsNamedPipe)
+            if (_transportType == TestTransports.WindowsNamedPipe)
             {
-                agent = new MockTracerAgent(new WindowsPipesConfig($"trace-{Guid.NewGuid()}", $"metrics-{Guid.NewGuid()}") { UseDogstatsD = useStatsD, UseTelemetry = useTelemetry });
+                var namedPipeAgent = MockTracerAgent.Create(new WindowsPipesConfig($"trace-{Guid.NewGuid()}", $"metrics-{Guid.NewGuid()}") { UseDogstatsD = useStatsD, UseTelemetry = useTelemetry });
+                _output.WriteLine($"Agent listener info: {namedPipeAgent.ListenerInfo}");
+                return namedPipeAgent;
             }
-            else
-            {
-                // Default
-                var agentPort = fixedPort ?? TcpPortProvider.GetOpenPort();
-                agent = new MockTracerAgent(agentPort, useSfxMetrics: useStatsD, useTelemetry: useTelemetry);
-            }
-#else
-            if (TransportType == TestTransports.WindowsNamedPipe)
-            {
-                agent = new MockTracerAgent(new WindowsPipesConfig($"trace-{Guid.NewGuid()}", $"metrics-{Guid.NewGuid()}") { UseDogstatsD = useStatsD, UseTelemetry = useTelemetry });
-            }
-            else
-            {
-                // Default
-                var agentPort = fixedPort ?? TcpPortProvider.GetOpenPort();
-                agent = new MockTracerAgent(agentPort, useSfxMetrics: useStatsD, useTelemetry: useTelemetry);
-            }
-#endif
 
-            _output.WriteLine($"Assigned port {agent.Port} for the agentPort.");
-            _output.WriteLine($"Agent listener info: {agent.ListenerInfo}");
-
-            return agent;
+            // Default
+            var agentPort = fixedPort ?? TcpPortProvider.GetOpenPort();
+            var tcpUdpAgent = MockTracerAgent.Create(agentPort, useStatsd: useStatsD, useTelemetry: useTelemetry);
+            _output.WriteLine($"Assigned port {tcpUdpAgent.Port} for the agentPort.");
+            _output.WriteLine($"Assigning port {tcpUdpAgent.MetricsPort} for the SignalFx metrics.");
+            _output.WriteLine($"Agent listener info: {tcpUdpAgent.ListenerInfo}");
+            return tcpUdpAgent;
         }
 
         public MockOtelLogsCollector GetMockOtelLogsCollector()
@@ -553,6 +561,40 @@ namespace Datadog.Trace.TestHelpers
             _output.WriteLine($"Assigned port {logsCollector.Port} for the logsCollectorPort.");
 
             return logsCollector;
+        }
+
+        public bool IsRunningInAzureDevOps()
+        {
+            return Environment.GetEnvironmentVariable("SYSTEM_COLLECTIONID") != null;
+        }
+
+        public bool IsScheduledBuild()
+        {
+            return IsEnvironmentVariableSet("isScheduledBuild");
+        }
+
+        private bool IsEnvironmentVariableSet(string ev)
+        {
+            if (string.IsNullOrEmpty(ev))
+            {
+                return false;
+            }
+
+            var evValue = Environment.GetEnvironmentVariable(ev);
+            if (evValue == null)
+            {
+                CustomEnvironmentVariables.TryGetValue(ev, out evValue);
+            }
+
+            return evValue == "1" || string.Equals(evValue, "true", StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        private string GetProfilerPath()
+        {
+            // The Tracer is not currently utilizing the Native Loader in production. It is only being used in the Continuous Profiler beta.
+            // Because of that, we don't test it in the default pipeline.
+            bool useNativeLoader = IsEnvironmentVariableSet(InstrumentationVerification.UseNativeLoader);
+            return useNativeLoader ? GetNativeLoaderPath() : GetTracerNativeDLLPath();
         }
     }
 }

@@ -16,7 +16,7 @@
 
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>$(SharedAssetsBaseDir)\resources\Datadog.Trace.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>$(SharedAssetsBaseDir)\resources\SignalFx.Tracing.snk</AssemblyOriginatorKeyFile>
     <DelaySign>false</DelaySign>
   </PropertyGroup>
 

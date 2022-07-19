@@ -24,12 +24,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [SkippableFact]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
+        [Trait("SupportsInstrumentationVerification", "True")]
         public void MetricsDisabled()
         {
             SetEnvironmentVariable("SIGNALFX_RUNTIME_METRICS_ENABLED", "0");
             using var agent = EnvironmentHelper.GetMockAgent(useStatsD: true);
-            Output.WriteLine($"Assigning port {agent.Port} for the agentPort.");
-            Output.WriteLine($"Assigning port {agent.MetricsPort} for the SignalFx metrics.");
 
             using var processResult = RunSampleAndWaitForExit(agent);
             var requests = agent.Metrics;
@@ -40,18 +39,47 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [SkippableFact]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
-        public void SubmitsMetrics()
+        [Trait("SupportsInstrumentationVerification", "True")]
+        public void UdpSubmitsMetrics()
         {
             EnvironmentHelper.EnableDefaultTransport();
             RunTest();
         }
 
+        [SkippableFact(Skip = "Flaky test")]
+        [Trait("Category", "EndToEnd")]
+        [Trait("RunOnWindows", "True")]
+        public void NamedPipesSubmitsMetrics()
+        {
+            if (!EnvironmentTools.IsWindows())
+            {
+                throw new SkipException("Can't use WindowsNamedPipes on non-Windows");
+            }
+
+            EnvironmentHelper.EnableWindowsNamedPipes();
+            // The server implementation of named pipes is flaky so have 3 attempts
+            var attemptsRemaining = 3;
+            while (true)
+            {
+                try
+                {
+                    attemptsRemaining--;
+                    RunTest();
+                    return;
+                }
+                catch (Exception ex) when (attemptsRemaining > 0 && ex is not SkipException)
+                {
+                    Output.WriteLine($"Error executing test. {attemptsRemaining} attempts remaining. {ex}");
+                }
+            }
+        }
+
         private void RunTest()
         {
             SetEnvironmentVariable("SIGNALFX_RUNTIME_METRICS_ENABLED", "1");
+            SetInstrumentationVerification();
 
             using var agent = EnvironmentHelper.GetMockAgent(useStatsD: true);
-            Output.WriteLine($"Assigning port {agent.MetricsPort} for the SignalFx metrics.");
 
             using var processResult = RunSampleAndWaitForExit(agent);
 
@@ -76,6 +104,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             }
 
             Assert.Empty(agent.Exceptions);
+            VerifyInstrumentation(processResult.Process);
         }
     }
 }
