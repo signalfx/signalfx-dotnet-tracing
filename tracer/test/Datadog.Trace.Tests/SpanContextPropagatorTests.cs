@@ -23,6 +23,7 @@ namespace Datadog.Trace.Tests
         private const ulong StringSpanId = 2000000000000000;
         private const ulong SpanId = 2305843009213693952;
         private const int SamplingPriority = 0;
+
         private static readonly TraceId TraceId = TraceId.CreateRandom();
 
         private static readonly CultureInfo InvariantCulture = CultureInfo.InvariantCulture;
@@ -265,11 +266,11 @@ namespace Datadog.Trace.Tests
             return headers;
         }
 
-        private static void VerifySetCalls(Mock<IHeadersCollection> headers)
+        private static void VerifySetCalls(Mock<IHeadersCollection> headers, KeyValuePair<string, string>[] headersToCheck = null)
         {
             var once = Times.Once();
 
-            foreach (var pair in DefaultHeaderValues)
+            foreach (var pair in headersToCheck ?? DefaultHeaderValues)
             {
                 headers.Verify(h => h.Set(pair.Key, pair.Value), once);
             }
