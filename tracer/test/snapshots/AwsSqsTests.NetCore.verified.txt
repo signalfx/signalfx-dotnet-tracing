@@ -1,4 +1,4 @@
-[
+﻿[
   {
     TraceId: Id_1,
     SpanId: Id_2,
@@ -6,9 +6,11 @@
     Resource: async-methods,
     Service: Samples.AWS.SQS,
     Tags: {
-      env: integration_tests,
+      deployment.environment: integration_tests,
       language: dotnet,
-      runtime-id: Guid_1
+      runtime-id: Guid_1,
+      signalfx.tracing.library: dotnet-tracing,
+      signalfx.tracing.version: x.y.z
     },
     Metrics: {
       process_id: 0,
@@ -23,7 +25,7 @@
     SpanId: Id_3,
     Name: sqs.request,
     Resource: SQS.CreateQueue,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -34,14 +36,10 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
@@ -49,7 +47,7 @@
     SpanId: Id_4,
     Name: sqs.request,
     Resource: SQS.CreateQueue,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -60,124 +58,105 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_1,
     SpanId: Id_5,
-    Name: http.request,
+    Name: POST,
+    LogicScope: http.request,
     Resource: POST localhost:00000/,
-    Service: Samples.AWS.SQS-http-client,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
       component: HttpMessageHandler,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http-client-handler-type: System.Net.Http.HttpClientHandler,
       http.method: POST,
       http.status_code: 200,
       http.url: http://localhost:00000/,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_1,
     SpanId: Id_6,
-    Name: http.request,
+    Name: POST,
+    LogicScope: http.request,
     Resource: POST localhost:00000/,
-    Service: Samples.AWS.SQS-http-client,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
       component: HttpMessageHandler,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http-client-handler-type: System.Net.Http.HttpClientHandler,
       http.method: POST,
       http.status_code: 200,
       http.url: http://localhost:00000/,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_1,
     SpanId: Id_7,
-    Name: http.request,
+    Name: POST,
+    LogicScope: http.request,
     Resource: POST localhost:00000/,
-    Service: Samples.AWS.SQS-http-client,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
       component: HttpMessageHandler,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http-client-handler-type: System.Net.Http.HttpClientHandler,
       http.method: POST,
       http.status_code: 200,
       http.url: http://localhost:00000/,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_1,
     SpanId: Id_8,
-    Name: http.request,
+    Name: POST,
+    LogicScope: http.request,
     Resource: POST localhost:00000/?/MyAsyncSQSQueue,
-    Service: Samples.AWS.SQS-http-client,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
       component: HttpMessageHandler,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http-client-handler-type: System.Net.Http.HttpClientHandler,
       http.method: POST,
       http.status_code: 200,
       http.url: http://localhost:00000/000000000000/MyAsyncSQSQueue,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
     TraceId: Id_1,
     SpanId: Id_9,
-    Name: http.request,
+    Name: POST,
+    LogicScope: http.request,
     Resource: POST localhost:00000/?/MyAsyncSQSQueue2,
-    Service: Samples.AWS.SQS-http-client,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
       component: HttpMessageHandler,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http-client-handler-type: System.Net.Http.HttpClientHandler,
       http.method: POST,
       http.status_code: 200,
       http.url: http://localhost:00000/000000000000/MyAsyncSQSQueue2,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
@@ -185,7 +164,7 @@
     SpanId: Id_10,
     Name: sqs.request,
     Resource: SQS.SendMessage,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -195,14 +174,10 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
@@ -210,7 +185,7 @@
     SpanId: Id_11,
     Name: sqs.request,
     Resource: SQS.ReceiveMessage,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -220,14 +195,10 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
@@ -235,7 +206,7 @@
     SpanId: Id_12,
     Name: sqs.request,
     Resource: SQS.DeleteMessage,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -245,14 +216,10 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
@@ -260,7 +227,7 @@
     SpanId: Id_13,
     Name: sqs.request,
     Resource: SQS.SendMessageBatch,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -270,14 +237,10 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
@@ -285,7 +248,7 @@
     SpanId: Id_14,
     Name: sqs.request,
     Resource: SQS.ReceiveMessage,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -295,14 +258,10 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
@@ -310,7 +269,7 @@
     SpanId: Id_15,
     Name: sqs.request,
     Resource: SQS.DeleteMessageBatch,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -320,14 +279,10 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
@@ -335,7 +290,7 @@
     SpanId: Id_16,
     Name: sqs.request,
     Resource: SQS.SendMessage,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -345,14 +300,10 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
@@ -360,7 +311,7 @@
     SpanId: Id_17,
     Name: sqs.request,
     Resource: SQS.ReceiveMessage,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -370,14 +321,10 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
@@ -385,7 +332,7 @@
     SpanId: Id_18,
     Name: sqs.request,
     Resource: SQS.DeleteMessage,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -395,14 +342,10 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
@@ -410,7 +353,7 @@
     SpanId: Id_19,
     Name: sqs.request,
     Resource: SQS.SendMessageBatch,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -420,14 +363,10 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
@@ -435,7 +374,7 @@
     SpanId: Id_20,
     Name: sqs.request,
     Resource: SQS.ReceiveMessage,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -445,14 +384,10 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
@@ -460,7 +395,7 @@
     SpanId: Id_21,
     Name: sqs.request,
     Resource: SQS.DeleteMessageBatch,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -470,14 +405,10 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
@@ -485,7 +416,7 @@
     SpanId: Id_22,
     Name: sqs.request,
     Resource: SQS.SendMessage,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -495,14 +426,10 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
@@ -510,7 +437,7 @@
     SpanId: Id_23,
     Name: sqs.request,
     Resource: SQS.SendMessage,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -520,14 +447,10 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
@@ -535,7 +458,7 @@
     SpanId: Id_24,
     Name: sqs.request,
     Resource: SQS.ReceiveMessage,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -545,14 +468,10 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
@@ -560,7 +479,7 @@
     SpanId: Id_25,
     Name: sqs.request,
     Resource: SQS.DeleteMessage,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -570,14 +489,10 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
@@ -585,7 +500,7 @@
     SpanId: Id_26,
     Name: sqs.request,
     Resource: SQS.ReceiveMessage,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -595,14 +510,10 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
@@ -610,7 +521,7 @@
     SpanId: Id_27,
     Name: sqs.request,
     Resource: SQS.DeleteMessage,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -620,14 +531,10 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
@@ -635,7 +542,7 @@
     SpanId: Id_28,
     Name: sqs.request,
     Resource: SQS.SendMessageBatch,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -645,14 +552,10 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
@@ -660,7 +563,7 @@
     SpanId: Id_29,
     Name: sqs.request,
     Resource: SQS.SendMessageBatch,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -670,14 +573,10 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
@@ -685,7 +584,7 @@
     SpanId: Id_30,
     Name: sqs.request,
     Resource: SQS.ReceiveMessage,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -695,14 +594,10 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
@@ -710,7 +605,7 @@
     SpanId: Id_31,
     Name: sqs.request,
     Resource: SQS.DeleteMessageBatch,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -720,14 +615,10 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
@@ -735,7 +626,7 @@
     SpanId: Id_32,
     Name: sqs.request,
     Resource: SQS.ReceiveMessage,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -745,14 +636,10 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
@@ -760,7 +647,7 @@
     SpanId: Id_33,
     Name: sqs.request,
     Resource: SQS.DeleteMessageBatch,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -770,14 +657,10 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
@@ -785,7 +668,7 @@
     SpanId: Id_34,
     Name: sqs.request,
     Resource: SQS.DeleteQueue,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -795,14 +678,10 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   },
   {
@@ -810,7 +689,7 @@
     SpanId: Id_35,
     Name: sqs.request,
     Resource: SQS.DeleteQueue,
-    Service: Samples.AWS.SQS-aws-sqs,
+    Service: Samples.AWS.SQS,
     Type: http,
     ParentId: Id_2,
     Tags: {
@@ -820,14 +699,10 @@
       aws.requestId: Guid_Empty,
       aws.service: SQS,
       component: aws-sdk,
-      env: integration_tests,
+      deployment.environment: integration_tests,
       http.method: POST,
       http.status_code: 200,
-      runtime-id: Guid_1,
       span.kind: client
-    },
-    Metrics: {
-      _dd.top_level: 1.0
     }
   }
 ]
