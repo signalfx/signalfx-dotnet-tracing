@@ -195,7 +195,6 @@ partial class Build : NukeBuild
         .Description("Builds the native unit tests and runs them")
         .After(Clean, BuildTracerHome, BuildProfilerHome)
         .DependsOn(CreateRequiredDirectories)
-        .DependsOn(CompileProfilerManagedSrc)
         .DependsOn(CompileNativeTests)
         .DependsOn(RunNativeTests);
 

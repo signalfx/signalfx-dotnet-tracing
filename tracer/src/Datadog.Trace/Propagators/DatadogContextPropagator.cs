@@ -8,6 +8,7 @@
 #nullable enable
 
 using System.Globalization;
+using Datadog.Trace.Propagation;
 using Datadog.Trace.Tagging;
 
 namespace Datadog.Trace.Propagators
@@ -50,7 +51,7 @@ namespace Datadog.Trace.Propagators
 
             if (propagatedTraceTags != null)
             {
-                carrierSetter.Set(carrier, HttpHeaderNames.PropagatedTags, propagatedTraceTags);
+                carrierSetter.Set(carrier, DDHttpHeaderNames.PropagatedTags, propagatedTraceTags);
             }
         }
 
@@ -76,7 +77,7 @@ namespace Datadog.Trace.Propagators
             var parentId = ParseUtility.ParseUInt64(carrier, carrierGetter, "parent-id") ?? 0;
             var samplingPriority = ParseUtility.ParseInt32(carrier, carrierGetter, "sampling-priority");
             var origin = ParseUtility.ParseString(carrier, carrierGetter, "origin");
-            var propagatedTraceTags = ParseUtility.ParseString(carrier, carrierGetter, HttpHeaderNames.PropagatedTags);
+            var propagatedTraceTags = ParseUtility.ParseString(carrier, carrierGetter, DDHttpHeaderNames.PropagatedTags);
 
             spanContext = new SpanContext(traceId, parentId, samplingPriority, serviceName: null, origin)
                           {

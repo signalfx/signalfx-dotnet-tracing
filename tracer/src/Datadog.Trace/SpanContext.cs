@@ -192,6 +192,7 @@ namespace Datadog.Trace
         /// </summary>
         internal string TraceState { get; }
 
+        /// <summary>
         /// Gets or sets the header value that contains the propagated trace tags,
         /// formatted as "key1=value1,key2=value2".
         /// </summary>

@@ -119,6 +119,11 @@ namespace Datadog.Trace.Tagging
             return _cachedPropagationHeader ??= TagPropagation.ToHeader(this, maxLength);
         }
 
+        public List<KeyValuePair<string, string>>.Enumerator GetEnumerator()
+        {
+            return _tags?.GetEnumerator() ?? EmptyEnumerator;
+        }
+
         /// <summary>
         /// Returns the trace tags an <see cref="IEnumerable{T}"/>.
         /// Use for testing only as it will allocate the enumerator on the heap.

@@ -6,11 +6,9 @@
 // Modified by Splunk Inc.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Datadog.Trace.Configuration;
-using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.TestHelpers;
 using FluentAssertions;
 using VerifyXunit;
@@ -65,50 +63,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 // Use the snapshot to verify each run of RunServiceStack, instead of testing all of the application spans
                 for (int i = 0; i < numberOfRuns; i++)
                 {
-                    Assert.Equal("redis.command", span.LogicScope);
-                    Assert.Equal("Samples.ServiceStack.Redis", span.Service);
-                    Assert.Equal(SpanTypes.Redis, span.Type);
-                    Assert.Equal(host, DictionaryExtensions.GetValueOrDefault(span.Tags, "net.peer.name"));
-                    Assert.Equal(port, DictionaryExtensions.GetValueOrDefault(span.Tags, "net.peer.port"));
-                    Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
-                }
-
-                var expectedFromOneRun = new TupleList<string, string>
-                {
-                    { "SET", $"SET {TestPrefix}ServiceStack.Redis.INCR 0" },
-                    { "PING", "PING" },
-                    { "DDCUSTOM", "DDCUSTOM COMMAND" },
-                    { "ECHO", "ECHO Hello World" },
-                    { "SLOWLOG", "SLOWLOG GET 5" },
-                    { "INCR", $"INCR {TestPrefix}ServiceStack.Redis.INCR" },
-                    { "INCRBYFLOAT", $"INCRBYFLOAT {TestPrefix}ServiceStack.Redis.INCR 1.25" },
-                    { "TIME", "TIME" },
-                    { "SELECT", "SELECT 0" },
-                };
-
-                var expected = new TupleList<string, string>();
-                expected.AddRange(expectedFromOneRun);
-                expected.AddRange(expectedFromOneRun);
-#if NETCOREAPP3_1_OR_GREATER
-                expected.AddRange(expectedFromOneRun); // On .NET Core 3.1 and .NET 5 we run the routine a third time
-#endif
-
-                Assert.Equal(expected.Count, spans.Count);
-
-                for (int i = 0; i < expected.Count; i++)
-                {
-                    var e1 = expected[i].Item1;
-                    var e2 = expected[i].Item2;
-
-                    var a1 = i < spans.Count
-                                 ? spans[i].Resource
-                                 : string.Empty;
-                    var a2 = i < spans.Count
-                                 ? DictionaryExtensions.GetValueOrDefault(spans[i].Tags, "db.statement")
-                                 : string.Empty;
-
-                    Assert.True(e1 == a1, $@"invalid resource name for span #{i}, expected ""{e1}"", actual ""{a1}""");
-                    Assert.True(e2 == a2, $@"invalid raw command for span #{i}, expected ""{e2}"" != ""{a2}""");
                     var routineSpans = spans.GetRange(i * expectedSpansPerRun, expectedSpansPerRun).AsReadOnly();
                     await VerifyHelper.VerifySpans(
                         routineSpans,

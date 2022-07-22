@@ -5,6 +5,8 @@
 
 // Modified by Splunk Inc.
 
+using System;
+
 namespace Datadog.Trace.Propagation
 {
     /// <summary>

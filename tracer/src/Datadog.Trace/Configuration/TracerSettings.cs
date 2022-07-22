@@ -441,16 +441,6 @@ namespace Datadog.Trace.Configuration
         internal int TagPropagationHeaderMaxLength { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating the injection propagation style.
-        /// </summary>
-        internal string[] PropagationStyleInject { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating the extraction propagation style.
-        /// </summary>
-        internal string[] PropagationStyleExtract { get; set; }
-
-        /// <summary>
         /// Gets or sets a value indicating whether runtime metrics
         /// are enabled and sent to DogStatsd.
         /// </summary>

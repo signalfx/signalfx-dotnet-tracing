@@ -3,12 +3,11 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
+// Modified by Splunk Inc.
+
 using System.Linq;
 using Datadog.Trace.Agent;
 using Datadog.Trace.Configuration;
-using Datadog.Trace.TestHelpers;
 using FluentAssertions;
 using Xunit;
 
@@ -24,7 +23,7 @@ namespace Datadog.Trace.IntegrationTests
             _testApi = new TestApi();
 
             var settings = new TracerSettings();
-            var agentWriter = new AgentWriter(_testApi, statsAggregator: null, statsd: null);
+            var agentWriter = new AgentWriter(_testApi, statsAggregator: null, metrics: null);
             _tracer = new Tracer(settings, agentWriter, sampler: null, scopeManager: null, statsd: null);
         }
 
