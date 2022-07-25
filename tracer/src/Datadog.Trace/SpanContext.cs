@@ -25,6 +25,7 @@ namespace Datadog.Trace
             Keys.Origin,
             Keys.RawTraceId,
             Keys.RawSpanId,
+            Keys.PropagatedTags,
             // For mismatch version support we need to keep supporting old keys.
             "trace-id",
             "parent-id",
@@ -192,6 +193,12 @@ namespace Datadog.Trace
         internal string TraceState { get; }
 
         /// <summary>
+        /// Gets or sets the header value that contains the propagated trace tags,
+        /// formatted as "key1=value1,key2=value2".
+        /// </summary>
+        internal string PropagatedTags { get; set; }
+
+        /// <summary>
         /// Gets the trace context.
         /// Returns null for contexts created from incoming propagated context.
         /// </summary>
@@ -310,6 +317,10 @@ namespace Datadog.Trace
                     value = RawSpanId;
                     return true;
 
+                case Keys.PropagatedTags:
+                    value = PropagatedTags;
+                    return true;
+
                 default:
                     value = null;
                     return false;
@@ -319,12 +330,14 @@ namespace Datadog.Trace
         internal static class Keys
         {
             private const string Prefix = "__DistributedKey-";
+
             public const string TraceId = $"{Prefix}TraceId";
             public const string ParentId = $"{Prefix}ParentId";
             public const string SamplingPriority = $"{Prefix}SamplingPriority";
             public const string Origin = $"{Prefix}Origin";
             public const string RawTraceId = $"{Prefix}RawTraceId";
             public const string RawSpanId = $"{Prefix}RawSpanId";
+            public const string PropagatedTags = $"{Prefix}PropagatedTags";
         }
     }
 }
