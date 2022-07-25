@@ -115,6 +115,8 @@
     <Compile Include="Handlers\CustomTracingExceptionHandler.cs" />
     <Compile Include="Handlers\PassThroughQuerySuccessMessageHandler.cs" />
     <Compile Include="Handlers\TerminatingQuerySuccessMessageHandler.cs" />
+    <Compile Include="MyHttpException.cs" />
+    <Compile Include="MyHttpExceptionFIilterAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

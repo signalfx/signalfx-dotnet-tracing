@@ -50,9 +50,10 @@ namespace Samples.AspNetMvc5.Controllers
 
         [HttpGet]
         [Route("statuscode/{value}")]
+        [MyHttpExceptionFilter]
         public IHttpActionResult StatusCode(int value)
         {
-            return this.Content((HttpStatusCode)value, "Status code set to " + value);
+            throw new MyHttpException(value);
         }
 
         [HttpGet]
