@@ -32,6 +32,8 @@ namespace Samples.AspNetCoreMvc
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseExceptionHandler(MyHttpException.Handler);
+
             app.UseMiddleware<PingMiddleware>();
             app.Map("/branch", x => x.UseMiddleware<PingMiddleware>());
 
