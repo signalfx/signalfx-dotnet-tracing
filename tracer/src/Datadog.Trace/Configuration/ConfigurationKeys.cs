@@ -571,7 +571,7 @@ namespace Datadog.Trace.Configuration
             /// <remarks>
             /// This value is not used when extracting an incoming propagation header from an upstream service.
             /// </remarks>
-            public const string HeaderMaxLength = "DD_TRACE_X_DATADOG_TAGS_MAX_LENGTH";
+            public const string HeaderMaxLength = "SIGNALFX_TRACE_X_DATADOG_TAGS_MAX_LENGTH";
         }
     }
 }

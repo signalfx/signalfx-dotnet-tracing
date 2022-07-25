@@ -16,7 +16,7 @@ internal static class TagPropagation
 {
     /// <summary>
     /// Default value for the maximum length of an outgoing propagation header ("x-datadog-tags").
-    /// This value is used when injecting headers and can be overriden with DD_TRACE_X_DATADOG_TAGS_MAX_LENGTH.
+    /// This value is used when injecting headers and can be overriden with SIGNALFX_TRACE_X_DATADOG_TAGS_MAX_LENGTH.
     /// </summary>
     public const int OutgoingPropagationHeaderMaxLength = 512;
 

@@ -71,6 +71,7 @@ These settings should be never used by the users.
 | `SIGNALFX_SITE` | Sets the default destination site. |  |
 | `SIGNALFX_LOG_LEVEL` | Sets the log level for serverless. |  |
 | `_SIGNALFX_EXTENSION_PATH` | Sets the lambda extension path. |  |
+| `SIGNALFX_TRACE_X_DATADOG_TAGS_MAX_LENGTH` | Configuration key for the maximum length of an outgoing propagation header's value ("x-datadog-tags") | `512`  |
 
 ## Unpublished settings
 
