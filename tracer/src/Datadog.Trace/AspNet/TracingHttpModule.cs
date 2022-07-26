@@ -122,13 +122,14 @@ namespace Datadog.Trace.AspNet
                 }
 
                 string host = httpRequest.Headers.Get("Host");
+                var userAgent = httpRequest.Headers.Get(CommonHttpHeaderNames.UserAgent);
                 string httpMethod = httpRequest.HttpMethod.ToUpperInvariant();
                 string url = httpRequest.Url.ToString(); // Upstream uses RawUrl, ie. the part of the URL following the domain information.
 
                 var tags = new WebTags();
                 scope = tracer.StartActiveInternal(httpMethod, propagatedContext, tags: tags);
                 // Leave resourceName blank for now - we'll update it in OnEndRequest
-                scope.Span.DecorateWebServerSpan(resourceName: null, httpMethod, host, url, tags, tagsFromHeaders, httpRequest.UserHostAddress);
+                scope.Span.DecorateWebServerSpan(resourceName: null, httpMethod, host, url, userAgent, tags, tagsFromHeaders, httpRequest.UserHostAddress);
                 scope.Span.LogicScope = _requestOperationName;
 
                 tags.SetAnalyticsSampleRate(IntegrationId, tracer.Settings, enabledWithGlobalSetting: true);
@@ -198,7 +199,7 @@ namespace Datadog.Trace.AspNet
                         }
 
                         if (app.Context.Items[SharedItems.HttpContextPropagatedResourceNameKey] is string resourceName
-                             && !string.IsNullOrEmpty(resourceName))
+                         && !string.IsNullOrEmpty(resourceName))
                         {
                             scope.Span.ResourceName = resourceName;
                             // Resource name with low cardinality, update the operation name.

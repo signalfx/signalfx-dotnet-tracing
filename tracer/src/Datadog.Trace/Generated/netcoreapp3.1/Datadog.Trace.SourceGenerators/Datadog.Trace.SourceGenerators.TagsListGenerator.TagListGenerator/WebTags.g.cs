@@ -10,6 +10,8 @@ namespace Datadog.Trace.Tagging
     {
         // SpanKindBytes = System.Text.Encoding.UTF8.GetBytes("span.kind");
         private static readonly byte[] SpanKindBytes = new byte[] { 115, 112, 97, 110, 46, 107, 105, 110, 100 };
+        // HttpUserAgentBytes = System.Text.Encoding.UTF8.GetBytes("http.user_agent");
+        private static readonly byte[] HttpUserAgentBytes = new byte[] { 104, 116, 116, 112, 46, 117, 115, 101, 114, 95, 97, 103, 101, 110, 116 };
         // HttpMethodBytes = System.Text.Encoding.UTF8.GetBytes("http.method");
         private static readonly byte[] HttpMethodBytes = new byte[] { 104, 116, 116, 112, 46, 109, 101, 116, 104, 111, 100 };
         // HttpRequestHeadersHostBytes = System.Text.Encoding.UTF8.GetBytes("http.host");
@@ -26,6 +28,7 @@ namespace Datadog.Trace.Tagging
             return key switch
             {
                 "span.kind" => SpanKind,
+                "http.user_agent" => HttpUserAgent,
                 "http.method" => HttpMethod,
                 "http.host" => HttpRequestHeadersHost,
                 "http.url" => HttpUrl,
@@ -39,6 +42,9 @@ namespace Datadog.Trace.Tagging
         {
             switch(key)
             {
+                case "http.user_agent": 
+                    HttpUserAgent = value;
+                    break;
                 case "http.method": 
                     HttpMethod = value;
                     break;
@@ -63,6 +69,7 @@ namespace Datadog.Trace.Tagging
         protected static Datadog.Trace.Tagging.IProperty<string?>[] WebTagsProperties => 
              Datadog.Trace.ExtensionMethods.ArrayExtensions.Concat(InstrumentationTagsProperties,
                 new Datadog.Trace.Tagging.Property<WebTags, string?>("span.kind", t => t.SpanKind),
+                new Datadog.Trace.Tagging.Property<WebTags, string?>("http.user_agent", t => t.HttpUserAgent),
                 new Datadog.Trace.Tagging.Property<WebTags, string?>("http.method", t => t.HttpMethod),
                 new Datadog.Trace.Tagging.Property<WebTags, string?>("http.host", t => t.HttpRequestHeadersHost),
                 new Datadog.Trace.Tagging.Property<WebTags, string?>("http.url", t => t.HttpUrl),
@@ -75,6 +82,11 @@ namespace Datadog.Trace.Tagging
             if (SpanKind is not null)
             {
                 processor.Process(new TagItem<string>("span.kind", SpanKind, SpanKindBytes));
+            }
+
+            if (HttpUserAgent is not null)
+            {
+                processor.Process(new TagItem<string>("http.user_agent", HttpUserAgent, HttpUserAgentBytes));
             }
 
             if (HttpMethod is not null)
@@ -119,6 +131,12 @@ namespace Datadog.Trace.Tagging
                 WriteTag(ref bytes, ref offset, SpanKindBytes, SpanKind, tagProcessors);
             }
 
+            if (HttpUserAgent is not null)
+            {
+                count++;
+                WriteTag(ref bytes, ref offset, HttpUserAgentBytes, HttpUserAgent, tagProcessors);
+            }
+
             if (HttpMethod is not null)
             {
                 count++;
@@ -158,6 +176,13 @@ namespace Datadog.Trace.Tagging
             {
                 sb.Append("span.kind (tag):")
                   .Append(SpanKind)
+                  .Append(',');
+            }
+
+            if (HttpUserAgent is not null)
+            {
+                sb.Append("http.user_agent (tag):")
+                  .Append(HttpUserAgent)
                   .Append(',');
             }
 

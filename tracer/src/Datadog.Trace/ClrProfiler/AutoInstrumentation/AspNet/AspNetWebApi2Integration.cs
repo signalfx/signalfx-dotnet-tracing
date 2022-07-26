@@ -49,6 +49,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
                 var request = controllerContext.Request;
                 SpanContext propagatedContext = null;
                 var tagsFromHeaders = Enumerable.Empty<KeyValuePair<string, string>>();
+                tags = new AspNetTags();
 
                 if (request != null && tracer.InternalActiveScope == null)
                 {
@@ -67,10 +68,8 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
                     }
                 }
 
-                tags = new AspNetTags();
                 scope = tracer.StartActiveInternal(OperationName, propagatedContext, tags: tags);
                 UpdateSpan(controllerContext, scope.Span, tags, tagsFromHeaders);
-
                 tags.SetAnalyticsSampleRate(IntegrationId, tracer.Settings, enabledWithGlobalSetting: true);
                 tracer.TracerManager.Telemetry.IntegrationGeneratedSpan(IntegrationId);
             }
@@ -86,12 +85,14 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
         {
             try
             {
-                var newResourceNamesEnabled = Tracer.Instance.Settings.RouteTemplateResourceNamesEnabled;
+                var tracer = Tracer.Instance;
+                var newResourceNamesEnabled = tracer.Settings.RouteTemplateResourceNamesEnabled;
                 var request = controllerContext.Request;
                 Uri requestUri = request.RequestUri;
 
                 string host = request.Headers.Host ?? string.Empty;
                 string rawUrl = requestUri?.ToString() ?? string.Empty;
+                string userAgent = request.Headers.UserAgent?.ToString() ?? string.Empty;
                 string method = request.Method.Method?.ToUpperInvariant() ?? "GET";
                 string route = null;
                 try
@@ -128,7 +129,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
                         out controller,
                         out action,
                         addSlashPrefix: newResourceNamesEnabled,
-                        expandRouteTemplates: newResourceNamesEnabled && Tracer.Instance.Settings.ExpandRouteTemplatesEnabled);
+                        expandRouteTemplates: newResourceNamesEnabled && tracer.Settings.ExpandRouteTemplatesEnabled);
                 }
                 else if (route != null)
                 {
@@ -145,9 +146,9 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
                     // get the route values. Not sure how this is possible, but is preexisting behaviour
                     try
                     {
+                        area = (routeValues.GetValueOrDefault("area") as string)?.ToLowerInvariant();
                         controller = (routeValues.GetValueOrDefault("controller") as string)?.ToLowerInvariant();
                         action = (routeValues.GetValueOrDefault("action") as string)?.ToLowerInvariant();
-                        area = (routeValues.GetValueOrDefault("area") as string)?.ToLowerInvariant();
                     }
                     catch
                     {
@@ -159,6 +160,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
                     method: method,
                     host: host,
                     httpUrl: rawUrl,
+                    userAgent: userAgent,
                     tags,
                     headerTags,
                     HttpContext.Current?.Request.UserHostAddress);

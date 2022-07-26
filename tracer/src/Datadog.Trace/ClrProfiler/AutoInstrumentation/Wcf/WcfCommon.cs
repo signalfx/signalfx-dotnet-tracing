@@ -58,6 +58,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
                 SpanContext propagatedContext = null;
                 var tagsFromHeaders = Enumerable.Empty<KeyValuePair<string, string>>();
                 string host = null;
+                string userAgent = null;
                 string httpMethod = null;
 
                 IDictionary<string, object> requestProperties = requestMessage.Properties;
@@ -69,6 +70,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
 
                     // we're using an http transport
                     host = webHeaderCollection[HttpRequestHeader.Host];
+                    userAgent = webHeaderCollection[HttpRequestHeader.UserAgent];
                     httpMethod = httpRequestPropertyProxy.Method?.ToUpperInvariant();
 
                     // try to extract propagated context values from http headers
@@ -106,6 +108,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
                     httpMethod,
                     host,
                     httpUrl: requestHeadersTo?.AbsoluteUri,
+                    userAgent,
                     tags,
                     tagsFromHeaders);
 

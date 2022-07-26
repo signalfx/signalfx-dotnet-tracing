@@ -76,7 +76,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
             Fixture.SetOutput(null);
         }
 
-        protected string GetTestName(string testName)
+        protected virtual string GetTestName(string testName)
         {
             return testName
                  + (_enableRouteTemplateResourceNames ? ".WithFF" : ".NoFF");
@@ -92,6 +92,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AspNetCore
             {
                 _httpClient = new HttpClient();
                 _httpClient.DefaultRequestHeaders.Add(CommonHttpHeaderNames.TracingEnabled, "false");
+                _httpClient.DefaultRequestHeaders.Add(CommonHttpHeaderNames.UserAgent, "testhelper");
                 _httpClient.DefaultRequestHeaders.Add(HeaderName1WithMapping, HeaderValue1);
                 _httpClient.DefaultRequestHeaders.Add(HeaderName2, HeaderValue2);
             }

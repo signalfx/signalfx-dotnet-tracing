@@ -59,6 +59,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
                 {
                     var newResourceNamesEnabled = tracer.Settings.RouteTemplateResourceNamesEnabled;
                     string host = httpContext.Request.Headers.Get("Host");
+                    string userAgent = httpContext.Request.Headers.Get(CommonHttpHeaderNames.UserAgent);
                     string httpMethod = httpContext.Request.HttpMethod.ToUpperInvariant();
                     string url = httpContext.Request.Url?.ToString(); // Upstream uses RawUrl, ie. the part of the URL following the domain information.
                     string resourceName = null;
@@ -94,7 +95,6 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
                     string areaName;
                     string controllerName;
                     string actionName;
-
                     if ((wasAttributeRouted || newResourceNamesEnabled) && string.IsNullOrEmpty(resourceName) && !string.IsNullOrEmpty(routeUrl))
                     {
                         resourceName = AspNetResourceNameHelper.CalculateResourceName(
@@ -149,6 +149,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
                         method: httpMethod,
                         host: host,
                         httpUrl: url,
+                        userAgent: userAgent,
                         tags,
                         tagsFromHeaders,
                         httpContext.Request.UserHostAddress);
