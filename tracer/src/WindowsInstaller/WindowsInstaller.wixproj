@@ -17,9 +17,9 @@
     <IntermediateOutputPath>obj\$(Configuration)\$(Platform)\</IntermediateOutputPath>
     <SuppressPdbOutput>True</SuppressPdbOutput>
     <DefineSolutionProperties>false</DefineSolutionProperties>
-    <OutputName>signalfx-dotnet-tracing-0.2.6-$(Platform)</OutputName>
+    <OutputName>signalfx-dotnet-tracing-0.2.7-$(Platform)</OutputName>
     <TracerHomeDirectory Condition="'$(TracerHomeDirectory)' == ''">$(MSBuildThisFileDirectory)..\bin\dd-tracer-home</TracerHomeDirectory>
-    <DefineConstants>InstallerVersion=0.2.6;TracerHomeDirectory=$(TracerHomeDirectory)</DefineConstants>
+    <DefineConstants>InstallerVersion=0.2.7;TracerHomeDirectory=$(TracerHomeDirectory)</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DefineConstants>$(DefineConstants);Debug</DefineConstants>

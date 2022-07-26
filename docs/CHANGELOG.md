@@ -15,9 +15,13 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 ### Bugfixes
 
-- Fix span context propagation for [AlwaysOn Profiling](always-on-profiling.md)
-
 ### Enhancements
+
+## [Release 0.2.7](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.2.7)
+
+### Bugfixes
+
+- Fix span context propagation for [AlwaysOn Profiling](always-on-profiling.md)
 
 ---
 
