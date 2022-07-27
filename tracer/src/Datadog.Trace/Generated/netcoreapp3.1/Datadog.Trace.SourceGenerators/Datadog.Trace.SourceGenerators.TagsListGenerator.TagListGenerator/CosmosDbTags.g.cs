@@ -39,9 +39,6 @@ namespace Datadog.Trace.Tagging
         {
             switch(key)
             {
-                case "db.system": 
-                    DbType = value;
-                    break;
                 case "cosmosdb.container": 
                     ContainerId = value;
                     break;

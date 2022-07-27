@@ -18,7 +18,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Redis
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(RedisHelper));
 
-        internal static Scope CreateScope(Tracer tracer, IntegrationId integrationId, string host, string port, string rawCommand)
+        internal static Scope CreateScope(Tracer tracer, IntegrationId integrationId, string integrationName, string host, string port, string rawCommand)
         {
             if (!Tracer.Instance.Settings.IsIntegrationEnabled(integrationId))
             {
@@ -40,6 +40,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Redis
             try
             {
                 var tags = new RedisTags();
+                tags.InstrumentationName = integrationName;
 
                 int separatorIndex = rawCommand.IndexOf(' ');
                 string command;
