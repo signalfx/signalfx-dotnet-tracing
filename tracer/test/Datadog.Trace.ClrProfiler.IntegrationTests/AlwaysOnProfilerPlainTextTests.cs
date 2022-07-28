@@ -9,6 +9,7 @@ using System.Linq;
 using Datadog.Trace.TestHelpers;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using OpenTelemetry.TestHelpers.Proto.Common.V1;
 using OpenTelemetry.TestHelpers.Proto.Logs.V1;
 using VerifyXunit;
 using Xunit;
@@ -58,7 +59,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                     using (new AssertionScope())
                     {
-                        AllShouldHaveCorrectAttributes(logRecords, "text");
+                        AllShouldHaveCorrectAttributes(logRecords, ExpectedAttributes());
                         AllBodiesShouldHaveCorrectFormat(logRecords);
                     }
 
@@ -69,6 +70,33 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 Assert.True(containStackTraceForClassHierarchy, "At least one stack trace containing class hierarchy should be reported.");
             }
+        }
+
+        private static List<KeyValue> ExpectedAttributes()
+        {
+            return new List<KeyValue>
+            {
+                new KeyValue
+                {
+                    Key = "com.splunk.sourcetype",
+                    Value = new AnyValue { StringValue = "otel.profiling" }
+                },
+                new KeyValue
+                {
+                    Key = "source.event.period",
+                    Value = new AnyValue { IntValue = 1000L }
+                },
+                new KeyValue
+                {
+                    Key = "profiling.data.format",
+                    Value = new AnyValue { StringValue = "text" }
+                },
+                new KeyValue
+                {
+                    Key = "profiling.data.type",
+                    Value = new AnyValue { StringValue = "cpu" }
+                }
+            };
         }
 
         private static void AllBodiesShouldHaveCorrectFormat(List<LogRecord> logRecords)

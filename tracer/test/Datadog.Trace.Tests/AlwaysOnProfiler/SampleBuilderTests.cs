@@ -33,16 +33,5 @@ namespace Datadog.Trace.Tests.AlwaysOnProfiler.Builder
             sample.Labels.Should().HaveCount(1);
             sample.Labels[0].Should().Be(label);
         }
-
-        [Fact]
-        public void AddValue()
-        {
-            _sampleBuilder.AddValue(100);
-
-            var sample = _sampleBuilder.Build();
-
-            sample.Values.Should().HaveCount(1);
-            sample.Values[0].Should().Be(100);
-        }
     }
 }

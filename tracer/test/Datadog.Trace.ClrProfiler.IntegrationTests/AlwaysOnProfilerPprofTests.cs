@@ -14,6 +14,7 @@ using Datadog.Trace.Vendors.ProtoBuf;
 using Datadog.Tracer.Pprof.Proto.Profile;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using OpenTelemetry.TestHelpers.Proto.Common.V1;
 using VerifyXunit;
 using Xunit;
 using Xunit.Abstractions;
@@ -70,7 +71,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                     using (new AssertionScope())
                     {
-                        AllShouldHaveCorrectAttributes(logRecords, "pprof-gzip-base64");
+                        AllShouldHaveCorrectAttributes(logRecords, ExpectedAttributes());
                     }
 
                     // all samples should contain the same common attributes, only stack traces are vary
@@ -80,6 +81,28 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 Assert.True(containStackTraceForClassHierarchy, "At least one stack trace containing class hierarchy should be reported.");
             }
+        }
+
+        private static List<KeyValue> ExpectedAttributes()
+        {
+            return new List<KeyValue>
+            {
+                new KeyValue
+                {
+                    Key = "com.splunk.sourcetype",
+                    Value = new AnyValue { StringValue = "otel.profiling" }
+                },
+                new KeyValue
+                {
+                    Key = "profiling.data.format",
+                    Value = new AnyValue { StringValue = "pprof-gzip-base64" }
+                },
+                new KeyValue
+                {
+                    Key = "profiling.data.type",
+                    Value = new AnyValue { StringValue = "cpu" }
+                }
+            };
         }
 
         private static bool ContainStackTraceForClassHierarchy(Profile profile, string expectedStackTrace)

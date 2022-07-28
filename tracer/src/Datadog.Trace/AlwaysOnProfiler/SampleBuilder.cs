@@ -18,12 +18,6 @@ namespace Datadog.Trace.AlwaysOnProfiler.Builder
             return this;
         }
 
-        public SampleBuilder AddValue(long value)
-        {
-            _values.Add(value);
-            return this;
-        }
-
         public SampleBuilder AddLocationId(ulong locationId)
         {
             _locationIds.Add(locationId);
