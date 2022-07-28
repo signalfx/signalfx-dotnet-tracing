@@ -75,12 +75,12 @@ These settings should be never used by the users.
 | `SIGNALFX_DEBUGGER_POLL_INTERVAL` | Sets the debugger poll interval (in seconds). | `1`  |
 | `SIGNALFX_DEBUGGER_SNAPSHOT_URL` | Sets the URL used to query our backend directly for the list of active probes. This can only be used if SIGNALFX_API_KEY is also available. | |
 | `SIGNALFX_DEBUGGER_PROBE_FILE` | Sets the probe configuration file full path. Loads the probe configuration from a local file on disk. Useful for local development and testing. | |
-| `SIGNALFX_DEBUGGER_ENABLED` | Enabling or disabling the Live Debugger | `false`  |
 | `SIGNALFX_DEBUGGER_MAX_DEPTH_TO_SERIALIZE` | Sets the max object depth to serialize for probe snapshots. | `1`  |
 | `SIGNALFX_DEBUGGER_MAX_TIME_TO_SERIALIZE` | Sets the maximum duration (in milliseconds) to run serialization for probe snapshots. | `150`  |
 | `SIGNALFX_DEBUGGER_UPLOAD_BATCH_SIZE` | Sets the maximum upload batch size. | `100`  |
 | `SIGNALFX_DEBUGGER_DIAGNOSTICS_INTERVAL` | Sets the interval (in seconds) between sending probe statuses. | `3600`  |
 | `SIGNALFX_DEBUGGER_UPLOAD_FLUSH_INTERVAL` | Sets the interval (in milliseconds) between flushing statuses. | `0`  |
+| `SIGNALFX_INTERNAL_DEBUGGER_ENABLED` | Enabling or disabling the Live Debugger | `false`  |
 | `SIGNALFX_INTERNAL_DEBUGGER_INSTRUMENT_ALL` | Determine whether to enter "instrument all" mode where the Debugger instrumentation is applied to every jit compiled method. Only useful for testing purposes. | `false` |
 
 ## Unpublished settings
