@@ -9,6 +9,7 @@
 #pragma warning disable SA1402 // File may only contain a single class
 #pragma warning disable SA1649 // File name must match first type name
 
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Datadog.Trace.Configuration;
@@ -194,8 +195,28 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             // Append virtual directory to the actual request
             var spans = await GetWebServerSpans(_iisFixture.VirtualApplicationPath + path, _iisFixture.Agent, _iisFixture.HttpPort, statusCode, expectedSpanCount);
 
-            var sanitisedPath = VerifyHelper.SanitisePathsForVerify(path);
+            var aspnetSpans = spans.Where(s => s.LogicScope == "aspnet.request");
+            foreach (var aspnetSpan in aspnetSpans)
+            {
+                var result = aspnetSpan.IsAspNet();
+                Assert.True(result.Success, result.ToString());
+            }
 
+            var aspnetMvcSpans = spans.Where(s => s.LogicScope == "aspnet-mvc.request");
+            foreach (var aspnetMvcSpan in aspnetMvcSpans)
+            {
+                var result = aspnetMvcSpan.IsAspNetMvc();
+                Assert.True(result.Success, result.ToString());
+            }
+
+            var aspnetWebApi2Spans = spans.Where(s => s.LogicScope == "aspnet-webapi.request");
+            foreach (var aspnetWebApi2Span in aspnetWebApi2Spans)
+            {
+                var result = aspnetWebApi2Span.IsAspNetWebApi2();
+                Assert.True(result.Success, result.ToString());
+            }
+
+            var sanitisedPath = VerifyHelper.SanitisePathsForVerify(path);
             var settings = VerifyHelper.GetSpanVerifierSettings(sanitisedPath, (int)statusCode);
 
             // Overriding the type name here as we have multiple test classes in the file

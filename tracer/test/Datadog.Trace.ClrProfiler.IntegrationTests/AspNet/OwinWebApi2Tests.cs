@@ -12,6 +12,7 @@
 using System;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -122,8 +123,14 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
             var spans = await _fixture.WaitForSpans(Output, path, expectedSpanCount);
 
-            var sanitisedPath = VerifyHelper.SanitisePathsForVerify(path);
+            var aspnetWebApi2Spans = spans.Where(s => s.LogicScope == "aspnet-webapi.request");
+            foreach (var aspnetWebApi2Span in aspnetWebApi2Spans)
+            {
+                var result = aspnetWebApi2Span.IsAspNetWebApi2();
+                Assert.True(result.Success, result.ToString());
+            }
 
+            var sanitisedPath = VerifyHelper.SanitisePathsForVerify(path);
             var settings = VerifyHelper.GetSpanVerifierSettings(sanitisedPath, (int)statusCode);
 
             // Overriding the type name here as we have multiple test classes in the file

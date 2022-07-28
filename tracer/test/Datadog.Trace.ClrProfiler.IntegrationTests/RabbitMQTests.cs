@@ -66,9 +66,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 foreach (var span in rabbitmqSpans)
                 {
-                    Assert.Equal(SpanTypes.Queue, span.Type);
-                    Assert.Equal("rabbitmq", span.Tags[Tags.Messaging.System]);
-                    Assert.Equal("RabbitMQ", span.Tags[Tags.InstrumentationName]);
+                    var result = span.IsRabbitMQ();
+                    Assert.True(result.Success, result.ToString());
+
                     Assert.Equal(ExpectedServiceName, span.Service);
 
                     span.Tags.TryGetValue(Tags.AmqpCommand, out string command);

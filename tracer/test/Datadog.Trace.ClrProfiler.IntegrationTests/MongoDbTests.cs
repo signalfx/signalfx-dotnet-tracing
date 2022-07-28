@@ -97,10 +97,19 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 var nonAdminSpans = spans
                                    .Where(x => !adminSpans.Contains(x))
                                    .ToList();
+                var allMongoSpans = spans
+                                    .Where(x => x.GetTag(Tags.InstrumentationName) == "MongoDb")
+                                    .ToList();
 
                 await VerifyHelper.VerifySpans(nonAdminSpans, settings)
                                   .UseTextForParameters($"packageVersion={snapshotSuffix}_tagCommands={tagCommands}")
                                   .DisableRequireUniquePrefix();
+
+                foreach (var span in allMongoSpans)
+                {
+                    var result = span.IsMongoDB();
+                    Assert.True(result.Success, result.ToString());
+                }
 
                 telemetry.AssertIntegrationEnabled(IntegrationId.MongoDb);
 
@@ -111,11 +120,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 {
                     adminSpan.Tags.Should().IntersectWith(new Dictionary<string, string>
                     {
-                        { "component", "MongoDb" },
                         { "db.name", "admin" },
                         { "deployment.environment", "integration_tests" },
                         { "mongodb.collection", "1" },
-                        { "span.kind", "client" },
                     });
 
                     if (adminSpan.Resource == "buildInfo admin")

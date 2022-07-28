@@ -55,9 +55,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             var msmqSpans = spans.Where(span => string.Equals(span.Service, ExpectedServiceName, StringComparison.OrdinalIgnoreCase));
             foreach (var span in msmqSpans)
             {
-                span.Type.Should().Be(SpanTypes.Queue);
+                var result = span.IsMsmq();
+                Assert.True(result.Success, result.ToString());
+
                 span.Service.Should().Be(ExpectedServiceName);
-                span.Tags.Should().Contain(new System.Collections.Generic.KeyValuePair<string, string>(Tags.InstrumentationName, "msmq"));
+
                 if (span.Tags[Tags.MsmqIsTransactionalQueue] == "True")
                 {
                     span.Tags[Tags.MsmqQueuePath].Should().Be(".\\Private$\\private-transactional-queue");
@@ -68,9 +70,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     span.Tags[Tags.MsmqQueuePath].Should().Be(".\\Private$\\private-nontransactional-queue");
                     nonTransactionalTraces++;
                 }
-
-                span.Name.Should().Be("msmq.command");
-                span.Tags.Should().ContainKey(Tags.Version);
 
                 var command = span.Tags[Tags.MsmqCommand];
 
