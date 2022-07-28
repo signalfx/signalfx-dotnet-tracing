@@ -16,16 +16,14 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
         private readonly LogsData _logsData;
 
-        protected ThreadSampleExporter(ImmutableTracerSettings tracerSettings, ILogSender logSender)
+        protected ThreadSampleExporter(ImmutableTracerSettings tracerSettings, ILogSender logSender, string format)
         {
             FixedLogRecordAttributes = new ReadOnlyCollection<KeyValue>(new List<KeyValue>
             {
                 GdiProfilingConventions.LogRecord.Attributes.Source,
-                GdiProfilingConventions.LogRecord.Attributes.Period((long)tracerSettings.ThreadSamplingPeriod.TotalMilliseconds),
-                GdiProfilingConventions.LogRecord.Attributes.Format(tracerSettings.ExporterSettings.ProfilerExportFormat),
-                GdiProfilingConventions.LogRecord.Attributes.Type
+                GdiProfilingConventions.LogRecord.Attributes.Type,
+                GdiProfilingConventions.LogRecord.Attributes.Format(format)
             });
-
             _logsData = GdiProfilingConventions.CreateLogsData(tracerSettings.GlobalTags);
             _logSender = logSender ?? throw new ArgumentNullException(nameof(logSender));
         }
@@ -40,20 +38,12 @@ namespace Datadog.Trace.AlwaysOnProfiler
             }
 
             // The same _logsData instance is used on all export messages. With the exception of the list of
-            // LogRecords, the Logs property, all other fields are prepopulated. At this point the code just`
-            // need to create a LogRecord for each thread sample and add it to the Logs list.
-            var logRecords = _logsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs;
-
-            foreach (var threadSample in threadSamples)
-            {
-                var logRecord = CreateLogRecord(threadSample.Timestamp.Nanoseconds);
-                DecorateLogRecord(logRecord, threadSample);
-
-                logRecords.Add(logRecord);
-            }
-
+            // LogRecords, the Logs property, all other fields are prepopulated.
             try
             {
+                // Populate the list of LogRecords
+                ProcessThreadSamples(threadSamples);
+
                 _logSender.Send(_logsData);
             }
             finally
@@ -64,28 +54,34 @@ namespace Datadog.Trace.AlwaysOnProfiler
             }
         }
 
-        protected abstract void DecorateLogRecord(LogRecord logRecord, ThreadSample threadSample);
+        protected abstract void ProcessThreadSamples(List<ThreadSample> samples);
 
-        private LogRecord CreateLogRecord(ulong timeUnixNanoseconds)
+        protected LogRecord AddLogRecord(ulong timeUnixNanoseconds, string body)
         {
-            return new LogRecord
+            // The stack follows the experimental GDI conventions described at
+            // https://github.com/signalfx/gdi-specification/blob/29cbcbc969531d50ccfd0b6a4198bb8a89cedebb/specification/semantic_conventions.md#logrecord-message-fields
+
+            var logRecord = new LogRecord
             {
                 Attributes =
                 {
                     FixedLogRecordAttributes[0],
                     FixedLogRecordAttributes[1],
-                    FixedLogRecordAttributes[2],
-                    FixedLogRecordAttributes[3]
+                    FixedLogRecordAttributes[2]
                 },
                 TimeUnixNano = timeUnixNanoseconds,
+                Body = new AnyValue { StringValue = body }
             };
+
+            _logsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs.Add(logRecord);
+            return logRecord;
         }
 
         /// <summary>
         /// Holds the GDI profiling semantic conventions.
         /// <see href="https://github.com/signalfx/gdi-specification/blob/b09e176ca3771c3ef19fc9d23e8722fc77a3b6e9/specification/semantic_conventions.md#profiling-resourcelogs-message"/>
         /// </summary>
-        private static class GdiProfilingConventions
+        internal static class GdiProfilingConventions
         {
             private const string OpenTelemetryProfiling = "otel.profiling";
             private const string Version = "0.1.0";
@@ -164,19 +160,14 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         };
                     }
 
-                    public static KeyValue Format(ProfilerExportFormat profilerExportFormat)
+                    public static KeyValue Format(string format)
                     {
                         return new KeyValue
                         {
                             Key = "profiling.data.format",
                             Value = new AnyValue
                             {
-                                StringValue = profilerExportFormat switch
-                                {
-                                    ProfilerExportFormat.Pprof => "pprof-gzip-base64",
-                                    ProfilerExportFormat.Text => "text",
-                                    _ => throw new ArgumentOutOfRangeException(nameof(profilerExportFormat), profilerExportFormat, null)
-                                }
+                                StringValue = format
                             }
                         };
                     }

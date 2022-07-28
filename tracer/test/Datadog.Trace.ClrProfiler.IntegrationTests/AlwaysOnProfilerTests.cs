@@ -19,40 +19,16 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 {
     public class AlwaysOnProfilerTests : TestHelper
     {
-        public AlwaysOnProfilerTests(ITestOutputHelper output)
+        protected AlwaysOnProfilerTests(ITestOutputHelper output)
             : base("AlwaysOnProfiler", output)
         {
             SetServiceVersion("1.0.0");
         }
 
-        protected static void AllShouldHaveCorrectAttributes(List<LogRecord> logRecords, string format)
+        protected static void AllShouldHaveCorrectAttributes(List<LogRecord> logRecords, List<KeyValue> attributes)
         {
             var expectedAttributesForLogRecord = new LogRecord();
-            expectedAttributesForLogRecord.Attributes.Add(
-                new KeyValue
-                {
-                    Key = "com.splunk.sourcetype",
-                    Value = new AnyValue { StringValue = "otel.profiling" }
-                });
-            expectedAttributesForLogRecord.Attributes.Add(
-                new KeyValue
-                {
-                    Key = "source.event.period",
-                    Value = new AnyValue { IntValue = 1000L }
-                });
-            expectedAttributesForLogRecord.Attributes.Add(
-                new KeyValue
-                {
-                    Key = "profiling.data.format",
-                    Value = new AnyValue { StringValue = format }
-                });
-            expectedAttributesForLogRecord.Attributes.Add(
-                new KeyValue
-                {
-                    Key = "profiling.data.type",
-                    Value = new AnyValue { StringValue = "cpu" }
-                });
-
+            expectedAttributesForLogRecord.Attributes.AddRange(attributes);
             logRecords.Should().AllBeEquivalentTo(expectedAttributesForLogRecord, option => option.Including(x => x.Attributes));
         }
 
