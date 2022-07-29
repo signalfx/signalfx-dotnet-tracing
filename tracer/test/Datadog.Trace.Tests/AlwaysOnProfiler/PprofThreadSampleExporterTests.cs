@@ -104,6 +104,33 @@ public class PprofThreadSampleExporterTests
     }
 
     [Fact]
+    public void Timestamp_is_exported_inside_labels()
+    {
+        var sender = new TestSender();
+        var exporter = new PprofThreadSampleExporter(
+            DefaultSettings(),
+            sender);
+
+        exporter.ExportThreadSamples(new List<ThreadSample>
+        {
+            new ThreadSample()
+            {
+                Timestamp = new ThreadSample.Time(milliseconds: 1000)
+            }
+        });
+
+        var sentLog = sender.SentLogs[0];
+
+        sentLog.TimeUnixNano.Should().Be(0, "for pprof exporter, timestamp for an event is exported as a label.");
+
+        var profile = Deserialize(sentLog.Body.StringValue);
+
+        var timestamp = GetLabelNum("source.event.time", profile);
+
+        timestamp.Should().Be(1000);
+    }
+
+    [Fact]
     public void Format_is_added_to_log_record_attributes()
     {
         var sender = new TestSender();

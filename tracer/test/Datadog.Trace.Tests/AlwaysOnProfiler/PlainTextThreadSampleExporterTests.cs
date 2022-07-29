@@ -40,6 +40,26 @@ public class PlainTextThreadSampleExporterTests
     }
 
     [Fact]
+    public void Timestamp_is_set_on_log_record()
+    {
+        var settings = DefaultSettings();
+        var testSender = new TestSender();
+        var exporter = new PlainTextThreadSampleExporter(settings, testSender);
+
+        exporter.ExportThreadSamples(new List<ThreadSample>
+        {
+            new ThreadSample()
+            {
+                Timestamp = new ThreadSample.Time(milliseconds: 1000)
+            }
+        });
+
+        var sentLog = testSender.SentLogs[0];
+
+        sentLog.TimeUnixNano.Should().Be(1000 * 1_000_000u);
+    }
+
+    [Fact]
     public void Event_period_is_added_to_log_record_attributes()
     {
         const long expectedPeriod = 1000;

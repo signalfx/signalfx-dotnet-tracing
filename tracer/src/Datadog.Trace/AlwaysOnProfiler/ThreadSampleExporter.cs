@@ -56,7 +56,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
         protected abstract void ProcessThreadSamples(List<ThreadSample> samples);
 
-        protected LogRecord AddLogRecord(ulong timeUnixNanoseconds, string body)
+        protected LogRecord AddLogRecord(string body)
         {
             // The stack follows the experimental GDI conventions described at
             // https://github.com/signalfx/gdi-specification/blob/29cbcbc969531d50ccfd0b6a4198bb8a89cedebb/specification/semantic_conventions.md#logrecord-message-fields
@@ -69,7 +69,6 @@ namespace Datadog.Trace.AlwaysOnProfiler
                     FixedLogRecordAttributes[1],
                     FixedLogRecordAttributes[2]
                 },
-                TimeUnixNano = timeUnixNanoseconds,
                 Body = new AnyValue { StringValue = body }
             };
 
