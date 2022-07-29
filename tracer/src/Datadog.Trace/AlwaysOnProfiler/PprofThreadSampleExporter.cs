@@ -25,7 +25,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
         {
             var profile = BuildProfile(samples);
             // all of the samples in the batch have the same timestamp, pick from the first sample
-            AddLogRecord(samples[0].Timestamp.Nanoseconds, Serialize(profile));
+            AddLogRecord(Serialize(profile));
         }
 
         private static string Serialize(Profile profile)

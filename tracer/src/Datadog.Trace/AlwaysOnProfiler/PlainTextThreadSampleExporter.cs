@@ -24,7 +24,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
         {
             foreach (var threadSample in samples)
             {
-                var logRecord = AddLogRecord(threadSample.Timestamp.Nanoseconds, BuildStackTrace(threadSample));
+                var logRecord = AddLogRecord(BuildStackTrace(threadSample));
                 DecorateLogRecord(logRecord, threadSample);
             }
         }
@@ -86,6 +86,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 logRecord.TraceId = ToBigEndianBytes(threadSample.TraceIdHigh, threadSample.TraceIdLow);
             }
 
+            logRecord.TimeUnixNano = threadSample.Timestamp.Nanoseconds;
             logRecord.Attributes.Add(_samplingPeriodAttribute);
         }
     }
