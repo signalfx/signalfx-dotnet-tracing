@@ -205,6 +205,70 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         }
     }
 
+    [Collection("IisTests")]
+    public class AspNetWebApi2TestsCustomExceptionCallTargetClassic : AspNetWebApi2CustomExceptionTests
+    {
+        public AspNetWebApi2TestsCustomExceptionCallTargetClassic(IisFixture iisFixture, ITestOutputHelper output)
+            : base(iisFixture, output, classicMode: true, enableRouteTemplateResourceNames: false)
+        {
+        }
+    }
+
+    [UsesVerify]
+    public abstract class AspNetWebApi2CustomExceptionTests : TestHelper, IClassFixture<IisFixture>
+    {
+        private readonly IisFixture _iisFixture;
+        private readonly string _testName;
+
+        public AspNetWebApi2CustomExceptionTests(IisFixture iisFixture, ITestOutputHelper output, bool classicMode, bool enableRouteTemplateResourceNames, bool enableRouteTemplateExpansion = false, bool virtualApp = false)
+            : base("AspNetMvc5CustomException", @"test\test-applications\aspnet", output)
+        {
+            SetServiceVersion("1.0.0");
+            SetEnvironmentVariable(ConfigurationKeys.FeatureFlags.RouteTemplateResourceNamesEnabled, enableRouteTemplateResourceNames.ToString());
+            SetEnvironmentVariable(ConfigurationKeys.ExpandRouteTemplatesEnabled, enableRouteTemplateExpansion.ToString());
+
+            _iisFixture = iisFixture;
+            _iisFixture.ShutdownPath = "/home/shutdown";
+            if (virtualApp)
+            {
+                _iisFixture.VirtualApplicationPath = "/my-app";
+            }
+
+            _iisFixture.TryStartIis(this, classicMode ? IisAppType.AspNetClassic : IisAppType.AspNetIntegrated);
+            _testName = nameof(AspNetWebApi2CustomExceptionTests)
+                      + (virtualApp ? ".VirtualApp" : string.Empty)
+                      + (classicMode ? ".Classic" : ".Integrated")
+                      + (enableRouteTemplateExpansion ? ".WithExpansion" :
+                        (enableRouteTemplateResourceNames ? ".WithFF" : ".NoFF"));
+        }
+
+        public static TheoryData<string, int, int> Data() => new()
+        {
+            { "/api2/ThrowCustomNotFoundException", 404, 2 },
+        };
+
+        [SkippableTheory]
+        [Trait("Category", "EndToEnd")]
+        [Trait("RunOnWindows", "True")]
+        [Trait("LoadFromGAC", "True")]
+        [MemberData(nameof(Data))]
+        public async Task SubmitsTraces(string path, HttpStatusCode statusCode, int expectedSpanCount)
+        {
+            // Append virtual directory to the actual request
+            var spans = await GetWebServerSpans(_iisFixture.VirtualApplicationPath + path, _iisFixture.Agent, _iisFixture.HttpPort, statusCode, expectedSpanCount);
+
+            var sanitisedPath = VerifyHelper.SanitisePathsForVerify(path);
+
+            var settings = VerifyHelper.GetSpanVerifierSettings(sanitisedPath, (int)statusCode);
+
+            // Overriding the type name here as we have multiple test classes in the file
+            // Overriding the method name to _
+            // Overriding the parameters to remove the expectedSpanCount parameter, which is necessary for operation but unnecessary for the filename
+            await Verifier.Verify(spans, settings)
+                          .UseFileName($"{_testName}.__path={sanitisedPath}_statusCode={(int)statusCode}");
+        }
+    }
+
     [UsesVerify]
     public abstract class AspNetWebApi2ModuleOnlyTests : TestHelper, IClassFixture<IisFixture>
     {
