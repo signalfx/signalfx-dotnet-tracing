@@ -78,7 +78,7 @@ function addAgents(overview, config) {
             body.append(p)
             const args = document.createElement('ul');
             agent.additionalEnvVars.forEach(arg => {
-                addListItem(args, `${arg.key}=${arg.value}`, ['font-monospace', 'envvar']);
+                addListItem(args, `${arg.name}=${arg.value}`, ['font-monospace', 'envvar']);
             });
             body.append(args);
         }
