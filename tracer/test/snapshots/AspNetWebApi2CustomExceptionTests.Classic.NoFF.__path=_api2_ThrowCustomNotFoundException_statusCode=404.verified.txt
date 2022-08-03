@@ -44,7 +44,6 @@ at Samples.AspNetMvc5CustomException.Controllers.ConventionsController.ThrowCust
     Service: sample,
     Type: web,
     ParentId: Id_2,
-    Error: 1,
     Tags: {
       aspnet.action: throwcustomnotfoundexception,
       aspnet.controller: conventions,
@@ -56,11 +55,6 @@ at Samples.AspNetMvc5CustomException.Controllers.ConventionsController.ThrowCust
       http.url: http://localhost:00000/api2/ThrowCustomNotFoundException,
       language: dotnet,
       net.peer.ip: ::1,
-      sfx.error.kind: Samples.AspNetMvc5CustomException.Data.CustomNotFoundException,
-      sfx.error.message: Exception of type 'Samples.AspNetMvc5CustomException.Data.CustomNotFoundException' was thrown.,
-      sfx.error.stack:
-Samples.AspNetMvc5CustomException.Data.CustomNotFoundException: Exception of type 'Samples.AspNetMvc5CustomException.Data.CustomNotFoundException' was thrown.
-at Samples.AspNetMvc5CustomException.Controllers.ConventionsController.ThrowCustomNotFoundException(),
       span.kind: server,
       version: 1.0.0
     }
