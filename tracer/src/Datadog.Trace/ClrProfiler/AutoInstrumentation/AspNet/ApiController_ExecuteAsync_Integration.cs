@@ -117,6 +117,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
                 else
                 {
                     // Looks like we won't be able to get the final status code
+                    scope.Span.SetException(exception);
                     scope.Dispose();
                 }
             }
