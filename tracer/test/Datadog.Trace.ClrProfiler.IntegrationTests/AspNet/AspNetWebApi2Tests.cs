@@ -8,7 +8,6 @@
 #pragma warning disable SA1649 // File name must match first type name
 
 using System.Net;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.TestHelpers;
@@ -209,7 +208,16 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
     public class AspNetWebApi2TestsCustomExceptionCallTargetClassic : AspNetWebApi2CustomExceptionTests
     {
         public AspNetWebApi2TestsCustomExceptionCallTargetClassic(IisFixture iisFixture, ITestOutputHelper output)
-            : base(iisFixture, output, classicMode: true, enableRouteTemplateResourceNames: false)
+            : base(iisFixture, output, classicMode: true)
+        {
+        }
+    }
+
+    [Collection("IisTests")]
+    public class AspNetWebApi2TestsCustomExceptionCallTargetIntegrated : AspNetWebApi2CustomExceptionTests
+    {
+        public AspNetWebApi2TestsCustomExceptionCallTargetIntegrated(IisFixture iisFixture, ITestOutputHelper output)
+            : base(iisFixture, output, classicMode: false)
         {
         }
     }
@@ -220,26 +228,17 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         private readonly IisFixture _iisFixture;
         private readonly string _testName;
 
-        public AspNetWebApi2CustomExceptionTests(IisFixture iisFixture, ITestOutputHelper output, bool classicMode, bool enableRouteTemplateResourceNames, bool enableRouteTemplateExpansion = false, bool virtualApp = false)
+        public AspNetWebApi2CustomExceptionTests(IisFixture iisFixture, ITestOutputHelper output, bool classicMode)
             : base("AspNetMvc5CustomException", @"test\test-applications\aspnet", output)
         {
             SetServiceVersion("1.0.0");
-            SetEnvironmentVariable(ConfigurationKeys.FeatureFlags.RouteTemplateResourceNamesEnabled, enableRouteTemplateResourceNames.ToString());
-            SetEnvironmentVariable(ConfigurationKeys.ExpandRouteTemplatesEnabled, enableRouteTemplateExpansion.ToString());
 
             _iisFixture = iisFixture;
             _iisFixture.ShutdownPath = "/home/shutdown";
-            if (virtualApp)
-            {
-                _iisFixture.VirtualApplicationPath = "/my-app";
-            }
 
             _iisFixture.TryStartIis(this, classicMode ? IisAppType.AspNetClassic : IisAppType.AspNetIntegrated);
             _testName = nameof(AspNetWebApi2CustomExceptionTests)
-                      + (virtualApp ? ".VirtualApp" : string.Empty)
-                      + (classicMode ? ".Classic" : ".Integrated")
-                      + (enableRouteTemplateExpansion ? ".WithExpansion" :
-                        (enableRouteTemplateResourceNames ? ".WithFF" : ".NoFF"));
+                      + (classicMode ? ".Classic" : ".Integrated");
         }
 
         public static TheoryData<string, int, int> Data() => new()

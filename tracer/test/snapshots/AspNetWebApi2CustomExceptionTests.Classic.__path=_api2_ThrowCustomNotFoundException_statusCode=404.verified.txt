@@ -2,9 +2,9 @@
   {
     TraceId: Id_1,
     SpanId: Id_2,
-    Name: GET api2/throwcustomnotfoundexception/{value},
+    Name: GET /api2/throwcustomnotfoundexception/{value},
     LogicScope: aspnet.request,
-    Resource: GET api2/throwcustomnotfoundexception/{value},
+    Resource: GET /api2/throwcustomnotfoundexception/{value},
     Service: sample,
     Type: web,
     Tags: {
@@ -32,9 +32,9 @@
   {
     TraceId: Id_1,
     SpanId: Id_3,
-    Name: GET api2/throwcustomnotfoundexception/{value},
+    Name: GET /api2/throwcustomnotfoundexception/{value},
     LogicScope: aspnet-webapi.request,
-    Resource: GET api2/throwcustomnotfoundexception/{value},
+    Resource: GET /api2/throwcustomnotfoundexception/{value},
     Service: sample,
     Type: web,
     ParentId: Id_2,
