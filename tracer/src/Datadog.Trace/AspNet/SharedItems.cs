@@ -16,6 +16,7 @@ namespace Datadog.Trace.AspNet
     internal static class SharedItems
     {
         public const string HttpContextPropagatedResourceNameKey = "__SignalFx.Tracing.ClrProfiler.Managed.AspNetMvcIntegration-aspnet.resourcename";
+        public const string HttpContextPropagatedExceptionKey = "__SignalFx.Tracing.ClrProfiler.Managed.AspNetMvcIntegration-aspnet.exception";
         private static readonly Func<Stack<Scope>, Scope> Pop = stack => stack.Pop();
         private static readonly Func<Stack<Scope>, Scope> Peek = stack => stack.Peek();
 

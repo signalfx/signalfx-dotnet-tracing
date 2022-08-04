@@ -210,6 +210,11 @@ namespace Datadog.Trace.AspNet
                             scope.Span.ResourceName = $"{app.Request.HttpMethod.ToUpperInvariant()} {path.ToLowerInvariant()}";
                         }
 
+                        if (app.Context.Items[SharedItems.HttpContextPropagatedExceptionKey] is Exception exception && app.Context.Response.StatusCode != 404)
+                        {
+                            scope.Span.SetException(exception);
+                        }
+
                         scope.Dispose();
                     }
                     finally
@@ -240,9 +245,8 @@ namespace Datadog.Trace.AspNet
                 var httpContext = (sender as HttpApplication)?.Context;
                 var exception = httpContext?.Error;
 
-                // We want to ignore 404 exceptions here, as they are not errors
-                var httpException = exception as HttpException;
-                var is404 = httpException?.GetHttpCode() == 404;
+                // We want to ignore 404 code as it is not an error
+                var is404 = httpContext?.Response.StatusCode == 404;
 
                 if (httpContext?.Items[_httpContextScopeKey] is Scope scope)
                 {
