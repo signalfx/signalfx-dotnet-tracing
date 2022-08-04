@@ -26,7 +26,7 @@ RUN mkdir -p /opt/datadog \
     && rm -rf /app/install
 
 # Set the optional env vars
-ENV DD_PROFILING_ENABLED=1
+ENV SIGNALFX_PROFILING_ENABLED=1
 ENV ASPNETCORE_URLS=http://localhost:5000
 
 # Copy the app across

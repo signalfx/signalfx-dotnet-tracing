@@ -38,9 +38,9 @@ RUN [Environment]::SetEnvironmentVariable('CORECLR_PROFILER_PATH',  $env:RELATIV
 # Set the required env vars
 ENV CORECLR_ENABLE_PROFILING=1 \
     CORECLR_PROFILER={846F5F1C-F9AE-4B07-969E-05C26BC060D8} \
-    DD_DOTNET_TRACER_HOME="c:\app\datadog" \
-    DD_TRACE_LOG_DIRECTORY="C:\logs" \
-    DD_PROFILING_ENABLED=1 \
+    SIGNALFX_DOTNET_TRACER_HOME="c:\app\datadog" \
+    SIGNALFX_TRACE_LOG_DIRECTORY="C:\logs" \
+    SIGNALFX_PROFILING_ENABLED=1 \
     ASPNETCORE_URLS=http://localhost:5000
 
 # Copy the app across
