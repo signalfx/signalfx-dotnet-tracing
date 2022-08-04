@@ -86,7 +86,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Testing
             {
                 if (span is not null)
                 {
-                    coveragePayload.TraceId = span.TraceId;
+                    coveragePayload.TraceId = span.TraceId.Lower;
                     coveragePayload.SpanId = span.SpanId;
                 }
 
