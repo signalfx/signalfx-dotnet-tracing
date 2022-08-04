@@ -19,8 +19,8 @@ WORKDIR /app
 COPY --from=builder /src/artifacts /app/install
 
 ARG INSTALL_CMD
-RUN mkdir -p /opt/datadog \
-    && mkdir -p /var/log/datadog \
+RUN mkdir -p /opt/signalfx \
+    && mkdir -p /var/log/signalfx \
     && mkdir -p /tool \
     && cp /app/install/* /tool \
     && rm -rf /app/install

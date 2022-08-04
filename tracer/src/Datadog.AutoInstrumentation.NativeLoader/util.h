@@ -58,7 +58,7 @@ static ::shared::WSTRING GetDatadogLogsDirectoryPath()
     // on Windows WSTRING == wstring
     return (program_data_path / signalfx_logs_folder_path).wstring();
 #else
-    return shared::ToWSTRING("/var/log/datadog/dotnet/");
+    return shared::ToWSTRING("/var/log/signalfx/dotnet/");
 #endif
 }
 

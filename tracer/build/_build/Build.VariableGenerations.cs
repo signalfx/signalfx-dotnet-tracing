@@ -302,7 +302,7 @@ partial class Build : NukeBuild
                             (publishFramework: TargetFramework.NETCOREAPP3_1, "3.1-alpine3.13"),
                             (publishFramework: TargetFramework.NETCOREAPP2_1, "2.1-alpine3.12"),
                         },
-                        installCmd: "tar -C /opt/datadog -xzf ./datadog-dotnet-apm*-musl.tar.gz",
+                        installCmd: "tar -C /opt/signalfx -xzf ./datadog-dotnet-apm*-musl.tar.gz",
                         linuxArtifacts: "linux-packages-alpine",
                         dockerName: "mcr.microsoft.com/dotnet/aspnet"
                     );
@@ -434,7 +434,7 @@ partial class Build : NukeBuild
                             (publishFramework: TargetFramework.NETCOREAPP3_1, "3.1-bullseye-slim"),
                             (publishFramework: TargetFramework.NETCOREAPP2_1, "2.1-stretch-slim"),
                         },
-                        relativeProfilerPath: "datadog/linux-x64/SignalFx.Tracing.ClrProfiler.Native.so",
+                        relativeProfilerPath: "signalfx/linux-x64/SignalFx.Tracing.ClrProfiler.Native.so",
                         dockerName: "mcr.microsoft.com/dotnet/aspnet"
                     );
 
@@ -448,7 +448,7 @@ partial class Build : NukeBuild
                             (publishFramework: TargetFramework.NETCOREAPP3_1, "35-3.1"),
                             (publishFramework: TargetFramework.NETCOREAPP2_1, "29-2.1"),
                         },
-                        relativeProfilerPath: "datadog/linux-x64/SignalFx.Tracing.ClrProfiler.Native.so",
+                        relativeProfilerPath: "signalfx/linux-x64/SignalFx.Tracing.ClrProfiler.Native.so",
                         dockerName: "andrewlock/dotnet-fedora"
                     );
 
@@ -462,7 +462,7 @@ partial class Build : NukeBuild
                             (publishFramework: TargetFramework.NETCOREAPP3_1, "3.1-alpine3.14"),
                             (publishFramework: TargetFramework.NETCOREAPP2_1, "2.1-alpine3.12"),
                         },
-                        relativeProfilerPath: "datadog/linux-musl-x64/SignalFx.Tracing.ClrProfiler.Native.so",
+                        relativeProfilerPath: "signalfx/linux-musl-x64/SignalFx.Tracing.ClrProfiler.Native.so",
                         dockerName: "mcr.microsoft.com/dotnet/aspnet"
                     );
 
@@ -476,7 +476,7 @@ partial class Build : NukeBuild
                             (publishFramework: TargetFramework.NETCOREAPP3_1, "7-3.1"),
                             (publishFramework: TargetFramework.NETCOREAPP2_1, "7-2.1"),
                         },
-                        relativeProfilerPath: "datadog/linux-x64/SignalFx.Tracing.ClrProfiler.Native.so",
+                        relativeProfilerPath: "signalfx/linux-x64/SignalFx.Tracing.ClrProfiler.Native.so",
                         dockerName: "andrewlock/dotnet-centos"
                     );
 
@@ -490,7 +490,7 @@ partial class Build : NukeBuild
                             (publishFramework: TargetFramework.NETCOREAPP3_1, "15-3.1"),
                             (publishFramework: TargetFramework.NETCOREAPP2_1, "15-2.1"),
                         },
-                        relativeProfilerPath: "datadog/linux-x64/SignalFx.Tracing.ClrProfiler.Native.so",
+                        relativeProfilerPath: "signalfx/linux-x64/SignalFx.Tracing.ClrProfiler.Native.so",
                         dockerName: "andrewlock/dotnet-opensuse"
                     );
 
@@ -513,7 +513,7 @@ partial class Build : NukeBuild
                             (publishFramework: TargetFramework.NET5_0, "5.0-buster-slim"),
                             (publishFramework: TargetFramework.NET5_0, "5.0-focal"),
                         },
-                        relativeProfilerPath: "datadog/linux-arm64/SignalFx.Tracing.ClrProfiler.Native.so",
+                        relativeProfilerPath: "signalfx/linux-arm64/SignalFx.Tracing.ClrProfiler.Native.so",
                         dockerName: "mcr.microsoft.com/dotnet/aspnet"
                     );
 
@@ -722,7 +722,7 @@ partial class Build : NukeBuild
                                                                        : string.Empty
                                      select new
                                      {
-                                         relativeProfilerPath = $"win-{platform}/Datadog.Trace.ClrProfiler.Native.dll",
+                                         relativeProfilerPath = $"win-{platform}/SignalFx.Tracing.ClrProfiler.Native.dll",
                                          dockerTag = dockerTag,
                                          publishFramework = image.publishFramework,
                                          runtimeImage = $"{dockerName}:{image.runtimeTag}",
@@ -755,7 +755,7 @@ partial class Build : NukeBuild
                                                                        : string.Empty
                                      select new
                                      {
-                                         relativeProfilerPath = $"datadog/win-{platform}/Datadog.Trace.ClrProfiler.Native.dll",
+                                         relativeProfilerPath = $"signalfx/win-{platform}/SignalFx.Tracing.ClrProfiler.Native.dll",
                                          dockerTag = dockerTag,
                                          publishFramework = image.publishFramework,
                                          runtimeImage = $"{dockerName}:{image.runtimeTag}",
