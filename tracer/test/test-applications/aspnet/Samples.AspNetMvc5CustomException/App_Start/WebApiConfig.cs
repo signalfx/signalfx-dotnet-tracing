@@ -16,7 +16,7 @@ namespace Samples.AspNetMvc5CustomException
 
 
             // Add global message handler
-            config.MessageHandlers.Add(new CustomNofFoundExceptionMessageHandler());
+            config.MessageHandlers.Add(new CustomNotFoundExceptionMessageHandler());
 
             config.Routes.MapHttpRoute(
                 name: "ApiConventions",

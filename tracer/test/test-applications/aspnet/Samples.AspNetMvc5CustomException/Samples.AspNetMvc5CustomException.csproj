@@ -105,7 +105,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Handlers\CustomNofFoundExceptionMessageHandler.cs" />
+    <Compile Include="Handlers\CustomNotFoundExceptionMessageHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

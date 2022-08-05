@@ -1,6 +1,5 @@
 // Modified by Splunk Inc.
 
-using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -8,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Samples.AspNetMvc5CustomException.Handlers
 {
-    public class CustomNofFoundExceptionMessageHandler : DelegatingHandler
+    public class CustomNotFoundExceptionMessageHandler : DelegatingHandler
     {
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
