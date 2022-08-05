@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿// Modified by Splunk Inc.
+
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 

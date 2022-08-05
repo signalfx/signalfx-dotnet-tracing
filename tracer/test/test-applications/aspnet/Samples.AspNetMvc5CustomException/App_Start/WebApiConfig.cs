@@ -1,3 +1,5 @@
+// Modified by Splunk Inc.
+
 using System.Web.Http;
 using Samples.AspNetMvc5CustomException.Handlers;
 
