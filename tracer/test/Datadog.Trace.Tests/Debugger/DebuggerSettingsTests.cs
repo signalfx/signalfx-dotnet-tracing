@@ -23,7 +23,7 @@ namespace Datadog.Trace.Tests.Debugger
 
             tracerSettings.DebuggerSettings.ProbeMode.Should().Be(ProbeMode.File);
             tracerSettings.DebuggerSettings.ProbeConfigurationsPath.Should().Be(expected);
-            tracerSettings.DebuggerSettings.SnapshotsPath.Should().Be("http://127.0.0.1:8126");
+            tracerSettings.DebuggerSettings.SnapshotsPath.Should().Be("http://127.0.0.1:9411/api/v2/spans");
         }
 
         [Fact]
@@ -35,17 +35,17 @@ namespace Datadog.Trace.Tests.Debugger
 
         [Theory]
         [InlineData(null)]
-        [InlineData("http://localhost:8126")]
+        [InlineData("http://127.0.0.1:9411/api/v2/spans")]
         public void WhenAgentModeEnabled_UseAgentMode(string agentUri)
         {
             var tracerSettings = new TracerSettings(new NameValueConfigurationSource(new()
             {
-                { ConfigurationKeys.AgentUri, agentUri },
+                { ConfigurationKeys.EndpointUrl, agentUri },
             }));
 
             tracerSettings.DebuggerSettings.ProbeMode.Should().Be(ProbeMode.Agent);
-            tracerSettings.DebuggerSettings.ProbeConfigurationsPath.Should().Be("http://127.0.0.1:8126");
-            tracerSettings.DebuggerSettings.SnapshotsPath.Should().Be("http://127.0.0.1:8126");
+            tracerSettings.DebuggerSettings.ProbeConfigurationsPath.Should().Be("http://127.0.0.1:9411/api/v2/spans");
+            tracerSettings.DebuggerSettings.SnapshotsPath.Should().Be("http://127.0.0.1:9411/api/v2/spans");
         }
 
         [Theory]

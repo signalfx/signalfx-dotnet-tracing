@@ -61,12 +61,11 @@ namespace Datadog.Trace.TestHelpers
                 settings.UseParameters(parameters);
             }
 
-            VerifierSettings.MemberConverter<MockSpan, Dictionary<string, string>>(x => x.Tags, ScrubStackTraceForErrors);
-
             settings.ModifySerialization(_ =>
             {
                 _.IgnoreMember<MockSpan>(s => s.Duration);
                 _.IgnoreMember<MockSpan>(s => s.Start);
+                _.MemberConverter<MockSpan, Dictionary<string, string>>(x => x.Tags, ScrubStackTraceForErrors);
             });
 
             settings.AddRegexScrubber(LocalhostRegex, "localhost:00000");
@@ -74,7 +73,6 @@ namespace Datadog.Trace.TestHelpers
             settings.AddRegexScrubber(KeepRateRegex, "_dd.tracer_kr: 1.0");
             settings.AddRegexScrubber(ProcessIdRegex, "process_id: 0");
             settings.ScrubInlineGuids();
-
             return settings;
         }
 
