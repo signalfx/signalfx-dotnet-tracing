@@ -1,5 +1,5 @@
 
-const RESULTS_DIR = "testresults";
+const RESULTS_DIR = "results";
 
 // Returns a list of available historic runs
 async function getRuns(){
