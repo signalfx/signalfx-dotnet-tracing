@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)..\..\..\..\..\Signalfx.Tracing.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)..\..\..\..\..\SignalFx.Tracing.snk</AssemblyOriginatorKeyFile>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <Platforms>x86;x64</Platforms>
