@@ -10,7 +10,7 @@ using System.Diagnostics;
 using System.ServiceModel;
 using System.Threading;
 using Datadog.Demos.NoOpWcfService.Library;
-using Datadog.Util;
+using Datadog.Demos.Util;
 
 namespace Datadog.Demos.NoOpWcfService.Host
 {
@@ -114,7 +114,7 @@ namespace Datadog.Demos.NoOpWcfService.Host
 
             Console.WriteLine("    RuntimeEnvironmentInfo:");
             Console.WriteLine();
-            Console.WriteLine("        " + RuntimeEnvironmentInfo.SingeltonInstance.ToString());
+            Console.WriteLine("        " + RuntimeEnvironmentInfo.Instance);
 
             Console.WriteLine();
             Console.WriteLine("    AppDomain.CurrentDomain.SetupInformation.TargetFrameworkName:");

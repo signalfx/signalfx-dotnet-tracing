@@ -40,11 +40,11 @@ ARG RELATIVE_PROFILER_PATH
 RUN [Environment]::SetEnvironmentVariable('CORECLR_PROFILER_PATH', 'c:\monitoring-home\' + $env:RELATIVE_PROFILER_PATH, [EnvironmentVariableTarget]::Machine);
 
 # Set the additional env vars
-ENV DD_PROFILING_ENABLED=1 \
+ENV SIGNALFX_PROFILING_ENABLED=1 \
     CORECLR_ENABLE_PROFILING=1 \
-    CORECLR_PROFILER={846F5F1C-F9AE-4B07-969E-05C26BC060D8} \
-    DD_DOTNET_TRACER_HOME="c:\monitoring-home" \
-    DD_TRACE_LOG_DIRECTORY="C:\logs" \
+    CORECLR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874} \
+    SIGNALFX_DOTNET_TRACER_HOME="c:\monitoring-home" \
+    SIGNALFX_TRACE_LOG_DIRECTORY="C:\logs" \
     ASPNETCORE_URLS=http://localhost:5000
 
 # Copy the app across

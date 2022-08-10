@@ -36,8 +36,8 @@ RUN mkdir /logs; \
     rm /install -r -fo
 
 # Set the additional env vars
-ENV DD_PROFILING_ENABLED=1 \
-    DD_TRACE_LOG_DIRECTORY="C:\logs" \
+ENV SIGNALFX_PROFILING_ENABLED=1 \
+    SIGNALFX_TRACE_LOG_DIRECTORY="C:\logs" \
     ASPNETCORE_URLS=http://localhost:5000
 
 # Copy the app across
