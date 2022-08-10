@@ -121,7 +121,7 @@ checksums-sign:
 run-overhead-test:
   stage: run-overhead-test
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "main" && $CI_COMMIT_MESSAGE =~ /\[agent-version-update\]/'
+    - if: '$CI_COMMIT_REF_NAME == "main" && $CI_COMMIT_MESSAGE =~ /\[signalfx-version-update\]/'
     - if: '$CI_COMMIT_REF_NAME == "main"'
       when: manual
   image:
