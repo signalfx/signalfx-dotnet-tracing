@@ -66,6 +66,9 @@ jobs:
     runs-on: ${{ matrix.machine }}
     timeout-minutes: 30
     steps:
+    - name: Support Windows long paths
+      if: ${{ runner.os == 'Windows' }}
+      run: git config --system core.longpaths true
     - uses: actions/checkout@v3.0.2
     - uses: actions/setup-dotnet@v2.1.0
       with:
@@ -164,6 +167,9 @@ jobs:
     runs-on: ${{ matrix.machine }}
     timeout-minutes: 30
     steps:
+    - name: Support Windows long paths
+      if: ${{ runner.os == 'Windows' }}
+      run: git config --system core.longpaths true
     - uses: actions/checkout@v3.0.2
     - uses: actions/setup-dotnet@v2.1.0
       with:
@@ -232,6 +238,9 @@ jobs:
     runs-on: ${{ matrix.machine }}
     timeout-minutes: 30
     steps:
+    - name: Support Windows long paths
+      if: ${{ runner.os == 'Windows' }}
+      run: git config --system core.longpaths true
     - uses: actions/checkout@v3.0.2
     - uses: actions/setup-dotnet@v2.1.0
       with:
@@ -303,6 +312,9 @@ jobs:
     runs-on: ${{ matrix.machine }}
     timeout-minutes: 60
     steps:
+    - name: Support Windows long paths
+      if: ${{ runner.os == 'Windows' }}
+      run: git config --system core.longpaths true
     - uses: actions/checkout@v3.0.2
     - uses: actions/setup-dotnet@v2.1.0
       with:
@@ -420,6 +432,9 @@ jobs:
         framework: [ net461, netcoreapp3.1 ]
     timeout-minutes: 60
     steps:
+    - name: Support Windows long paths
+      if: ${{ runner.os == 'Windows' }}
+      run: git config --system core.longpaths true
     - uses: actions/checkout@v3.0.2
     - uses: actions/setup-dotnet@v2.1.0
       with:
@@ -466,6 +481,9 @@ jobs:
         framework: [ net461, netcoreapp3.1 ]
     timeout-minutes: 60
     steps: 
+    - name: Support Windows long paths
+      if: ${{ runner.os == 'Windows' }}
+      run: git config --system core.longpaths true
     - uses: actions/checkout@v3.0.2
     - uses: actions/setup-dotnet@v2.1.0
       with:
