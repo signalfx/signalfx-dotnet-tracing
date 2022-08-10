@@ -1,3 +1,5 @@
+>ℹ️&nbsp;&nbsp; Provisioning scripts were reused with minimal modifications from [splunk-otel-java-overhead-test](https://github.com/signalfx/splunk-otel-java-overhead-test).
+
 The overhead tests attempt to reduce the impact of noisy neighbors by provisioning
 the collector and sqlserver services on a separate cloud instance.
 
