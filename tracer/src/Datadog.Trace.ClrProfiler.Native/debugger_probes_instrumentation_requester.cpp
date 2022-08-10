@@ -17,7 +17,7 @@ namespace debugger
 
 /**
  * \brief For testing purposes only. This method is used to determine if we are in "instrument-all mode", in which case we should instrument every single method on the given assembly. 
- * \This mode is enabled when the environment variable `DD_INTERNAL_DEBUGGER_INSTRUMENT_ALL` is set to true.
+ * \This mode is enabled when the environment variable `SIGNALFX_INTERNAL_DEBUGGER_INSTRUMENT_ALL` is set to true.
  * \param assemblyName the name of the assembly we're trying to rewrite using Debugger's Instrumentation
  * \return true if the given assembly is viable for instrument-all, false otherwise.
  */
@@ -47,7 +47,7 @@ bool DebuggerProbesInstrumentationRequester::ShouldPerformInstrumentAll(const WS
 }
 
 /**
- * \brief For Testing-Purposes. Requests ReJIT for the given method if certain checks are met. Relevant when the environment variable `DD_INTERNAL_DEBUGGER_INSTRUMENT_ALL` is set to true.
+ * \brief For Testing-Purposes. Requests ReJIT for the given method if certain checks are met. Relevant when the environment variable `SIGNALFX_INTERNAL_DEBUGGER_INSTRUMENT_ALL` is set to true.
  * \param module_info the ModuleInfo of the module entering into instrumentation-all.
  * \param module_id the ModuleID of the module entering into instrumentation-all.
  * \param function_token the mdToken of the method entering into instrumentation-all.

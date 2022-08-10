@@ -12,7 +12,7 @@ namespace environment
 
     // Determine whether to enter "instrument all" mode where the Debugger instrumentation
     // is applied to every jit compiled method. Only useful for testing purposes. Default is false.
-    const WSTRING internal_instrument_all_enabled = WStr("DD_INTERNAL_DEBUGGER_INSTRUMENT_ALL");
+    const WSTRING internal_instrument_all_enabled = WStr("SIGNALFX_INTERNAL_DEBUGGER_INSTRUMENT_ALL");
 
 } // namespace environment
 } // namespace debugger

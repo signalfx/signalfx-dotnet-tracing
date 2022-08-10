@@ -53,7 +53,7 @@ namespace Datadog.Trace.Debugger.PInvoke
         // and optional on .NET Core
         private static partial class Windows
         {
-            [DllImport("Datadog.Trace.ClrProfiler.Native.dll")]
+            [DllImport("SignalFx.Tracing.ClrProfiler.Native.dll")]
             public static extern void InstrumentProbes(
                 [In] NativeMethodProbeDefinition[] methodProbes,
                 int methodProbesLength,
@@ -62,7 +62,7 @@ namespace Datadog.Trace.Debugger.PInvoke
                 [In] NativeRemoveProbeRequest[] revertProbes,
                 int revertProbesLength);
 
-            [DllImport("Datadog.Trace.ClrProfiler.Native.dll", CharSet = CharSet.Unicode)]
+            [DllImport("SignalFx.Tracing.ClrProfiler.Native.dll", CharSet = CharSet.Unicode)]
             public static extern int GetProbesStatuses(
                 [In, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPWStr, SizeParamIndex = 1)] string[] probeIds,
                 int probeIdsLength,
@@ -72,7 +72,7 @@ namespace Datadog.Trace.Debugger.PInvoke
         // assume .NET Core if not running on Windows
         private static partial class NonWindows
         {
-            [DllImport("Datadog.Trace.ClrProfiler.Native")]
+            [DllImport("SignalFx.Tracing.ClrProfiler.Native")]
             public static extern void InstrumentProbes(
                 [In] NativeMethodProbeDefinition[] methodProbes,
                 int methodProbesLength,
@@ -81,7 +81,7 @@ namespace Datadog.Trace.Debugger.PInvoke
                 [In] NativeRemoveProbeRequest[] revertProbes,
                 int revertProbesLength);
 
-            [DllImport("Datadog.Trace.ClrProfiler.Native")]
+            [DllImport("SignalFx.Tracing.ClrProfiler.Native")]
             public static extern int GetProbesStatuses(
                 [In, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPWStr, SizeParamIndex = 1)] string[] probeIds,
                 int probeIdsLength,
