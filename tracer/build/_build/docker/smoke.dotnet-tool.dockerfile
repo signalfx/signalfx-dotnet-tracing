@@ -19,14 +19,14 @@ WORKDIR /app
 COPY --from=builder /src/artifacts /app/install
 
 ARG INSTALL_CMD
-RUN mkdir -p /opt/datadog \
-    && mkdir -p /var/log/datadog \
+RUN mkdir -p /opt/signalfx \
+    && mkdir -p /var/log/signalfx \
     && mkdir -p /tool \
     && cp /app/install/* /tool \
     && rm -rf /app/install
 
 # Set the optional env vars
-ENV DD_PROFILING_ENABLED=1
+ENV SIGNALFX_PROFILING_ENABLED=1
 ENV ASPNETCORE_URLS=http://localhost:5000
 
 # Copy the app across

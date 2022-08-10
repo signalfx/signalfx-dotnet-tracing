@@ -40,10 +40,20 @@ namespace Datadog.Trace.TestHelpers
                   .Replace("?", "-");
         }
 
+        public static void InitializeGlobalSettings()
+        {
+            VerifierSettings.DerivePathInfo(
+                (sourceFile, projectDirectory, type, method) =>
+                {
+                    return new(directory: Path.Combine(projectDirectory, "..", "snapshots"));
+                });
+        }
+
         public static VerifySettings GetSpanVerifierSettings(params object[] parameters)
         {
             var settings = new VerifySettings();
 
+            InitializeGlobalSettings();
             DerivePathInfoForSnapshotFiles();
 
             if (parameters.Length > 0)
