@@ -68,8 +68,6 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
             {
                 if (exception != null)
                 {
-                    scope.Span.SetException(exception);
-
                     // In case of exception, the status code is set further down the ASP.NET pipeline
                     // We use the OnRequestCompleted callback to be notified when that happens.
                     // We don't know how long it'll take for ASP.NET to invoke the callback,
@@ -78,7 +76,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
                     // us to defer finishing the span later while making sure callers of this method do not
                     // get this scope when calling Tracer.ActiveScope
                     var now = scope.Span.Context.TraceContext.UtcNow;
-                    httpContext.AddOnRequestCompleted(h => OnRequestCompletedAfterException(h, scope, now));
+                    httpContext.AddOnRequestCompleted(h => OnRequestCompletedAfterException(h, scope, now, exception));
 
                     scope.SetFinishOnClose(false);
                     scope.Dispose();
@@ -94,8 +92,13 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
             return new CallTargetReturn<TResult>(returnValue);
         }
 
-        private static void OnRequestCompletedAfterException(HttpContext httpContext, Scope scope, DateTimeOffset finishTime)
+        private static void OnRequestCompletedAfterException(HttpContext httpContext, Scope scope, DateTimeOffset finishTime, Exception exception)
         {
+            if (httpContext.Response.StatusCode != 404)
+            {
+                scope.Span.SetException(exception);
+            }
+
             HttpContextHelper.AddHeaderTagsFromHttpResponse(httpContext, scope);
 
             if (!HttpRuntime.UsingIntegratedPipeline && httpContext.Response.StatusCode == 200)
