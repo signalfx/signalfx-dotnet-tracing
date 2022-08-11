@@ -21,17 +21,29 @@ namespace Datadog.Trace.Agent.Transports
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<HttpClientRequest>();
 
         private readonly HttpClient _client;
-        private readonly HttpRequestMessage _request;
+        private readonly HttpRequestMessage _postRequest;
+        private readonly HttpRequestMessage _getRequest;
+        private readonly Uri _uri;
 
         public HttpClientRequest(HttpClient client, Uri endpoint)
         {
             _client = client;
-            _request = new HttpRequestMessage(HttpMethod.Post, endpoint);
+            _postRequest = new HttpRequestMessage(HttpMethod.Post, endpoint);
+            _getRequest = new HttpRequestMessage(HttpMethod.Get, endpoint);
+            _uri = endpoint;
         }
 
         public void AddHeader(string name, string value)
         {
-            _request.Headers.Add(name, value);
+            _postRequest.Headers.Add(name, value);
+            _getRequest.Headers.Add(name, value);
+        }
+
+        public async Task<IApiResponse> GetAsync()
+        {
+            _getRequest.Content = null;
+
+            return new HttpClientResponse(await _client.SendAsync(_getRequest).ConfigureAwait(false));
         }
 
         public async Task<IApiResponse> PostAsync(ArraySegment<byte> bytes, string contentType)
@@ -40,9 +52,9 @@ namespace Datadog.Trace.Agent.Transports
             using (var content = new ByteArrayContent(bytes.Array, bytes.Offset, bytes.Count))
             {
                 content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
-                _request.Content = content;
+                _postRequest.Content = content;
 
-                var response = await _client.SendAsync(_request).ConfigureAwait(false);
+                var response = await _client.SendAsync(_postRequest).ConfigureAwait(false);
 
                 return new HttpClientResponse(response);
             }
@@ -58,7 +70,7 @@ namespace Datadog.Trace.Agent.Transports
             Log.Debug<int>("Sending multipart form request with {Count} items.", items.Length);
 
             using var formDataContent = new MultipartFormDataContent(boundary: Boundary);
-            _request.Content = formDataContent;
+            _postRequest.Content = formDataContent;
 
             foreach (var item in items)
             {
@@ -79,7 +91,7 @@ namespace Datadog.Trace.Agent.Transports
                 }
             }
 
-            var response = await _client.SendAsync(_request).ConfigureAwait(false);
+            var response = await _client.SendAsync(_postRequest).ConfigureAwait(false);
             return new HttpClientResponse(response);
         }
     }

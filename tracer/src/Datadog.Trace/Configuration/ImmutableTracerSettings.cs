@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Datadog.Trace.Debugger;
 using Datadog.Trace.Logging.DirectSubmission;
 using Datadog.Trace.Util;
 
@@ -83,6 +84,7 @@ namespace Datadog.Trace.Configuration
             LogSubmissionSettings = ImmutableDirectLogSubmissionSettings.Create(settings.LogSubmissionSettings);
             // Logs injection is enabled by default if direct log submission is enabled, otherwise disabled by default
             LogsInjectionEnabled = settings.LogSubmissionSettings.LogsInjectionEnabled ?? LogSubmissionSettings.IsEnabled;
+            DebuggerSettings = ImmutableDebuggerSettings.Create(settings.DebuggerSettings);
 
             PropagationStyleInject = settings.PropagationStyleInject;
             PropagationStyleExtract = settings.PropagationStyleExtract;
@@ -270,6 +272,8 @@ namespace Datadog.Trace.Configuration
         internal bool ExpandRouteTemplatesEnabled { get; }
 
         internal ImmutableDirectLogSubmissionSettings LogSubmissionSettings { get; }
+
+        internal ImmutableDebuggerSettings DebuggerSettings { get; }
 
         /// <summary>
         /// Gets a value indicating whether MongoDb integration should tag the command BsonDocument as db.statement.

@@ -5,20 +5,21 @@
 
 // Modified by Splunk Inc.
 
-namespace Datadog.Trace;
-
-internal class ReadOnlySpanContext : ISpanContext
+namespace Datadog.Trace
 {
-    public ReadOnlySpanContext(TraceId traceId, ulong spanId, string serviceName)
+    internal class ReadOnlySpanContext : ISpanContext
     {
-        TraceId = traceId;
-        SpanId = spanId;
-        ServiceName = serviceName;
+        public ReadOnlySpanContext(TraceId traceId, ulong spanId, string serviceName)
+        {
+            TraceId = traceId;
+            SpanId = spanId;
+            ServiceName = serviceName;
+        }
+
+        public TraceId TraceId { get; }
+
+        public ulong SpanId { get; }
+
+        public string ServiceName { get; }
     }
-
-    public TraceId TraceId { get; }
-
-    public ulong SpanId { get; }
-
-    public string ServiceName { get; }
 }
