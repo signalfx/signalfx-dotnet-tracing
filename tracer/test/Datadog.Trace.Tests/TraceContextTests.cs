@@ -6,6 +6,7 @@
 // Modified by Splunk Inc.
 
 using System;
+using Datadog.Trace.Configuration;
 using Datadog.Trace.PlatformHelpers;
 using Datadog.Trace.TestHelpers;
 using Datadog.Trace.Util;
@@ -203,7 +204,7 @@ namespace Datadog.Trace.Tests
             {
                 vars.Add(AzureAppServices.AzureAppServicesContextKey, "true");
                 vars.Add(AzureAppServices.ResourceGroupKey, "ThisIsAResourceGroup");
-                vars.Add(Datadog.Trace.Configuration.ConfigurationKeys.ApiKey, "xxx");
+                vars.Add(ConfigurationKeys.SignalFxAccessToken, "xxx");
                 AzureAppServices.Metadata = new AzureAppServices(vars);
             }
 
