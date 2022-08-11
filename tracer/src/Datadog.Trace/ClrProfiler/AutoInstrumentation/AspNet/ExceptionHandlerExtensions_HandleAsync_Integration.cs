@@ -3,10 +3,13 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #if NETFRAMEWORK
 
 using System.ComponentModel;
 using System.Threading;
+using Datadog.Trace.AspNet;
 using Datadog.Trace.ClrProfiler.CallTarget;
 using Datadog.Trace.Configuration;
 
@@ -51,11 +54,12 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
             var scope = Tracer.Instance.ActiveScope;
             var exception = context.Exception;
 
-            if (scope is not null && exception is not null)
+            var httpContext = System.Web.HttpContext.Current;
+            if (scope is not null && httpContext is not null && exception is not null)
             {
-                // Only try setting an exception if there's an active span
-                // The rest of the instrumentation will handle disposing the scope
-                scope.Span.SetException(exception);
+                // The exception should be set only when it is available and the response status code is not equal to 404
+                // as the final status code is not available here (nor when the method finished) the exception has to be registered for further usage.
+                httpContext.Items[SharedItems.HttpContextPropagatedExceptionKey] = exception;
             }
 
             return CallTargetState.GetDefault();

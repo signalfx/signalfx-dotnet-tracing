@@ -15,6 +15,9 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 ### Bugfixes
 
+- [ASP.NET Web API 2 Instrumentation] Fix the case when the spans was
+  incorrectly marked as errors when servers return 404 status code.
+
 ### Enhancements
 
 ## [Release 0.2.7](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.2.7)

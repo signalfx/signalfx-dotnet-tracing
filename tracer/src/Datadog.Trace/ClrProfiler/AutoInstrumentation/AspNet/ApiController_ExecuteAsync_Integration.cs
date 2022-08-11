@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
@@ -99,8 +101,6 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
 
             if (exception != null)
             {
-                scope.Span.SetException(exception);
-
                 // We don't have access to the final status code at this point
                 // Ask the HttpContext to call us back to that we can get it
                 if (httpContext != null)
@@ -111,7 +111,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
                     // us to defer finishing the span later while making sure callers of this method do not
                     // get this scope when calling Tracer.ActiveScope
                     var now = scope.Span.Context.TraceContext.UtcNow;
-                    httpContext.AddOnRequestCompleted(h => OnRequestCompletedAfterException(h, scope, now));
+                    httpContext.AddOnRequestCompleted(h => OnRequestCompletedAfterException(h, scope, now, exception));
 
                     scope.SetFinishOnClose(false);
                     scope.Dispose();
@@ -119,6 +119,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
                 else
                 {
                     // Looks like we won't be able to get the final status code
+                    scope.Span.SetException(exception);
                     scope.Dispose();
                 }
             }
@@ -132,8 +133,13 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
             return responseMessage;
         }
 
-        private static void OnRequestCompletedAfterException(HttpContext httpContext, Scope scope, DateTimeOffset finishTime)
+        private static void OnRequestCompletedAfterException(HttpContext httpContext, Scope scope, DateTimeOffset finishTime, Exception exception)
         {
+            if (httpContext.Response.StatusCode != 404)
+            {
+                scope.Span.SetException(exception);
+            }
+
             HttpContextHelper.AddHeaderTagsFromHttpResponse(httpContext, scope);
             scope.Span.SetHttpStatusCode(httpContext.Response.StatusCode, isServer: true, Tracer.Instance.Settings);
             scope.Span.Finish(finishTime);

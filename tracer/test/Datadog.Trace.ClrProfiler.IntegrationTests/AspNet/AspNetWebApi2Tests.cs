@@ -3,12 +3,13 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #if NET461
 #pragma warning disable SA1402 // File may only contain a single class
 #pragma warning disable SA1649 // File name must match first type name
 
 using System.Net;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.TestHelpers;
@@ -190,6 +191,70 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 statusCode = (HttpStatusCode)500;
             }
 
+            // Append virtual directory to the actual request
+            var spans = await GetWebServerSpans(_iisFixture.VirtualApplicationPath + path, _iisFixture.Agent, _iisFixture.HttpPort, statusCode, expectedSpanCount);
+
+            var sanitisedPath = VerifyHelper.SanitisePathsForVerify(path);
+
+            var settings = VerifyHelper.GetSpanVerifierSettings(sanitisedPath, (int)statusCode);
+
+            // Overriding the type name here as we have multiple test classes in the file
+            // Overriding the method name to _
+            // Overriding the parameters to remove the expectedSpanCount parameter, which is necessary for operation but unnecessary for the filename
+            await Verifier.Verify(spans, settings)
+                          .UseFileName($"{_testName}.__path={sanitisedPath}_statusCode={(int)statusCode}");
+        }
+    }
+
+    [Collection("IisTests")]
+    public class AspNetWebApi2TestsCustomExceptionCallTargetClassic : AspNetWebApi2CustomExceptionTests
+    {
+        public AspNetWebApi2TestsCustomExceptionCallTargetClassic(IisFixture iisFixture, ITestOutputHelper output)
+            : base(iisFixture, output, classicMode: true)
+        {
+        }
+    }
+
+    [Collection("IisTests")]
+    public class AspNetWebApi2TestsCustomExceptionCallTargetIntegrated : AspNetWebApi2CustomExceptionTests
+    {
+        public AspNetWebApi2TestsCustomExceptionCallTargetIntegrated(IisFixture iisFixture, ITestOutputHelper output)
+            : base(iisFixture, output, classicMode: false)
+        {
+        }
+    }
+
+    [UsesVerify]
+    public abstract class AspNetWebApi2CustomExceptionTests : TestHelper, IClassFixture<IisFixture>
+    {
+        private readonly IisFixture _iisFixture;
+        private readonly string _testName;
+
+        public AspNetWebApi2CustomExceptionTests(IisFixture iisFixture, ITestOutputHelper output, bool classicMode)
+            : base("AspNetMvc5CustomException", @"test\test-applications\aspnet", output)
+        {
+            SetServiceVersion("1.0.0");
+
+            _iisFixture = iisFixture;
+            _iisFixture.ShutdownPath = "/home/shutdown";
+
+            _iisFixture.TryStartIis(this, classicMode ? IisAppType.AspNetClassic : IisAppType.AspNetIntegrated);
+            _testName = nameof(AspNetWebApi2CustomExceptionTests)
+                      + (classicMode ? ".Classic" : ".Integrated");
+        }
+
+        public static TheoryData<string, int, int> Data() => new()
+        {
+            { "/api2/ThrowCustomNotFoundException", 404, 2 },
+        };
+
+        [SkippableTheory]
+        [Trait("Category", "EndToEnd")]
+        [Trait("RunOnWindows", "True")]
+        [Trait("LoadFromGAC", "True")]
+        [MemberData(nameof(Data))]
+        public async Task SubmitsTraces(string path, HttpStatusCode statusCode, int expectedSpanCount)
+        {
             // Append virtual directory to the actual request
             var spans = await GetWebServerSpans(_iisFixture.VirtualApplicationPath + path, _iisFixture.Agent, _iisFixture.HttpPort, statusCode, expectedSpanCount);
 
