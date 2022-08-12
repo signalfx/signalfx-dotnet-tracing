@@ -11,7 +11,7 @@ Name | Required |
 ---------|----------------|
 component | `AdoNet`
 db.name | No
-db.type | `fake`
+db.system | `fake`
 span.kind | `client`
 version | Yes
 
@@ -152,7 +152,7 @@ Name | Required |
 component | `CosmosDb`
 cosmosdb.container | No
 db.name | No
-db.type | `cosmosdb`
+db.system | `cosmosdb`
 net.peer.name | Yes
 span.kind | `client`
 version | Yes
@@ -198,7 +198,6 @@ version | Yes
 Name | Required |
 ---------|----------------|
 LogicScope | `graphql.execute`; `graphql.validate`
-Name | `graphql.execute`; `graphql.validate`
 Type | `graphql`
 ### Tags
 Name | Required |
@@ -311,7 +310,7 @@ Name | Required |
 component | `MySql`
 db.name | Yes
 db.statement | Yes
-db.type | `mysql`
+db.system | `mysql`
 span.kind | `client`
 version | Yes
 
@@ -327,7 +326,7 @@ Name | Required |
 component | `Npgsql`
 db.name | Yes
 db.statement | Yes
-db.type | `postgresql`
+db.system | `postgresql`
 span.kind | `client`
 version | Yes
 
@@ -342,7 +341,7 @@ Name | Required |
 ---------|----------------|
 component | `Oracle`
 db.name | Yes
-db.type | `oracle`
+db.system | `oracle`
 span.kind | `client`
 
 ## RabbitMQ
@@ -444,7 +443,7 @@ Name | Required |
 component | `Sqlite`
 db.name | No
 db.statement | Yes
-db.type | `sqlite`
+db.system | `sqlite`
 span.kind | `client`
 version | Yes
 
@@ -460,7 +459,7 @@ Name | Required |
 component | `SqlClient`
 db.name | No
 db.statement | Yes
-db.type | `mssql`
+db.system | `mssql`
 span.kind | `client`
 version | Yes
 
@@ -474,7 +473,7 @@ Type | `web`
 Name | Required |
 ---------|----------------|
 component | `Wcf`
-http.method | Yes
+http.method | No
 http.url | Yes
 span.kind | `server`
 

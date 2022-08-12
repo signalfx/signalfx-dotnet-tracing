@@ -15,7 +15,7 @@ namespace Datadog.Trace.TestHelpers
             .Tags(s => s
                 .IsOptional("db.name")
                 .IsPresent("version")
-                .Matches("db.type", "fake")
+                .Matches("db.system", "fake")
                 .Matches("component", "AdoNet")
                 .Matches("span.kind", "client"));
 
@@ -138,7 +138,7 @@ namespace Datadog.Trace.TestHelpers
                 .IsOptional("db.name")
                 .IsPresent("net.peer.name")
                 .IsPresent("version")
-                .Matches("db.type", "cosmosdb")
+                .Matches("db.system", "cosmosdb")
                 .Matches("component", "CosmosDb")
                 .Matches("span.kind", "client"));
 
@@ -172,7 +172,6 @@ namespace Datadog.Trace.TestHelpers
 
         public static Result IsGraphQL(this MockSpan span) => Result.FromSpan(span)
             .Properties(s => s
-                .MatchesOneOf(Name, "graphql.execute", "graphql.validate")
                 .MatchesOneOf(LogicScope, "graphql.execute", "graphql.validate")
                 .Matches(Type, "graphql"))
             .Tags(s => s
@@ -260,7 +259,7 @@ namespace Datadog.Trace.TestHelpers
                 .IsPresent("db.name")
                 .IsPresent("db.statement")
                 .IsPresent("version")
-                .Matches("db.type", "mysql")
+                .Matches("db.system", "mysql")
                 .Matches("component", "MySql")
                 .Matches("span.kind", "client"));
 
@@ -272,7 +271,7 @@ namespace Datadog.Trace.TestHelpers
                 .IsPresent("db.name")
                 .IsPresent("db.statement")
                 .IsPresent("version")
-                .Matches("db.type", "postgresql")
+                .Matches("db.system", "postgresql")
                 .Matches("component", "Npgsql")
                 .Matches("span.kind", "client"));
 
@@ -282,7 +281,7 @@ namespace Datadog.Trace.TestHelpers
                 .Matches(Type, "sql"))
             .Tags(s => s
                 .IsPresent("db.name")
-                .Matches("db.type", "oracle")
+                .Matches("db.system", "oracle")
                 .Matches("component", "Oracle")
                 .Matches("span.kind", "client"));
 
@@ -361,7 +360,7 @@ namespace Datadog.Trace.TestHelpers
                 .IsOptional("db.name")
                 .IsPresent("db.statement")
                 .IsPresent("version")
-                .Matches("db.type", "sqlite")
+                .Matches("db.system", "sqlite")
                 .Matches("component", "Sqlite")
                 .Matches("span.kind", "client"));
 
@@ -373,7 +372,7 @@ namespace Datadog.Trace.TestHelpers
                 .IsOptional("db.name")
                 .IsPresent("db.statement")
                 .IsPresent("version")
-                .Matches("db.type", "mssql")
+                .Matches("db.system", "mssql")
                 .Matches("component", "SqlClient")
                 .Matches("span.kind", "client"));
 
@@ -382,8 +381,8 @@ namespace Datadog.Trace.TestHelpers
                 .Matches(LogicScope, "wcf.request")
                 .Matches(Type, "web"))
             .Tags(s => s
-                .IsPresent("http.method")
                 .IsPresent("http.url")
+                .IsOptional("http.method")
                 .Matches("component", "Wcf")
                 .Matches("span.kind", "server"));
 

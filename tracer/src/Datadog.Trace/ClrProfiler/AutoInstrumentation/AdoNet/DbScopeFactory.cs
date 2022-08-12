@@ -35,7 +35,9 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AdoNet
             {
                 Span parent = tracer.InternalActiveScope?.Span;
 
-                if (IsDbAlreadyInstrumented(parent, dbType, command.CommandText))
+                if (parent is { Type: SpanTypes.Sql } &&
+                    parent.GetTag(Tags.DbType) == dbType &&
+                    parent.ResourceName == command.CommandText)
                 {
                     // we are already instrumenting this,
                     // don't instrument nested methods that belong to the same stacktrace
@@ -44,10 +46,10 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AdoNet
                 }
 
                 var tags = new SqlTags
-                           {
-                               DbType = dbType,
-                               InstrumentationName = IntegrationRegistry.GetName(integrationId)
-                           };
+                {
+                    DbType = dbType,
+                    InstrumentationName = IntegrationRegistry.GetName(integrationId)
+                };
 
                 tags.SetAnalyticsSampleRate(integrationId, tracer.Settings, enabledWithGlobalSetting: false);
 
@@ -120,14 +122,6 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AdoNet
                     };
                     return true;
             }
-        }
-
-        internal static bool IsDbAlreadyInstrumented(Span parent, string dbType, string commandText)
-        {
-            return parent != null &&
-                   parent.Type == SpanTypes.Sql &&
-                   parent.GetTag(Tags.DbType) == dbType &&
-                   parent.ResourceName == commandText;
         }
 
         public static class Cache<TCommand>
