@@ -15,6 +15,7 @@
       http.request.headers.host: localhost:00000,
       http.status_code: 500,
       http.url: http://localhost:00000/status-code/500,
+      http.user_agent: testhelper,
       language: dotnet,
       net.peer.ip: 127.0.0.1,
       runtime-id: Guid_1,
