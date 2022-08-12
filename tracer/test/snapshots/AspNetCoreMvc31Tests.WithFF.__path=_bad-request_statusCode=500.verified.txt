@@ -40,6 +40,7 @@
       http.response.headers.server: Kestrel,
       http.status_code: 500,
       http.url: http://localhost:00000/bad-request,
+      http.user_agent: testhelper,
       language: dotnet,
       net.peer.ip: 127.0.0.1,
       runtime-id: Guid_1,

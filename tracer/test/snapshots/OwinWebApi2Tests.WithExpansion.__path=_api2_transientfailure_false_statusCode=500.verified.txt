@@ -16,7 +16,7 @@
       http.method: GET,
       http.request.headers.host: localhost:00000,
       http.url: http://localhost:00000/api2/transientfailure/false,
-      http_useragent: Mozilla/5.0,
+      http.user_agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36,
       language: dotnet,
       runtime-id: Guid_1,
       sfx.error.kind: System.ArgumentException,
