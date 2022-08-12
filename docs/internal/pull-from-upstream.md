@@ -26,6 +26,7 @@
     docs, typically new instrumentations are first added as "partially supported",
     see [instrumented-libraries.md](../instrumented-libraries.md#partially-supported).
     * Run build via nuke and commit any needed fixes, until it passes.
+    * Run `GenerateSpanDocumentation` via nuke to update `span_metadata.md`. It regenerates span metadata documentation based on `SpanMetadataRules.cs`.
 
 6. If squashing cherry-pick from upstream to pass CLA check:
     * `git rebase -i <squash_sha>^`

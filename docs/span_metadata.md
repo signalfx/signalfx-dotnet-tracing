@@ -29,7 +29,7 @@ aerospike.key | No
 aerospike.namespace | No
 aerospike.setname | No
 aerospike.userkey | No
-component | `aerospike`
+component | `Aerospike`
 db.system | `aerospike`
 span.kind | `client`
 
@@ -38,7 +38,6 @@ span.kind | `client`
 Name | Required |
 ---------|----------------|
 LogicScope | `aspnet.request`
-Name | `span.Tags["http.method"]`
 Type | `web`
 ### Tags
 Name | Required |
@@ -54,7 +53,6 @@ span.kind | `server`
 Name | Required |
 ---------|----------------|
 LogicScope | `aspnet-mvc.request`
-Name | `span.Tags["http.method"]`
 Type | `web`
 ### Tags
 Name | Required |
@@ -185,10 +183,10 @@ Type | `elasticsearch`
 Name | Required |
 ---------|----------------|
 component | `elasticsearch-net`
+db.operation | Yes
 db.statement | No
 db.system | `elasticsearch`
 elasticsearch.action | Yes
-elasticsearch.method | Yes
 elasticsearch.url | Yes
 span.kind | `client`
 version | Yes
@@ -233,7 +231,6 @@ span.kind | `client`; `server`
 Name | Required |
 ---------|----------------|
 LogicScope | `http.request`
-Name | `span.Tags["http.method"]`
 Type | `http`
 ### Tags
 Name | Required |
@@ -482,7 +479,6 @@ span.kind | `server`
 Name | Required |
 ---------|----------------|
 LogicScope | `http.request`
-Name | `span.Tags["http.method"]`
 Type | `http`
 ### Tags
 Name | Required |

@@ -35,7 +35,6 @@ namespace Datadog.Trace.TestHelpers
 
         public static Result IsAspNet(this MockSpan span) => Result.FromSpan(span)
             .Properties(s => s
-                .Matches(Name, span.Tags["http.method"])
                 .Matches(LogicScope, "aspnet.request")
                 .Matches(Type, "web"))
             .Tags(s => s
@@ -49,7 +48,6 @@ namespace Datadog.Trace.TestHelpers
 
         public static Result IsAspNetMvc(this MockSpan span) => Result.FromSpan(span)
             .Properties(s => s
-                .Matches(Name, span.Tags["http.method"])
                 .Matches(LogicScope, "aspnet-mvc.request")
                 .Matches(Type, "web"))
             .Tags(s => s
@@ -199,7 +197,6 @@ namespace Datadog.Trace.TestHelpers
 
         public static Result IsHttpMessageHandler(this MockSpan span) => Result.FromSpan(span)
             .Properties(s => s
-                .Matches(Name, span.Tags["http.method"])
                 .Matches(LogicScope, "http.request")
                 .Matches(Type, "http"))
             .Tags(s => s
@@ -388,7 +385,6 @@ namespace Datadog.Trace.TestHelpers
 
         public static Result IsWebRequest(this MockSpan span) => Result.FromSpan(span)
             .Properties(s => s
-                .Matches(Name, span.Tags["http.method"])
                 .Matches(LogicScope, "http.request")
                 .Matches(Type, "http"))
             .Tags(s => s
