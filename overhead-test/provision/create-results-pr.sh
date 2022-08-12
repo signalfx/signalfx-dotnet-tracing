@@ -50,7 +50,6 @@ ls -1 ${RESULTS_TARGET_DIR} | grep -v README | grep -v index.txt > ${RESULTS_TAR
 echo "Adding new files to changelist"
 git add ${RESULTS_TARGET_DIR}/index.txt
 git add ${RESULTS_TARGET_DIR}/${REV}/*
-git diff --cached
 echo "Committing changes..."
 git commit -S -am "[automated] $MSG"
 git show HEAD
