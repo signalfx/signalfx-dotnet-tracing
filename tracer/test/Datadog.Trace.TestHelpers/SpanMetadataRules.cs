@@ -30,7 +30,7 @@ namespace Datadog.Trace.TestHelpers
                 .IsOptional("aerospike.setname")
                 .IsOptional("aerospike.userkey")
                 .Matches("db.system", "aerospike")
-                .Matches("component", "aerospike")
+                .Matches("component", "Aerospike")
                 .Matches("span.kind", "client"));
 
         public static Result IsAspNet(this MockSpan span) => Result.FromSpan(span)
@@ -162,9 +162,9 @@ namespace Datadog.Trace.TestHelpers
                 .Matches(Type, "elasticsearch"))
             .Tags(s => s
                 .IsPresent("elasticsearch.action")
-                .IsPresent("elasticsearch.method")
                 .IsPresent("elasticsearch.url")
                 .IsPresent("version")
+                .IsPresent("db.operation")
                 .IsOptional("db.statement")
                 .Matches("db.system", "elasticsearch")
                 .Matches("component", "elasticsearch-net")
