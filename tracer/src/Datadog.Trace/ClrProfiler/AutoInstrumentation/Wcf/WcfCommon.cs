@@ -88,10 +88,6 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
                     }
                 }
 
-                var tags = new WcfTags();
-                scope = tracer.StartActiveInternal("wcf.request", propagatedContext, tags: tags);
-                var span = scope.Span;
-
                 var requestHeaders = requestMessage.Headers;
                 string action = requestHeaders.Action;
                 Uri requestHeadersTo = requestHeaders.To;
@@ -100,6 +96,10 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
                 var operationName = !string.IsNullOrEmpty(operationNameSuffix)
                     ? $"{DefaultOperationName} {operationNameSuffix}"
                     : DefaultOperationName;
+
+                var tags = new WcfTags();
+                scope = tracer.StartActiveInternal(operationName, propagatedContext, tags: tags);
+                var span = scope.Span;
 
                 span.LogicScope = DefaultOperationName;
                 span.DecorateWebServerSpan(
