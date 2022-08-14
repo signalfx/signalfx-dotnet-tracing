@@ -3,7 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
-using System;
+// Modified by Splunk Inc.
+
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -35,7 +36,7 @@ public class LiveDebuggerTests : TestHelper
         SetServiceVersion("1.0.0");
     }
 
-    [Fact(Skip = "Live Debugger is temporarily disabled.")]
+    [Fact(Skip = "Splunk: Not supported")]
     [Trait("Category", "EndToEnd")]
     [Trait("Category", "ArmUnsupported")]
     [Trait("RunOnWindows", "True")]
@@ -45,7 +46,7 @@ public class LiveDebuggerTests : TestHelper
         await RunTest();
     }
 
-    [Fact(Skip = "Live Debugger is temporarily disabled.")]
+    [Fact(Skip = "Splunk: Not supported")]
     [Trait("Category", "EndToEnd")]
     [Trait("Category", "ArmUnsupported")]
     [Trait("RunOnWindows", "True")]
