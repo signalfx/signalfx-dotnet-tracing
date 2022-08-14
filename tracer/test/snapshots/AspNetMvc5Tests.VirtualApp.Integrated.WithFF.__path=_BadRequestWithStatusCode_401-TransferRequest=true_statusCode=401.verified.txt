@@ -17,8 +17,9 @@
       http.request.headers.host: localhost:00000,
       http.status_code: 401,
       http.url: http://localhost:00000/my-app/Error/Index?errorId=Guid_2&ErrorStatusCode=401,
+      http.user_agent: testhelper,
       language: dotnet,
-      net.peer.ip: ::1,
+      net.peer.ip: 127.0.0.1,
       span.kind: server,
       version: 1.0.0
     }
@@ -38,8 +39,9 @@
       http.request.headers.host: localhost:00000,
       http.status_code: 401,
       http.url: http://localhost:00000/my-app/Error/Index?errorId=Guid_2&ErrorStatusCode=401,
+      http.user_agent: testhelper,
       language: dotnet,
-      net.peer.ip: ::1,
+      net.peer.ip: 127.0.0.1,
       span.kind: server,
       version: 1.0.0
     }
@@ -59,8 +61,9 @@
       http.request.headers.host: localhost:00000,
       http.status_code: 401,
       http.url: http://localhost:00000/my-app/BadRequestWithStatusCode/401?TransferRequest=true,
+      http.user_agent: testhelper,
       language: dotnet,
-      net.peer.ip: ::1,
+      net.peer.ip: 127.0.0.1,
       runtime-id: Guid_1,
       sfx.error.kind: System.Exception,
       sfx.error.message: Oops, it broke. Specified status code was: 401,
@@ -99,8 +102,9 @@ at Samples.AspNetMvc5.Controllers.HomeController.BadRequestWithStatusCode(Int32 
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
       http.url: http://localhost:00000/my-app/BadRequestWithStatusCode/401?TransferRequest=true,
+      http.user_agent: testhelper,
       language: dotnet,
-      net.peer.ip: ::1,
+      net.peer.ip: 127.0.0.1,
       sfx.error.kind: System.Exception,
       sfx.error.message: Oops, it broke. Specified status code was: 401,
       sfx.error.stack:

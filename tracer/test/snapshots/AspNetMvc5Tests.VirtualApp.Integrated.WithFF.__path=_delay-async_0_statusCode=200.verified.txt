@@ -17,8 +17,9 @@
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
       http.url: http://localhost:00000/my-app/delay-async/0,
+      http.user_agent: testhelper,
       language: dotnet,
-      net.peer.ip: ::1,
+      net.peer.ip: 127.0.0.1,
       span.kind: server,
       version: 1.0.0
     }
@@ -37,8 +38,9 @@
       http.request.headers.host: localhost:00000,
       http.status_code: 200,
       http.url: http://localhost:00000/my-app/delay-async/0,
+      http.user_agent: testhelper,
       language: dotnet,
-      net.peer.ip: ::1,
+      net.peer.ip: 127.0.0.1,
       runtime-id: Guid_1,
       signalfx.tracing.library: dotnet-tracing,
       signalfx.tracing.version: x.y.z,
