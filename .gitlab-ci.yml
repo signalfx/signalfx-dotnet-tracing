@@ -172,6 +172,5 @@ run-overhead-test:
     - ./overhead-test/provision/start-remote-test.sh
     - sleep 30
     - ./overhead-test/provision/wait-for-test-complete.sh
-    # Don't create results PR yet
-#    - ./overhead-test/provision/fetch-results.sh
-#    - ./overhead-test/provision/create-results-pr.sh
+    - ./overhead-test/provision/fetch-results.sh
+    - ./overhead-test/provision/create-results-pr.sh
