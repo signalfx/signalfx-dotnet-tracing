@@ -435,7 +435,7 @@ namespace Datadog.Trace.Configuration
 
         /// <summary>
         /// Configuration key for enabling/disabling reporting query string
-        /// Default value is false
+        /// Default value is true
         /// </summary>
         /// <seealso cref="TracerSettings.QueryStringReportingEnabled"/>
         public const string QueryStringReportingEnabled = "SIGNALFX_HTTP_SERVER_TAG_QUERY_STRING";
