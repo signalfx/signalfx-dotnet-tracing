@@ -294,7 +294,7 @@ namespace Datadog.Trace.Configuration
         internal string ObfuscationQueryStringRegex { get; }
 
         /// <summary>
-        /// Gets a value indicating whether or not http.url should contain the query string, enabled by default with DD_HTTP_SERVER_TAG_QUERY_STRING
+        /// Gets a value indicating whether or not http.url should contain the query string, enabled by default with SIGNALFX_HTTP_SERVER_TAG_QUERY_STRING
         /// </summary>
         internal bool QueryStringReportingEnabled { get; }
 

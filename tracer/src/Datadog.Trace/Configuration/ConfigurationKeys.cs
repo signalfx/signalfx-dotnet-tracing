@@ -424,21 +424,21 @@ namespace Datadog.Trace.Configuration
         /// Default value is in TracerSettings
         /// </summary>
         /// <seealso cref="TracerSettings.ObfuscationQueryStringRegex"/>
-        public const string ObfuscationQueryStringRegex = "DD_TRACE_OBFUSCATION_QUERY_STRING_REGEXP";
+        public const string ObfuscationQueryStringRegex = "SIGNALFX_TRACE_OBFUSCATION_QUERY_STRING_REGEXP";
 
         /// <summary>
         /// Configuration key for specifying a timeout in milliseconds to the execution of the query string obfuscation regex
         /// Default value is 200ms
         /// </summary>
         /// <seealso cref="TracerSettings.ObfuscationQueryStringRegexTimeout"/>
-        public const string ObfuscationQueryStringRegexTimeout = "DD_TRACE_OBFUSCATION_QUERY_STRING_REGEXP_TIMEOUT";
+        public const string ObfuscationQueryStringRegexTimeout = "SIGNALFX_TRACE_OBFUSCATION_QUERY_STRING_REGEXP_TIMEOUT";
 
         /// <summary>
         /// Configuration key for enabling/disabling reporting query string
-        /// Default value is true
+        /// Default value is false
         /// </summary>
         /// <seealso cref="TracerSettings.QueryStringReportingEnabled"/>
-        public const string QueryStringReportingEnabled = "DD_HTTP_SERVER_TAG_QUERY_STRING";
+        public const string QueryStringReportingEnabled = "SIGNALFX_HTTP_SERVER_TAG_QUERY_STRING";
 
         /// <summary>
         /// String constants for CI Visibility configuration keys.

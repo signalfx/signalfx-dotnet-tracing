@@ -188,7 +188,7 @@ namespace Datadog.Trace.Configuration
 
             ObfuscationQueryStringRegex = source?.GetString(ConfigurationKeys.ObfuscationQueryStringRegex) ?? DefaultObfuscationQueryStringRegex;
 
-            QueryStringReportingEnabled = source?.GetBool(ConfigurationKeys.QueryStringReportingEnabled) ?? true;
+            QueryStringReportingEnabled = source?.GetBool(ConfigurationKeys.QueryStringReportingEnabled) ?? false;
 
             ObfuscationQueryStringRegexTimeout = source?.GetDouble(ConfigurationKeys.ObfuscationQueryStringRegexTimeout) is { } x and > 0 ? x : 200;
 
