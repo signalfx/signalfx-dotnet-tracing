@@ -27,6 +27,11 @@ namespace Datadog.Trace.Configuration
         private const int DefaultRecordedValueMaxLength = 12000;
 
         /// <summary>
+        /// Default obfuscation query string regex if none specified via env DD_OBFUSCATION_QUERY_STRING_REGEXP
+        /// </summary>
+        internal const string DefaultObfuscationQueryStringRegex = @"((?i)(?:p(?:ass)?w(?:or)?d|pass(?:_?phrase)?|secret|(?:api_?|private_?|public_?|access_?|secret_?)key(?:_?id)?|token|consumer_?(?:id|key|secret)|sign(?:ed|ature)?|auth(?:entication|orization)?)(?:(?:\s|%20)*(?:=|%3D)[^&]+|(?:""|%22)(?:\s|%20)*(?::|%3A)(?:\s|%20)*(?:""|%22)(?:%2[^2]|%[^2]|[^""%])+(?:""|%22))|bearer(?:\s|%20)+[a-z0-9\._\-]|token(?::|%3A)[a-z0-9]{13}|gh[opsu]_[0-9a-zA-Z]{36}|ey[I-L](?:[\w=-]|%3D)+\.ey[I-L](?:[\w=-]|%3D)+(?:\.(?:[\w.+\/=-]|%3D|%2F|%2B)+)?|[\-]{5}BEGIN(?:[a-z\s]|%20)+PRIVATE(?:\s|%20)KEY[\-]{5}[^\-]+[\-]{5}END(?:[a-z\s]|%20)+PRIVATE(?:\s|%20)KEY|ssh-rsa(?:\s|%20)*(?:[a-z0-9\/\.+]|%2F|%5C|%2B){100,})";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="TracerSettings"/> class with default values.
         /// </summary>
         public TracerSettings()
@@ -95,16 +100,16 @@ namespace Datadog.Trace.Configuration
                                    .ToDictionary(kvp => kvp.Key.Trim(), kvp => kvp.Value.Trim());
 
             var inputHeaderTags = source?.GetDictionary(ConfigurationKeys.HeaderTags, allowOptionalMappings: true) ??
-                         // default value (empty)
-                         new Dictionary<string, string>();
+                                  // default value (empty)
+                                  new Dictionary<string, string>();
 
             var headerTagsNormalizationFixEnabled = source?.GetBool(ConfigurationKeys.FeatureFlags.HeaderTagsNormalizationFixEnabled) ?? true;
             // Filter out tags with empty keys or empty values, and trim whitespaces
             HeaderTags = InitializeHeaderTags(inputHeaderTags, headerTagsNormalizationFixEnabled);
 
             var serviceNameMappings = source?.GetDictionary(ConfigurationKeys.ServiceNameMappings)
-                                      ?.Where(kvp => !string.IsNullOrWhiteSpace(kvp.Key) && !string.IsNullOrWhiteSpace(kvp.Value))
-                                      ?.ToDictionary(kvp => kvp.Key.Trim(), kvp => kvp.Value.Trim());
+                                            ?.Where(kvp => !string.IsNullOrWhiteSpace(kvp.Key) && !string.IsNullOrWhiteSpace(kvp.Value))
+                                            ?.ToDictionary(kvp => kvp.Key.Trim(), kvp => kvp.Value.Trim());
 
             ServiceNameMappings = new ServiceNames(serviceNameMappings);
 
@@ -143,8 +148,8 @@ namespace Datadog.Trace.Configuration
             }
 
             var httpServerErrorStatusCodes = source?.GetString(ConfigurationKeys.HttpServerErrorStatusCodes) ??
-                                           // Default value
-                                           "500-599";
+                                             // Default value
+                                             "500-599";
 
             HttpServerErrorStatusCodes = ParseHttpCodesToArray(httpServerErrorStatusCodes);
 
@@ -154,10 +159,10 @@ namespace Datadog.Trace.Configuration
             HttpClientErrorStatusCodes = ParseHttpCodesToArray(httpClientErrorStatusCodes);
 
             TraceBufferSize = source?.GetInt32(ConfigurationKeys.BufferSize)
-                ?? 1024 * 1024 * 10; // 10MB
+                           ?? 1024 * 1024 * 10; // 10MB
 
             TraceBatchInterval = source?.GetInt32(ConfigurationKeys.SerializationBatchInterval)
-                        ?? 100;
+                              ?? 100;
 
             RecordedValueMaxLength = source.SafeReadInt32(
                 key: ConfigurationKeys.RecordedValueMaxLength,
@@ -165,13 +170,13 @@ namespace Datadog.Trace.Configuration
                 validators: (value) => value >= 0);
 
             RouteTemplateResourceNamesEnabled = source?.GetBool(ConfigurationKeys.FeatureFlags.RouteTemplateResourceNamesEnabled)
-                                                   ?? true;
+                                             ?? true;
 
             TraceResponseHeaderEnabled = source?.GetBool(ConfigurationKeys.TraceResponseHeaderEnabled)
                                             ?? true;
             ExpandRouteTemplatesEnabled = source?.GetBool(ConfigurationKeys.ExpandRouteTemplatesEnabled)
-                                        // disabled by default if route template resource names enabled
-                                        ?? !RouteTemplateResourceNamesEnabled;
+                                          // disabled by default if route template resource names enabled
+                                       ?? !RouteTemplateResourceNamesEnabled;
 
             KafkaCreateConsumerScopeEnabled = source?.GetBool(ConfigurationKeys.KafkaCreateConsumerScopeEnabled)
                                            ?? true; // default
@@ -179,7 +184,13 @@ namespace Datadog.Trace.Configuration
             TagMongoCommands = source?.GetBool(ConfigurationKeys.TagMongoCommands) ?? true;
 
             DelayWcfInstrumentationEnabled = source?.GetBool(ConfigurationKeys.FeatureFlags.DelayWcfInstrumentationEnabled)
-                                            ?? false;
+                                          ?? false;
+
+            ObfuscationQueryStringRegex = source?.GetString(ConfigurationKeys.ObfuscationQueryStringRegex) ?? DefaultObfuscationQueryStringRegex;
+
+            QueryStringReportingEnabled = source?.GetBool(ConfigurationKeys.QueryStringReportingEnabled) ?? true;
+
+            ObfuscationQueryStringRegexTimeout = source?.GetDouble(ConfigurationKeys.ObfuscationQueryStringRegexTimeout) is { } x and > 0 ? x : 200;
 
             PropagationStyleInject = TrimSplitString(source?.GetString(ConfigurationKeys.Propagators) ?? $"{nameof(Propagators.ContextPropagators.Names.B3)},{nameof(Propagators.ContextPropagators.Names.W3C)}", ',').ToArray();
 
@@ -198,21 +209,25 @@ namespace Datadog.Trace.Configuration
                            string.Empty;
 
             var grpcTags = source?.GetDictionary(ConfigurationKeys.GrpcTags, allowOptionalMappings: true) ??
-                                  // default value (empty)
-                                  new Dictionary<string, string>();
+                           // default value (empty)
+                           new Dictionary<string, string>();
 
             // Filter out tags with empty keys or empty values, and trim whitespaces
             GrpcTags = InitializeHeaderTags(grpcTags, headerTagsNormalizationFixEnabled: true);
 
             var propagationHeaderMaximumLength = source?.GetInt32(ConfigurationKeys.TagPropagation.HeaderMaxLength);
 
-            TagPropagationHeaderMaxLength = propagationHeaderMaximumLength is >= 0 and <= Tagging.TagPropagation.OutgoingPropagationHeaderMaxLength ?
-                                             (int)propagationHeaderMaximumLength :
-                                             Tagging.TagPropagation.OutgoingPropagationHeaderMaxLength;
+            TagPropagationHeaderMaxLength = propagationHeaderMaximumLength is >= 0 and <= Tagging.TagPropagation.OutgoingPropagationHeaderMaxLength
+                ? (int)propagationHeaderMaximumLength
+                : Tagging.TagPropagation.OutgoingPropagationHeaderMaxLength;
 
             IsActivityListenerEnabled = source?.GetBool(ConfigurationKeys.FeatureFlags.ActivityListenerEnabled) ??
-                    // default value
-                    false;
+                                        // default value
+                                        false;
+
+            IpHeader = source?.GetString(ConfigurationKeys.IpHeader);
+
+            IpHeaderDisabled = source?.GetBool(ConfigurationKeys.IpHeaderDisabled) ?? false;
 
             if (IsActivityListenerEnabled)
             {
@@ -340,6 +355,16 @@ namespace Datadog.Trace.Configuration
         public IDictionary<string, string> HeaderTags { get; set; }
 
         /// <summary>
+        /// Gets or sets a custom request header configured to read the ip from. For backward compatibility, it fallbacks on DD_APPSEC_IPHEADER
+        /// </summary>
+        internal string IpHeader { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the ip header should not be collected. The default is false.
+        /// </summary>
+        internal bool IpHeaderDisabled { get; set; }
+
+        /// <summary>
         /// Gets or sets the map of metadata keys to tag names, which are applied to the root <see cref="Span"/>
         /// of incoming and outgoing GRPC requests.
         /// </summary>
@@ -416,14 +441,20 @@ namespace Datadog.Trace.Configuration
         internal bool DelayWcfInstrumentationEnabled { get; set; }
 
         /// <summary>
-        /// Gets a value indicating the injection propagation style.
+        /// Gets or sets a value indicating the regex to apply to obfuscate http query strings.
         /// </summary>
-        internal string[] PropagationStyleInject { get; }
+        internal string ObfuscationQueryStringRegex { get; set; }
 
         /// <summary>
-        /// Gets a value indicating the extraction propagation style.
+        /// Gets or sets a value indicating whether or not http.url should contain the query string, enabled by default
         /// </summary>
-        internal string[] PropagationStyleExtract { get; }
+        internal bool QueryStringReportingEnabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating a timeout in milliseconds to the execution of the query string obfuscation regex
+        /// Default value is 100ms
+        /// </summary>
+        internal double ObfuscationQueryStringRegexTimeout { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the diagnostic log at startup is enabled
@@ -439,6 +470,16 @@ namespace Datadog.Trace.Configuration
         /// This value is not used when extracting an incoming propagation header from an upstream service.
         /// </remarks>
         internal int TagPropagationHeaderMaxLength { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating the injection propagation style.
+        /// </summary>
+        internal string[] PropagationStyleInject { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating the extraction propagation style.
+        /// </summary>
+        internal string[] PropagationStyleExtract { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether runtime metrics

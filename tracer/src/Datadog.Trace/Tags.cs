@@ -88,7 +88,7 @@ namespace Datadog.Trace
         /// <summary>
         /// The user agent
         /// </summary>
-        internal const string HttpUserAgent = "http.useragent";
+        internal const string HttpUserAgent = "http.user_agent";
 
         /// <summary>
         /// Whether a span denotes an error.

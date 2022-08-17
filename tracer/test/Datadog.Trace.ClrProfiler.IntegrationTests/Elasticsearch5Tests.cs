@@ -167,21 +167,10 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 foreach (var span in spans)
                 {
-                    Assert.Equal("elasticsearch.query", span.LogicScope);
-                    Assert.Equal("Samples.Elasticsearch.V5", span.Service);
-                    Assert.Equal("elasticsearch", span.Type);
-                    Assert.Equal("elasticsearch", DictionaryExtensions.GetValueOrDefault(span.Tags, "db.system"));
-                    Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
+                    var result = span.IsElasticsearchNet();
+                    Assert.True(result.Success, result.ToString());
 
-                    span.Tags.TryGetValue(Tags.DbStatement, out string statement);
-                    if (tagQueries && statementNames.Contains(span.Name))
-                    {
-                        Assert.NotNull(statement);
-                    }
-                    else
-                    {
-                        Assert.Null(statement);
-                    }
+                    Assert.Equal("Samples.Elasticsearch.V5", span.Service);
                 }
 
                 ValidateSpans(spans, (span) => span.Resource, expected);

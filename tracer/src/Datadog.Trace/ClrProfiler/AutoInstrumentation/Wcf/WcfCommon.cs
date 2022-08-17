@@ -15,7 +15,6 @@ using Datadog.Trace.Configuration;
 using Datadog.Trace.DuckTyping;
 using Datadog.Trace.ExtensionMethods;
 using Datadog.Trace.Logging;
-using Datadog.Trace.Propagation;
 using Datadog.Trace.Propagators;
 using Datadog.Trace.Tagging;
 
@@ -58,6 +57,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
                 SpanContext propagatedContext = null;
                 var tagsFromHeaders = Enumerable.Empty<KeyValuePair<string, string>>();
                 string host = null;
+                string userAgent = null;
                 string httpMethod = null;
 
                 IDictionary<string, object> requestProperties = requestMessage.Properties;
@@ -69,6 +69,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
 
                     // we're using an http transport
                     host = webHeaderCollection[HttpRequestHeader.Host];
+                    userAgent = webHeaderCollection[HttpRequestHeader.UserAgent];
                     httpMethod = httpRequestPropertyProxy.Method?.ToUpperInvariant();
 
                     // try to extract propagated context values from http headers
@@ -78,7 +79,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
                         {
                             var headers = webHeaderCollection.Wrap();
                             propagatedContext = SpanContextPropagator.Instance.Extract(headers);
-                            tagsFromHeaders = headers.ExtractHeaderTags(tracer.Settings.HeaderTags, PropagationExtensions.HttpRequestHeadersTagPrefix);
+                            tagsFromHeaders = SpanContextPropagator.Instance.ExtractHeaderTags(headers, tracer.Settings.HeaderTags, SpanContextPropagator.HttpRequestHeadersTagPrefix);
                         }
                         catch (Exception ex)
                         {
@@ -99,13 +100,14 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Wcf
                 var tags = new WcfTags();
                 scope = tracer.StartActiveInternal(operationName, propagatedContext, tags: tags);
                 var span = scope.Span;
-                span.LogicScope = DefaultOperationName;
 
+                span.LogicScope = DefaultOperationName;
                 span.DecorateWebServerSpan(
                     resourceName: action ?? requestHeadersTo?.LocalPath,
                     httpMethod,
                     host,
                     httpUrl: requestHeadersTo?.AbsoluteUri,
+                    userAgent,
                     tags,
                     tagsFromHeaders);
 

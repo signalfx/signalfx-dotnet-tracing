@@ -37,7 +37,7 @@ namespace Datadog.Trace.Configuration
             /// Default value is false (disabled).
             /// </summary>
             /// <seealso cref="DebuggerSettings.Enabled"/>
-            public const string Enabled = "SIGNALFX_DEBUGGER_ENABLED";
+            public const string Enabled = "SIGNALFX_INTERNAL_DEBUGGER_ENABLED";
 
             /// <summary>
             /// Configuration key for the max object depth to serialize for probe snapshots.

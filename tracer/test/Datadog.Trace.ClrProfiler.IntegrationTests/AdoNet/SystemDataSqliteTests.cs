@@ -1,4 +1,4 @@
-﻿// <copyright file="SystemDataSqliteTests.cs" company="Datadog">
+// <copyright file="SystemDataSqliteTests.cs" company="Datadog">
 // Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
@@ -42,12 +42,10 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
 
             foreach (var span in spans)
             {
-                Assert.Equal(expectedOperationName, span.Name);
+                var result = span.IsSqlite();
+                Assert.True(result.Success, result.ToString());
+
                 Assert.Equal(expectedServiceName, span.Service);
-                Assert.Equal(SpanTypes.Sql, span.Type);
-                Assert.Equal(dbType, span.Tags[Tags.DbType]);
-                Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
-                Assert.Contains(Tags.DbStatement, (IDictionary<string, string>)span.Tags);
             }
 
             telemetry.AssertIntegrationEnabled(IntegrationId.Sqlite);

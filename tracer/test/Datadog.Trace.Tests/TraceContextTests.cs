@@ -6,6 +6,9 @@
 // Modified by Splunk Inc.
 
 using System;
+using Datadog.Trace.Configuration;
+using Datadog.Trace.PlatformHelpers;
+using Datadog.Trace.TestHelpers;
 using Datadog.Trace.Util;
 using FluentAssertions;
 using Moq;
@@ -13,6 +16,8 @@ using Xunit;
 
 namespace Datadog.Trace.Tests
 {
+    [Collection(nameof(AzureAppServicesTestCollection))]
+    [AzureAppServicesRestorer]
     public class TraceContextTests
     {
         private readonly Mock<IDatadogTracer> _tracerMock = new Mock<IDatadogTracer>();
@@ -168,8 +173,10 @@ namespace Datadog.Trace.Tests
             spans.Value.Should().OnlyContain(s => s == rootSpan || s.GetMetric(Metrics.SamplingPriority) == null, "only the root span should have a priority");
         }
 
-        [Fact]
-        public void PartialFlushShouldPropagateSamplingPriority()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void PartialFlushShouldPropagateMetadata(bool inAASContext)
         {
             const int partialFlushThreshold = 2;
 
@@ -191,6 +198,16 @@ namespace Datadog.Trace.Tests
             tracer.Setup(t => t.Write(It.IsAny<ArraySegment<Span>>()))
                   .Callback<ArraySegment<Span>>(s => spans = s);
 
+            var vars = Environment.GetEnvironmentVariables();
+
+            if (inAASContext)
+            {
+                vars.Add(AzureAppServices.AzureAppServicesContextKey, "true");
+                vars.Add(AzureAppServices.ResourceGroupKey, "ThisIsAResourceGroup");
+                vars.Add(ConfigurationKeys.SignalFxAccessToken, "xxx");
+                AzureAppServices.Metadata = new AzureAppServices(vars);
+            }
+
             var traceContext = new TraceContext(tracer.Object);
             traceContext.SetSamplingPriority(SamplingPriorityValues.UserKeep);
 
@@ -210,6 +227,15 @@ namespace Datadog.Trace.Tests
             spans.Value.Should().NotBeNullOrEmpty("partial flush should have been triggered");
 
             spans.Value.Should().OnlyContain(s => (int)s.GetMetric(Metrics.SamplingPriority) == SamplingPriorityValues.UserKeep);
+
+            if (inAASContext)
+            {
+                spans.Value.Array[0].GetTag(Tags.AzureAppServicesResourceGroup).Should().NotBeNull();
+            }
+            else
+            {
+                spans.Value.Array[0].GetTag(Tags.AzureAppServicesResourceGroup).Should().BeNull();
+            }
         }
     }
 }

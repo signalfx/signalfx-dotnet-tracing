@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -47,7 +49,7 @@ public class ProbesTests : TestHelper
                            .Select(t => new object[] { t });
     }
 
-    [SkippableTheory]
+    [SkippableTheory(Skip = "Splunk: Not supported")]
     [Trait("Category", "EndToEnd")]
     [Trait("RunOnWindows", "True")]
     [InlineData(typeof(OverloadAndSimpleNameTest))]
@@ -95,7 +97,7 @@ public class ProbesTests : TestHelper
         }
     }
 
-    [SkippableFact]
+    [SkippableFact(Skip = "Splunk: Not supported")]
     [Trait("Category", "EndToEnd")]
     [Trait("RunOnWindows", "True")]
     public async Task LineProbeEmit100SnapshotsTest()
@@ -138,7 +140,7 @@ public class ProbesTests : TestHelper
         }
     }
 
-    [SkippableTheory]
+    [SkippableTheory(Skip = "Splunk: Not supported")]
     [Trait("Category", "EndToEnd")]
     [Trait("RunOnWindows", "True")]
     [MemberData(nameof(ProbeTests))]

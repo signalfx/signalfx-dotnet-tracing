@@ -73,12 +73,10 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
 
             foreach (var span in spans)
             {
-                Assert.Equal(expectedOperationName, span.Name);
+                var result = span.IsSqlClient();
+                Assert.True(result.Success, result.ToString());
+
                 Assert.Equal(expectedServiceName, span.Service);
-                Assert.Equal(SpanTypes.Sql, span.Type);
-                Assert.Equal(dbType, span.Tags[Tags.DbType]);
-                Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
-                Assert.Contains(Tags.DbStatement, (IDictionary<string, string>)span.Tags);
             }
 
             telemetry.AssertIntegrationEnabled(IntegrationId.SqlClient);

@@ -50,9 +50,10 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 foreach (var span in spans)
                 {
-                    Assert.Equal("couchbase.query", span.Name);
+                    var result = span.IsCouchbase();
+                    Assert.True(result.Success, result.ToString());
+
                     Assert.Equal("Samples.Couchbase3", span.Service);
-                    Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
                 }
 
                 var expected = new List<string>

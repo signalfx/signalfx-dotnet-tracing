@@ -341,6 +341,20 @@ namespace Datadog.Trace.Configuration
         public const string HttpClientErrorStatusCodes = "SIGNALFX_HTTP_CLIENT_ERROR_STATUSES";
 
         /// <summary>
+        /// Configuration key indicating the optional name of the custom header to take into account to report the ip address from.
+        /// If this variable is set all other IP related headers should be ignored
+        /// Default is value is null (do not override).
+        /// </summary>
+        /// <seealso cref="TracerSettings.IpHeader"/>
+        public const string IpHeader = "SIGNALFX_TRACE_CLIENT_IP_HEADER";
+
+        /// <summary>
+        /// Configuration key indicating if the header should not be collected. The default for SIGNALFX_TRACE_CLIENT_IP_HEADER_DISABLED is false.
+        /// </summary>
+        /// <seealso cref="TracerSettings.IpHeaderDisabled"/>
+        public const string IpHeaderDisabled = "SIGNALFX_TRACE_CLIENT_IP_HEADER_DISABLED";
+
+        /// <summary>
         /// Configuration key to enable or disable the creation of a span context on exiting a successful Kafka
         /// Consumer.Consume() call, and closing the scope on entering Consumer.Consume().
         /// Default value is <c>true</c> (enabled).
@@ -404,6 +418,27 @@ namespace Datadog.Trace.Configuration
         /// Default value is "" (disabled).
         /// </summary>
         public const string TraceMethods = "SIGNALFX_TRACE_METHODS";
+
+        /// <summary>
+        /// Configuration key for specifying a custom regex to obfuscate query strings.
+        /// Default value is in TracerSettings
+        /// </summary>
+        /// <seealso cref="TracerSettings.ObfuscationQueryStringRegex"/>
+        public const string ObfuscationQueryStringRegex = "SIGNALFX_TRACE_OBFUSCATION_QUERY_STRING_REGEXP";
+
+        /// <summary>
+        /// Configuration key for specifying a timeout in milliseconds to the execution of the query string obfuscation regex
+        /// Default value is 200ms
+        /// </summary>
+        /// <seealso cref="TracerSettings.ObfuscationQueryStringRegexTimeout"/>
+        public const string ObfuscationQueryStringRegexTimeout = "SIGNALFX_TRACE_OBFUSCATION_QUERY_STRING_REGEXP_TIMEOUT";
+
+        /// <summary>
+        /// Configuration key for enabling/disabling reporting query string
+        /// Default value is true
+        /// </summary>
+        /// <seealso cref="TracerSettings.QueryStringReportingEnabled"/>
+        public const string QueryStringReportingEnabled = "SIGNALFX_HTTP_SERVER_TAG_QUERY_STRING";
 
         /// <summary>
         /// String constants for CI Visibility configuration keys.

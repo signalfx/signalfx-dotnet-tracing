@@ -17,6 +17,12 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 ### Enhancements
 
+Adds support to include ASP.NET Core query string in the tag `http.url`. By default **enabled**. See configuration variables:
+
+- `SIGNALFX_HTTP_SERVER_TAG_QUERY_STRING` - Enable or disable query string inclusion.
+- `SIGNALFX_TRACE_OBFUSCATION_QUERY_STRING_REGEXP` - Query string obfuscation regex.
+- `SIGNALFX_TRACE_OBFUSCATION_QUERY_STRING_REGEXP_TIMEOUT` - Obfuscation regex runtime timeout.
+
 ## [Release 0.2.8](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.2.8)
 
 ### Bugfixes

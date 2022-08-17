@@ -9,7 +9,7 @@ public static class BuildVariables
     public static void AddDebuggerEnvironmentVariables(this Dictionary<string, string> envVars, AbsolutePath tracerHomeDirectory)
     {
         envVars.AddTracerEnvironmentVariables(tracerHomeDirectory);
-        envVars.Add("SINGNALFX_DEBUGGER_ENABLED", "1");
+        envVars.Add("SINGNALFX_INTERNAL_DEBUGGER_ENABLED", "1");
         envVars.Add("SINGNALFX_INTERNAL_DEBUGGER_INSTRUMENT_ALL", "1");
     }
 
@@ -40,8 +40,8 @@ public static class BuildVariables
 
         if (EnvironmentInfo.IsWin)
         {
-            envVars.Add("CORECLR_PROFILER_PATH_32", monitoringHomeDirectory / "win-x86" / "SignalFx.Tracing.ClrProfiler.Native.dll");
-            envVars.Add("CORECLR_PROFILER_PATH_64", monitoringHomeDirectory / "win-x64" / "SignalFx.Tracing.ClrProfiler.Native.dll");
+            envVars.Add("CORECLR_PROFILER_PATH_32", monitoringHomeDirectory / "Datadog.AutoInstrumentation.NativeLoader.x86.dll");
+            envVars.Add("CORECLR_PROFILER_PATH_64", monitoringHomeDirectory / "Datadog.AutoInstrumentation.NativeLoader.x64.dll");
         }
         else
         {

@@ -38,12 +38,12 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
 
                 foreach (var span in spans)
                 {
+                    // Assert Npgsql because the Dapper application uses Postgres for the actual client
+                    var result = span.IsNpgsql();
+                    Assert.True(result.Success, result.ToString());
+
                     Assert.Equal(expectedOperationName, span.Name);
                     Assert.Equal(expectedServiceName, span.Service);
-                    Assert.Equal(SpanTypes.Sql, span.Type);
-                    Assert.Equal(dbType, span.Tags?[Tags.DbType]);
-                    Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
-                    Assert.Contains(Tags.DbStatement, (IDictionary<string, string>)span.Tags);
                 }
             }
         }
@@ -65,12 +65,12 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
 
                 foreach (var span in spans)
                 {
+                    // Assert Npgsql because the Dapper application uses Postgres for the actual client
+                    var result = span.IsNpgsql();
+                    Assert.True(result.Success, result.ToString());
+
                     Assert.Equal(expectedOperationName, span.Name);
                     Assert.Equal(expectedServiceName, span.Service);
-                    Assert.Equal(SpanTypes.Sql, span.Type);
-                    Assert.Equal(dbType, span.Tags?[Tags.DbType]);
-                    Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
-                    Assert.Contains(Tags.DbStatement, (IDictionary<string, string>)span.Tags);
                 }
             }
         }

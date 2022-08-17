@@ -90,7 +90,7 @@ namespace Datadog.Trace.Debugger
         {
             if (!_settings.Enabled)
             {
-                Log.Information("Live Debugger is disabled. To enable it, please set SIGNALFX_DEBUGGER_ENABLED environment variable to 'true'.");
+                Log.Information("Live Debugger is disabled. To enable it, please set SIGNALFX_INTERNAL_DEBUGGER_ENABLED environment variable to 'true'.");
                 return;
             }
 

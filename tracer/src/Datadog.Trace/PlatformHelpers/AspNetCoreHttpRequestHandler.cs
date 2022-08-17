@@ -102,7 +102,9 @@ namespace Datadog.Trace.PlatformHelpers
         {
             string host = request.Host.Value;
             string httpMethod = request.Method?.ToUpperInvariant() ?? "UNKNOWN";
-            string url = request.GetUrl();
+            string url = request.GetUrl(tracer.TracerManager.QueryStringManager);
+            string userAgent = request.Headers[CommonHttpHeaderNames.UserAgent];
+
             resourceName ??= GetDefaultResourceName(request);
 
             SpanContext propagatedContext = ExtractPropagatedContext(request);
@@ -126,7 +128,7 @@ namespace Datadog.Trace.PlatformHelpers
 
             // TODO: investigate if can be simplified
             var remoteIp = httpContext?.Connection?.RemoteIpAddress?.ToString();
-            scope.Span.DecorateWebServerSpan(resourceName, httpMethod, host, url, tags, tagsFromHeaders, remoteIp);
+            scope.Span.DecorateWebServerSpan(resourceName, httpMethod, host, url, userAgent, tags, tagsFromHeaders, remoteIp);
 
             tags.SetAnalyticsSampleRate(_integrationId, tracer.Settings, enabledWithGlobalSetting: true);
             tracer.TracerManager.Telemetry.IntegrationGeneratedSpan(_integrationId);
