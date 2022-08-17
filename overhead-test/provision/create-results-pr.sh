@@ -48,15 +48,13 @@ git add ${RESULTS_TARGET_DIR}/index.txt
 git add ${RESULTS_TARGET_DIR}/${REV}/*
 echo "Committing changes..."
 git commit -S -am "[automated] $MSG"
-git show HEAD
-# TODO: uncomment when verified
-#echo "Pushing results to remote branch ${NEW_BRANCH}"
-#git push https://srv-gh-o11y-gdi-dotnet-test:"${GITHUB_TOKEN}"@github.com/signalfx/signalfx-dotnet-tracing.git ${NEW_BRANCH}
-#
-#echo "Running PR create command:"
-#gh pr create \
-#  --title "$MSG" \
-#  --body "$MSG" \
-#  --label automated \
-#  --base main \
-#  --head "$NEW_BRANCH"
+echo "Pushing results to remote branch ${NEW_BRANCH}"
+git push https://srv-gh-o11y-gdi-dotnet-test:"${GITHUB_TOKEN}"@github.com/signalfx/signalfx-dotnet-tracing.git ${NEW_BRANCH}
+
+echo "Running PR create command:"
+gh pr create \
+  --title "$MSG" \
+  --body "$MSG" \
+  --label automated \
+  --base main \
+  --head "$NEW_BRANCH"
