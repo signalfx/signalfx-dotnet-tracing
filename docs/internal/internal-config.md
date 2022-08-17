@@ -80,7 +80,7 @@ These settings should be never used by the users.
 | `SIGNALFX_DEBUGGER_UPLOAD_BATCH_SIZE` | Sets the maximum upload batch size. | `100`  |
 | `SIGNALFX_DEBUGGER_DIAGNOSTICS_INTERVAL` | Sets the interval (in seconds) between sending probe statuses. | `3600`  |
 | `SIGNALFX_DEBUGGER_UPLOAD_FLUSH_INTERVAL` | Sets the interval (in milliseconds) between flushing statuses. | `0`  |
-| `SIGNALFX_INTERNAL_DEBUGGER_ENABLED` | Enabling or disabling the Live Debugger | `false`  |
+| `SIGNALFX_INTERNAL_DEBUGGER_ENABLED` | Enables the Live Debugger | `false`  |
 | `SIGNALFX_INTERNAL_DEBUGGER_INSTRUMENT_ALL` | Determine whether to enter "instrument all" mode where the Debugger instrumentation is applied to every jit compiled method. Only useful for testing purposes. | `false` |
 
 ## Unpublished settings

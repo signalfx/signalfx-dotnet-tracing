@@ -165,9 +165,9 @@ This feature is ASP.NET Core only.
 
 | Setting | Description | Default |
 |-|-|-|
-| `SIGNALFX_TRACE_OBFUSCATION_QUERY_STRING_REGEXP` | Specifying a custom regex to obfuscate query strings. | (see default below)[^regex] |
-| `SIGNALFX_TRACE_OBFUSCATION_QUERY_STRING_REGEXP_TIMEOUT` | Specifying a timeout in milliseconds to the execution of the query string obfuscation regex. | `200` |
-| `SIGNALFX_HTTP_SERVER_TAG_QUERY_STRING` | Enabling / disabling reporting query string | `true` |
+| `SIGNALFX_TRACE_OBFUSCATION_QUERY_STRING_REGEXP` | Specifies a custom regex to obfuscate query strings. | (see default below)[^regex] |
+| `SIGNALFX_TRACE_OBFUSCATION_QUERY_STRING_REGEXP_TIMEOUT` | Specifies a timeout in milliseconds to the execution of the query string obfuscation regex. | `200` |
+| `SIGNALFX_HTTP_SERVER_TAG_QUERY_STRING` | Enables reporting query string | `true` |
 
 [^regex]: Query string obfuscation default regex:
 
