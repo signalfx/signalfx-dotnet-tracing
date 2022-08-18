@@ -17,7 +17,6 @@ namespace Datadog.Trace
         public const string Key = "Server-Timing";
 
         private const string ExposeHeadersHeaderName = "Access-Control-Expose-Headers";
-        private const string ServerTimingFormat = "traceparent;desc=\"{0}\"";
 
         /// <summary>
         /// Sets the Server-Timing (and Access-Control-Expose-Headers) headers.
@@ -37,7 +36,9 @@ namespace Datadog.Trace
 
         private static string ToHeaderValue(SpanContext context)
         {
-            return string.Format(ServerTimingFormat, W3CContextPropagator.GetFormattedTraceParent(context));
+            var samplingPriority = context.TraceContext?.SamplingPriority ?? context.SamplingPriority ?? SamplingPriorityValues.AutoKeep;
+            var sampled = samplingPriority > 0 ? "01" : "00";
+            return $"traceparent;desc=\"00-{context.TraceId}-{context.SpanId.ToString("x16")}-{sampled}\"";
         }
     }
 }
