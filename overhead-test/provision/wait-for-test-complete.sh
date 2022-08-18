@@ -8,7 +8,7 @@ source ${MYDIR}/env.sh
 echo "Waiting for tests to complete...zzz..."
 
 function poll_wait(){
-  sleep 30
+  sleep 180
 }
 
 while [ 1 == 1 ] ; do
