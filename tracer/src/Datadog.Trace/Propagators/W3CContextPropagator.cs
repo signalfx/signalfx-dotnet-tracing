@@ -7,7 +7,6 @@
 
 #nullable enable
 
-using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Datadog.Trace.Propagators

@@ -1,6 +1,5 @@
 // Modified by Splunk Inc.
 
-using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.Headers;
 using Datadog.Trace.TestHelpers;
