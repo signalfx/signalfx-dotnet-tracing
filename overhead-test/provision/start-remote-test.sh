@@ -11,4 +11,4 @@ ssh -f -o "LogLevel=ERROR" \
     -o "UserKnownHostsFile=/dev/null"\
     -i ~/.orca/id_rsa \
     splunk@${TESTBOX_HOST} \
-    'screen -dm bash -c "./run-tests.sh 3; bash"'
+    'screen -dm bash -c "./run-tests.sh 10; bash"'
