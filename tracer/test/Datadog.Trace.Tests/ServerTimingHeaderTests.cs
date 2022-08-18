@@ -17,7 +17,7 @@ namespace Datadog.Trace.Tests
         internal void SetHeaders_InjectsTheHeadersCorrectly(IHeadersCollection headers)
         {
             var traceId = TraceId.CreateRandom();
-            var spanContext = new SpanContext(traceId, 123, SamplingPriority.UserKeep);
+            var spanContext = new SpanContext(traceId, 123, SamplingPriority.AutoKeep);
 
             ServerTimingHeader.SetHeaders(spanContext, headers, (h, name, value) => h.Add(name, value));
 
@@ -36,7 +36,7 @@ namespace Datadog.Trace.Tests
         [InlineData(SamplingPriority.UserKeep, false, "01")]
         [InlineData(null, true, "01")]
         [InlineData(SamplingPriority.UserReject, true, "00")]
-        [InlineData(SamplingPriority.UserKeep, true, "01")]
+        [InlineData(SamplingPriority.AutoKeep, true, "01")]
         internal void HandleContextCorrectly(SamplingPriority? samplingPriority, bool useTraceContext, string expectedSampled)
         {
             var traceId = TraceId.CreateRandom();
