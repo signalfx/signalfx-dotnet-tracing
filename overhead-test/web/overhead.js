@@ -1,9 +1,9 @@
 
 const MARKETING_NAMES = {
     'none': 'Not instrumented',
-    'signalfx-dotnet': 'SignalFx Dotnet agent',
-    'signalfx-dotnet-with-profiling-10s': 'SignalFx Dotnet agent with AlwaysOn Profiling',
-    'signalfx-dotnet-with-profiling-1s': 'SignalFx Dotnet agent with AlwaysOn Profiling - high frequency sampling'
+    'signalfx-dotnet': 'SignalFx Instrumentation for .NET',
+    'signalfx-dotnet-with-profiling-10s': 'SignalFx Instrumentation for .NET with AlwaysOn Profiling',
+    'signalfx-dotnet-with-profiling-1s': 'SignalFx Instrumentation for .NET with AlwaysOn Profiling - high frequency sampling'
 }
 
 async function startOverhead() {
