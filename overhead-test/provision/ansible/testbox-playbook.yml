@@ -33,7 +33,7 @@
     - name: copy deb package into context directory
       ansible.posix.synchronize:
         src: ../../../package.deb
-        dest: /home/splunk/docker-build-context/package.deb
+        dest: /home/splunk/docker-build-context/
     - name: copy run-tests script
       ansible.builtin.template:
         src: run-tests.sh.jinja
