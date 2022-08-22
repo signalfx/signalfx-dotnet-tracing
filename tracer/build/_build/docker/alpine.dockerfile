@@ -22,8 +22,9 @@ RUN apk update \
         xz-dev \
         gdb \
         musl-dbg \
+    && gem install --version 1.6.0 --user-install git \
     && gem install --version 2.7.6 dotenv \
-    && gem install --version 1.14.1 --no-document fpm
+    && gem install --version 1.14.1 --minimal-deps --no-document fpm
 
 ENV IsAlpine=true
 
@@ -42,7 +43,7 @@ FROM base as tester
 
 # Install .NET Core runtimes using install script
 RUN curl -sSL https://dot.net/v1/dotnet-install.sh --output dotnet-install.sh \
-    && echo "4147ff176c9fbbc22452244c5f8da66cd8b5028decdeda36c54eae95d49e3b34  dotnet-install.sh" | sha256sum -c \
+    && echo "18450c72b35727b13b9b8a4191c2c95d7fbd3f4a0091ab71edcfb16eb57e5494  dotnet-install.sh" | sha256sum -c \
     && chmod +x ./dotnet-install.sh \
     && ./dotnet-install.sh --runtime aspnetcore --version 2.1.30 --install-dir /usr/share/dotnet --no-path \
     && ./dotnet-install.sh --runtime aspnetcore --version 3.0.3 --install-dir /usr/share/dotnet --no-path \
