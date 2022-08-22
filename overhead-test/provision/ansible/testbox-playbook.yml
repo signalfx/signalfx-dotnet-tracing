@@ -30,6 +30,10 @@
       ansible.posix.synchronize:
         src: ../../src
         dest: /home/splunk/
+    - name: copy deb package into context directory
+      ansible.posix.synchronize:
+        src: ../../../package.deb
+        dest: /home/splunk/docker-build-context/package.deb
     - name: copy run-tests script
       ansible.builtin.template:
         src: run-tests.sh.jinja
@@ -42,7 +46,7 @@
         cmd: docker build -f /home/splunk/src/Docker/eshop-app.dockerfile -t eshop-app-dc --target baseline-app .
     - name: build instrumented-app docker image
       ansible.builtin.command:
-        cmd: docker build -f /home/splunk/src/Docker/eshop-app.dockerfile -t eshop-app-instrumented-dc --target instrumented-app .
+        cmd: docker build -f /home/splunk/src/Docker/eshop-app.dockerfile -t eshop-app-instrumented-dc --target instrumented-app /home/splunk/docker-build-context
     - name: build test project
       ansible.builtin.command:
         cmd: dotnet build --configuration Release --output /home/splunk/bin /home/splunk/src/SignalFx.OverheadTest.csproj
