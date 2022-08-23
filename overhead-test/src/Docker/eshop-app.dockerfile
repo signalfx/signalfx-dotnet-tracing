@@ -38,16 +38,8 @@ FROM baseline-app as instrumented-app
 RUN mkdir -p /var/log/signalfx
 RUN mkdir -p /opt/signalfx
 
-RUN apt-get update \
-    && apt-get -y upgrade \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y --fix-missing \
-    curl
-
-# TODO Splunk: update with release
-ARG TRACER_VERSION=0.2.8
-
-RUN curl -LO https://github.com/signalfx/signalfx-dotnet-tracing/releases/download/v${TRACER_VERSION}/signalfx-dotnet-tracing_${TRACER_VERSION}_amd64.deb
-RUN dpkg -i ./signalfx-dotnet-tracing_${TRACER_VERSION}_amd64.deb
+COPY package.deb ./
+RUN dpkg -i package.deb
 
 ENV CORECLR_ENABLE_PROFILING=1
 ENV CORECLR_PROFILER={B4C89B0F-9908-4F73-9F59-0D77C5A06874}

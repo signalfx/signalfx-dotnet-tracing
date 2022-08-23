@@ -3,7 +3,7 @@
 # Creates a PR into main branch from the results
 
 MYDIR=$(dirname $0)
-RESULTS=${MYDIR}/../web/results
+RESULTS=${MYDIR}/../web/new-results
 REV=$(ls "${RESULTS}")
 NEW_BRANCH="results_${REV}"
 
@@ -42,7 +42,7 @@ mkdir -p $RESULTS_TARGET_DIR
 rsync -avv --progress "${RESULTS}/${REV}" github-clone/${RESULTS_TARGET_DIR}
 cd github-clone
 echo "Results list: " && ls -l ${RESULTS_TARGET_DIR}
-ls -1 ${RESULTS_TARGET_DIR} | grep -v README | grep -v index.txt > ${RESULTS_TARGET_DIR}/index.txt
+ls -1 ${RESULTS_TARGET_DIR} | grep -v index.txt > ${RESULTS_TARGET_DIR}/index.txt
 echo "Adding new files to changelist"
 git add ${RESULTS_TARGET_DIR}/index.txt
 git add ${RESULTS_TARGET_DIR}/${REV}/*

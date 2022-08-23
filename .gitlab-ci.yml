@@ -120,8 +120,7 @@ checksums-sign:
 
 run-overhead-test:
   stage: run-overhead-test
-  # can start independently of other jobs
-  needs: []
+  needs: ["sign-deb"]
   rules:
     # run when version tag encountered
     - if: '$CI_COMMIT_TAG =~ /^v.*/'
@@ -166,6 +165,8 @@ run-overhead-test:
     - echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
     - apt update
     - apt install -y gh
+    # rename deb package
+    - cp -vfp $(ls signed/*.deb) package.deb
   script:
     - orca --cloud aws show deployments
     # provisioning will not work if deployments already exist, so we purge here first.
