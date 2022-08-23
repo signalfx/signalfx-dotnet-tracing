@@ -15,7 +15,7 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 ### Bugfixes
 
-- Fix sampled value in ServerTiming header
+- Fix sampled value in `ServerTiming header
 
 ### Enhancements
 
