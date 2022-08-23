@@ -6,7 +6,7 @@ source ${MYDIR}/env.sh
 TS=$(ssh -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null" -o "LogLevel=ERROR" -i ~/.orca/id_rsa splunk@${TESTBOX_HOST} "date -r bin/results/ '+%Y%m%d_%H%M%S'")
 echo Timestamp dir will be ${TS}
 
-RESULTS=${MYDIR}/../web/results/${TS}
+RESULTS=${MYDIR}/../web/new-results/${TS}
 mkdir -p $RESULTS
 
 # fetch only csv results and json config
