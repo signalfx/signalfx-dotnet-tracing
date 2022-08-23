@@ -16,7 +16,7 @@ internal class TestConfig
                 AgentConfig.Profiled,
                 AgentConfig.ProfiledHighFrequency
             },
-            8500,
+            1000,
             30,
             900);
     }
