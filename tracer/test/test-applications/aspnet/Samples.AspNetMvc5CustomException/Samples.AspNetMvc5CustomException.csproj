@@ -101,11 +101,11 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\ConventionsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Data\CustomNotFoundException.cs" />
+    <Compile Include="Data\CustomHttpCodeException.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Handlers\CustomNotFoundExceptionMessageHandler.cs" />
+    <Compile Include="Handlers\CustomHttpCodeExceptionMessageHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
