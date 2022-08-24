@@ -15,6 +15,8 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 ### Bugfixes
 
+- Fix sampled value in `ServerTiming header
+
 ### Enhancements
 
 Adds support to include ASP.NET Core query string in the tag `http.url`. By default **enabled**. See configuration variables:

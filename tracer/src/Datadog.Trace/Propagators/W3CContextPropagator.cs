@@ -19,12 +19,6 @@ namespace Datadog.Trace.Propagators
         /// </summary>
         public const string TraceParent = "traceparent";
 
-        public static string GetFormattedTraceParent(SpanContext context)
-        {
-            var sampled = context.SamplingPriority > 0 ? "01" : "00";
-            return string.Format($"00-{{0}}-{{1}}-{sampled}", context.TraceId.ToString(), context.SpanId.ToString("x16"));
-        }
-
         public void Inject<TCarrier, TCarrierSetter>(SpanContext context, TCarrier carrier, TCarrierSetter carrierSetter)
             where TCarrierSetter : struct, ICarrierSetter<TCarrier>
         {
