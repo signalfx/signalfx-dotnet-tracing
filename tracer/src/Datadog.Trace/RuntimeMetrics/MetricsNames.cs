@@ -3,28 +3,19 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 namespace Datadog.Trace.RuntimeMetrics
 {
     internal static class MetricsNames
     {
-        public const string ExceptionsCount = "runtime.dotnet.exceptions.count";
-
-        public const string Gen0CollectionsCount = "runtime.dotnet.gc.count.gen0";
-        public const string Gen1CollectionsCount = "runtime.dotnet.gc.count.gen1";
-        public const string Gen2CollectionsCount = "runtime.dotnet.gc.count.gen2";
-
-        public const string GcPauseTime = "runtime.dotnet.gc.pause_time";
-        public const string GcMemoryLoad = "runtime.dotnet.gc.memory_load";
-
-        public const string Gen0HeapSize = "runtime.dotnet.gc.size.gen0";
-        public const string Gen1HeapSize = "runtime.dotnet.gc.size.gen1";
-        public const string Gen2HeapSize = "runtime.dotnet.gc.size.gen2";
-        public const string LohSize = "runtime.dotnet.gc.size.loh";
+        private const string MetricPrefix = "process.runtime.dotnet.";
+        public const string ExceptionsCount = $"{MetricPrefix}exceptions.count";
 
         public const string ContentionTime = "runtime.dotnet.threads.contention_time";
-        public const string ContentionCount = "runtime.dotnet.threads.contention_count";
+        public const string ContentionCount = $"{MetricPrefix}monitor.lock_contention.count";
 
-        public const string ThreadPoolWorkersCount = "runtime.dotnet.threads.workers_count";
+        public const string ThreadPoolWorkersCount = $"{MetricPrefix}thread_pool.threads.count";
 
         public const string ThreadsCount = "runtime.dotnet.threads.count";
 
@@ -42,5 +33,13 @@ namespace Datadog.Trace.RuntimeMetrics
         public const string AspNetCoreCurrentConnections = "runtime.dotnet.aspnetcore.connections.current";
         public const string AspNetCoreConnectionQueueLength = "runtime.dotnet.aspnetcore.connections.queue_length";
         public const string AspNetCoreTotalConnections = "runtime.dotnet.aspnetcore.connections.total";
+
+        internal static class Gc
+        {
+            public const string CollectionsCount = $"{MetricPrefix}gc.collections.count";
+            public const string HeapSize = $"{MetricPrefix}gc.heap.size";
+            public const string AllocatedBytes = $"{MetricPrefix}gc.allocations.size";
+            public const string HeapCommittedMemory = $"{MetricPrefix}gc.committed_memory.size";
+        }
     }
 }

@@ -3,11 +3,14 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #if NETCOREAPP
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Tracing;
+using System.Reflection;
 using System.Threading;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Vendors.StatsdClient;
@@ -19,33 +22,25 @@ namespace Datadog.Trace.RuntimeMetrics
         private const string RuntimeEventSourceName = "Microsoft-Windows-DotNETRuntime";
         private const string AspNetCoreHostingEventSourceName = "Microsoft.AspNetCore.Hosting";
         private const string AspNetCoreKestrelEventSourceName = "Microsoft-AspNetCore-Server-Kestrel";
-        private const string GcHeapStatsMetrics = $"{MetricsNames.Gen0HeapSize}, {MetricsNames.Gen1HeapSize}, {MetricsNames.Gen2HeapSize}, {MetricsNames.LohSize}";
-        private const string GcGlobalHeapMetrics = $"{MetricsNames.GcMemoryLoad}, runtime.dotnet.gc.count.gen#";
         private const string ThreadStatsMetrics = $"{MetricsNames.ContentionTime}, {MetricsNames.ContentionCount}, {MetricsNames.ThreadPoolWorkersCount}";
 
-        private const int EventGcSuspendBegin = 9;
-        private const int EventGcRestartEnd = 3;
-        private const int EventGcHeapStats = 4;
         private const int EventContentionStop = 91;
-        private const int EventGcGlobalHeapHistory = 205;
+
+        private const int EventGcHeapStats = 4;
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<RuntimeEventListener>();
 
-        private static readonly string[] GcCountMetricNames = { MetricsNames.Gen0CollectionsCount, MetricsNames.Gen1CollectionsCount, MetricsNames.Gen2CollectionsCount };
-        private static readonly string[] CompactingGcTags = { "compacting_gc:true" };
-        private static readonly string[] NotCompactingGcTags = { "compacting_gc:false" };
-
         private static readonly IReadOnlyDictionary<string, string> MetricsMapping;
 
-        private readonly IDogStatsd _statsd;
-
+#if NET6_0_OR_GREATER
+        private static readonly Func<int, ulong> GetGenerationSize;
+#endif
+        private static bool _isGcInfoAvailable;
         private readonly Timing _contentionTime = new Timing();
 
         private readonly string _delayInSeconds;
 
-        private long _contentionCount;
-
-        private DateTime? _gcStart;
+        private readonly IDogStatsd _statsd;
 
         static RuntimeEventListener()
         {
@@ -59,6 +54,15 @@ namespace Datadog.Trace.RuntimeMetrics
                 ["connection-queue-length"] = MetricsNames.AspNetCoreConnectionQueueLength,
                 ["total-connections"] = MetricsNames.AspNetCoreTotalConnections
             };
+
+            // source originated from: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/blob/main/src/OpenTelemetry.Instrumentation.Runtime/RuntimeMetrics.cs
+#if NET6_0_OR_GREATER
+            var mi = typeof(GC).GetMethod("GetGenerationSize", BindingFlags.NonPublic | BindingFlags.Static);
+            if (mi != null)
+            {
+                GetGenerationSize = mi.CreateDelegate<Func<int, ulong>>();
+            }
+#endif
         }
 
         public RuntimeEventListener(IDogStatsd statsd, TimeSpan delay)
@@ -69,14 +73,54 @@ namespace Datadog.Trace.RuntimeMetrics
             EventSourceCreated += (_, e) => EnableEventSource(e.EventSource);
         }
 
+        private static bool IsGcInfoAvailable
+        {
+            get
+            {
+                if (_isGcInfoAvailable)
+                {
+                    return true;
+                }
+
+                if (GC.CollectionCount(0) > 0)
+                {
+                    _isGcInfoAvailable = true;
+                }
+
+                return _isGcInfoAvailable;
+            }
+        }
+
         public void Refresh()
         {
             // Can't use a Timing because Dogstatsd doesn't support local aggregation
             // It means that the aggregations in the UI would be wrong
             _statsd.Gauge(MetricsNames.ContentionTime, _contentionTime.Clear());
-            _statsd.Counter(MetricsNames.ContentionCount, Interlocked.Exchange(ref _contentionCount, 0));
+            _statsd.Counter(MetricsNames.ContentionCount, Monitor.LockContentionCount);
 
+            // TODO splunk: opentelemetry-dotnet-contrib plans to change to ObservableUpDownCounter, will need to be adjusted
             _statsd.Gauge(MetricsNames.ThreadPoolWorkersCount, ThreadPool.ThreadCount);
+
+            GcMetrics.PushCollectionCounts(_statsd);
+
+#if NET6_0_OR_GREATER
+            // source originated from: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/blob/main/src/OpenTelemetry.Instrumentation.Runtime/RuntimeMetrics.cs
+            var generationInfo = GC.GetGCMemoryInfo().GenerationInfo;
+            var maxSupportedLength = Math.Min(generationInfo.Length, GcMetrics.GenNames.Count);
+            for (var i = 0; i < maxSupportedLength; i++)
+            {
+                // TODO splunk: opentelemetry-dotnet-contrib plans to change to ObservableUpDownCounter, will need to be adjusted
+                _statsd.Gauge(MetricsNames.Gc.HeapSize, GetGenerationSize(i), tags: new[] { GcMetrics.GenerationTag(i) });
+            }
+
+            if (IsGcInfoAvailable)
+            {
+                // TODO splunk: opentelemetry-dotnet-contrib plans to change to ObservableUpDownCounter, will need to be adjusted
+                _statsd.Gauge(MetricsNames.Gc.HeapCommittedMemory, GC.GetGCMemoryInfo().TotalCommittedBytes);
+            }
+#endif
+
+            _statsd.Counter(MetricsNames.Gc.AllocatedBytes, GC.GetTotalAllocatedBytes());
 
             Log.Debug("Sent the following metrics: {metrics}", ThreadStatsMetrics);
         }
@@ -94,61 +138,41 @@ namespace Datadog.Trace.RuntimeMetrics
 
             try
             {
-                if (eventData.EventName == "EventCounters")
-                {
-                    ExtractCounters(eventData.Payload);
-                }
-                else if (eventData.EventId == EventGcSuspendBegin)
-                {
-                    _gcStart = eventData.TimeStamp;
-                }
-                else if (eventData.EventId == EventGcRestartEnd)
-                {
-                    var start = _gcStart;
-
-                    if (start != null)
-                    {
-                        _statsd.Timer(MetricsNames.GcPauseTime, (eventData.TimeStamp - start.Value).TotalMilliseconds);
-                        Log.Debug("Sent the following metrics: {metrics}", MetricsNames.GcPauseTime);
-                    }
-                }
-                else
-                {
-                    if (eventData.EventId == EventGcHeapStats)
-                    {
-                        var stats = HeapStats.FromPayload(eventData.Payload);
-
-                        _statsd.Gauge(MetricsNames.Gen0HeapSize, stats.Gen0Size);
-                        _statsd.Gauge(MetricsNames.Gen1HeapSize, stats.Gen1Size);
-                        _statsd.Gauge(MetricsNames.Gen2HeapSize, stats.Gen2Size);
-                        _statsd.Gauge(MetricsNames.LohSize, stats.LohSize);
-
-                        Log.Debug("Sent the following metrics: {metrics}", GcHeapStatsMetrics);
-                    }
-                    else if (eventData.EventId == EventContentionStop)
-                    {
-                        var durationInNanoseconds = (double)eventData.Payload[2];
-
-                        _contentionTime.Time(durationInNanoseconds / 1_000_000);
-                        Interlocked.Increment(ref _contentionCount);
-                    }
-                    else if (eventData.EventId == EventGcGlobalHeapHistory)
-                    {
-                        var heapHistory = HeapHistory.FromPayload(eventData.Payload);
-
-                        if (heapHistory.MemoryLoad != null)
-                        {
-                            _statsd.Gauge(MetricsNames.GcMemoryLoad, heapHistory.MemoryLoad.Value);
-                        }
-
-                        _statsd.Increment(GcCountMetricNames[heapHistory.Generation], 1, tags: heapHistory.Compacting ? CompactingGcTags : NotCompactingGcTags);
-                        Log.Debug("Sent the following metrics: {metrics}", GcGlobalHeapMetrics);
-                    }
-                }
+                HandleEvent(eventData);
             }
             catch (Exception ex)
             {
                 Log.Warning<int, string>(ex, "Error while processing event {EventId} {EventName}", eventData.EventId, eventData.EventName);
+            }
+        }
+
+        private void HandleEvent(EventWrittenEventArgs eventData)
+        {
+#if !NET6_0_OR_GREATER
+            if (eventData.EventId == EventGcHeapStats)
+            {
+                var stats = HeapStats.FromPayload(eventData.Payload);
+
+                // TODO splunk: opentelemetry-dotnet-contrib plans to change to ObservableUpDownCounter, will need to be adjusted
+                _statsd.Gauge(MetricsNames.Gc.HeapSize, stats.Gen0Size, tags: new[] { GcMetrics.GenerationTag(0) });
+                _statsd.Gauge(MetricsNames.Gc.HeapSize, stats.Gen1Size, tags: new[] { GcMetrics.GenerationTag(1) });
+                _statsd.Gauge(MetricsNames.Gc.HeapSize, stats.Gen2Size, tags: new[] { GcMetrics.GenerationTag(2) });
+                _statsd.Gauge(MetricsNames.Gc.HeapSize, stats.LohSize, tags: new[] { GcMetrics.GenerationTag(3) });
+            }
+#endif
+
+            if (eventData.EventName == "EventCounters")
+            {
+                ExtractCounters(eventData.Payload);
+            }
+            else
+            {
+                if (eventData.EventId == EventContentionStop)
+                {
+                    var durationInNanoseconds = (double)eventData.Payload[2];
+
+                    _contentionTime.Time(durationInNanoseconds / 1_000_000);
+                }
             }
         }
 

@@ -76,7 +76,7 @@ namespace Datadog.Trace.Vendors.StatsdClient
         /// <param name="value">A given delta.</param>
         /// <param name="sampleRate">Percentage of metric to be sent.</param>
         /// <param name="tags">Array of tags to be added to the data.</param>
-        public void Counter(string statName, double value, double sampleRate = 1.0, string[] tags = null)
+        public void Counter(string statName, long value, double sampleRate = 1.0, string[] tags = null)
         {
             _metricsSender?.SendMetric(MetricType.Count, statName, value, sampleRate, tags);
         }

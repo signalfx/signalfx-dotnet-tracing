@@ -33,7 +33,7 @@ namespace Datadog.Trace.RuntimeMetrics
             _counter?.Dispose();
         }
 
-        public double? GetValue(string instanceName)
+        public long? GetValue(string instanceName)
         {
             var counter = _counter;
 

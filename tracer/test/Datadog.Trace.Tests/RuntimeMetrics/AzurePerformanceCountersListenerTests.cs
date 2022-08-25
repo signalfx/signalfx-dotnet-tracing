@@ -33,25 +33,15 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
 
             listener.Refresh();
 
-            statsd.Verify(s => s.Gauge(MetricsNames.Gen0HeapSize, expectedGen0HeapSize, 1, null), Times.Once);
-            statsd.Verify(s => s.Gauge(MetricsNames.Gen1HeapSize, expectedGen1HeapSize, 1, null), Times.Once);
-            statsd.Verify(s => s.Gauge(MetricsNames.Gen2HeapSize, expectedGen2HeapSize, 1, null), Times.Once);
-            statsd.Verify(s => s.Gauge(MetricsNames.LohSize, expectedLohHeapSize, 1, null), Times.Once);
+            statsd.Verify(s => s.Gauge(MetricsNames.Gc.HeapSize, expectedGen0HeapSize, 1, new[] { "generation:gen0" }), Times.Once);
+            statsd.Verify(s => s.Gauge(MetricsNames.Gc.HeapSize, expectedGen1HeapSize, 1, new[] { "generation:gen1" }), Times.Once);
+            statsd.Verify(s => s.Gauge(MetricsNames.Gc.HeapSize, expectedGen2HeapSize, 1, new[] { "generation:gen2" }), Times.Once);
+            statsd.Verify(s => s.Gauge(MetricsNames.Gc.HeapSize, expectedLohHeapSize, 1, new[] { "generation:loh" }), Times.Once);
 
-            statsd.VerifyNoOtherCalls();
-            statsd.Invocations.Clear();
-
-            listener.Refresh();
-
-            statsd.Verify(s => s.Gauge(MetricsNames.Gen0HeapSize, expectedGen0HeapSize, 1, null), Times.Once);
-            statsd.Verify(s => s.Gauge(MetricsNames.Gen1HeapSize, expectedGen1HeapSize, 1, null), Times.Once);
-            statsd.Verify(s => s.Gauge(MetricsNames.Gen2HeapSize, expectedGen2HeapSize, 1, null), Times.Once);
-            statsd.Verify(s => s.Gauge(MetricsNames.LohSize, expectedLohHeapSize, 1, null), Times.Once);
-
-            // Those metrics aren't pushed the first time (differential count)
-            statsd.Verify(s => s.Increment(MetricsNames.Gen0CollectionsCount, It.IsAny<int>(), 1, null), Times.Once);
-            statsd.Verify(s => s.Increment(MetricsNames.Gen1CollectionsCount, It.IsAny<int>(), 1, null), Times.Once);
-            statsd.Verify(s => s.Increment(MetricsNames.Gen2CollectionsCount, It.IsAny<int>(), 1, null), Times.Once);
+            // note: collections count no longer extracted from counters
+            statsd.Verify(s => s.Counter(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), 1, new[] { "generation:gen0" }), Times.Once);
+            statsd.Verify(s => s.Counter(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), 1, new[] { "generation:gen1" }), Times.Once);
+            statsd.Verify(s => s.Counter(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), 1, new[] { "generation:gen2" }), Times.Once);
 
             statsd.VerifyNoOtherCalls();
         }

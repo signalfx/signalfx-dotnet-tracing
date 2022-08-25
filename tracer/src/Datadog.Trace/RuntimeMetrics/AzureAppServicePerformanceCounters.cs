@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #if NETFRAMEWORK
 
 using System;
@@ -16,14 +18,10 @@ namespace Datadog.Trace.RuntimeMetrics
     internal class AzureAppServicePerformanceCounters : IRuntimeMetricsListener
     {
         internal const string EnvironmentVariableName = "WEBSITE_COUNTERS_CLR";
-        private const string GarbageCollectionMetrics = $"{MetricsNames.Gen0HeapSize}, {MetricsNames.Gen1HeapSize}, {MetricsNames.Gen2HeapSize}, {MetricsNames.LohSize}, {MetricsNames.Gen0CollectionsCount}, {MetricsNames.Gen1CollectionsCount}, {MetricsNames.Gen2CollectionsCount}";
+        private const string GarbageCollectionMetrics = $"{MetricsNames.Gc.HeapSize}, {MetricsNames.Gc.CollectionsCount}";
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<AzureAppServicePerformanceCounters>();
         private readonly IDogStatsd _statsd;
-
-        private int? _previousGen0Count;
-        private int? _previousGen1Count;
-        private int? _previousGen2Count;
 
         public AzureAppServicePerformanceCounters(IDogStatsd statsd)
         {
@@ -39,33 +37,12 @@ namespace Datadog.Trace.RuntimeMetrics
             var rawValue = EnvironmentHelpers.GetEnvironmentVariable(EnvironmentVariableName);
             var value = JsonConvert.DeserializeObject<PerformanceCountersValue>(rawValue);
 
-            _statsd.Gauge(MetricsNames.Gen0HeapSize, value.Gen0Size);
-            _statsd.Gauge(MetricsNames.Gen1HeapSize, value.Gen1Size);
-            _statsd.Gauge(MetricsNames.Gen2HeapSize, value.Gen2Size);
-            _statsd.Gauge(MetricsNames.LohSize, value.LohSize);
+            _statsd.Gauge(MetricsNames.Gc.HeapSize, value.Gen0Size, tags: new[] { GcMetrics.GenerationTag(0) });
+            _statsd.Gauge(MetricsNames.Gc.HeapSize, value.Gen1Size, tags: new[] { GcMetrics.GenerationTag(1) });
+            _statsd.Gauge(MetricsNames.Gc.HeapSize, value.Gen2Size, tags: new[] { GcMetrics.GenerationTag(2) });
+            _statsd.Gauge(MetricsNames.Gc.HeapSize, value.LohSize, tags: new[] { GcMetrics.GenerationTag(3) });
 
-            var gen0 = GC.CollectionCount(0);
-            var gen1 = GC.CollectionCount(1);
-            var gen2 = GC.CollectionCount(2);
-
-            if (_previousGen0Count != null)
-            {
-                _statsd.Increment(MetricsNames.Gen0CollectionsCount, gen0 - _previousGen0Count.Value);
-            }
-
-            if (_previousGen1Count != null)
-            {
-                _statsd.Increment(MetricsNames.Gen1CollectionsCount, gen1 - _previousGen1Count.Value);
-            }
-
-            if (_previousGen2Count != null)
-            {
-                _statsd.Increment(MetricsNames.Gen2CollectionsCount, gen2 - _previousGen2Count.Value);
-            }
-
-            _previousGen0Count = gen0;
-            _previousGen1Count = gen1;
-            _previousGen2Count = gen2;
+            GcMetrics.PushCollectionCounts(_statsd);
 
             Log.Debug("Sent the following metrics: {metrics}", GarbageCollectionMetrics);
         }
