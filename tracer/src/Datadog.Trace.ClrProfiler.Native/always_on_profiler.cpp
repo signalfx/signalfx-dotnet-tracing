@@ -628,13 +628,17 @@ void ThreadSampler::AllocationTick(ULONG dataLen, LPCBYTE data)
 {
     // FIXME find a symbolic way into this rather than byte offsets
     uint64_t allocatedSize = *((uint64_t*) &(data[dataLen - 8]));
+#ifdef _WIN32
     printf("Allocation: %i %ws\n", (int) allocatedSize, (wchar_t*) &data[26]);
+#else
+    printf("Allocation: %i\n", (int) allocatedSize);
+#endif
 }
 
 void ThreadSampler::StartAllocationSampling(ICorProfilerInfo12* info12)
 {
     EVENTPIPE_SESSION session;
-    COR_PRF_EVENTPIPE_PROVIDER_CONFIG sessionConfig[] = {{L"Microsoft-Windows-DotNETRuntime",
+    COR_PRF_EVENTPIPE_PROVIDER_CONFIG sessionConfig[] = {{WStr("Microsoft-Windows-DotNETRuntime"),
                                                           0x1, // CLR_GC_KEYWORD
                                                           // documentation says AllocationTick is at info but it lies
                                                           COR_PRF_EVENTPIPE_VERBOSE, nullptr}};
