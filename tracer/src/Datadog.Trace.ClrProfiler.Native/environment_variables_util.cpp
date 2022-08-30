@@ -68,4 +68,9 @@ bool IsThreadSamplingEnabled()
     CheckIfTrue(shared::GetEnvironmentValue(environment::thread_sampling_enabled));
 }
 
+bool IsAllocationSamplingEnabled()
+{
+    CheckIfTrue(shared::GetEnvironmentValue(environment::allocation_sampling_enabled));
+}
+
 } // namespace trace

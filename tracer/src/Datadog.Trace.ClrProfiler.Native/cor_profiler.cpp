@@ -266,6 +266,27 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
             Logger::Error("Could not enable thread sampling: CLR version not supported");
         }
     }
+    if (IsAllocationSamplingEnabled())
+    {
+        ICorProfilerInfo12 * info12 = nullptr;
+        HRESULT hr = info_->QueryInterface(__uuidof(ICorProfilerInfo12), (void**) &info12);
+        if (!FAILED(hr) && info12 != nullptr)
+        {
+            if (this->threadSampler == nullptr)
+            {
+                // FIXME may want to combine precheck logic to ensure only one allocation site
+                this->threadSampler = new always_on_profiler::ThreadSampler();
+            }
+            this->threadSampler->StartAllocationSampling(info12);
+        }
+        else
+        {
+            Logger::Error("Could not enable allocation sampling: CLR version not supported");
+        }
+
+
+    }
+
 
     // we're in!
     Logger::Info("Profiler filepath: ", currentModuleFileName);
@@ -3316,5 +3337,18 @@ HRESULT STDMETHODCALLTYPE CorProfiler::ThreadNameChanged(ThreadID threadId, ULON
     }
     return S_OK;
 }
+
+HRESULT STDMETHODCALLTYPE CorProfiler::EventPipeEventDelivered(EVENTPIPE_PROVIDER provider, DWORD eventId, DWORD eventVersion,
+                                                  ULONG cbMetadataBlob, LPCBYTE metadataBlob, ULONG cbEventData,
+                                                  LPCBYTE eventData, LPCGUID pActivityId, LPCGUID pRelatedActivityId,
+                                                  ThreadID eventThread, ULONG numStackFrames, UINT_PTR stackFrames[])
+{
+    if (threadSampler != nullptr && eventId == 10 && eventVersion == 4) 
+    {
+        threadSampler->AllocationTick(cbEventData, eventData);
+    }
+    return S_OK;
+}
+
 
 } // namespace trace

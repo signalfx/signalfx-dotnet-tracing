@@ -624,6 +624,27 @@ void ThreadSampler::StartSampling(ICorProfilerInfo10* cor_profiler_info10)
 #endif
 }
 
+void ThreadSampler::AllocationTick(ULONG dataLen, LPCBYTE data)
+{
+    // FIXME find a symbolic way into this rather than byte offsets
+    uint64_t allocatedSize = *((uint64_t*) &(data[dataLen - 8]));
+    printf("Allocation: %i %ws\n", (int) allocatedSize, (wchar_t*) &data[26]);
+}
+
+void ThreadSampler::StartAllocationSampling(ICorProfilerInfo12* info12)
+{
+    EVENTPIPE_SESSION session;
+    COR_PRF_EVENTPIPE_PROVIDER_CONFIG sessionConfig[] = {{L"Microsoft-Windows-DotNETRuntime",
+                                                          0x1, // CLR_GC_KEYWORD
+                                                          // documentation says AllocationTick is at info but it lies
+                                                          COR_PRF_EVENTPIPE_VERBOSE, nullptr}};
+    HRESULT hr = info12->EventPipeStartSession(1, sessionConfig, false, &session);
+    if (FAILED(hr))
+    {
+        trace::Logger::Error("Could not enable allocation sampling: session pipe error", hr);
+    }
+}
+
 void ThreadSampler::ThreadCreated(ThreadID thread_id)
 {
     // So it seems the Thread* items can be/are called out of order.  ThreadCreated doesn't carry any valuable

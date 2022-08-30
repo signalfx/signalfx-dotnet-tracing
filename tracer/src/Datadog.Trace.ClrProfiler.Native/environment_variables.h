@@ -112,6 +112,7 @@ namespace environment {
 
     // If you change this, change corresponding logic in Instrument.cs too
     const shared::WSTRING thread_sampling_enabled = WStr("SIGNALFX_PROFILER_ENABLED");
+    const shared::WSTRING allocation_sampling_enabled = WStr("SIGNALFX_ALLOCATION_PROFILER_ENABLED");
 
     const shared::WSTRING thread_sampling_period = WStr("SIGNALFX_PROFILER_CALL_STACK_INTERVAL");
 } // namespace environment
