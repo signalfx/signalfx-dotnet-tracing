@@ -7,7 +7,7 @@ namespace SignalFx.OverheadTest.Containers;
 
 internal abstract class CollectorBase : IAsyncDisposable
 {
-    protected const string ImageName = "otel/opentelemetry-collector-contrib:0.51.0";
+    protected const string ImageName = "otel/opentelemetry-collector-contrib:0.58.0";
     protected const string ContainerCollectorConfigPath = "/etc/otelcol-contrib/config.yaml";
 
     protected const int TraceReceiverPort = 9411;
