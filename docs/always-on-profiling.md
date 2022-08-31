@@ -1,9 +1,6 @@
 
 # About the .NET AlwaysOn Profiling
 
-> :construction: &nbsp;Status: Experimental - exported telemetry and
-> configuration settings may change.
-
 The SignalFx Instrumentation for .NET includes a continuous thread sampler
 that can be enabled with a configuration setting. This sampler periodically captures
 the call stack state for all .NET threads and sends these
