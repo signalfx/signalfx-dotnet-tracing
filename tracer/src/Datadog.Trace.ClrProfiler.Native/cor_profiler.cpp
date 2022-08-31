@@ -274,14 +274,14 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
         {
             if (this->threadSampler == nullptr)
             {
-                // FIXME may want to combine precheck logic to ensure only one allocation site
+                // TODO Splunk: may want to combine precheck logic to ensure only one allocation site
                 this->threadSampler = new always_on_profiler::ThreadSampler();
             }
             this->threadSampler->StartAllocationSampling(info12);
         }
         else
         {
-            Logger::Error("Could not enable allocation sampling: CLR version not supported");
+            Logger::Error("Could not enable allocation sampling: CLR version not supported ", hr);
         }
 
 
