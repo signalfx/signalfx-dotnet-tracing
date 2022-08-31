@@ -40,7 +40,7 @@ to `true` for your .NET process.
 
 # Configuration settings
 
-Please check [description](internal-config.md) for the following environment variables
+Please check [description](advanced-config.md#alwayson-profiling-settings) for the following environment variables
 
 * `SIGNALFX_PROFILER_LOGS_ENDPOINT`,
 * `SIGNALFX_PROFILER_ENABLED`,
