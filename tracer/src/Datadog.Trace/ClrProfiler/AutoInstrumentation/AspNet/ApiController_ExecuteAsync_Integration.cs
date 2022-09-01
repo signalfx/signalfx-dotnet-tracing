@@ -135,7 +135,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AspNet
 
         private static void OnRequestCompletedAfterException(HttpContext httpContext, Scope scope, DateTimeOffset finishTime, Exception exception)
         {
-            if (httpContext.Response.StatusCode != 404)
+            if (Tracer.Instance.Settings.IsErrorStatusCode(httpContext.Response.StatusCode, serverStatusCode: true))
             {
                 scope.Span.SetException(exception);
             }

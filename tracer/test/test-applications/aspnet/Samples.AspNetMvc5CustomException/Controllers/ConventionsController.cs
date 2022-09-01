@@ -8,9 +8,9 @@ namespace Samples.AspNetMvc5CustomException.Controllers
     public class ConventionsController : ApiController
     {
         [HttpGet]
-        public IHttpActionResult ThrowCustomNotFoundException()
+        public IHttpActionResult ThrowCustomHttpCodeException(int httpStatusCode)
         {
-            throw new CustomNotFoundException();
+            throw new CustomHttpCodeException();
         }
     }
 }
