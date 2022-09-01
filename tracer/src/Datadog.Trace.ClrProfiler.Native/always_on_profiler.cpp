@@ -624,6 +624,34 @@ void ThreadSampler::StartSampling(ICorProfilerInfo10* cor_profiler_info10)
 #endif
 }
 
+void ThreadSampler::AllocationTick(ULONG dataLen, LPCBYTE data)
+{
+    // TODO Splunk: find a symbolic way into this rather than byte offsets
+    uint64_t allocatedSize = *((uint64_t*) &(data[dataLen - 8]));
+    // Don't have a running linux box to test on at the moment and 
+    // unsure of the right wprintf/etc incantation
+#ifdef _WIN32
+    printf("Allocation: %i %ws\n", (int) allocatedSize, (wchar_t*) &data[26]);
+#else
+    printf("Allocation: %i\n", (int) allocatedSize);
+#endif
+}
+
+void ThreadSampler::StartAllocationSampling(ICorProfilerInfo12* info12)
+{
+    EVENTPIPE_SESSION session;
+    // TODO Splunk: manual test on linux to see if this config still delivers events to the pipe
+    COR_PRF_EVENTPIPE_PROVIDER_CONFIG sessionConfig[] = {{WStr("Microsoft-Windows-DotNETRuntime"),
+                                                          0x1, // CLR_GC_KEYWORD
+                                                          // documentation says AllocationTick is at info but it lies
+                                                          COR_PRF_EVENTPIPE_VERBOSE, nullptr}};
+    HRESULT hr = info12->EventPipeStartSession(1, sessionConfig, false, &session);
+    if (FAILED(hr))
+    {
+        trace::Logger::Error("Could not enable allocation sampling: session pipe error", hr);
+    }
+}
+
 void ThreadSampler::ThreadCreated(ThreadID thread_id)
 {
     // So it seems the Thread* items can be/are called out of order.  ThreadCreated doesn't carry any valuable

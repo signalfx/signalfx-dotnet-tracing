@@ -47,6 +47,7 @@ namespace trace
 {
 
 bool IsThreadSamplingEnabled();
+bool IsAllocationSamplingEnabled();
 bool DisableOptimizations();
 bool EnableInlining();
 bool IsNGENEnabled();

@@ -82,6 +82,8 @@ class ThreadSampler
 {
 public:
     void StartSampling(ICorProfilerInfo10* cor_profiler_info10);
+    void StartAllocationSampling(ICorProfilerInfo12* info12);
+    void AllocationTick(ULONG dataLen, LPCBYTE data);
     ICorProfilerInfo10* info10;
     static void ThreadCreated(ThreadID thread_id);
     void ThreadDestroyed(ThreadID thread_id);

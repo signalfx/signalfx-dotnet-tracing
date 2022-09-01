@@ -177,6 +177,13 @@ public:
     HRESULT STDMETHODCALLTYPE ThreadAssignedToOSThread(ThreadID managedThreadId, DWORD osThreadId) override;
     HRESULT STDMETHODCALLTYPE ThreadNameChanged(ThreadID threadId, ULONG cchName, WCHAR name[]) override;
 
+    // Needed for allocation sampling
+    HRESULT STDMETHODCALLTYPE EventPipeEventDelivered(EVENTPIPE_PROVIDER provider, DWORD eventId, DWORD eventVersion,
+                                                      ULONG cbMetadataBlob, LPCBYTE metadataBlob, ULONG cbEventData,
+                                                      LPCBYTE eventData, LPCGUID pActivityId,
+                                                      LPCGUID pRelatedActivityId, ThreadID eventThread,
+                                                      ULONG numStackFrames, UINT_PTR stackFrames[]) override;
+
     void EnableByRefInstrumentation();
     void EnableCallTargetStateByRef();
     void AddDerivedInstrumentations(WCHAR* id, CallTargetDefinition* items, int size);
