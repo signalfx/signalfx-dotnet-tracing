@@ -266,7 +266,12 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
         public static TheoryData<string, int, int> Data() => new()
         {
-            { "/api2/ThrowCustomNotFoundException", 404, 2 },
+            { "/api2/ThrowCustomHttpCodeException/200", 200, 2 },
+            { "/api2/ThrowCustomHttpCodeException/400", 400, 2 },
+            { "/api2/ThrowCustomHttpCodeException/404", 404, 2 },
+            { "/api2/ThrowCustomHttpCodeException/499", 499, 2 },
+            { "/api2/ThrowCustomHttpCodeException/500", 500, 2 },
+            { "/api2/ThrowCustomHttpCodeException/599", 599, 2 },
         };
 
         [SkippableTheory]
