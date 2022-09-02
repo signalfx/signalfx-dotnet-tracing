@@ -628,19 +628,21 @@ void ThreadSampler::AllocationTick(ULONG dataLen, LPCBYTE data)
 {
     // TODO Splunk: find a symbolic way into this rather than byte offsets
     uint64_t allocatedSize = *((uint64_t*) &(data[dataLen - 8]));
-    // Don't have a running linux box to test on at the moment and 
-    // unsure of the right wprintf/etc incantation
 #ifdef _WIN32
     printf("Allocation: %i %ws\n", (int) allocatedSize, (wchar_t*) &data[26]);
 #else
-    printf("Allocation: %i\n", (int) allocatedSize);
+    shared::WSTRING ws = shared::WSTRING((char16_t*)(&data[26]));
+    std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> convert;
+    std::string s = convert.to_bytes(ws);
+    printf("Allocation: %i %s\n", (int) allocatedSize, s.c_str());
+
 #endif
+
 }
 
 void ThreadSampler::StartAllocationSampling(ICorProfilerInfo12* info12)
 {
     EVENTPIPE_SESSION session;
-    // TODO Splunk: manual test on linux to see if this config still delivers events to the pipe
     COR_PRF_EVENTPIPE_PROVIDER_CONFIG sessionConfig[] = {{WStr("Microsoft-Windows-DotNETRuntime"),
                                                           0x1, // CLR_GC_KEYWORD
                                                           // documentation says AllocationTick is at info but it lies
