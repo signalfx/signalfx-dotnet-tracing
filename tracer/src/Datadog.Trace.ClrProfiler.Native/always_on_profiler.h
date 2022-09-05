@@ -81,7 +81,7 @@ public:
 class ThreadSampler
 {
 public:
-    void StartSampling(ICorProfilerInfo10* cor_profiler_info10);
+    void StartThreadSampling();
     void StartAllocationSampling(ICorProfilerInfo12* info12);
     void AllocationTick(ULONG dataLen, LPCBYTE data);
     ICorProfilerInfo10* info10;
@@ -89,6 +89,9 @@ public:
     void ThreadDestroyed(ThreadID thread_id);
     void ThreadAssignedToOsThread(ThreadID managedThreadId, DWORD os_thread_id);
     void ThreadNameChanged(ThreadID thread_id, ULONG cch_name, WCHAR name[]);
+
+    void SetGlobalInfo10(ICorProfilerInfo10* info10);
+    ThreadState* GetCurrentThreadState(ThreadID tid);
 
     std::unordered_map<ThreadID, ThreadState*> managed_tid_to_state_;
     std::mutex thread_state_lock_;
