@@ -611,17 +611,33 @@ DWORD WINAPI SamplingThreadMain(_In_ LPVOID param)
     }
 }
 
-void ThreadSampler::StartSampling(ICorProfilerInfo10* cor_profiler_info10)
+void ThreadSampler::SetGlobalInfo10(ICorProfilerInfo10* cor_profiler_info10)
 {
-    trace::Logger::Info("ThreadSampler::StartSampling");
     profiler_info = cor_profiler_info10;
     this->info10 = cor_profiler_info10;
+}
+
+void ThreadSampler::StartThreadSampling()
+{
+    trace::Logger::Info("ThreadSampler::StartThreadSampling");
 #ifdef _WIN32
     CreateThread(nullptr, 0, &SamplingThreadMain, this, 0, nullptr);
 #else
     pthread_t thr;
     pthread_create(&thr, NULL, (void *(*)(void *)) &SamplingThreadMain, this);
 #endif
+}
+
+thread_span_context GetCurrentSpanContext(ThreadID tid)
+{
+    std::lock_guard<std::mutex> guard(thread_span_context_lock);
+    return thread_span_context_map[tid];
+}
+
+ThreadState* ThreadSampler::GetCurrentThreadState(ThreadID tid)
+{
+    std::lock_guard<std::mutex> guard(thread_state_lock_);
+    return managed_tid_to_state_[tid];
 }
 
 void ThreadSampler::AllocationTick(ULONG dataLen, LPCBYTE data)
@@ -638,6 +654,15 @@ void ThreadSampler::AllocationTick(ULONG dataLen, LPCBYTE data)
 
 #endif
 
+    ThreadID threadId;
+    const HRESULT hr = info10->GetCurrentThreadID(&threadId);
+    if (FAILED(hr))
+    {
+        trace::Logger::Debug("GetCurrentThreadId failed, ", hr);
+        return;
+    }
+    auto spanCtx = GetCurrentSpanContext(threadId);
+    auto threadState = GetCurrentThreadState(threadId);
 }
 
 void ThreadSampler::StartAllocationSampling(ICorProfilerInfo12* info12)
