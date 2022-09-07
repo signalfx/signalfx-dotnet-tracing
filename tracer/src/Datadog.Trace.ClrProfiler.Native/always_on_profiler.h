@@ -19,6 +19,7 @@ constexpr auto unknown_managed_thread_id = -1;
 extern "C"
 {
     EXPORTTHIS int32_t SignalFxReadThreadSamples(int32_t len, unsigned char* buf);
+    EXPORTTHIS int32_t SignalFxReadAllocationSamples(int32_t len, unsigned char* buf);
     // ReSharper disable CppInconsistentNaming
     EXPORTTHIS void SignalFxSetNativeContext(uint64_t traceIdHigh, uint64_t traceIdLow, uint64_t spanId, int32_t managedThreadId);
     // ReSharper restore CppInconsistentNaming
@@ -172,6 +173,8 @@ private:
     std::unordered_map<TKey, typename std::list<std::pair<TKey, TValue>>::iterator> map_;
 };
 } // namespace always_on_profiler
+
+void AllocationSamplingAppendToBuffer(int32_t appendLen, unsigned char* appendBuf);
 
 bool ThreadSamplingShouldProduceThreadSample();
 void ThreadSamplingRecordProducedThreadSample(std::vector<unsigned char>* buf);

@@ -129,6 +129,26 @@ TEST(ThreadSamplerTest, StaticBufferManagement)
     ASSERT_EQ('E', read_buf[0]);
 }
 
+TEST(ThreadSamplerTest, AllocationBufferBehavior)
+{
+    unsigned char read_buf[4];
+    unsigned char write_buf[] = {5, 6, 7, 8};
+    // Invalid inputs don't blow up
+    ASSERT_EQ(0, SignalFxReadAllocationSamples(0, read_buf));
+    ASSERT_EQ(0, SignalFxReadAllocationSamples(4, NULL));
+    AllocationSamplingAppendToBuffer(0, NULL);
+    // No data->0 result
+    ASSERT_EQ(0, SignalFxReadAllocationSamples(4, read_buf));
+    AllocationSamplingAppendToBuffer(1, write_buf);
+    ASSERT_EQ(1, SignalFxReadAllocationSamples(4, read_buf));
+    ASSERT_EQ(0, SignalFxReadAllocationSamples(4, read_buf));
+    AllocationSamplingAppendToBuffer(1, write_buf);
+    AllocationSamplingAppendToBuffer(2, write_buf);
+    ASSERT_EQ(3, SignalFxReadAllocationSamples(4, read_buf));
+    ASSERT_EQ(0, SignalFxReadAllocationSamples(4, read_buf));
+}
+
+
 TEST(ThreadSamplerTest, LRUCache)
 {
     constexpr int max = 10000;
