@@ -26,6 +26,7 @@ namespace Datadog.Trace.RuntimeMetrics
         public const string CpuPercentage = "runtime.dotnet.cpu.percent";
 
         public const string AspNetCoreCurrentRequests = "runtime.dotnet.aspnetcore.requests.current";
+
         public const string AspNetCoreFailedRequests = "runtime.dotnet.aspnetcore.requests.failed";
         public const string AspNetCoreTotalRequests = "runtime.dotnet.aspnetcore.requests.total";
         public const string AspNetCoreRequestQueueLength = "runtime.dotnet.aspnetcore.requests.queue_length";

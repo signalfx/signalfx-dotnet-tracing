@@ -7,17 +7,21 @@ using Datadog.Trace.Vendors.StatsdClient;
 
 namespace Datadog.Trace.RuntimeMetrics;
 
-// source originated from: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/blob/main/src/OpenTelemetry.Instrumentation.Runtime/RuntimeMetrics.cs
+// source originated from: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/blob/bc947a00c3f859cc436f050e81172fc1f8bc09d7/src/OpenTelemetry.Instrumentation.Runtime/RuntimeMetrics.cs
 internal static class GcMetrics
 {
     private const int NumberOfGenerations = 3;
 
-    internal static ReadOnlyCollection<string> GenNames { get; } = new(new List<string> { "gen0", "gen1", "gen2", "loh", "poh" });
-
-    public static string GenerationTag(int i)
+    private enum GcGeneration
     {
-        return $"generation:{GenNames[i]}";
+        Gen0,
+        Gen1,
+        Gen2,
+        LargeObjectHeap,
+        PinnedObjectHeap
     }
+
+    public static ReadOnlyCollection<string> GenNames { get; } = new(new List<string> { "gen0", "gen1", "gen2", "loh", "poh" });
 
     public static void PushCollectionCounts(IDogStatsd dogStatsd)
     {
@@ -28,9 +32,36 @@ internal static class GcMetrics
             long collectionsFromThisGeneration = GC.CollectionCount(gen);
             var currentValue = collectionsFromThisGeneration - collectionsFromHigherGeneration;
 
-            dogStatsd.Counter(MetricsNames.Gc.CollectionsCount, currentValue, tags: new[] { GenerationTag(gen) });
+            dogStatsd.Counter(MetricsNames.Gc.CollectionsCount, currentValue, tags: Tags.GenerationTags[gen]);
 
             collectionsFromHigherGeneration = collectionsFromThisGeneration;
+        }
+    }
+
+    internal static class Tags
+    {
+        public static string[] Gen0 { get; } = new[] { GenerationTag(GcGeneration.Gen0) };
+
+        public static string[] Gen1 { get; } = new[] { GenerationTag(GcGeneration.Gen1) };
+
+        public static string[] Gen2 { get; } = new[] { GenerationTag(GcGeneration.Gen2) };
+
+        public static string[] Loh { get; } = new[] { GenerationTag(GcGeneration.LargeObjectHeap) };
+
+        public static string[] Poh { get; } = new[] { GenerationTag(GcGeneration.PinnedObjectHeap) };
+
+        public static ReadOnlyCollection<string[]> GenerationTags { get; } = new(new List<string[]>
+        {
+            Gen0,
+            Gen1,
+            Gen2,
+            Loh,
+            Poh
+        });
+
+        private static string GenerationTag(GcGeneration gcGeneration)
+        {
+            return $"generation:{GenNames[(int)gcGeneration]}";
         }
     }
 }

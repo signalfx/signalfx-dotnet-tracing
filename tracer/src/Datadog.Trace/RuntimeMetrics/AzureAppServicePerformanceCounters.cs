@@ -37,10 +37,10 @@ namespace Datadog.Trace.RuntimeMetrics
             var rawValue = EnvironmentHelpers.GetEnvironmentVariable(EnvironmentVariableName);
             var value = JsonConvert.DeserializeObject<PerformanceCountersValue>(rawValue);
 
-            _statsd.Gauge(MetricsNames.Gc.HeapSize, value.Gen0Size, tags: new[] { GcMetrics.GenerationTag(0) });
-            _statsd.Gauge(MetricsNames.Gc.HeapSize, value.Gen1Size, tags: new[] { GcMetrics.GenerationTag(1) });
-            _statsd.Gauge(MetricsNames.Gc.HeapSize, value.Gen2Size, tags: new[] { GcMetrics.GenerationTag(2) });
-            _statsd.Gauge(MetricsNames.Gc.HeapSize, value.LohSize, tags: new[] { GcMetrics.GenerationTag(3) });
+            _statsd.Gauge(MetricsNames.Gc.HeapSize, value.Gen0Size, tags: GcMetrics.Tags.Gen0);
+            _statsd.Gauge(MetricsNames.Gc.HeapSize, value.Gen1Size, tags: GcMetrics.Tags.Gen1);
+            _statsd.Gauge(MetricsNames.Gc.HeapSize, value.Gen2Size, tags: GcMetrics.Tags.Gen2);
+            _statsd.Gauge(MetricsNames.Gc.HeapSize, value.LohSize, tags: GcMetrics.Tags.Loh);
 
             GcMetrics.PushCollectionCounts(_statsd);
 
