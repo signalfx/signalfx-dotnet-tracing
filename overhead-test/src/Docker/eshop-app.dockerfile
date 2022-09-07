@@ -1,35 +1,34 @@
-FROM mcr.microsoft.com/dotnet/sdk:3.1 AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 
 RUN git clone https://github.com/dotnet-architecture/eShopOnWeb.git
-RUN git -C ./eShopOnWeb checkout e5e9868003b2e940c731cdf34a3b8fa2a89d272c
+RUN git -C ./eShopOnWeb checkout ce63e38a23046f946888da47cf8fe579dd7f3b2a
 
-# modify the code to use real database, instead of in-memory, as outlined in:
-# https://github.com/dotnet-architecture/eShopOnWeb/tree/e5e9868003b2e940c731cdf34a3b8fa2a89d272c#configuring-the-sample-to-use-sql-server
+# disable auth for item creation
+RUN sed -i -e '15d' /eShopOnWeb/src/PublicApi/CatalogItemEndpoints/Create.cs
 
-# remove line 37
-RUN sed -i -e '37d' /eShopOnWeb/src/Web/Startup.cs
+# disable auth for item deletion
+RUN sed -i -e '13d' /eShopOnWeb/src/PublicApi/CatalogItemEndpoints/Delete.cs
 
-# uncomment line 39
-RUN sed -i -e '39s/\/\///g' /eShopOnWeb/src/Web/Startup.cs
-
-# uncomment line 19, and fix the name for the variable
-RUN sed -i -e '19s/\/\/\ context/catalogContext/' /eShopOnWeb/src/Infrastructure/Data/CatalogContextSeed.cs
-
-WORKDIR /eShopOnWeb/src/Web
+WORKDIR /eShopOnWeb/src/PublicApi
 
 RUN dotnet restore
 RUN dotnet publish -c Release -o out
 
-FROM mcr.microsoft.com/dotnet/aspnet:3.1 AS baseline-app
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS baseline-app
 
 WORKDIR /app
+
+RUN apt-get update \
+    && apt-get -y upgrade \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --fix-missing \
+    curl
 
 # TODO Splunk: for now install dotnet-counters in app (replace with sidecar container)
 RUN curl -sSL https://aka.ms/dotnet-counters/linux-x64 --output dotnet-counters  \
     && chmod +x ./dotnet-counters
 
-COPY --from=build-env /eShopOnWeb/src/Web/out ./
-ENTRYPOINT ["dotnet", "Web.dll"]
+COPY --from=build /eShopOnWeb/src/PublicApi/out ./
+ENTRYPOINT ["dotnet", "PublicApi.dll"]
 
 FROM baseline-app as instrumented-app
 

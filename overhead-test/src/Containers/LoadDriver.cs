@@ -52,7 +52,13 @@ internal class LoadDriver : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        await _container.CleanUpAsync();
+        // An attempt to cleanup not started container
+        // results in exception
+        if (_container.State != TestcontainersState.Undefined)
+        {
+            await _container.CleanUpAsync();
+        }
+
         await _logStream.DisposeAsync();
         await _resultStream.DisposeAsync();
     }
@@ -74,13 +80,13 @@ internal class LoadDriver : IAsyncDisposable
     internal TestcontainersContainer BuildWarmup()
     {
         return new TestcontainersBuilder<TestcontainersContainer>()
-            .WithAutoRemove(true)
             .WithImage(LoadDriveImageName)
             .WithName($"{OverheadTest.Prefix}-k6-warmup")
             .WithNetwork(_network)
             .WithCommand("run", "-u", "10", "-e", $"ESHOP_HOSTNAME={EshopApp.ContainerName}", "-i", "500",
                 ContainerScriptPath)
             .WithBindMount(_hostScriptPath, ContainerScriptPath)
+            .WithAutoRemove(true)
             .Build();
     }
 }
