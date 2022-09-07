@@ -112,11 +112,14 @@ public:
     void EndSample() const;
     void EndBatch() const;
     void WriteFinalStats(const SamplingStatistics& stats) const;
+    void AllocationSample(uint64_t allocSize, const WCHAR* allocType, size_t allocTypeCharLen, ThreadID id, const ThreadState* state, const thread_span_context& span_context) const;
 
 private:
+    void WriteCurrentTimeMillis() const;
     void WriteCodedFrameString(FunctionID fid, const shared::WSTRING& str);
     void WriteShort(int16_t val) const;
     void WriteInt(int32_t val) const;
+    void WriteString(const WCHAR* s, size_t len) const;
     void WriteString(const shared::WSTRING& str) const;
     void WriteByte(unsigned char b) const;
     void WriteUInt64(uint64_t val) const;

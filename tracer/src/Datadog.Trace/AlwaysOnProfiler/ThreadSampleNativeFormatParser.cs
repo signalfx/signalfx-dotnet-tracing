@@ -146,6 +146,22 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         new object[] { microsSuspended, numThreads, totalFrames, numCacheMisses });
                     }
                 }
+                else if (operationCode == OpCodes.AllocationSample)
+                {
+                    var timestampMillis = ReadInt64();
+                    var allocatedSize = ReadInt64(); // Technically uint64 but whatever
+                    var typeName = ReadString();
+                    var managedId = ReadInt();
+                    var nativeId = ReadInt();
+                    var threadName = ReadString();
+                    var traceIdHigh = ReadInt64();
+                    var traceIdLow = ReadInt64();
+                    var spanId = ReadInt64();
+                    // TODO Splunk: read stack frame (share code with above StartSample)
+                    var stackFrameCodeCurrentlyZero = ReadShort();
+                    // TODO Splunk: export this somewhere
+                    // Console.WriteLine("ALLOC: " + allocatedSize + " " + typeName);
+                }
                 else
                 {
                     _position = _length + 1;
@@ -232,6 +248,11 @@ namespace Datadog.Trace.AlwaysOnProfiler
             /// Marks the beginning of a section with statistics, see THREAD_SAMPLES_FINAL_STATS on native code.
             /// </summary>
             public const byte BatchStats = 0x07;
+
+            /// <summary>
+            /// Marks the start of an allocation sample, see THREAD_SAMPLES_ALLOCATION_SAMPLE on native code.
+            /// </summary>
+            public const byte AllocationSample = 0x08;
         }
     }
 }
