@@ -34,7 +34,18 @@ namespace Datadog.Trace.SignalFx.Metrics
         /// <param name="tags">Tags added to the metric.</param>
         public void SendGaugeMetric(string name, double value, string[] tags = null)
         {
-            Send(MetricType.GAUGE, name, value, tags);
+            Send(MetricType.GAUGE, name, datum => datum.doubleValue = value, tags);
+        }
+
+        /// <summary>
+        /// Sends cumulative counter metric using configured reporter.
+        /// </summary>
+        /// <param name="name">The name of the metric.</param>
+        /// <param name="value">The value of the metric.</param>
+        /// <param name="tags">Tags added to the metric.</param>
+        public void SendCumulativeCounterMetric(string name, long value, string[] tags = null)
+        {
+            Send(MetricType.CUMULATIVE_COUNTER, name, datum => datum.intValue = value, tags);
         }
 
         /// <summary>
@@ -43,9 +54,9 @@ namespace Datadog.Trace.SignalFx.Metrics
         /// <param name="name">The name of the metric.</param>
         /// <param name="value">The value of the metric.</param>
         /// <param name="tags">Tags added to the metric.</param>
-        public void SendCounterMetric(string name, double value, string[] tags = null)
+        public void SendCounterMetric(string name, long value, string[] tags = null)
         {
-            Send(MetricType.COUNTER, name, value, tags);
+            Send(MetricType.COUNTER, name, datum => datum.intValue = value, tags);
         }
 
         public void Dispose()
@@ -63,26 +74,27 @@ namespace Datadog.Trace.SignalFx.Metrics
             };
         }
 
-        private void Send(MetricType metricType, string name, double value, string[] tags)
+        private void Send(MetricType metricType, string name, Action<Datum> valueSetter, string[] tags)
         {
-            var dataPoint = CreateDataPoint(metricType, name, value, tags);
+            var dataPoint = CreateDataPoint(metricType, name, valueSetter, tags);
             if (!_writer.TryWrite(dataPoint))
             {
                 Log.Warning("Metric upload failed, worker queue full.");
             }
         }
 
-        private DataPoint CreateDataPoint(MetricType metricType, string name, double value, string[] tags)
+        private DataPoint CreateDataPoint(MetricType metricType, string name, Action<Datum> valueSetter, string[] tags)
         {
             // TODO splunk: consider pooling data points
             var dataPoint = new DataPoint
             {
                 metricType = metricType,
                 metric = name,
-                value = new Datum { doubleValue = value },
+                value = new Datum(),
                 timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
             };
 
+            valueSetter(dataPoint.value);
             dataPoint.dimensions.AddRange(_globalDimensions);
 
             if (tags != null)

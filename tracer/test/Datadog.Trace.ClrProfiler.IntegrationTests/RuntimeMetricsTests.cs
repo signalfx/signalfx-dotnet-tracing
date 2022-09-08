@@ -89,7 +89,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             // - exception count is gathered using common .NET APIs
             // - contention count is gathered using platform-specific APIs
 
-            var exceptionRequestsCount = requests.Count(r => r.metric == "runtime.dotnet.exceptions.count");
+            var exceptionRequestsCount = requests.Count(r => r.metric == "process.runtime.dotnet.exceptions.count");
 
             Assert.True(exceptionRequestsCount > 0, "No exception metrics received.");
 
@@ -98,7 +98,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
              || (Environment.Version.Major == 3 && Environment.Version.Minor == 1)
              || Environment.Version.Major >= 5)
             {
-                var contentionRequestsCount = requests.Count(r => r.metric == "runtime.dotnet.threads.contention_count");
+                var contentionRequestsCount = requests.Count(r => r.metric == "process.runtime.dotnet.monitor.lock_contention.count");
 
                 Assert.True(contentionRequestsCount > 0, "No contention metrics received.");
             }

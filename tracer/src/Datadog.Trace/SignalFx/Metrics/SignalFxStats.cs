@@ -16,7 +16,7 @@ namespace Datadog.Trace.SignalFx.Metrics
         public SignalFxStats(SignalFxMetricSender metricSender)
         {
             _metricSender = metricSender ?? throw new ArgumentNullException(nameof(metricSender));
-            // splunk: consider supporting telemetry with our metric exporter
+            // TODO splunk: consider supporting telemetry with our metric exporter
             TelemetryCounters = new Vendors.StatsdClient.Telemetry();
         }
 
@@ -32,19 +32,20 @@ namespace Datadog.Trace.SignalFx.Metrics
             // nothing to configure
         }
 
-        public void Counter(string statName, double value, double sampleRate = 1, string[] tags = null)
+        public void Counter(string statName, long value, double sampleRate = 1, string[] tags = null)
         {
-            _metricSender.SendCounterMetric(statName, value, tags);
+            // we want to map to cumulative counter, leave the name to reduce required changes
+            _metricSender.SendCumulativeCounterMetric(statName, value, tags);
         }
 
         public void Increment(string statName, int value = 1, double sampleRate = 1, string[] tags = null)
         {
+            // we want to map to counter, leave the name to reduce required changes
             _metricSender.SendCounterMetric(statName, value, tags);
         }
 
         public void Decrement(string statName, int value = 1, double sampleRate = 1, params string[] tags)
         {
-            _metricSender.SendCounterMetric(statName, -value, tags);
         }
 
         public void Gauge(string statName, double value, double sampleRate = 1, string[] tags = null)

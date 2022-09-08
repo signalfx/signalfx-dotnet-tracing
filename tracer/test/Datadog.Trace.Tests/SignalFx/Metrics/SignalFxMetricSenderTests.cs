@@ -16,7 +16,14 @@ namespace Datadog.Trace.Tests.SignalFx.Metrics
 
             sender.SendGaugeMetric("test_metric", 1.11, tags: new[] { "tag2:v2" });
 
-            Assert(reporter.SentMessages, MetricType.GAUGE);
+            var dataPointUploadMessages = reporter.SentMessages;
+            dataPointUploadMessages.Should().HaveCount(1);
+            var dataPoint = dataPointUploadMessages[0];
+
+            AssertCommon(dataPoint);
+
+            dataPoint.value.doubleValue.Should().Be(1.11);
+            dataPoint.metricType.Should().Be(MetricType.GAUGE);
         }
 
         [Fact]
@@ -25,18 +32,40 @@ namespace Datadog.Trace.Tests.SignalFx.Metrics
             var reporter = new TestWriter();
             var sender = new SignalFxMetricSender(reporter, new[] { "tag1:v1" });
 
-            sender.SendCounterMetric("test_metric", 1.11, tags: new[] { "tag2:v2" });
+            sender.SendCounterMetric("test_metric", 1, tags: new[] { "tag2:v2" });
 
-            Assert(reporter.SentMessages, MetricType.COUNTER);
-        }
-
-        private static void Assert(IList<DataPoint> dataPointUploadMessages, MetricType expectedMetricType)
-        {
+            var dataPointUploadMessages = reporter.SentMessages;
             dataPointUploadMessages.Should().HaveCount(1);
             var dataPoint = dataPointUploadMessages[0];
+
+            AssertCommon(dataPoint);
+
+            dataPoint.value.intValue.Should().Be(1);
+            dataPoint.metricType.Should().Be(MetricType.COUNTER);
+        }
+
+        [Fact]
+        public void Cumulative_counter_metric_types_are_sent()
+        {
+            var reporter = new TestWriter();
+            var sender = new SignalFxMetricSender(reporter, new[] { "tag1:v1" });
+
+            sender.SendCumulativeCounterMetric("test_metric", 1, tags: new[] { "tag2:v2" });
+
+            var dataPointUploadMessages = reporter.SentMessages;
+            dataPointUploadMessages.Should().HaveCount(1);
+            var dataPoint = dataPointUploadMessages[0];
+
+            AssertCommon(dataPoint);
+
+            dataPoint.value.intValue.Should().Be(1);
+            dataPoint.metricType.Should().Be(MetricType.CUMULATIVE_COUNTER);
+        }
+
+        private static void AssertCommon(DataPoint dataPoint)
+        {
             dataPoint.metric.Should().Be("test_metric");
-            dataPoint.value.doubleValue.Should().Be(1.11);
-            dataPoint.metricType.Should().Be(expectedMetricType);
+
             var dataPointDimensions = dataPoint.dimensions;
 
             dataPointDimensions.Should().HaveCount(2);
