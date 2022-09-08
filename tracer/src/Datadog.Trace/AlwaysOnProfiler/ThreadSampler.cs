@@ -40,6 +40,20 @@ namespace Datadog.Trace.AlwaysOnProfiler
             exporter.ExportThreadSamples(threadSamples);
         }
 
+        private static void ReadAndExportAllocationSampleBatch(byte[] buffer, ThreadSampleExporter exporter)
+        {
+            var read = NativeMethods.SignalFxReadAllocationSamples(buffer.Length, buffer);
+            if (read <= 0)
+            {
+                // No data just return.
+                return;
+            }
+
+            // TODO Splunk: Actually implement exporter for this data
+            var parser = new ThreadSampleNativeFormatParser(buffer, read);
+            var threadSamples = parser.Parse();
+        }
+
         private static void SampleReadingThread()
         {
             var buffer = new byte[BufferSize];
@@ -54,6 +68,16 @@ namespace Datadog.Trace.AlwaysOnProfiler
                     // Call twice in quick succession to catch up any blips; the second will likely return 0 (no buffer)
                     ReadAndExportThreadSampleBatch(buffer, exporter);
                     ReadAndExportThreadSampleBatch(buffer, exporter);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Error processing thread samples batch.");
+                }
+
+                try
+                {
+                    // Managed-side calls to this method dictate buffer changeover, no catch up call needed
+                    ReadAndExportAllocationSampleBatch(buffer, exporter);
                 }
                 catch (Exception ex)
                 {

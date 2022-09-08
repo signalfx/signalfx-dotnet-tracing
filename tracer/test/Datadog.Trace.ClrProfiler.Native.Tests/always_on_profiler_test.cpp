@@ -52,6 +52,27 @@ TEST(ThreadSamplerTest, BasicBufferBehavior)
     ASSERT_EQ(1290, tsb.buffer_->size()); // not manually calculated but does depend on thread name limiting and not repeating frame strings
     ASSERT_EQ(2, tsb.codes_.size());
 }
+TEST(ThreadSamplerTest, AllocationSampleBuffer)
+{
+    auto buf = std::vector<unsigned char>();
+    shared::WSTRING longThreadName;
+    for (int i = 0; i < 400; i++)
+    {
+        longThreadName.append(WStr("blah blah "));
+    }
+    const shared::WSTRING frame1 = WStr("SomeFairlyLongClassName::SomeMildlyLongMethodName");
+    const shared::WSTRING frame2 = WStr("SomeFairlyLongClassName::ADifferentMethodName");
+    const shared::WSTRING typeName = WStr("ThisIsMyTypeName");
+    ThreadSamplesBuffer tsb(&buf);
+    ThreadState threadState;
+    threadState.native_id_ = 1000;
+    threadState.thread_name_.append(longThreadName);
+
+    tsb.AllocationSample(32, typeName.c_str(), typeName.length(), 1, &threadState, thread_span_context());
+    // TODO Splunk: record frames here
+
+    ASSERT_EQ(1109, tsb.buffer_->size()); // not manually calculated
+}
 
 TEST(ThreadSamplerTest, BufferOverrunBehavior)
 {

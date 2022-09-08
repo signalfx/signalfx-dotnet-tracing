@@ -166,6 +166,7 @@ constexpr auto kThreadSamplesStartBatch = 0x01;
 constexpr auto kThreadSamplesStartSample = 0x02;
 constexpr auto kThreadSamplesEndBatch = 0x06;
 constexpr auto kThreadSamplesFinalStats = 0x07;
+constexpr auto kAllocationSample = 0x08;
 
 constexpr auto kCurrentThreadSamplesBufferVersion = 1;
 
@@ -184,9 +185,7 @@ void ThreadSamplesBuffer::StartBatch() const
     CHECK_SAMPLES_BUFFER_LENGTH()
     WriteByte(kThreadSamplesStartBatch);
     WriteInt(kCurrentThreadSamplesBufferVersion);
-    const auto ms =
-        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-    WriteUInt64(ms.count());
+    WriteCurrentTimeMillis();
 }
 
 void ThreadSamplesBuffer::StartSample(ThreadID id, const ThreadState* state, const thread_span_context& span_context) const
@@ -201,6 +200,25 @@ void ThreadSamplesBuffer::StartSample(ThreadID id, const ThreadState* state, con
     WriteUInt64(span_context.span_id_);
     // Feature possibilities: (managed/native) thread priority, cpu/wait times, etc.
 }
+
+void ThreadSamplesBuffer::AllocationSample(uint64_t allocSize, const WCHAR* allocType, size_t allocTypeCharLen, ThreadID id,
+                                                const ThreadState* state,
+                                                const thread_span_context& span_context) const
+
+{
+    CHECK_SAMPLES_BUFFER_LENGTH()
+    WriteByte(kAllocationSample);
+    WriteCurrentTimeMillis();
+    WriteUInt64(allocSize);
+    WriteString(allocType, allocTypeCharLen);
+    WriteInt(span_context.managed_thread_id_);
+    WriteInt(static_cast<int32_t>(state->native_id_));
+    WriteString(state->thread_name_);
+    WriteUInt64(span_context.trace_id_high_);
+    WriteUInt64(span_context.trace_id_low_);
+    WriteUInt64(span_context.span_id_);
+}
+
 void ThreadSamplesBuffer::RecordFrame(FunctionID fid, const shared::WSTRING& frame)
 {
     CHECK_SAMPLES_BUFFER_LENGTH()
@@ -256,16 +274,22 @@ void ThreadSamplesBuffer::WriteInt(int32_t val) const
     buffer_->push_back(((val >> 8) & 0xFF));
     buffer_->push_back(val & 0xFF);
 }
-void ThreadSamplesBuffer::WriteString(const shared::WSTRING& str) const
+
+void ThreadSamplesBuffer::WriteString(const WCHAR* s, size_t charLen) const
 {
     // limit strings to a max length overall; this prevents (e.g.) thread names or
     // any other miscellaneous strings that come along from blowing things out
-    const short used_len = static_cast<short>(std::min(str.length(), static_cast<size_t>(kMaxStringLength)));
+    const short used_len = static_cast<short>(std::min(charLen, static_cast<size_t>(kMaxStringLength)));
     WriteShort(used_len);
     // odd bit of casting since we're copying bytes, not wchars
-    const auto str_begin = reinterpret_cast<const unsigned char*>(&str.c_str()[0]);
+    const auto str_begin = reinterpret_cast<const unsigned char*>(s);
     // possible endian-ness assumption here; unclear how the managed layer would decode on big endian platforms
     buffer_->insert(buffer_->end(), str_begin, str_begin + used_len * 2);
+}
+
+void ThreadSamplesBuffer::WriteString(const shared::WSTRING& str) const
+{
+    WriteString(str.c_str(), str.length());
 }
 void ThreadSamplesBuffer::WriteByte(unsigned char b) const
 {
@@ -281,6 +305,13 @@ void ThreadSamplesBuffer::WriteUInt64(uint64_t val) const
     buffer_->push_back(((val >> 16) & 0xFF));
     buffer_->push_back(((val >> 8) & 0xFF));
     buffer_->push_back(val & 0xFF);
+}
+
+void ThreadSamplesBuffer::WriteCurrentTimeMillis() const
+{
+    const auto ms =
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+    WriteUInt64(ms.count());
 }
 
 class SamplingHelper
@@ -687,7 +718,10 @@ ThreadState* ThreadSampler::GetCurrentThreadState(ThreadID tid)
 void ThreadSampler::AllocationTick(ULONG dataLen, LPCBYTE data)
 {
     // TODO Splunk: find a symbolic way into this rather than byte offsets
+    // TODO Splunk: in particular the win:Pointer types need adjustment
     uint64_t allocatedSize = *((uint64_t*) &(data[dataLen - 8]));
+    WCHAR* typeName = (WCHAR*) &data[26];
+    size_t typeNameCharLen = (dataLen - 46) / 2;
 #ifdef _WIN32
     printf("Allocation: %i %ws\n", (int) allocatedSize, (wchar_t*) &data[26]);
 #else
@@ -695,7 +729,6 @@ void ThreadSampler::AllocationTick(ULONG dataLen, LPCBYTE data)
     std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> convert;
     std::string s = convert.to_bytes(ws);
     printf("Allocation: %i %s\n", (int) allocatedSize, s.c_str());
-
 #endif
 
     ThreadID threadId;
@@ -705,8 +738,19 @@ void ThreadSampler::AllocationTick(ULONG dataLen, LPCBYTE data)
         trace::Logger::Debug("GetCurrentThreadId failed, ", hr);
         return;
     }
+    auto unknownThreadState = ThreadState();
     auto spanCtx = GetCurrentSpanContext(threadId);
     auto threadState = GetCurrentThreadState(threadId);
+    if (threadState == nullptr)
+    {
+        threadState = &unknownThreadState;
+    }
+    std::vector<unsigned char> localBytes;
+    ThreadSamplesBuffer localBuf = ThreadSamplesBuffer(&localBytes);
+    localBuf.AllocationSample(allocatedSize, typeName, typeNameCharLen, threadId, threadState, spanCtx);
+    // TODO Splunk: frame stack goes in here
+    localBuf.EndSample();
+    AllocationSamplingAppendToBuffer(static_cast<int32_t>(localBytes.size()), localBytes.data());
 }
 
 void ThreadSampler::StartAllocationSampling(ICorProfilerInfo12* info12)
