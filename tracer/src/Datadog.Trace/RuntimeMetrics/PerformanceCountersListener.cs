@@ -75,10 +75,10 @@ namespace Datadog.Trace.RuntimeMetrics
                 _instanceName = GetSimpleInstanceName();
             }
 
-            TryUpdateGauge(MetricsNames.Gc.HeapSize, _gen0Size, GcMetrics.GenerationTag(0));
-            TryUpdateGauge(MetricsNames.Gc.HeapSize, _gen1Size, GcMetrics.GenerationTag(1));
-            TryUpdateGauge(MetricsNames.Gc.HeapSize, _gen2Size, GcMetrics.GenerationTag(2));
-            TryUpdateGauge(MetricsNames.Gc.HeapSize, _lohSize, GcMetrics.GenerationTag(3));
+            TryUpdateGauge(MetricsNames.Gc.HeapSize, _gen0Size, GcMetrics.Tags.Gen0);
+            TryUpdateGauge(MetricsNames.Gc.HeapSize, _gen1Size, GcMetrics.Tags.Gen1);
+            TryUpdateGauge(MetricsNames.Gc.HeapSize, _gen2Size, GcMetrics.Tags.Gen2);
+            TryUpdateGauge(MetricsNames.Gc.HeapSize, _lohSize, GcMetrics.Tags.LargeObjectHeap);
 
             TryUpdateCounter(MetricsNames.ContentionCount, _contentionCount);
 
@@ -118,13 +118,13 @@ namespace Datadog.Trace.RuntimeMetrics
             }
         }
 
-        private void TryUpdateGauge(string path, PerformanceCounterWrapper counter, string tag)
+        private void TryUpdateGauge(string path, PerformanceCounterWrapper counter, string[] tags)
         {
             var value = counter.GetValue(_instanceName);
 
             if (value != null)
             {
-                _statsd.Gauge(path, value.Value, tags: new[] { tag });
+                _statsd.Gauge(path, value.Value, tags: tags);
             }
         }
 
