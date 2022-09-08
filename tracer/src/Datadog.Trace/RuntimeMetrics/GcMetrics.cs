@@ -46,17 +46,17 @@ internal static class GcMetrics
 
         public static string[] Gen2 { get; } = new[] { GenerationTag(GcGeneration.Gen2) };
 
-        public static string[] Loh { get; } = new[] { GenerationTag(GcGeneration.LargeObjectHeap) };
+        public static string[] LargeObjectHeap { get; } = new[] { GenerationTag(GcGeneration.LargeObjectHeap) };
 
-        public static string[] Poh { get; } = new[] { GenerationTag(GcGeneration.PinnedObjectHeap) };
+        public static string[] PinnedObjectHeap { get; } = new[] { GenerationTag(GcGeneration.PinnedObjectHeap) };
 
         public static ReadOnlyCollection<string[]> GenerationTags { get; } = new(new List<string[]>
         {
             Gen0,
             Gen1,
             Gen2,
-            Loh,
-            Poh
+            LargeObjectHeap,
+            PinnedObjectHeap
         });
 
         private static string GenerationTag(GcGeneration gcGeneration)

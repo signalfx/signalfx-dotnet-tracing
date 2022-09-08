@@ -78,7 +78,7 @@ namespace Datadog.Trace.RuntimeMetrics
             TryUpdateGauge(MetricsNames.Gc.HeapSize, _gen0Size, GcMetrics.Tags.Gen0);
             TryUpdateGauge(MetricsNames.Gc.HeapSize, _gen1Size, GcMetrics.Tags.Gen1);
             TryUpdateGauge(MetricsNames.Gc.HeapSize, _gen2Size, GcMetrics.Tags.Gen2);
-            TryUpdateGauge(MetricsNames.Gc.HeapSize, _lohSize, GcMetrics.Tags.Loh);
+            TryUpdateGauge(MetricsNames.Gc.HeapSize, _lohSize, GcMetrics.Tags.LargeObjectHeap);
 
             TryUpdateCounter(MetricsNames.ContentionCount, _contentionCount);
 

@@ -40,7 +40,7 @@ namespace Datadog.Trace.RuntimeMetrics
             _statsd.Gauge(MetricsNames.Gc.HeapSize, value.Gen0Size, tags: GcMetrics.Tags.Gen0);
             _statsd.Gauge(MetricsNames.Gc.HeapSize, value.Gen1Size, tags: GcMetrics.Tags.Gen1);
             _statsd.Gauge(MetricsNames.Gc.HeapSize, value.Gen2Size, tags: GcMetrics.Tags.Gen2);
-            _statsd.Gauge(MetricsNames.Gc.HeapSize, value.LohSize, tags: GcMetrics.Tags.Loh);
+            _statsd.Gauge(MetricsNames.Gc.HeapSize, value.LohSize, tags: GcMetrics.Tags.LargeObjectHeap);
 
             GcMetrics.PushCollectionCounts(_statsd);
 
