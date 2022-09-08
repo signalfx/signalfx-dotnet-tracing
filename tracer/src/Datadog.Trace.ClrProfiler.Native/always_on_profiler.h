@@ -19,6 +19,7 @@ constexpr auto unknown_managed_thread_id = -1;
 extern "C"
 {
     EXPORTTHIS int32_t SignalFxReadThreadSamples(int32_t len, unsigned char* buf);
+    EXPORTTHIS int32_t SignalFxReadAllocationSamples(int32_t len, unsigned char* buf);
     // ReSharper disable CppInconsistentNaming
     EXPORTTHIS void SignalFxSetNativeContext(uint64_t traceIdHigh, uint64_t traceIdLow, uint64_t spanId, int32_t managedThreadId);
     // ReSharper restore CppInconsistentNaming
@@ -81,7 +82,7 @@ public:
 class ThreadSampler
 {
 public:
-    void StartSampling(ICorProfilerInfo10* cor_profiler_info10);
+    void StartThreadSampling();
     void StartAllocationSampling(ICorProfilerInfo12* info12);
     void AllocationTick(ULONG dataLen, LPCBYTE data);
     ICorProfilerInfo10* info10;
@@ -89,6 +90,9 @@ public:
     void ThreadDestroyed(ThreadID thread_id);
     void ThreadAssignedToOsThread(ThreadID managedThreadId, DWORD os_thread_id);
     void ThreadNameChanged(ThreadID thread_id, ULONG cch_name, WCHAR name[]);
+
+    void SetGlobalInfo10(ICorProfilerInfo10* info10);
+    ThreadState* GetCurrentThreadState(ThreadID tid);
 
     std::unordered_map<ThreadID, ThreadState*> managed_tid_to_state_;
     std::mutex thread_state_lock_;
@@ -169,6 +173,8 @@ private:
     std::unordered_map<TKey, typename std::list<std::pair<TKey, TValue>>::iterator> map_;
 };
 } // namespace always_on_profiler
+
+void AllocationSamplingAppendToBuffer(int32_t appendLen, unsigned char* appendBuf);
 
 bool ThreadSamplingShouldProduceThreadSample();
 void ThreadSamplingRecordProducedThreadSample(std::vector<unsigned char>* buf);

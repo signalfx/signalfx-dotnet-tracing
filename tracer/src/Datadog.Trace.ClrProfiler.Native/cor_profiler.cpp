@@ -254,12 +254,16 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
         return E_FAIL;
     }
 
+    if (IsThreadSamplingEnabled() || IsAllocationSamplingEnabled())
+    {
+        this->threadSampler = new always_on_profiler::ThreadSampler();
+        this->threadSampler->SetGlobalInfo10(info10);
+    }
     if (IsThreadSamplingEnabled())
     {
         if (metThreadSamplingRequirements)
         {
-            this->threadSampler = new always_on_profiler::ThreadSampler();
-            this->threadSampler->StartSampling(info10);
+            this->threadSampler->StartThreadSampling();
         }
         else
         {
@@ -272,11 +276,6 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
         HRESULT hr = info_->QueryInterface(__uuidof(ICorProfilerInfo12), (void**) &info12);
         if (!FAILED(hr) && info12 != nullptr)
         {
-            if (this->threadSampler == nullptr)
-            {
-                // TODO Splunk: may want to combine precheck logic to ensure only one allocation site
-                this->threadSampler = new always_on_profiler::ThreadSampler();
-            }
             this->threadSampler->StartAllocationSampling(info12);
         }
         else

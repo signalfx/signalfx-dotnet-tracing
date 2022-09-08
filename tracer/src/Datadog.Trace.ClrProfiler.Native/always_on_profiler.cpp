@@ -34,9 +34,12 @@ constexpr auto kMaxVolatileFunctionNameCacheSize = 2000;
 // https://github.com/dotnet/samples/blob/2cf486af936261b04a438ea44779cdc26c613f98/core/profiling/stacksampling/src/sampler.cpp
 // That stack sampling project is worth reading for a simpler (though higher overhead) take on thread sampling.
 
-static std::mutex buffer_lock = std::mutex();
-static std::vector<unsigned char>* buffer_a;
-static std::vector<unsigned char>* buffer_b;
+static std::mutex cpu_buffer_lock = std::mutex();
+static std::vector<unsigned char>* cpu_buffer_a;
+static std::vector<unsigned char>* cpu_buffer_b;
+
+static std::mutex allocation_buffer_lock = std::mutex();
+static std::vector<unsigned char>* allocation_buffer = new std::vector<unsigned char>();
 
 static std::mutex thread_span_context_lock;
 static std::unordered_map<ThreadID, always_on_profiler::thread_span_context> thread_span_context_map;
@@ -46,16 +49,16 @@ static ICorProfilerInfo10* profiler_info; // After feature sets settle down, per
 // Dirt-simple back pressure system to save overhead if managed code is not reading fast enough
 bool ThreadSamplingShouldProduceThreadSample()
 {
-    std::lock_guard<std::mutex> guard(buffer_lock);
-    return buffer_a == nullptr || buffer_b == nullptr;
+    std::lock_guard<std::mutex> guard(cpu_buffer_lock);
+    return cpu_buffer_a == nullptr || cpu_buffer_b == nullptr;
 }
 void ThreadSamplingRecordProducedThreadSample(std::vector<unsigned char>* buf)
 {
-    std::lock_guard<std::mutex> guard(buffer_lock);
-    if (buffer_a == nullptr) {
-        buffer_a = buf;
-    } else if (buffer_b == nullptr) {
-        buffer_b = buf;
+    std::lock_guard<std::mutex> guard(cpu_buffer_lock);
+    if (cpu_buffer_a == nullptr) {
+        cpu_buffer_a = buf;
+    } else if (cpu_buffer_b == nullptr) {
+        cpu_buffer_b = buf;
     } else {
         trace::Logger::Warn("Unexpected buffer drop in ThreadSampling_RecordProducedThreadSample");
         delete buf; // needs to be dropped now
@@ -71,17 +74,58 @@ int32_t ThreadSamplingConsumeOneThreadSample(int32_t len, unsigned char* buf)
     }
     std::vector<unsigned char>* to_use = nullptr;
     {
-        std::lock_guard<std::mutex> guard(buffer_lock);
-        if (buffer_a != nullptr)
+        std::lock_guard<std::mutex> guard(cpu_buffer_lock);
+        if (cpu_buffer_a != nullptr)
         {
-            to_use = buffer_a;
-            buffer_a = nullptr;
+            to_use = cpu_buffer_a;
+            cpu_buffer_a = nullptr;
         }
-        else if (buffer_b != nullptr)
+        else if (cpu_buffer_b != nullptr)
         {
-            to_use = buffer_b;
-            buffer_b = nullptr;
+            to_use = cpu_buffer_b;
+            cpu_buffer_b = nullptr;
         }
+    }
+    if (to_use == nullptr)
+    {
+        return 0;
+    }
+    const size_t to_use_len = static_cast<int>(std::min(to_use->size(), static_cast<size_t>(len)));
+    memcpy(buf, to_use->data(), to_use_len);
+    delete to_use;
+    return static_cast<int32_t>(to_use_len);
+}
+
+void AllocationSamplingAppendToBuffer(int32_t appendLen, unsigned char* appendBuf)
+{
+    if (appendLen <= 0 || appendBuf == NULL)
+    {
+        return;
+    }
+    std::lock_guard<std::mutex> guard(allocation_buffer_lock);
+
+    if (allocation_buffer->size() >= kSamplesBufferMaximumSize)
+    {
+        return;
+    }
+    size_t actualLen = std::min((size_t) appendLen, kSamplesBufferMaximumSize - allocation_buffer->size());
+    allocation_buffer->insert(allocation_buffer->end(), appendBuf, &appendBuf[actualLen]);
+}
+
+// Can return 0
+int32_t AllocationSamplingConsumeAndReplaceBuffer(int32_t len, unsigned char* buf)
+{
+    if (len <= 0 || buf == nullptr)
+    {
+        trace::Logger::Warn("Unexpected 0/null buffer to SignalFxReadAllocationSamples");
+        return 0;
+    }
+    std::vector<unsigned char>* to_use = nullptr;
+    {
+        std::lock_guard<std::mutex> guard(allocation_buffer_lock);
+        to_use = allocation_buffer;
+        allocation_buffer = new std::vector<unsigned char>();
+        allocation_buffer->reserve(kSamplesBufferDefaultSize);
     }
     if (to_use == nullptr)
     {
@@ -611,17 +655,33 @@ DWORD WINAPI SamplingThreadMain(_In_ LPVOID param)
     }
 }
 
-void ThreadSampler::StartSampling(ICorProfilerInfo10* cor_profiler_info10)
+void ThreadSampler::SetGlobalInfo10(ICorProfilerInfo10* cor_profiler_info10)
 {
-    trace::Logger::Info("ThreadSampler::StartSampling");
     profiler_info = cor_profiler_info10;
     this->info10 = cor_profiler_info10;
+}
+
+void ThreadSampler::StartThreadSampling()
+{
+    trace::Logger::Info("ThreadSampler::StartThreadSampling");
 #ifdef _WIN32
     CreateThread(nullptr, 0, &SamplingThreadMain, this, 0, nullptr);
 #else
     pthread_t thr;
     pthread_create(&thr, NULL, (void *(*)(void *)) &SamplingThreadMain, this);
 #endif
+}
+
+thread_span_context GetCurrentSpanContext(ThreadID tid)
+{
+    std::lock_guard<std::mutex> guard(thread_span_context_lock);
+    return thread_span_context_map[tid];
+}
+
+ThreadState* ThreadSampler::GetCurrentThreadState(ThreadID tid)
+{
+    std::lock_guard<std::mutex> guard(thread_state_lock_);
+    return managed_tid_to_state_[tid];
 }
 
 void ThreadSampler::AllocationTick(ULONG dataLen, LPCBYTE data)
@@ -638,6 +698,15 @@ void ThreadSampler::AllocationTick(ULONG dataLen, LPCBYTE data)
 
 #endif
 
+    ThreadID threadId;
+    const HRESULT hr = info10->GetCurrentThreadID(&threadId);
+    if (FAILED(hr))
+    {
+        trace::Logger::Debug("GetCurrentThreadId failed, ", hr);
+        return;
+    }
+    auto spanCtx = GetCurrentSpanContext(threadId);
+    auto threadState = GetCurrentThreadState(threadId);
 }
 
 void ThreadSampler::StartAllocationSampling(ICorProfilerInfo12* info12)
@@ -770,6 +839,10 @@ extern "C"
     EXPORTTHIS int32_t SignalFxReadThreadSamples(int32_t len, unsigned char* buf)
     {
         return ThreadSamplingConsumeOneThreadSample(len, buf);
+    }
+    EXPORTTHIS int32_t SignalFxReadAllocationSamples(int32_t len, unsigned char* buf)
+    {
+        return AllocationSamplingConsumeAndReplaceBuffer(len, buf);
     }
     EXPORTTHIS void SignalFxSetNativeContext(uint64_t traceIdHigh, uint64_t traceIdLow, uint64_t spanId,
                                              int32_t managedThreadId)
