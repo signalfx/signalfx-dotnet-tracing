@@ -80,6 +80,7 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
             statsd.Verify(s => s.Counter(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), It.IsAny<double>(), new[] { "generation:gen2" }), Times.AtLeastOnce);
 
 #if NET6_0_OR_GREATER
+            statsd.Verify(s => s.Gauge(MetricsNames.Gc.HeapSize, It.IsAny<double>(), It.IsAny<double>(), new[] { "generation:poh" }), Times.AtLeastOnce);
             statsd.Verify(s => s.Gauge(MetricsNames.Gc.HeapCommittedMemory, It.IsAny<double>(), It.IsAny<double>(), It.IsAny<string[]>()), Times.AtLeastOnce);
 #endif
         }

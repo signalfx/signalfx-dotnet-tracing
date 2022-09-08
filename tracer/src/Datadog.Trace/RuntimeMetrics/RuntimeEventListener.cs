@@ -55,7 +55,7 @@ namespace Datadog.Trace.RuntimeMetrics
                 ["total-connections"] = MetricsNames.AspNetCoreTotalConnections
             };
 
-            // source originated from: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/blob/main/src/OpenTelemetry.Instrumentation.Runtime/RuntimeMetrics.cs
+            // source originated from: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/blob/bc947a00c3f859cc436f050e81172fc1f8bc09d7/src/OpenTelemetry.Instrumentation.Runtime/RuntimeMetrics.cs
 #if NET6_0_OR_GREATER
             var mi = typeof(GC).GetMethod("GetGenerationSize", BindingFlags.NonPublic | BindingFlags.Static);
             if (mi != null)
@@ -104,13 +104,20 @@ namespace Datadog.Trace.RuntimeMetrics
             GcMetrics.PushCollectionCounts(_statsd);
 
 #if NET6_0_OR_GREATER
-            // source originated from: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/blob/main/src/OpenTelemetry.Instrumentation.Runtime/RuntimeMetrics.cs
+            // source originated from: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/blob/bc947a00c3f859cc436f050e81172fc1f8bc09d7/src/OpenTelemetry.Instrumentation.Runtime/RuntimeMetrics.cs
             var generationInfo = GC.GetGCMemoryInfo().GenerationInfo;
             var maxSupportedLength = Math.Min(generationInfo.Length, GcMetrics.GenNames.Count);
             for (var i = 0; i < maxSupportedLength; i++)
             {
+                // heap size returned by GetGenerationSize, based on value of i:
+                // 0 -> gen0
+                // 1 -> gen1
+                // 2 -> gen2
+                // 3 -> loh
+                // 4 -> poh
+
                 // TODO splunk: opentelemetry-dotnet-contrib plans to change to ObservableUpDownCounter, will need to be adjusted
-                _statsd.Gauge(MetricsNames.Gc.HeapSize, GetGenerationSize(i), tags: new[] { GcMetrics.GenerationTag(i) });
+                _statsd.Gauge(MetricsNames.Gc.HeapSize, GetGenerationSize(i), tags: GcMetrics.Tags.GenerationTags[i]);
             }
 
             if (IsGcInfoAvailable)
@@ -154,10 +161,10 @@ namespace Datadog.Trace.RuntimeMetrics
                 var stats = HeapStats.FromPayload(eventData.Payload);
 
                 // TODO splunk: opentelemetry-dotnet-contrib plans to change to ObservableUpDownCounter, will need to be adjusted
-                _statsd.Gauge(MetricsNames.Gc.HeapSize, stats.Gen0Size, tags: new[] { GcMetrics.GenerationTag(0) });
-                _statsd.Gauge(MetricsNames.Gc.HeapSize, stats.Gen1Size, tags: new[] { GcMetrics.GenerationTag(1) });
-                _statsd.Gauge(MetricsNames.Gc.HeapSize, stats.Gen2Size, tags: new[] { GcMetrics.GenerationTag(2) });
-                _statsd.Gauge(MetricsNames.Gc.HeapSize, stats.LohSize, tags: new[] { GcMetrics.GenerationTag(3) });
+                _statsd.Gauge(MetricsNames.Gc.HeapSize, stats.Gen0Size, tags: GcMetrics.Tags.Gen0);
+                _statsd.Gauge(MetricsNames.Gc.HeapSize, stats.Gen1Size, tags: GcMetrics.Tags.Gen1);
+                _statsd.Gauge(MetricsNames.Gc.HeapSize, stats.Gen2Size, tags: GcMetrics.Tags.Gen2);
+                _statsd.Gauge(MetricsNames.Gc.HeapSize, stats.LohSize, tags: GcMetrics.Tags.LargeObjectHeap);
             }
 #endif
 
