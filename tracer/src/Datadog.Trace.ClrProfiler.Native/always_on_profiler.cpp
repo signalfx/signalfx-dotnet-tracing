@@ -715,17 +715,39 @@ ThreadState* ThreadSampler::GetCurrentThreadState(ThreadID tid)
     return managed_tid_to_state_[tid];
 }
 
+// You can read about the ETW event format for AllocationTick at
+// https://docs.microsoft.com/en-us/dotnet/framework/performance/garbage-collection-etw-events#gcallocationtick_v3-event
+// or, if that is not working, a search for "GCAllocationTick ETW" will get you there.
+// As of this comment, the above link only documents v3 of the event, with v4 undocumented but
+// by source traversal differs only by the addition of the actual size of the just-allocated object
+// Do not be fooled by "AllocationAmount" which is set to the 100kb sampling limit.
+
+// AllocationAmount     int32
+// AllocationKind       int32
+// InstanceId           int16
+// AllocationAmount64   int64
+// TypeId               pointer
+// TypeName             ucs2 string, null terminated, variable length
+// HeapIndex            int32
+// Address              pointer
+// AllocatedSize        int64
+
+constexpr auto EtwPointerSize = sizeof(void*);
+constexpr auto AllocationTickV4TypeNameStartByteIndex = 4 + 4 + 2 + 8 + EtwPointerSize;
+constexpr auto AllocationTickV4SizeWithoutTypeName    = 4 + 4 + 2 + 8 + EtwPointerSize + 4 + EtwPointerSize + 8;
+
 void ThreadSampler::AllocationTick(ULONG dataLen, LPCBYTE data)
 {
-    // TODO Splunk: find a symbolic way into this rather than byte offsets
-    // TODO Splunk: in particular the win:Pointer types need adjustment
+    // In v4 it's the last field, so use a relative offset from the end
     uint64_t allocatedSize = *((uint64_t*) &(data[dataLen - 8]));
-    WCHAR* typeName = (WCHAR*) &data[26];
-    size_t typeNameCharLen = (dataLen - 46) / 2;
+    // Here's the first byte of the typeName
+    WCHAR* typeName = (WCHAR*) &data[AllocationTickV4TypeNameStartByteIndex];
+    // and its length can be derived without iterating it since there is only the one variable-length field
+    size_t typeNameCharLen = (dataLen - AllocationTickV4SizeWithoutTypeName) / 2;
 #ifdef _WIN32
-    printf("Allocation: %i %ws\n", (int) allocatedSize, (wchar_t*) &data[26]);
+    printf("Allocation: %i %ws\n", (int) allocatedSize, typeName);
 #else
-    shared::WSTRING ws = shared::WSTRING((char16_t*)(&data[26]));
+    shared::WSTRING ws = shared::WSTRING(typeName);
     std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> convert;
     std::string s = convert.to_bytes(ws);
     printf("Allocation: %i %s\n", (int) allocatedSize, s.c_str());
