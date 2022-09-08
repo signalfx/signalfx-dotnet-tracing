@@ -31,7 +31,7 @@ namespace Datadog.Trace.Vendors.StatsdClient
         /// <param name="value">A given delta.</param>
         /// <param name="sampleRate">Percentage of metric to be sent.</param>
         /// <param name="tags">Array of tags to be added to the data.</param>
-        void Counter(string statName, double value, double sampleRate = 1, string[] tags = null);
+        void Counter(string statName, long value, double sampleRate = 1, string[] tags = null);
 
         /// <summary>
         /// Decrements the specified counter.

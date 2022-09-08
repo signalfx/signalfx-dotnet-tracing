@@ -3,7 +3,10 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 // Disabled on .NET Core 3.1 as we were running into this issue: https://github.com/dotnet/runtime/issues/51579
+
 #if NET5_0_OR_GREATER
 using System;
 using System.Collections.Generic;
@@ -30,44 +33,56 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
             listener.Refresh();
 
             statsd.Verify(s => s.Gauge(MetricsNames.ContentionTime, It.IsAny<double>(), 1, null), Times.Once);
-            statsd.Verify(s => s.Counter(MetricsNames.ContentionCount, It.IsAny<double>(), 1, null), Times.Once);
+            statsd.Verify(s => s.Counter(MetricsNames.ContentionCount, It.IsAny<long>(), 1, null), Times.Once);
             statsd.Verify(s => s.Gauge(MetricsNames.ThreadPoolWorkersCount, It.IsAny<double>(), 1, null), Times.Once);
         }
 
         [Fact]
         public void MonitorGarbageCollections()
         {
-            string[] compactingGcTags = { "compacting_gc:true" };
-
             var statsd = new Mock<IDogStatsd>();
 
-            var mutex = new ManualResetEventSlim();
+            // number of reported heap sizes depends on the version of the runtime
+            var expectedCount = Environment.Version.Major >= 6 ? 5 : 4;
 
-            // GcPauseTime is pushed on the GcRestartEnd event, which should be the last event for any GC
-            statsd.Setup(s => s.Timer(MetricsNames.GcPauseTime, It.IsAny<double>(), It.IsAny<double>(), null))
-                .Callback(() => mutex.Set());
+            // needed for runtime version < net6
+            var countdownEvent = new CountdownEvent(expectedCount);
+
+            statsd.Setup(s => s.Gauge(MetricsNames.Gc.HeapSize, It.IsAny<double>(), It.IsAny<double>(), It.IsAny<string[]>()))
+                .Callback(() => countdownEvent.Signal());
 
             using var listener = new RuntimeEventListener(statsd.Object, TimeSpan.FromSeconds(10));
 
             statsd.Invocations.Clear();
 
-            for (int i = 0; i < 3; i++)
+            countdownEvent.Reset(); // In case a GC was triggered when creating the listener
+
+            GC.Collect(2, GCCollectionMode.Forced, blocking: true, compacting: true);
+
+            // refresh for collection counts metrics to be pushed
+            listener.Refresh();
+
+            // GC events are pushed asynchronously for runtime version < net6, wait for the last one to be processed
+            if (!countdownEvent.Wait(TimeSpan.FromSeconds(30)))
             {
-                mutex.Reset(); // In case a GC was triggered when creating the listener
-
-                GC.Collect(2, GCCollectionMode.Forced, blocking: true, compacting: true);
-
-                // GC events are pushed asynchronously, wait for the last one to be processed
-                mutex.Wait();
+                throw new TimeoutException("Timed-out waiting for heap sizes to be reported.");
             }
 
-            statsd.Verify(s => s.Gauge(MetricsNames.Gen0HeapSize, It.IsAny<double>(), It.IsAny<double>(), null), Times.AtLeastOnce);
-            statsd.Verify(s => s.Gauge(MetricsNames.Gen1HeapSize, It.IsAny<double>(), It.IsAny<double>(), null), Times.AtLeastOnce);
-            statsd.Verify(s => s.Gauge(MetricsNames.Gen2HeapSize, It.IsAny<double>(), It.IsAny<double>(), null), Times.AtLeastOnce);
-            statsd.Verify(s => s.Gauge(MetricsNames.LohSize, It.IsAny<double>(), It.IsAny<double>(), null), Times.AtLeastOnce);
-            statsd.Verify(s => s.Timer(MetricsNames.GcPauseTime, It.IsAny<double>(), It.IsAny<double>(), null), Times.AtLeastOnce);
-            statsd.Verify(s => s.Gauge(MetricsNames.GcMemoryLoad, It.IsAny<double>(), It.IsAny<double>(), null), Times.AtLeastOnce);
-            statsd.Verify(s => s.Increment(MetricsNames.Gen2CollectionsCount, 1, It.IsAny<double>(), compactingGcTags), Times.AtLeastOnce);
+            statsd.Verify(s => s.Gauge(MetricsNames.Gc.HeapSize, It.IsAny<double>(), It.IsAny<double>(), new[] { "generation:gen0" }), Times.AtLeastOnce);
+            statsd.Verify(s => s.Gauge(MetricsNames.Gc.HeapSize, It.IsAny<double>(), It.IsAny<double>(), new[] { "generation:gen1" }), Times.AtLeastOnce);
+            statsd.Verify(s => s.Gauge(MetricsNames.Gc.HeapSize, It.IsAny<double>(), It.IsAny<double>(), new[] { "generation:gen2" }), Times.AtLeastOnce);
+            statsd.Verify(s => s.Gauge(MetricsNames.Gc.HeapSize, It.IsAny<double>(), It.IsAny<double>(), new[] { "generation:loh" }), Times.AtLeastOnce);
+
+            statsd.Verify(s => s.Counter(MetricsNames.Gc.AllocatedBytes, It.IsAny<long>(), It.IsAny<double>(), It.IsAny<string[]>()), Times.AtLeastOnce);
+
+            statsd.Verify(s => s.Counter(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), It.IsAny<double>(), new[] { "generation:gen0" }), Times.AtLeastOnce);
+            statsd.Verify(s => s.Counter(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), It.IsAny<double>(), new[] { "generation:gen1" }), Times.AtLeastOnce);
+            statsd.Verify(s => s.Counter(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), It.IsAny<double>(), new[] { "generation:gen2" }), Times.AtLeastOnce);
+
+#if NET6_0_OR_GREATER
+            statsd.Verify(s => s.Gauge(MetricsNames.Gc.HeapSize, It.IsAny<double>(), It.IsAny<double>(), new[] { "generation:poh" }), Times.AtLeastOnce);
+            statsd.Verify(s => s.Gauge(MetricsNames.Gc.HeapCommittedMemory, It.IsAny<double>(), It.IsAny<double>(), It.IsAny<string[]>()), Times.AtLeastOnce);
+#endif
         }
 
         [Fact]

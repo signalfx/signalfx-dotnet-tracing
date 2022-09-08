@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 #if NETFRAMEWORK
 using System;
 using System.Diagnostics;
@@ -18,7 +20,7 @@ namespace Datadog.Trace.RuntimeMetrics
     {
         private const string MemoryCategoryName = ".NET CLR Memory";
         private const string ThreadingCategoryName = ".NET CLR LocksAndThreads";
-        private const string GarbageCollectionMetrics = $"{MetricsNames.Gen0HeapSize}, {MetricsNames.Gen1HeapSize}, {MetricsNames.Gen2HeapSize}, {MetricsNames.LohSize}, {MetricsNames.ContentionCount}, {MetricsNames.Gen0CollectionsCount}, {MetricsNames.Gen1CollectionsCount}, {MetricsNames.Gen2CollectionsCount}";
+        private const string GarbageCollectionMetrics = $"{MetricsNames.Gc.HeapSize}, {MetricsNames.Gc.CollectionsCount}";
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<PerformanceCountersListener>();
 
@@ -35,12 +37,6 @@ namespace Datadog.Trace.RuntimeMetrics
         private PerformanceCounterWrapper _gen2Size;
         private PerformanceCounterWrapper _lohSize;
         private PerformanceCounterWrapper _contentionCount;
-
-        private int? _previousGen0Count;
-        private int? _previousGen1Count;
-        private int? _previousGen2Count;
-
-        private double? _lastContentionCount;
 
         private Task _initializationTask;
 
@@ -79,35 +75,14 @@ namespace Datadog.Trace.RuntimeMetrics
                 _instanceName = GetSimpleInstanceName();
             }
 
-            TryUpdateGauge(MetricsNames.Gen0HeapSize, _gen0Size);
-            TryUpdateGauge(MetricsNames.Gen1HeapSize, _gen1Size);
-            TryUpdateGauge(MetricsNames.Gen2HeapSize, _gen2Size);
-            TryUpdateGauge(MetricsNames.LohSize, _lohSize);
+            TryUpdateGauge(MetricsNames.Gc.HeapSize, _gen0Size, GcMetrics.Tags.Gen0);
+            TryUpdateGauge(MetricsNames.Gc.HeapSize, _gen1Size, GcMetrics.Tags.Gen1);
+            TryUpdateGauge(MetricsNames.Gc.HeapSize, _gen2Size, GcMetrics.Tags.Gen2);
+            TryUpdateGauge(MetricsNames.Gc.HeapSize, _lohSize, GcMetrics.Tags.LargeObjectHeap);
 
-            TryUpdateCounter(MetricsNames.ContentionCount, _contentionCount, ref _lastContentionCount);
+            TryUpdateCounter(MetricsNames.ContentionCount, _contentionCount);
 
-            var gen0 = GC.CollectionCount(0);
-            var gen1 = GC.CollectionCount(1);
-            var gen2 = GC.CollectionCount(2);
-
-            if (_previousGen0Count != null)
-            {
-                _statsd.Increment(MetricsNames.Gen0CollectionsCount, gen0 - _previousGen0Count.Value);
-            }
-
-            if (_previousGen1Count != null)
-            {
-                _statsd.Increment(MetricsNames.Gen1CollectionsCount, gen1 - _previousGen1Count.Value);
-            }
-
-            if (_previousGen2Count != null)
-            {
-                _statsd.Increment(MetricsNames.Gen2CollectionsCount, gen2 - _previousGen2Count.Value);
-            }
-
-            _previousGen0Count = gen0;
-            _previousGen1Count = gen1;
-            _previousGen2Count = gen2;
+            GcMetrics.PushCollectionCounts(_statsd);
 
             Log.Debug("Sent the following metrics: {metrics}", GarbageCollectionMetrics);
         }
@@ -143,17 +118,17 @@ namespace Datadog.Trace.RuntimeMetrics
             }
         }
 
-        private void TryUpdateGauge(string path, PerformanceCounterWrapper counter)
+        private void TryUpdateGauge(string path, PerformanceCounterWrapper counter, string[] tags)
         {
             var value = counter.GetValue(_instanceName);
 
             if (value != null)
             {
-                _statsd.Gauge(path, value.Value);
+                _statsd.Gauge(path, value.Value, tags: tags);
             }
         }
 
-        private void TryUpdateCounter(string path, PerformanceCounterWrapper counter, ref double? lastValue)
+        private void TryUpdateCounter(string path, PerformanceCounterWrapper counter)
         {
             var value = counter.GetValue(_instanceName);
 
@@ -162,14 +137,7 @@ namespace Datadog.Trace.RuntimeMetrics
                 return;
             }
 
-            if (lastValue == null)
-            {
-                lastValue = value;
-                return;
-            }
-
-            _statsd.Counter(path, value.Value - lastValue.Value);
-            lastValue = value;
+            _statsd.Counter(path, value.Value);
         }
 
         private Tuple<string, bool> GetInstanceName()

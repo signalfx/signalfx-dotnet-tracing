@@ -18,7 +18,7 @@ namespace Datadog.Trace.DogStatsd
         {
         }
 
-        public void Counter(string statName, double value, double sampleRate = 1, string[] tags = null)
+        public void Counter(string statName, long value, double sampleRate = 1, string[] tags = null)
         {
         }
 
