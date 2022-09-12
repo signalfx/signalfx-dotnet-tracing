@@ -187,7 +187,8 @@ namespace Datadog.Trace
 
                     var statsAggregator = StatsAggregator.Create(api, settings);
 
-                    return new AgentWriter(api, statsAggregator, metrics, maxBufferSize: settings.ExporterSettings.TraceBufferSize);
+                    const int maxBufferSize = 1024 * 1024 * 10;
+                    return new AgentWriter(api, statsAggregator, metrics, maxBufferSize: maxBufferSize);
             }
         }
 
