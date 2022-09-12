@@ -180,14 +180,14 @@ namespace Datadog.Trace
             switch (settings.Exporter)
             {
                 case ExporterType.Zipkin:
-                    return new ExporterWriter(new ZipkinExporter(settings), metrics);
+                    return new ExporterWriter(new ZipkinExporter(settings), metrics, queueSize: settings.ExporterSettings.TraceBufferSize);
                 default:
                     var apiRequestFactory = TracesTransportStrategy.Get(settings.ExporterSettings);
                     var api = new Api(apiRequestFactory, statsd, sampler.SetDefaultSampleRates, settings.ExporterSettings.PartialFlushEnabled, settings.StatsComputationEnabled);
 
                     var statsAggregator = StatsAggregator.Create(api, settings);
 
-                    return new AgentWriter(api, statsAggregator, metrics, maxBufferSize: settings.TraceBufferSize);
+                    return new AgentWriter(api, statsAggregator, metrics, maxBufferSize: settings.ExporterSettings.TraceBufferSize);
             }
         }
 

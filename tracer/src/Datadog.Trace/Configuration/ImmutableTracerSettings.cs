@@ -65,7 +65,6 @@ namespace Datadog.Trace.Configuration
             HttpServerErrorStatusCodes = settings.HttpServerErrorStatusCodes;
             HttpClientErrorStatusCodes = settings.HttpClientErrorStatusCodes;
             ServiceNameMappings = settings.ServiceNameMappings;
-            TraceBufferSize = settings.TraceBufferSize;
             TraceBatchInterval = settings.TraceBatchInterval;
             RouteTemplateResourceNamesEnabled = settings.RouteTemplateResourceNamesEnabled;
             DelayWcfInstrumentationEnabled = settings.DelayWcfInstrumentationEnabled;
@@ -262,11 +261,6 @@ namespace Datadog.Trace.Configuration
         /// Gets configuration values for changing service names based on configuration
         /// </summary>
         internal ServiceNames ServiceNameMappings { get; }
-
-        /// <summary>
-        /// Gets a value indicating the size in bytes of the trace buffer
-        /// </summary>
-        internal int TraceBufferSize { get; }
 
         /// <summary>
         /// Gets a value indicating the batch interval for the serialization queue, in milliseconds

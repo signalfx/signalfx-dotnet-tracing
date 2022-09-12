@@ -388,6 +388,9 @@ namespace Datadog.Trace
                     writer.WritePropertyName("partialflush_minspans");
                     writer.WriteValue(instanceSettings.ExporterSettings.PartialFlushMinSpans);
 
+                    writer.WritePropertyName("trace_buffer_size");
+                    writer.WriteValue(instanceSettings.ExporterSettings.TraceBufferSize);
+
                     writer.WritePropertyName("runtime_id");
                     writer.WriteValue(DistributedTracer.Instance.GetRuntimeId());
 
