@@ -17,6 +17,8 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 ### Enhancements
 
+- Add `SIGNALFX_TRACE_BUFFER_SIZE` setting to configure trace exporter buffer size.
+
 ## [Release 0.2.9](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.2.9)
 
 ### Bugfixes

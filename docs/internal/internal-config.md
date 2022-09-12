@@ -54,7 +54,6 @@ These settings should be never used by the users.
 | `SIGNALFX_TRACE_AGENT_PORT` | The Agent port where the tracer can send traces | `9411` |
 | `SIGNALFX_TRACE_ANALYTICS_ENABLED` | Enable to activate default Analytics. | `false` |
 | `SIGNALFX_TRACE_BATCH_INTERVAL` | The batch interval in milliseconds for the serialization queue. | `100` |
-| `SIGNALFX_TRACE_BUFFER_SIZE` | The size in bytes of the trace buffer. | `1024 * 1024 * 10 (10MB)` |
 | `SIGNALFX_TRACE_LOG_PATH` | (Deprecated) The path of the profiler log file. | Linux: `/var/log/signalfx/dotnet/dotnet-profiler.log`<br>Windows: `%ProgramData%\SignalFx .NET Tracing\logs\dotnet-profiler.log` |
 | `SIGNALFX_TRACE_HEADER_TAG_NORMALIZATION_FIX_ENABLED` | Enables a fix around header tags normalization. We used to normalize periods even if a tag was provided for a header, whereas we should not. | `true` |
 | `SIGNALFX_TRACE_PIPE_NAME` | The named pipe where the tracer can send traces. |  |

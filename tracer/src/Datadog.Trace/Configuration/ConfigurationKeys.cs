@@ -133,11 +133,6 @@ namespace Datadog.Trace.Configuration
         public const string ServiceNameMappings = "SIGNALFX_TRACE_SERVICE_MAPPING";
 
         /// <summary>
-        /// Configuration key for setting the size in bytes of the trace buffer
-        /// </summary>
-        public const string BufferSize = "SIGNALFX_TRACE_BUFFER_SIZE";
-
-        /// <summary>
         /// Configuration key for setting the batch interval in milliseconds for the serialization queue
         /// </summary>
         public const string SerializationBatchInterval = "SIGNALFX_TRACE_BATCH_INTERVAL";

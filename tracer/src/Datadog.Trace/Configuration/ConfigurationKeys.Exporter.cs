@@ -105,5 +105,10 @@ namespace Datadog.Trace.Configuration
         /// Default is <c>false</c>
         /// </summary>
         public const string TraceSyncExport = "SIGNALFX_TRACE_SYNC_EXPORT";
+
+        /// <summary>
+        /// Configuration key for setting the size of the trace buffer
+        /// </summary>
+        public const string TraceBufferSize = "SIGNALFX_TRACE_BUFFER_SIZE";
     }
 }

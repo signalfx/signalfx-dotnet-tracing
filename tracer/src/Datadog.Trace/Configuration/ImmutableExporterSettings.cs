@@ -56,6 +56,7 @@ namespace Datadog.Trace.Configuration
             ProfilerExportFormat = settings.ProfilerExportFormat;
 
             SyncExport = settings.SyncExport;
+            TraceBufferSize = settings.TraceBufferSize;
         }
 
         /// <summary>
@@ -120,6 +121,11 @@ namespace Datadog.Trace.Configuration
         /// Gets a value indicating whether exports should be synchronous.
         /// </summary>
         public bool SyncExport { get; }
+
+        /// <summary>
+        /// Gets a value indicating the size of the trace buffer
+        /// </summary>
+        public int TraceBufferSize { get; }
 
         /// <summary>
         /// Gets the transport used to send traces to the Agent.

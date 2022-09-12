@@ -72,7 +72,7 @@ The following settings are common to most instrumentation scenarios:
 
 ## Exporter settings
 
-Use following settings to configure where the telemetry data is being exported.
+Use following settings to configure where and how the telemetry data is being exported.
 
 | Setting | Description | Default |
 |-|-|-|
@@ -82,6 +82,7 @@ Use following settings to configure where the telemetry data is being exported.
 | `SIGNALFX_METRICS_ENDPOINT_URL` | The URL to where metric exporters send metrics. Overrides `SIGNALFX_REALM` configuration for the metrics ingestion endpoint. | `http://localhost:9943/v2/datapoint` |
 | `SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED` | Enable to export traces that contain a minimum number of closed spans, as defined by `SIGNALFX_TRACE_PARTIAL_FLUSH_MIN_SPANS`. | `false` |
 | `SIGNALFX_TRACE_PARTIAL_FLUSH_MIN_SPANS` | Minimum number of closed spans in a trace before it's exported. The default value is ``500``. Requires the value of the ``SIGNALFX_TRACE_PARTIAL_FLUSH_ENABLED`` environment variable to be ``true``. | `500` |
+| `SIGNALFX_TRACE_BUFFER_SIZE` | The size of the trace exporter buffer, expressed as the number of traces. | `1000` |
 
 ### Exporting directly to Splunk Observability Cloud
 

@@ -158,9 +158,6 @@ namespace Datadog.Trace.Configuration
                                         "400-599";
             HttpClientErrorStatusCodes = ParseHttpCodesToArray(httpClientErrorStatusCodes);
 
-            TraceBufferSize = source?.GetInt32(ConfigurationKeys.BufferSize)
-                           ?? 1024 * 1024 * 10; // 10MB
-
             TraceBatchInterval = source?.GetInt32(ConfigurationKeys.SerializationBatchInterval)
                               ?? 100;
 
@@ -533,11 +530,6 @@ namespace Datadog.Trace.Configuration
         /// Gets configuration values for changing service names based on configuration
         /// </summary>
         internal ServiceNames ServiceNameMappings { get; }
-
-        /// <summary>
-        /// Gets or sets a value indicating the size in bytes of the trace buffer
-        /// </summary>
-        internal int TraceBufferSize { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating the batch interval for the serialization queue, in milliseconds

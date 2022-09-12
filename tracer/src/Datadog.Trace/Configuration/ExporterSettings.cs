@@ -99,6 +99,11 @@ namespace Datadog.Trace.Configuration
                 validators: (val) => val > 0);
             SyncExport = source?.GetBool(ConfigurationKeys.TraceSyncExport) ?? false;
 
+            TraceBufferSize = source.SafeReadInt32(
+                key: ConfigurationKeys.TraceBufferSize,
+                defaultTo: 1000,
+                validators: configuredSize => configuredSize > 0);
+
             var stringProfileExportFormat = source?.GetString(ConfigurationKeys.AlwaysOnProfiler.ExportFormat);
             if (string.IsNullOrEmpty(stringProfileExportFormat))
             {
@@ -184,6 +189,11 @@ namespace Datadog.Trace.Configuration
         /// Gets or sets a value indicating whether to do synchronous export.
         /// </summary>
         public bool SyncExport { get; set; }
+
+        /// <summary>
+        /// Gets or sets the size of the trace buffer.
+        /// </summary>
+        public int TraceBufferSize { get; set; }
 
         /// <summary>
         /// Gets or sets the type of metrics exporter.
