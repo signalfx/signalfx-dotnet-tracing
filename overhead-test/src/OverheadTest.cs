@@ -68,6 +68,11 @@ public class OverheadTest : IAsyncLifetime
     [Fact]
     public async Task Run()
     {
+        // Test expects eshop-app-dc and eshop-app-dc-instrumented container images to be present.
+        // They should be built based on eshop-app.dockerfile in Docker directory.
+        // When running locally, ensure package.deb is present at the root of the repository,
+        // before attempting to build an instrumented image.
+
         _testOutputHelper.WriteLine($"----------------Starting execution: {(ShouldRunLocally() ? "local" : "remote")}");
         _testOutputHelper.WriteLine($"Directory for iteration results created at: {_iterationResults}");
 
