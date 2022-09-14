@@ -44,6 +44,8 @@ static std::vector<unsigned char>* allocation_buffer = new std::vector<unsigned 
 static std::mutex thread_span_context_lock;
 static std::unordered_map<ThreadID, always_on_profiler::thread_span_context> thread_span_context_map;
 
+static std::mutex name_cache_lock = std::mutex();
+
 static ICorProfilerInfo10* profiler_info; // After feature sets settle down, perhaps this should be refactored and have a single static instance of ThreadSampler
 
 // Dirt-simple back pressure system to save overhead if managed code is not reading fast enough
@@ -526,14 +528,25 @@ shared::WSTRING* SamplingHelper::Lookup(FunctionID fid, COR_PRF_FRAME_INFO frame
     return answer;
 }
 
+// TODO Splunk: This strongly suggests that the "name cache" and "buffer management" portions of 
+// the SamplingHelper should be split apart
+struct HelperAndBuffer
+{
+    SamplingHelper* helper;
+    ThreadSamplesBuffer* buffer;
+    HelperAndBuffer(SamplingHelper* h, ThreadSamplesBuffer* b) : helper(h), buffer(b)
+    {
+    }
+};
+
 HRESULT __stdcall FrameCallback(_In_ FunctionID func_id, _In_ UINT_PTR ip, _In_ COR_PRF_FRAME_INFO frame_info,
                                 _In_ ULONG32 context_size, _In_ BYTE context[], _In_ void* client_data)
 {
-    const auto helper = static_cast<SamplingHelper*>(client_data);
-    helper->stats_.total_frames++;
-    const shared::WSTRING* name = helper->Lookup(func_id, frame_info);
+    const auto hb = static_cast<HelperAndBuffer*>(client_data);
+    hb->helper->stats_.total_frames++;
+    const shared::WSTRING* name = hb->helper->Lookup(func_id, frame_info);
     // This is where line numbers could be calculated
-    helper->cur_writer_->RecordFrame(func_id, *name);
+    hb->buffer->RecordFrame(func_id, *name);
     return S_OK;
 }
 
@@ -552,7 +565,7 @@ void CaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10)
 
     ts->helper.volatile_function_name_cache_.Clear();
     ts->helper.cur_writer_->StartBatch();
-
+    HelperAndBuffer hb = HelperAndBuffer(&ts->helper, ts->helper.cur_writer_);
     while ((hr = thread_enum->Next(1, &thread_id, &num_returned)) == S_OK)
     {
         ts->helper.stats_.num_threads++;
@@ -569,7 +582,7 @@ void CaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10)
         }
 
         // Don't reuse the hr being used for the thread enum, especially since a failed snapshot isn't fatal
-        HRESULT snapshotHr = info10->DoStackSnapshot(thread_id, &FrameCallback, COR_PRF_SNAPSHOT_DEFAULT, &ts->helper, nullptr, 0);
+        HRESULT snapshotHr = info10->DoStackSnapshot(thread_id, &FrameCallback, COR_PRF_SNAPSHOT_DEFAULT, &hb, nullptr, 0);
         if (FAILED(snapshotHr))
         {
             trace::Logger::Debug("DoStackSnapshot failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, snapshotHr);
@@ -606,8 +619,11 @@ int GetSamplingPeriod()
 void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10)
 {
     // These locks are in use by managed threads; Acquire locks before suspending the runtime to prevent deadlock
+    // Any of these can be in use by random app/clr threads, but this is the only
+    // place that acquires more than one lock at a time.
     std::lock_guard<std::mutex> thread_state_guard(ts->thread_state_lock_);
     std::lock_guard<std::mutex> span_context_guard(thread_span_context_lock);
+    std::lock_guard<std::mutex> name_cache_guard(name_cache_lock);
 
     const auto start = std::chrono::steady_clock::now();
 
@@ -723,6 +739,19 @@ constexpr auto EtwPointerSize = sizeof(void*);
 constexpr auto AllocationTickV4TypeNameStartByteIndex = 4 + 4 + 2 + 8 + EtwPointerSize;
 constexpr auto AllocationTickV4SizeWithoutTypeName    = 4 + 4 + 2 + 8 + EtwPointerSize + 4 + EtwPointerSize + 8;
 
+void CaptureAllocationStack(ThreadSampler* ts, ThreadSamplesBuffer * buffer)
+{
+    std::lock_guard<std::mutex> guard(name_cache_lock);
+    // Read explanation of volatile clearing in SamplingHelper::Lookup
+    ts->helper.volatile_function_name_cache_.Clear();
+    HelperAndBuffer hb = HelperAndBuffer(&ts->helper, buffer);
+    HRESULT hr = ts->info10->DoStackSnapshot(NULL, &FrameCallback, COR_PRF_SNAPSHOT_DEFAULT, &hb, nullptr, 0);
+    if (FAILED(hr))
+    {
+        trace::Logger::Debug("DoStackSnapshot failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
+    }
+}
+
 void ThreadSampler::AllocationTick(ULONG dataLen, LPCBYTE data)
 {
     // In v4 it's the last field, so use a relative offset from the end
@@ -757,7 +786,7 @@ void ThreadSampler::AllocationTick(ULONG dataLen, LPCBYTE data)
     std::vector<unsigned char> localBytes;
     ThreadSamplesBuffer localBuf = ThreadSamplesBuffer(&localBytes);
     localBuf.AllocationSample(allocatedSize, typeName, typeNameCharLen, threadId, threadState, spanCtx);
-    // TODO Splunk: frame stack goes in here
+    CaptureAllocationStack(this, &localBuf);
     localBuf.EndSample();
     AllocationSamplingAppendToBuffer(static_cast<int32_t>(localBytes.size()), localBytes.data());
 }
