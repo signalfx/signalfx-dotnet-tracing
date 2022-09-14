@@ -314,229 +314,217 @@ void ThreadSamplesBuffer::WriteCurrentTimeMillis() const
     WriteUInt64(ms.count());
 }
 
-class SamplingHelper
-{
-public:
-    // These are permanent parts of the helper object
-    ICorProfilerInfo10* info10_ = nullptr;
-    NameCache<FunctionIdentifier, shared::WSTRING*> function_name_cache_;
-    NameCache<FunctionID, std::pair<shared::WSTRING*, FunctionIdentifier>> volatile_function_name_cache_;
-    // These cycle every sample and/or are owned externally
-    ThreadSamplesBuffer* cur_writer_ = nullptr;
-    std::vector<unsigned char>* cur_buffer_ = nullptr;
-    SamplingStatistics stats_;
 
-    SamplingHelper() :
+SamplingHelper::SamplingHelper() :
         function_name_cache_(kMaxFunctionNameCacheSize, nullptr),
         volatile_function_name_cache_(kMaxVolatileFunctionNameCacheSize, std::pair<shared::WSTRING*, FunctionIdentifier>(nullptr, {}))
-    {
-    }
+{
+}
 
-    bool AllocateBuffer()
+bool SamplingHelper::AllocateBuffer()
+{
+    const bool should = ThreadSamplingShouldProduceThreadSample();
+    if (!should)
     {
-        const bool should = ThreadSamplingShouldProduceThreadSample();
-        if (!should)
-        {
-            return should;
-        }
-        stats_ = SamplingStatistics();
-        cur_buffer_ = new std::vector<unsigned char>();
-        cur_buffer_->reserve(kSamplesBufferDefaultSize);
-        cur_writer_ = new ThreadSamplesBuffer(cur_buffer_);
         return should;
     }
-    void PublishBuffer()
+    stats_ = SamplingStatistics();
+    cur_buffer_ = new std::vector<unsigned char>();
+    cur_buffer_->reserve(kSamplesBufferDefaultSize);
+    cur_writer_ = new ThreadSamplesBuffer(cur_buffer_);
+    return should;
+}
+
+void SamplingHelper::PublishBuffer()
+{
+    ThreadSamplingRecordProducedThreadSample(cur_buffer_);
+    delete cur_writer_;
+    cur_writer_ = nullptr;
+    cur_buffer_ = nullptr;
+    stats_ = SamplingStatistics();
+}
+
+[[nodiscard]] FunctionIdentifier SamplingHelper::GetFunctionIdentifier(const FunctionID func_id,
+                                                                    const COR_PRF_FRAME_INFO frame_info) const
+{
+    if (func_id == 0)
     {
-        ThreadSamplingRecordProducedThreadSample(cur_buffer_);
-        delete cur_writer_;
-        cur_writer_ = nullptr;
-        cur_buffer_ = nullptr;
-        stats_ = SamplingStatistics();
+        constexpr auto zero_valid_function_identifier = FunctionIdentifier{0, 0, true};
+        return zero_valid_function_identifier;
     }
 
-private:
-    [[nodiscard]] FunctionIdentifier GetFunctionIdentifier(const FunctionID func_id, const COR_PRF_FRAME_INFO frame_info) const
+    ModuleID module_id = 0;
+    mdToken function_token = 0;
+    // theoretically there is a possibility to use GetFunctionInfo method, but it does not support generic methods
+    const HRESULT hr = info10_->GetFunctionInfo2(func_id, frame_info, nullptr, &module_id, &function_token, 0, nullptr, nullptr);
+    if (FAILED(hr))
     {
-        if (func_id == 0)
-        {
-            constexpr auto zero_valid_function_identifier = FunctionIdentifier{0, 0, true};
-            return zero_valid_function_identifier;
-        }
-
-        ModuleID module_id = 0;
-        mdToken function_token = 0;
-        // theoretically there is a possibility to use GetFunctionInfo method, but it does not support generic methods
-        const HRESULT hr = info10_->GetFunctionInfo2(func_id, frame_info, nullptr, &module_id, &function_token, 0, nullptr, nullptr);
-        if (FAILED(hr))
-        {
-            trace::Logger::Debug("GetFunctionInfo2 failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
-            constexpr auto zero_invalid_function_identifier = FunctionIdentifier{0, 0, false};
-            return zero_invalid_function_identifier;
-        }
-
-        return FunctionIdentifier{function_token, module_id, true};
+        trace::Logger::Debug("GetFunctionInfo2 failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
+        constexpr auto zero_invalid_function_identifier = FunctionIdentifier{0, 0, false};
+        return zero_invalid_function_identifier;
     }
 
-    void GetFunctionName(FunctionIdentifier function_identifier, shared::WSTRING& result)
+    return FunctionIdentifier{function_token, module_id, true};
+}
+
+void SamplingHelper::GetFunctionName(FunctionIdentifier function_identifier, shared::WSTRING& result)
+{
+    constexpr auto unknown_list_of_arguments = WStr("(unknown)");
+    constexpr auto unknown_function_name = WStr("Unknown(unknown)");
+
+    if (!function_identifier.is_valid)
     {
-        constexpr auto unknown_list_of_arguments = WStr("(unknown)");
-        constexpr auto unknown_function_name = WStr("Unknown(unknown)");
+        result.append(unknown_function_name);
+        return;
+    }
 
-        if (!function_identifier.is_valid)
-        {
-            result.append(unknown_function_name);
-            return;
-        }
+    if (function_identifier.function_token == 0)
+    {
+        constexpr auto unknown_native_function_name = WStr("Unknown_Native_Function(unknown)");
+        result.append(unknown_native_function_name);
+        return;
+    }
 
-        if (function_identifier.function_token == 0)
-        {
-            constexpr auto unknown_native_function_name = WStr("Unknown_Native_Function(unknown)");
-            result.append(unknown_native_function_name);
-            return;
-        }
+    ComPtr<IMetaDataImport2> metadata_import;
+    HRESULT hr = info10_->GetModuleMetaData(function_identifier.module_id, ofRead, IID_IMetaDataImport2,
+                                            reinterpret_cast<IUnknown**>(&metadata_import));
+    if (FAILED(hr))
+    {
+        trace::Logger::Debug("GetModuleMetaData failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
+        result.append(unknown_function_name);
+        return;
+    }
 
-        ComPtr<IMetaDataImport2> metadata_import;
-        HRESULT hr = info10_->GetModuleMetaData(function_identifier.module_id, ofRead, IID_IMetaDataImport2,
-                                              reinterpret_cast<IUnknown**>(&metadata_import));
-        if (FAILED(hr))
-        {
-            trace::Logger::Debug("GetModuleMetaData failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
-            result.append(unknown_function_name);
-            return;
-        }
+    const auto function_info = GetFunctionInfo(metadata_import, function_identifier.function_token);
 
-        const auto function_info = GetFunctionInfo(metadata_import, function_identifier.function_token);
+    if (!function_info.IsValid())
+    {
+        trace::Logger::Debug("GetFunctionInfo failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
+        result.append(unknown_function_name);
+        return;
+    }
 
-        if (!function_info.IsValid())
-        {
-            trace::Logger::Debug("GetFunctionInfo failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
-            result.append(unknown_function_name);
-            return;
-        }
-
-        result.append(function_info.type.name);
-        result.append(name_separator);
-        result.append(function_info.name);
+    result.append(function_info.type.name);
+    result.append(name_separator);
+    result.append(function_info.name);
 
         
-        HCORENUM function_gen_params_enum = nullptr;
-        HCORENUM class_gen_params_enum = nullptr;
-        mdGenericParam function_generic_params[kGenericParamsMaxLen]{};
-        mdGenericParam class_generic_params[kGenericParamsMaxLen]{};
-        ULONG function_gen_params_count = 0;
-        ULONG class_gen_params_count = 0;
+    HCORENUM function_gen_params_enum = nullptr;
+    HCORENUM class_gen_params_enum = nullptr;
+    mdGenericParam function_generic_params[kGenericParamsMaxLen]{};
+    mdGenericParam class_generic_params[kGenericParamsMaxLen]{};
+    ULONG function_gen_params_count = 0;
+    ULONG class_gen_params_count = 0;
 
-        mdTypeDef class_token = function_info.type.id;
+    mdTypeDef class_token = function_info.type.id;
 
-        hr = metadata_import->EnumGenericParams(&class_gen_params_enum, class_token, class_generic_params, kGenericParamsMaxLen,
-                                     &class_gen_params_count);
-        metadata_import->CloseEnum(class_gen_params_enum);
-        if (FAILED(hr))
-        {
-            trace::Logger::Debug("Class generic parameters enumeration failed. HRESULT=0x", std::setfill('0'), std::setw(8),
-                          std::hex, hr);
-            result.append(unknown_list_of_arguments);
-            return;
-        }
+    hr = metadata_import->EnumGenericParams(&class_gen_params_enum, class_token, class_generic_params, kGenericParamsMaxLen,
+                                    &class_gen_params_count);
+    metadata_import->CloseEnum(class_gen_params_enum);
+    if (FAILED(hr))
+    {
+        trace::Logger::Debug("Class generic parameters enumeration failed. HRESULT=0x", std::setfill('0'), std::setw(8),
+                        std::hex, hr);
+        result.append(unknown_list_of_arguments);
+        return;
+    }
         
-        hr = metadata_import->EnumGenericParams(&function_gen_params_enum, function_identifier.function_token, function_generic_params,
-                                     kGenericParamsMaxLen,
-                                      &function_gen_params_count);
-        metadata_import->CloseEnum(function_gen_params_enum);
-        if (FAILED(hr))
-        {
-            trace::Logger::Debug("Method generic parameters enumeration failed. HRESULT=0x", std::setfill('0'), std::setw(8),
-                          std::hex, hr);
-            result.append(unknown_list_of_arguments);
-            return;
-        }
+    hr = metadata_import->EnumGenericParams(&function_gen_params_enum, function_identifier.function_token, function_generic_params,
+                                    kGenericParamsMaxLen,
+                                    &function_gen_params_count);
+    metadata_import->CloseEnum(function_gen_params_enum);
+    if (FAILED(hr))
+    {
+        trace::Logger::Debug("Method generic parameters enumeration failed. HRESULT=0x", std::setfill('0'), std::setw(8),
+                        std::hex, hr);
+        result.append(unknown_list_of_arguments);
+        return;
+    }
 
-        if (function_gen_params_count > 0)
+    if (function_gen_params_count > 0)
+    {
+        result.append(kGenericParamsOpeningBrace);
+        for (ULONG i = 0; i < function_gen_params_count; ++i)
         {
-            result.append(kGenericParamsOpeningBrace);
-            for (ULONG i = 0; i < function_gen_params_count; ++i)
+            if (i != 0)
             {
-                if (i != 0)
-                {
-                    result.append(kParamsSeparator);
-                }
-
-                WCHAR param_type_name[kParamNameMaxLen]{};
-                ULONG pch_name = 0;
-                hr = metadata_import->GetGenericParamProps(function_generic_params[i], nullptr, nullptr, nullptr,
-                                                           nullptr, param_type_name, kParamNameMaxLen, &pch_name);
-                if (FAILED(hr))
-                {
-                    trace::Logger::Debug("GetGenericParamProps failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
-                    result.append(kUnknown);
-                }
-                else
-                {
-                    result.append(param_type_name);
-                }
+                result.append(kParamsSeparator);
             }
-            result.append(kGenericParamsClosingBrace);
-        }
-        
-        // try to list arguments type
-        FunctionMethodSignature function_method_signature = function_info.method_signature;
-        hr = function_method_signature.TryParse();
-        if (FAILED(hr))
-        {
-            result.append(unknown_list_of_arguments);
-            trace::Logger::Debug("FunctionMethodSignature parsing failed. HRESULT=0x", std::setfill('0'), std::setw(8),std::hex, hr);
-        }
-        else
-        {
-            const auto& arguments = function_method_signature.GetMethodArguments();
-            result.append(kFunctionParamsOpeningBrace);
-            for (ULONG i = 0; i < arguments.size(); i++)
+
+            WCHAR param_type_name[kParamNameMaxLen]{};
+            ULONG pch_name = 0;
+            hr = metadata_import->GetGenericParamProps(function_generic_params[i], nullptr, nullptr, nullptr,
+                                                        nullptr, param_type_name, kParamNameMaxLen, &pch_name);
+            if (FAILED(hr))
             {
-                if (i != 0)
-                {
-                    result.append(kParamsSeparator);
-                }
-
-                result.append(arguments[i].GetTypeTokName(metadata_import, class_generic_params, function_generic_params));
+                trace::Logger::Debug("GetGenericParamProps failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
+                result.append(kUnknown);
             }
-            result.append(kFunctionParamsClosingBrace);
+            else
+            {
+                result.append(param_type_name);
+            }
         }
+        result.append(kGenericParamsClosingBrace);
+    }
+        
+    // try to list arguments type
+    FunctionMethodSignature function_method_signature = function_info.method_signature;
+    hr = function_method_signature.TryParse();
+    if (FAILED(hr))
+    {
+        result.append(unknown_list_of_arguments);
+        trace::Logger::Debug("FunctionMethodSignature parsing failed. HRESULT=0x", std::setfill('0'), std::setw(8),std::hex, hr);
+    }
+    else
+    {
+        const auto& arguments = function_method_signature.GetMethodArguments();
+        result.append(kFunctionParamsOpeningBrace);
+        for (ULONG i = 0; i < arguments.size(); i++)
+        {
+            if (i != 0)
+            {
+                result.append(kParamsSeparator);
+            }
+
+            result.append(arguments[i].GetTypeTokName(metadata_import, class_generic_params, function_generic_params));
+        }
+        result.append(kFunctionParamsClosingBrace);
+    }
+}
+
+shared::WSTRING* SamplingHelper::Lookup(FunctionID fid, COR_PRF_FRAME_INFO frame)
+{
+    // This method is using two layers of caching
+    // 1st layer depends on FunctionID which is volatile (and valid only within one thread suspension)
+    // 2nd layer depends on mdToken for function (which is stable) and ModuleId which could be volatile,
+    // but the pair should be stable enough to avoid any overlaps.
+
+    const std::pair<shared::WSTRING*, FunctionIdentifier> volatile_answer = volatile_function_name_cache_.Get(fid);
+    if (volatile_answer.first != nullptr)
+    {
+        function_name_cache_.Refresh(volatile_answer.second);
+        return volatile_answer.first;
     }
 
-public:
-    shared::WSTRING* Lookup(FunctionID fid, COR_PRF_FRAME_INFO frame)
+    const auto function_identifier = this->GetFunctionIdentifier(fid, frame);
+
+    shared::WSTRING* answer = function_name_cache_.Get(function_identifier);
+    if (answer != nullptr)
     {
-        // This method is using two layers of caching
-        // 1st layer depends on FunctionID which is volatile (and valid only within one thread suspension)
-        // 2nd layer depends on mdToken for function (which is stable) and ModuleId which could be volatile,
-        // but the pair should be stable enough to avoid any overlaps.
-
-        const std::pair<shared::WSTRING*, FunctionIdentifier> volatile_answer = volatile_function_name_cache_.Get(fid);
-        if (volatile_answer.first != nullptr)
-        {
-            function_name_cache_.Refresh(volatile_answer.second);
-            return volatile_answer.first;
-        }
-
-        const auto function_identifier = this->GetFunctionIdentifier(fid, frame);
-
-        shared::WSTRING* answer = function_name_cache_.Get(function_identifier);
-        if (answer != nullptr)
-        {
-            volatile_function_name_cache_.Put(fid, std::pair(answer, function_identifier));
-            return answer;
-        }
-        stats_.name_cache_misses++;
-        answer = new shared::WSTRING();
-        this->GetFunctionName(function_identifier, *answer);
-
-        const auto old_value = function_name_cache_.Put(function_identifier, answer);
-        delete old_value;
-
         volatile_function_name_cache_.Put(fid, std::pair(answer, function_identifier));
         return answer;
     }
-};
+    stats_.name_cache_misses++;
+    answer = new shared::WSTRING();
+    this->GetFunctionName(function_identifier, *answer);
+
+    const auto old_value = function_name_cache_.Put(function_identifier, answer);
+    delete old_value;
+
+    volatile_function_name_cache_.Put(fid, std::pair(answer, function_identifier));
+    return answer;
+}
 
 HRESULT __stdcall FrameCallback(_In_ FunctionID func_id, _In_ UINT_PTR ip, _In_ COR_PRF_FRAME_INFO frame_info,
                                 _In_ ULONG32 context_size, _In_ BYTE context[], _In_ void* client_data)
@@ -550,7 +538,7 @@ HRESULT __stdcall FrameCallback(_In_ FunctionID func_id, _In_ UINT_PTR ip, _In_ 
 }
 
 // Factored out from the loop to a separate function for easier auditing and control of the thread state lock
-void CaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, SamplingHelper& helper)
+void CaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10)
 {
     ICorProfilerThreadEnum* thread_enum = nullptr;
     HRESULT hr = info10->EnumThreads(&thread_enum);
@@ -562,33 +550,33 @@ void CaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, SamplingHelpe
     ThreadID thread_id;
     ULONG num_returned = 0;
 
-    helper.volatile_function_name_cache_.Clear();
-    helper.cur_writer_->StartBatch();
+    ts->helper.volatile_function_name_cache_.Clear();
+    ts->helper.cur_writer_->StartBatch();
 
     while ((hr = thread_enum->Next(1, &thread_id, &num_returned)) == S_OK)
     {
-        helper.stats_.num_threads++;
+        ts->helper.stats_.num_threads++;
         thread_span_context spanContext = thread_span_context_map[thread_id];
         auto found = ts->managed_tid_to_state_.find(thread_id);
         if (found != ts->managed_tid_to_state_.end() && found->second != nullptr)
         {
-            helper.cur_writer_->StartSample(thread_id, found->second, spanContext);
+            ts->helper.cur_writer_->StartSample(thread_id, found->second, spanContext);
         }
         else
         {
             auto unknown = ThreadState();
-            helper.cur_writer_->StartSample(thread_id, &unknown, spanContext);
+            ts->helper.cur_writer_->StartSample(thread_id, &unknown, spanContext);
         }
 
         // Don't reuse the hr being used for the thread enum, especially since a failed snapshot isn't fatal
-        HRESULT snapshotHr = info10->DoStackSnapshot(thread_id, &FrameCallback, COR_PRF_SNAPSHOT_DEFAULT, &helper, nullptr, 0);
+        HRESULT snapshotHr = info10->DoStackSnapshot(thread_id, &FrameCallback, COR_PRF_SNAPSHOT_DEFAULT, &ts->helper, nullptr, 0);
         if (FAILED(snapshotHr))
         {
             trace::Logger::Debug("DoStackSnapshot failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, snapshotHr);
         }
-        helper.cur_writer_->EndSample();
+        ts->helper.cur_writer_->EndSample();
     }
-    helper.cur_writer_->EndBatch();
+    ts->helper.cur_writer_->EndBatch();
 }
 
 int GetSamplingPeriod()
@@ -615,7 +603,7 @@ int GetSamplingPeriod()
     }
 }
 
-void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, SamplingHelper & helper)
+void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10)
 {
     // These locks are in use by managed threads; Acquire locks before suspending the runtime to prevent deadlock
     std::lock_guard<std::mutex> thread_state_guard(ts->thread_state_lock_);
@@ -631,7 +619,7 @@ void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, Sa
     else
     {
         try {
-            CaptureSamples(ts, info10, helper);
+            CaptureSamples(ts, info10);
         } catch (const std::exception& e) {
             trace::Logger::Warn("Could not capture thread samples: ", e.what());
         } catch (...) {
@@ -648,12 +636,12 @@ void PauseClrAndCaptureSamples(ThreadSampler* ts, ICorProfilerInfo10* info10, Sa
 
     const auto end = std::chrono::steady_clock::now();
     const auto elapsed_micros = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-    helper.stats_.micros_suspended = static_cast<int>(elapsed_micros);
-    helper.cur_writer_->WriteFinalStats(helper.stats_);
-    trace::Logger::Debug("Threads sampled in ", elapsed_micros, " micros. threads=", helper.stats_.num_threads,
-                  " frames=", helper.stats_.total_frames, " misses=", helper.stats_.name_cache_misses);
+    ts->helper.stats_.micros_suspended = static_cast<int>(elapsed_micros);
+    ts->helper.cur_writer_->WriteFinalStats(ts->helper.stats_);
+    trace::Logger::Debug("Threads sampled in ", elapsed_micros, " micros. threads=", ts->helper.stats_.num_threads,
+                  " frames=", ts->helper.stats_.total_frames, " misses=", ts->helper.stats_.name_cache_misses);
 
-    helper.PublishBuffer();
+    ts->helper.PublishBuffer();
 }
 
 void SleepMillis(int millis) {
@@ -669,19 +657,17 @@ DWORD WINAPI SamplingThreadMain(_In_ LPVOID param)
     const int sleep_millis = GetSamplingPeriod();
     const auto ts = static_cast<ThreadSampler*>(param);
     ICorProfilerInfo10* info10 = ts->info10;
-    SamplingHelper helper;
-    helper.info10_ = info10;
 
     info10->InitializeCurrentThread();
 
     while (true)
     {
         SleepMillis(sleep_millis);
-        const bool shouldSample = helper.AllocateBuffer();
+        const bool shouldSample = ts->helper.AllocateBuffer();
         if (!shouldSample) {
             trace::Logger::Warn("Skipping a thread sample period, buffers are full. ** THIS WILL RESULT IN LOSS OF PROFILING DATA **");
         } else {
-            PauseClrAndCaptureSamples(ts, info10, helper);
+            PauseClrAndCaptureSamples(ts, info10);
         }
     }
 }
@@ -690,6 +676,7 @@ void ThreadSampler::SetGlobalInfo10(ICorProfilerInfo10* cor_profiler_info10)
 {
     profiler_info = cor_profiler_info10;
     this->info10 = cor_profiler_info10;
+    this->helper.info10_ = cor_profiler_info10;
 }
 
 void ThreadSampler::StartThreadSampling()

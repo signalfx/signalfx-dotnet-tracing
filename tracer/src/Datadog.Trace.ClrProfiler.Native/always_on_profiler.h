@@ -79,24 +79,6 @@ public:
     }
 };
 
-class ThreadSampler
-{
-public:
-    void StartThreadSampling();
-    void StartAllocationSampling(ICorProfilerInfo12* info12);
-    void AllocationTick(ULONG dataLen, LPCBYTE data);
-    ICorProfilerInfo10* info10;
-    static void ThreadCreated(ThreadID thread_id);
-    void ThreadDestroyed(ThreadID thread_id);
-    void ThreadAssignedToOsThread(ThreadID managedThreadId, DWORD os_thread_id);
-    void ThreadNameChanged(ThreadID thread_id, ULONG cch_name, WCHAR name[]);
-
-    void SetGlobalInfo10(ICorProfilerInfo10* info10);
-    ThreadState* GetCurrentThreadState(ThreadID tid);
-
-    std::unordered_map<ThreadID, ThreadState*> managed_tid_to_state_;
-    std::mutex thread_state_lock_;
-};
 
 class ThreadSamplesBuffer
 {
@@ -175,6 +157,51 @@ private:
     std::list<std::pair<TKey, TValue>> list_;
     std::unordered_map<TKey, typename std::list<std::pair<TKey, TValue>>::iterator> map_;
 };
+
+class SamplingHelper
+{
+public:
+    // These are permanent parts of the helper object
+    ICorProfilerInfo10* info10_ = nullptr;
+    NameCache<FunctionIdentifier, shared::WSTRING*> function_name_cache_;
+    NameCache<FunctionID, std::pair<shared::WSTRING*, FunctionIdentifier>> volatile_function_name_cache_;
+    // These cycle every sample and/or are owned externally
+    ThreadSamplesBuffer* cur_writer_ = nullptr;
+    std::vector<unsigned char>* cur_buffer_ = nullptr;
+    SamplingStatistics stats_;
+
+    SamplingHelper();
+    bool AllocateBuffer();
+    void PublishBuffer();
+    shared::WSTRING* Lookup(FunctionID fid, COR_PRF_FRAME_INFO frame);
+
+private:
+    [[nodiscard]] FunctionIdentifier GetFunctionIdentifier(const FunctionID func_id,
+                                                           const COR_PRF_FRAME_INFO frame_info) const;
+    void GetFunctionName(FunctionIdentifier function_identifier, shared::WSTRING& result);
+
+};
+
+class ThreadSampler
+{
+public:
+    void StartThreadSampling();
+    void StartAllocationSampling(ICorProfilerInfo12* info12);
+    void AllocationTick(ULONG dataLen, LPCBYTE data);
+    ICorProfilerInfo10* info10;
+    static void ThreadCreated(ThreadID thread_id);
+    void ThreadDestroyed(ThreadID thread_id);
+    void ThreadAssignedToOsThread(ThreadID managedThreadId, DWORD os_thread_id);
+    void ThreadNameChanged(ThreadID thread_id, ULONG cch_name, WCHAR name[]);
+
+    void SetGlobalInfo10(ICorProfilerInfo10* info10);
+    ThreadState* GetCurrentThreadState(ThreadID tid);
+
+    std::unordered_map<ThreadID, ThreadState*> managed_tid_to_state_;
+    std::mutex thread_state_lock_;
+    SamplingHelper helper;
+};
+
 } // namespace always_on_profiler
 
 void AllocationSamplingAppendToBuffer(int32_t appendLen, unsigned char* appendBuf);
