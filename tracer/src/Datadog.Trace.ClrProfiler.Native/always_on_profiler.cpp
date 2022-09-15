@@ -745,7 +745,7 @@ void CaptureAllocationStack(ThreadSampler* ts, ThreadSamplesBuffer * buffer)
     // Read explanation of volatile clearing in SamplingHelper::Lookup
     ts->helper.volatile_function_name_cache_.Clear();
     HelperAndBuffer hb = HelperAndBuffer(&ts->helper, buffer);
-    HRESULT hr = ts->info10->DoStackSnapshot(NULL, &FrameCallback, COR_PRF_SNAPSHOT_DEFAULT, &hb, nullptr, 0);
+    HRESULT hr = ts->info10->DoStackSnapshot((ThreadID) NULL, &FrameCallback, COR_PRF_SNAPSHOT_DEFAULT, &hb, nullptr, 0);
     if (FAILED(hr))
     {
         trace::Logger::Debug("DoStackSnapshot failed. HRESULT=0x", std::setfill('0'), std::setw(8), std::hex, hr);
