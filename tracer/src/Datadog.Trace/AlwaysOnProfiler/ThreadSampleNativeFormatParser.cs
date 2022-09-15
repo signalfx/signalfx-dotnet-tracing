@@ -35,6 +35,35 @@ namespace Datadog.Trace.AlwaysOnProfiler
         }
 
         /// <summary>
+        /// Reads stack frames until 0 (no more frames) is encountered
+        /// </summary>
+        internal void ReadStackFrames(short code, ThreadSample threadSample)
+        {
+            while (code != 0)
+            {
+                string value;
+                if (code < 0)
+                {
+                    value = ReadString();
+                    _codes[-code] = value;
+                }
+                else
+                {
+                    value = _codes[code];
+                }
+
+                if (value != null)
+                {
+                    // we are replacing Datadog.Trace namespace to avoid conflicts while upstream sync
+                    var replacedValue = value.Replace("Datadog.Trace.", "SignalFx.Tracing.");
+                    threadSample.Frames.Add(replacedValue);
+                }
+
+                code = ReadShort();
+            }
+        }
+
+        /// <summary>
         /// Parses the thread sample batch.
         /// </summary>
         internal List<ThreadSample> Parse()
@@ -97,28 +126,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         ThreadIndex = threadIndex
                     };
 
-                    while (code != 0)
-                    {
-                        string value;
-                        if (code < 0)
-                        {
-                            value = ReadString();
-                            _codes[-code] = value;
-                        }
-                        else
-                        {
-                            value = _codes[code];
-                        }
-
-                        if (value != null)
-                        {
-                            // we are replacing Datadog.Trace namespace to avoid conflicts while upstream sync
-                            var replacedValue = value.Replace("Datadog.Trace.", "SignalFx.Tracing.");
-                            threadSample.Frames.Add(replacedValue);
-                        }
-
-                        code = ReadShort();
-                    }
+                    this.ReadStackFrames(code, threadSample);
 
                     if (threadName == ThreadSampler.BackgroundThreadName)
                     {
@@ -157,8 +165,10 @@ namespace Datadog.Trace.AlwaysOnProfiler
                     var traceIdHigh = ReadInt64();
                     var traceIdLow = ReadInt64();
                     var spanId = ReadInt64();
-                    // TODO Splunk: read stack frame (share code with above StartSample)
-                    var stackFrameCodeCurrentlyZero = ReadShort();
+
+                    ThreadSample ts = new ThreadSample();
+                    var code = ReadShort();
+                    this.ReadStackFrames(code, ts);
                     // TODO Splunk: export this somewhere
                     // Console.WriteLine("ALLOC: " + allocatedSize + " " + typeName);
                 }
