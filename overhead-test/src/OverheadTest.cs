@@ -86,12 +86,14 @@ public class OverheadTest : IAsyncLifetime
 
             Directory.CreateDirectory(resultsConvention.ContainerLogs);
 
-            _testOutputHelper.WriteLine($"Directory for configuration created at: {resultsConvention.AgentResults}");
+            _testOutputHelper.WriteLine(
+            $"Directory for configuration created at: {resultsConvention.AgentResults}");
 
             await using var sqlServer = CreateSqlServer(resultsConvention);
             await sqlServer.StartAsync();
 
-            await using var eshopApp = new EshopApp(_network, _collector, sqlServer, resultsConvention, agentConfig);
+            await using var eshopApp =
+                new EshopApp(_network, _collector, sqlServer, resultsConvention, agentConfig);
             await eshopApp.StartAsync();
 
             _testOutputHelper.WriteLine("----------------Starting warmup.");
@@ -114,7 +116,7 @@ public class OverheadTest : IAsyncLifetime
 
             // there should be 2 processes running inside the container: the app and dotnet-counters
             Assert.Equal(2, processList.Count);
-            Assert.Contains(processList, s => s.Contains("dotnet Web.dll"));
+            Assert.Contains(processList, s => s.Contains("dotnet PublicApi.dll"));
             Assert.Contains(processList, s => s.Contains("./dotnet-counters"));
 
             _testOutputHelper.WriteLine("----------------Starting driving a load on the app.");

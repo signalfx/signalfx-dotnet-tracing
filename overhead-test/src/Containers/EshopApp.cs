@@ -39,6 +39,9 @@ internal class EshopApp : IAsyncDisposable
         _logStream = File.Create(Path.Combine(namingConvention.ContainerLogs, "eshop-app.txt"));
         _resultStream = File.Create(Path.Combine(namingConvention.AgentResults, CounterResultsFile));
 
+        var instrumentationLogs = Path.Combine(namingConvention.AgentResults, "instrumentation-logs");
+        Directory.CreateDirectory(instrumentationLogs);
+
         var testcontainersBuilder = new TestcontainersBuilder<TestcontainersContainer>()
             .WithImage(config.DockerImageName)
             .WithName(ContainerName)
@@ -54,6 +57,7 @@ internal class EshopApp : IAsyncDisposable
             .WithEnvironment("Logging__LogLevel__Default", "Warning")
             .WithEnvironment("Logging__LogLevel__System", "Warning")
             .WithEnvironment("Logging__LogLevel__Microsoft.Hosting.Lifetime", "Information")
+            .WithBindMount(instrumentationLogs, "/var/log/signalfx")
             .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(AppPort))
             .WithOutputConsumer(Consume.RedirectStdoutAndStderrToStream(_logStream, _logStream));
         foreach (var envVar in config.AdditionalEnvVars)

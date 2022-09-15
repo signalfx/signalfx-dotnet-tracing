@@ -14,11 +14,11 @@ function rand(max) {
 function randomItem(items) {
     const toDuplicate = randItem(items);
     return {
-        // for now, use fixed type/brand, duplicate other values from a random item from the list
-        catalogBrandId: 1,
-        catalogTypeId: 1,
-        description: `duplicate for ${toDuplicate.id}`,
-        name: `duplicated from ${toDuplicate.name}`,
+        catalogBrandId: 2,
+        catalogTypeId: 2,
+        description: `short`,
+        // name is being checked for uniqueness during insertion
+        name: Math.random().toString(16),
         pictureUri: toDuplicate.pictureUri,
         price: toDuplicate.price + 1
     };
@@ -26,7 +26,7 @@ function randomItem(items) {
 
 export default function () {
 
-    const catalogItems = `${baseUri}/catalog/list`;
+    const catalogItems = `${baseUri}/catalog-items`;
     const catalogRetrieval = http.get(catalogItems);
     check(catalogRetrieval, {"retrieve catalog status 200": r => r.status === 200});
 
