@@ -158,22 +158,16 @@ private:
     std::unordered_map<TKey, typename std::list<std::pair<TKey, TValue>>::iterator> map_;
 };
 
-class SamplingHelper
+class NamingHelper
 {
 public:
     // These are permanent parts of the helper object
     ICorProfilerInfo10* info10_ = nullptr;
     NameCache<FunctionIdentifier, shared::WSTRING*> function_name_cache_;
     NameCache<FunctionID, std::pair<shared::WSTRING*, FunctionIdentifier>> volatile_function_name_cache_;
-    // These cycle every sample and/or are owned externally
-    ThreadSamplesBuffer* cur_writer_ = nullptr;
-    std::vector<unsigned char>* cur_buffer_ = nullptr;
-    SamplingStatistics stats_;
 
-    SamplingHelper();
-    bool AllocateBuffer();
-    void PublishBuffer();
-    shared::WSTRING* Lookup(FunctionID fid, COR_PRF_FRAME_INFO frame);
+    NamingHelper();
+    shared::WSTRING* Lookup(FunctionID fid, COR_PRF_FRAME_INFO frame, SamplingStatistics & stats);
 
 private:
     [[nodiscard]] FunctionIdentifier GetFunctionIdentifier(const FunctionID func_id,
@@ -182,7 +176,7 @@ private:
 
 };
 
-class ThreadSampler
+class AlwaysOnProfiler
 {
 public:
     void StartThreadSampling();
@@ -199,7 +193,13 @@ public:
 
     std::unordered_map<ThreadID, ThreadState*> managed_tid_to_state_;
     std::mutex thread_state_lock_;
-    SamplingHelper helper;
+    NamingHelper helper;
+
+    // These cycle every sample and/or are owned externally
+    ThreadSamplesBuffer* cur_cpu_writer_ = nullptr;
+    SamplingStatistics stats_;
+    bool AllocateBuffer();
+    void PublishBuffer();
 };
 
 } // namespace always_on_profiler

@@ -9,9 +9,9 @@
 
 using namespace always_on_profiler;
 
-TEST(ThreadSamplerTest, ThreadStateTracking)
+TEST(AlwaysOnProfilerTest, ThreadStateTracking)
 {
-    ThreadSampler ts; // Do NOT call StartSampling on this, which will create a background thread, etc.
+    AlwaysOnProfiler ts; // Do NOT call StartSampling on this, which will create a background thread, etc.
     ts.ThreadAssignedToOsThread(1, 1001);
     ts.ThreadNameChanged(1, 6, const_cast<WCHAR*>(L"Sample"));
     ts.ThreadCreated(1);
@@ -27,7 +27,7 @@ TEST(ThreadSamplerTest, ThreadStateTracking)
     EXPECT_EQ(0, ts.managed_tid_to_state_.size());
 }
 
-TEST(ThreadSamplerTest, BasicBufferBehavior)
+TEST(AlwaysOnProfilerTest, BasicBufferBehavior)
 {
     auto buf = std::vector<unsigned char>();
     shared::WSTRING longThreadName;
@@ -52,7 +52,7 @@ TEST(ThreadSamplerTest, BasicBufferBehavior)
     ASSERT_EQ(1290, tsb.buffer_->size()); // not manually calculated but does depend on thread name limiting and not repeating frame strings
     ASSERT_EQ(2, tsb.codes_.size());
 }
-TEST(ThreadSamplerTest, AllocationSampleBuffer)
+TEST(AlwaysOnProfilerTest, AllocationSampleBuffer)
 {
     auto buf = std::vector<unsigned char>();
     shared::WSTRING longThreadName;
@@ -74,7 +74,7 @@ TEST(ThreadSamplerTest, AllocationSampleBuffer)
     ASSERT_EQ(1109, tsb.buffer_->size()); // not manually calculated
 }
 
-TEST(ThreadSamplerTest, BufferOverrunBehavior)
+TEST(AlwaysOnProfilerTest, BufferOverrunBehavior)
 {
     auto buf = std::vector<unsigned char>();
     shared::WSTRING long_thread_name;
@@ -106,7 +106,7 @@ TEST(ThreadSamplerTest, BufferOverrunBehavior)
     ASSERT_TRUE(buf.size() < 210000 && buf.size() >= 200000);
 }
 
-TEST(ThreadSamplerTest, StaticBufferManagement)
+TEST(AlwaysOnProfilerTest, StaticBufferManagement)
 {
     const auto buf_a = new std::vector<unsigned char>();
     buf_a->resize(1);
@@ -150,7 +150,7 @@ TEST(ThreadSamplerTest, StaticBufferManagement)
     ASSERT_EQ('E', read_buf[0]);
 }
 
-TEST(ThreadSamplerTest, AllocationBufferBehavior)
+TEST(AlwaysOnProfilerTest, AllocationBufferBehavior)
 {
     unsigned char read_buf[4];
     unsigned char write_buf[] = {5, 6, 7, 8};
@@ -170,7 +170,7 @@ TEST(ThreadSamplerTest, AllocationBufferBehavior)
 }
 
 
-TEST(ThreadSamplerTest, LRUCache)
+TEST(AlwaysOnProfilerTest, LRUCache)
 {
     constexpr int max = 10000;
     NameCache<FunctionID, std::pair<shared::WSTRING*, FunctionIdentifier>> cache(max, std::pair<shared::WSTRING*, FunctionIdentifier>(nullptr, {}));

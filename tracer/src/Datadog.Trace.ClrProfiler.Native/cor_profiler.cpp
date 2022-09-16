@@ -39,7 +39,7 @@ CorProfiler* profiler = nullptr;
 HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_unknown)
 {
     auto _ = trace::Stats::Instance()->InitializeMeasure();
-    this->threadSampler = NULL;
+    this->alwaysOnProfiler = NULL;
 
     // check if debug mode is enabled
     if (IsDebugEnabled())
@@ -256,14 +256,14 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
 
     if (IsThreadSamplingEnabled() || IsAllocationSamplingEnabled())
     {
-        this->threadSampler = new always_on_profiler::ThreadSampler();
-        this->threadSampler->SetGlobalInfo10(info10);
+        this->alwaysOnProfiler = new always_on_profiler::AlwaysOnProfiler();
+        this->alwaysOnProfiler->SetGlobalInfo10(info10);
     }
     if (IsThreadSamplingEnabled())
     {
         if (metThreadSamplingRequirements)
         {
-            this->threadSampler->StartThreadSampling();
+            this->alwaysOnProfiler->StartThreadSampling();
         }
         else
         {
@@ -276,7 +276,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
         HRESULT hr = info_->QueryInterface(__uuidof(ICorProfilerInfo12), (void**) &info12);
         if (!FAILED(hr) && info12 != nullptr)
         {
-            this->threadSampler->StartAllocationSampling(info12);
+            this->alwaysOnProfiler->StartAllocationSampling(info12);
         }
         else
         {
@@ -3306,33 +3306,33 @@ HRESULT STDMETHODCALLTYPE CorProfiler::JITCachedFunctionSearchStarted(FunctionID
 
 HRESULT STDMETHODCALLTYPE CorProfiler::ThreadCreated(ThreadID threadId)
 {
-    if (threadSampler != NULL)
+    if (alwaysOnProfiler != NULL)
     {
-        threadSampler->ThreadCreated(threadId);
+        alwaysOnProfiler->ThreadCreated(threadId);
     }
     return S_OK;
 }
 HRESULT STDMETHODCALLTYPE CorProfiler::ThreadDestroyed(ThreadID threadId)
 {
-    if (threadSampler != NULL)
+    if (alwaysOnProfiler != NULL)
     {
-        threadSampler->ThreadDestroyed(threadId);
+        alwaysOnProfiler->ThreadDestroyed(threadId);
     }
     return S_OK;
 }
 HRESULT STDMETHODCALLTYPE CorProfiler::ThreadAssignedToOSThread(ThreadID managedThreadId, DWORD osThreadId)
 {
-    if (threadSampler != NULL)
+    if (alwaysOnProfiler != NULL)
     {
-        threadSampler->ThreadAssignedToOsThread(managedThreadId, osThreadId);
+        alwaysOnProfiler->ThreadAssignedToOsThread(managedThreadId, osThreadId);
     }
     return S_OK;
 }
 HRESULT STDMETHODCALLTYPE CorProfiler::ThreadNameChanged(ThreadID threadId, ULONG cchName, WCHAR name[])
 {
-    if (threadSampler != NULL)
+    if (alwaysOnProfiler != NULL)
     {
-        threadSampler->ThreadNameChanged(threadId, cchName, name);
+        alwaysOnProfiler->ThreadNameChanged(threadId, cchName, name);
     }
     return S_OK;
 }
@@ -3342,9 +3342,9 @@ HRESULT STDMETHODCALLTYPE CorProfiler::EventPipeEventDelivered(EVENTPIPE_PROVIDE
                                                   LPCBYTE eventData, LPCGUID pActivityId, LPCGUID pRelatedActivityId,
                                                   ThreadID eventThread, ULONG numStackFrames, UINT_PTR stackFrames[])
 {
-    if (threadSampler != nullptr && eventId == 10 && eventVersion == 4) 
+    if (alwaysOnProfiler != nullptr && eventId == 10 && eventVersion == 4) 
     {
-        threadSampler->AllocationTick(cbEventData, eventData);
+        alwaysOnProfiler->AllocationTick(cbEventData, eventData);
     }
     return S_OK;
 }
