@@ -30,7 +30,7 @@ class DebuggerMethodRewriter;
 
 namespace always_on_profiler
 {
-class ThreadSampler;
+class AlwaysOnProfiler;
 }
 
 namespace trace
@@ -57,7 +57,7 @@ private:
     std::unordered_set<AppDomainID> first_jit_compilation_app_domains;
     bool is_desktop_iis = false;
 
-    always_on_profiler::ThreadSampler* threadSampler;
+    always_on_profiler::AlwaysOnProfiler* alwaysOnProfiler;
 
     //
     // CallTarget Members
@@ -171,7 +171,7 @@ public:
     //
     void InitializeProfiler(WCHAR* id, CallTargetDefinition* items, int size);
 
-    // ICorProfilerInfo callbacks to track thread naming (used by ThreadSampler only)
+    // ICorProfilerInfo callbacks to track thread naming (used by AlwaysOnProfiler only)
     HRESULT STDMETHODCALLTYPE ThreadCreated(ThreadID threadId)override;
     HRESULT STDMETHODCALLTYPE ThreadDestroyed(ThreadID threadId)override;
     HRESULT STDMETHODCALLTYPE ThreadAssignedToOSThread(ThreadID managedThreadId, DWORD osThreadId) override;
