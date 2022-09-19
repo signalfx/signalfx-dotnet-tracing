@@ -752,6 +752,57 @@ void CaptureAllocationStack(AlwaysOnProfiler* prof, ThreadSamplesBuffer* buffer)
     }
 }
 
+AllocationSubSampler::AllocationSubSampler(uint32_t targetPC, uint32_t secondsPC) :
+    targetPerCycle(targetPC), secondsPerCycle(secondsPC), seenThisCycle(0), sampledThisCycle(0), seenLastCycle(0),
+    nextCycleStartMillis(
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())),
+    sampleLock(), rand()
+{
+}
+void AllocationSubSampler::AdvanceCycle(std::chrono::milliseconds now)
+{
+    nextCycleStartMillis = now + std::chrono::seconds(secondsPerCycle);
+    seenLastCycle = seenThisCycle;
+    seenThisCycle = 0;
+    sampledThisCycle = 0;
+}
+
+// We want to sample T items out of N per unit time, where N is unknown and may be < S or may be orders 
+// of magnitude bigger than S.  One excellent approach for this is reservoir sampling, where new items
+// displace existing samples such that the end result is a uniform sample of N.  However, our overhead is not 
+// just limited to the subscription to the AllocationTick events, but also the additional 
+// captured data (e.g., the stack trace, locking and copying the span context).  Therefore, reservoir "replacements"
+// where an already-captured item gets displaced by a new one add additional undesired overhead.  How much?
+// Well, some monte carlo experiments with (e.g.) T=100 and N=1000 suggest that the wasted overhead on unsent data
+// would be Waste~=230, a tremendous waste of CPU cycles to collect and then discard 230 stack traces, etc.
+// Instead, let's treat the current cycle as statistically very similar to the last one, and sample 1/X events
+// where X is based on what N was last time.  Not the most elegant approach, but simple to code and errs on the
+// side of reduced/capped overhead.
+bool AllocationSubSampler::ShouldSample()
+{
+    std::lock_guard<std::mutex> guard(sampleLock);
+
+    auto now =
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+    if (now > nextCycleStartMillis)
+    {
+        AdvanceCycle(now);
+    }
+    seenThisCycle++;
+    if (sampledThisCycle >= targetPerCycle) {
+        return false;
+    }
+    // roll a [1,lastCycle] die, and if it comes up <= targetPerCycle, it wins 
+    // But lastCycle could be 0, so normalize that to 1.
+    std::uniform_int_distribution<uint32_t> rando(1, std::max(seenLastCycle, (uint32_t)1));
+    bool sample = rando(rand) <= targetPerCycle;
+    if (sample) {
+        sampledThisCycle++;
+    }
+    return sample;
+}
+
+
 void AlwaysOnProfiler::AllocationTick(ULONG dataLen, LPCBYTE data)
 {
     // In v4 it's the last field, so use a relative offset from the end

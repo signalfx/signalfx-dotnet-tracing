@@ -207,3 +207,56 @@ TEST(AlwaysOnProfilerTest, LRUCache)
         ASSERT_EQ(NULL, cache.Get(i).first);
     }
 }
+
+TEST(AlwaysOnProfilerTest, AllocationSubSampler)
+{
+    AllocationSubSampler samp(10, 1);
+    // Cycle 1: 20, of which the first 10 should be chosen
+    for (int i = 0; i < 10; i++)
+    {
+        ASSERT_EQ(true, samp.ShouldSample());
+    }
+    for (int i = 0; i < 10; i++)
+    {
+        ASSERT_EQ(false, samp.ShouldSample());
+    }
+    // Cycle 2: 100, of which 10 should be chosen
+    samp.AdvanceCycle(
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()));
+    std::vector<bool> c2;
+    int c2Total = 0;
+    for (int i = 0; i < 100; i++)
+    {
+        bool sample = samp.ShouldSample();
+        c2.push_back(sample);
+        if (sample)
+        {
+            c2Total++;
+        }
+    }
+    // but not, statistically speaking, the first 8 in a row
+    ASSERT_FALSE(c2[0] && c2[1] && c2[2] && c2[3] && c2[4] && c2[5] && c2[6] && c2[7]);
+    ASSERT_EQ(10, c2Total);
+
+    // Cycle 2: 10, of which statistically 1 is chosen, relaxed to <= 4
+    samp.AdvanceCycle(
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()));
+    int c3Total = 0;
+    for (int i = 0; i < 10; i++)
+    {
+        if (samp.ShouldSample())
+        {
+            c3Total++;
+        }
+    }
+    ASSERT_TRUE(c3Total <= 4);
+
+    // Now start over and test the actual time advancement logic
+    AllocationSubSampler timedSamp(2, 1);
+    ASSERT_TRUE(timedSamp.ShouldSample());
+    ASSERT_TRUE(timedSamp.ShouldSample());
+    ASSERT_FALSE(timedSamp.ShouldSample());
+    ASSERT_FALSE(timedSamp.ShouldSample());
+    std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+    ASSERT_TRUE(timedSamp.ShouldSample());
+}
