@@ -6,6 +6,7 @@
 #include <list>
 #include <utility>
 #include <unordered_map>
+#include <random>
 
 constexpr auto unknown_managed_thread_id = -1;
 
@@ -174,6 +175,28 @@ private:
                                                            const COR_PRF_FRAME_INFO frame_info) const;
     void GetFunctionName(FunctionIdentifier function_identifier, shared::WSTRING& result);
 
+};
+
+// We can get more AllocationTick events than we reasonably want to push to the cloud; this
+// structure/logic helps us rate-control this effect.  More details about the algorithm are in the
+// implementation of ShouldSample().
+class AllocationSubSampler
+{
+public:
+    AllocationSubSampler(uint32_t targetPerCycle, uint32_t secondsPerCycle);
+    bool ShouldSample();
+    // internal implementation detail that is public for unit testing purposes
+    void AdvanceCycle(std::chrono::milliseconds now);
+
+private:
+    uint32_t targetPerCycle;
+    uint32_t secondsPerCycle;
+    uint32_t seenThisCycle;
+    uint32_t sampledThisCycle;
+    uint32_t seenLastCycle;
+    std::chrono::milliseconds nextCycleStartMillis;
+    std::mutex sampleLock;
+    std::default_random_engine rand;
 };
 
 class AlwaysOnProfiler
