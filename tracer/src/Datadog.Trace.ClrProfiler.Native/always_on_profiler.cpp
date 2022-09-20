@@ -752,11 +752,11 @@ void CaptureAllocationStack(AlwaysOnProfiler* prof, ThreadSamplesBuffer* buffer)
     }
 }
 
-AllocationSubSampler::AllocationSubSampler(uint32_t targetPC, uint32_t secondsPC) :
-    targetPerCycle(targetPC), secondsPerCycle(secondsPC), seenThisCycle(0), sampledThisCycle(0), seenLastCycle(0),
+AllocationSubSampler::AllocationSubSampler(uint32_t targetPerCycle_, uint32_t secondsPerCycle_) :
+    targetPerCycle(targetPerCycle_), secondsPerCycle(secondsPerCycle_), seenThisCycle(0), sampledThisCycle(0), seenLastCycle(0),
     nextCycleStartMillis(
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())),
-    sampleLock(), rand()
+    sampleLock(), rand(std::default_random_engine((unsigned int)(nextCycleStartMillis.count())))
 {
 }
 void AllocationSubSampler::AdvanceCycle(std::chrono::milliseconds now)
@@ -767,8 +767,8 @@ void AllocationSubSampler::AdvanceCycle(std::chrono::milliseconds now)
     sampledThisCycle = 0;
 }
 
-// We want to sample T items out of N per unit time, where N is unknown and may be < S or may be orders 
-// of magnitude bigger than S.  One excellent approach for this is reservoir sampling, where new items
+// We want to sample T items out of N per unit time, where N is unknown and may be < T or may be orders 
+// of magnitude bigger than T.  One excellent approach for this is reservoir sampling, where new items
 // displace existing samples such that the end result is a uniform sample of N.  However, our overhead is not 
 // just limited to the subscription to the AllocationTick events, but also the additional 
 // captured data (e.g., the stack trace, locking and copying the span context).  Therefore, reservoir "replacements"
