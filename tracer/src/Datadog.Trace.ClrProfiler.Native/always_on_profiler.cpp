@@ -106,12 +106,11 @@ void AllocationSamplingAppendToBuffer(int32_t appendLen, unsigned char* appendBu
     }
     std::lock_guard<std::mutex> guard(allocation_buffer_lock);
 
-    if (allocation_buffer->size() >= kSamplesBufferMaximumSize)
+    if (allocation_buffer->size() + appendLen >= kSamplesBufferMaximumSize)
     {
         return;
     }
-    size_t actualLen = std::min((size_t) appendLen, kSamplesBufferMaximumSize - allocation_buffer->size());
-    allocation_buffer->insert(allocation_buffer->end(), appendBuf, &appendBuf[actualLen]);
+    allocation_buffer->insert(allocation_buffer->end(), appendBuf, &appendBuf[appendLen]);
 }
 
 // Can return 0

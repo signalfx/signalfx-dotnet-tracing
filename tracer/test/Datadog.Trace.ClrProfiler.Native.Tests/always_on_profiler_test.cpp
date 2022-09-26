@@ -69,9 +69,12 @@ TEST(AlwaysOnProfilerTest, AllocationSampleBuffer)
     threadState.thread_name_.append(longThreadName);
 
     tsb.AllocationSample(32, typeName.c_str(), typeName.length(), 1, &threadState, thread_span_context());
-    // TODO Splunk: record frames here
+    tsb.RecordFrame(7001, frame1);
+    tsb.RecordFrame(7002, frame2);
+    tsb.RecordFrame(7001, frame1);
+    tsb.EndSample();
 
-    ASSERT_EQ(1109, tsb.buffer_->size()); // not manually calculated
+    ASSERT_EQ(1309, tsb.buffer_->size()); // not manually calculated
 }
 
 TEST(AlwaysOnProfilerTest, BufferOverrunBehavior)
@@ -167,6 +170,17 @@ TEST(AlwaysOnProfilerTest, AllocationBufferBehavior)
     AllocationSamplingAppendToBuffer(2, write_buf);
     ASSERT_EQ(3, SignalFxReadAllocationSamples(4, read_buf));
     ASSERT_EQ(0, SignalFxReadAllocationSamples(4, read_buf));
+
+    // Now test overrun
+    int unitSize = 6 * 1024;
+    unsigned char* buf = (unsigned char*) calloc(100 * unitSize, 1);
+    ASSERT_TRUE(buf != NULL);
+    for (int i = 0; i < 100; i++)
+    {
+        AllocationSamplingAppendToBuffer(unitSize, buf);
+    }
+    int32_t amountRead = SignalFxReadAllocationSamples(100 * unitSize, buf);
+    ASSERT_EQ(198 * 1024, amountRead);
 }
 
 
@@ -238,7 +252,7 @@ TEST(AlwaysOnProfilerTest, AllocationSubSampler)
     ASSERT_FALSE(c2[0] && c2[1] && c2[2] && c2[3] && c2[4] && c2[5] && c2[6] && c2[7]);
     ASSERT_EQ(10, c2Total);
 
-    // Cycle 2: 10, of which statistically 1 is chosen, relaxed to <= 4
+    // Cycle 3: 10, of which statistically 1 is chosen, relaxed to <= 4
     samp.AdvanceCycle(
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()));
     int c3Total = 0;
@@ -257,6 +271,6 @@ TEST(AlwaysOnProfilerTest, AllocationSubSampler)
     ASSERT_TRUE(timedSamp.ShouldSample());
     ASSERT_FALSE(timedSamp.ShouldSample());
     ASSERT_FALSE(timedSamp.ShouldSample());
-    std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     ASSERT_TRUE(timedSamp.ShouldSample());
 }
