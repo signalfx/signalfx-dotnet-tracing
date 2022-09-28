@@ -115,6 +115,7 @@ namespace environment {
     const shared::WSTRING allocation_sampling_enabled = WStr("SIGNALFX_PROFILER_MEMORY_ENABLED");
 
     const shared::WSTRING thread_sampling_period = WStr("SIGNALFX_PROFILER_CALL_STACK_INTERVAL");
+    const shared::WSTRING max_allocation_samples_per_minute = WStr("SIGNALFX_PROFILER_MAX_MEMORY_SAMPLES_PER_MINUTE");
 } // namespace environment
 } // namespace trace
 
