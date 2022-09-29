@@ -735,6 +735,8 @@ ThreadState* AlwaysOnProfiler::GetCurrentThreadState(ThreadID tid)
 // by source traversal differs only by the addition of the actual size of the just-allocated object
 // Do not be fooled by "AllocationAmount" which is set to the 100kb sampling limit.
 
+// https://github.com/dotnet/runtime/blob/cdb6e1d5f9075214c8a58ca75d5314b5dc64daed/src/coreclr/vm/ClrEtwAll.man#L1157
+
 // AllocationAmount     int32
 // AllocationKind       int32
 // InstanceId           int16
@@ -824,8 +826,11 @@ void AlwaysOnProfiler::AllocationTick(ULONG dataLen, LPCBYTE data)
     uint64_t allocatedSize = *((uint64_t*) &(data[dataLen - 8]));
     // Here's the first byte of the typeName
     WCHAR* typeName = (WCHAR*) &data[AllocationTickV4TypeNameStartByteIndex];
+
     // and its length can be derived without iterating it since there is only the one variable-length field
-    size_t typeNameCharLen = (dataLen - AllocationTickV4SizeWithoutTypeName) / 2;
+    // account for the null char
+    size_t typeNameCharLen = (dataLen - AllocationTickV4SizeWithoutTypeName) / 2 - 1;
+
 #ifdef _WIN32
     printf("Allocation: %i %ws\n", (int) allocatedSize, typeName);
 #else
