@@ -217,6 +217,7 @@ public:
     std::unordered_map<ThreadID, ThreadState*> managed_tid_to_state_;
     std::mutex thread_state_lock_;
     NamingHelper helper;
+    AllocationSubSampler* allocationSubSampler = nullptr;
 
     // These cycle every sample and/or are owned externally
     ThreadSamplesBuffer* cur_cpu_writer_ = nullptr;
