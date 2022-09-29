@@ -271,6 +271,13 @@ TEST(AlwaysOnProfilerTest, AllocationSubSampler)
     ASSERT_TRUE(timedSamp.ShouldSample());
     ASSERT_FALSE(timedSamp.ShouldSample());
     ASSERT_FALSE(timedSamp.ShouldSample());
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    // advance cycle
+    std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+    timedSamp.ShouldSample(); // 50/50 chance on this, no assert
+    // advance cycle again - with lastCycle == 1, the next should be guaranteed reset of state
+    std::this_thread::sleep_for(std::chrono::milliseconds(1500));
     ASSERT_TRUE(timedSamp.ShouldSample());
+    ASSERT_TRUE(timedSamp.ShouldSample());
+    ASSERT_FALSE(timedSamp.ShouldSample());
+    ASSERT_FALSE(timedSamp.ShouldSample());
 }

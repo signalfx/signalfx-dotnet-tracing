@@ -23,6 +23,8 @@ constexpr auto kSamplesBufferDefaultSize = 20 * 1024;
 constexpr auto kDefaultSamplePeriod = 10000;
 constexpr auto kMinimumSamplePeriod = 1000;
 
+constexpr auto kDefaultMaxAllocsPerMinute = 200;
+
 // FIXME make configurable (hidden)?
 // These numbers were chosen to keep total overhead under 1 MB of RAM in typical cases (name lengths being the biggest
 // variable)
@@ -591,12 +593,12 @@ void CaptureSamples(AlwaysOnProfiler* prof, ICorProfilerInfo10* info10)
     prof->cur_cpu_writer_->EndBatch();
 }
 
-int GetSamplingPeriod()
+int GetConfiguredInt(const shared::WSTRING key, const int minimumValue, const int defaultValue)
 {
-    const shared::WSTRING val = shared::GetEnvironmentValue(trace::environment::thread_sampling_period);
+    const shared::WSTRING val = shared::GetEnvironmentValue(key);
     if (val.empty())
     {
-        return kDefaultSamplePeriod;
+        return defaultValue;
     }
     try
     {
@@ -607,12 +609,21 @@ int GetSamplingPeriod()
         std::string str = convert.to_bytes(val);
         int parsedValue = std::stoi(str);
 #endif
-        return (int) std::max(kMinimumSamplePeriod, parsedValue);
+        return (int) std::max(minimumValue, parsedValue);
     }
     catch (...)
     {
-        return kDefaultSamplePeriod;
+        return defaultValue;
     }
+}
+
+int GetSamplingPeriod()
+{
+    return GetConfiguredInt(trace::environment::thread_sampling_period, kMinimumSamplePeriod, kDefaultSamplePeriod);
+}
+int GetMaxAllocationsPerMinute()
+{
+    return GetConfiguredInt(trace::environment::max_allocation_samples_per_minute, 1, kDefaultMaxAllocsPerMinute);
 }
 
 void PauseClrAndCaptureSamples(AlwaysOnProfiler* prof, ICorProfilerInfo10* info10)
@@ -806,6 +817,11 @@ bool AllocationSubSampler::ShouldSample()
 
 void AlwaysOnProfiler::AllocationTick(ULONG dataLen, LPCBYTE data)
 {
+    if (this->allocationSubSampler == nullptr || !this->allocationSubSampler->ShouldSample())
+    {
+        return;
+    }
+
     // In v4 it's the last field, so use a relative offset from the end
     uint64_t allocatedSize = *((uint64_t*) &(data[dataLen - 8]));
     // Here's the first byte of the typeName
@@ -848,6 +864,8 @@ void AlwaysOnProfiler::AllocationTick(ULONG dataLen, LPCBYTE data)
 
 void AlwaysOnProfiler::StartAllocationSampling(ICorProfilerInfo12* info12)
 {
+    this->allocationSubSampler = new AllocationSubSampler(GetMaxAllocationsPerMinute(), 60);
+
     EVENTPIPE_SESSION session;
     COR_PRF_EVENTPIPE_PROVIDER_CONFIG sessionConfig[] = {{WStr("Microsoft-Windows-DotNETRuntime"),
                                                           0x1, // CLR_GC_KEYWORD
