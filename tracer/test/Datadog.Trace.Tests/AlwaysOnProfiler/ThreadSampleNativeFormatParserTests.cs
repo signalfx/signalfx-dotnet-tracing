@@ -39,6 +39,19 @@ namespace Datadog.Trace.Tests.AlwaysOnProfiler
             settings.UseParameters(fileName);
             await Verifier.Verify(samples, settings);
         }
+
+        [Fact]
+        public async Task ParseTruncatedBuffer()
+        {
+            var buf = File.ReadAllBytes($"../../../AlwaysOnProfiler/Buffers/TruncatedBuffer.bin");
+
+            var parser = new ThreadSampleNativeFormatParser(buf, buf.Length);
+            var samples = parser.Parse();
+
+            VerifySettings settings = new();
+            settings.UseParameters("TruncatedBuffer");
+            await Verifier.Verify(samples, settings);
+        }
     }
 }
 #endif

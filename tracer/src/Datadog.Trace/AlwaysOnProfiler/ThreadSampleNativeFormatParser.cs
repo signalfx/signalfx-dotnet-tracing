@@ -72,115 +72,122 @@ namespace Datadog.Trace.AlwaysOnProfiler
             var samples = new List<ThreadSample>();
             long sampleStartMillis = 0;
 
-            while (_position < _length)
+            try
             {
-                var operationCode = _buffer[_position];
-                _position++;
-                if (operationCode == OpCodes.StartBatch)
+                while (_position < _length)
                 {
-                    var version = ReadInt();
-                    if (version != 1)
+                    var operationCode = _buffer[_position];
+                    _position++;
+                    if (operationCode == OpCodes.StartBatch)
                     {
-                        return null; // not able to parse
+                        var version = ReadInt();
+                        if (version != 1)
+                        {
+                            return null; // not able to parse
+                        }
+
+                        sampleStartMillis = ReadInt64();
+
+                        if (IsLogLevelDebugEnabled)
+                        {
+                            var sampleStart = new DateTime(
+                                (sampleStartMillis * TimeSpan.TicksPerMillisecond) + TimeConstants.UnixEpochInTicks).ToLocalTime();
+                            Log.Debug(
+                                "Parsing thread samples captured at {date} {time}",
+                                sampleStart.ToLongDateString(),
+                                sampleStart.ToLongTimeString());
+                        }
                     }
-
-                    sampleStartMillis = ReadInt64();
-
-                    if (IsLogLevelDebugEnabled)
+                    else if (operationCode == OpCodes.StartSample)
                     {
-                        var sampleStart = new DateTime(
-                            (sampleStartMillis * TimeSpan.TicksPerMillisecond) + TimeConstants.UnixEpochInTicks).ToLocalTime();
-                        Log.Debug(
-                            "Parsing thread samples captured at {date} {time}",
-                            sampleStart.ToLongDateString(),
-                            sampleStart.ToLongTimeString());
+                        var managedId = ReadInt();
+                        var nativeId = ReadInt();
+                        var threadName = ReadString();
+                        var traceIdHigh = ReadInt64();
+                        var traceIdLow = ReadInt64();
+                        var spanId = ReadInt64();
+
+                        var threadIndex = batchThreadIndex++;
+
+                        var code = ReadShort();
+                        if (code == 0)
+                        {
+                            // Empty stack, skip this sample.
+                            continue;
+                        }
+
+                        var threadSample = new ThreadSample
+                        {
+                            Timestamp = new ThreadSample.Time(sampleStartMillis),
+                            TraceIdHigh = traceIdHigh,
+                            TraceIdLow = traceIdLow,
+                            SpanId = spanId,
+                            ManagedId = managedId,
+                            NativeId = nativeId,
+                            ThreadName = threadName,
+                            ThreadIndex = threadIndex
+                        };
+
+                        this.ReadStackFrames(code, threadSample);
+
+                        if (threadName == ThreadSampler.BackgroundThreadName)
+                        {
+                            // TODO Splunk: add configuration option to include the sampler thread. By default remove it.
+                            continue;
+                        }
+
+                        samples.Add(threadSample);
+                    }
+                    else if (operationCode == OpCodes.EndBatch)
+                    {
+                        // end batch, nothing here
+                    }
+                    else if (operationCode == OpCodes.BatchStats)
+                    {
+                        var microsSuspended = ReadInt();
+                        var numThreads = ReadInt();
+                        var totalFrames = ReadInt();
+                        var numCacheMisses = ReadInt();
+
+                        if (IsLogLevelDebugEnabled)
+                        {
+                            Log.Debug(
+                                "CLR was suspended for {microsSuspended} microseconds to collect a thread sample batch: threads={numThreads} frames={totalFrames} misses={numCacheMisses}",
+                                new object[] { microsSuspended, numThreads, totalFrames, numCacheMisses });
+                        }
+                    }
+                    else if (operationCode == OpCodes.AllocationSample)
+                    {
+                        var timestampMillis = ReadInt64();
+                        var allocatedSize = ReadInt64(); // Technically uint64 but whatever
+                        var typeName = ReadString();
+                        var managedId = ReadInt();
+                        var nativeId = ReadInt();
+                        var threadName = ReadString();
+                        var traceIdHigh = ReadInt64();
+                        var traceIdLow = ReadInt64();
+                        var spanId = ReadInt64();
+
+                        ThreadSample ts = new ThreadSample();
+                        var code = ReadShort();
+                        this.ReadStackFrames(code, ts);
+                        // TODO Splunk: export this somewhere
+                        // Console.WriteLine("ALLOC: " + allocatedSize + " " + typeName);
+                    }
+                    else
+                    {
+                        _position = _length + 1;
+
+                        if (IsLogLevelDebugEnabled)
+                        {
+                            Log.Debug("Not expected operation code while parsing thread stack trace: '{0}'. Operation will be ignored.", operationCode);
+                        }
                     }
                 }
-                else if (operationCode == OpCodes.StartSample)
-                {
-                    var managedId = ReadInt();
-                    var nativeId = ReadInt();
-                    var threadName = ReadString();
-                    var traceIdHigh = ReadInt64();
-                    var traceIdLow = ReadInt64();
-                    var spanId = ReadInt64();
-
-                    var threadIndex = batchThreadIndex++;
-
-                    var code = ReadShort();
-                    if (code == 0)
-                    {
-                        // Empty stack, skip this sample.
-                        continue;
-                    }
-
-                    var threadSample = new ThreadSample
-                    {
-                        Timestamp = new ThreadSample.Time(sampleStartMillis),
-                        TraceIdHigh = traceIdHigh,
-                        TraceIdLow = traceIdLow,
-                        SpanId = spanId,
-                        ManagedId = managedId,
-                        NativeId = nativeId,
-                        ThreadName = threadName,
-                        ThreadIndex = threadIndex
-                    };
-
-                    this.ReadStackFrames(code, threadSample);
-
-                    if (threadName == ThreadSampler.BackgroundThreadName)
-                    {
-                        // TODO Splunk: add configuration option to include the sampler thread. By default remove it.
-                        continue;
-                    }
-
-                    samples.Add(threadSample);
-                }
-                else if (operationCode == OpCodes.EndBatch)
-                {
-                    // end batch, nothing here
-                }
-                else if (operationCode == OpCodes.BatchStats)
-                {
-                    var microsSuspended = ReadInt();
-                    var numThreads = ReadInt();
-                    var totalFrames = ReadInt();
-                    var numCacheMisses = ReadInt();
-
-                    if (IsLogLevelDebugEnabled)
-                    {
-                        Log.Debug(
-                        "CLR was suspended for {microsSuspended} microseconds to collect a thread sample batch: threads={numThreads} frames={totalFrames} misses={numCacheMisses}",
-                        new object[] { microsSuspended, numThreads, totalFrames, numCacheMisses });
-                    }
-                }
-                else if (operationCode == OpCodes.AllocationSample)
-                {
-                    var timestampMillis = ReadInt64();
-                    var allocatedSize = ReadInt64(); // Technically uint64 but whatever
-                    var typeName = ReadString();
-                    var managedId = ReadInt();
-                    var nativeId = ReadInt();
-                    var threadName = ReadString();
-                    var traceIdHigh = ReadInt64();
-                    var traceIdLow = ReadInt64();
-                    var spanId = ReadInt64();
-
-                    ThreadSample ts = new ThreadSample();
-                    var code = ReadShort();
-                    this.ReadStackFrames(code, ts);
-                    // TODO Splunk: export this somewhere
-                    // Console.WriteLine("ALLOC: " + allocatedSize + " " + typeName);
-                }
-                else
-                {
-                    _position = _length + 1;
-
-                    if (IsLogLevelDebugEnabled)
-                    {
-                        Log.Debug("Not expected operation code while parsing thread stack trace: '{0}'. Operation will be ignored.", operationCode);
-                    }
-                }
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "Unexpected error while parsing sample.");
             }
 
             return samples;
