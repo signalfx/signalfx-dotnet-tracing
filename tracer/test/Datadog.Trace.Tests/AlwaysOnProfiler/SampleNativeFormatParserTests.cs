@@ -1,6 +1,7 @@
 // Modified by Splunk Inc.
 
 #if NETCOREAPP3_1_OR_GREATER
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,9 +14,9 @@ using Xunit;
 namespace Datadog.Trace.Tests.AlwaysOnProfiler
 {
     [UsesVerify]
-    public class ThreadSampleNativeFormatParserTests
+    public class SampleNativeFormatParserTests
     {
-        static ThreadSampleNativeFormatParserTests()
+        static SampleNativeFormatParserTests()
         {
             VerifierSettings.DerivePathInfo(
                 (sourceFile, projectDirectory, type, method) =>
@@ -27,13 +28,15 @@ namespace Datadog.Trace.Tests.AlwaysOnProfiler
         public static IEnumerable<object[]> GetBufferFiles =>
             Enumerable.Range(0, 2).Select(n => new object[] { $"Buffer{n:D6}" });
 
+        public static IEnumerable<object[]> GetAllocationBufferFiles =>
+            Enumerable.Range(1, 3).Select(n => new object[] { $"AllocationBuffer{n}" });
+
         [Theory]
         [MemberData(nameof(GetBufferFiles))]
         public async Task ParseSampleBuffer(string fileName)
         {
             var buf = File.ReadAllBytes($"../../../AlwaysOnProfiler/Buffers/{fileName}.bin");
-            var parser = new ThreadSampleNativeFormatParser(buf, buf.Length);
-            var samples = parser.Parse();
+            var samples = SampleNativeFormatParser.ParseThreadSamples(buf, buf.Length);
 
             VerifySettings settings = new();
             settings.UseParameters(fileName);
@@ -45,11 +48,22 @@ namespace Datadog.Trace.Tests.AlwaysOnProfiler
         {
             var buf = File.ReadAllBytes($"../../../AlwaysOnProfiler/Buffers/TruncatedBuffer.bin");
 
-            var parser = new ThreadSampleNativeFormatParser(buf, buf.Length);
-            var samples = parser.Parse();
+            var samples = SampleNativeFormatParser.ParseThreadSamples(buf, buf.Length);
 
             VerifySettings settings = new();
             settings.UseParameters("TruncatedBuffer");
+            await Verifier.Verify(samples, settings);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetAllocationBufferFiles))]
+        public async Task ParseSampleAllocationBuffer(string fileName)
+        {
+            var buf = File.ReadAllBytes($"../../../AlwaysOnProfiler/Buffers/{fileName}.bin");
+            var samples = SampleNativeFormatParser.ParseAllocationSamples(buf, buf.Length);
+
+            VerifySettings settings = new();
+            settings.UseParameters(fileName);
             await Verifier.Verify(samples, settings);
         }
     }
