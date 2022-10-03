@@ -263,7 +263,10 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 string value;
                 if (code < 0)
                 {
-                    value = ReadString(buffer, ref position);
+                    var bufferString = ReadString(buffer, ref position);
+
+                    // we are replacing Datadog.Trace namespace to avoid conflicts while upstream sync
+                    value = bufferString.Replace("Datadog.Trace.", "SignalFx.Tracing.");
                     dictionary[-code] = value;
                 }
                 else
@@ -273,10 +276,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
                 if (value != null)
                 {
-                    // we are replacing Datadog.Trace namespace to avoid conflicts while upstream sync
-                    // TODO Splunk: replace once
-                    var replacedValue = value.Replace("Datadog.Trace.", "SignalFx.Tracing.");
-                    threadSample.Frames.Add(replacedValue);
+                    threadSample.Frames.Add(value);
                 }
 
                 code = ReadShort(buffer, ref position);
