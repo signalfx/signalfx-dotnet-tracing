@@ -21,8 +21,8 @@ namespace Datadog.Trace.AlwaysOnProfiler
         /// <summary>
         /// Parses the thread sample batch.
         /// </summary>
-        /// <param name="buffer">the buffer</param>
-        /// <param name="read">read amount</param>
+        /// <param name="buffer">byte array containing native thread samples format data</param>
+        /// <param name="read">how much of the buffer is actually used</param>
         internal static List<ThreadSample> ParseThreadSamples(byte[] buffer, int read)
         {
             uint batchThreadIndex = 0;
@@ -137,6 +137,11 @@ namespace Datadog.Trace.AlwaysOnProfiler
             return samples;
         }
 
+        /// <summary>
+        /// Parses the allocation sample batch.
+        /// </summary>
+        /// <param name="buffer">byte array containing native allocation samples format data</param>
+        /// <param name="read">how much of the buffer is actually used</param>
         internal static List<AllocationSample> ParseAllocationSamples(byte[] buffer, int read)
         {
             var allocationSamples = new List<AllocationSample>();
@@ -176,7 +181,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         // each allocation sample has independently coded strings
                         var codeDictionary = new Dictionary<int, string>();
                         ReadStackFrames(code, threadSample, codeDictionary, buffer, ref position);
-                        allocationSamples.Add(new AllocationSample(new AllocationDetails(allocatedSize, typeName), threadSample));
+                        allocationSamples.Add(new AllocationSample(allocatedSize, typeName, threadSample));
                     }
                     else
                     {

@@ -1,9 +1,7 @@
-﻿[
+[
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 144,
-      TypeName: System.String
-    },
+    AllocationSizeBytes: 144,
+    TypeName: System.String,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371462339000000,
@@ -26,10 +24,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 904,
-      TypeName: System.String
-    },
+    AllocationSizeBytes: 904,
+    TypeName: System.String,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371462350000000,
@@ -51,10 +47,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 984,
-      TypeName: System.String
-    },
+    AllocationSizeBytes: 984,
+    TypeName: System.String,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371462353000000,
@@ -77,10 +71,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 168,
-      TypeName: System.String
-    },
+    AllocationSizeBytes: 168,
+    TypeName: System.String,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371462360000000,
@@ -102,10 +94,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 904,
-      TypeName: System.String
-    },
+    AllocationSizeBytes: 904,
+    TypeName: System.String,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371462364000000,
@@ -127,10 +117,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 96,
-      TypeName: System.Int32[]
-    },
+    AllocationSizeBytes: 96,
+    TypeName: System.Int32[],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371463458000000,
@@ -168,10 +156,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 104,
-      TypeName: System.Reflection.RuntimeMethodInfo
-    },
+    AllocationSizeBytes: 104,
+    TypeName: System.Reflection.RuntimeMethodInfo,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371463483000000,
@@ -206,10 +192,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 1048,
-      TypeName: System.Reflection.RuntimeMethodInfo[]
-    },
+    AllocationSizeBytes: 1048,
+    TypeName: System.Reflection.RuntimeMethodInfo[],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371463493000000,
@@ -246,10 +230,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 280,
-      TypeName: System.String
-    },
+    AllocationSizeBytes: 280,
+    TypeName: System.String,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371463495000000,
@@ -285,10 +267,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 104,
-      TypeName: System.Reflection.RuntimeMethodInfo
-    },
+    AllocationSizeBytes: 104,
+    TypeName: System.Reflection.RuntimeMethodInfo,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371463507000000,
@@ -327,10 +307,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 88,
-      TypeName: System.RuntimeMethodInfoStub
-    },
+    AllocationSizeBytes: 88,
+    TypeName: System.RuntimeMethodInfoStub,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371463508000000,
@@ -371,10 +349,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 104,
-      TypeName: System.Reflection.RuntimeMethodInfo
-    },
+    AllocationSizeBytes: 104,
+    TypeName: System.Reflection.RuntimeMethodInfo,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371463509000000,
@@ -411,10 +387,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 104,
-      TypeName: System.Reflection.PropertyInfo[]
-    },
+    AllocationSizeBytes: 104,
+    TypeName: System.Reflection.PropertyInfo[],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371463522000000,
@@ -455,10 +429,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 104,
-      TypeName: System.Reflection.PropertyInfo[]
-    },
+    AllocationSizeBytes: 104,
+    TypeName: System.Reflection.PropertyInfo[],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371463709000000,
@@ -491,10 +463,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 112,
-      TypeName: Datadog.Trace.Vendors.ProtoBuf.Meta.MetaType
-    },
+    AllocationSizeBytes: 112,
+    TypeName: Datadog.Trace.Vendors.ProtoBuf.Meta.MetaType,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371463717000000,
@@ -525,10 +495,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 104,
-      TypeName: System.Reflection.RuntimeMethodInfo
-    },
+    AllocationSizeBytes: 104,
+    TypeName: System.Reflection.RuntimeMethodInfo,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371463719000000,
@@ -569,10 +537,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 32,
-      TypeName: System.String
-    },
+    AllocationSizeBytes: 32,
+    TypeName: System.String,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371463721000000,
@@ -616,10 +582,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 128,
-      TypeName: System.Reflection.MemberInfo[]
-    },
+    AllocationSizeBytes: 128,
+    TypeName: System.Reflection.MemberInfo[],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371463726000000,
@@ -657,10 +621,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 248,
-      TypeName: System.Type[]
-    },
+    AllocationSizeBytes: 248,
+    TypeName: System.Type[],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371463731000000,
@@ -701,10 +663,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 32,
-      TypeName: System.Version
-    },
+    AllocationSizeBytes: 32,
+    TypeName: System.Version,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371463736000000,
@@ -728,10 +688,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 80,
-      TypeName: System.Signature
-    },
+    AllocationSizeBytes: 80,
+    TypeName: System.Signature,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371464092000000,
@@ -774,10 +732,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 48,
-      TypeName: SelectArrayIterator`2[System.Reflection.ParameterInfo,System.Type]
-    },
+    AllocationSizeBytes: 48,
+    TypeName: SelectArrayIterator`2[System.Reflection.ParameterInfo,System.Type],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371464280000000,
@@ -812,10 +768,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 16320,
-      TypeName: System.Object[]
-    },
+    AllocationSizeBytes: 16320,
+    TypeName: System.Object[],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371464318000000,
@@ -856,10 +810,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 32,
-      TypeName: System.Version
-    },
+    AllocationSizeBytes: 32,
+    TypeName: System.Version,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371469518000000,
@@ -898,10 +850,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 192,
-      TypeName: System.String
-    },
+    AllocationSizeBytes: 192,
+    TypeName: System.String,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371469862000000,
@@ -932,10 +882,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 7304,
-      TypeName: System.String
-    },
+    AllocationSizeBytes: 7304,
+    TypeName: System.String,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371469864000000,
@@ -961,10 +909,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 216,
-      TypeName: System.SByte[]
-    },
+    AllocationSizeBytes: 216,
+    TypeName: System.SByte[],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371474050000000,
@@ -1009,10 +955,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 48,
-      TypeName: System.Reflection.CustomAttributeRecord[]
-    },
+    AllocationSizeBytes: 48,
+    TypeName: System.Reflection.CustomAttributeRecord[],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371475095000000,

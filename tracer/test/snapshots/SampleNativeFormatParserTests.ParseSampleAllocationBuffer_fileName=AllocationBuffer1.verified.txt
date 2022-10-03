@@ -1,9 +1,7 @@
-﻿[
+[
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 32,
-      TypeName: System.Collections.Generic.List`1[Datadog.Tracer.Pprof.Proto.Profile.Label]
-    },
+    AllocationSizeBytes: 32,
+    TypeName: System.Collections.Generic.List`1[Datadog.Tracer.Pprof.Proto.Profile.Label],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371544941000000,
@@ -24,10 +22,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 48,
-      TypeName: System.Reflection.CustomAttributeRecord[]
-    },
+    AllocationSizeBytes: 48,
+    TypeName: System.Reflection.CustomAttributeRecord[],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371550156000000,
@@ -66,10 +62,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 2160,
-      TypeName: Entry[System.Int32,System.String][]
-    },
+    AllocationSizeBytes: 2160,
+    TypeName: Entry[System.Int32,System.String][],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371550158000000,
@@ -91,10 +85,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 216,
-      TypeName: System.SByte[]
-    },
+    AllocationSizeBytes: 216,
+    TypeName: System.SByte[],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371552206000000,
@@ -139,10 +131,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 48,
-      TypeName: System.Reflection.CustomAttributeRecord[]
-    },
+    AllocationSizeBytes: 48,
+    TypeName: System.Reflection.CustomAttributeRecord[],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371555331000000,

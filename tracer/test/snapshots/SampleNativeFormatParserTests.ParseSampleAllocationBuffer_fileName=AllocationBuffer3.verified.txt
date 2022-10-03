@@ -1,9 +1,7 @@
-﻿[
+[
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 14808,
-      TypeName: EventMetadata[]
-    },
+    AllocationSizeBytes: 14808,
+    TypeName: EventMetadata[],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371457638000000,
@@ -31,10 +29,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 29592,
-      TypeName: EventMetadata[]
-    },
+    AllocationSizeBytes: 29592,
+    TypeName: EventMetadata[],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371457654000000,
@@ -63,10 +59,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 80,
-      TypeName: System.RuntimeType[]
-    },
+    AllocationSizeBytes: 80,
+    TypeName: System.RuntimeType[],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371457656000000,
@@ -97,10 +91,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 64,
-      TypeName: System.Diagnostics.Tracing.EventAttribute
-    },
+    AllocationSizeBytes: 64,
+    TypeName: System.Diagnostics.Tracing.EventAttribute,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371457657000000,
@@ -136,10 +128,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 16024,
-      TypeName: System.Char[]
-    },
+    AllocationSizeBytes: 16024,
+    TypeName: System.Char[],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371457658000000,
@@ -171,10 +161,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 48,
-      TypeName: System.Text.StringBuilder
-    },
+    AllocationSizeBytes: 48,
+    TypeName: System.Text.StringBuilder,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371457659000000,
@@ -206,10 +194,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 16024,
-      TypeName: System.Char[]
-    },
+    AllocationSizeBytes: 16024,
+    TypeName: System.Char[],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371457661000000,
@@ -243,10 +229,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 48,
-      TypeName: System.Text.StringBuilder
-    },
+    AllocationSizeBytes: 48,
+    TypeName: System.Text.StringBuilder,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371457663000000,
@@ -279,10 +263,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 48,
-      TypeName: System.Text.StringBuilder
-    },
+    AllocationSizeBytes: 48,
+    TypeName: System.Text.StringBuilder,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371457663000000,
@@ -315,10 +297,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 216832,
-      TypeName: System.String
-    },
+    AllocationSizeBytes: 216832,
+    TypeName: System.String,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371457664000000,
@@ -349,10 +329,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 108440,
-      TypeName: System.Byte[]
-    },
+    AllocationSizeBytes: 108440,
+    TypeName: System.Byte[],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371457664000000,
@@ -383,10 +361,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 131104,
-      TypeName: System.Int64[]
-    },
+    AllocationSizeBytes: 131104,
+    TypeName: System.Int64[],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371458580000000,
@@ -422,10 +398,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 831304,
-      TypeName: System.Int64[]
-    },
+    AllocationSizeBytes: 831304,
+    TypeName: System.Int64[],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371458584000000,
@@ -461,10 +435,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 40,
-      TypeName: System.String
-    },
+    AllocationSizeBytes: 40,
+    TypeName: System.String,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371458594000000,
@@ -500,10 +472,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 96,
-      TypeName: System.Reflection.RuntimeParameterInfo
-    },
+    AllocationSizeBytes: 96,
+    TypeName: System.Reflection.RuntimeParameterInfo,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371459279000000,
@@ -560,10 +530,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 88,
-      TypeName: System.String
-    },
+    AllocationSizeBytes: 88,
+    TypeName: System.String,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371459467000000,
@@ -607,10 +575,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 1416,
-      TypeName: System.Reflection.CustomAttributeRecord[]
-    },
+    AllocationSizeBytes: 1416,
+    TypeName: System.Reflection.CustomAttributeRecord[],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371459588000000,
@@ -656,10 +622,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 72,
-      TypeName: System.String
-    },
+    AllocationSizeBytes: 72,
+    TypeName: System.String,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371459766000000,
@@ -692,10 +656,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 80,
-      TypeName: System.Reflection.AssemblyName
-    },
+    AllocationSizeBytes: 80,
+    TypeName: System.Reflection.AssemblyName,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371459883000000,
@@ -735,10 +697,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 272,
-      TypeName: Node[System.String,System.String][]
-    },
+    AllocationSizeBytes: 272,
+    TypeName: Node[System.String,System.String][],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371459889000000,
@@ -788,10 +748,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 912,
-      TypeName: Entry[System.Int32,System.String][]
-    },
+    AllocationSizeBytes: 912,
+    TypeName: Entry[System.Int32,System.String][],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371459978000000,
@@ -852,10 +810,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 36520,
-      TypeName: System.String
-    },
+    AllocationSizeBytes: 36520,
+    TypeName: System.String,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371459979000000,
@@ -915,10 +871,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 20504,
-      TypeName: System.UInt16[]
-    },
+    AllocationSizeBytes: 20504,
+    TypeName: System.UInt16[],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371460071000000,
@@ -972,10 +926,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 192,
-      TypeName: Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.SymbolicRegexBuilder`1[Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD]
-    },
+    AllocationSizeBytes: 192,
+    TypeName: Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.SymbolicRegexBuilder`1[Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371460152000000,
@@ -1023,10 +975,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 36784,
-      TypeName: Entry[System.ValueTuple`3[System.Int32,Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD,Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD],Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD][]
-    },
+    AllocationSizeBytes: 36784,
+    TypeName: Entry[System.ValueTuple`3[System.Int32,Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD,Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD],Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD][],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371460199000000,
@@ -1082,10 +1032,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 40,
-      TypeName: Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD
-    },
+    AllocationSizeBytes: 40,
+    TypeName: Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371460209000000,
@@ -1140,10 +1088,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 77264,
-      TypeName: Entry[System.ValueTuple`3[System.Int32,Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD,Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD],Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD][]
-    },
+    AllocationSizeBytes: 77264,
+    TypeName: Entry[System.ValueTuple`3[System.Int32,Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD,Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD],Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD][],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371460210000000,
@@ -1212,10 +1158,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 77264,
-      TypeName: Entry[System.ValueTuple`3[Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.CharSetSolver+BooleanOperation,Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD,Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD],Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD][]
-    },
+    AllocationSizeBytes: 77264,
+    TypeName: Entry[System.ValueTuple`3[Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.CharSetSolver+BooleanOperation,Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD,Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD],Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD][],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371460211000000,
@@ -1285,10 +1229,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 161992,
-      TypeName: Entry[System.ValueTuple`3[System.Int32,Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD,Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD],Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD][]
-    },
+    AllocationSizeBytes: 161992,
+    TypeName: Entry[System.ValueTuple`3[System.Int32,Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD,Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD],Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD][],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371460211000000,
@@ -1355,10 +1297,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 161992,
-      TypeName: Entry[System.ValueTuple`3[Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.CharSetSolver+BooleanOperation,Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD,Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD],Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD][]
-    },
+    AllocationSizeBytes: 161992,
+    TypeName: Entry[System.ValueTuple`3[Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.CharSetSolver+BooleanOperation,Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD,Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD],Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD][],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371460212000000,
@@ -1418,10 +1358,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 72,
-      TypeName: Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.SymbolicRegexNode`1[Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD]
-    },
+    AllocationSizeBytes: 72,
+    TypeName: Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.SymbolicRegexNode`1[Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371460213000000,
@@ -1470,10 +1408,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 40,
-      TypeName: Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD
-    },
+    AllocationSizeBytes: 40,
+    TypeName: Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371460219000000,
@@ -1530,10 +1466,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 336792,
-      TypeName: Entry[System.ValueTuple`3[Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.CharSetSolver+BooleanOperation,Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD,Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD],Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD][]
-    },
+    AllocationSizeBytes: 336792,
+    TypeName: Entry[System.ValueTuple`3[Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.CharSetSolver+BooleanOperation,Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD,Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD],Datadog.Trace.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD][],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371460220000000,
@@ -1598,10 +1532,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 288,
-      TypeName: System.GCMemoryInfoData
-    },
+    AllocationSizeBytes: 288,
+    TypeName: System.GCMemoryInfoData,
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371460273000000,
@@ -1621,10 +1553,8 @@
     }
   },
   {
-    AllocationDetails: {
-      AllocationSizeBytes: 204856,
-      TypeName: System.Byte[]
-    },
+    AllocationSizeBytes: 204856,
+    TypeName: System.Byte[],
     ThreadSample: {
       Timestamp: {
         Nanoseconds: 1664371461273000000,

@@ -2,13 +2,16 @@
 
 internal class AllocationSample
 {
-    public AllocationSample(AllocationDetails allocationDetails, ThreadSample threadSample)
+    public AllocationSample(long allocationSizeBytes, string allocationTypeName, ThreadSample threadSample)
     {
+        AllocationSizeBytes = allocationSizeBytes;
+        TypeName = allocationTypeName;
         ThreadSample = threadSample;
-        AllocationDetails = allocationDetails;
     }
 
-    public AllocationDetails AllocationDetails { get; }
+    public long AllocationSizeBytes { get; }
+
+    public string TypeName { get; }
 
     public ThreadSample ThreadSample { get; }
 }
