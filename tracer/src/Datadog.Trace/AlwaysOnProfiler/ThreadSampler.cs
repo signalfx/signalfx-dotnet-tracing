@@ -34,8 +34,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 return;
             }
 
-            var parser = new ThreadSampleNativeFormatParser(buffer, read);
-            var threadSamples = parser.Parse();
+            var threadSamples = SampleNativeFormatParser.ParseThreadSamples(buffer, read);
 
             exporter.ExportThreadSamples(threadSamples);
         }
@@ -49,16 +48,15 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 return;
             }
 
-            // TODO Splunk: Actually implement exporter for this data
-            var parser = new ThreadSampleNativeFormatParser(buffer, read);
-            var threadSamples = parser.Parse();
+            var allocationSamples = SampleNativeFormatParser.ParseAllocationSamples(buffer, read);
+            exporter.ExportAllocationSamples(allocationSamples);
         }
 
         private static void SampleReadingThread()
         {
             var buffer = new byte[BufferSize];
             var exporterFactory = new ThreadSampleExporterFactory(_tracerSettings);
-            var exporter = exporterFactory.CreateThreadSampleExporter();
+            var sampleExporter = exporterFactory.CreateThreadSampleExporter();
 
             while (true)
             {
@@ -66,8 +64,8 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 try
                 {
                     // Call twice in quick succession to catch up any blips; the second will likely return 0 (no buffer)
-                    ReadAndExportThreadSampleBatch(buffer, exporter);
-                    ReadAndExportThreadSampleBatch(buffer, exporter);
+                    ReadAndExportThreadSampleBatch(buffer, sampleExporter);
+                    ReadAndExportThreadSampleBatch(buffer, sampleExporter);
                 }
                 catch (Exception ex)
                 {
@@ -77,7 +75,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 try
                 {
                     // Managed-side calls to this method dictate buffer changeover, no catch up call needed
-                    ReadAndExportAllocationSampleBatch(buffer, exporter);
+                    ReadAndExportAllocationSampleBatch(buffer, sampleExporter);
                 }
                 catch (Exception ex)
                 {

@@ -54,6 +54,11 @@ namespace Datadog.Trace.AlwaysOnProfiler
             }
         }
 
+        public void ExportAllocationSamples(List<AllocationSample> allocationSample)
+        {
+            // TODO Splunk: implement
+        }
+
         protected abstract void ProcessThreadSamples(List<ThreadSample> samples);
 
         protected LogRecord AddLogRecord(string body)
