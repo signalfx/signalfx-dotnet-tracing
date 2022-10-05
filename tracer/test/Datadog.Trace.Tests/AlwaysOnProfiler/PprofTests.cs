@@ -2,7 +2,6 @@
 
 using System.Collections.Generic;
 using Datadog.Trace.AlwaysOnProfiler;
-using Datadog.Trace.AlwaysOnProfiler.Builder;
 using FluentAssertions;
 using Xunit;
 

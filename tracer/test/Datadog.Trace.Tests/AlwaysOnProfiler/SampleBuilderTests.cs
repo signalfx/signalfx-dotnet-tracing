@@ -1,11 +1,11 @@
 // Modified by Splunk Inc.
 
-using Datadog.Trace.AlwaysOnProfiler.Builder;
+using Datadog.Trace.AlwaysOnProfiler;
 using Datadog.Tracer.Pprof.Proto.Profile;
 using FluentAssertions;
 using Xunit;
 
-namespace Datadog.Trace.Tests.AlwaysOnProfiler.Builder
+namespace Datadog.Trace.Tests.AlwaysOnProfiler
 {
     public class SampleBuilderTests
     {

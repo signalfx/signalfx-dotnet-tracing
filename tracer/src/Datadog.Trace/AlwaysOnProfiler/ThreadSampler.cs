@@ -1,6 +1,7 @@
 // Modified by Splunk Inc.
 
 using System;
+using System.IO;
 using System.Threading;
 using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.Configuration;

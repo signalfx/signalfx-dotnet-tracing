@@ -24,9 +24,34 @@ namespace Datadog.Trace.AlwaysOnProfiler
         {
             foreach (var threadSample in samples)
             {
-                var logRecord = AddLogRecord(BuildStackTrace(threadSample));
-                DecorateLogRecord(logRecord, threadSample);
+                var logRecord = BuildLogRecord(threadSample, ProfilingDataTypeCpu);
+
+                logRecord.Attributes.Add(_samplingPeriodAttribute);
             }
+        }
+
+        protected override void ProcessAllocationSamples(List<AllocationSample> allocationSamples)
+        {
+            foreach (var allocationSample in allocationSamples)
+            {
+                var logRecord = BuildLogRecord(allocationSample.ThreadSample, ProfilingDataTypeAllocation);
+
+                // TODO Splunk: export typename
+                var memoryAllocatedAttribute = CreateMemoryAllocatedAttribute(allocationSample.AllocationSizeBytes);
+                logRecord.Attributes.Add(memoryAllocatedAttribute);
+            }
+        }
+
+        private static KeyValue CreateMemoryAllocatedAttribute(long allocationSizeBytes)
+        {
+            return new KeyValue
+            {
+                Key = "memory.allocated",
+                Value = new AnyValue
+                {
+                    IntValue = allocationSizeBytes
+                }
+            };
         }
 
         private static byte[] ToBigEndianBytes(long high, long low)
@@ -78,7 +103,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
             return stackTraceBuilder.ToString();
         }
 
-        private void DecorateLogRecord(LogRecord logRecord, ThreadSample threadSample)
+        private static void SetCommonFields(LogRecord logRecord, ThreadSample threadSample)
         {
             if (threadSample.SpanId != 0 || threadSample.TraceIdHigh != 0 || threadSample.TraceIdLow != 0)
             {
@@ -87,7 +112,13 @@ namespace Datadog.Trace.AlwaysOnProfiler
             }
 
             logRecord.TimeUnixNano = threadSample.Timestamp.Nanoseconds;
-            logRecord.Attributes.Add(_samplingPeriodAttribute);
+        }
+
+        private LogRecord BuildLogRecord(ThreadSample threadSample, KeyValue sampleType)
+        {
+            var logRecord = AddLogRecord(BuildStackTrace(threadSample), sampleType);
+            SetCommonFields(logRecord, threadSample);
+            return logRecord;
         }
     }
 }

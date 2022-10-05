@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using Datadog.Trace.AlwaysOnProfiler.Builder;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Vendors.ProtoBuf;
 using Datadog.Tracer.Pprof.Proto.Profile;
@@ -23,9 +22,14 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
         protected override void ProcessThreadSamples(List<ThreadSample> samples)
         {
-            var profile = BuildProfile(samples);
-            // all of the samples in the batch have the same timestamp, pick from the first sample
-            AddLogRecord(Serialize(profile));
+            var cpuProfile = BuildCpuProfile(samples);
+            AddLogRecord(cpuProfile, ProfilingDataTypeCpu);
+        }
+
+        protected override void ProcessAllocationSamples(List<AllocationSample> allocationSamples)
+        {
+            var allocationProfile = BuildAllocationProfile(allocationSamples);
+            AddLogRecord(allocationProfile, ProfilingDataTypeAllocation);
         }
 
         private static string Serialize(Profile profile)
@@ -41,35 +45,56 @@ namespace Datadog.Trace.AlwaysOnProfiler
             return Convert.ToBase64String(byteArray);
         }
 
-        private Profile BuildProfile(List<ThreadSample> threadSamples)
+        private static SampleBuilder CreateSampleBuilder(Pprof pprof, ThreadSample threadSample)
+        {
+            var sampleBuilder = new SampleBuilder();
+
+            pprof.AddLabel(sampleBuilder, "source.event.time", threadSample.Timestamp.Milliseconds);
+
+            if (threadSample.SpanId != 0 || threadSample.TraceIdHigh != 0 || threadSample.TraceIdLow != 0)
+            {
+                pprof.AddLabel(sampleBuilder, "span_id", threadSample.SpanId.ToString("x16"));
+                pprof.AddLabel(sampleBuilder, "trace_id", TraceIdHelper.ToString(threadSample.TraceIdHigh, threadSample.TraceIdLow));
+            }
+
+            foreach (var methodName in threadSample.Frames)
+            {
+                sampleBuilder.AddLocationId(pprof.GetLocationId(methodName));
+            }
+
+            pprof.AddLabel(sampleBuilder, "thread.id", threadSample.ManagedId);
+            pprof.AddLabel(sampleBuilder, "thread.name", threadSample.ThreadName);
+            pprof.AddLabel(sampleBuilder, "thread.os.id", threadSample.NativeId);
+            return sampleBuilder;
+        }
+
+        private static string BuildAllocationProfile(List<AllocationSample> allocationSamples)
+        {
+            var pprof = new Pprof();
+            foreach (var allocationSample in allocationSamples)
+            {
+                var sampleBuilder = CreateSampleBuilder(pprof, allocationSample.ThreadSample);
+
+                // TODO Splunk: export typename
+                sampleBuilder.AddValue(allocationSample.AllocationSizeBytes);
+                pprof.Profile.Samples.Add(sampleBuilder.Build());
+            }
+
+            return Serialize(pprof.Profile);
+        }
+
+        private string BuildCpuProfile(List<ThreadSample> threadSamples)
         {
             var pprof = new Pprof();
             foreach (var threadSample in threadSamples)
             {
-                var sampleBuilder = new SampleBuilder();
+                var sampleBuilder = CreateSampleBuilder(pprof, threadSample);
 
-                pprof.AddLabel(sampleBuilder, "source.event.time", threadSample.Timestamp.Milliseconds);
                 pprof.AddLabel(sampleBuilder, "source.event.period", (long)_threadSamplingPeriod.TotalMilliseconds);
-
-                if (threadSample.SpanId != 0 || threadSample.TraceIdHigh != 0 || threadSample.TraceIdLow != 0)
-                {
-                    pprof.AddLabel(sampleBuilder, "span_id", threadSample.SpanId.ToString("x16"));
-                    pprof.AddLabel(sampleBuilder, "trace_id", TraceIdHelper.ToString(threadSample.TraceIdHigh, threadSample.TraceIdLow));
-                }
-
-                foreach (var methodName in threadSample.Frames)
-                {
-                    sampleBuilder.AddLocationId(pprof.GetLocationId(methodName));
-                }
-
-                pprof.AddLabel(sampleBuilder, "thread.id", threadSample.ManagedId);
-                pprof.AddLabel(sampleBuilder, "thread.name", threadSample.ThreadName);
-                pprof.AddLabel(sampleBuilder, "thread.os.id", threadSample.NativeId);
-
                 pprof.Profile.Samples.Add(sampleBuilder.Build());
             }
 
-            return pprof.Profile;
+            return Serialize(pprof.Profile);
         }
     }
 }
