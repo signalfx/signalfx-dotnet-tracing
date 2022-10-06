@@ -1,4 +1,4 @@
-﻿namespace Datadog.Trace.AlwaysOnProfiler;
+namespace Datadog.Trace.AlwaysOnProfiler;
 
 internal class AllocationSample
 {

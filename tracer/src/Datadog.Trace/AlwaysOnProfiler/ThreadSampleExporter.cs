@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Datadog.Trace.Configuration;
 using Datadog.Tracer.OpenTelemetry.Proto.Common.V1;
 using Datadog.Tracer.OpenTelemetry.Proto.Logs.V1;
@@ -16,19 +15,23 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
         private readonly LogsData _logsData;
 
+        private readonly KeyValue _format;
+
         protected ThreadSampleExporter(ImmutableTracerSettings tracerSettings, ILogSender logSender, string format)
         {
-            FixedLogRecordAttributes = new ReadOnlyCollection<KeyValue>(new List<KeyValue>
-            {
-                GdiProfilingConventions.LogRecord.Attributes.Source,
-                GdiProfilingConventions.LogRecord.Attributes.Type,
-                GdiProfilingConventions.LogRecord.Attributes.Format(format)
-            });
+            // The same _logsData instance is used on all export messages. With the exception of the list of
+            // LogRecords, the Logs property, all other fields are prepopulated.
             _logsData = GdiProfilingConventions.CreateLogsData(tracerSettings.GlobalTags);
             _logSender = logSender ?? throw new ArgumentNullException(nameof(logSender));
+
+            _format = GdiProfilingConventions.LogRecord.Attributes.Format(format);
+            ProfilingDataTypeCpu = GdiProfilingConventions.LogRecord.Attributes.Type("cpu");
+            ProfilingDataTypeAllocation = GdiProfilingConventions.LogRecord.Attributes.Type("allocation");
         }
 
-        private ReadOnlyCollection<KeyValue> FixedLogRecordAttributes { get; }
+        protected KeyValue ProfilingDataTypeCpu { get; }
+
+        protected KeyValue ProfilingDataTypeAllocation { get; }
 
         public void ExportThreadSamples(List<ThreadSample> threadSamples)
         {
@@ -37,13 +40,28 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 return;
             }
 
-            // The same _logsData instance is used on all export messages. With the exception of the list of
-            // LogRecords, the Logs property, all other fields are prepopulated.
+            ProcessThreadSamples(threadSamples);
+            Export();
+        }
+
+        public void ExportAllocationSamples(List<AllocationSample> allocationSamples)
+        {
+            if (allocationSamples == null || allocationSamples.Count < 1)
+            {
+                return;
+            }
+
+            ProcessAllocationSamples(allocationSamples);
+            Export();
+        }
+
+        /// <summary>
+        /// Exports accumulated log records and clears the collection.
+        /// </summary>
+        private void Export()
+        {
             try
             {
-                // Populate the list of LogRecords
-                ProcessThreadSamples(threadSamples);
-
                 _logSender.Send(_logsData);
             }
             finally
@@ -54,14 +72,11 @@ namespace Datadog.Trace.AlwaysOnProfiler
             }
         }
 
-        public void ExportAllocationSamples(List<AllocationSample> allocationSample)
-        {
-            // TODO Splunk: implement
-        }
-
         protected abstract void ProcessThreadSamples(List<ThreadSample> samples);
 
-        protected LogRecord AddLogRecord(string body)
+        protected abstract void ProcessAllocationSamples(List<AllocationSample> allocationSamples);
+
+        protected LogRecord AddLogRecord(string body, KeyValue profilingDataType)
         {
             // The stack follows the experimental GDI conventions described at
             // https://github.com/signalfx/gdi-specification/blob/29cbcbc969531d50ccfd0b6a4198bb8a89cedebb/specification/semantic_conventions.md#logrecord-message-fields
@@ -70,9 +85,9 @@ namespace Datadog.Trace.AlwaysOnProfiler
             {
                 Attributes =
                 {
-                    FixedLogRecordAttributes[0],
-                    FixedLogRecordAttributes[1],
-                    FixedLogRecordAttributes[2]
+                    GdiProfilingConventions.LogRecord.Attributes.Source,
+                    profilingDataType,
+                    _format
                 },
                 Body = new AnyValue { StringValue = body }
             };
@@ -149,11 +164,17 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         Value = new AnyValue { StringValue = OpenTelemetryProfiling }
                     };
 
-                    public static readonly KeyValue Type = new()
+                    public static KeyValue Type(string sampleType)
                     {
-                        Key = "profiling.data.type",
-                        Value = new AnyValue { StringValue = "cpu" }
-                    };
+                        return new KeyValue
+                        {
+                            Key = "profiling.data.type",
+                            Value = new AnyValue
+                            {
+                                StringValue = sampleType
+                            }
+                        };
+                    }
 
                     public static KeyValue Period(long periodMilliseconds)
                     {

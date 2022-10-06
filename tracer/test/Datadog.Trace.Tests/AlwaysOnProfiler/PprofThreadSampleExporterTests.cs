@@ -189,6 +189,127 @@ public class PprofThreadSampleExporterTests
         }
     }
 
+    [Fact]
+    public void Allocation_size_in_bytes_is_sent_as_a_value_for_exported_allocation_sample()
+    {
+        var sender = new TestSender();
+        var exporter = new PprofThreadSampleExporter(
+            DefaultSettings(),
+            sender);
+
+        var allocationSample = new AllocationSample(
+            1000,
+            "System.String",
+            new ThreadSample
+            {
+                Timestamp = new ThreadSample.Time(10000),
+                ThreadIndex = 0,
+                NativeId = 1,
+                ManagedId = 2,
+                ThreadName = "test_thread"
+            });
+
+        exporter.ExportAllocationSamples(
+            new List<AllocationSample> { allocationSample });
+
+        var sentLog = sender.SentLogs[0];
+
+        var profile = Deserialize(sentLog.Body.StringValue);
+
+        using (new AssertionScope())
+        {
+            var values = profile.Samples[0].Values;
+            values.Length.Should().Be(1);
+
+            var allocationSize = values[0];
+            allocationSize.Should().Be(1000);
+        }
+    }
+
+    [Fact]
+    public void Log_record_type_is_set_to_allocation_for_exported_allocation_sample()
+    {
+        var sender = new TestSender();
+        var exporter = new PprofThreadSampleExporter(
+            DefaultSettings(),
+            sender);
+
+        var allocationSample = new AllocationSample(
+            1000,
+            "System.String",
+            new ThreadSample
+            {
+                Timestamp = new ThreadSample.Time(10000),
+                ThreadIndex = 0,
+                NativeId = 1,
+                ManagedId = 2,
+                ThreadName = "test_thread"
+            });
+
+        exporter.ExportAllocationSamples(new List<AllocationSample> { allocationSample });
+
+        var sentLog = sender.SentLogs[0];
+
+        var profilingDataType = sentLog.Attributes.Single(kv => kv.Key == "profiling.data.type");
+        profilingDataType.Value.StringValue.Should().Be("allocation");
+    }
+
+    [Fact]
+    public void Common_labels_are_set_for_exported_allocation_sample()
+    {
+        var sender = new TestSender();
+        var exporter = new PprofThreadSampleExporter(
+            DefaultSettings(),
+            sender);
+
+        var allocationSample = new AllocationSample(
+            1000,
+            "System.String",
+            new ThreadSample
+            {
+                Timestamp = new ThreadSample.Time(1000),
+                ThreadIndex = 0,
+                NativeId = 1,
+                ManagedId = 2,
+                ThreadName = "test_thread",
+                SpanId = 1234567890,
+                TraceIdLow = 9876543210,
+                TraceIdHigh = 1234567890
+            });
+
+        exporter.ExportAllocationSamples(new List<AllocationSample> { allocationSample });
+
+        var sentLog = sender.SentLogs[0];
+
+        var profile = Deserialize(sentLog.Body.StringValue);
+
+        using (new AssertionScope())
+        {
+            // https://github.com/signalfx/gdi-specification/blob/bd5c6f56f26b535c6fa922d2d9b5d00a7b7b5afd/specification/semantic_conventions.md#pprof-profileproto-data-format
+            // These labels are common for cpu and allocation samples
+
+            var timestamp = GetLabelNum("source.event.time", profile);
+            timestamp.Should().Be(1000);
+
+            var traceId = GetLabelString("trace_id", profile.StringTables, profile.Samples[0]);
+            // concatenated hex representations of 1234567890 and 9876543210
+            traceId.Should().Be("00000000499602d2000000024cb016ea");
+
+            var spanId = GetLabelString("span_id", profile.StringTables, profile.Samples[0]);
+            // hex representation of 1234567890
+            spanId.Should().Be("00000000499602d2");
+
+            var managedThreadId = GetLabelNum("thread.id", profile);
+            managedThreadId.Should().Be(2);
+
+            var threadName = GetLabelString("thread.name", profile.StringTables, profile.Samples[0]);
+            threadName.Should().Be("test_thread");
+
+            var nativeId = GetLabelNum("thread.os.id", profile);
+            nativeId.Should().Be(1);
+        }
+    }
+
     private static long GetLabelNum(string labelName, Profile profile)
     {
         var label = GetLabel(labelName, profile.StringTables, profile.Samples[0]);
