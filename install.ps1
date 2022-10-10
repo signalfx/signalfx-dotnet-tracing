@@ -4,7 +4,7 @@
 
 # signalfx-dotnet-tracing github repository API
 $release = "v0.2.9"
-$api = "https://api.github.com/repos/signalfx/signalfx-dotnet-tracing/releases/$release"
+$api = "https://api.github.com/repos/signalfx/signalfx-dotnet-tracing/releases/tags/$release"
 
 # determine OS architecture
 $os_bits = (Get-CimInstance Win32_OperatingSystem).OSArchitecture
