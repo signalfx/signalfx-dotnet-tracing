@@ -1,5 +1,10 @@
+#
+# NB: This install script is expected by signalfx/splunk-otel-collector (install.ps1)
+#
+
 # signalfx-dotnet-tracing github repository API
-$api = "https://api.github.com/repos/signalfx/signalfx-dotnet-tracing/releases/latest"
+$release = "v0.2.9"
+$api = "https://api.github.com/repos/signalfx/signalfx-dotnet-tracing/releases/$release"
 
 # determine OS architecture
 $os_bits = (Get-CimInstance Win32_OperatingSystem).OSArchitecture

@@ -384,6 +384,11 @@ namespace PrepareRelease
                     "../shared/src/azure-site-extension/install.cmd",
                     text => Regex.Replace(text, VersionPattern(), VersionString()));
 
+                // Setup scripts
+                SynchronizeVersion(
+                    "../install.ps1",
+                    text => Regex.Replace(text, VersionPattern(), VersionString()));
+
                 Console.WriteLine($"Completed synchronizing source versions to {VersionString()}");
             }
         }
