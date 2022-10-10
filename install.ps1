@@ -21,7 +21,12 @@ $msi = Join-Path $env:temp $download.name
 Invoke-WebRequest -Uri $download.browser_download_url -OutFile $msi
 
 # Install downloaded MSI
-Start-Process msiexec.exe -Wait -ArgumentList "/I $msi /quiet"
+$process = Start-Process msiexec.exe -Wait -PassThru -ArgumentList "/I $msi /quiet"
+
+if($process.ExitCode -ne 0 -or $process.ExitCode -ne 3010){
+    throw "Could not install. The installer returned error code $($process.ExitCode).`r`n" + 
+    "See more: https://learn.microsoft.com/en-us/windows/win32/msi/error-codes"
+}
 
 # Cleanup
 Remove-Item $msi
