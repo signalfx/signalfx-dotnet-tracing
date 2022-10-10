@@ -61,7 +61,9 @@ jobs:
         uses: actions/upload-artifact@v3.1.0
         with:
           name: artifacts
-          path: tracer/bin/artifacts/*/en-us
+          path: |
+            tracer/bin/artifacts/*/en-us
+            install.ps1
       - name: Upload NuGet packages
         uses: actions/upload-artifact@v3.1.0
         with:
