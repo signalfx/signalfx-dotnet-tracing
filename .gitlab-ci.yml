@@ -3,10 +3,14 @@ include:
   - project: core-ee/signing/api-integration
     ref: develop
     file: /templates/.sign-client.yml
+  - project: 'ci-cd/templates'
+    ref: master
+    file: '/prodsec/.oss-scan.yml'
 
 stages:
   - build
   - sign
+  - verify
   - checksum
   - checksum-sign
   - run-overhead-test
@@ -178,3 +182,9 @@ run-overhead-test:
     - ./overhead-test/provision/wait-for-test-complete.sh
     - ./overhead-test/provision/fetch-results.sh
     - ./overhead-test/provision/create-results-pr.sh
+
+oss-scan:
+  stage: verify
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+  extends: .oss-scan
