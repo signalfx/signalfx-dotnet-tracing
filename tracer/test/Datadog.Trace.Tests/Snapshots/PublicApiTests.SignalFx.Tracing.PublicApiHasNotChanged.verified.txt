@@ -114,6 +114,7 @@ namespace Datadog.Trace.Configuration
             "ee https://docs.datadoghq.com/tracing/legacy_app_analytics/")]
         public bool AnalyticsEnabled { get; }
         public Datadog.Trace.Configuration.ConventionType Convention { get; }
+        public bool CpuProfilingEnabled { get; }
         public string CustomSamplingRules { get; }
         public string Environment { get; }
         public Datadog.Trace.Configuration.ExporterType Exporter { get; }
@@ -126,6 +127,7 @@ namespace Datadog.Trace.Configuration
         public bool KafkaCreateConsumerScopeEnabled { get; }
         public bool LogsInjectionEnabled { get; }
         public int MaxTracesSubmittedPerSecond { get; }
+        public bool MemoryProfilingEnabled { get; }
         public int RecordedValueMaxLength { get; }
         public string ServiceName { get; }
         public string ServiceVersion { get; }
@@ -133,7 +135,6 @@ namespace Datadog.Trace.Configuration
         public bool StatsComputationEnabled { get; }
         public bool TagElasticsearchQueries { get; }
         public bool TagRedisCommands { get; }
-        public bool ThreadSamplingEnabled { get; }
         public System.TimeSpan ThreadSamplingPeriod { get; }
         public bool TraceEnabled { get; }
         public bool TracerMetricsEnabled { get; }
