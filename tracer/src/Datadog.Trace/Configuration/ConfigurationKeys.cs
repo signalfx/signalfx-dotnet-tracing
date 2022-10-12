@@ -548,15 +548,22 @@ namespace Datadog.Trace.Configuration
         internal static class AlwaysOnProfiler
         {
             /// <summary>
-            /// Configuration key for enabling or disabling the thread sampling.
+            /// Configuration key for enabling or disabling the cpu profiling.
             /// The default value is false (disabled)
             /// </summary>
-            /// <seealso cref="TracerSettings.ThreadSamplingEnabled"/>
-            public const string Enabled = "SIGNALFX_PROFILER_ENABLED";
+            /// <seealso cref="TracerSettings.CpuProfilingEnabled"/>
+            public const string CpuEnabled = "SIGNALFX_PROFILER_ENABLED";
+
+            /// <summary>
+            /// Configuration key for enabling or disabling the allocation profiling.
+            /// The default value is false (disabled)
+            /// </summary>
+            /// <seealso cref="TracerSettings.MemoryProfilingEnabled"/>
+            public const string MemoryEnabled = "SIGNALFX_PROFILER_MEMORY_ENABLED";
 
             /// <summary>
             /// Configuration key to set default thread sampling period.
-            /// The default value is 1000 milliseconds.
+            /// The default value is 10000 milliseconds.
             /// </summary>
             /// <seealso cref="TracerSettings.ThreadSamplingPeriod"/>
             public const string Period = "SIGNALFX_PROFILER_CALL_STACK_INTERVAL";
@@ -565,7 +572,7 @@ namespace Datadog.Trace.Configuration
             /// Configuration key to set export format.
             /// The default value is Pprof.
             /// </summary>
-            /// <seealso cref="TracerSettings.ThreadSamplingEnabled"/>
+            /// <seealso cref="ExporterSettings.ProfilerExportFormat"/>
             public const string ExportFormat = "SIGNALFX_PROFILER_EXPORT_FORMAT";
         }
 

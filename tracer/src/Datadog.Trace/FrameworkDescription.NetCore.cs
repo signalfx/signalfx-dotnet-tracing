@@ -78,9 +78,14 @@ namespace Datadog.Trace
             return Name.ToLowerInvariant().Contains("core") || IsNet5();
         }
 
-        public bool SupportsAlwaysOnProfiler()
+        public bool SupportsCpuProfiling()
         {
             return Environment.Version.Major is 3 or >= 5;
+        }
+
+        public bool SupportsMemoryProfiling()
+        {
+            return Environment.Version.Major >= 5;
         }
 
         private static string GetNetCoreOrNetFrameworkVersion()

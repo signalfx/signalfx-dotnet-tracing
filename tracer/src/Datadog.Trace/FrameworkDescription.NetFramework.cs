@@ -50,7 +50,12 @@ namespace Datadog.Trace
             return false;
         }
 
-        public bool SupportsAlwaysOnProfiler()
+        public bool SupportsCpuProfiling()
+        {
+            return false;
+        }
+
+        public bool SupportsMemoryProfiling()
         {
             return false;
         }

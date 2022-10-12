@@ -196,7 +196,8 @@ namespace Datadog.Trace.Configuration
             TagElasticsearchQueries = source?.GetBool(ConfigurationKeys.TagElasticsearchQueries) ?? true;
 
             // If you change this, change environment_variables.h too
-            ThreadSamplingEnabled = source?.GetBool(ConfigurationKeys.AlwaysOnProfiler.Enabled) ?? false;
+            CpuProfilingEnabled = source?.GetBool(ConfigurationKeys.AlwaysOnProfiler.CpuEnabled) ?? false;
+            MemoryProfilingEnabled = source?.GetBool(ConfigurationKeys.AlwaysOnProfiler.MemoryEnabled) ?? false;
             ThreadSamplingPeriod = GetThreadSamplingPeriod(source);
 
             LogSubmissionSettings = new DirectLogSubmissionSettings(source);
@@ -537,11 +538,18 @@ namespace Datadog.Trace.Configuration
         internal int TraceBatchInterval { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the thread sampling is enabled.
+        /// Gets or sets a value indicating whether the cpu profiling is enabled.
         /// The default value is false (disabled)
         /// </summary>
-        /// <seealso cref="TracerSettings.ThreadSamplingEnabled"/>
-        internal bool ThreadSamplingEnabled { get; set; }
+        /// <seealso cref="ConfigurationKeys.AlwaysOnProfiler.CpuEnabled"/>
+        internal bool CpuProfilingEnabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the allocation profiling is enabled.
+        /// The default value is false (disabled)
+        /// </summary>
+        /// <seealso cref="ConfigurationKeys.AlwaysOnProfiler.MemoryEnabled"/>
+        internal bool MemoryProfilingEnabled { get; set; }
 
         /// <summary>
         /// Gets or sets a value for the thread sampling period.

@@ -186,7 +186,7 @@ namespace Datadog.Trace.ClrProfiler
                 }
             }
 
-            InitializeThreadSampling();
+            InitializeAlwaysOnProfiling();
 
             Log.Debug("Initialization finished.");
         }
@@ -298,29 +298,21 @@ namespace Datadog.Trace.ClrProfiler
             Log.Debug("Initialization of non native parts finished.");
         }
 
-        private static void InitializeThreadSampling()
+        private static void InitializeAlwaysOnProfiling()
         {
             // this method should be called when Tracer.Instance is initialized
             // otherwise it can produce multiple tracer instances
             // Thread Sampling ("profiling") feature
-            if (TracerManager.Instance.Settings.ThreadSamplingEnabled)
+            var tracerSettings = TracerManager.Instance.Settings;
+            if (tracerSettings.CpuProfilingEnabled || tracerSettings.MemoryProfilingEnabled)
             {
-                if (FrameworkDescription.Instance.SupportsAlwaysOnProfiler())
+                try
                 {
-                    try
-                    {
-                        Log.Debug("Initializing thread sampling.");
-                        ThreadSampler.Initialize(TracerManager.Instance.Settings);
-                        Log.Information("Thread sampling initialized.");
-                    }
-                    catch (Exception e)
-                    {
-                        Log.Error(e, "Cannot initialize thread sampling.");
-                    }
+                    ThreadSampler.Initialize(tracerSettings);
                 }
-                else
+                catch (Exception e)
                 {
-                    Log.Error("Cannot initialize thread sampling. .NET version is not supported.");
+                    Log.Error(e, "Cannot initialize thread sampling.");
                 }
             }
         }
