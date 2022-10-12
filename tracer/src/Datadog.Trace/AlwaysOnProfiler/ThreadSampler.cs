@@ -1,9 +1,8 @@
 // Modified by Splunk Inc.
 
 using System;
-using System.IO;
 using System.Threading;
-using Datadog.Trace.ClrProfiler;
+using Datadog.Trace.AlwaysOnProfiler.NativeBufferExporters;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Logging;
 
@@ -24,64 +23,14 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(ThreadSampler));
 
-        private static ImmutableTracerSettings _tracerSettings;
-
-        private static void ReadAndExportThreadSampleBatch(byte[] buffer, ThreadSampleExporter exporter)
-        {
-            var read = NativeMethods.SignalFxReadThreadSamples(buffer.Length, buffer);
-            if (read <= 0)
-            {
-                // No data just return.
-                return;
-            }
-
-            var threadSamples = SampleNativeFormatParser.ParseThreadSamples(buffer, read);
-
-            exporter.ExportThreadSamples(threadSamples);
-        }
-
-        private static void ReadAndExportAllocationSampleBatch(byte[] buffer, ThreadSampleExporter exporter)
-        {
-            var read = NativeMethods.SignalFxReadAllocationSamples(buffer.Length, buffer);
-            if (read <= 0)
-            {
-                // No data just return.
-                return;
-            }
-
-            var allocationSamples = SampleNativeFormatParser.ParseAllocationSamples(buffer, read);
-            exporter.ExportAllocationSamples(allocationSamples);
-        }
-
-        private static void SampleReadingThread()
+        private static void SampleReadingThread(INativeBufferExporter nativeBufferExporter, TimeSpan samplingPeriod)
         {
             var buffer = new byte[BufferSize];
-            var exporterFactory = new ThreadSampleExporterFactory(_tracerSettings);
-            var sampleExporter = exporterFactory.CreateThreadSampleExporter();
 
             while (true)
             {
-                Thread.Sleep(_tracerSettings.ThreadSamplingPeriod);
-                try
-                {
-                    // Call twice in quick succession to catch up any blips; the second will likely return 0 (no buffer)
-                    ReadAndExportThreadSampleBatch(buffer, sampleExporter);
-                    ReadAndExportThreadSampleBatch(buffer, sampleExporter);
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex, "Error processing thread samples batch.");
-                }
-
-                try
-                {
-                    // Managed-side calls to this method dictate buffer changeover, no catch up call needed
-                    ReadAndExportAllocationSampleBatch(buffer, sampleExporter);
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex, "Error processing thread samples batch.");
-                }
+                Thread.Sleep(samplingPeriod);
+                nativeBufferExporter.Export(buffer);
             }
         }
 
@@ -91,14 +40,58 @@ namespace Datadog.Trace.AlwaysOnProfiler
         /// <param name="tracerSettings">Configuration settings.</param>
         public static void Initialize(ImmutableTracerSettings tracerSettings)
         {
-            _tracerSettings = tracerSettings;
+            if (tracerSettings.CpuProfilingEnabled && !FrameworkDescription.Instance.SupportsCpuProfiling())
+            {
+                Log.Warning("Cpu profiling enabled but not supported.");
+            }
 
-            var thread = new Thread(SampleReadingThread)
+            if (tracerSettings.MemoryProfilingEnabled && !FrameworkDescription.Instance.SupportsMemoryProfiling())
+            {
+                Log.Warning("Memory profiling enabled but not supported.");
+            }
+
+            var cpuProfilingAvailable = tracerSettings.CpuProfilingEnabled && FrameworkDescription.Instance.SupportsCpuProfiling();
+            var memoryProfilingAvailable = tracerSettings.MemoryProfilingEnabled && FrameworkDescription.Instance.SupportsMemoryProfiling();
+
+            if (!cpuProfilingAvailable && !memoryProfilingAvailable)
+            {
+                Log.Warning("Environment does not meet AlwaysOnProfiler requirements.");
+                return;
+            }
+
+            Log.Debug("Initializing AlwaysOnProfiler export thread.");
+
+            var bufferExporter = GetConfiguredExporter(tracerSettings, cpuProfilingAvailable, memoryProfilingAvailable);
+
+            var thread = new Thread(() =>
+            {
+                SampleReadingThread(bufferExporter, tracerSettings.ThreadSamplingPeriod);
+            })
             {
                 Name = BackgroundThreadName,
                 IsBackground = true
             };
             thread.Start();
+
+            Log.Information("AlwaysOnProfiler export thread initialized.");
+        }
+
+        private static INativeBufferExporter GetConfiguredExporter(ImmutableTracerSettings tracerSettings, bool cpuProfilingAvailable, bool memoryProfilingAvailable)
+        {
+            var exporterFactory = new ThreadSampleExporterFactory(tracerSettings);
+            var sampleExporter = exporterFactory.CreateThreadSampleExporter();
+
+            var cpuBufferExporter = new CpuNativeBufferExporter(sampleExporter);
+            var allocationBufferExporter = new AllocationNativeBufferExporter(sampleExporter);
+
+            INativeBufferExporter configuredExporter = cpuProfilingAvailable switch
+            {
+                true when memoryProfilingAvailable => new SequentialNativeBufferExporter(cpuBufferExporter, allocationBufferExporter),
+                true => cpuBufferExporter,
+                _ => allocationBufferExporter
+            };
+
+            return configuredExporter;
         }
     }
 }

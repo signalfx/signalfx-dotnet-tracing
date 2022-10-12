@@ -103,7 +103,7 @@ namespace Datadog.Trace
             sampler ??= GetSampler(settings);
 
             agentWriter ??= GetAgentWriter(settings, statsd, sampler);
-            scopeManager ??= new AsyncLocalScopeManager(settings.ThreadSamplingEnabled && FrameworkDescription.Instance.SupportsAlwaysOnProfiler());
+            scopeManager ??= new AsyncLocalScopeManager(settings.CpuProfilingEnabled && FrameworkDescription.Instance.SupportsCpuProfiling());
 
             if (settings.RuntimeMetricsEnabled && !DistributedTracer.Instance.IsChildTracer)
             {

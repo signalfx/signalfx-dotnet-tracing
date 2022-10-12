@@ -80,7 +80,8 @@ namespace Datadog.Trace.Configuration
             Convention = settings.Convention;
             Exporter = settings.Exporter;
 
-            ThreadSamplingEnabled = settings.ThreadSamplingEnabled;
+            CpuProfilingEnabled = settings.CpuProfilingEnabled;
+            MemoryProfilingEnabled = settings.MemoryProfilingEnabled;
             ThreadSamplingPeriod = settings.ThreadSamplingPeriod;
             LogSubmissionSettings = ImmutableDirectLogSubmissionSettings.Create(settings.LogSubmissionSettings);
             // Logs injection is enabled by default if direct log submission is enabled, otherwise disabled by default
@@ -357,9 +358,14 @@ namespace Datadog.Trace.Configuration
         public ExporterType Exporter { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the thread sampling is enabled.
+        /// Gets a value indicating whether the cpu profiling is enabled.
         /// </summary>
-        public bool ThreadSamplingEnabled { get; }
+        public bool CpuProfilingEnabled { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the memory profiling is enabled.
+        /// </summary>
+        public bool MemoryProfilingEnabled { get; }
 
         /// <summary>
         /// Gets a value for the thread sampling period.

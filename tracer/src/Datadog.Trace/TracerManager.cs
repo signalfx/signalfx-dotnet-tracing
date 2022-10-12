@@ -401,10 +401,13 @@ namespace Datadog.Trace
                     writer.WriteValue(agentError ?? string.Empty);
 
                     writer.WritePropertyName("thread_sampling_enabled");
-                    writer.WriteValue(instanceSettings.ThreadSamplingEnabled);
+                    writer.WriteValue(instanceSettings.CpuProfilingEnabled);
 
                     writer.WritePropertyName("thread_sampling_period");
                     writer.WriteValue(instanceSettings.ThreadSamplingPeriod);
+
+                    writer.WritePropertyName("memory_profiling_enabled");
+                    writer.WriteValue(instanceSettings.MemoryProfilingEnabled);
 
                     writer.WritePropertyName("logs_endpoint_url");
                     writer.WriteValue(instanceSettings.ExporterSettings.LogsEndpointUrl);
