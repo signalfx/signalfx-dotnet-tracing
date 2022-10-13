@@ -1,25 +1,23 @@
 
-# About the .NET AlwaysOn Profiling
+# About the .NET Memory Profiling
 
-The SignalFx Instrumentation for .NET includes a continuous thread sampler
-that can be enabled with a configuration setting. This sampler periodically captures
-the call stack state for all .NET threads and sends these
-to the Splunk Observability Cloud as logs. You can then view a flame graph of application
-call stacks and inspect individual code-level call stacks for relevant traces.
+The SignalFx Instrumentation for .NET includes a Memory Profiler
+that can be enabled with a configuration setting. This profiler samples allocations,
+captures the call stack state for .NET thread that triggered the allocation,
+and sends these to the Splunk Observability Cloud as logs.
 
-## How does the thread sampler work?
+Memory allocation data, together with the stack traces and dotnet runtime metrics,
+can then be used to investigate memory leaks and unusual consumption patterns.
+
+## How does the memory profiler work?
 
 The profiler leverages [.NET profiling](https://docs.microsoft.com/en-us/dotnet/framework/unmanaged-api/profiling/)
-to perform periodic call stack sampling. For every sampling period,
-the runtime is suspended
-and the samples for all managed thread are saved into the buffer,
-then the runtime resumes.
+to perform allocation sampling.
+For every sampled allocation, allocation amount together with state of the thread
+that triggered the allocation are saved into buffer.
 
-The separate managed-thread is processing data from the buffer
-and sends it to the OpenTelemetry Collector.
-
-To make the process more efficient, the sampler uses two independent buffers
-to store samples alternatively.
+The managed-thread shared with [CPU Profiler](../always-on-profiling.md)
+processes the data from the buffer and sends it to the OpenTelemetry Collector.
 
 Stack trace data is embedded as a string inside of an OTLP logs payload. The
 [Splunk OpenTelemetry Collector](https://github.com/signalfx/splunk-otel-collector)
@@ -28,55 +26,52 @@ Splunk APM.
 
 # Requirements
 
-* .NET Core 3.1 or .NET 5.0 or higher (`ICorProfilerInfo10` available in runtime).
+* .NET 5.0 or higher (`ICorProfilerInfo12` available in runtime).
 * [Splunk OpenTelemetry Collector](https://github.com/signalfx/splunk-otel-collector)
 version 0.34.0 or higher.
 _Sending profiling data directly to ingest is not supported at this time_.
 
 # Enable the profiler
 
-To enable the profiler, set the `SIGNALFX_PROFILER_ENABLED` environment variable
+To enable the profiler, set the `SIGNALFX_PROFILER_MEMORY_ENABLED` environment variable
 to `true` for your .NET process.
 
 # Configuration settings
 
-Please check [description](advanced-config.md#alwayson-profiling-settings) for the following environment variables
+Please check the descriptions for the following environment variable:
 
-* `SIGNALFX_PROFILER_LOGS_ENDPOINT`,
-* `SIGNALFX_PROFILER_ENABLED`,
-* `SIGNALFX_PROFILER_CALL_STACK_INTERVAL`.
+* [`SIGNALFX_PROFILER_MEMORY_ENABLED`](../internal/internal-config.md#internal-settings)
+* [`SIGNALFX_PROFILER_LOGS_ENDPOINT`](../advanced-config.md#alwayson-profiling-settings)
 
-> We strongly recommend using defaults for `SIGNALFX_PROFILER_CALL_STACK_INTERVAL`.
+> _NOTE_: `SIGNALFX_PROFILER_LOGS_ENDPOINT` affects both CPU and Memory profiling.
 
 # Escape hatch
 
-The profiler limits its own behavior when both buffers
-used to store sampled data are full.
+The profiler limits its own behavior when buffer
+used to store allocation samples is full.
 
 This scenario might happen when the data processing thread is not able
 to send data to collector in the given period of time.
-
-Thread sampler will resume when any of the buffers are empty.
 
 # Troubleshooting the .NET profiler
 
 ## How do I know if it's working?
 
 At the startup, the SignalFx Instrumentation for .NET will log the string
-`AlwaysOnProfiler::StartThreadSampling` at `info` log level
+`AlwaysOnProfiler::MemoryProfiling started` at `info` log level.
 
 You can grep for this in the native logs for the instrumentation
 to see something like this:
 
 ```text
-10/12/22 12:10:31.962 PM [12096|22036] [info] AlwaysOnProfiler::StartThreadSampling
+10/12/22 12:10:31.962 PM [12096|22036] [info] AlwaysOnProfiler::MemoryProfiling started.
 ```
 
-Attempt to enable CPU Profiler on the unsupported runtime version
-results in the following entry in the managed logs for the instrumentation:
+Attempt to enable Memory Profiler on the unsupported runtime version
+results in an entry in the managed logs for the instrumentation similar to this:
 
 ```text
-2022-10-12 12:37:18.640 +02:00 [WRN] Cpu profiling enabled but not supported.
+2022-10-12 12:37:18.640 +02:00 [WRN] Memory profiling enabled but not supported.
 ```
 
 ## How can I see the profiler configuration?
@@ -85,22 +80,17 @@ The SignalFx Instrumentation for .NET logs the profiling configuration
 at `INF` log level during the startup. You can grep for the string `TRACER CONFIGURATION`
 to see the configuration.
 
+Ensure `memory_profiling_enabled` is set to `true`.
+Ensure `logs_endpoint_url` points to the deployed [Splunk OpenTelemetry Collector](https://github.com/signalfx/splunk-otel-collector).
+
 ## What does the escape hatch do?
 
-The escape hatch automatically discards profiling data
+The escape hatch automatically discards captured allocation data
 if the ingest limit has been reached.
 
 If the escape hatch activates, it logs the following message:
 
-```text
-Skipping a thread sample period, buffers are full.
-```
-
-You can also look for:
-
-```text
-** THIS WILL RESULT IN LOSS OF PROFILING DATA **.
-```
+`Discarding captured allocation sample. Allocation buffer is full.`
 
 If you see these log messages, check the configuration and communication layer
 between your process and the Collector.
@@ -108,7 +98,7 @@ between your process and the Collector.
 ## What if I'm on an unsupported .NET version?
 
 If you want to use the profiler and see this in your logs, you must upgrade
-your .NET version to .NET Core 3.1 or .NET 5.0 or higher.
+your .NET version to .NET 5.0 or higher.
 None of the .NET Framework versions is supported.
 
 ## Why is the OTLP/logs exporter complaining?
@@ -135,7 +125,3 @@ and that an exporter is configured for `splunk_hec` export.
 Ensure that the `token` and `endpoint` fields are [correctly configured](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/splunkhecreceiver#configuration).
 Lastly, double check that the logs _pipeline_ is configured to use
 the OTLP HTTP receiver and `splunk_hec` exporter.
-
-## Can I tell the sampler to ignore some threads?
-
-There is no such functionality. All managed threads are captured by the profiler.
