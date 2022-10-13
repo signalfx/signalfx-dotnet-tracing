@@ -62,8 +62,8 @@ Thread sampler will resume when any of the buffers are empty.
 
 ## How do I know if it's working?
 
-At the startup, the SignalFx Instrumentation for .NET will log the string
-`AlwaysOnProfiler::StartThreadSampling` at `info` log level
+At the startup, the SignalFx Instrumentation for .NET logs the string
+`AlwaysOnProfiler::StartThreadSampling` at `info` log level.
 
 You can grep for this in the native logs for the instrumentation
 to see something like this:
@@ -72,14 +72,14 @@ to see something like this:
 10/12/22 12:10:31.962 PM [12096|22036] [info] AlwaysOnProfiler::StartThreadSampling
 ```
 
-Attempt to enable CPU Profiler on the unsupported runtime version
-results in the following entry in the managed logs for the instrumentation:
+If you try to enable CPU Profiler on the unsupported runtime version, you'll get
+a log entry similar to the following in the managed logs for the instrumentation:
 
 ```text
 2022-10-12 12:37:18.640 +02:00 [WRN] Cpu profiling enabled but not supported.
 ```
 
-## How can I see the profiler configuration?
+## How can I see AlwaysOn Profiling configuration?
 
 The SignalFx Instrumentation for .NET logs the profiling configuration
 at `INF` log level during the startup. You can grep for the string `TRACER CONFIGURATION`

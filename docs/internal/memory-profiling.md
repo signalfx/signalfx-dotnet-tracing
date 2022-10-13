@@ -1,28 +1,28 @@
 
-# About the .NET Memory Profiling
+# About the AlwaysOn memory profiling for .NET
 
-The SignalFx Instrumentation for .NET includes a Memory Profiler
-that can be enabled with a configuration setting. This profiler samples allocations,
-captures the call stack state for .NET thread that triggered the allocation,
-and sends these to the Splunk Observability Cloud as logs.
+The SignalFx Instrumentation for .NET includes a memory profiler for Splunk
+APM that can be enabled with a setting. The profiler samples allocations,
+captures the call stack state for the .NET thread that triggered the allocation,
+and sends the telemetry to Splunk Observability Cloud.
 
-Memory allocation data, together with the stack traces and dotnet runtime metrics,
-can then be used to investigate memory leaks and unusual consumption patterns.
+Use the memory allocation data, together with the stack traces and .NET runtime metrics,
+to investigate memory leaks and unusual consumption patterns in AlwaysOn Profiling.
 
 ## How does the memory profiler work?
 
 The profiler leverages [.NET profiling](https://docs.microsoft.com/en-us/dotnet/framework/unmanaged-api/profiling/)
 to perform allocation sampling.
-For every sampled allocation, allocation amount together with state of the thread
+For every sampled allocation, allocation amount as well as the state of the thread
 that triggered the allocation are saved into buffer.
 
-The managed-thread shared with [CPU Profiler](../always-on-profiling.md)
+The managed thread shared with [CPU Profiler](../always-on-profiling.md)
 processes the data from the buffer and sends it to the OpenTelemetry Collector.
 
-Stack trace data is embedded as a string inside of an OTLP logs payload. The
+Stack trace data is embedded as a string inside of the OTLP logs payload. The
 [Splunk OpenTelemetry Collector](https://github.com/signalfx/splunk-otel-collector)
 detects profiling data inside OTLP logs and forwards it to
-Splunk APM.
+the Splunk APM.
 
 # Requirements
 
@@ -38,7 +38,7 @@ to `true` for your .NET process.
 
 # Configuration settings
 
-Please check the descriptions for the following environment variable:
+Make sure you're following the documentation for the following environment variables:
 
 * [`SIGNALFX_PROFILER_MEMORY_ENABLED`](../internal/internal-config.md#internal-settings)
 * [`SIGNALFX_PROFILER_LOGS_ENDPOINT`](../advanced-config.md#alwayson-profiling-settings)
@@ -119,7 +119,7 @@ Other collector distributions might not be able to correctly route
 the log data containing profiles.
 * Make sure that the collector is configured correctly to handle profiling data.
 By default, the [Splunk OpenTelemetry Collector](https://github.com/signalfx/splunk-otel-collector)
-handles this, but a custom configuration might have overridden some settings.
+handles this, but a custom configuration might override some settings.
 Make sure that an OTLP HTTP _receiver_ is configured in the collector
 and that an exporter is configured for `splunk_hec` export.
 Ensure that the `token` and `endpoint` fields are [correctly configured](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/splunkhecreceiver#configuration).
