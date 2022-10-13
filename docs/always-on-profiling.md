@@ -46,6 +46,8 @@ Please check [description](advanced-config.md#alwayson-profiling-settings) for t
 * `SIGNALFX_PROFILER_ENABLED`,
 * `SIGNALFX_PROFILER_CALL_STACK_INTERVAL`.
 
+> _NOTE_: `SIGNALFX_PROFILER_LOGS_ENDPOINT` affects both CPU and Memory profiling.
+
 > We strongly recommend using defaults for `SIGNALFX_PROFILER_CALL_STACK_INTERVAL`.
 
 # Escape hatch
