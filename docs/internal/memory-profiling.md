@@ -1,5 +1,5 @@
 
-# About the AlwaysOn memory profiling for .NET
+# About AlwaysOn memory profiling for .NET
 
 The SignalFx Instrumentation for .NET includes a memory profiler for Splunk
 APM that can be enabled with a setting. The profiler samples allocations,
@@ -67,8 +67,8 @@ to see something like this:
 10/12/22 12:10:31.962 PM [12096|22036] [info] AlwaysOnProfiler::MemoryProfiling started.
 ```
 
-Attempt to enable Memory Profiler on the unsupported runtime version
-results in an entry in the managed logs for the instrumentation similar to this:
+If you enable the memory profiler on an unsupported runtime version
+an entry in the managed logs for the instrumentation similar to this appears:
 
 ```text
 2022-10-12 12:37:18.640 +02:00 [WRN] Memory profiling enabled but not supported.
