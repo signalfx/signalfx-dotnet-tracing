@@ -13,8 +13,9 @@ to investigate memory leaks and unusual consumption patterns in AlwaysOn Profili
 
 The profiler leverages [.NET profiling](https://docs.microsoft.com/en-us/dotnet/framework/unmanaged-api/profiling/)
 to perform allocation sampling.
-For every sampled allocation, allocation amount as well as the state of the thread
-that triggered the allocation are saved into buffer.
+For every sampled allocation, allocation amount together with stack
+trace of the thread that triggered the allocation, and associated
+span context, are saved into buffer.
 
 The managed thread shared with [CPU Profiler](../always-on-profiling.md)
 processes the data from the buffer and sends it to the OpenTelemetry Collector.
@@ -49,6 +50,8 @@ Make sure you're following the documentation for the following environment varia
 
 The profiler limits its own behavior when buffer
 used to store allocation samples is full.
+
+Current maximum size of the buffer is 200 KiB.
 
 This scenario might happen when the data processing thread is not able
 to send data to collector in the given period of time.
