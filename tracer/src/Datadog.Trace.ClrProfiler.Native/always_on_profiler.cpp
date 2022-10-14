@@ -110,6 +110,7 @@ void AllocationSamplingAppendToBuffer(int32_t appendLen, unsigned char* appendBu
 
     if (allocation_buffer->size() + appendLen >= kSamplesBufferMaximumSize)
     {
+        trace::Logger::Warn("Discarding captured allocation sample. Allocation buffer is full.");
         return;
     }
     allocation_buffer->insert(allocation_buffer->end(), appendBuf, &appendBuf[appendLen]);
@@ -876,6 +877,8 @@ void AlwaysOnProfiler::StartAllocationSampling(ICorProfilerInfo12* info12)
     {
         trace::Logger::Error("Could not enable allocation sampling: session pipe error", hr);
     }
+
+    trace::Logger::Info("AlwaysOnProfiler::MemoryProfiling started.");
 }
 
 void AlwaysOnProfiler::ThreadCreated(ThreadID thread_id)
