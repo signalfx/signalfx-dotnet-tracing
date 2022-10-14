@@ -82,8 +82,6 @@ namespace Datadog.Trace.RuntimeMetrics
 
             TryUpdateCounter(MetricsNames.ContentionCount, _contentionCount);
 
-            GcMetrics.PushCollectionCounts(_statsd);
-
             Log.Debug("Sent the following metrics: {metrics}", GarbageCollectionMetrics);
         }
 

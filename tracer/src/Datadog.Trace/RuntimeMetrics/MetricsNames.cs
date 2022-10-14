@@ -41,6 +41,7 @@ namespace Datadog.Trace.RuntimeMetrics
             public const string HeapSize = $"{MetricPrefix}gc.heap.size";
             public const string AllocatedBytes = $"{MetricPrefix}gc.allocations.size";
             public const string HeapCommittedMemory = $"{MetricPrefix}gc.committed_memory.size";
+            public const string PauseTime = $"{MetricPrefix}gc.pause.time";
         }
     }
 }

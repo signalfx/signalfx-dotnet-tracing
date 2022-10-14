@@ -33,10 +33,6 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
             statsd.Verify(s => s.Gauge(MetricsNames.Gc.HeapSize, It.IsAny<double>(), 1, new[] { "generation:gen2" }), Times.Once);
             statsd.Verify(s => s.Gauge(MetricsNames.Gc.HeapSize, It.IsAny<double>(), 1, new[] { "generation:loh" }), Times.Once);
 
-            statsd.Verify(s => s.Counter(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), 1, new[] { "generation:gen0" }), Times.Once);
-            statsd.Verify(s => s.Counter(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), 1, new[] { "generation:gen1" }), Times.Once);
-            statsd.Verify(s => s.Counter(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), 1, new[] { "generation:gen2" }), Times.Once);
-
             statsd.Verify(s => s.Counter(MetricsNames.ContentionCount, It.IsAny<long>(), 1, It.IsAny<string[]>()), Times.Once);
 
             statsd.VerifyNoOtherCalls();

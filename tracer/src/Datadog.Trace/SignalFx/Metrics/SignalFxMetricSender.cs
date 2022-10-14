@@ -59,6 +59,17 @@ namespace Datadog.Trace.SignalFx.Metrics
             Send(MetricType.COUNTER, name, datum => datum.intValue = value, tags);
         }
 
+        /// <summary>
+        /// Sends counter metric with a double value using configured reporter.
+        /// </summary>
+        /// <param name="name">The name of the metric.</param>
+        /// <param name="value">The value of the metric.</param>
+        /// <param name="tags">Tags added to the metric.</param>
+        public void SendDoubleCounterMetric(string name, double value, string[] tags = null)
+        {
+            Send(MetricType.COUNTER, name, datum => datum.doubleValue = value, tags);
+        }
+
         public void Dispose()
         {
             _writer?.Dispose();

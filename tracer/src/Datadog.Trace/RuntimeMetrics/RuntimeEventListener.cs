@@ -27,6 +27,8 @@ namespace Datadog.Trace.RuntimeMetrics
         private const int EventContentionStop = 91;
 
         private const int EventGcHeapStats = 4;
+        private const int EventGcSuspendBegin = 9;
+        private const int EventGcRestartEnd = 3;
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<RuntimeEventListener>();
 
@@ -41,6 +43,7 @@ namespace Datadog.Trace.RuntimeMetrics
         private readonly string _delayInSeconds;
 
         private readonly IDogStatsd _statsd;
+        private DateTime? _gcStart;
 
         static RuntimeEventListener()
         {
@@ -100,8 +103,6 @@ namespace Datadog.Trace.RuntimeMetrics
 
             // TODO splunk: opentelemetry-dotnet-contrib plans to change to ObservableUpDownCounter, will need to be adjusted
             _statsd.Gauge(MetricsNames.ThreadPoolWorkersCount, ThreadPool.ThreadCount);
-
-            GcMetrics.PushCollectionCounts(_statsd);
 
 #if NET6_0_OR_GREATER
             // source originated from: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/blob/bc947a00c3f859cc436f050e81172fc1f8bc09d7/src/OpenTelemetry.Instrumentation.Runtime/RuntimeMetrics.cs
@@ -171,6 +172,19 @@ namespace Datadog.Trace.RuntimeMetrics
             if (eventData.EventName == "EventCounters")
             {
                 ExtractCounters(eventData.Payload);
+            }
+            else if (eventData.EventId == EventGcSuspendBegin)
+            {
+                _gcStart = eventData.TimeStamp;
+            }
+            else if (eventData.EventId == EventGcRestartEnd)
+            {
+                var start = _gcStart;
+
+                if (start != null)
+                {
+                    _statsd.IncrementDouble(MetricsNames.Gc.PauseTime, (eventData.TimeStamp - start.Value).TotalMilliseconds);
+                }
             }
             else
             {
