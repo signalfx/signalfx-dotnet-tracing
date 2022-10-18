@@ -832,15 +832,6 @@ void AlwaysOnProfiler::AllocationTick(ULONG dataLen, LPCBYTE data)
     // account for the null char
     size_t typeNameCharLen = (dataLen - AllocationTickV4SizeWithoutTypeName) / 2 - 1;
 
-#ifdef _WIN32
-    printf("Allocation: %i %ws\n", (int) allocatedSize, typeName);
-#else
-    shared::WSTRING ws = shared::WSTRING(typeName);
-    std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> convert;
-    std::string s = convert.to_bytes(ws);
-    printf("Allocation: %i %s\n", (int) allocatedSize, s.c_str());
-#endif
-
     ThreadID threadId;
     const HRESULT hr = info10->GetCurrentThreadID(&threadId);
     if (FAILED(hr))
@@ -855,6 +846,12 @@ void AlwaysOnProfiler::AllocationTick(ULONG dataLen, LPCBYTE data)
     {
         threadState = &unknownThreadState;
     }
+    // Note that by using a local buffer that we will copy as a whole into the
+    // "main" one later, we gain atomicity and improved concurrency, but lose out on a shared
+    // string-coding dictionary for all the allocation samples in a cycle.  The tradeoffs here
+    // are non-obvious and the code+locking complexity to share codes would be high, so this will do
+    // until proven otherwise.  The managed code specifically understands that the strings in each
+    // allocation sample are coded separately so if this changes, that code will need to change too.
     std::vector<unsigned char> localBytes;
     ThreadSamplesBuffer localBuf = ThreadSamplesBuffer(&localBytes);
     localBuf.AllocationSample(allocatedSize, typeName, typeNameCharLen, threadId, threadState, spanCtx);

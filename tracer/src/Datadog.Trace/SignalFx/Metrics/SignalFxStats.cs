@@ -44,6 +44,11 @@ namespace Datadog.Trace.SignalFx.Metrics
             _metricSender.SendCounterMetric(statName, value, tags);
         }
 
+        public void IncrementDouble(string statName, double value, double sampleRate = 1, string[] tags = null)
+        {
+            _metricSender.SendDoubleCounterMetric(statName, value, tags);
+        }
+
         public void Decrement(string statName, int value = 1, double sampleRate = 1, params string[] tags)
         {
         }

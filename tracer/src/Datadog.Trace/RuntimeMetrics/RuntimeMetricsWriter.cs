@@ -101,6 +101,8 @@ namespace Datadog.Trace.RuntimeMetrics
             {
                 _listener?.Refresh();
 
+                GcMetrics.PushCollectionCounts(_statsd);
+
                 if (_enableProcessMetrics)
                 {
                     ProcessHelpers.GetCurrentProcessRuntimeMetrics(out var newUserCpu, out var newSystemCpu, out var threadCount, out var memoryUsage);

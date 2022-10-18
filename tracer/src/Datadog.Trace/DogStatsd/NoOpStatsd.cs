@@ -76,6 +76,10 @@ namespace Datadog.Trace.DogStatsd
         {
         }
 
+        public void IncrementDouble(string statName, double value, double sampleRate = 1, string[] tags = null)
+        {
+        }
+
         public void Dispose()
         {
         }

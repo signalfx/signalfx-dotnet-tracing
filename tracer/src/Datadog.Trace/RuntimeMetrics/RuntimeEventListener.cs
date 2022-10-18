@@ -28,6 +28,16 @@ namespace Datadog.Trace.RuntimeMetrics
 
         private const int EventGcHeapStats = 4;
 
+        // https://learn.microsoft.com/en-us/dotnet/fundamentals/diagnostics/runtime-garbage-collection-events#gcsuspendeebegin_v1-event
+        private const int EventGcSuspendBegin = 9;
+
+        // https://learn.microsoft.com/en-us/dotnet/fundamentals/diagnostics/runtime-garbage-collection-events#gcrestarteeend_v1-event
+        private const int EventGcRestartEnd = 3;
+
+        // https://github.com/dotnet/runtime/blob/55e2378d86841ec766ee21d5e504d7724c39b53b/src/coreclr/vm/threadsuspend.h#L171
+        private const int SuspendForGc = 1;
+        private const int SuspendForGcPrep = 6;
+
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<RuntimeEventListener>();
 
         private static readonly IReadOnlyDictionary<string, string> MetricsMapping;
@@ -41,6 +51,7 @@ namespace Datadog.Trace.RuntimeMetrics
         private readonly string _delayInSeconds;
 
         private readonly IDogStatsd _statsd;
+        private DateTime? _gcStart;
 
         static RuntimeEventListener()
         {
@@ -100,8 +111,6 @@ namespace Datadog.Trace.RuntimeMetrics
 
             // TODO splunk: opentelemetry-dotnet-contrib plans to change to ObservableUpDownCounter, will need to be adjusted
             _statsd.Gauge(MetricsNames.ThreadPoolWorkersCount, ThreadPool.ThreadCount);
-
-            GcMetrics.PushCollectionCounts(_statsd);
 
 #if NET6_0_OR_GREATER
             // source originated from: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/blob/bc947a00c3f859cc436f050e81172fc1f8bc09d7/src/OpenTelemetry.Instrumentation.Runtime/RuntimeMetrics.cs
@@ -171,6 +180,29 @@ namespace Datadog.Trace.RuntimeMetrics
             if (eventData.EventName == "EventCounters")
             {
                 ExtractCounters(eventData.Payload);
+            }
+            else if (eventData.EventId == EventGcSuspendBegin)
+            {
+                // event is generated also for non-gc related suspends
+                // verify suspend reason before setting _gcStart field
+                var suspendReason = (uint)eventData.Payload[0];
+                if (suspendReason == SuspendForGc || suspendReason == SuspendForGcPrep)
+                {
+                    _gcStart = eventData.TimeStamp;
+                }
+            }
+            else if (eventData.EventId == EventGcRestartEnd)
+            {
+                var start = _gcStart;
+
+                // for etw it was possible to miss some events
+                // set to null to avoid bogus data
+                _gcStart = null;
+
+                if (start != null)
+                {
+                    _statsd.IncrementDouble(MetricsNames.Gc.PauseTime, (eventData.TimeStamp - start.Value).TotalMilliseconds);
+                }
             }
             else
             {

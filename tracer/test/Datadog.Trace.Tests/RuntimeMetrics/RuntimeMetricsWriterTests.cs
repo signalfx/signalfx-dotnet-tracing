@@ -35,6 +35,21 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
         }
 
         [Fact]
+        public void PushGcCollectionCounts()
+        {
+            var listener = new Mock<IRuntimeMetricsListener>();
+
+            var stats = new Mock<IDogStatsd>();
+            using var runtimeMetricsWriter = new RuntimeMetricsWriter(stats.Object, TimeSpan.FromMilliseconds(10), (statsd, timeSpan) => listener.Object);
+
+            runtimeMetricsWriter.PushEvents();
+
+            stats.Verify(s => s.Counter(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), It.IsAny<double>(), new[] { "generation:gen0" }), Times.AtLeastOnce);
+            stats.Verify(s => s.Counter(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), It.IsAny<double>(), new[] { "generation:gen1" }), Times.AtLeastOnce);
+            stats.Verify(s => s.Counter(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), It.IsAny<double>(), new[] { "generation:gen2" }), Times.AtLeastOnce);
+        }
+
+        [Fact]
         public void ShouldSwallowFactoryExceptions()
         {
             var writer = new RuntimeMetricsWriter(Mock.Of<IDogStatsd>(), TimeSpan.FromMilliseconds(10), (statsd, timeSpan) => throw new InvalidOperationException("This exception should be caught"));
