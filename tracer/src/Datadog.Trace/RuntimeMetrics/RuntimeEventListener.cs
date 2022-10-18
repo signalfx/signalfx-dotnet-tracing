@@ -27,8 +27,16 @@ namespace Datadog.Trace.RuntimeMetrics
         private const int EventContentionStop = 91;
 
         private const int EventGcHeapStats = 4;
+
+        // https://learn.microsoft.com/en-us/dotnet/fundamentals/diagnostics/runtime-garbage-collection-events#gcsuspendeebegin_v1-event
         private const int EventGcSuspendBegin = 9;
+
+        // https://learn.microsoft.com/en-us/dotnet/fundamentals/diagnostics/runtime-garbage-collection-events#gcrestarteeend_v1-event
         private const int EventGcRestartEnd = 3;
+
+        // https://github.com/dotnet/runtime/blob/55e2378d86841ec766ee21d5e504d7724c39b53b/src/coreclr/vm/threadsuspend.h#L171
+        private const int SuspendForGc = 1;
+        private const int SuspendForGcPrep = 6;
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<RuntimeEventListener>();
 
@@ -175,11 +183,21 @@ namespace Datadog.Trace.RuntimeMetrics
             }
             else if (eventData.EventId == EventGcSuspendBegin)
             {
-                _gcStart = eventData.TimeStamp;
+                // event is generated also for non-gc related suspends
+                // verify suspend reason before setting _gcStart field
+                var suspendReason = (uint)eventData.Payload[0];
+                if (suspendReason == SuspendForGc || suspendReason == SuspendForGcPrep)
+                {
+                    _gcStart = eventData.TimeStamp;
+                }
             }
             else if (eventData.EventId == EventGcRestartEnd)
             {
                 var start = _gcStart;
+
+                // for etw it was possible to miss some events
+                // set to null to avoid bogus data
+                _gcStart = null;
 
                 if (start != null)
                 {
