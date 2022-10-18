@@ -42,8 +42,6 @@ namespace Datadog.Trace.RuntimeMetrics
             _statsd.Gauge(MetricsNames.Gc.HeapSize, value.Gen2Size, tags: GcMetrics.Tags.Gen2);
             _statsd.Gauge(MetricsNames.Gc.HeapSize, value.LohSize, tags: GcMetrics.Tags.LargeObjectHeap);
 
-            GcMetrics.PushCollectionCounts(_statsd);
-
             Log.Debug("Sent the following metrics: {metrics}", GarbageCollectionMetrics);
         }
 

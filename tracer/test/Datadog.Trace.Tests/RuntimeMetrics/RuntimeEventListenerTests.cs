@@ -42,30 +42,25 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
         {
             var statsd = new Mock<IDogStatsd>();
 
-            // number of reported heap sizes depends on the version of the runtime
-            var expectedCount = Environment.Version.Major >= 6 ? 5 : 4;
+            var mutex = new ManualResetEventSlim();
 
-            // needed for runtime version < net6
-            var countdownEvent = new CountdownEvent(expectedCount);
-
-            statsd.Setup(s => s.Gauge(MetricsNames.Gc.HeapSize, It.IsAny<double>(), It.IsAny<double>(), It.IsAny<string[]>()))
-                .Callback(() => countdownEvent.Signal());
+            // TotalPauseTime is pushed on the GcRestartEnd event, which should be the last event for any GC
+            statsd.Setup(s => s.IncrementDouble(MetricsNames.Gc.PauseTime, It.IsAny<double>(), It.IsAny<double>(), It.IsAny<string[]>()))
+                .Callback(() => mutex.Set());
 
             using var listener = new RuntimeEventListener(statsd.Object, TimeSpan.FromSeconds(10));
 
             statsd.Invocations.Clear();
 
-            countdownEvent.Reset(); // In case a GC was triggered when creating the listener
+            mutex.Reset(); // In case a GC was triggered when creating the listener
 
             GC.Collect(2, GCCollectionMode.Forced, blocking: true, compacting: true);
 
-            // refresh for collection counts metrics to be pushed
             listener.Refresh();
 
-            // GC events are pushed asynchronously for runtime version < net6, wait for the last one to be processed
-            if (!countdownEvent.Wait(TimeSpan.FromSeconds(30)))
+            if (!mutex.Wait(TimeSpan.FromSeconds(30)))
             {
-                throw new TimeoutException("Timed-out waiting for heap sizes to be reported.");
+                throw new TimeoutException("Timed-out waiting for pause times to be reported.");
             }
 
             statsd.Verify(s => s.Gauge(MetricsNames.Gc.HeapSize, It.IsAny<double>(), It.IsAny<double>(), new[] { "generation:gen0" }), Times.AtLeastOnce);
@@ -74,10 +69,7 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
             statsd.Verify(s => s.Gauge(MetricsNames.Gc.HeapSize, It.IsAny<double>(), It.IsAny<double>(), new[] { "generation:loh" }), Times.AtLeastOnce);
 
             statsd.Verify(s => s.Counter(MetricsNames.Gc.AllocatedBytes, It.IsAny<long>(), It.IsAny<double>(), It.IsAny<string[]>()), Times.AtLeastOnce);
-
-            statsd.Verify(s => s.Counter(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), It.IsAny<double>(), new[] { "generation:gen0" }), Times.AtLeastOnce);
-            statsd.Verify(s => s.Counter(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), It.IsAny<double>(), new[] { "generation:gen1" }), Times.AtLeastOnce);
-            statsd.Verify(s => s.Counter(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), It.IsAny<double>(), new[] { "generation:gen2" }), Times.AtLeastOnce);
+            statsd.Verify(s => s.IncrementDouble(MetricsNames.Gc.PauseTime, It.IsAny<double>(), It.IsAny<double>(), It.IsAny<string[]>()), Times.AtLeastOnce);
 
 #if NET6_0_OR_GREATER
             statsd.Verify(s => s.Gauge(MetricsNames.Gc.HeapSize, It.IsAny<double>(), It.IsAny<double>(), new[] { "generation:poh" }), Times.AtLeastOnce);
