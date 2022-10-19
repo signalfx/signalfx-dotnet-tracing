@@ -18,7 +18,7 @@ function Get-TempPath() {
     .SYNOPSIS
     Installs SignalFx Instrumentation for .NET.
 #>
-function Install-SignalFxCore() {
+function Install-SignalFxDotnet() {
     # signalfx-dotnet-tracing github repository API
     $release = "0.2.9"
     $api = "https://api.github.com/repos/signalfx/signalfx-dotnet-tracing/releases/tags/v$($release)"
@@ -55,4 +55,4 @@ function Install-SignalFxCore() {
     Remove-Item $msi
 }
 
-Export-ModuleMember -Function Install-SignalFxCore
+Export-ModuleMember -Function Install-SignalFxDotnet
