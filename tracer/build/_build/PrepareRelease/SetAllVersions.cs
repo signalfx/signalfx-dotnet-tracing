@@ -386,7 +386,7 @@ namespace PrepareRelease
 
                 // Setup scripts
                 SynchronizeVersion(
-                    "../install.ps1",
+                    "../install.psm1",
                     text => Regex.Replace(text, VersionPattern(), VersionString()));
 
                 Console.WriteLine($"Completed synchronizing source versions to {VersionString()}");
