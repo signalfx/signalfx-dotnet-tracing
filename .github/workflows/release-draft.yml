@@ -61,7 +61,9 @@ jobs:
         uses: actions/upload-artifact@v3.1.0
         with:
           name: artifacts
-          path: tracer/bin/artifacts/*/en-us
+          path: |
+            tracer/bin/artifacts/*/en-us
+            install.psm1
       - name: Upload NuGet packages
         uses: actions/upload-artifact@v3.1.0
         with:
@@ -89,6 +91,6 @@ jobs:
         id: get_version
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\/v}
       - name: Create Release
-        run: gh release create v${{ steps.get_version.outputs.VERSION }} --draft artifacts/signalfx* artifacts/x64/en-us/*.msi  artifacts/x86/en-us/*.msi zip/signalfx-dotnet-tracing-*.zip nuget/SignalFx.NET.Tracing.Azure.Site.Extension.*.nupkg
+        run: gh release create v${{ steps.get_version.outputs.VERSION }} --draft artifacts/*.psm1 artifacts/signalfx* artifacts/x64/en-us/*.msi  artifacts/x86/en-us/*.msi zip/signalfx-dotnet-tracing-*.zip nuget/SignalFx.NET.Tracing.Azure.Site.Extension.*.nupkg
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
