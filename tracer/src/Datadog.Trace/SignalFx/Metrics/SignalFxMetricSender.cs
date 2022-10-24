@@ -8,71 +8,52 @@ using Datadog.Tracer.SignalFx.Metrics.Protobuf;
 
 namespace Datadog.Trace.SignalFx.Metrics
 {
-    internal class SignalFxMetricSender : IDisposable
+    internal class SignalFxMetricSender : ISignalFxMetricSender
     {
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(SignalFxMetricSender));
+        private static readonly Func<ISignalFxMetricExporter, int, ISignalFxMetricWriter> InitializeListenerFunc = InitializeWriter;
 
         private readonly ISignalFxMetricWriter _writer;
         private readonly List<Dimension> _globalDimensions;
 
-        public SignalFxMetricSender(ISignalFxMetricWriter writer, string[] globalTags)
+        public SignalFxMetricSender(string[] globalTags, ISignalFxMetricExporter exporter, int maxQueueSize)
+            : this(globalTags, exporter, maxQueueSize, InitializeListenerFunc)
+        {
+        }
+
+        public SignalFxMetricSender(string[] globalTags, ISignalFxMetricExporter exporter, int maxQueueSize, Func<ISignalFxMetricExporter, int, ISignalFxMetricWriter> initializeWriter)
         {
             if (globalTags == null)
             {
                 throw new ArgumentNullException(nameof(globalTags));
             }
 
-            _writer = writer ?? throw new ArgumentNullException(nameof(writer));
+            _writer = initializeWriter(exporter, maxQueueSize);
             _globalDimensions = globalTags.Select(tag => ToDimension(tag)).ToList();
-        }
-
-        /// <summary>
-        /// Sends gauge metric using configured reporter.
-        /// </summary>
-        /// <param name="name">The name of the metric.</param>
-        /// <param name="value">The value of the metric.</param>
-        /// <param name="tags">Tags added to the metric.</param>
-        public void SendGaugeMetric(string name, double value, string[] tags = null)
-        {
-            Send(MetricType.GAUGE, name, datum => datum.doubleValue = value, tags);
-        }
-
-        /// <summary>
-        /// Sends cumulative counter metric using configured reporter.
-        /// </summary>
-        /// <param name="name">The name of the metric.</param>
-        /// <param name="value">The value of the metric.</param>
-        /// <param name="tags">Tags added to the metric.</param>
-        public void SendCumulativeCounterMetric(string name, long value, string[] tags = null)
-        {
-            Send(MetricType.CUMULATIVE_COUNTER, name, datum => datum.intValue = value, tags);
-        }
-
-        /// <summary>
-        /// Sends counter metric using configured reporter.
-        /// </summary>
-        /// <param name="name">The name of the metric.</param>
-        /// <param name="value">The value of the metric.</param>
-        /// <param name="tags">Tags added to the metric.</param>
-        public void SendCounterMetric(string name, long value, string[] tags = null)
-        {
-            Send(MetricType.COUNTER, name, datum => datum.intValue = value, tags);
-        }
-
-        /// <summary>
-        /// Sends counter metric with a double value using configured reporter.
-        /// </summary>
-        /// <param name="name">The name of the metric.</param>
-        /// <param name="value">The value of the metric.</param>
-        /// <param name="tags">Tags added to the metric.</param>
-        public void SendDoubleCounterMetric(string name, double value, string[] tags = null)
-        {
-            Send(MetricType.COUNTER, name, datum => datum.doubleValue = value, tags);
         }
 
         public void Dispose()
         {
             _writer?.Dispose();
+        }
+
+        public void SendDouble(string name, double value, MetricType metricType, string[] tags)
+        {
+            var dataPoint = CreateDataPoint(metricType, name, tags);
+            dataPoint.value.doubleValue = value;
+            Write(dataPoint);
+        }
+
+        public void SendLong(string name, long value, MetricType metricType, string[] tags)
+        {
+            var dataPoint = CreateDataPoint(metricType, name, tags);
+            dataPoint.value.intValue = value;
+            Write(dataPoint);
+        }
+
+        private static ISignalFxMetricWriter InitializeWriter(ISignalFxMetricExporter exporter, int maxQueueSize)
+        {
+            return new AsyncSignalFxMetricWriter(exporter, maxQueueSize);
         }
 
         private static Dimension ToDimension(string t)
@@ -85,16 +66,15 @@ namespace Datadog.Trace.SignalFx.Metrics
             };
         }
 
-        private void Send(MetricType metricType, string name, Action<Datum> valueSetter, string[] tags)
+        private void Write(DataPoint dataPoint)
         {
-            var dataPoint = CreateDataPoint(metricType, name, valueSetter, tags);
             if (!_writer.TryWrite(dataPoint))
             {
                 Log.Warning("Metric upload failed, worker queue full.");
             }
         }
 
-        private DataPoint CreateDataPoint(MetricType metricType, string name, Action<Datum> valueSetter, string[] tags)
+        private DataPoint CreateDataPoint(MetricType metricType, string name, string[] tags)
         {
             // TODO splunk: consider pooling data points
             var dataPoint = new DataPoint
@@ -105,7 +85,6 @@ namespace Datadog.Trace.SignalFx.Metrics
                 timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
             };
 
-            valueSetter(dataPoint.value);
             dataPoint.dimensions.AddRange(_globalDimensions);
 
             if (tags != null)

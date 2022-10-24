@@ -11,21 +11,26 @@ using System.Runtime.ExceptionServices;
 using System.Threading;
 using Datadog.Trace.Logging;
 using Datadog.Trace.PlatformHelpers;
+using Datadog.Trace.SignalFx.Metrics;
 using Datadog.Trace.Util;
 using Datadog.Trace.Vendors.StatsdClient;
+using MetricType = Datadog.Tracer.SignalFx.Metrics.Protobuf.MetricType;
 
 namespace Datadog.Trace.RuntimeMetrics
 {
     internal class RuntimeMetricsWriter : IDisposable
     {
-        private const string ProcessMetrics = $"{MetricsNames.ThreadsCount}, {MetricsNames.CommittedMemory}, {MetricsNames.CpuUserTime}, {MetricsNames.CpuSystemTime}, {MetricsNames.CpuPercentage}";
+        private const string ProcessMetrics = $"{MetricsNames.Process.ThreadsCount}, {MetricsNames.Process.MemoryUsage}, {MetricsNames.Process.MemoryVirtual}, {MetricsNames.Process.CpuTime}, {MetricsNames.Process.CpuUtilization}";
+
+        private static readonly string[] CpuUserTag = new[] { "state:user" };
+        private static readonly string[] CpuSystemTag = new[] { "state:system" };
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<RuntimeMetricsWriter>();
-        private static readonly Func<IDogStatsd, TimeSpan, IRuntimeMetricsListener> InitializeListenerFunc = InitializeListener;
+        private static readonly Func<ISignalFxMetricSender, TimeSpan, IRuntimeMetricsListener> InitializeListenerFunc = InitializeListener;
 
         private readonly TimeSpan _delay;
 
-        private readonly IDogStatsd _statsd;
+        private readonly ISignalFxMetricSender _metricSender;
         private readonly Timer _timer;
 
         private readonly IRuntimeMetricsListener _listener;
@@ -37,15 +42,15 @@ namespace Datadog.Trace.RuntimeMetrics
         private TimeSpan _previousUserCpu;
         private TimeSpan _previousSystemCpu;
 
-        public RuntimeMetricsWriter(IDogStatsd statsd, TimeSpan delay)
-            : this(statsd, delay, InitializeListenerFunc)
+        public RuntimeMetricsWriter(ISignalFxMetricSender metricSender, TimeSpan delay)
+            : this(metricSender, delay, InitializeListenerFunc)
         {
         }
 
-        internal RuntimeMetricsWriter(IDogStatsd statsd, TimeSpan delay, Func<IDogStatsd, TimeSpan, IRuntimeMetricsListener> initializeListener)
+        internal RuntimeMetricsWriter(ISignalFxMetricSender metricSender, TimeSpan delay, Func<ISignalFxMetricSender, TimeSpan, IRuntimeMetricsListener> initializeListener)
         {
             _delay = delay;
-            _statsd = statsd;
+            _metricSender = metricSender;
             _timer = new Timer(_ => PushEvents(), null, delay, delay);
 
             try
@@ -59,7 +64,7 @@ namespace Datadog.Trace.RuntimeMetrics
 
             try
             {
-                ProcessHelpers.GetCurrentProcessRuntimeMetrics(out var userCpu, out var systemCpu, out _, out _);
+                ProcessHelpers.GetCurrentProcessRuntimeMetrics(out var userCpu, out var systemCpu, out _, out _, out _);
 
                 _previousUserCpu = userCpu;
                 _previousSystemCpu = systemCpu;
@@ -74,7 +79,7 @@ namespace Datadog.Trace.RuntimeMetrics
 
             try
             {
-                _listener = initializeListener(statsd, delay);
+                _listener = initializeListener(metricSender, delay);
             }
             catch (Exception ex)
             {
@@ -101,11 +106,11 @@ namespace Datadog.Trace.RuntimeMetrics
             {
                 _listener?.Refresh();
 
-                GcMetrics.PushCollectionCounts(_statsd);
+                GcMetrics.PushCollectionCounts(_metricSender);
 
                 if (_enableProcessMetrics)
                 {
-                    ProcessHelpers.GetCurrentProcessRuntimeMetrics(out var newUserCpu, out var newSystemCpu, out var threadCount, out var memoryUsage);
+                    ProcessHelpers.GetCurrentProcessRuntimeMetrics(out var newUserCpu, out var newSystemCpu, out var threadCount, out var privateMemory, out var workingSet);
 
                     var userCpu = newUserCpu - _previousUserCpu;
                     var systemCpu = newSystemCpu - _previousSystemCpu;
@@ -113,20 +118,21 @@ namespace Datadog.Trace.RuntimeMetrics
                     _previousUserCpu = newUserCpu;
                     _previousSystemCpu = newSystemCpu;
 
-                    // Note: the behavior of Environment.ProcessorCount has changed a lot accross version: https://github.com/dotnet/runtime/issues/622
+                    _metricSender.SendLong(MetricsNames.Process.ThreadsCount, threadCount, MetricType.GAUGE);
+
+                    _metricSender.SendLong(MetricsNames.Process.MemoryUsage, workingSet, MetricType.GAUGE);
+                    _metricSender.SendLong(MetricsNames.Process.MemoryVirtual, privateMemory, MetricType.GAUGE);
+
+                    _metricSender.SendDouble(MetricsNames.Process.CpuTime, newUserCpu.TotalSeconds, MetricType.CUMULATIVE_COUNTER, CpuUserTag);
+                    _metricSender.SendDouble(MetricsNames.Process.CpuTime, newSystemCpu.TotalSeconds, MetricType.CUMULATIVE_COUNTER, CpuSystemTag);
+
+                    // Note: the behavior of Environment.ProcessorCount has changed a lot across version: https://github.com/dotnet/runtime/issues/622
                     // What we want is the number of cores attributed to the container, which is the behavior in 3.1.2+ (and, I believe, in 2.x)
-                    var maximumCpu = Environment.ProcessorCount * _delay.TotalMilliseconds;
-                    var totalCpu = userCpu + systemCpu;
+                    var maximumCpu = Environment.ProcessorCount * _delay.TotalSeconds;
 
-                    _statsd.Gauge(MetricsNames.ThreadsCount, threadCount);
-
-                    _statsd.Gauge(MetricsNames.CommittedMemory, memoryUsage);
-
-                    // Get CPU time in milliseconds per second
-                    _statsd.Gauge(MetricsNames.CpuUserTime, userCpu.TotalMilliseconds / _delay.TotalSeconds);
-                    _statsd.Gauge(MetricsNames.CpuSystemTime, systemCpu.TotalMilliseconds / _delay.TotalSeconds);
-
-                    _statsd.Gauge(MetricsNames.CpuPercentage, Math.Round(totalCpu.TotalMilliseconds * 100 / maximumCpu, 1, MidpointRounding.AwayFromZero));
+                    // https://github.com/open-telemetry/opentelemetry-dotnet-contrib/pull/687#discussion_r995076259
+                    _metricSender.SendDouble(MetricsNames.Process.CpuUtilization, Math.Min(userCpu.TotalSeconds / maximumCpu, 1D), MetricType.GAUGE, CpuUserTag);
+                    _metricSender.SendDouble(MetricsNames.Process.CpuUtilization, Math.Min(systemCpu.TotalSeconds / maximumCpu, 1D), MetricType.GAUGE, CpuSystemTag);
 
                     Log.Debug("Sent the following metrics: {metrics}", ProcessMetrics);
                 }
@@ -135,7 +141,7 @@ namespace Datadog.Trace.RuntimeMetrics
                 {
                     foreach (var element in _exceptionCounts)
                     {
-                        _statsd.Increment(MetricsNames.ExceptionsCount, element.Value, tags: new[] { $"exception_type:{element.Key}" });
+                        _metricSender.SendLong(MetricsNames.ExceptionsCount, element.Value, MetricType.COUNTER, new[] { $"exception_type:{element.Key}" });
                     }
 
                     // There's a race condition where we could clear items that haven't been pushed
@@ -155,12 +161,12 @@ namespace Datadog.Trace.RuntimeMetrics
             }
         }
 
-        private static IRuntimeMetricsListener InitializeListener(IDogStatsd statsd, TimeSpan delay)
+        private static IRuntimeMetricsListener InitializeListener(ISignalFxMetricSender metricSender, TimeSpan delay)
         {
 #if NETCOREAPP
-            return new RuntimeEventListener(statsd, delay);
+            return new RuntimeEventListener(metricSender, delay);
 #elif NETFRAMEWORK
-            return AzureAppServices.Metadata.IsRelevant ? new AzureAppServicePerformanceCounters(statsd) : new PerformanceCountersListener(statsd);
+            return AzureAppServices.Metadata.IsRelevant ? new AzureAppServicePerformanceCounters(metricSender) : new PerformanceCountersListener(metricSender);
 #else
             return null;
 #endif

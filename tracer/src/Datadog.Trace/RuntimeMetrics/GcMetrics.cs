@@ -3,7 +3,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Datadog.Trace.SignalFx.Metrics;
 using Datadog.Trace.Vendors.StatsdClient;
+using MetricType = Datadog.Tracer.SignalFx.Metrics.Protobuf.MetricType;
 
 namespace Datadog.Trace.RuntimeMetrics;
 
@@ -23,7 +25,7 @@ internal static class GcMetrics
 
     public static ReadOnlyCollection<string> GenNames { get; } = new(new List<string> { "gen0", "gen1", "gen2", "loh", "poh" });
 
-    public static void PushCollectionCounts(IDogStatsd dogStatsd)
+    public static void PushCollectionCounts(ISignalFxMetricSender metricSender)
     {
         long collectionsFromHigherGeneration = 0;
 
@@ -32,7 +34,7 @@ internal static class GcMetrics
             long collectionsFromThisGeneration = GC.CollectionCount(gen);
             var currentValue = collectionsFromThisGeneration - collectionsFromHigherGeneration;
 
-            dogStatsd.Counter(MetricsNames.Gc.CollectionsCount, currentValue, tags: Tags.GenerationTags[gen]);
+            metricSender.SendLong(MetricsNames.Gc.CollectionsCount, currentValue, MetricType.CUMULATIVE_COUNTER, Tags.GenerationTags[gen]);
 
             collectionsFromHigherGeneration = collectionsFromThisGeneration;
         }

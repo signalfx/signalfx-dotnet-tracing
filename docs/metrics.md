@@ -15,28 +15,31 @@ To learn about differences between SignalFx metric types, visit [documentation](
 
 ## .NET runtime metrics
 
-The names and the metric structure of the metrics exported are aligned with OpenTelemetry
-[implementation](https://github.com/open-telemetry/opentelemetry-dotnet-contrib/blob/bc947a00c3f859cc436f050e81172fc1f8bc09d7/src/OpenTelemetry.Instrumentation.Runtime).
+Names and metric structure of the metrics exported are aligned with OpenTelemetry
+implementation from [Runtime](https://github.com/open-telemetry/opentelemetry-dotnet-contrib/blob/bc947a00c3f859cc436f050e81172fc1f8bc09d7/src/OpenTelemetry.Instrumentation.Runtime) package.
 
-| Metric                                                 | Description                                                                                                                     | Type              |
-|:-------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------|:------------------|
-| `process.runtime.dotnet.exceptions.count`              | Count of exceptions since the previous observation.                                   | Counter           |
-| `process.runtime.dotnet.gc.collections.count`          | Number of garbage collections since the process started.                                             | CumulativeCounter |
+| Metric                                                 | Description                                                                                                               | Type              |
+|:-------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------|:------------------|
+| `process.runtime.dotnet.exceptions.count`              | Count of exceptions since the previous observation.                                                                       | Counter           |
+| `process.runtime.dotnet.gc.collections.count`          | Number of garbage collections since the process started.                                                                  | CumulativeCounter |
 | `process.runtime.dotnet.gc.heap.size`                  | Heap size, as observed during the last garbage collection.                                                                | Gauge             |
-| `process.runtime.dotnet.gc.allocations.size`           | Count of bytes allocated on the managed GC heap since the process started. (.NET Core only)                             | CumulativeCounter |
+| `process.runtime.dotnet.gc.allocations.size`           | Count of bytes allocated on the managed GC heap since the process started. (.NET Core only)                               | CumulativeCounter |
 | `process.runtime.dotnet.gc.committed_memory.size`      | Amount of committed virtual memory for the managed GC heap, as observed during the last garbage collection. (.NET 6 only) | Gauge             |
-| `process.runtime.dotnet.gc.pause.time`                 | Number of milliseconds spent in GC pause. (.NET Core only)                                                                  | Counter           |
-| `process.runtime.dotnet.monitor.lock_contention.count` | Contentions count when trying to acquire a monitor lock since the process started.                   | CumulativeCounter |
-| `process.runtime.dotnet.thread_pool.threads.count`     | Number of thread pool threads, as observed during the last measurement. Only available for .NET Core.                                  | Gauge             |
+| `process.runtime.dotnet.gc.pause.time`                 | Number of milliseconds spent in GC pause. (.NET Core only)                                                                | Counter           |
+| `process.runtime.dotnet.monitor.lock_contention.count` | Contentions count when trying to acquire a monitor lock since the process started.                                        | CumulativeCounter |
+| `process.runtime.dotnet.thread_pool.threads.count`     | Number of thread pool threads, as observed during the last measurement. Only available for .NET Core.                     | Gauge             |
 
 ## Process metrics
 
-| Metric                                                  | Description                                                                                                                       | Type               |
-|:--------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------|:-------------------|
-| `runtime.dotnet.cpu.percent`                            | The percentage of total CPU used by the application.                                                                              | Gauge              |
-| `runtime.dotnet.cpu.system`                             | The number of milliseconds executing outside the kernel.                                                                          | Gauge              |
-| `runtime.dotnet.cpu.user`                               | The number of milliseconds executing in the kernel.                                                                               | Gauge              |
-| `runtime.dotnet.threads.count`                          | The number of threads that were running in the process.                                                                           | Counter            |
+Names and metric structure of the metrics exported are aligned with OpenTelemetry implementation from [Process](https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/926386e68c9066e8032853e8309abdf4088d8dca/src/OpenTelemetry.Instrumentation.Process) package.
+
+| Metric                               | Description                                                                                                                         | Type              |
+|:-------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------|:------------------|
+| `process.memory.usage`               | The amount of physical memory allocated for this process.                                                                           | Gauge             |
+| `process.memory.virtual`             | The amount of virtual memory allocated for this process that cannot be shared with other processes.                                 | Gauge             |
+| `process.cpu.time`                   | Total CPU seconds broken down by different states(`user`,`system`).                                                                 | CumulativeCounter |
+| `process.cpu.utilization`            | Difference in process.cpu.time since the last measurement, divided by the elapsed time and number of CPUs available to the process. | Gauge             |
+| `process.threads`                    | Process threads count.                                                                                                              | Gauge             |
 
 ## ASP.NET Core metrics
 

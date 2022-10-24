@@ -9,9 +9,11 @@
 
 using System;
 using Datadog.Trace.Logging;
+using Datadog.Trace.SignalFx.Metrics;
 using Datadog.Trace.Util;
 using Datadog.Trace.Vendors.Newtonsoft.Json;
 using Datadog.Trace.Vendors.StatsdClient;
+using MetricType = Datadog.Tracer.SignalFx.Metrics.Protobuf.MetricType;
 
 namespace Datadog.Trace.RuntimeMetrics
 {
@@ -21,11 +23,11 @@ namespace Datadog.Trace.RuntimeMetrics
         private const string GarbageCollectionMetrics = $"{MetricsNames.Gc.HeapSize}, {MetricsNames.Gc.CollectionsCount}";
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<AzureAppServicePerformanceCounters>();
-        private readonly IDogStatsd _statsd;
+        private readonly ISignalFxMetricSender _metricSender;
 
-        public AzureAppServicePerformanceCounters(IDogStatsd statsd)
+        public AzureAppServicePerformanceCounters(ISignalFxMetricSender metricSender)
         {
-            _statsd = statsd;
+            _metricSender = metricSender;
         }
 
         public void Dispose()
@@ -37,10 +39,10 @@ namespace Datadog.Trace.RuntimeMetrics
             var rawValue = EnvironmentHelpers.GetEnvironmentVariable(EnvironmentVariableName);
             var value = JsonConvert.DeserializeObject<PerformanceCountersValue>(rawValue);
 
-            _statsd.Gauge(MetricsNames.Gc.HeapSize, value.Gen0Size, tags: GcMetrics.Tags.Gen0);
-            _statsd.Gauge(MetricsNames.Gc.HeapSize, value.Gen1Size, tags: GcMetrics.Tags.Gen1);
-            _statsd.Gauge(MetricsNames.Gc.HeapSize, value.Gen2Size, tags: GcMetrics.Tags.Gen2);
-            _statsd.Gauge(MetricsNames.Gc.HeapSize, value.LohSize, tags: GcMetrics.Tags.LargeObjectHeap);
+            _metricSender.SendLong(MetricsNames.Gc.HeapSize, value.Gen0Size, MetricType.GAUGE, GcMetrics.Tags.Gen0);
+            _metricSender.SendLong(MetricsNames.Gc.HeapSize, value.Gen1Size, MetricType.GAUGE, GcMetrics.Tags.Gen1);
+            _metricSender.SendLong(MetricsNames.Gc.HeapSize, value.Gen2Size, MetricType.GAUGE, GcMetrics.Tags.Gen2);
+            _metricSender.SendLong(MetricsNames.Gc.HeapSize, value.LohSize, MetricType.GAUGE, GcMetrics.Tags.LargeObjectHeap);
 
             Log.Debug("Sent the following metrics: {metrics}", GarbageCollectionMetrics);
         }

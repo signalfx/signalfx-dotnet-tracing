@@ -246,10 +246,6 @@ namespace Datadog.Trace.Vendors.StatsdClient
             _metricsSender?.SendServiceCheck(name, (int)status, timestamp, hostname, tags, message);
         }
 
-        public void IncrementDouble(string statName, double value, double sampleRate = 1, string[] tags = null)
-        {
-        }
-
         /// <summary>
         /// Flushes all metrics.
         /// </summary>
