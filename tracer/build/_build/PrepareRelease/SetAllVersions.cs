@@ -386,7 +386,7 @@ namespace PrepareRelease
 
                 // Setup scripts
                 SynchronizeVersion(
-                    "../install.psm1",
+                    "../Splunk.SignalFx.DotNet.psm1",
                     text => Regex.Replace(text, VersionPattern(), VersionString()));
 
                 Console.WriteLine($"Completed synchronizing source versions to {VersionString()}");

@@ -63,7 +63,7 @@ jobs:
           name: artifacts
           path: |
             tracer/bin/artifacts/*/en-us
-            install.psm1
+            Splunk.SignalFx.DotNet.psm1
       - name: Upload NuGet packages
         uses: actions/upload-artifact@v3.1.0
         with:
