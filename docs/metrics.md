@@ -31,7 +31,7 @@ implementation from the [Runtime](https://github.com/open-telemetry/opentelemetr
 
 ## Process metrics
 
-Names and metric structure of the metrics exported are aligned with OpenTelemetry implementation from [Process](https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/926386e68c9066e8032853e8309abdf4088d8dca/src/OpenTelemetry.Instrumentation.Process) package.
+Names and metric structure of the metrics exported are aligned with the OpenTelemetry implementation from the [Process](https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/926386e68c9066e8032853e8309abdf4088d8dca/src/OpenTelemetry.Instrumentation.Process) package.
 
 | Metric                               | Description                                                                                                                         | Type              |
 |:-------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------|:------------------|
