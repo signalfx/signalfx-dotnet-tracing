@@ -15,8 +15,8 @@ To learn about differences between SignalFx metric types, visit [documentation](
 
 ## .NET runtime metrics
 
-Names and metric structure of the metrics exported are aligned with OpenTelemetry
-implementation from [Runtime](https://github.com/open-telemetry/opentelemetry-dotnet-contrib/blob/bc947a00c3f859cc436f050e81172fc1f8bc09d7/src/OpenTelemetry.Instrumentation.Runtime) package.
+Names and metric structure of the metrics exported are aligned with the OpenTelemetry
+implementation from the [Runtime](https://github.com/open-telemetry/opentelemetry-dotnet-contrib/blob/bc947a00c3f859cc436f050e81172fc1f8bc09d7/src/OpenTelemetry.Instrumentation.Runtime) package.
 
 | Metric                                                 | Description                                                                                                               | Type              |
 |:-------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------|:------------------|
