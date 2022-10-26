@@ -174,14 +174,5 @@ namespace Datadog.Trace.Vendors.StatsdClient
             string hostname = null,
             string[] tags = null,
             string message = null);
-
-        /// <summary>
-        /// Increments the specified double-valued counter.
-        /// </summary>
-        /// <param name="statName">The name of the metric.</param>
-        /// <param name="value">The amount of increment.</param>
-        /// <param name="sampleRate">Percentage of metric to be sent.</param>
-        /// <param name="tags">Array of tags to be added to the data.</param>
-        void IncrementDouble(string statName, double value, double sampleRate = 1, string[] tags = null);
     }
 }

@@ -13,7 +13,8 @@ using System.Diagnostics.Tracing;
 using System.Reflection;
 using System.Threading;
 using Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.StatsdClient;
+using Datadog.Trace.SignalFx.Metrics;
+using Datadog.Tracer.SignalFx.Metrics.Protobuf;
 
 namespace Datadog.Trace.RuntimeMetrics
 {
@@ -50,7 +51,7 @@ namespace Datadog.Trace.RuntimeMetrics
 
         private readonly string _delayInSeconds;
 
-        private readonly IDogStatsd _statsd;
+        private readonly ISignalFxMetricSender _metricSender;
         private DateTime? _gcStart;
 
         static RuntimeEventListener()
@@ -76,9 +77,9 @@ namespace Datadog.Trace.RuntimeMetrics
 #endif
         }
 
-        public RuntimeEventListener(IDogStatsd statsd, TimeSpan delay)
+        public RuntimeEventListener(ISignalFxMetricSender metricSender, TimeSpan delay)
         {
-            _statsd = statsd;
+            _metricSender = metricSender;
             _delayInSeconds = ((int)delay.TotalSeconds).ToString();
 
             EventSourceCreated += (_, e) => EnableEventSource(e.EventSource);
@@ -106,11 +107,11 @@ namespace Datadog.Trace.RuntimeMetrics
         {
             // Can't use a Timing because Dogstatsd doesn't support local aggregation
             // It means that the aggregations in the UI would be wrong
-            _statsd.Gauge(MetricsNames.ContentionTime, _contentionTime.Clear());
-            _statsd.Counter(MetricsNames.ContentionCount, Monitor.LockContentionCount);
+            _metricSender.SendDouble(MetricsNames.ContentionTime, _contentionTime.Clear(), MetricType.GAUGE);
+            _metricSender.SendLong(MetricsNames.ContentionCount, Monitor.LockContentionCount, MetricType.CUMULATIVE_COUNTER);
 
             // TODO splunk: opentelemetry-dotnet-contrib plans to change to ObservableUpDownCounter, will need to be adjusted
-            _statsd.Gauge(MetricsNames.ThreadPoolWorkersCount, ThreadPool.ThreadCount);
+            _metricSender.SendLong(MetricsNames.ThreadPoolWorkersCount, ThreadPool.ThreadCount, MetricType.GAUGE);
 
 #if NET6_0_OR_GREATER
             // source originated from: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/blob/bc947a00c3f859cc436f050e81172fc1f8bc09d7/src/OpenTelemetry.Instrumentation.Runtime/RuntimeMetrics.cs
@@ -126,24 +127,24 @@ namespace Datadog.Trace.RuntimeMetrics
                 // 4 -> poh
 
                 // TODO splunk: opentelemetry-dotnet-contrib plans to change to ObservableUpDownCounter, will need to be adjusted
-                _statsd.Gauge(MetricsNames.Gc.HeapSize, GetGenerationSize(i), tags: GcMetrics.Tags.GenerationTags[i]);
+                _metricSender.SendLong(MetricsNames.Gc.HeapSize, (long)GetGenerationSize(i), MetricType.GAUGE, tags: GcMetrics.Tags.GenerationTags[i]);
             }
 
             if (IsGcInfoAvailable)
             {
                 // TODO splunk: opentelemetry-dotnet-contrib plans to change to ObservableUpDownCounter, will need to be adjusted
-                _statsd.Gauge(MetricsNames.Gc.HeapCommittedMemory, GC.GetGCMemoryInfo().TotalCommittedBytes);
+                _metricSender.SendLong(MetricsNames.Gc.HeapCommittedMemory, GC.GetGCMemoryInfo().TotalCommittedBytes, MetricType.GAUGE);
             }
 #endif
 
-            _statsd.Counter(MetricsNames.Gc.AllocatedBytes, GC.GetTotalAllocatedBytes());
+            _metricSender.SendLong(MetricsNames.Gc.AllocatedBytes, GC.GetTotalAllocatedBytes(), MetricType.CUMULATIVE_COUNTER);
 
             Log.Debug("Sent the following metrics: {metrics}", ThreadStatsMetrics);
         }
 
         protected override void OnEventWritten(EventWrittenEventArgs eventData)
         {
-            if (_statsd == null)
+            if (_metricSender == null)
             {
                 // I know it sounds crazy at first, but because OnEventSourceCreated is called from the base constructor,
                 // and EnableEvents is called from OnEventSourceCreated, it's entirely possible that OnEventWritten
@@ -170,10 +171,10 @@ namespace Datadog.Trace.RuntimeMetrics
                 var stats = HeapStats.FromPayload(eventData.Payload);
 
                 // TODO splunk: opentelemetry-dotnet-contrib plans to change to ObservableUpDownCounter, will need to be adjusted
-                _statsd.Gauge(MetricsNames.Gc.HeapSize, stats.Gen0Size, tags: GcMetrics.Tags.Gen0);
-                _statsd.Gauge(MetricsNames.Gc.HeapSize, stats.Gen1Size, tags: GcMetrics.Tags.Gen1);
-                _statsd.Gauge(MetricsNames.Gc.HeapSize, stats.Gen2Size, tags: GcMetrics.Tags.Gen2);
-                _statsd.Gauge(MetricsNames.Gc.HeapSize, stats.LohSize, tags: GcMetrics.Tags.LargeObjectHeap);
+                _metricSender.SendLong(MetricsNames.Gc.HeapSize, (long)stats.Gen0Size, MetricType.GAUGE, tags: GcMetrics.Tags.Gen0);
+                _metricSender.SendLong(MetricsNames.Gc.HeapSize, (long)stats.Gen1Size, MetricType.GAUGE, tags: GcMetrics.Tags.Gen1);
+                _metricSender.SendLong(MetricsNames.Gc.HeapSize, (long)stats.Gen2Size, MetricType.GAUGE, tags: GcMetrics.Tags.Gen2);
+                _metricSender.SendLong(MetricsNames.Gc.HeapSize, (long)stats.LohSize, MetricType.GAUGE, tags: GcMetrics.Tags.LargeObjectHeap);
             }
 #endif
 
@@ -201,7 +202,7 @@ namespace Datadog.Trace.RuntimeMetrics
 
                 if (start != null)
                 {
-                    _statsd.IncrementDouble(MetricsNames.Gc.PauseTime, (eventData.TimeStamp - start.Value).TotalMilliseconds);
+                    _metricSender.SendDouble(MetricsNames.Gc.PauseTime, (eventData.TimeStamp - start.Value).TotalMilliseconds, MetricType.COUNTER);
                 }
             }
             else
@@ -254,7 +255,7 @@ namespace Datadog.Trace.RuntimeMetrics
                 {
                     var value = (double)rawValue;
 
-                    _statsd.Gauge(statName, value);
+                    _metricSender.SendDouble(statName, value, MetricType.GAUGE);
                     Log.Debug("Sent the following metrics: {metrics}", statName);
                 }
                 else

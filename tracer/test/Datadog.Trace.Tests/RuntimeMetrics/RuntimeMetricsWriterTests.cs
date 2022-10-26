@@ -6,12 +6,12 @@
 // Modified by Splunk Inc.
 
 using System;
-using System.Linq;
 using System.Threading;
 using Datadog.Trace.RuntimeMetrics;
-using Datadog.Trace.Vendors.StatsdClient;
+using Datadog.Trace.SignalFx.Metrics;
 using Moq;
 using Xunit;
+using MetricType = Datadog.Tracer.SignalFx.Metrics.Protobuf.MetricType;
 
 namespace Datadog.Trace.Tests.RuntimeMetrics
 {
@@ -28,41 +28,63 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
             listener.Setup(l => l.Refresh())
                 .Callback(() => mutex.Set());
 
-            using (new RuntimeMetricsWriter(Mock.Of<IDogStatsd>(), TimeSpan.FromMilliseconds(10), (statsd, timeSpan) => listener.Object))
+            using (new RuntimeMetricsWriter(Mock.Of<ISignalFxMetricSender>(), TimeSpan.FromMilliseconds(10), (_, _) => listener.Object))
             {
                 Assert.True(mutex.Wait(10000), "Method Refresh() wasn't called on the listener");
             }
         }
 
         [Fact]
-        public void PushGcCollectionCounts()
+        public void PushGcMetrics()
         {
             var listener = new Mock<IRuntimeMetricsListener>();
 
-            var stats = new Mock<IDogStatsd>();
-            using var runtimeMetricsWriter = new RuntimeMetricsWriter(stats.Object, TimeSpan.FromMilliseconds(10), (statsd, timeSpan) => listener.Object);
+            var metricSender = new Mock<ISignalFxMetricSender>();
+            using var runtimeMetricsWriter = new RuntimeMetricsWriter(metricSender.Object, TimeSpan.FromSeconds(10), (_, _) => listener.Object);
 
             runtimeMetricsWriter.PushEvents();
 
-            stats.Verify(s => s.Counter(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), It.IsAny<double>(), new[] { "generation:gen0" }), Times.AtLeastOnce);
-            stats.Verify(s => s.Counter(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), It.IsAny<double>(), new[] { "generation:gen1" }), Times.AtLeastOnce);
-            stats.Verify(s => s.Counter(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), It.IsAny<double>(), new[] { "generation:gen2" }), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendLong(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), MetricType.CUMULATIVE_COUNTER, new[] { "generation:gen0" }), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendLong(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), MetricType.CUMULATIVE_COUNTER, new[] { "generation:gen1" }), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendLong(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), MetricType.CUMULATIVE_COUNTER, new[] { "generation:gen2" }), Times.AtLeastOnce);
+        }
+
+        [Fact]
+        public void PushProcessMetrics()
+        {
+            var listener = new Mock<IRuntimeMetricsListener>();
+
+            var metricSender = new Mock<ISignalFxMetricSender>();
+            using var runtimeMetricsWriter = new RuntimeMetricsWriter(metricSender.Object, TimeSpan.FromSeconds(10), (_, _) => listener.Object);
+
+            runtimeMetricsWriter.PushEvents();
+
+            metricSender.Verify(s => s.SendDouble(MetricsNames.Process.CpuTime, It.IsAny<double>(), MetricType.CUMULATIVE_COUNTER, new[] { "state:user" }), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendDouble(MetricsNames.Process.CpuTime, It.IsAny<double>(), MetricType.CUMULATIVE_COUNTER, new[] { "state:system" }), Times.AtLeastOnce);
+
+            metricSender.Verify(s => s.SendDouble(MetricsNames.Process.CpuUtilization, It.IsAny<double>(), MetricType.GAUGE, new[] { "state:user" }), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendDouble(MetricsNames.Process.CpuUtilization, It.IsAny<double>(), MetricType.GAUGE, new[] { "state:system" }), Times.AtLeastOnce);
+
+            metricSender.Verify(s => s.SendLong(MetricsNames.Process.MemoryUsage, It.IsAny<long>(), MetricType.GAUGE, It.IsAny<string[]>()), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendLong(MetricsNames.Process.MemoryVirtual, It.IsAny<long>(), MetricType.GAUGE, It.IsAny<string[]>()), Times.AtLeastOnce);
+
+            metricSender.Verify(s => s.SendLong(MetricsNames.Process.ThreadsCount, It.IsAny<long>(), MetricType.GAUGE, It.IsAny<string[]>()), Times.AtLeastOnce);
         }
 
         [Fact]
         public void ShouldSwallowFactoryExceptions()
         {
-            var writer = new RuntimeMetricsWriter(Mock.Of<IDogStatsd>(), TimeSpan.FromMilliseconds(10), (statsd, timeSpan) => throw new InvalidOperationException("This exception should be caught"));
+            var writer = new RuntimeMetricsWriter(Mock.Of<ISignalFxMetricSender>(), TimeSpan.FromMilliseconds(10), (_, _) => throw new InvalidOperationException("This exception should be caught"));
             writer.Dispose();
         }
 
         [Fact(Skip = "Uninstable test see https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation/issues/67")]
         public void ShouldCaptureFirstChanceExceptions()
         {
-            var statsd = new Mock<IDogStatsd>();
+            var metricSender = new Mock<ISignalFxMetricSender>();
             var listener = new Mock<IRuntimeMetricsListener>();
 
-            using (var writer = new RuntimeMetricsWriter(statsd.Object, TimeSpan.FromMilliseconds(Timeout.Infinite), (statsd, timeSpan) => listener.Object))
+            using (var writer = new RuntimeMetricsWriter(metricSender.Object, TimeSpan.FromMilliseconds(Timeout.Infinite), (_, _) => listener.Object))
             {
                 for (int i = 0; i < 10; i++)
                 {
@@ -88,31 +110,31 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
                     }
                 }
 
-                statsd.Verify(
-                    s => s.Increment(MetricsNames.ExceptionsCount, It.IsAny<int>(), It.IsAny<double>(), It.IsAny<string[]>()),
+                metricSender.Verify(
+                    s => s.SendLong(MetricsNames.ExceptionsCount, It.IsAny<int>(), MetricType.COUNTER, It.IsAny<string[]>()),
                     Times.Never);
 
                 writer.PushEvents();
 
-                statsd.Verify(
-                    s => s.Increment(MetricsNames.ExceptionsCount, 10, It.IsAny<double>(), new[] { "exception_type:CustomException1" }),
+                metricSender.Verify(
+                    s => s.SendLong(MetricsNames.ExceptionsCount, 10, MetricType.COUNTER, new[] { "exception_type:CustomException1" }),
                     Times.Once);
 
-                statsd.Verify(
-                    s => s.Increment(MetricsNames.ExceptionsCount, 5, It.IsAny<double>(), new[] { "exception_type:CustomException2" }),
+                metricSender.Verify(
+                    s => s.SendLong(MetricsNames.ExceptionsCount, 5, MetricType.COUNTER, new[] { "exception_type:CustomException2" }),
                     Times.Once);
 
-                statsd.Invocations.Clear();
+                metricSender.Invocations.Clear();
 
-                // Make sure stats are reset when pushed
+                // Make sure metricSender are reset when pushed
                 writer.PushEvents();
 
-                statsd.Verify(
-                    s => s.Increment(MetricsNames.ExceptionsCount, It.IsAny<int>(), It.IsAny<double>(), new[] { "exception_type:CustomException1" }),
+                metricSender.Verify(
+                    s => s.SendLong(MetricsNames.ExceptionsCount, It.IsAny<int>(), MetricType.COUNTER, new[] { "exception_type:CustomException1" }),
                     Times.Never);
 
-                statsd.Verify(
-                    s => s.Increment(MetricsNames.ExceptionsCount, It.IsAny<int>(), It.IsAny<double>(), new[] { "exception_type:CustomException2" }),
+                metricSender.Verify(
+                    s => s.SendLong(MetricsNames.ExceptionsCount, It.IsAny<int>(), MetricType.COUNTER, new[] { "exception_type:CustomException2" }),
                     Times.Never);
             }
         }
@@ -120,10 +142,10 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
         [Fact]
         public void CleanupResources()
         {
-            var statsd = new Mock<IDogStatsd>();
+            var metricSender = new Mock<ISignalFxMetricSender>();
             var listener = new Mock<IRuntimeMetricsListener>();
 
-            var writer = new RuntimeMetricsWriter(statsd.Object, TimeSpan.FromMilliseconds(Timeout.Infinite), (statsd, timeSpan) => listener.Object);
+            var writer = new RuntimeMetricsWriter(metricSender.Object, TimeSpan.FromMilliseconds(Timeout.Infinite), (_, _) => listener.Object);
             writer.Dispose();
 
             listener.Verify(l => l.Dispose(), Times.Once);

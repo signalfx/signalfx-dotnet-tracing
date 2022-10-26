@@ -11,8 +11,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Datadog.Trace.Logging;
+using Datadog.Trace.SignalFx.Metrics;
 using Datadog.Trace.Util;
 using Datadog.Trace.Vendors.StatsdClient;
+using MetricType = Datadog.Tracer.SignalFx.Metrics.Protobuf.MetricType;
 
 namespace Datadog.Trace.RuntimeMetrics
 {
@@ -24,7 +26,7 @@ namespace Datadog.Trace.RuntimeMetrics
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<PerformanceCountersListener>();
 
-        private readonly IDogStatsd _statsd;
+        private readonly ISignalFxMetricSender _metricSender;
         private readonly string _processName;
         private readonly int _processId;
 
@@ -40,9 +42,9 @@ namespace Datadog.Trace.RuntimeMetrics
 
         private Task _initializationTask;
 
-        public PerformanceCountersListener(IDogStatsd statsd)
+        public PerformanceCountersListener(ISignalFxMetricSender metricSender)
         {
-            _statsd = statsd;
+            _metricSender = metricSender;
 
             ProcessHelpers.GetCurrentProcessInformation(out _processName, out _, out _processId);
 
@@ -122,7 +124,7 @@ namespace Datadog.Trace.RuntimeMetrics
 
             if (value != null)
             {
-                _statsd.Gauge(path, value.Value, tags: tags);
+                _metricSender.SendLong(path, value.Value, MetricType.GAUGE, tags);
             }
         }
 
@@ -135,7 +137,7 @@ namespace Datadog.Trace.RuntimeMetrics
                 return;
             }
 
-            _statsd.Counter(path, value.Value);
+            _metricSender.SendLong(path, value.Value, MetricType.CUMULATIVE_COUNTER);
         }
 
         private Tuple<string, bool> GetInstanceName()
