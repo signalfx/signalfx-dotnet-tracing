@@ -107,6 +107,7 @@ namespace Datadog.Trace.RuntimeMetrics
                 _listener?.Refresh();
 
                 GcMetrics.PushCollectionCounts(_metricSender);
+                _metricSender.SendLong(MetricsNames.Gc.TotalObjectsSize, GC.GetTotalMemory(false), MetricType.GAUGE);
 
                 if (_enableProcessMetrics)
                 {

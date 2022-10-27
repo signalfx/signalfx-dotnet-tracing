@@ -25,9 +25,10 @@ implementation from the [Runtime](https://github.com/open-telemetry/opentelemetr
 | `process.runtime.dotnet.exceptions.count`              | Count of exceptions since the previous observation.                                                                       | Counter           |
 | `process.runtime.dotnet.gc.collections.count`          | Number of garbage collections since the process started.                                                                  | CumulativeCounter |
 | `process.runtime.dotnet.gc.heap.size`                  | Heap size, as observed during the last garbage collection.                                                                | Gauge             |
+| `process.runtime.dotnet.gc.objects.size`               | Count of bytes currently in use by live objects in the GC heap.                                                           | Gauge             |
 | `process.runtime.dotnet.gc.allocations.size`           | Count of bytes allocated on the managed GC heap since the process started. (.NET Core only)                               | CumulativeCounter |
 | `process.runtime.dotnet.gc.committed_memory.size`      | Amount of committed virtual memory for the managed GC heap, as observed during the last garbage collection. (.NET 6 only) | Gauge             |
-| `process.runtime.dotnet.gc.pause.time`                 | Number of milliseconds spent in GC pause. (.NET Core only)                                                                | Counter           |
+| `process.runtime.dotnet.gc.pause.time`                 | Number of milliseconds spent in GC pause. (.NET Core only)(equivalent not yet available on OpenTelemetry side)            | Counter           |
 | `process.runtime.dotnet.monitor.lock_contention.count` | Contentions count when trying to acquire a monitor lock since the process started.                                        | CumulativeCounter |
 | `process.runtime.dotnet.thread_pool.threads.count`     | Number of thread pool threads, as observed during the last measurement. Only available for .NET Core.                     | Gauge             |
 

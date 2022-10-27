@@ -47,6 +47,8 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
             metricSender.Verify(s => s.SendLong(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), MetricType.CUMULATIVE_COUNTER, new[] { "generation:gen0" }), Times.AtLeastOnce);
             metricSender.Verify(s => s.SendLong(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), MetricType.CUMULATIVE_COUNTER, new[] { "generation:gen1" }), Times.AtLeastOnce);
             metricSender.Verify(s => s.SendLong(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), MetricType.CUMULATIVE_COUNTER, new[] { "generation:gen2" }), Times.AtLeastOnce);
+
+            metricSender.Verify(s => s.SendLong(MetricsNames.Gc.TotalObjectsSize, It.IsAny<long>(), MetricType.GAUGE, It.IsAny<string[]>()), Times.AtLeastOnce);
         }
 
         [Fact]
