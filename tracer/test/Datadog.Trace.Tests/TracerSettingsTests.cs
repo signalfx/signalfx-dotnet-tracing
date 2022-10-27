@@ -107,6 +107,24 @@ namespace Datadog.Trace.Tests
         }
 
         [Theory]
+        [InlineData("1", "0", true)]
+        [InlineData("0", "1", true)]
+        [InlineData("0", "0", false)]
+        [InlineData("1", "1", true)]
+        public void EnableRuntimeMetrics(string metricsExplicitlyEnabled, string memoryProfilingEnabled, bool expected)
+        {
+            var settings = new NameValueCollection
+            {
+                { ConfigurationKeys.RuntimeMetricsEnabled, metricsExplicitlyEnabled },
+                { ConfigurationKeys.AlwaysOnProfiler.MemoryEnabled, memoryProfilingEnabled }
+            };
+
+            var tracerSettings = new TracerSettings(new NameValueConfigurationSource(settings));
+
+            Assert.Equal(expected, tracerSettings.RuntimeMetricsEnabled);
+        }
+
+        [Theory]
         [InlineData("a,b,c,d,,f", new[] { "a", "b", "c", "d", "f" })]
         [InlineData(" a, b ,c, ,,f ", new[] { "a", "b", "c", "f" })]
         [InlineData("a,b, c ,d,      e      ,f  ", new[] { "a", "b", "c", "d", "e", "f" })]
