@@ -111,6 +111,8 @@ namespace Datadog.Trace.Tests
         [InlineData("0", "1", true)]
         [InlineData("0", "0", false)]
         [InlineData("1", "1", true)]
+        [InlineData(null, "1", true)]
+        [InlineData(null, null, false)]
         public void EnableRuntimeMetrics(string metricsExplicitlyEnabled, string memoryProfilingEnabled, bool expected)
         {
             var settings = new NameValueCollection
