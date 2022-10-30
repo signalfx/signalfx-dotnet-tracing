@@ -62,7 +62,7 @@ function Install-SignalFxDotnet() {
 function Get-IsSignalFxInstalled() {
     $path = [System.Environment]::GetEnvironmentVariable("SIGNALFX_DOTNET_TRACER_HOME", [System.EnvironmentVariableTarget]::Machine)
 
-    if($path) {
+    if ($path) {
         return Test-Path $path
     }
 
