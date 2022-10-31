@@ -55,4 +55,19 @@ function Install-SignalFxDotnet() {
     Remove-Item $msi
 }
 
+<#
+    .SYNOPSIS
+    Gets if SignalFx Instrumentation for .NET is installed.
+#>
+function Get-IsSignalFxInstalled() {
+    $path = [System.Environment]::GetEnvironmentVariable("SIGNALFX_DOTNET_TRACER_HOME", [System.EnvironmentVariableTarget]::Machine)
+
+    if ($path) {
+        return Test-Path $path
+    }
+
+    return $false
+}
+
 Export-ModuleMember -Function Install-SignalFxDotnet
+Export-ModuleMember -Function Get-IsSignalFxInstalled
