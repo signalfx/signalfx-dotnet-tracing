@@ -123,9 +123,6 @@ namespace Datadog.Trace.Configuration
 
             StatsComputationEnabled = source?.GetBool(ConfigurationKeys.StatsComputationEnabled) ?? false;
 
-            RuntimeMetricsEnabled = source?.GetBool(ConfigurationKeys.RuntimeMetricsEnabled) ??
-                                    false;
-
             CustomSamplingRules = source?.GetString(ConfigurationKeys.CustomSamplingRules);
 
             GlobalSamplingRate = source?.GetDouble(ConfigurationKeys.GlobalSamplingRate);
@@ -197,7 +194,11 @@ namespace Datadog.Trace.Configuration
 
             // If you change this, change environment_variables.h too
             CpuProfilingEnabled = source?.GetBool(ConfigurationKeys.AlwaysOnProfiler.CpuEnabled) ?? false;
-            MemoryProfilingEnabled = source?.GetBool(ConfigurationKeys.AlwaysOnProfiler.MemoryEnabled) ?? false;
+            var memoryProfilingEnabled = source?.GetBool(ConfigurationKeys.AlwaysOnProfiler.MemoryEnabled) ?? false;
+            MemoryProfilingEnabled = memoryProfilingEnabled;
+            var runtimeMetricsExplicitlyEnabled = source?.GetBool(ConfigurationKeys.RuntimeMetricsEnabled) ??
+                                        false;
+            RuntimeMetricsEnabled = runtimeMetricsExplicitlyEnabled || memoryProfilingEnabled;
             ThreadSamplingPeriod = GetThreadSamplingPeriod(source);
 
             LogSubmissionSettings = new DirectLogSubmissionSettings(source);
