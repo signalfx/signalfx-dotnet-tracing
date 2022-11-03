@@ -41,7 +41,8 @@ on:
 
 env:
   buildConfiguration: Release
-  dotnetSdkVersion: 7.0.100-rc.2
+  dotnetSdkVersion: 7.0.100-rc.2.22477.23
+  dotnetSdkImageVersion: 7.0.100-rc.2
   relativeTracerHome: /shared/bin/monitoring-home/tracer
   relativeArtifacts: /tracer/src/bin/artifacts
   binDir: ${{ github.workspace }}/tracer/src/bin
@@ -138,6 +139,7 @@ jobs:
       run: |
         docker build \
           --build-arg DOTNETSDK_VERSION=${dotnetSdkVersion} \
+          --build-arg DOTNETSDKIMAGE_VERSION=${dotnetSdkImageVersion} \
           --tag dd-trace-dotnet/${{ matrix.base-image }}-builder \
           --target builder \
           --file "./tracer/build/_build/docker/${{ matrix.base-image }}.dockerfile" \
@@ -211,6 +213,7 @@ jobs:
       run: |
         docker build \
           --build-arg DOTNETSDK_VERSION=${dotnetSdkVersion} \
+          --build-arg DOTNETSDKIMAGE_VERSION=${dotnetSdkImageVersion} \
           --tag dd-trace-dotnet/${{ matrix.base-image }}-tester \
           --target tester \
           --file "./tracer/build/_build/docker/${{ matrix.base-image }}.dockerfile" \
@@ -284,6 +287,7 @@ jobs:
       run: |
         docker build \
           --build-arg DOTNETSDK_VERSION=${dotnetSdkVersion} \
+          --build-arg DOTNETSDKIMAGE_VERSION=${dotnetSdkImageVersion} \
           --tag dd-trace-dotnet/${{ matrix.base-image }}-builder \
           --target builder \
           --file "./tracer/build/_build/docker/${{ matrix.base-image }}.dockerfile" \
@@ -394,6 +398,7 @@ jobs:
       run: |
         docker build \
           --build-arg DOTNETSDK_VERSION=${dotnetSdkVersion} \
+          --build-arg DOTNETSDKIMAGE_VERSION=${dotnetSdkImageVersion} \
           --tag dd-trace-dotnet/${{ matrix.base-image }}-builder \
           --target builder \
           --file "./tracer/build/_build/docker/${{ matrix.base-image }}.dockerfile" \

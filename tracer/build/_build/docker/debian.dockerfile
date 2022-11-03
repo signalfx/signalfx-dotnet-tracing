@@ -85,6 +85,7 @@ RUN if [ "$(uname -m)" = "x86_64" ]; \
     && ./dotnet-install.sh --runtime aspnetcore --version 3.0.3 --install-dir /usr/share/dotnet --no-path \
     && ./dotnet-install.sh --runtime aspnetcore --version 3.1.30 --install-dir /usr/share/dotnet --no-path \
     && ./dotnet-install.sh --runtime aspnetcore --version 5.0.17 --install-dir /usr/share/dotnet --no-path \
+    && ./dotnet-install.sh --runtime aspnetcore --version 6.0.10 --install-dir /usr/share/dotnet --no-path \
     && rm dotnet-install.sh
 
 
