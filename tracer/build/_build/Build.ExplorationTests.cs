@@ -343,7 +343,7 @@ class ExplorationTestDescription
                 GitRepositoryTag = "v1.3.0",
                 IsGitShallowCloneSupported = true,
                 PathToUnitTestProject = "src/Cake.Common.Tests",
-                SupportedFrameworks = new[] { TargetFramework.NETCOREAPP3_1, TargetFramework.NET5_0, TargetFramework.NET6_0 },
+                SupportedFrameworks = new[] { TargetFramework.NETCOREAPP3_1, TargetFramework.NET5_0, TargetFramework.NET6_0, TargetFramework.NET7_0 },
             },
             ExplorationTestName.swashbuckle => new ExplorationTestDescription()
             {
@@ -352,7 +352,7 @@ class ExplorationTestDescription
                 GitRepositoryTag = "v6.2.3",
                 IsGitShallowCloneSupported = true,
                 PathToUnitTestProject = "test/Swashbuckle.AspNetCore.SwaggerGen.Test",
-                SupportedFrameworks = new[] { TargetFramework.NET6_0 },
+                SupportedFrameworks = new[] { TargetFramework.NET6_0, TargetFramework.NET7_0 },
             },
             ExplorationTestName.paket => new ExplorationTestDescription()
             {
@@ -371,7 +371,7 @@ class ExplorationTestDescription
                 GitRepositoryTag = "107.0.3",
                 IsGitShallowCloneSupported = true,
                 PathToUnitTestProject = "test/RestSharp.Tests",
-                SupportedFrameworks = new[] { TargetFramework.NET6_0 },
+                SupportedFrameworks = new[] { TargetFramework.NET6_0, TargetFramework.NET7_0 },
             },
             ExplorationTestName.serilog => new ExplorationTestDescription()
             {
@@ -399,7 +399,7 @@ class ExplorationTestDescription
                 GitRepositoryTag = "v11.0.0",
                 IsGitShallowCloneSupported = true,
                 PathToUnitTestProject = "src/UnitTests",
-                SupportedFrameworks = new[] { TargetFramework.NET6_0 },
+                SupportedFrameworks = new[] { TargetFramework.NET6_0, TargetFramework.NET7_0 },
                 SupportedOSPlatforms = new[] { OSPlatform.Windows },
             },
             //ExplorationTestName.ilspy => new ExplorationTestDescription()
