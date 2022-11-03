@@ -15,7 +15,7 @@ jobs:
     timeout-minutes: 30
     env:
       baseImage: ${{ matrix.baseImage }}
-      dotnetSdkVersion: 6.0.401
+      dotnetSdkVersion: 6.0.402
     steps:
     - uses: actions/checkout@v3.1.0
     - name: Build Docker image
@@ -52,9 +52,9 @@ jobs:
         with:
           dotnet-version: | 
             2.1.818
-            3.1.423
+            3.1.424
             5.0.408
-            6.0.401
+            6.0.402
       - run: tracer\build.cmd Clean BuildTracerHome PackageTracerHome
         shell: cmd
       - name: Upload Windows MSI
