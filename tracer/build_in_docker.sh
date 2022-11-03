@@ -9,7 +9,7 @@ BUILD_DIR="$ROOT_DIR/tracer/build/_build"
 IMAGE_NAME="signalfx-dotnet-tracing/debian-base"
 
 docker build \
-   --build-arg DOTNETSDK_VERSION=6.0.402 \
+   --build-arg DOTNETSDK_VERSION=7.0.100-rc.2 \
    --tag $IMAGE_NAME \
    --file "$BUILD_DIR/docker/centos7.dockerfile" \
    "$BUILD_DIR"

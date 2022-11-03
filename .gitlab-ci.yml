@@ -21,7 +21,7 @@ linux-build:
     matrix:
       - baseImage: [ alpine, debian ]
   variables:
-    dotnetSdkVersion: 6.0.402
+    dotnetSdkVersion: 7.0.100-rc.2
   script:
     - |
       rm .dockerignore
