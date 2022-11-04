@@ -4,7 +4,7 @@
 
 Minimum requirements:
 
-- [Visual Studio 2022 (17.0)](https://visualstudio.microsoft.com/downloads/) or newer
+- [Visual Studio 2022 (17.4)](https://visualstudio.microsoft.com/downloads/) or newer
   - Workloads
     - Desktop development with C++
     - .NET desktop development
@@ -12,12 +12,13 @@ Minimum requirements:
     - Optional: ASP.NET and web development (to build samples)
   - Individual components
     - .NET Framework 4.7 targeting pack
-- [.NET 6.0 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
-- [.NET 6.0 x86 SDK](https://dotnet.microsoft.com/download/dotnet/6.0) to run 32-bit tests locally
+- [.NET 7.0 SDK](https://dotnet.microsoft.com/download/dotnet/7.0)
+- [.NET 7.0 x86 SDK](https://dotnet.microsoft.com/download/dotnet/7.0) to run 32-bit tests locally
 - Optional: [ASP.NET Core 2.1 Runtime](https://dotnet.microsoft.com/download/dotnet-core/2.1) to test in .NET Core 2.1 locally.
 - Optional: [ASP.NET Core 3.0 Runtime](https://dotnet.microsoft.com/download/dotnet-core/3.0) to test in .NET Core 3.0 locally.
 - Optional: [ASP.NET Core 3.1 Runtime](https://dotnet.microsoft.com/download/dotnet-core/3.1) to test in .NET Core 3.1 locally.
-- Optional: [ASP.NET 5.0 Runtime](https://dotnet.microsoft.com/download/dotnet-core/5.0) to test in .NET 5.0 locally.
+- Optional: [ASP.NET 5.0 Runtime](https://dotnet.microsoft.com/download/dotnet/5.0) to test in .NET 5.0 locally.
+- Optional: [ASP.NET 6.0 Runtime](https://dotnet.microsoft.com/download/dotnet/6.0) to test in .NET 6.0 locally.
 - Optional: [nuget.exe CLI](https://www.nuget.org/downloads) v5.3 or newer
 - Optional: [WiX Toolset 3.11.1](http://wixtoolset.org/releases/) or newer to build Windows installer (msi)
   - [WiX Toolset Visual Studio Extension](https://wixtoolset.org/releases/) to build installer from Visual Studio
