@@ -1,4 +1,4 @@
-﻿// <copyright file="AspNetCoreEndpointRoutingTestData.cs" company="Datadog">
+// <copyright file="AspNetCoreEndpointRoutingTestData.cs" company="Datadog">
 // Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
@@ -227,7 +227,11 @@ namespace Datadog.Trace.IntegrationTests.DiagnosticListeners
             { Tags.AspNetCoreAction, null },
             { Tags.AspNetCoreArea, null },
             { Tags.AspNetCorePage, null },
+#if NET7_0
+            { Tags.AspNetCoreEndpoint, "HTTP: GET /echo/{value:int?}" },
+#else
             { Tags.AspNetCoreEndpoint, "/echo/{value:int?} HTTP: GET" },
+#endif
         };
 
         private static SerializableDictionary ThrowsTags() => new()
@@ -237,7 +241,11 @@ namespace Datadog.Trace.IntegrationTests.DiagnosticListeners
             { Tags.AspNetCoreAction, null },
             { Tags.AspNetCoreArea, null },
             { Tags.AspNetCorePage, null },
+#if NET7_0
+            { Tags.AspNetCoreEndpoint, "HTTP: GET /throws" },
+#else
             { Tags.AspNetCoreEndpoint, "/throws HTTP: GET" },
+#endif
         };
 
         private static SerializableDictionary ApiIndexParentTags() => new()
