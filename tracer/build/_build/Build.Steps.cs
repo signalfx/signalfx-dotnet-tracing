@@ -1102,19 +1102,21 @@ partial class Build
         try
         {
             // Different filter from RunWindowsIntegrationTests
-            DotNetTest(config => config
-                                .SetDotnetPath(TargetPlatform)
-                                .SetConfiguration(BuildConfiguration)
-                                .SetTargetPlatform(TargetPlatform)
-                                .SetFramework(Framework)
-                                .EnableNoRestore()
-                                .EnableNoBuild()
-                                .SetFilter(Filter ?? "(RunOnWindows=True)&LoadFromGAC=True")
-                                .SetProcessEnvironmentVariable("TracerHomeDirectory", TracerHomeDirectory)
-                                .SetLogsDirectory(TestLogsDirectory)
-                                .When(CodeCoverage, ConfigureCodeCoverage)
-                                .EnableTrxLogOutput(GetResultsDirectory(project))
-                                .SetProjectFile(project));
+            DotNetMSBuild(s => s
+                    .SetMSBuildPath()
+                    .SetConfiguration(BuildConfiguration)
+                    .SetTargetPlatform(TargetPlatform)
+                    .SetProperty("TargetFramework", Framework.ToString())
+                    .DisableRestore()
+                    .SetProcessEnvironmentVariable("TracerHomeDirectory", TracerHomeDirectory)
+                    .SetLogsDirectory(TestLogsDirectory)
+                    .EnableNoDependencies()
+                    .SetTargets("VSTest")
+                    .SetProperty("VSTestNoBuild", true)
+                    .SetNoLogo(true)
+                    .SetFilter(Filter ?? "(RunOnWindows=True)&LoadFromGAC=True")
+                    .EnableTrxLogOutput(GetResultsDirectory(project))
+                    .SetTargetPath(project));
         }
         finally
         {
@@ -1136,19 +1138,21 @@ partial class Build
             try
             {
                 // Different filter from RunWindowsIntegrationTests
-                DotNetTest(config => config
-                    .SetDotnetPath(TargetPlatform)
+                DotNetMSBuild(s => s
+                    .SetMSBuildPath()
                     .SetConfiguration(BuildConfiguration)
                     .SetTargetPlatform(TargetPlatform)
-                    .SetFramework(Framework)
-                    .EnableNoRestore()
-                    .EnableNoBuild()
-                    .SetFilter(Filter ?? "(RunOnWindows=True)&MSI=True")
+                    .SetProperty("TargetFramework", Framework.ToString())
+                    .DisableRestore()
                     .SetProcessEnvironmentVariable("TracerHomeDirectory", TracerHomeDirectory)
                     .SetLogsDirectory(TestLogsDirectory)
-                    .When(CodeCoverage, ConfigureCodeCoverage)
-                    .EnableTrxLogOutput(resultsDirectory)
-                    .SetProjectFile(project));
+                    .EnableNoDependencies()
+                    .SetTargets("VSTest")
+                    .SetProperty("VSTestNoBuild", true)
+                    .SetNoLogo(true)
+                    .SetFilter(Filter ?? "(RunOnWindows=True)&LoadFromGAC=True")
+                    .EnableTrxLogOutput(GetResultsDirectory(project))
+                    .SetTargetPath(project));
             }
             finally
             {
