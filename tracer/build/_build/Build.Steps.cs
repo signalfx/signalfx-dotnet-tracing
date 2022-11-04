@@ -1016,35 +1016,29 @@ partial class Build
                     .SetTargets("VSTest")
                     .SetProperty("VSTestNoBuild", true)
                     .SetNoLogo(true)
-                    // .When(!string.IsNullOrEmpty(Filter), c => c.SetFilter(Filter))
-                    // .When(CodeCoverage, ConfigureCodeCoverage)
+                    .When(!string.IsNullOrEmpty(Filter), c => c.SetFilter(Filter))
                     .CombineWith(ParallelIntegrationTests, (s, project) => s
                         .EnableTrxLogOutput(GetResultsDirectory(project))
                         .SetTargetPath(project)));
 
-
-                    // .CombineWith(ParallelIntegrationTests, (s, project) => s
-                    //    .EnableTrxLogOutput(GetResultsDirectory(project))
-                    //    .SetProjectFile(project)), degreeOfParallelism: 4);
-
-                        
                 // TODO: I think we should change this filter to run on Windows by default
                 // (RunOnWindows!=False|Category=Smoke)&LoadFromGAC!=True&IIS!=True
-                DotNetTest(config => config
-                    .SetDotnetPath(TargetPlatform)
+                DotNetMSBuild(s => s
+                    .SetMSBuildPath()
                     .SetConfiguration(BuildConfiguration)
                     .SetTargetPlatform(TargetPlatform)
-                    .SetFramework(Framework)
-                    //.WithMemoryDumpAfter(timeoutInMinutes: 30)
-                    .EnableNoRestore()
-                    .EnableNoBuild()
-                    .SetFilter(Filter ?? "RunOnWindows=True&LoadFromGAC!=True&IIS!=True")
+                    .SetProperty("TargetFramework", Framework.ToString())
+                    .DisableRestore()
                     .SetProcessEnvironmentVariable("TracerHomeDirectory", TracerHomeDirectory)
                     .SetLogsDirectory(TestLogsDirectory)
-                    .When(CodeCoverage, ConfigureCodeCoverage)
-                    .CombineWith(ClrProfilerIntegrationTests, (s, project) => s
+                    .EnableNoDependencies()
+                    .SetTargets("VSTest")
+                    .SetProperty("VSTestNoBuild", true)
+                    .SetNoLogo(true)
+                    .SetFilter(Filter ?? "RunOnWindows=True&LoadFromGAC!=True&IIS!=True")
+                    .CombineWith(ParallelIntegrationTests, (s, project) => s
                         .EnableTrxLogOutput(GetResultsDirectory(project))
-                        .SetProjectFile(project)));
+                        .SetTargetPath(project)));
             }
             finally
             {

@@ -107,6 +107,12 @@ internal static partial class DotNetSettingsExtensions
               .SetProperty("VSTestResultsDirectory", resultsDirectory);
     }
 
+    public static DotNetMSBuildSettings SetFilter(this DotNetMSBuildSettings settings, string filter)
+    {
+        return settings
+              .SetProperty("VSTestTestCaseFilter", filter);
+    }
+
     /// <summary>
     /// GitLab installs MSBuild in a non-standard place that causes issues for Nuke trying to resolve it
     /// </summary>
