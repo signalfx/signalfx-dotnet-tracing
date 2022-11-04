@@ -1053,6 +1053,7 @@ partial class Build
         .After(CompileRegressionSamples)
         .After(CompileFrameworkReproductions)
         .After(BuildNativeLoader)
+        .After(BuildWindowsRegressionTests)
         .Requires(() => IsWin)
         .Requires(() => Framework)
         .Executes(() =>
@@ -1062,20 +1063,22 @@ partial class Build
 
             try
             {
-                DotNetTest(config => config
-                    .SetDotnetPath(TargetPlatform)
+                DotNetMSBuild(s => s
+                    .SetMSBuildPath()
                     .SetConfiguration(BuildConfiguration)
                     .SetTargetPlatform(TargetPlatform)
-                    .SetFramework(Framework)
-                    .EnableNoRestore()
-                    .EnableNoBuild()
-                    .SetFilter(Filter ?? "Category=Smoke&LoadFromGAC!=True")
+                    .SetProperty("TargetFramework", Framework.ToString())
+                    .DisableRestore()
                     .SetProcessEnvironmentVariable("TracerHomeDirectory", TracerHomeDirectory)
                     .SetLogsDirectory(TestLogsDirectory)
-                    .When(CodeCoverage, ConfigureCodeCoverage)
+                    .EnableNoDependencies()
+                    .SetTargets("VSTest")
+                    .SetProperty("VSTestNoBuild", true)
+                    .SetNoLogo(true)
+                    .SetFilter(Filter ?? "Category=Smoke&LoadFromGAC!=True")
                     .CombineWith(ClrProfilerIntegrationTests, (s, project) => s
                         .EnableTrxLogOutput(GetResultsDirectory(project))
-                        .SetProjectFile(project)));
+                        .SetTargetPath(project)));
             }
             finally
             {
