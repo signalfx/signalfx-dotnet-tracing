@@ -10,7 +10,7 @@ include:
 stages:
   - build
   - sign
-  - verify
+  - fossa-scan
   - checksum
   - checksum-sign
   - run-overhead-test
@@ -184,7 +184,7 @@ run-overhead-test:
     - ./overhead-test/provision/create-results-pr.sh
 
 oss-scan:
-  stage: verify
+  stage: fossa-scan
   rules:
     - if: '$CI_COMMIT_REF_NAME == "main"'
   extends: .oss-scan
