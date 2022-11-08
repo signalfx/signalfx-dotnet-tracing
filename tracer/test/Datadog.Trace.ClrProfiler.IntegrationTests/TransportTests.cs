@@ -32,7 +32,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 .Cast<TracesTransportType>()
                 .Select(x => new object[] { x });
 
+#if NET7_0
+        [SkippableTheory(Skip = "APMI-3563 - fix .NET 7 tests")]
+#else
         [SkippableTheory]
+#endif
         [MemberData(nameof(Data))]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]

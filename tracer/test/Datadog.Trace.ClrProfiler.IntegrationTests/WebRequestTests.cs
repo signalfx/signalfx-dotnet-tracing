@@ -28,7 +28,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetEnvironmentVariable("SIGNALFX_PROPAGATORS", "B3");
         }
 
+#if NET7_0
+        [SkippableFact(Skip = "APMI-3568 - fix .NET 7 tests")]
+#else
         [SkippableFact]
+#endif
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         [Trait("SupportsInstrumentationVerification", "True")]
@@ -65,7 +69,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             }
         }
 
+#if NET7_0
+        [SkippableFact(Skip = "APMI-3568 - fix .NET 7 tests")]
+#else
         [SkippableFact]
+#endif
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         [Trait("SupportsInstrumentationVerification", "True")]

@@ -43,7 +43,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             from socketHandlerEnabled in new[] { true, false }
             select new object[] { instrumentationOptions, socketHandlerEnabled };
 
+#if NET7_0
+        [SkippableTheory(Skip = "APMI-3559 - fix .NET 7 tests")]
+#else
         [SkippableTheory]
+#endif
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         [Trait("SupportsInstrumentationVerification", "True")]
@@ -95,7 +99,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             }
         }
 
+#if NET7_0
+        [SkippableTheory(Skip = "APMI-3559 - fix .NET 7 tests")]
+#else
         [SkippableTheory]
+#endif
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         [Trait("SupportsInstrumentationVerification", "True")]

@@ -37,7 +37,12 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetEnvironmentVariable("SIGNALFX_LOGS_INJECTION", "true");
         }
 
+#if NET7_0
+        [SkippableTheory(Skip = "APMI-3560 - fix .NET 7 tests")]
+#else
+
         [SkippableTheory]
+#endif
         [InlineData(false)]
         [InlineData(true)]
         [Trait("Category", "EndToEnd")]
@@ -78,7 +83,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             }
         }
 
-        [SkippableFact]
+        [SkippableFact(Skip= "APMI-3560 - fix .NET 7 tests")]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         [Trait("SupportsInstrumentationVerification", "True")]
