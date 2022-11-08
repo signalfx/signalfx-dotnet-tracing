@@ -34,7 +34,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             EnableDebugMode();
         }
 
+#if NET7_0
+        [SkippableFact(Skip = "APMI-3562 - fix .NET 7 tests")]
+#else
         [SkippableFact]
+#endif
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         public async Task Telemetry_Agentless_IsSentOnAppClose()
@@ -86,7 +90,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             AssertTelemetry(data);
         }
 
+#if NET7_0
+        [SkippableFact(Skip = "APMI-3562 - fix .NET 7 tests")]
+#else
         [SkippableFact]
+#endif
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         public async Task WhenDisabled_DoesntSendTelemetry()

@@ -75,7 +75,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetEnvironmentVariable("ASPNETCORE_URLS", "http://127.0.0.1:0"); // don't use SSL
         }
 
+#if NET7_0
+        [SkippableTheory(Skip = "APMI-3565 - fix .NET 7 tests")]
+#else
         [SkippableTheory]
+#endif
         [MemberData(nameof(GetData))]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]

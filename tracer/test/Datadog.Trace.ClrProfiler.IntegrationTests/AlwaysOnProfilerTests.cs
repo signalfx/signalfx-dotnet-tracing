@@ -36,7 +36,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         {
             var stackTrace = new List<string>
             {
+#if NET7_0_OR_GREATER
+                "System.Threading.Thread.Sleep(System.Int32)",
+#else
                 "System.Threading.Thread.Sleep(System.TimeSpan)",
+#endif
                 "Samples.AlwaysOnProfiler.Fs.ClassFs.methodFs(System.String)",
                 "Samples.AlwaysOnProfiler.Vb.ClassVb.MethodVb(System.String)",
                 "SignalFx.Tracing.TestDynamicClass.TryInvoke(System.Dynamic.InvokeBinder, System.Object[], System.Object\u0026)",

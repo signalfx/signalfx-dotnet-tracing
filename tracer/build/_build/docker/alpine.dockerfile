@@ -1,5 +1,5 @@
-ARG DOTNETSDK_VERSION
-FROM mcr.microsoft.com/dotnet/sdk:$DOTNETSDK_VERSION-alpine3.16 as base
+ARG DOTNETSDKIMAGE_VERSION
+FROM mcr.microsoft.com/dotnet/sdk:$DOTNETSDKIMAGE_VERSION-alpine3.16 as base
 
 # SECURITY NOTE: Exception is made for APK packages, 
 # no need to lock versions
@@ -48,8 +48,9 @@ RUN curl -sSL https://dot.net/v1/dotnet-install.sh --output dotnet-install.sh \
     && chmod +x ./dotnet-install.sh \
     && ./dotnet-install.sh --runtime aspnetcore --version 2.1.30 --install-dir /usr/share/dotnet --no-path \
     && ./dotnet-install.sh --runtime aspnetcore --version 3.0.3 --install-dir /usr/share/dotnet --no-path \
-    && ./dotnet-install.sh --runtime aspnetcore --version 3.1.26 --install-dir /usr/share/dotnet --no-path \
+    && ./dotnet-install.sh --runtime aspnetcore --version 3.1.30 --install-dir /usr/share/dotnet --no-path \
     && ./dotnet-install.sh --runtime aspnetcore --version 5.0.17 --install-dir /usr/share/dotnet --no-path \
+    && ./dotnet-install.sh --runtime aspnetcore --version 6.0.10 --install-dir /usr/share/dotnet --no-path \
     && rm dotnet-install.sh
 
 # Copy the build project in and build it
