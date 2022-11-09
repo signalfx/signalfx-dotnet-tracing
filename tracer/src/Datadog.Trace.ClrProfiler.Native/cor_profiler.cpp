@@ -175,6 +175,21 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
 
     const auto metThreadSamplingRequirements = info10 != nullptr;
 
+    // get ICorProfilerInfo12 for >= .NET 5.0
+    ICorProfilerInfo12* info12 = nullptr;
+    hr = info_->QueryInterface(__uuidof(ICorProfilerInfo12), (void**) &info12);
+
+    if (SUCCEEDED(hr))
+    {
+        Logger::Debug("Interface ICorProfilerInfo12 found.");
+    }
+    else
+    {
+        info12 = nullptr;
+    }
+
+    const auto metAllocationSamplingRequirements = info12 != nullptr;
+
     auto pInfo = info10 != nullptr ? info10 : this->info_;
     auto work_offloader = std::make_shared<RejitWorkOffloader>(pInfo);
 
@@ -188,7 +203,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
                        COR_PRF_MONITOR_MODULE_LOADS | COR_PRF_MONITOR_ASSEMBLY_LOADS | COR_PRF_MONITOR_APPDOMAIN_LOADS |
                        COR_PRF_ENABLE_REJIT;
 
-    if (IsThreadSamplingEnabled() && metThreadSamplingRequirements)
+    if (IsThreadSamplingEnabled() && metThreadSamplingRequirements || IsAllocationSamplingEnabled() && metAllocationSamplingRequirements)
     {
         event_mask |= COR_PRF_MONITOR_THREADS | COR_PRF_ENABLE_STACK_SNAPSHOT;
     }
@@ -272,9 +287,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
     }
     if (IsAllocationSamplingEnabled())
     {
-        ICorProfilerInfo12 * info12 = nullptr;
-        HRESULT hr = info_->QueryInterface(__uuidof(ICorProfilerInfo12), (void**) &info12);
-        if (!FAILED(hr) && info12 != nullptr)
+        if (metAllocationSamplingRequirements)
         {
             this->alwaysOnProfiler->StartAllocationSampling(info12);
         }
