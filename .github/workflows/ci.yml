@@ -74,9 +74,9 @@ jobs:
       with:
         dotnet-version: | 
           2.1.818
-          3.1.424
+          3.1.425
           5.0.408
-          6.0.402
+          6.0.403
           7.0.100
     - name: Install CMake 3.19.8
       if: ${{ runner.os == 'Linux' }}
@@ -130,9 +130,9 @@ jobs:
       with:
         dotnet-version: | 
           2.1.818
-          3.1.424
+          3.1.425
           5.0.408
-          6.0.402
+          6.0.403
           7.0.100
     - name: Build Docker image
       run: |
@@ -177,9 +177,9 @@ jobs:
       with:
         dotnet-version: | 
           2.1.818
-          3.1.424
+          3.1.425
           5.0.408
-          6.0.402
+          6.0.403
           7.0.100
     - run: ./tracer/build.cmd Clean BuildTracerHome BuildAndRunManagedUnitTests
     - uses: actions/upload-artifact@v3.1.1
@@ -203,9 +203,9 @@ jobs:
       with:
         dotnet-version: | 
           2.1.818
-          3.1.424
+          3.1.425
           5.0.408
-          6.0.402
+          6.0.403
           7.0.100
     - name: Build Docker image
       run: |
@@ -250,9 +250,9 @@ jobs:
       with:
         dotnet-version: | 
           2.1.818
-          3.1.424
+          3.1.425
           5.0.408
-          6.0.402
+          6.0.403
           7.0.100
     - name: Install CMake 3.19.8
       if: ${{ runner.os == 'Linux' }}
@@ -276,9 +276,9 @@ jobs:
       with:
         dotnet-version: | 
           2.1.818
-          3.1.424
+          3.1.425
           5.0.408
-          6.0.402
+          6.0.403
           7.0.100
     - name: Build Docker image
       run: |
@@ -326,9 +326,9 @@ jobs:
       with:
         dotnet-version: | 
           2.1.818
-          3.1.424
+          3.1.425
           5.0.408
-          6.0.402
+          6.0.403
           7.0.100
     # Cosmos is _way_ to flaky at the moment. Try enabling again at a later time
     # - name: Start CosmosDB Emulator
@@ -386,9 +386,9 @@ jobs:
       with:
         dotnet-version: | 
           2.1.818
-          3.1.424
+          3.1.425
           5.0.408
-          6.0.402
+          6.0.403
           7.0.100
     - name: Build Docker image
       run: |
@@ -448,9 +448,9 @@ jobs:
       with:
         dotnet-version: | 
           2.1.818
-          3.1.424
+          3.1.425
           5.0.408
-          6.0.402
+          6.0.403
           7.0.100
     - name: install Microsoft.Net.Component.4.6.1.TargetingPack
       run: |
@@ -498,9 +498,9 @@ jobs:
       with:
         dotnet-version: |
           2.1.818
-          3.1.424
+          3.1.425
           5.0.408
-          6.0.402
+          6.0.403
           7.0.100
     - name: install Microsoft.Net.Component.4.6.1.TargetingPack
       run: |
