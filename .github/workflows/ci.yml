@@ -41,8 +41,7 @@ on:
 
 env:
   buildConfiguration: Release
-  dotnetSdkVersion: 7.0.100-rc.2.22477.23
-  dotnetSdkImageVersion: 7.0.100-rc.2
+  dotnetSdkVersion: 7.0.100
   relativeTracerHome: /shared/bin/monitoring-home/tracer
   relativeArtifacts: /tracer/src/bin/artifacts
   binDir: ${{ github.workspace }}/tracer/src/bin
@@ -78,7 +77,7 @@ jobs:
           3.1.424
           5.0.408
           6.0.402
-          7.0.100-rc.2.22477.23
+          7.0.100
     - name: Install CMake 3.19.8
       if: ${{ runner.os == 'Linux' }}
       run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh -o cmakeinstall.sh && chmod +x cmakeinstall.sh && sudo ./cmakeinstall.sh --prefix=/usr/local --exclude-subdir
@@ -134,12 +133,11 @@ jobs:
           3.1.424
           5.0.408
           6.0.402
-          7.0.100-rc.2.22477.23
+          7.0.100
     - name: Build Docker image
       run: |
         docker build \
           --build-arg DOTNETSDK_VERSION=${dotnetSdkVersion} \
-          --build-arg DOTNETSDKIMAGE_VERSION=${dotnetSdkImageVersion} \
           --tag dd-trace-dotnet/${{ matrix.base-image }}-builder \
           --target builder \
           --file "./tracer/build/_build/docker/${{ matrix.base-image }}.dockerfile" \
@@ -182,7 +180,7 @@ jobs:
           3.1.424
           5.0.408
           6.0.402
-          7.0.100-rc.2.22477.23
+          7.0.100
     - run: ./tracer/build.cmd Clean BuildTracerHome BuildAndRunManagedUnitTests
     - uses: actions/upload-artifact@v3.1.1
       with:
@@ -208,12 +206,11 @@ jobs:
           3.1.424
           5.0.408
           6.0.402
-          7.0.100-rc.2.22477.23
+          7.0.100
     - name: Build Docker image
       run: |
         docker build \
           --build-arg DOTNETSDK_VERSION=${dotnetSdkVersion} \
-          --build-arg DOTNETSDKIMAGE_VERSION=${dotnetSdkImageVersion} \
           --tag dd-trace-dotnet/${{ matrix.base-image }}-tester \
           --target tester \
           --file "./tracer/build/_build/docker/${{ matrix.base-image }}.dockerfile" \
@@ -256,7 +253,7 @@ jobs:
           3.1.424
           5.0.408
           6.0.402
-          7.0.100-rc.2.22477.23
+          7.0.100
     - name: Install CMake 3.19.8
       if: ${{ runner.os == 'Linux' }}
       run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh -o cmakeinstall.sh && chmod +x cmakeinstall.sh && sudo ./cmakeinstall.sh --prefix=/usr/local --exclude-subdir
@@ -282,12 +279,11 @@ jobs:
           3.1.424
           5.0.408
           6.0.402
-          7.0.100-rc.2.22477.23
+          7.0.100
     - name: Build Docker image
       run: |
         docker build \
           --build-arg DOTNETSDK_VERSION=${dotnetSdkVersion} \
-          --build-arg DOTNETSDKIMAGE_VERSION=${dotnetSdkImageVersion} \
           --tag dd-trace-dotnet/${{ matrix.base-image }}-builder \
           --target builder \
           --file "./tracer/build/_build/docker/${{ matrix.base-image }}.dockerfile" \
@@ -333,7 +329,7 @@ jobs:
           3.1.424
           5.0.408
           6.0.402
-          7.0.100-rc.2.22477.23
+          7.0.100
     # Cosmos is _way_ to flaky at the moment. Try enabling again at a later time
     # - name: Start CosmosDB Emulator
     #   if: ${{ matrix.target == 'BuildAndRunWindowsIntegrationTests' }}
@@ -393,12 +389,11 @@ jobs:
           3.1.424
           5.0.408
           6.0.402
-          7.0.100-rc.2.22477.23
+          7.0.100
     - name: Build Docker image
       run: |
         docker build \
           --build-arg DOTNETSDK_VERSION=${dotnetSdkVersion} \
-          --build-arg DOTNETSDKIMAGE_VERSION=${dotnetSdkImageVersion} \
           --tag dd-trace-dotnet/${{ matrix.base-image }}-builder \
           --target builder \
           --file "./tracer/build/_build/docker/${{ matrix.base-image }}.dockerfile" \
@@ -456,7 +451,7 @@ jobs:
           3.1.424
           5.0.408
           6.0.402
-          7.0.100-rc.2.22477.23
+          7.0.100
     - name: install Microsoft.Net.Component.4.6.1.TargetingPack
       run: |
           Set-Location "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
@@ -506,7 +501,7 @@ jobs:
           3.1.424
           5.0.408
           6.0.402
-          7.0.100-rc.2.22477.23
+          7.0.100
     - name: install Microsoft.Net.Component.4.6.1.TargetingPack
       run: |
           Set-Location "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
