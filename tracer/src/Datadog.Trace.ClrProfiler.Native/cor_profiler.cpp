@@ -178,7 +178,6 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
     // get ICorProfilerInfo12 for >= .NET 5.0
     ICorProfilerInfo12* info12 = nullptr;
     hr = info_->QueryInterface(__uuidof(ICorProfilerInfo12), (void**) &info12);
-
     if (SUCCEEDED(hr))
     {
         Logger::Debug("Interface ICorProfilerInfo12 found.");
