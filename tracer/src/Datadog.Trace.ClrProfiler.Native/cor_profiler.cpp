@@ -203,7 +203,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::Initialize(IUnknown* cor_profiler_info_un
                        COR_PRF_MONITOR_MODULE_LOADS | COR_PRF_MONITOR_ASSEMBLY_LOADS | COR_PRF_MONITOR_APPDOMAIN_LOADS |
                        COR_PRF_ENABLE_REJIT;
 
-    if (IsThreadSamplingEnabled() && metThreadSamplingRequirements || IsAllocationSamplingEnabled() && metAllocationSamplingRequirements)
+    if ((IsThreadSamplingEnabled() && metThreadSamplingRequirements) || (IsAllocationSamplingEnabled() && metAllocationSamplingRequirements))
     {
         event_mask |= COR_PRF_MONITOR_THREADS | COR_PRF_ENABLE_STACK_SNAPSHOT;
     }
