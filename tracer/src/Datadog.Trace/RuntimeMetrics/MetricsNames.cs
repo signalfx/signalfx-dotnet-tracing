@@ -30,7 +30,7 @@ namespace Datadog.Trace.RuntimeMetrics
         {
             public const string CollectionsCount = "process.runtime.dotnet.gc.collections.count";
             public const string HeapSize = "process.runtime.dotnet.gc.heap.size";
-            public const string LiveHeapSize = "process.runtime.dotnet.gc.heap.live";
+            public const string TotalObjectsSize = "process.runtime.dotnet.gc.objects.size";
             public const string AllocatedBytes = "process.runtime.dotnet.gc.allocations.size";
             public const string HeapCommittedMemory = "process.runtime.dotnet.gc.committed_memory.size";
             public const string PauseTime = "process.runtime.dotnet.gc.pause.time";
