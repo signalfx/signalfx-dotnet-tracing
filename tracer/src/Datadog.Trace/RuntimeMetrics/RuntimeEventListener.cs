@@ -43,6 +43,8 @@ namespace Datadog.Trace.RuntimeMetrics
 
         private static readonly IReadOnlyDictionary<string, string> MetricsMapping;
 
+        private static readonly Func<int> GetLastPercentTimeInGc;
+
 #if NET6_0_OR_GREATER
         private static readonly Func<int, ulong> GetGenerationSize;
 #endif
@@ -66,6 +68,12 @@ namespace Datadog.Trace.RuntimeMetrics
                 ["connection-queue-length"] = MetricsNames.AspNetCoreConnectionQueueLength,
                 ["total-connections"] = MetricsNames.AspNetCoreTotalConnections
             };
+
+            var percentTimeInGcMethodInfo = typeof(GC).GetMethod("GetLastGCPercentTimeInGC", BindingFlags.NonPublic | BindingFlags.Static);
+            if (percentTimeInGcMethodInfo != null)
+            {
+                GetLastPercentTimeInGc = (Func<int>)percentTimeInGcMethodInfo.CreateDelegate(typeof(Func<int>));
+            }
 
             // source originated from: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/blob/bc947a00c3f859cc436f050e81172fc1f8bc09d7/src/OpenTelemetry.Instrumentation.Runtime/RuntimeMetrics.cs
 #if NET6_0_OR_GREATER
@@ -138,6 +146,7 @@ namespace Datadog.Trace.RuntimeMetrics
 #endif
 
             _metricSender.SendLong(MetricsNames.Gc.AllocatedBytes, GC.GetTotalAllocatedBytes(), MetricType.CUMULATIVE_COUNTER);
+            _metricSender.SendLong(MetricsNames.Gc.PercentTimeInGc, GetLastPercentTimeInGc(), MetricType.GAUGE);
 
             Log.Debug("Sent the following metrics: {metrics}", ThreadStatsMetrics);
         }

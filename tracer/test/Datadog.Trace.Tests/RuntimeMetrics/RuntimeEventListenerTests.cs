@@ -71,6 +71,7 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
 
             metricSender.Verify(s => s.SendLong(MetricsNames.Gc.AllocatedBytes, It.IsAny<long>(), MetricType.CUMULATIVE_COUNTER, It.IsAny<string[]>()), Times.AtLeastOnce);
             metricSender.Verify(s => s.SendDouble(MetricsNames.Gc.PauseTime, It.IsAny<double>(), MetricType.COUNTER, It.IsAny<string[]>()), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendLong(MetricsNames.Gc.PercentTimeInGc, It.IsAny<long>(), MetricType.GAUGE, It.IsAny<string[]>()), Times.AtLeastOnce);
 
 #if NET6_0_OR_GREATER
             metricSender.Verify(s => s.SendLong(MetricsNames.Gc.HeapSize, It.IsAny<long>(), MetricType.GAUGE, new[] { "generation:poh" }), Times.AtLeastOnce);

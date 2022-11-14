@@ -34,6 +34,7 @@ namespace Datadog.Trace.RuntimeMetrics
             public const string AllocatedBytes = "process.runtime.dotnet.gc.allocations.size";
             public const string HeapCommittedMemory = "process.runtime.dotnet.gc.committed_memory.size";
             public const string PauseTime = "process.runtime.dotnet.gc.pause.time";
+            public const string PercentTimeInGc = "process.runtime.dotnet.gc.time_in_gc";
         }
 
         internal static class Process
