@@ -14,6 +14,10 @@ function Get-TempPath() {
     return $temp
 }
 
+function Reset-IIS() {    
+    Start-Process "iisreset.exe" -NoNewWindow -Wait
+}
+
 <#
     .SYNOPSIS
     Installs SignalFx Instrumentation for .NET.
@@ -51,6 +55,8 @@ function Install-SignalFxDotnet() {
         throw "Could not install. The installer returned error code $($process.ExitCode).`r`n" + 
         "See more: https://learn.microsoft.com/en-us/windows/win32/msi/error-codes"
     }
+
+    Reset-IIS
 
     Remove-Item $msi
 }
