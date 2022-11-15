@@ -22,11 +22,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             SetServiceVersion("1.0.0");
         }
 
-#if NET7_0
-        [SkippableFact(Skip = "APMI-3561 - fix .NET 7 tests")]
-#else
         [SkippableFact]
-#endif
         [Trait("Category", "EndToEnd")]
         public void SubmitsTraces()
         {
