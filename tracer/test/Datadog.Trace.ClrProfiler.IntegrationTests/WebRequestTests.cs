@@ -5,7 +5,6 @@
 
 // Modified by Splunk Inc.
 
-using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.ClrProfiler.IntegrationTests.Helpers;
 using Datadog.Trace.Configuration;
@@ -28,11 +27,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetEnvironmentVariable("SIGNALFX_PROPAGATORS", "B3");
         }
 
-#if NET7_0
-        [SkippableFact(Skip = "APMI-3568 - fix .NET 7 tests")]
-#else
         [SkippableFact]
-#endif
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         [Trait("SupportsInstrumentationVerification", "True")]
@@ -64,16 +59,16 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 PropagationTestHelpers.AssertPropagationEnabled(spans.First(), processResult);
 
+#if NET7_0
+                telemetry.AssertIntegrationEnabled(IntegrationId.HttpSocketsHandler); // uses HttpClient internally
+#else
                 telemetry.AssertIntegrationEnabled(IntegrationId.WebRequest);
+#endif
                 VerifyInstrumentation(processResult.Process);
             }
         }
 
-#if NET7_0
-        [SkippableFact(Skip = "APMI-3568 - fix .NET 7 tests")]
-#else
         [SkippableFact]
-#endif
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         [Trait("SupportsInstrumentationVerification", "True")]
@@ -93,7 +88,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 PropagationTestHelpers.AssertPropagationDisabled(processResult);
 
+#if NET7_0
+                telemetry.AssertIntegrationDisabled(IntegrationId.HttpMessageHandler); // uses HttpClient internally
+#else
                 telemetry.AssertIntegrationDisabled(IntegrationId.WebRequest);
+#endif
                 VerifyInstrumentation(processResult.Process);
             }
         }
