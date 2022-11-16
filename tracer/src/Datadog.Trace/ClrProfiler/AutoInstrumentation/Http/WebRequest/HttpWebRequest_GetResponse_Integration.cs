@@ -13,8 +13,8 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Http.WebRequest
 {
     /// <summary>
     /// CallTarget integration for HttpWebRequest.GetResponse.
-    /// .NET 7+ uses an HttpClient
-    /// internally, which is already instrumented.
+    /// .NET 7+ uses an HttpClient internally (https://github.com/dotnet/runtime/pull/38511)
+    /// which is already instrumented.
     /// </summary>
     [InstrumentMethod(
         AssemblyName = WebRequestCommon.NetFrameworkAssembly,
