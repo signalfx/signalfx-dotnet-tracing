@@ -55,9 +55,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 #if NETFRAMEWORK
             var expectedCorrelatedTraceCount = 3;
             var expectedCorrelatedSpanCount = 3;
-#elif NET7_0_OR_GREATER
-            var expectedCorrelatedTraceCount = 3;
-            var expectedCorrelatedSpanCount = 4;
 #else
             var expectedCorrelatedTraceCount = 2;
             var expectedCorrelatedSpanCount = 4;
