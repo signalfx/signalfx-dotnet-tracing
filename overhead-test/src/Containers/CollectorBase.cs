@@ -12,6 +12,7 @@ internal abstract class CollectorBase : IAsyncDisposable
 
     protected const int TraceReceiverPort = 9411;
     protected const int LogReceiverPort = 4318;
+    protected const int MetricReceiverPort = 9943;
     protected readonly Stream Stream;
 
     protected CollectorBase(DirectoryInfo resultsDirectory)
@@ -25,6 +26,7 @@ internal abstract class CollectorBase : IAsyncDisposable
 
     internal string TraceReceiverUrl => $"http://{Address}:{TraceReceiverPort}/api/v2/spans";
     internal string LogsReceiverUrl => $"http://{Address}:{LogReceiverPort}/v1/logs";
+    internal string MetricsReceiverUrl => $"http://{Address}:{MetricReceiverPort}/v2/datapoint";
 
     public async ValueTask DisposeAsync()
     {

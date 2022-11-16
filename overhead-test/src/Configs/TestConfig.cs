@@ -13,8 +13,9 @@ internal class TestConfig
             {
                 AgentConfig.Baseline,
                 AgentConfig.Instrumented,
-                AgentConfig.Profiled,
-                AgentConfig.ProfiledHighFrequency
+                AgentConfig.CpuProfiled,
+                AgentConfig.MemoryProfiled,
+                AgentConfig.CpuAndMemoryProfiled,
             },
             8500,
             30,

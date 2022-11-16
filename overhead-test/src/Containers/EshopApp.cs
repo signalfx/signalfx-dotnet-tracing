@@ -49,6 +49,7 @@ internal class EshopApp : IAsyncDisposable
             .WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development")
             .WithEnvironment("SIGNALFX_ENDPOINT_URL", collector.TraceReceiverUrl)
             .WithEnvironment("SIGNALFX_PROFILER_LOGS_ENDPOINT", collector.LogsReceiverUrl)
+            .WithEnvironment("SIGNALFX_METRICS_ENDPOINT_URL", collector.MetricsReceiverUrl)
             .WithEnvironment("SIGNALFX_PROFILER_EXCLUDE_PROCESSES", "dotnet-counters")
             .WithEnvironment("SIGNALFX_TRACE_BUFFER_SIZE", "3000")
             .WithEnvironment("ConnectionStrings__CatalogConnection", sqlServer.CatalogConnection)
