@@ -89,7 +89,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 PropagationTestHelpers.AssertPropagationDisabled(processResult);
 
 #if NET7_0
-                telemetry.AssertIntegrationEnabled(IntegrationId.HttpSocketsHandler); // uses HttpClient internally
+                telemetry.AssertIntegrationDisabled(IntegrationId.HttpMessageHandler); // uses HttpClient internally
 #else
                 telemetry.AssertIntegrationDisabled(IntegrationId.WebRequest);
 #endif
