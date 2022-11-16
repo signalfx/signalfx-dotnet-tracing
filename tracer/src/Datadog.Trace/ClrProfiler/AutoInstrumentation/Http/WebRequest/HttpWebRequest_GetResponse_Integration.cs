@@ -12,7 +12,9 @@ using Datadog.Trace.ExtensionMethods;
 namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Http.WebRequest
 {
     /// <summary>
-    /// CallTarget integration for HttpWebRequest.GetResponse
+    /// CallTarget integration for HttpWebRequest.GetResponse.
+    /// .NET 7+ uses an HttpClient
+    /// internally, which is already instrumented.
     /// </summary>
     [InstrumentMethod(
         AssemblyName = WebRequestCommon.NetFrameworkAssembly,
