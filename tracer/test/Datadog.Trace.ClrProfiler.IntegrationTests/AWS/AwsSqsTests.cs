@@ -29,11 +29,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AWS
             SetEnvironmentVariable("SIGNALFX_PROPAGATORS", "B3");
         }
 
-#if NET7_0
-        [SkippableTheory(Skip = "APMI-3564 - fix .NET 7 tests")]
-#else
         [SkippableTheory]
-#endif
         [MemberData(nameof(PackageVersions.AwsSqs), MemberType = typeof(PackageVersions))]
         [Trait("Category", "EndToEnd")]
         public async Task SubmitsTraces(string packageVersion)
