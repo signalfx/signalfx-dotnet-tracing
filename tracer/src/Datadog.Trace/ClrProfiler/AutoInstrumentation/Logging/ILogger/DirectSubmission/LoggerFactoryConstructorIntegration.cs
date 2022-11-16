@@ -1,4 +1,4 @@
-﻿// <copyright file="LoggerFactoryConstructorIntegration.cs" company="Datadog">
+// <copyright file="LoggerFactoryConstructorIntegration.cs" company="Datadog">
 // Unless explicitly stated otherwise all files in this repository are licensed under the Apache 2 License.
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
@@ -31,6 +31,15 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.Logging.ILogger.DirectSu
         ParameterTypeNames = new[] { "System.Collections.Generic.IEnumerable`1[Microsoft.Extensions.Logging.ILoggerProvider]", "Microsoft.Extensions.Options.IOptionsMonitor`1[Microsoft.Extensions.Logging.LoggerFilterOptions]", "Microsoft.Extensions.Options.IOptions`1[Microsoft.Extensions.Logging.LoggerFactoryOptions]" },
         MinimumVersion = "5.0.0",
         MaximumVersion = "6.*.*",
+        IntegrationName = LoggerIntegrationCommon.IntegrationName)]
+    [InstrumentMethod(
+        AssemblyName = "Microsoft.Extensions.Logging",
+        TypeName = "Microsoft.Extensions.Logging.LoggerFactory",
+        MethodName = ".ctor",
+        ReturnTypeName = ClrNames.Void,
+        ParameterTypeNames = new[] { "System.Collections.Generic.IEnumerable`1[Microsoft.Extensions.Logging.ILoggerProvider]", "Microsoft.Extensions.Options.IOptionsMonitor`1[Microsoft.Extensions.Logging.LoggerFilterOptions]", "Microsoft.Extensions.Options.IOptions`1[Microsoft.Extensions.Logging.LoggerFactoryOptions]", "Microsoft.Extensions.Logging.IExternalScopeProvider" },
+        MinimumVersion = "7.0.0",
+        MaximumVersion = "7.*.*",
         IntegrationName = LoggerIntegrationCommon.IntegrationName)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
