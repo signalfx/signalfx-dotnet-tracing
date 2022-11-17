@@ -416,6 +416,9 @@ namespace Datadog.Trace
                     writer.WritePropertyName("thread_sampling_period");
                     writer.WriteValue(instanceSettings.ThreadSamplingPeriod);
 
+                    writer.WritePropertyName("profiler_export_interval");
+                    writer.WriteValue(instanceSettings.ProfilerExportInterval);
+
                     writer.WritePropertyName("memory_profiling_enabled");
                     writer.WriteValue(instanceSettings.MemoryProfilingEnabled);
 

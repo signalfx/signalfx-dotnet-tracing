@@ -83,6 +83,8 @@ namespace Datadog.Trace.Configuration
             CpuProfilingEnabled = settings.CpuProfilingEnabled;
             MemoryProfilingEnabled = settings.MemoryProfilingEnabled;
             ThreadSamplingPeriod = settings.ThreadSamplingPeriod;
+            ProfilerExportInterval = CpuProfilingEnabled ? ThreadSamplingPeriod : settings.ProfilerExportInterval;
+
             LogSubmissionSettings = ImmutableDirectLogSubmissionSettings.Create(settings.LogSubmissionSettings);
             // Logs injection is enabled by default if direct log submission is enabled, otherwise disabled by default
             LogsInjectionEnabled = settings.LogSubmissionSettings.LogsInjectionEnabled ?? LogSubmissionSettings.IsEnabled;
@@ -371,6 +373,11 @@ namespace Datadog.Trace.Configuration
         /// Gets a value for the thread sampling period.
         /// </summary>
         public TimeSpan ThreadSamplingPeriod { get; }
+
+        /// <summary>
+        /// Gets a value for the profiler export interval.
+        /// </summary>
+        internal TimeSpan ProfilerExportInterval { get; }
 
         /// <summary>
         /// Gets a value indicating whether to enable the updated WCF instrumentation that delays execution
