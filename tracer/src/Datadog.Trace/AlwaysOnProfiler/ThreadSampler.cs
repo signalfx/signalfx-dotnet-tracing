@@ -23,13 +23,13 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(ThreadSampler));
 
-        private static void SampleReadingThread(INativeBufferExporter nativeBufferExporter, TimeSpan samplingPeriod)
+        private static void SampleReadingThread(INativeBufferExporter nativeBufferExporter, TimeSpan exportInterval)
         {
             var buffer = new byte[BufferSize];
 
             while (true)
             {
-                Thread.Sleep(samplingPeriod);
+                Thread.Sleep(exportInterval);
                 nativeBufferExporter.Export(buffer);
             }
         }
@@ -65,7 +65,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
             var thread = new Thread(() =>
             {
-                SampleReadingThread(bufferExporter, tracerSettings.ThreadSamplingPeriod);
+                SampleReadingThread(bufferExporter, tracerSettings.ProfilerExportInterval);
             })
             {
                 Name = BackgroundThreadName,
