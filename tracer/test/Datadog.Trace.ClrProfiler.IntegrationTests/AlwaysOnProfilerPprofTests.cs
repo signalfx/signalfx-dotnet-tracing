@@ -36,6 +36,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         {
             SetEnvironmentVariable("SIGNALFX_PROFILER_ENABLED", "true");
             SetEnvironmentVariable("SIGNALFX_PROFILER_CALL_STACK_INTERVAL", "1000");
+            SetEnvironmentVariable("SIGNALFX_PROFILER_EXPORT_INTERVAL", "1000");
 
             using (var agent = EnvironmentHelper.GetMockAgent())
             using (var logsCollector = EnvironmentHelper.GetMockOtelLogsCollector())
