@@ -560,6 +560,15 @@ namespace Datadog.Trace.Configuration
         internal TimeSpan ThreadSamplingPeriod { get; set; }
 
         /// <summary>
+        /// Gets or sets a value for the profiling data export interval.
+        /// The default value is 1000 milliseconds.
+        /// If CPU profiling is enables this value should match ThreadSamplingPeriod.
+        /// </summary>
+        /// <seealso cref="TracerSettings.ProfilerExportInterval"/>
+        /// <seealso cref="TracerSettings.ThreadSamplingPeriod"/>
+        internal TimeSpan ProfilerExportInterval { get; set; }
+
+        /// <summary>
         /// Gets a value indicating whether the feature flag to enable the updated ASP.NET resource names is enabled
         /// </summary>
         /// <seealso cref="ConfigurationKeys.FeatureFlags.RouteTemplateResourceNamesEnabled"/>
@@ -754,7 +763,7 @@ namespace Datadog.Trace.Configuration
         {
             // If you change any of these constants, check with always_on_profiler.cpp first
             int period = source.SafeReadInt32(
-                key: ConfigurationKeys.AlwaysOnProfiler.Period,
+                key: ConfigurationKeys.AlwaysOnProfiler.ThreadSamplingPeriod,
                 defaultTo: 10_000,
                 validators: (value) => value >= 1_000);
 

@@ -566,7 +566,16 @@ namespace Datadog.Trace.Configuration
             /// The default value is 10000 milliseconds.
             /// </summary>
             /// <seealso cref="TracerSettings.ThreadSamplingPeriod"/>
-            public const string Period = "SIGNALFX_PROFILER_CALL_STACK_INTERVAL";
+            public const string ThreadSamplingPeriod = "SIGNALFX_PROFILER_CALL_STACK_INTERVAL";
+
+            /// <summary>
+            /// Configuration key to set default profiling data export interval.
+            /// If CPU profiling is enables this value should match ThreadSamplingPeriod.
+            /// The default value is 10000 milliseconds.
+            /// </summary>
+            /// <seealso cref="ConfigurationKeys.AlwaysOnProfiler.ThreadSamplingPeriod"/>
+            /// <seealso cref="TracerSettings.ProfilerExportInterval"/>
+            public const string ExportInterval = "SIGNALFX_PROFILER_EXPORT_INTERVAL";
 
             /// <summary>
             /// Configuration key to set export format.
