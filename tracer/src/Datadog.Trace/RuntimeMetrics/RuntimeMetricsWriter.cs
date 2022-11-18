@@ -111,7 +111,7 @@ namespace Datadog.Trace.RuntimeMetrics
 
                 if (_enableProcessMetrics)
                 {
-                    ProcessHelpers.GetCurrentProcessRuntimeMetrics(out var newUserCpu, out var newSystemCpu, out var threadCount, out var privateMemory, out var workingSet);
+                    ProcessHelpers.GetCurrentProcessRuntimeMetrics(out var newUserCpu, out var newSystemCpu, out var threadCount, out var virtualMemory, out var workingSet);
 
                     var userCpu = newUserCpu - _previousUserCpu;
                     var systemCpu = newSystemCpu - _previousSystemCpu;
@@ -122,7 +122,7 @@ namespace Datadog.Trace.RuntimeMetrics
                     _metricSender.SendLong(MetricsNames.Process.ThreadsCount, threadCount, MetricType.GAUGE);
 
                     _metricSender.SendLong(MetricsNames.Process.MemoryUsage, workingSet, MetricType.GAUGE);
-                    _metricSender.SendLong(MetricsNames.Process.MemoryVirtual, privateMemory, MetricType.GAUGE);
+                    _metricSender.SendLong(MetricsNames.Process.MemoryVirtual, virtualMemory, MetricType.GAUGE);
 
                     _metricSender.SendDouble(MetricsNames.Process.CpuTime, newUserCpu.TotalSeconds, MetricType.CUMULATIVE_COUNTER, CpuUserTag);
                     _metricSender.SendDouble(MetricsNames.Process.CpuTime, newSystemCpu.TotalSeconds, MetricType.CUMULATIVE_COUNTER, CpuSystemTag);
