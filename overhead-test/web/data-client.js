@@ -8,10 +8,10 @@ async function getRuns(){
         .then(body => body.split("\n").filter(x => x !== 'index.txt'));
 }
 
-async function getResults(name){
+async function getResults(name, config){
     return fetch(`${RESULTS_DIR}/${name}/results.csv`)
         .then(resp => resp.text())
-        .then(body => parseCsv(body))
+        .then(body => parseCsv(body, config))
         .then(data => {
             const aggregated = aggregateRunData(data);
             console.log(aggregated)

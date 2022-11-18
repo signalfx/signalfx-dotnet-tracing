@@ -19,9 +19,9 @@
  *   ]
  * }
  */
-function parseCsv(body) {
+function parseCsv(body, config) {
     const runs = parseRuns(body);
-    const agents = body.split('\n')[0].split(',').slice(1).map(x => x.replace(/:.*/, '')).slice(0, 4);
+    const agents = config.agents.map(config => config.name);
     console.log(agents);
     return {
         agents: agents,
