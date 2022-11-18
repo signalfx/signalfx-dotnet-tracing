@@ -20,8 +20,10 @@ internal class RemoteCollector : CollectorBase
             .WithDockerEndpoint(_dockerEndpoint.Url)
             .WithExposedPort(LogReceiverPort)
             .WithExposedPort(TraceReceiverPort)
+            .WithExposedPort(MetricReceiverPort)
             .WithPortBinding(LogReceiverPort, LogReceiverPort)
             .WithPortBinding(TraceReceiverPort, TraceReceiverPort)
+            .WithPortBinding(MetricReceiverPort, MetricReceiverPort)
             .WithBindMount(HostCollectorConfigPath, ContainerCollectorConfigPath)
             .WithOutputConsumer(Consume.RedirectStdoutAndStderrToStream(Stream, Stream))
             .Build();
