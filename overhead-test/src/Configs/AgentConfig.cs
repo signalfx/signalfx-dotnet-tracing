@@ -19,23 +19,42 @@ internal class AgentConfig
             new("SIGNALFX_PROFILER_ENABLED", "0")
         });
 
-    public static readonly AgentConfig Profiled = new(
+    public static readonly AgentConfig CpuProfiled = new(
         "signalfx-dotnet-with-profiling-10s",
-        "signalfx dotnet with tracing and default profiling frequency (every 10s)",
+        "signalfx dotnet with tracing and default CPU profiling frequency (every 10s)",
         InstrumentedImageName,
         new EnvVar[]
         {
             new("SIGNALFX_PROFILER_ENABLED", "1")
         });
 
-    public static readonly AgentConfig ProfiledHighFrequency = new(
+    public static readonly AgentConfig CpuProfiledHighFrequency = new(
         "signalfx-dotnet-with-profiling-1s",
-        "signalfx dotnet with tracing and max profiling frequency (every 1s)",
+        "signalfx dotnet with tracing and max CPU profiling frequency (every 1s)",
         InstrumentedImageName,
         new EnvVar[]
         {
             new("SIGNALFX_PROFILER_ENABLED", "1"),
             new("SIGNALFX_PROFILER_CALL_STACK_INTERVAL", "1000")
+        });
+
+    public static readonly AgentConfig MemoryProfiled = new(
+        "signalfx-dotnet-with-mem-profiling",
+        "signalfx dotnet with tracing and memory profiling",
+        InstrumentedImageName,
+        new EnvVar[]
+        {
+            new("SIGNALFX_PROFILER_MEMORY_ENABLED", "1")
+        });
+
+    public static readonly AgentConfig CpuAndMemoryProfiled = new(
+        "signalfx-dotnet-with-cpu-and-mem-profiling",
+        "signalfx dotnet with tracing, CPU and memory profiling",
+        InstrumentedImageName,
+        new EnvVar[]
+        {
+            new("SIGNALFX_PROFILER_MEMORY_ENABLED", "1"),
+            new("SIGNALFX_PROFILER_ENABLED", "1"),
         });
 
     private const string BaseImageName = "eshop-app-dc";

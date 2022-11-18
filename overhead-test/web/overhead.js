@@ -2,8 +2,10 @@
 const MARKETING_NAMES = {
     'none': 'Not instrumented',
     'signalfx-dotnet': 'SignalFx Instrumentation for .NET',
-    'signalfx-dotnet-with-profiling-10s': 'SignalFx Instrumentation for .NET with AlwaysOn Profiling',
-    'signalfx-dotnet-with-profiling-1s': 'SignalFx Instrumentation for .NET with AlwaysOn Profiling - high frequency sampling'
+    'signalfx-dotnet-with-profiling-10s': 'SignalFx Instrumentation for .NET with AlwaysOn CPU Profiling',
+    'signalfx-dotnet-with-profiling-1s': 'SignalFx Instrumentation for .NET with AlwaysOn CPU Profiling - high frequency sampling',
+    'signalfx-dotnet-with-mem-profiling': 'SignalFx Instrumentation for .NET with AlwaysOn Memory Profiling',
+    'signalfx-dotnet-with-cpu-and-mem-profiling' : 'SignalFx Instrumentation for .NET with AlwaysOn CPU and Memory Profiling'
 }
 
 async function startOverhead() {
@@ -23,7 +25,7 @@ async function testRunChosen() {
     const value = document.getElementById('test-run').value;
     console.log(`selection changed ${value}`);
     const config = await getConfig(value);
-    const results = await getResults(value)
+    const results = await getResults(value, config)
     addOverview(config);
     addCharts(results);
 }

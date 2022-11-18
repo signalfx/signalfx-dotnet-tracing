@@ -3,6 +3,7 @@ extensions:
 
 receivers:
   zipkin:
+  signalfx:
   otlp:
     protocols:
       grpc:
@@ -19,6 +20,10 @@ service:
   pipelines:
     traces:
       receivers: [ zipkin ]
+      processors: [ batch ]
+      exporters: [ logging ]
+    metrics:
+      receivers: [ signalfx ]
       processors: [ batch ]
       exporters: [ logging ]
     logs:
