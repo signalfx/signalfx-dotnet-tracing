@@ -45,7 +45,6 @@ namespace Datadog.Trace.RuntimeMetrics
         private static readonly Func<int, ulong> GetGenerationSize;
 #endif
         private static bool _isGcInfoAvailable;
-        private readonly Timing _contentionTime = new Timing();
 
         private readonly string _delayInSeconds;
 
