@@ -39,7 +39,7 @@ Names and metric structure of the metrics exported are aligned with the OpenTele
 | Metric                               | Description                                                                                                                         | Type              |
 |:-------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------|:------------------|
 | `process.memory.usage`               | The amount of physical memory allocated for this process.                                                                           | Gauge             |
-| `process.memory.virtual`             | The amount of virtual memory allocated for this process that cannot be shared with other processes.                                 | Gauge             |
+| `process.memory.virtual`             | The amount of committed virtual memory for this process.                                                                            | Gauge             |
 | `process.cpu.time`                   | Total CPU seconds broken down by different states(`user`,`system`).                                                                 | CumulativeCounter |
 | `process.cpu.utilization`            | Difference in process.cpu.time since the last measurement, divided by the elapsed time and number of CPUs available to the process. | Gauge             |
 | `process.threads`                    | Process threads count.                                                                                                              | Gauge             |

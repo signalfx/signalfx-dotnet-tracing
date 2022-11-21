@@ -159,7 +159,6 @@ of SignalFx Instrumentation for .NET.
 | `SIGNALFX_PROFILER_LOGS_ENDPOINT` | The URL to where logs are exported using [OTLP/HTTP v1 log protocol](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md) | `http://localhost:4318/v1/logs` |
 | `SIGNALFX_PROFILER_ENABLED` | Enable to activate thread sampling. | `false` |
 | `SIGNALFX_PROFILER_CALL_STACK_INTERVAL` | Sampling period in milliseconds. It defines how often the threads are stopped in order to fetch all stack traces. This value cannot be lower than `1000` milliseconds. | `10000` |
-| `SIGNALFX_PROFILER_EXPORT_INTERVAL` | Profiling exporter interval in milliseconds. It defines how often the profiling data is sent to the collector. If the CPU profiling is enabled this value will automatically be set to match `SIGNALFX_PROFILER_CALL_STACK_INTERVAL` | `10000` |
 
 ## Including query string settings
 
