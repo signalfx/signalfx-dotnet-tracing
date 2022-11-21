@@ -23,9 +23,7 @@ namespace Datadog.Trace.RuntimeMetrics
         private const string RuntimeEventSourceName = "Microsoft-Windows-DotNETRuntime";
         private const string AspNetCoreHostingEventSourceName = "Microsoft.AspNetCore.Hosting";
         private const string AspNetCoreKestrelEventSourceName = "Microsoft-AspNetCore-Server-Kestrel";
-        private const string ThreadStatsMetrics = $"{MetricsNames.ContentionTime}, {MetricsNames.ContentionCount}, {MetricsNames.ThreadPoolWorkersCount}";
-
-        private const int EventContentionStop = 91;
+        private const string ThreadStatsMetrics = $"{MetricsNames.ContentionCount}, {MetricsNames.ThreadPoolWorkersCount}";
 
         private const int EventGcHeapStats = 4;
 
@@ -47,7 +45,6 @@ namespace Datadog.Trace.RuntimeMetrics
         private static readonly Func<int, ulong> GetGenerationSize;
 #endif
         private static bool _isGcInfoAvailable;
-        private readonly Timing _contentionTime = new Timing();
 
         private readonly string _delayInSeconds;
 
@@ -105,9 +102,6 @@ namespace Datadog.Trace.RuntimeMetrics
 
         public void Refresh()
         {
-            // Can't use a Timing because Dogstatsd doesn't support local aggregation
-            // It means that the aggregations in the UI would be wrong
-            _metricSender.SendDouble(MetricsNames.ContentionTime, _contentionTime.Clear(), MetricType.GAUGE);
             _metricSender.SendLong(MetricsNames.ContentionCount, Monitor.LockContentionCount, MetricType.CUMULATIVE_COUNTER);
 
             // TODO splunk: opentelemetry-dotnet-contrib plans to change to ObservableUpDownCounter, will need to be adjusted
@@ -203,15 +197,6 @@ namespace Datadog.Trace.RuntimeMetrics
                 if (start != null)
                 {
                     _metricSender.SendDouble(MetricsNames.Gc.PauseTime, (eventData.TimeStamp - start.Value).TotalMilliseconds, MetricType.COUNTER);
-                }
-            }
-            else
-            {
-                if (eventData.EventId == EventContentionStop)
-                {
-                    var durationInNanoseconds = (double)eventData.Payload[2];
-
-                    _contentionTime.Time(durationInNanoseconds / 1_000_000);
                 }
             }
         }

@@ -11,7 +11,6 @@ namespace Datadog.Trace.RuntimeMetrics
     {
         public const string ExceptionsCount = "process.runtime.dotnet.exceptions.count";
 
-        public const string ContentionTime = "runtime.dotnet.threads.contention_time";
         public const string ContentionCount = "process.runtime.dotnet.monitor.lock_contention.count";
 
         public const string ThreadPoolWorkersCount = "process.runtime.dotnet.thread_pool.threads.count";
