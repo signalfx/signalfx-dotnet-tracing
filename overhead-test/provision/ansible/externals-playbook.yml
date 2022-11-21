@@ -40,6 +40,8 @@
           - 4318
           # trace receiver
           - 9411
+          # metric receiver
+          - 9943
           # sqlserver
           - 1433
         source: "!{{testbox_host}}"
