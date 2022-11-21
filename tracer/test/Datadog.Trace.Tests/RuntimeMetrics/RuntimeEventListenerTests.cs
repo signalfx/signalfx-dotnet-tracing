@@ -33,7 +33,6 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
 
             listener.Refresh();
 
-            metricSender.Verify(s => s.SendDouble(MetricsNames.ContentionTime, It.IsAny<double>(), MetricType.GAUGE, null), Times.Once);
             metricSender.Verify(s => s.SendLong(MetricsNames.ContentionCount, It.IsAny<long>(), MetricType.CUMULATIVE_COUNTER, null), Times.Once);
             metricSender.Verify(s => s.SendLong(MetricsNames.ThreadPoolWorkersCount, It.IsAny<long>(), MetricType.GAUGE, null), Times.Once);
         }
