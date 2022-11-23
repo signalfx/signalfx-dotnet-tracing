@@ -27,7 +27,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("SupportsInstrumentationVerification", "True")]
         public void MetricsDisabled()
         {
-            SetEnvironmentVariable("SIGNALFX_RUNTIME_METRICS_ENABLED", "0");
+            SetEnvironmentVariable("SIGNALFX_METRICS_NetRuntime_ENABLED", "0");
             using var agent = EnvironmentHelper.GetMockAgent(useStatsD: true);
 
             using var processResult = RunSampleAndWaitForExit(agent);
@@ -76,7 +76,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
         private void RunTest()
         {
-            SetEnvironmentVariable("SIGNALFX_RUNTIME_METRICS_ENABLED", "1");
+            SetEnvironmentVariable("SIGNALFX_METRICS_NetRuntime_ENABLED", "1");
             SetInstrumentationVerification();
 
             using var agent = EnvironmentHelper.GetMockAgent(useStatsD: true);
