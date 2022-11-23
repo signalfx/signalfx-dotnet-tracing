@@ -199,12 +199,6 @@ namespace Datadog.Trace.Configuration
         public const string TracerMetricsEnabled = "SIGNALFX_TRACE_METRICS_ENABLED";
 
         /// <summary>
-        /// Configuration key for enabling or disabling runtime metrics sent to DogStatsD.
-        /// Default value is <c>false</c> (disabled).
-        /// </summary>
-        public const string RuntimeMetricsEnabled = "SIGNALFX_RUNTIME_METRICS_ENABLED";
-
-        /// <summary>
         /// Configuration key for enabling or disabling tagging Redis
         /// commands as db.statement.
         /// </summary>

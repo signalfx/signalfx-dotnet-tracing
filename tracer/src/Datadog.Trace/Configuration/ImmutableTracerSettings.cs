@@ -59,7 +59,6 @@ namespace Datadog.Trace.Configuration
             IpHeaderDisabled = settings.IpHeaderDisabled;
             TracerMetricsEnabled = settings.TracerMetricsEnabled;
             StatsComputationEnabled = settings.StatsComputationEnabled;
-            RuntimeMetricsEnabled = settings.RuntimeMetricsEnabled;
             KafkaCreateConsumerScopeEnabled = settings.KafkaCreateConsumerScopeEnabled;
             StartupDiagnosticLogEnabled = settings.StartupDiagnosticLogEnabled;
             HttpClientExcludedUrlSubstrings = settings.HttpClientExcludedUrlSubstrings;
@@ -241,12 +240,6 @@ namespace Datadog.Trace.Configuration
         /// Gets a value indicating whether the diagnostic log at startup is enabled
         /// </summary>
         public bool StartupDiagnosticLogEnabled { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether runtime metrics
-        /// are enabled and sent to DogStatsd.
-        /// </summary>
-        internal bool RuntimeMetricsEnabled { get; }
 
         /// <summary>
         /// Gets the comma separated list of url patterns to skip tracing.
