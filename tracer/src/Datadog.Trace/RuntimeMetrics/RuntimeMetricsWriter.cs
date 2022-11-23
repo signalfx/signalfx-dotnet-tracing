@@ -25,13 +25,13 @@ namespace Datadog.Trace.RuntimeMetrics
     internal class RuntimeMetricsWriter : IDisposable
     {
         private const string ProcessMetrics = $"{MetricsNames.Process.ThreadsCount}, {MetricsNames.Process.MemoryUsage}, {MetricsNames.Process.MemoryVirtual}, {MetricsNames.Process.CpuTime}, {MetricsNames.Process.CpuUtilization}";
-        
+
         private static readonly string[] CpuUserTag = new[] { "state:user" };
         private static readonly string[] CpuSystemTag = new[] { "state:system" };
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<RuntimeMetricsWriter>();
         private static readonly Func<ImmutableMetricsIntegrationSettingsCollection, ISignalFxMetricSender, TimeSpan, IRuntimeMetricsListener> InitializeListenerFunc = InitializeListener;
-            
+
         private readonly IList<Action> sendMetricsActions = new List<Action>();
 
         private readonly ImmutableMetricsIntegrationSettingsCollection _settings;
@@ -142,6 +142,27 @@ namespace Datadog.Trace.RuntimeMetrics
             }
         }
 
+        private static IRuntimeMetricsListener InitializeListener(ImmutableMetricsIntegrationSettingsCollection settings, ISignalFxMetricSender metricSender, TimeSpan delay)
+        {
+#if NETCOREAPP
+            if (settings[MetricsIntegrationId.NetRuntime].Enabled || settings[MetricsIntegrationId.AspNet].Enabled)
+            {
+                return new RuntimeEventListener(settings, metricSender, delay);
+            }
+
+            return null;
+#elif NETFRAMEWORK
+            if (settings[MetricsIntegrationId.NetRuntime].Enabled)
+            {
+                return AzureAppServices.Metadata.IsRelevant ? new AzureAppServicePerformanceCounters(metricSender) : new PerformanceCountersListener(metricSender);
+            }
+
+            return null;
+#else
+            return null;
+#endif
+        }
+
         private void SendNetRuntimeMetrics()
         {
             _listener?.Refresh();
@@ -200,27 +221,6 @@ namespace Datadog.Trace.RuntimeMetrics
             _metricSender.SendDouble(MetricsNames.Process.CpuUtilization, Math.Min(systemCpu.TotalSeconds / maximumCpu, 1D), MetricType.GAUGE, CpuSystemTag);
 
             Log.Debug("Sent the following metrics: {metrics}", ProcessMetrics);
-        }
-
-        private static IRuntimeMetricsListener InitializeListener(ImmutableMetricsIntegrationSettingsCollection settings, ISignalFxMetricSender metricSender, TimeSpan delay)
-        {
-#if NETCOREAPP
-            if (settings[MetricsIntegrationId.NetRuntime].Enabled || settings[MetricsIntegrationId.AspNet].Enabled)
-            {
-                return new RuntimeEventListener(settings, metricSender, delay);
-            }
-
-            return null;
-#elif NETFRAMEWORK
-            if (settings[MetricsIntegrationId.NetRuntime].Enabled)
-            {
-                return AzureAppServices.Metadata.IsRelevant ? new AzureAppServicePerformanceCounters(metricSender) : new PerformanceCountersListener(metricSender);
-            }
-
-            return null;
-#else
-            return null;
-#endif
         }
 
         private void FirstChanceException(object sender, FirstChanceExceptionEventArgs e)

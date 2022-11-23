@@ -178,7 +178,7 @@ namespace Datadog.Trace.RuntimeMetrics
             if (eventData.EventName == "EventCounters" && _settings[MetricsIntegrationId.AspNet].Enabled)
             {
                 ExtractCounters(eventData.Payload);
-            } 
+            }
             else if (_settings[MetricsIntegrationId.NetRuntime].Enabled)
             {
                 if (eventData.EventId == EventGcSuspendBegin)
