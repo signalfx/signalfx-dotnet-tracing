@@ -29,7 +29,8 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
         {
             var metricSender = new Mock<ISignalFxMetricSender>();
 
-            using var listener = new RuntimeEventListener(metricSender.Object, TimeSpan.FromSeconds(10));
+            var settings = SettingsGenerator.Generate();
+            using var listener = new RuntimeEventListener(settings, metricSender.Object, TimeSpan.FromSeconds(10));
 
             listener.Refresh();
 
@@ -48,7 +49,8 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
             metricSender.Setup(s => s.SendDouble(MetricsNames.NetRuntime.Gc.PauseTime, It.IsAny<double>(), MetricType.COUNTER, It.IsAny<string[]>()))
                 .Callback(() => mutex.Set());
 
-            using var listener = new RuntimeEventListener(metricSender.Object, TimeSpan.FromSeconds(10));
+            var settings = SettingsGenerator.Generate();
+            using var listener = new RuntimeEventListener(settings, metricSender.Object, TimeSpan.FromSeconds(10));
 
             metricSender.Invocations.Clear();
 
@@ -105,7 +107,9 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
             };
 
             var metricSender = new Mock<ISignalFxMetricSender>();
-            using var listener = new RuntimeEventListener(metricSender.Object, TimeSpan.FromSeconds(1));
+            var settings = SettingsGenerator.Generate();
+
+            using var listener = new RuntimeEventListener(settings, metricSender.Object, TimeSpan.FromSeconds(1));
 
             // Wait for the counters to be refreshed
             mutex.Wait();

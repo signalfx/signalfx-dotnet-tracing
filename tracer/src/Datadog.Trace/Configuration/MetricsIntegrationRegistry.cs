@@ -17,7 +17,7 @@ internal static class MetricsIntegrationRegistry
 
         Names = new string[values.Cast<int>().Max() + 1];
 
-        foreach (IntegrationId value in values)
+        foreach (MetricsIntegrationId value in values)
         {
             var name = value.ToString();
 
@@ -28,14 +28,14 @@ internal static class MetricsIntegrationRegistry
         Ids = ids;
     }
 
-    internal static string GetName(IntegrationId integration)
+    internal static string GetName(MetricsIntegrationId integration)
         => Names[(int)integration];
 
-    internal static bool TryGetIntegrationId(string integrationName, out IntegrationId integration)
+    internal static bool TryGetIntegrationId(string integrationName, out MetricsIntegrationId integration)
     {
         if (Ids.TryGetValue(integrationName, out var id))
         {
-            integration = (IntegrationId)id;
+            integration = (MetricsIntegrationId)id;
             return true;
         }
 

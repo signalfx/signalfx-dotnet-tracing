@@ -28,7 +28,8 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
             listener.Setup(l => l.Refresh())
                 .Callback(() => mutex.Set());
 
-            using (new RuntimeMetricsWriter(Mock.Of<ISignalFxMetricSender>(), TimeSpan.FromMilliseconds(10), (_, _) => listener.Object))
+            var settings = SettingsGenerator.Generate();
+            using (new RuntimeMetricsWriter(settings, Mock.Of<ISignalFxMetricSender>(), TimeSpan.FromMilliseconds(10), (_, _, _) => listener.Object))
             {
                 Assert.True(mutex.Wait(10000), "Method Refresh() wasn't called on the listener");
             }
@@ -39,8 +40,9 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
         {
             var listener = new Mock<IRuntimeMetricsListener>();
 
+            var settings = SettingsGenerator.Generate();
             var metricSender = new Mock<ISignalFxMetricSender>();
-            using var runtimeMetricsWriter = new RuntimeMetricsWriter(metricSender.Object, TimeSpan.FromSeconds(10), (_, _) => listener.Object);
+            using var runtimeMetricsWriter = new RuntimeMetricsWriter(settings, metricSender.Object, TimeSpan.FromSeconds(10), (_, _, _) => listener.Object);
 
             runtimeMetricsWriter.PushEvents();
 
@@ -57,7 +59,8 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
             var listener = new Mock<IRuntimeMetricsListener>();
 
             var metricSender = new Mock<ISignalFxMetricSender>();
-            using var runtimeMetricsWriter = new RuntimeMetricsWriter(metricSender.Object, TimeSpan.FromSeconds(10), (_, _) => listener.Object);
+            var settings = SettingsGenerator.Generate();
+            using var runtimeMetricsWriter = new RuntimeMetricsWriter(settings, metricSender.Object, TimeSpan.FromSeconds(10), (_, _, _) => listener.Object);
 
             runtimeMetricsWriter.PushEvents();
 
@@ -76,7 +79,8 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
         [Fact]
         public void ShouldSwallowFactoryExceptions()
         {
-            var writer = new RuntimeMetricsWriter(Mock.Of<ISignalFxMetricSender>(), TimeSpan.FromMilliseconds(10), (_, _) => throw new InvalidOperationException("This exception should be caught"));
+            var settings = SettingsGenerator.Generate();
+            var writer = new RuntimeMetricsWriter(settings, Mock.Of<ISignalFxMetricSender>(), TimeSpan.FromMilliseconds(10), (_, _, _) => throw new InvalidOperationException("This exception should be caught"));
             writer.Dispose();
         }
 
@@ -86,7 +90,8 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
             var metricSender = new Mock<ISignalFxMetricSender>();
             var listener = new Mock<IRuntimeMetricsListener>();
 
-            using (var writer = new RuntimeMetricsWriter(metricSender.Object, TimeSpan.FromMilliseconds(Timeout.Infinite), (_, _) => listener.Object))
+            var settings = SettingsGenerator.Generate();
+            using (var writer = new RuntimeMetricsWriter(settings, metricSender.Object, TimeSpan.FromMilliseconds(Timeout.Infinite), (_, _, _) => listener.Object))
             {
                 for (int i = 0; i < 10; i++)
                 {
@@ -147,7 +152,8 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
             var metricSender = new Mock<ISignalFxMetricSender>();
             var listener = new Mock<IRuntimeMetricsListener>();
 
-            var writer = new RuntimeMetricsWriter(metricSender.Object, TimeSpan.FromMilliseconds(Timeout.Infinite), (_, _) => listener.Object);
+            var settings = SettingsGenerator.Generate();
+            var writer = new RuntimeMetricsWriter(settings, metricSender.Object, TimeSpan.FromMilliseconds(Timeout.Infinite), (_, _, _) => listener.Object);
             writer.Dispose();
 
             listener.Verify(l => l.Dispose(), Times.Once);

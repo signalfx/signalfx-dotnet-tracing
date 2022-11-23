@@ -51,7 +51,7 @@ public class MetricsIntegrationSettingsCollection
 
         for (int i = 0; i < integrations.Length; i++)
         {
-            var name = IntegrationRegistry.Names[i];
+            var name = MetricsIntegrationRegistry.Names[i];
 
             if (name != null)
             {
