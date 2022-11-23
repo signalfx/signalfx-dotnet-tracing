@@ -200,6 +200,9 @@ namespace Datadog.Trace.Configuration
             MemoryProfilingEnabled = memoryProfilingEnabled;
             ThreadSamplingPeriod = GetThreadSamplingPeriod(source);
 
+            var profilingExportInterval = source?.GetInt32(ConfigurationKeys.AlwaysOnProfiler.ExportInterval) ?? 10000;
+            ProfilerExportInterval = TimeSpan.FromMilliseconds(profilingExportInterval);
+
             LogSubmissionSettings = new DirectLogSubmissionSettings(source);
 
             TraceMethods = source?.GetString(ConfigurationKeys.TraceMethods) ??
