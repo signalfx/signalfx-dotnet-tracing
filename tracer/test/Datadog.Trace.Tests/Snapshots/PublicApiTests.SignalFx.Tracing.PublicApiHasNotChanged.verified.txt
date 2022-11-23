@@ -106,6 +106,15 @@ namespace Datadog.Trace.Configuration
     {
         public Datadog.Trace.Configuration.ImmutableIntegrationSettings this[string integrationName] { get; }
     }
+    public class ImmutableMetricsIntegrationSettings
+    {
+        public bool Enabled { get; }
+        public string IntegrationName { get; }
+    }
+    public class ImmutableMetricsIntegrationSettingsCollection
+    {
+        public Datadog.Trace.Configuration.ImmutableMetricsIntegrationSettings this[string integrationName] { get; }
+    }
     public class ImmutableTracerSettings
     {
         public ImmutableTracerSettings(Datadog.Trace.Configuration.IConfigurationSource source) { }
@@ -128,6 +137,7 @@ namespace Datadog.Trace.Configuration
         public bool LogsInjectionEnabled { get; }
         public int MaxTracesSubmittedPerSecond { get; }
         public bool MemoryProfilingEnabled { get; }
+        public Datadog.Trace.Configuration.ImmutableMetricsIntegrationSettingsCollection MetricsIntegrations { get; }
         public int RecordedValueMaxLength { get; }
         public string ServiceName { get; }
         public string ServiceVersion { get; }
@@ -162,6 +172,17 @@ namespace Datadog.Trace.Configuration
         public T GetValue<T>(string key) { }
         public override string ToString() { }
         public static Datadog.Trace.Configuration.JsonConfigurationSource FromFile(string filename) { }
+    }
+    public class MetricsIntegrationSettings
+    {
+        public MetricsIntegrationSettings(string integrationName, Datadog.Trace.Configuration.IConfigurationSource source) { }
+        public bool Enabled { get; set; }
+        public string IntegrationName { get; }
+    }
+    public class MetricsIntegrationSettingsCollection
+    {
+        public MetricsIntegrationSettingsCollection(Datadog.Trace.Configuration.IConfigurationSource source) { }
+        public Datadog.Trace.Configuration.MetricsIntegrationSettings this[string integrationName] { get; }
     }
     public class NameValueConfigurationSource : Datadog.Trace.Configuration.StringConfigurationSource
     {
@@ -203,6 +224,7 @@ namespace Datadog.Trace.Configuration
         public bool KafkaCreateConsumerScopeEnabled { get; set; }
         public bool LogsInjectionEnabled { get; set; }
         public int MaxTracesSubmittedPerSecond { get; set; }
+        public Datadog.Trace.Configuration.MetricsIntegrationSettingsCollection MetricsIntegrations { get; }
         public int RecordedValueMaxLength { get; set; }
         public bool RuntimeMetricsEnabled { get; set; }
         public string ServiceName { get; set; }
