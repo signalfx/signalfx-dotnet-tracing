@@ -354,8 +354,18 @@ namespace Datadog.Trace
                     writer.WritePropertyName("log_injection_enabled");
                     writer.WriteValue(instanceSettings.LogsInjectionEnabled);
 
-                    writer.WritePropertyName("runtime_metrics_enabled");
-                    writer.WriteValue(instanceSettings.RuntimeMetricsEnabled);
+                    writer.WritePropertyName("enabled_metrics_integrations");
+                    writer.WriteStartArray();
+
+                    foreach (var integration in instanceSettings.MetricsIntegrations.Settings)
+                    {
+                        if (integration.Enabled)
+                        {
+                            writer.WriteValue(integration.IntegrationName);
+                        }
+                    }
+
+                    writer.WriteEndArray();
 
                     writer.WritePropertyName("disabled_integrations");
                     writer.WriteStartArray();
