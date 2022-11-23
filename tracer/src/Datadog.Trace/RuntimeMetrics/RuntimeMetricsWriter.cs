@@ -107,7 +107,7 @@ namespace Datadog.Trace.RuntimeMetrics
                 _listener?.Refresh();
 
                 GcMetrics.PushCollectionCounts(_metricSender);
-                _metricSender.SendLong(MetricsNames.Gc.TotalObjectsSize, GC.GetTotalMemory(false), MetricType.GAUGE);
+                _metricSender.SendLong(MetricsNames.NetRuntime.Gc.TotalObjectsSize, GC.GetTotalMemory(false), MetricType.GAUGE);
 
                 if (_enableProcessMetrics)
                 {
@@ -142,18 +142,18 @@ namespace Datadog.Trace.RuntimeMetrics
                 {
                     foreach (var element in _exceptionCounts)
                     {
-                        _metricSender.SendLong(MetricsNames.ExceptionsCount, element.Value, MetricType.COUNTER, new[] { $"exception_type:{element.Key}" });
+                        _metricSender.SendLong(MetricsNames.NetRuntime.ExceptionsCount, element.Value, MetricType.COUNTER, new[] { $"exception_type:{element.Key}" });
                     }
 
                     // There's a race condition where we could clear items that haven't been pushed
                     // Having an exact exception count is probably not worth the overhead required to fix it
                     _exceptionCounts.Clear();
 
-                    Log.Debug("Sent the following metrics: {metrics}", MetricsNames.ExceptionsCount);
+                    Log.Debug("Sent the following metrics: {metrics}", MetricsNames.NetRuntime.ExceptionsCount);
                 }
                 else
                 {
-                    Log.Debug("Did not send the following metrics: {metrics}", MetricsNames.ExceptionsCount);
+                    Log.Debug("Did not send the following metrics: {metrics}", MetricsNames.NetRuntime.ExceptionsCount);
                 }
             }
             catch (Exception ex)

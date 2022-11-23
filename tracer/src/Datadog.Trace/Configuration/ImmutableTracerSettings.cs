@@ -51,6 +51,7 @@ namespace Datadog.Trace.Configuration
             CustomSamplingRules = settings.CustomSamplingRules;
             GlobalSamplingRate = settings.GlobalSamplingRate;
             Integrations = new ImmutableIntegrationSettingsCollection(settings.Integrations, settings.DisabledIntegrationNames);
+            MetricsIntegrations = new ImmutableMetricsIntegrationSettingsCollection(settings.MetricsIntegrations);
             GlobalTags = new ReadOnlyDictionary<string, string>(settings.GlobalTags);
             HeaderTags = new ReadOnlyDictionary<string, string>(settings.HeaderTags);
             GrpcTags = new ReadOnlyDictionary<string, string>(settings.GrpcTags);
@@ -185,6 +186,11 @@ namespace Datadog.Trace.Configuration
         /// Gets a collection of <see cref="Integrations"/> keyed by integration name.
         /// </summary>
         public ImmutableIntegrationSettingsCollection Integrations { get; }
+
+        /// <summary>
+        /// Gets a collection of <see cref="Integrations"/> keyed by integration name.
+        /// </summary>
+        public ImmutableMetricsIntegrationSettingsCollection MetricsIntegrations { get; }
 
         /// <summary>
         /// Gets the global tags, which are applied to all <see cref="Span"/>s.

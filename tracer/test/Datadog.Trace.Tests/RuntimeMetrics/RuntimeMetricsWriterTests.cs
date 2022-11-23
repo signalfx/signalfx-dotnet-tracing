@@ -44,11 +44,11 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
 
             runtimeMetricsWriter.PushEvents();
 
-            metricSender.Verify(s => s.SendLong(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), MetricType.CUMULATIVE_COUNTER, new[] { "generation:gen0" }), Times.AtLeastOnce);
-            metricSender.Verify(s => s.SendLong(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), MetricType.CUMULATIVE_COUNTER, new[] { "generation:gen1" }), Times.AtLeastOnce);
-            metricSender.Verify(s => s.SendLong(MetricsNames.Gc.CollectionsCount, It.IsAny<long>(), MetricType.CUMULATIVE_COUNTER, new[] { "generation:gen2" }), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendLong(MetricsNames.NetRuntime.Gc.CollectionsCount, It.IsAny<long>(), MetricType.CUMULATIVE_COUNTER, new[] { "generation:gen0" }), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendLong(MetricsNames.NetRuntime.Gc.CollectionsCount, It.IsAny<long>(), MetricType.CUMULATIVE_COUNTER, new[] { "generation:gen1" }), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendLong(MetricsNames.NetRuntime.Gc.CollectionsCount, It.IsAny<long>(), MetricType.CUMULATIVE_COUNTER, new[] { "generation:gen2" }), Times.AtLeastOnce);
 
-            metricSender.Verify(s => s.SendLong(MetricsNames.Gc.TotalObjectsSize, It.IsAny<long>(), MetricType.GAUGE, It.IsAny<string[]>()), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendLong(MetricsNames.NetRuntime.Gc.TotalObjectsSize, It.IsAny<long>(), MetricType.GAUGE, It.IsAny<string[]>()), Times.AtLeastOnce);
         }
 
         [Fact]
@@ -113,17 +113,17 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
                 }
 
                 metricSender.Verify(
-                    s => s.SendLong(MetricsNames.ExceptionsCount, It.IsAny<int>(), MetricType.COUNTER, It.IsAny<string[]>()),
+                    s => s.SendLong(MetricsNames.NetRuntime.ExceptionsCount, It.IsAny<int>(), MetricType.COUNTER, It.IsAny<string[]>()),
                     Times.Never);
 
                 writer.PushEvents();
 
                 metricSender.Verify(
-                    s => s.SendLong(MetricsNames.ExceptionsCount, 10, MetricType.COUNTER, new[] { "exception_type:CustomException1" }),
+                    s => s.SendLong(MetricsNames.NetRuntime.ExceptionsCount, 10, MetricType.COUNTER, new[] { "exception_type:CustomException1" }),
                     Times.Once);
 
                 metricSender.Verify(
-                    s => s.SendLong(MetricsNames.ExceptionsCount, 5, MetricType.COUNTER, new[] { "exception_type:CustomException2" }),
+                    s => s.SendLong(MetricsNames.NetRuntime.ExceptionsCount, 5, MetricType.COUNTER, new[] { "exception_type:CustomException2" }),
                     Times.Once);
 
                 metricSender.Invocations.Clear();
@@ -132,11 +132,11 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
                 writer.PushEvents();
 
                 metricSender.Verify(
-                    s => s.SendLong(MetricsNames.ExceptionsCount, It.IsAny<int>(), MetricType.COUNTER, new[] { "exception_type:CustomException1" }),
+                    s => s.SendLong(MetricsNames.NetRuntime.ExceptionsCount, It.IsAny<int>(), MetricType.COUNTER, new[] { "exception_type:CustomException1" }),
                     Times.Never);
 
                 metricSender.Verify(
-                    s => s.SendLong(MetricsNames.ExceptionsCount, It.IsAny<int>(), MetricType.COUNTER, new[] { "exception_type:CustomException2" }),
+                    s => s.SendLong(MetricsNames.NetRuntime.ExceptionsCount, It.IsAny<int>(), MetricType.COUNTER, new[] { "exception_type:CustomException2" }),
                     Times.Never);
             }
         }

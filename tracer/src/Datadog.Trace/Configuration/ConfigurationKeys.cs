@@ -515,6 +515,17 @@ namespace Datadog.Trace.Configuration
             public const string AnalyticsSampleRate = "SIGNALFX_TRACE_{0}_ANALYTICS_SAMPLE_RATE";
         }
 
+        /// <summary>
+        /// String format patterns used to match metrics integration-specific configuration keys.
+        /// </summary>
+        public static class Metrics
+        {
+            /// <summary>
+            /// Configuration key pattern for enabling or disabling a metric integration.
+            /// </summary>
+            public const string Enabled = "SIGNALFX_METRICS_{0}_ENABLED";
+        }
+
         internal static class FeatureFlags
         {
             /// <summary>

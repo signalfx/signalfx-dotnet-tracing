@@ -35,10 +35,10 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
 
             listener.Refresh();
 
-            statsd.Verify(s => s.SendLong(MetricsNames.Gc.HeapSize, expectedGen0HeapSize, MetricType.GAUGE, new[] { "generation:gen0" }), Times.Once);
-            statsd.Verify(s => s.SendLong(MetricsNames.Gc.HeapSize, expectedGen1HeapSize, MetricType.GAUGE, new[] { "generation:gen1" }), Times.Once);
-            statsd.Verify(s => s.SendLong(MetricsNames.Gc.HeapSize, expectedGen2HeapSize, MetricType.GAUGE, new[] { "generation:gen2" }), Times.Once);
-            statsd.Verify(s => s.SendLong(MetricsNames.Gc.HeapSize, expectedLohHeapSize, MetricType.GAUGE, new[] { "generation:loh" }), Times.Once);
+            statsd.Verify(s => s.SendLong(MetricsNames.NetRuntime.Gc.HeapSize, expectedGen0HeapSize, MetricType.GAUGE, new[] { "generation:gen0" }), Times.Once);
+            statsd.Verify(s => s.SendLong(MetricsNames.NetRuntime.Gc.HeapSize, expectedGen1HeapSize, MetricType.GAUGE, new[] { "generation:gen1" }), Times.Once);
+            statsd.Verify(s => s.SendLong(MetricsNames.NetRuntime.Gc.HeapSize, expectedGen2HeapSize, MetricType.GAUGE, new[] { "generation:gen2" }), Times.Once);
+            statsd.Verify(s => s.SendLong(MetricsNames.NetRuntime.Gc.HeapSize, expectedLohHeapSize, MetricType.GAUGE, new[] { "generation:loh" }), Times.Once);
 
             statsd.VerifyNoOtherCalls();
         }

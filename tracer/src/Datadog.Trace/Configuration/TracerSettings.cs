@@ -79,6 +79,8 @@ namespace Datadog.Trace.Configuration
 
             Integrations = new IntegrationSettingsCollection(source);
 
+            MetricsIntegrations = new MetricsIntegrationSettingsCollection(source);
+
             ExporterSettings = new ExporterSettings(source);
 
 #pragma warning disable 618 // App analytics is deprecated, but still used
@@ -341,6 +343,11 @@ namespace Datadog.Trace.Configuration
         /// Gets a collection of <see cref="Integrations"/> keyed by integration name.
         /// </summary>
         public IntegrationSettingsCollection Integrations { get; }
+
+        /// <summary>
+        /// Gets a collection of <see cref="MetricsIntegrations"/> keyed by metric integration name.
+        /// </summary>
+        public MetricsIntegrationSettingsCollection MetricsIntegrations { get; }
 
         /// <summary>
         /// Gets or sets the global tags, which are applied to all <see cref="Span"/>s.

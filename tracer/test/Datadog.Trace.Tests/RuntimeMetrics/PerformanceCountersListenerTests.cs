@@ -30,12 +30,12 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
 
             listener.Refresh();
 
-            statsd.Verify(s => s.SendLong(MetricsNames.Gc.HeapSize, It.IsAny<long>(), MetricType.GAUGE, new[] { "generation:gen0" }), Times.Once);
-            statsd.Verify(s => s.SendLong(MetricsNames.Gc.HeapSize, It.IsAny<long>(), MetricType.GAUGE, new[] { "generation:gen1" }), Times.Once);
-            statsd.Verify(s => s.SendLong(MetricsNames.Gc.HeapSize, It.IsAny<long>(), MetricType.GAUGE, new[] { "generation:gen2" }), Times.Once);
-            statsd.Verify(s => s.SendLong(MetricsNames.Gc.HeapSize, It.IsAny<long>(), MetricType.GAUGE, new[] { "generation:loh" }), Times.Once);
+            statsd.Verify(s => s.SendLong(MetricsNames.NetRuntime.Gc.HeapSize, It.IsAny<long>(), MetricType.GAUGE, new[] { "generation:gen0" }), Times.Once);
+            statsd.Verify(s => s.SendLong(MetricsNames.NetRuntime.Gc.HeapSize, It.IsAny<long>(), MetricType.GAUGE, new[] { "generation:gen1" }), Times.Once);
+            statsd.Verify(s => s.SendLong(MetricsNames.NetRuntime.Gc.HeapSize, It.IsAny<long>(), MetricType.GAUGE, new[] { "generation:gen2" }), Times.Once);
+            statsd.Verify(s => s.SendLong(MetricsNames.NetRuntime.Gc.HeapSize, It.IsAny<long>(), MetricType.GAUGE, new[] { "generation:loh" }), Times.Once);
 
-            statsd.Verify(s => s.SendLong(MetricsNames.ContentionCount, It.IsAny<long>(), MetricType.CUMULATIVE_COUNTER, It.IsAny<string[]>()), Times.Once);
+            statsd.Verify(s => s.SendLong(MetricsNames.NetRuntime.ContentionCount, It.IsAny<long>(), MetricType.CUMULATIVE_COUNTER, It.IsAny<string[]>()), Times.Once);
 
             statsd.VerifyNoOtherCalls();
         }
