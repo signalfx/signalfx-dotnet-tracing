@@ -9,6 +9,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Runtime.ExceptionServices;
 using System.Threading;
+using Datadog.Trace.Configuration;
 using Datadog.Trace.Logging;
 using Datadog.Trace.PlatformHelpers;
 using Datadog.Trace.SignalFx.Metrics;
@@ -21,13 +22,14 @@ namespace Datadog.Trace.RuntimeMetrics
     internal class RuntimeMetricsWriter : IDisposable
     {
         private const string ProcessMetrics = $"{MetricsNames.Process.ThreadsCount}, {MetricsNames.Process.MemoryUsage}, {MetricsNames.Process.MemoryVirtual}, {MetricsNames.Process.CpuTime}, {MetricsNames.Process.CpuUtilization}";
-
+        
         private static readonly string[] CpuUserTag = new[] { "state:user" };
         private static readonly string[] CpuSystemTag = new[] { "state:system" };
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<RuntimeMetricsWriter>();
-        private static readonly Func<ISignalFxMetricSender, TimeSpan, IRuntimeMetricsListener> InitializeListenerFunc = InitializeListener;
+        private static readonly Func<ImmutableMetricsIntegrationSettingsCollection, ISignalFxMetricSender, TimeSpan, IRuntimeMetricsListener> InitializeListenerFunc = InitializeListener;
 
+        private readonly ImmutableMetricsIntegrationSettingsCollection _settings;
         private readonly TimeSpan _delay;
 
         private readonly ISignalFxMetricSender _metricSender;
@@ -42,13 +44,19 @@ namespace Datadog.Trace.RuntimeMetrics
         private TimeSpan _previousUserCpu;
         private TimeSpan _previousSystemCpu;
 
-        public RuntimeMetricsWriter(ISignalFxMetricSender metricSender, TimeSpan delay)
-            : this(metricSender, delay, InitializeListenerFunc)
+        public RuntimeMetricsWriter(ImmutableMetricsIntegrationSettingsCollection settings, ISignalFxMetricSender metricSender, TimeSpan delay)
+            : this(settings, metricSender, delay, InitializeListenerFunc)
         {
         }
 
-        internal RuntimeMetricsWriter(ISignalFxMetricSender metricSender, TimeSpan delay, Func<ISignalFxMetricSender, TimeSpan, IRuntimeMetricsListener> initializeListener)
+        internal RuntimeMetricsWriter(
+            ImmutableMetricsIntegrationSettingsCollection settings,
+            ISignalFxMetricSender metricSender,
+            TimeSpan delay,
+            Func<ImmutableMetricsIntegrationSettingsCollection, ISignalFxMetricSender, TimeSpan, IRuntimeMetricsListener> initializeListener)
         {
+            _settings = settings;
+
             _delay = delay;
             _metricSender = metricSender;
             _timer = new Timer(_ => PushEvents(), null, delay, delay);
@@ -79,7 +87,7 @@ namespace Datadog.Trace.RuntimeMetrics
 
             try
             {
-                _listener = initializeListener(metricSender, delay);
+                _listener = initializeListener(_settings, metricSender, delay);
             }
             catch (Exception ex)
             {
@@ -104,12 +112,33 @@ namespace Datadog.Trace.RuntimeMetrics
         {
             try
             {
-                _listener?.Refresh();
+                if (_settings[MetricsIntegrationId.NetRuntime].Enabled)
+                {
+                    _listener?.Refresh();
 
-                GcMetrics.PushCollectionCounts(_metricSender);
-                _metricSender.SendLong(MetricsNames.NetRuntime.Gc.TotalObjectsSize, GC.GetTotalMemory(false), MetricType.GAUGE);
+                    GcMetrics.PushCollectionCounts(_metricSender);
+                    _metricSender.SendLong(MetricsNames.NetRuntime.Gc.TotalObjectsSize, GC.GetTotalMemory(false), MetricType.GAUGE);
 
-                if (_enableProcessMetrics)
+                    if (!_exceptionCounts.IsEmpty)
+                    {
+                        foreach (var element in _exceptionCounts)
+                        {
+                            _metricSender.SendLong(MetricsNames.NetRuntime.ExceptionsCount, element.Value, MetricType.COUNTER, new[] { $"exception_type:{element.Key}" });
+                        }
+
+                        // There's a race condition where we could clear items that haven't been pushed
+                        // Having an exact exception count is probably not worth the overhead required to fix it
+                        _exceptionCounts.Clear();
+
+                        Log.Debug("Sent the following metrics: {metrics}", MetricsNames.NetRuntime.ExceptionsCount);
+                    }
+                    else
+                    {
+                        Log.Debug("Did not send the following metrics: {metrics}", MetricsNames.NetRuntime.ExceptionsCount);
+                    }
+                }
+
+                if (_settings[MetricsIntegrationId.Process].Enabled && _enableProcessMetrics)
                 {
                     ProcessHelpers.GetCurrentProcessRuntimeMetrics(out var newUserCpu, out var newSystemCpu, out var threadCount, out var virtualMemory, out var workingSet);
 
@@ -137,24 +166,6 @@ namespace Datadog.Trace.RuntimeMetrics
 
                     Log.Debug("Sent the following metrics: {metrics}", ProcessMetrics);
                 }
-
-                if (!_exceptionCounts.IsEmpty)
-                {
-                    foreach (var element in _exceptionCounts)
-                    {
-                        _metricSender.SendLong(MetricsNames.NetRuntime.ExceptionsCount, element.Value, MetricType.COUNTER, new[] { $"exception_type:{element.Key}" });
-                    }
-
-                    // There's a race condition where we could clear items that haven't been pushed
-                    // Having an exact exception count is probably not worth the overhead required to fix it
-                    _exceptionCounts.Clear();
-
-                    Log.Debug("Sent the following metrics: {metrics}", MetricsNames.NetRuntime.ExceptionsCount);
-                }
-                else
-                {
-                    Log.Debug("Did not send the following metrics: {metrics}", MetricsNames.NetRuntime.ExceptionsCount);
-                }
             }
             catch (Exception ex)
             {
@@ -162,12 +173,22 @@ namespace Datadog.Trace.RuntimeMetrics
             }
         }
 
-        private static IRuntimeMetricsListener InitializeListener(ISignalFxMetricSender metricSender, TimeSpan delay)
+        private static IRuntimeMetricsListener InitializeListener(ImmutableMetricsIntegrationSettingsCollection settings, ISignalFxMetricSender metricSender, TimeSpan delay)
         {
 #if NETCOREAPP
-            return new RuntimeEventListener(metricSender, delay);
+            if (settings[MetricsIntegrationId.NetRuntime].Enabled || settings[MetricsIntegrationId.AspNet].Enabled)
+            {
+                return new RuntimeEventListener(settings, metricSender, delay);
+            }
+
+            return null;
 #elif NETFRAMEWORK
-            return AzureAppServices.Metadata.IsRelevant ? new AzureAppServicePerformanceCounters(metricSender) : new PerformanceCountersListener(metricSender);
+            if (settings[MetricsIntegrationId.NetRuntime].Enabled)
+            {
+                return AzureAppServices.Metadata.IsRelevant ? new AzureAppServicePerformanceCounters(metricSender) : new PerformanceCountersListener(metricSender);
+            }
+
+            return null;
 #else
             return null;
 #endif

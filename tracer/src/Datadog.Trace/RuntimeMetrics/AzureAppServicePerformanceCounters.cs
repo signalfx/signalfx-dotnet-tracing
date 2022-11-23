@@ -7,12 +7,10 @@
 
 #if NETFRAMEWORK
 
-using System;
 using Datadog.Trace.Logging;
 using Datadog.Trace.SignalFx.Metrics;
 using Datadog.Trace.Util;
 using Datadog.Trace.Vendors.Newtonsoft.Json;
-using Datadog.Trace.Vendors.StatsdClient;
 using MetricType = Datadog.Tracer.SignalFx.Metrics.Protobuf.MetricType;
 
 namespace Datadog.Trace.RuntimeMetrics

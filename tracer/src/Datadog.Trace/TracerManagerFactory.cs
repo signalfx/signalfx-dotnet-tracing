@@ -118,7 +118,7 @@ namespace Datadog.Trace
             if (settings.MetricsIntegrations.Settings.Any(s => s.Enabled) && !DistributedTracer.Instance.IsChildTracer)
             {
                 metricSender ??= CreateMetricSender(settings, defaultServiceName);
-                runtimeMetrics ??= new RuntimeMetricsWriter(metricSender, TimeSpan.FromSeconds(10));
+                runtimeMetrics ??= new RuntimeMetricsWriter(settings.MetricsIntegrations, metricSender, TimeSpan.FromSeconds(10));
             }
 
             logSubmissionManager = DirectLogSubmissionManager.Create(

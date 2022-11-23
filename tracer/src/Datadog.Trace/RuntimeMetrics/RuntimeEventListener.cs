@@ -12,6 +12,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics.Tracing;
 using System.Reflection;
 using System.Threading;
+using Datadog.Trace.Configuration;
 using Datadog.Trace.Logging;
 using Datadog.Trace.SignalFx.Metrics;
 using Datadog.Tracer.SignalFx.Metrics.Protobuf;
@@ -48,6 +49,7 @@ namespace Datadog.Trace.RuntimeMetrics
 
         private readonly string _delayInSeconds;
 
+        private readonly ImmutableMetricsIntegrationSettingsCollection _settings;
         private readonly ISignalFxMetricSender _metricSender;
         private DateTime? _gcStart;
 
@@ -74,8 +76,9 @@ namespace Datadog.Trace.RuntimeMetrics
 #endif
         }
 
-        public RuntimeEventListener(ISignalFxMetricSender metricSender, TimeSpan delay)
+        public RuntimeEventListener(ImmutableMetricsIntegrationSettingsCollection settings, ISignalFxMetricSender metricSender, TimeSpan delay)
         {
+            _settings = settings;
             _metricSender = metricSender;
             _delayInSeconds = ((int)delay.TotalSeconds).ToString();
 
@@ -160,7 +163,7 @@ namespace Datadog.Trace.RuntimeMetrics
         private void HandleEvent(EventWrittenEventArgs eventData)
         {
 #if !NET6_0_OR_GREATER
-            if (eventData.EventId == EventGcHeapStats)
+            if (eventData.EventId == EventGcHeapStats && _settings[MetricsIntegrationId.NetRuntime].Enabled)
             {
                 var stats = HeapStats.FromPayload(eventData.Payload);
 
@@ -172,31 +175,34 @@ namespace Datadog.Trace.RuntimeMetrics
             }
 #endif
 
-            if (eventData.EventName == "EventCounters")
+            if (eventData.EventName == "EventCounters" && _settings[MetricsIntegrationId.AspNet].Enabled)
             {
                 ExtractCounters(eventData.Payload);
-            }
-            else if (eventData.EventId == EventGcSuspendBegin)
+            } 
+            else if (_settings[MetricsIntegrationId.NetRuntime].Enabled)
             {
-                // event is generated also for non-gc related suspends
-                // verify suspend reason before setting _gcStart field
-                var suspendReason = (uint)eventData.Payload[0];
-                if (suspendReason == SuspendForGc || suspendReason == SuspendForGcPrep)
+                if (eventData.EventId == EventGcSuspendBegin)
                 {
-                    _gcStart = eventData.TimeStamp;
+                    // event is generated also for non-gc related suspends
+                    // verify suspend reason before setting _gcStart field
+                    var suspendReason = (uint)eventData.Payload[0];
+                    if (suspendReason == SuspendForGc || suspendReason == SuspendForGcPrep)
+                    {
+                        _gcStart = eventData.TimeStamp;
+                    }
                 }
-            }
-            else if (eventData.EventId == EventGcRestartEnd)
-            {
-                var start = _gcStart;
-
-                // for etw it was possible to miss some events
-                // set to null to avoid bogus data
-                _gcStart = null;
-
-                if (start != null)
+                else if (eventData.EventId == EventGcRestartEnd)
                 {
-                    _metricSender.SendDouble(MetricsNames.NetRuntime.Gc.PauseTime, (eventData.TimeStamp - start.Value).TotalMilliseconds, MetricType.COUNTER);
+                    var start = _gcStart;
+
+                    // for etw it was possible to miss some events
+                    // set to null to avoid bogus data
+                    _gcStart = null;
+
+                    if (start != null)
+                    {
+                        _metricSender.SendDouble(MetricsNames.NetRuntime.Gc.PauseTime, (eventData.TimeStamp - start.Value).TotalMilliseconds, MetricType.COUNTER);
+                    }
                 }
             }
         }

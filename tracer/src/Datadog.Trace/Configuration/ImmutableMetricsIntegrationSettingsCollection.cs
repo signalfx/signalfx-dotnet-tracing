@@ -46,7 +46,7 @@ public class ImmutableMetricsIntegrationSettingsCollection
             }
         }
 
-        internal ImmutableMetricsIntegrationSettings this[IntegrationId integration]
+        internal ImmutableMetricsIntegrationSettings this[MetricsIntegrationId integration]
             => Settings[(int)integration];
 
         private static ImmutableMetricsIntegrationSettings[] GetIntegrationSettingsById(
