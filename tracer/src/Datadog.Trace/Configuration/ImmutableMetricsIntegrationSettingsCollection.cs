@@ -1,4 +1,5 @@
-﻿using Datadog.Trace.Logging;
+﻿using System;
+using Datadog.Trace.Logging;
 
 namespace Datadog.Trace.Configuration;
 
@@ -13,10 +14,12 @@ public class ImmutableMetricsIntegrationSettingsCollection
         /// Initializes a new instance of the <see cref="ImmutableMetricsIntegrationSettingsCollection"/> class.
         /// </summary>
         /// <param name="settings">The <see cref="MetricsIntegrationSettingsCollection"/> to populate the immutable settings.</param>
+        /// <param name="memoryProfilingEnabled"> Indicates if the memory profiling was enabled.</param>
         internal ImmutableMetricsIntegrationSettingsCollection(
-            MetricsIntegrationSettingsCollection settings)
+            MetricsIntegrationSettingsCollection settings,
+            bool memoryProfilingEnabled)
         {
-            Settings = GetIntegrationSettingsById(settings);
+            Settings = GetIntegrationSettingsById(settings, memoryProfilingEnabled);
         }
 
         internal ImmutableMetricsIntegrationSettings[] Settings { get; }
@@ -47,11 +50,19 @@ public class ImmutableMetricsIntegrationSettingsCollection
             => Settings[(int)integration];
 
         private static ImmutableMetricsIntegrationSettings[] GetIntegrationSettingsById(
-            MetricsIntegrationSettingsCollection settings)
+            MetricsIntegrationSettingsCollection settings,
+            bool memoryProfilingEnabled)
         {
             var integrations = new ImmutableMetricsIntegrationSettings[settings.Settings.Length];
             for (var i = 0; i < integrations.Length; i++)
             {
+                // if the memory profiling is enabled runtime metrics have to be enabled.
+                if (memoryProfilingEnabled &&
+                    settings.Settings[i].IntegrationName.Equals(MetricsIntegrationId.NetRuntime.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                {
+                    settings.Settings[i].Enabled = true;
+                }
+
                 integrations[i] = new ImmutableMetricsIntegrationSettings(settings.Settings[i]);
             }
 

@@ -26,7 +26,7 @@ public class MetricsIntegrationSettings
             return;
         }
 
-        Enabled = source.GetBool(string.Format(ConfigurationKeys.Metrics.Enabled, integrationName));
+        Enabled = source.GetBool(string.Format(ConfigurationKeys.Metrics.Enabled, integrationName)) ?? false;
     }
 
     /// <summary>
@@ -35,8 +35,8 @@ public class MetricsIntegrationSettings
     public string IntegrationName { get; }
 
     /// <summary>
-    /// Gets a value indicating whether
+    /// Gets or sets a value indicating whether
     /// this integration is enabled.
     /// </summary>
-    public bool? Enabled { get; }
+    public bool Enabled { get; set; }
 }

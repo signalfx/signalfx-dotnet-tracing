@@ -30,5 +30,5 @@ public class ImmutableMetricsIntegrationSettings
     /// Gets a value indicating whether
     /// this integration is enabled.
     /// </summary>
-    public bool? Enabled { get; }
+    public bool Enabled { get; }
 }

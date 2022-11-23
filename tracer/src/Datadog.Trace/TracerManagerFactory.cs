@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using Datadog.Trace.Abstractions;
@@ -114,7 +115,7 @@ namespace Datadog.Trace
             agentWriter ??= GetAgentWriter(settings, statsd, sampler);
             scopeManager ??= new AsyncLocalScopeManager(settings.CpuProfilingEnabled && FrameworkDescription.Instance.SupportsCpuProfiling());
 
-            if (settings.RuntimeMetricsEnabled && !DistributedTracer.Instance.IsChildTracer)
+            if (settings.MetricsIntegrations.Settings.Any(s => s.Enabled) && !DistributedTracer.Instance.IsChildTracer)
             {
                 metricSender ??= CreateMetricSender(settings, defaultServiceName);
                 runtimeMetrics ??= new RuntimeMetricsWriter(metricSender, TimeSpan.FromSeconds(10));

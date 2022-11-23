@@ -51,7 +51,7 @@ namespace Datadog.Trace.Configuration
             CustomSamplingRules = settings.CustomSamplingRules;
             GlobalSamplingRate = settings.GlobalSamplingRate;
             Integrations = new ImmutableIntegrationSettingsCollection(settings.Integrations, settings.DisabledIntegrationNames);
-            MetricsIntegrations = new ImmutableMetricsIntegrationSettingsCollection(settings.MetricsIntegrations);
+            MetricsIntegrations = new ImmutableMetricsIntegrationSettingsCollection(settings.MetricsIntegrations, settings.MemoryProfilingEnabled);
             GlobalTags = new ReadOnlyDictionary<string, string>(settings.GlobalTags);
             HeaderTags = new ReadOnlyDictionary<string, string>(settings.HeaderTags);
             GrpcTags = new ReadOnlyDictionary<string, string>(settings.GrpcTags);
