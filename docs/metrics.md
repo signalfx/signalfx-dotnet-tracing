@@ -37,7 +37,7 @@ implementation from the [Runtime](https://github.com/open-telemetry/opentelemetr
 
 ## Process metrics
 
-Names and metric structure of the metrics exported are aligned with the OpenTelemetry implementation from the [Process](https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/926386e68c9066e8032853e8309abdf4088d8dca/src/OpenTelemetry.Instrumentation.Process) package.
+Names and metric structure of the metrics exported are aligned with the OpenTelemetryimplementation from the [Process](https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/926386e68c9066e8032853e8309abdf4088d8dca/src/OpenTelemetry.Instrumentation.Process) package.
 
 | Metric                               | Description                                                                                                                         | Type              |
 |:-------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------|:------------------|
@@ -51,13 +51,13 @@ Names and metric structure of the metrics exported are aligned with the OpenTele
 
 | Metric                                                  | Description                                                                                                                       | Type               |
 |:--------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------|:-------------------|
-| `runtime.dotnet.aspnetcore.connections.current`         | The current number of active HTTP connections to the web server. (.NET Core only)                                                 | Gauge              |
-| `runtime.dotnet.aspnetcore.connections.queue_length`    | The current length of the HTTP connection queue. (.NET Core only)                                                                 | Gauge              |
-| `runtime.dotnet.aspnetcore.connections.total`           | The total number of HTTP connections to the web server. (.NET Core only)                                                          | Gauge              |
-| `runtime.dotnet.aspnetcore.requests.current`            | The current number of HTTP requests that have started, but not yet stopped. (.NET Core only)                                      | Gauge              |
-| `runtime.dotnet.aspnetcore.requests.failed`             | The number of failed HTTP requests received by the server. (.NET Core only)                                                       | Gauge              |
-| `runtime.dotnet.aspnetcore.requests.queue_length`       | The current length of the HTTP request queue.                                                                                     | Gauge              |
-| `runtime.dotnet.aspnetcore.requests.total`              | The total number of HTTP requests received by the server. (.NET Core only)                                                        | Gauge              |
+| `signalfx.dotnet.aspnetcore.connections.current`         | The current number of active HTTP connections to the web server. (.NET Core only)                                                 | Gauge              |
+| `signalfx.dotnet.aspnetcore.connections.queue_length`    | The current length of the HTTP connection queue. (.NET Core only)                                                                 | Gauge              |
+| `signalfx.dotnet.aspnetcore.connections.total`           | The total number of HTTP connections to the web server. (.NET Core only)                                                          | Gauge              |
+| `signalfx.dotnet.aspnetcore.requests.current`            | The current number of HTTP requests that have started, but not yet stopped. (.NET Core only)                                      | Gauge              |
+| `signalfx.dotnet.aspnetcore.requests.failed`             | The number of failed HTTP requests received by the server. (.NET Core only)                                                       | Gauge              |
+| `signalfx.dotnet.aspnetcore.requests.queue_length`       | The current length of the HTTP request queue.                                                                                     | Gauge              |
+| `signalfx.dotnet.aspnetcore.requests.total`              | The total number of HTTP requests received by the server. (.NET Core only)                                                        | Gauge              |
 
 ## Additional permissions for IIS
 

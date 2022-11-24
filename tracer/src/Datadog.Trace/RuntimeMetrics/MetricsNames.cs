@@ -11,15 +11,15 @@ namespace Datadog.Trace.RuntimeMetrics
     {
         internal static class AspNet
         {
-            public const string CoreCurrentRequests = "runtime.dotnet.aspnetcore.requests.current";
+            public const string CoreCurrentRequests = "signalfx.dotnet.aspnetcore.requests.current";
 
-            public const string CoreFailedRequests = "runtime.dotnet.aspnetcore.requests.failed";
-            public const string CoreTotalRequests = "runtime.dotnet.aspnetcore.requests.total";
-            public const string CoreRequestQueueLength = "runtime.dotnet.aspnetcore.requests.queue_length";
+            public const string CoreFailedRequests = "signalfx.dotnet.aspnetcore.requests.failed";
+            public const string CoreTotalRequests = "signalfx.dotnet.aspnetcore.requests.total";
+            public const string CoreRequestQueueLength = "signalfx.dotnet.aspnetcore.requests.queue_length";
 
-            public const string CoreCurrentConnections = "runtime.dotnet.aspnetcore.connections.current";
-            public const string CoreConnectionQueueLength = "runtime.dotnet.aspnetcore.connections.queue_length";
-            public const string CoreTotalConnections = "runtime.dotnet.aspnetcore.connections.total";
+            public const string CoreCurrentConnections = "signalfx.dotnet.aspnetcore.connections.current";
+            public const string CoreConnectionQueueLength = "signalfx.dotnet.aspnetcore.connections.queue_length";
+            public const string CoreTotalConnections = "signalfx.dotnet.aspnetcore.connections.total";
         }
 
         internal static class NetRuntime
