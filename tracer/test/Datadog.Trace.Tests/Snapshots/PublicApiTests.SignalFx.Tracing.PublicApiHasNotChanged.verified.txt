@@ -226,7 +226,6 @@ namespace Datadog.Trace.Configuration
         public int MaxTracesSubmittedPerSecond { get; set; }
         public Datadog.Trace.Configuration.MetricsIntegrationSettingsCollection MetricsIntegrations { get; }
         public int RecordedValueMaxLength { get; set; }
-        public bool RuntimeMetricsEnabled { get; set; }
         public string ServiceName { get; set; }
         public string ServiceVersion { get; set; }
         public string SignalFxAccessToken { get; set; }
