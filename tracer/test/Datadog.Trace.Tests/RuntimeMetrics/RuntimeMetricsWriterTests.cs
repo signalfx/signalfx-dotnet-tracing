@@ -72,6 +72,35 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
         }
 
         [Fact]
+        public void ShouldOnlyPushNetRuntimeMetricsWhenEnabled()
+        {
+            var listener = new Mock<IRuntimeMetricsListener>();
+
+            var settings = SettingsGenerator.Generate(true, false, false);
+            var metricSender = new Mock<ISignalFxMetricSender>();
+            using var runtimeMetricsWriter = new RuntimeMetricsWriter(settings, metricSender.Object, TimeSpan.FromSeconds(10), (_, _, _) => listener.Object);
+
+            runtimeMetricsWriter.PushEvents();
+
+            metricSender.Verify(s => s.SendLong(MetricsNames.NetRuntime.Gc.CollectionsCount, It.IsAny<long>(), MetricType.CUMULATIVE_COUNTER, new[] { "generation:gen0" }), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendLong(MetricsNames.NetRuntime.Gc.CollectionsCount, It.IsAny<long>(), MetricType.CUMULATIVE_COUNTER, new[] { "generation:gen1" }), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendLong(MetricsNames.NetRuntime.Gc.CollectionsCount, It.IsAny<long>(), MetricType.CUMULATIVE_COUNTER, new[] { "generation:gen2" }), Times.AtLeastOnce);
+
+            metricSender.Verify(s => s.SendLong(MetricsNames.NetRuntime.Gc.TotalObjectsSize, It.IsAny<long>(), MetricType.GAUGE, It.IsAny<string[]>()), Times.AtLeastOnce);
+
+            metricSender.Verify(s => s.SendDouble(MetricsNames.Process.CpuTime, It.IsAny<double>(), MetricType.CUMULATIVE_COUNTER, new[] { "state:user" }), Times.Exactly(0));
+            metricSender.Verify(s => s.SendDouble(MetricsNames.Process.CpuTime, It.IsAny<double>(), MetricType.CUMULATIVE_COUNTER, new[] { "state:system" }), Times.Exactly(0));
+
+            metricSender.Verify(s => s.SendDouble(MetricsNames.Process.CpuUtilization, It.IsAny<double>(), MetricType.GAUGE, new[] { "state:user" }), Times.Exactly(0));
+            metricSender.Verify(s => s.SendDouble(MetricsNames.Process.CpuUtilization, It.IsAny<double>(), MetricType.GAUGE, new[] { "state:system" }), Times.Exactly(0));
+
+            metricSender.Verify(s => s.SendLong(MetricsNames.Process.MemoryUsage, It.IsAny<long>(), MetricType.GAUGE, It.IsAny<string[]>()), Times.Exactly(0));
+            metricSender.Verify(s => s.SendLong(MetricsNames.Process.MemoryVirtual, It.IsAny<long>(), MetricType.GAUGE, It.IsAny<string[]>()), Times.Exactly(0));
+
+            metricSender.Verify(s => s.SendLong(MetricsNames.Process.ThreadsCount, It.IsAny<long>(), MetricType.GAUGE, It.IsAny<string[]>()), Times.Exactly(0));
+        }
+
+        [Fact]
         public void ShouldNotPushProcessMetricsWhenDisabled()
         {
             var listener = new Mock<IRuntimeMetricsListener>();
