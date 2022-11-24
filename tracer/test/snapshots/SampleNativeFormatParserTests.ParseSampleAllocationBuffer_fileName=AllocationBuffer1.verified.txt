@@ -1,89 +1,4 @@
-[
-  {
-    AllocationSizeBytes: 32,
-    TypeName: System.Collections.Generic.List`1[Datadog.Tracer.Pprof.Proto.Profile.Label],
-    ThreadSample: {
-      Timestamp: {
-        Nanoseconds: 1664371544941000000,
-        Milliseconds: 1664371544941
-      },
-      ManagedId: Id_1,
-      NativeId: Id_2,
-      ThreadName: SignalFx Profiling Sampler Thread,
-      Frames: [
-        SignalFx.Tracing.AlwaysOnProfiler.Builder.SampleBuilder..ctor(),
-        SignalFx.Tracing.AlwaysOnProfiler.PprofThreadSampleExporter.BuildProfile(System.Collections.Generic.List`1[SignalFx.Tracing.AlwaysOnProfiler.ThreadSample]),
-        SignalFx.Tracing.AlwaysOnProfiler.PprofThreadSampleExporter.ProcessThreadSamples(System.Collections.Generic.List`1[SignalFx.Tracing.AlwaysOnProfiler.ThreadSample]),
-        SignalFx.Tracing.AlwaysOnProfiler.ThreadSampleExporter.ExportThreadSamples(System.Collections.Generic.List`1[SignalFx.Tracing.AlwaysOnProfiler.ThreadSample]),
-        SignalFx.Tracing.AlwaysOnProfiler.ThreadSampler.SampleReadingThread(),
-        System.Threading.Thread.StartCallback(),
-        Unknown_Native_Function(unknown)
-      ]
-    }
-  },
-  {
-    AllocationSizeBytes: 48,
-    TypeName: System.Reflection.CustomAttributeRecord[],
-    ThreadSample: {
-      Timestamp: {
-        Nanoseconds: 1664371550156000000,
-        Milliseconds: 1664371550156
-      },
-      ManagedId: Id_1,
-      NativeId: Id_2,
-      ThreadName: SignalFx Profiling Sampler Thread,
-      Frames: [
-        System.Reflection.RuntimeCustomAttributeData.GetCustomAttributeRecords(System.Reflection.RuntimeModule, System.Int32),
-        System.Reflection.CustomAttribute.AddCustomAttributes(System.RuntimeType.ListBuilder`1[System.Object]&, System.Reflection.RuntimeModule, System.Int32, System.RuntimeType, System.Boolean, System.RuntimeType.ListBuilder`1[System.Object]),
-        System.Reflection.CustomAttribute.GetCustomAttributes(System.Reflection.RuntimeModule, System.Int32, System.Int32, System.RuntimeType),
-        System.Reflection.CustomAttribute.GetCustomAttributes(System.Reflection.RuntimeMethodInfo, System.RuntimeType, System.Boolean),
-        System.Reflection.RuntimeMethodInfo.GetCustomAttributes(System.Type, System.Boolean),
-        System.Attribute.GetCustomAttributes(System.Reflection.MemberInfo, System.Type, System.Boolean),
-        System.Reflection.CustomAttributeExtensions.GetCustomAttributes[T](System.Reflection.MemberInfo, System.Boolean),
-        System.Diagnostics.StackTrace.TryResolveStateMachineMethod(System.Reflection.MethodBase&, System.Type&),
-        System.Diagnostics.StackTrace.ToString(System.Diagnostics.StackTrace.TraceFormat, System.Text.StringBuilder),
-        System.Diagnostics.StackTrace.ToString(System.Diagnostics.StackTrace.TraceFormat),
-        System.Exception.get_StackTrace(),
-        System.ComponentModel.Win32Exception.ToString(),
-        System.Exception.ToString(),
-        System.Exception.ToString(),
-        SignalFx.Tracing.Vendors.Serilog.Formatting.Display.MessageTemplateTextFormatter.Format(SignalFx.Tracing.Vendors.Serilog.Events.LogEvent, System.IO.TextWriter),
-        SignalFx.Tracing.Vendors.Serilog.Sinks.File.SharedFileSink.SignalFx.Tracing.Vendors.Serilog.Sinks.File.IFileSink.EmitOrOverflow(SignalFx.Tracing.Vendors.Serilog.Events.LogEvent),
-        SignalFx.Tracing.Vendors.Serilog.Sinks.File.RollingFileSink.Emit(SignalFx.Tracing.Vendors.Serilog.Events.LogEvent),
-        SignalFx.Tracing.Vendors.Serilog.Core.Sinks.SafeAggregateSink.Emit(SignalFx.Tracing.Vendors.Serilog.Events.LogEvent),
-        SignalFx.Tracing.Vendors.Serilog.Core.Logger.Write(SignalFx.Tracing.Vendors.Serilog.Events.LogEventLevel, System.Exception, System.String, System.Object[]),
-        SignalFx.Tracing.Logging.DatadogSerilogLogger.WriteIfNotRateLimited(SignalFx.Tracing.Vendors.Serilog.Events.LogEventLevel, System.Exception, System.String, System.Object[], System.Int32, System.String),
-        SignalFx.Tracing.AlwaysOnProfiler.OtlpHttpLogSender.Send(Datadog.Tracer.OpenTelemetry.Proto.Logs.V1.LogsData),
-        SignalFx.Tracing.AlwaysOnProfiler.ThreadSampleExporter.ExportThreadSamples(System.Collections.Generic.List`1[SignalFx.Tracing.AlwaysOnProfiler.ThreadSample]),
-        SignalFx.Tracing.AlwaysOnProfiler.ThreadSampler.SampleReadingThread(),
-        System.Threading.Thread.StartCallback(),
-        Unknown_Native_Function(unknown)
-      ]
-    }
-  },
-  {
-    AllocationSizeBytes: 2160,
-    TypeName: Entry[System.Int32,System.String][],
-    ThreadSample: {
-      Timestamp: {
-        Nanoseconds: 1664371550158000000,
-        Milliseconds: 1664371550158
-      },
-      ManagedId: Id_1,
-      NativeId: Id_2,
-      ThreadName: SignalFx Profiling Sampler Thread,
-      Frames: [
-        System.Collections.Generic.Dictionary`2.Resize(System.Int32, System.Boolean),
-        System.Collections.Generic.Dictionary`2.TryInsert(TKey, TValue, System.Collections.Generic.InsertionBehavior),
-        SignalFx.Tracing.AlwaysOnProfiler.ThreadSampleNativeFormatParser.ReadStackFrames(System.Int16, SignalFx.Tracing.AlwaysOnProfiler.ThreadSample),
-        SignalFx.Tracing.AlwaysOnProfiler.ThreadSampleNativeFormatParser.Parse(),
-        SignalFx.Tracing.AlwaysOnProfiler.ThreadSampler.ReadAndExportThreadSampleBatch(System.Byte[], SignalFx.Tracing.AlwaysOnProfiler.ThreadSampleExporter),
-        SignalFx.Tracing.AlwaysOnProfiler.ThreadSampler.SampleReadingThread(),
-        System.Threading.Thread.StartCallback(),
-        Unknown_Native_Function(unknown)
-      ]
-    }
-  },
+﻿[
   {
     AllocationSizeBytes: 216,
     TypeName: System.SByte[],
@@ -93,7 +8,7 @@
         Milliseconds: 1664371552206
       },
       ManagedId: Id_1,
-      NativeId: Id_3,
+      NativeId: Id_2,
       ThreadName: .NET ThreadPool Worker,
       Frames: [
         System.Net.Sockets.Socket.DoConnect(System.Net.EndPoint, System.Net.Internals.SocketAddress),
@@ -125,45 +40,6 @@
         System.Threading.Tasks.Task.ExecuteFromThreadPool(System.Threading.Thread),
         System.Threading.ThreadPoolWorkQueue.Dispatch(),
         System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart(),
-        System.Threading.Thread.StartCallback(),
-        Unknown_Native_Function(unknown)
-      ]
-    }
-  },
-  {
-    AllocationSizeBytes: 48,
-    TypeName: System.Reflection.CustomAttributeRecord[],
-    ThreadSample: {
-      Timestamp: {
-        Nanoseconds: 1664371555331000000,
-        Milliseconds: 1664371555331
-      },
-      ManagedId: Id_1,
-      NativeId: Id_2,
-      ThreadName: SignalFx Profiling Sampler Thread,
-      Frames: [
-        System.Reflection.RuntimeCustomAttributeData.GetCustomAttributeRecords(System.Reflection.RuntimeModule, System.Int32),
-        System.Reflection.CustomAttribute.AddCustomAttributes(System.RuntimeType.ListBuilder`1[System.Object]&, System.Reflection.RuntimeModule, System.Int32, System.RuntimeType, System.Boolean, System.RuntimeType.ListBuilder`1[System.Object]),
-        System.Reflection.CustomAttribute.GetCustomAttributes(System.Reflection.RuntimeModule, System.Int32, System.Int32, System.RuntimeType),
-        System.Reflection.CustomAttribute.GetCustomAttributes(System.Reflection.RuntimeMethodInfo, System.RuntimeType, System.Boolean),
-        System.Reflection.RuntimeMethodInfo.GetCustomAttributes(System.Type, System.Boolean),
-        System.Attribute.GetCustomAttributes(System.Reflection.MemberInfo, System.Type, System.Boolean),
-        System.Reflection.CustomAttributeExtensions.GetCustomAttributes[T](System.Reflection.MemberInfo, System.Boolean),
-        System.Diagnostics.StackTrace.TryResolveStateMachineMethod(System.Reflection.MethodBase&, System.Type&),
-        System.Diagnostics.StackTrace.ToString(System.Diagnostics.StackTrace.TraceFormat, System.Text.StringBuilder),
-        System.Diagnostics.StackTrace.ToString(System.Diagnostics.StackTrace.TraceFormat),
-        System.Exception.get_StackTrace(),
-        System.Exception.ToString(),
-        System.Exception.ToString(),
-        SignalFx.Tracing.Vendors.Serilog.Formatting.Display.MessageTemplateTextFormatter.Format(SignalFx.Tracing.Vendors.Serilog.Events.LogEvent, System.IO.TextWriter),
-        SignalFx.Tracing.Vendors.Serilog.Sinks.File.SharedFileSink.SignalFx.Tracing.Vendors.Serilog.Sinks.File.IFileSink.EmitOrOverflow(SignalFx.Tracing.Vendors.Serilog.Events.LogEvent),
-        SignalFx.Tracing.Vendors.Serilog.Sinks.File.RollingFileSink.Emit(SignalFx.Tracing.Vendors.Serilog.Events.LogEvent),
-        SignalFx.Tracing.Vendors.Serilog.Core.Sinks.SafeAggregateSink.Emit(SignalFx.Tracing.Vendors.Serilog.Events.LogEvent),
-        SignalFx.Tracing.Vendors.Serilog.Core.Logger.Write(SignalFx.Tracing.Vendors.Serilog.Events.LogEventLevel, System.Exception, System.String, System.Object[]),
-        SignalFx.Tracing.Logging.DatadogSerilogLogger.WriteIfNotRateLimited(SignalFx.Tracing.Vendors.Serilog.Events.LogEventLevel, System.Exception, System.String, System.Object[], System.Int32, System.String),
-        SignalFx.Tracing.AlwaysOnProfiler.OtlpHttpLogSender.Send(Datadog.Tracer.OpenTelemetry.Proto.Logs.V1.LogsData),
-        SignalFx.Tracing.AlwaysOnProfiler.ThreadSampleExporter.ExportThreadSamples(System.Collections.Generic.List`1[SignalFx.Tracing.AlwaysOnProfiler.ThreadSample]),
-        SignalFx.Tracing.AlwaysOnProfiler.ThreadSampler.SampleReadingThread(),
         System.Threading.Thread.StartCallback(),
         Unknown_Native_Function(unknown)
       ]

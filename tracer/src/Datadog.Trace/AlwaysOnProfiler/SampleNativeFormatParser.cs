@@ -180,7 +180,14 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
                         // each allocation sample has independently coded strings
                         var codeDictionary = new Dictionary<int, string>();
+
                         ReadStackFrames(code, threadSample, codeDictionary, buffer, ref position);
+                        if (threadName == ThreadSampler.BackgroundThreadName)
+                        {
+                            // TODO Splunk: add configuration option to include the sampler thread. By default remove it.
+                            continue;
+                        }
+
                         allocationSamples.Add(new AllocationSample(allocatedSize, typeName, threadSample));
                     }
                     else
