@@ -1,4 +1,4 @@
-[
+﻿[
   {
     AllocationSizeBytes: 14808,
     TypeName: EventMetadata[],
@@ -1548,24 +1548,6 @@
         System.Buffers.TlsOverPerCoreLockedStacksArrayPool`1.Trim(),
         System.Buffers.TlsOverPerCoreLockedStacksArrayPool`1.<>c.<InitializeTlsBucketsAndTrimming>b__13_0(System.Object),
         System.Gen2GcCallback.Finalize(),
-        Unknown_Native_Function(unknown)
-      ]
-    }
-  },
-  {
-    AllocationSizeBytes: 204856,
-    TypeName: System.Byte[],
-    ThreadSample: {
-      Timestamp: {
-        Nanoseconds: 1664371461273000000,
-        Milliseconds: 1664371461273
-      },
-      ManagedId: Id_1,
-      NativeId: Id_4,
-      ThreadName: SignalFx Profiling Sampler Thread,
-      Frames: [
-        SignalFx.Tracing.AlwaysOnProfiler.ThreadSampler.SampleReadingThread(),
-        System.Threading.Thread.StartCallback(),
         Unknown_Native_Function(unknown)
       ]
     }
