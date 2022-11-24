@@ -12,6 +12,7 @@ using System.Linq;
 using Datadog.Trace.Agent;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Sampling;
+using FluentAssertions.Execution;
 using Moq;
 using Xunit;
 
@@ -107,23 +108,35 @@ namespace Datadog.Trace.Tests
         }
 
         [Theory]
-        [InlineData("1", "0", true)]
-        [InlineData("0", "1", true)]
-        [InlineData("0", "0", false)]
-        [InlineData("1", "1", true)]
-        [InlineData(null, "1", true)]
-        [InlineData(null, null, false)]
-        public void EnableRuntimeMetrics(string metricsExplicitlyEnabled, string memoryProfilingEnabled, bool expected)
+        [InlineData("1", "1", "1", "0")]
+        [InlineData("1", "1", "0", "0")]
+        [InlineData("1", "0", "0", "0")]
+        [InlineData("1", "0", "1", "0")]
+        [InlineData("0", "0", "1", "1")]
+        [InlineData("0", "1", "0", "0")]
+        [InlineData("0", "0", "1", "0")]
+        [InlineData(null, null, null, "1")]
+        [InlineData(null, null, null, null)]
+        public void EnableRuntimeMetrics(string netRuntimeEnabled, string processEnabled, string aspNetEnabled, string memoryProfilingEnabled)
         {
+            var expectedNetRuntime = netRuntimeEnabled == "1" || memoryProfilingEnabled == "1";
+            var expectedProcess = processEnabled == "1";
+            var expectedAspNet = aspNetEnabled == "1";
+
             var settings = new NameValueCollection
             {
-                { ConfigurationKeys.RuntimeMetricsEnabled, metricsExplicitlyEnabled },
+                { string.Format(ConfigurationKeys.Metrics.Enabled, MetricsIntegrationId.NetRuntime), netRuntimeEnabled },
+                { string.Format(ConfigurationKeys.Metrics.Enabled, MetricsIntegrationId.Process), processEnabled },
+                { string.Format(ConfigurationKeys.Metrics.Enabled, MetricsIntegrationId.AspNet), aspNetEnabled },
                 { ConfigurationKeys.AlwaysOnProfiler.MemoryEnabled, memoryProfilingEnabled }
             };
 
-            var tracerSettings = new TracerSettings(new NameValueConfigurationSource(settings));
+            var tracerSettings = new TracerSettings(new NameValueConfigurationSource(settings)).Build();
 
-            Assert.Equal(expected, tracerSettings.RuntimeMetricsEnabled);
+            using var scope = new AssertionScope();
+            Assert.Equal(expectedNetRuntime, tracerSettings.MetricsIntegrations[MetricsIntegrationId.NetRuntime].Enabled);
+            Assert.Equal(expectedProcess, tracerSettings.MetricsIntegrations[MetricsIntegrationId.Process].Enabled);
+            Assert.Equal(expectedAspNet, tracerSettings.MetricsIntegrations[MetricsIntegrationId.AspNet].Enabled);
         }
 
         [Theory]
