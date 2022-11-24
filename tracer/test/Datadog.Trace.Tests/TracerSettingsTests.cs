@@ -140,6 +140,34 @@ namespace Datadog.Trace.Tests
         }
 
         [Theory]
+        [InlineData("1", "1", "1")]
+        [InlineData("1", "1", "0")]
+        [InlineData("1", "0", "0")]
+        [InlineData("1", "0", "1")]
+        [InlineData("0", "0", "1")]
+        [InlineData("0", "1", "0")]
+        public void DisableIntegrations(string graphEnabled, string kafkaEnabled, string cosmosEnabled)
+        {
+            var expected = graphEnabled != "0";
+            var expectedKafka = kafkaEnabled != "0";
+            var expectedCosmos = cosmosEnabled != "0";
+
+            var settings = new NameValueCollection
+            {
+                { string.Format(ConfigurationKeys.Integrations.Enabled, IntegrationId.GraphQL), graphEnabled },
+                { string.Format(ConfigurationKeys.Integrations.Enabled, IntegrationId.Kafka), kafkaEnabled },
+                { string.Format(ConfigurationKeys.Integrations.Enabled, IntegrationId.CosmosDb), cosmosEnabled }
+            };
+
+            var tracerSettings = new TracerSettings(new NameValueConfigurationSource(settings)).Build();
+
+            using var scope = new AssertionScope();
+            Assert.Equal(expected, tracerSettings.Integrations[IntegrationId.GraphQL].Enabled);
+            Assert.Equal(expectedKafka, tracerSettings.Integrations[IntegrationId.Kafka].Enabled);
+            Assert.Equal(expectedCosmos, tracerSettings.Integrations[IntegrationId.CosmosDb].Enabled);
+        }
+
+        [Theory]
         [InlineData("a,b,c,d,,f", new[] { "a", "b", "c", "d", "f" })]
         [InlineData(" a, b ,c, ,,f ", new[] { "a", "b", "c", "f" })]
         [InlineData("a,b, c ,d,      e      ,f  ", new[] { "a", "b", "c", "d", "e", "f" })]

@@ -117,7 +117,7 @@ namespace Datadog.Trace.ClrProfiler
 
                 tags.HttpMethod = uppercaseHttpMethod;
                 tags.HttpUrl = httpUrl;
-                tags.InstrumentationName = IntegrationRegistry.GetName(integrationId);
+                tags.InstrumentationName = ValuesRegistry<IntegrationId>.GetName(integrationId);
 
                 tags.SetAnalyticsSampleRate(integrationId, tracer.Settings, enabledWithGlobalSetting: false);
 

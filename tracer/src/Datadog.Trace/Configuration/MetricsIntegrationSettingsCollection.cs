@@ -31,7 +31,7 @@ public class MetricsIntegrationSettingsCollection
     {
         get
         {
-            if (MetricsIntegrationRegistry.TryGetIntegrationId(integrationName, out var integrationId))
+            if (ValuesRegistry<MetricsIntegrationId>.TryGetValue(integrationName, out var integrationId))
             {
                 return _settings[(int)integrationId];
             }
@@ -47,11 +47,11 @@ public class MetricsIntegrationSettingsCollection
 
     private static MetricsIntegrationSettings[] GetIntegrationSettings(IConfigurationSource source)
     {
-        var integrations = new MetricsIntegrationSettings[MetricsIntegrationRegistry.Names.Length];
+        var integrations = new MetricsIntegrationSettings[ValuesRegistry<MetricsIntegrationId>.Names.Length];
 
         for (int i = 0; i < integrations.Length; i++)
         {
-            var name = MetricsIntegrationRegistry.Names[i];
+            var name = ValuesRegistry<MetricsIntegrationId>.Names[i];
 
             if (name != null)
             {

@@ -33,7 +33,7 @@ public class ImmutableMetricsIntegrationSettingsCollection
         {
             get
             {
-                if (IntegrationRegistry.TryGetIntegrationId(integrationName, out var integrationId))
+                if (ValuesRegistry<IntegrationId>.TryGetValue(integrationName, out var integrationId))
                 {
                     return Settings[(int)integrationId];
                 }
