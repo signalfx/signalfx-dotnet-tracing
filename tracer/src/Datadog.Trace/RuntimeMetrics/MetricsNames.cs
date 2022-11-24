@@ -9,7 +9,7 @@ namespace Datadog.Trace.RuntimeMetrics
 {
     internal static class MetricsNames
     {
-        internal static class AspNet
+        internal static class AspNetCore
         {
             public const string CoreCurrentRequests = "signalfx.dotnet.aspnetcore.requests.current";
 

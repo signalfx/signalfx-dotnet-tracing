@@ -2,7 +2,7 @@
 
 internal enum MetricsIntegrationId
 {
-    AspNet,
+    AspNetCore,
     NetRuntime,
     Process
 }

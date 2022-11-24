@@ -127,7 +127,7 @@ namespace Datadog.Trace.Tests
             {
                 { string.Format(ConfigurationKeys.Metrics.Enabled, MetricsIntegrationId.NetRuntime), netRuntimeEnabled },
                 { string.Format(ConfigurationKeys.Metrics.Enabled, MetricsIntegrationId.Process), processEnabled },
-                { string.Format(ConfigurationKeys.Metrics.Enabled, MetricsIntegrationId.AspNet), aspNetEnabled },
+                { string.Format(ConfigurationKeys.Metrics.Enabled, MetricsIntegrationId.AspNetCore), aspNetEnabled },
                 { ConfigurationKeys.AlwaysOnProfiler.MemoryEnabled, memoryProfilingEnabled }
             };
 
@@ -136,7 +136,7 @@ namespace Datadog.Trace.Tests
             using var scope = new AssertionScope();
             Assert.Equal(expectedNetRuntime, tracerSettings.MetricsIntegrations[MetricsIntegrationId.NetRuntime].Enabled);
             Assert.Equal(expectedProcess, tracerSettings.MetricsIntegrations[MetricsIntegrationId.Process].Enabled);
-            Assert.Equal(expectedAspNet, tracerSettings.MetricsIntegrations[MetricsIntegrationId.AspNet].Enabled);
+            Assert.Equal(expectedAspNet, tracerSettings.MetricsIntegrations[MetricsIntegrationId.AspNetCore].Enabled);
         }
 
         [Theory]

@@ -114,12 +114,12 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
             // Wait for the counters to be refreshed
             mutex.Wait();
 
-            metricSender.Verify(s => s.SendDouble(MetricsNames.AspNet.CoreCurrentRequests, 1.0, MetricType.GAUGE, null), Times.AtLeastOnce);
-            metricSender.Verify(s => s.SendDouble(MetricsNames.AspNet.CoreFailedRequests, 2.0, MetricType.GAUGE, null), Times.AtLeastOnce);
-            metricSender.Verify(s => s.SendDouble(MetricsNames.AspNet.CoreTotalRequests, 4.0, MetricType.GAUGE, null), Times.AtLeastOnce);
-            metricSender.Verify(s => s.SendDouble(MetricsNames.AspNet.CoreRequestQueueLength, 8.0, MetricType.GAUGE, null), Times.AtLeastOnce);
-            metricSender.Verify(s => s.SendDouble(MetricsNames.AspNet.CoreConnectionQueueLength, 16.0, MetricType.GAUGE, null), Times.AtLeastOnce);
-            metricSender.Verify(s => s.SendDouble(MetricsNames.AspNet.CoreTotalConnections, 32.0, MetricType.GAUGE, null), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendDouble(MetricsNames.AspNetCore.CoreCurrentRequests, 1.0, MetricType.GAUGE, null), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendDouble(MetricsNames.AspNetCore.CoreFailedRequests, 2.0, MetricType.GAUGE, null), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendDouble(MetricsNames.AspNetCore.CoreTotalRequests, 4.0, MetricType.GAUGE, null), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendDouble(MetricsNames.AspNetCore.CoreRequestQueueLength, 8.0, MetricType.GAUGE, null), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendDouble(MetricsNames.AspNetCore.CoreConnectionQueueLength, 16.0, MetricType.GAUGE, null), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendDouble(MetricsNames.AspNetCore.CoreTotalConnections, 32.0, MetricType.GAUGE, null), Times.AtLeastOnce);
 
             foreach (var counter in counters)
             {

@@ -10,7 +10,7 @@ internal class SettingsGenerator
         var sourceMock = new Mock<IConfigurationSource>();
         sourceMock.Setup(configurationSource => configurationSource.GetBool("SIGNALFX_METRICS_NetRuntime_ENABLED")).Returns(netRuntimeEnabled);
         sourceMock.Setup(configurationSource => configurationSource.GetBool("SIGNALFX_METRICS_Process_ENABLED")).Returns(processEnabled);
-        sourceMock.Setup(configurationSource => configurationSource.GetBool("SIGNALFX_METRICS_AspNet_ENABLED")).Returns(aspNetEnabled);
+        sourceMock.Setup(configurationSource => configurationSource.GetBool("SIGNALFX_METRICS_AspNetCore_ENABLED")).Returns(aspNetEnabled);
         var metricsSetting = new MetricsIntegrationSettingsCollection(sourceMock.Object);
 
         return new ImmutableMetricsIntegrationSettingsCollection(metricsSetting, false);

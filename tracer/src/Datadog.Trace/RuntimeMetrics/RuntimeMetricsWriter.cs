@@ -145,7 +145,7 @@ namespace Datadog.Trace.RuntimeMetrics
         private static IRuntimeMetricsListener InitializeListener(ImmutableMetricsIntegrationSettingsCollection settings, ISignalFxMetricSender metricSender, TimeSpan delay)
         {
 #if NETCOREAPP
-            if (settings[MetricsIntegrationId.NetRuntime].Enabled || settings[MetricsIntegrationId.AspNet].Enabled)
+            if (settings[MetricsIntegrationId.NetRuntime].Enabled || settings[MetricsIntegrationId.AspNetCore].Enabled)
             {
                 return new RuntimeEventListener(settings, metricSender, delay);
             }

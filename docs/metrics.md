@@ -9,7 +9,7 @@ to Splunk Observability Cloud.
 
 To enable runtime metrics, set the `SIGNALFX_METRICS_{0}_ENABLED` environment
 variable to `true` for your .NET process.
-The supported metrics types are `NetRuntime`, `Process`, `AspNet`.
+The supported metrics types are `NetRuntime`, `Process`, `AspNetCore`.
 For example, in order to enable `NetRuntime` metrics, set `SIGNALFX_METRICS_NetRuntime_ENABLED=true`.
 
 > Runtime metrics are automatically enabled when [AlwaysOn memory profiling](internal/memory-profiling.md)

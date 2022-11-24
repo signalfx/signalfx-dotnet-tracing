@@ -57,13 +57,13 @@ namespace Datadog.Trace.RuntimeMetrics
         {
             MetricsMapping = new Dictionary<string, string>
             {
-                ["current-requests"] = MetricsNames.AspNet.CoreCurrentRequests,
-                ["failed-requests"] = MetricsNames.AspNet.CoreFailedRequests,
-                ["total-requests"] = MetricsNames.AspNet.CoreTotalRequests,
-                ["request-queue-length"] = MetricsNames.AspNet.CoreRequestQueueLength,
-                ["current-connections"] = MetricsNames.AspNet.CoreCurrentConnections,
-                ["connection-queue-length"] = MetricsNames.AspNet.CoreConnectionQueueLength,
-                ["total-connections"] = MetricsNames.AspNet.CoreTotalConnections
+                ["current-requests"] = MetricsNames.AspNetCore.CoreCurrentRequests,
+                ["failed-requests"] = MetricsNames.AspNetCore.CoreFailedRequests,
+                ["total-requests"] = MetricsNames.AspNetCore.CoreTotalRequests,
+                ["request-queue-length"] = MetricsNames.AspNetCore.CoreRequestQueueLength,
+                ["current-connections"] = MetricsNames.AspNetCore.CoreCurrentConnections,
+                ["connection-queue-length"] = MetricsNames.AspNetCore.CoreConnectionQueueLength,
+                ["total-connections"] = MetricsNames.AspNetCore.CoreTotalConnections
             };
 
             // source originated from: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/blob/bc947a00c3f859cc436f050e81172fc1f8bc09d7/src/OpenTelemetry.Instrumentation.Runtime/RuntimeMetrics.cs
@@ -175,7 +175,7 @@ namespace Datadog.Trace.RuntimeMetrics
             }
 #endif
 
-            if (eventData.EventName == "EventCounters" && _settings[MetricsIntegrationId.AspNet].Enabled)
+            if (eventData.EventName == "EventCounters" && _settings[MetricsIntegrationId.AspNetCore].Enabled)
             {
                 ExtractCounters(eventData.Payload);
             }
