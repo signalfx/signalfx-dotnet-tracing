@@ -1,4 +1,6 @@
-﻿using Datadog.Trace.Logging;
+﻿// Modified by Splunk Inc.
+
+using Datadog.Trace.Logging;
 
 namespace Datadog.Trace.Configuration;
 

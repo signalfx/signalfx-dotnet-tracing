@@ -1,4 +1,6 @@
-﻿namespace Datadog.Trace.Configuration;
+﻿// Modified by Splunk Inc.
+
+namespace Datadog.Trace.Configuration;
 
 /// <summary>
 /// Contains metrics integration-specific settings.
