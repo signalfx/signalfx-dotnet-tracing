@@ -17,7 +17,7 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 ### Enhancements
 
-## [Release 0.2.10](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.2.10)
+## [Release 1.0.0](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v1.0.0)
 
 ### Breaking changes
 

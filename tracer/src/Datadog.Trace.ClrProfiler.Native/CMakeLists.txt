@@ -5,7 +5,7 @@ cmake_policy(SET CMP0015 NEW)
 # Project definition
 # ******************************************************
 
-project("SignalFx.Tracing.ClrProfiler.Native" VERSION 0.2.10)
+project("SignalFx.Tracing.ClrProfiler.Native" VERSION 1.0.0)
 
 # ******************************************************
 # Environment detection
