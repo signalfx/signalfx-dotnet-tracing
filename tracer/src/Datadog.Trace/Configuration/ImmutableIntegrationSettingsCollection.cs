@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System.Collections.Generic;
 using Datadog.Trace.Logging;
 
@@ -38,7 +40,7 @@ namespace Datadog.Trace.Configuration
         {
             get
             {
-                if (IntegrationRegistry.TryGetIntegrationId(integrationName, out var integrationId))
+                if (ValuesRegistry<IntegrationId>.TryGetValue(integrationName, out var integrationId))
                 {
                     return Settings[(int)integrationId];
                 }

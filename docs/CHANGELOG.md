@@ -13,11 +13,15 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 ### Breaking changes
 
+- Replace `SIGNALFX_RUNTIME_METRICS_ENABLED` setting with `SIGNALFX_METRICS_{0}_ENABLED`,
+that allows to enable specific metrics groups (See [advanced-config](advanced-config.md)).
+
 ### Bugfixes
 
 ### Enhancements
 
 - Add `SIGNALFX_TRACE_BUFFER_SIZE` setting to configure trace exporter buffer size.
+- Add `SIGNALFX_METRICS_{0}_ENABLED` to enable specific metrics group.
 
 ## [Release 0.2.9](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.2.9)
 

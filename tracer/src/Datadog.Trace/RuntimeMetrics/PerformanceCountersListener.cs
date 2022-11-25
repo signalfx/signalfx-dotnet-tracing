@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 using Datadog.Trace.Logging;
 using Datadog.Trace.SignalFx.Metrics;
 using Datadog.Trace.Util;
-using Datadog.Trace.Vendors.StatsdClient;
 using MetricType = Datadog.Tracer.SignalFx.Metrics.Protobuf.MetricType;
 
 namespace Datadog.Trace.RuntimeMetrics
@@ -22,7 +21,7 @@ namespace Datadog.Trace.RuntimeMetrics
     {
         private const string MemoryCategoryName = ".NET CLR Memory";
         private const string ThreadingCategoryName = ".NET CLR LocksAndThreads";
-        private const string GarbageCollectionMetrics = $"{MetricsNames.Gc.HeapSize}, {MetricsNames.Gc.CollectionsCount}";
+        private const string GarbageCollectionMetrics = $"{MetricsNames.NetRuntime.Gc.HeapSize}, {MetricsNames.NetRuntime.Gc.CollectionsCount}";
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor<PerformanceCountersListener>();
 
@@ -77,12 +76,12 @@ namespace Datadog.Trace.RuntimeMetrics
                 _instanceName = GetSimpleInstanceName();
             }
 
-            TryUpdateGauge(MetricsNames.Gc.HeapSize, _gen0Size, GcMetrics.Tags.Gen0);
-            TryUpdateGauge(MetricsNames.Gc.HeapSize, _gen1Size, GcMetrics.Tags.Gen1);
-            TryUpdateGauge(MetricsNames.Gc.HeapSize, _gen2Size, GcMetrics.Tags.Gen2);
-            TryUpdateGauge(MetricsNames.Gc.HeapSize, _lohSize, GcMetrics.Tags.LargeObjectHeap);
+            TryUpdateGauge(MetricsNames.NetRuntime.Gc.HeapSize, _gen0Size, GcMetrics.Tags.Gen0);
+            TryUpdateGauge(MetricsNames.NetRuntime.Gc.HeapSize, _gen1Size, GcMetrics.Tags.Gen1);
+            TryUpdateGauge(MetricsNames.NetRuntime.Gc.HeapSize, _gen2Size, GcMetrics.Tags.Gen2);
+            TryUpdateGauge(MetricsNames.NetRuntime.Gc.HeapSize, _lohSize, GcMetrics.Tags.LargeObjectHeap);
 
-            TryUpdateCounter(MetricsNames.ContentionCount, _contentionCount);
+            TryUpdateCounter(MetricsNames.NetRuntime.ContentionCount, _contentionCount);
 
             Log.Debug("Sent the following metrics: {metrics}", GarbageCollectionMetrics);
         }

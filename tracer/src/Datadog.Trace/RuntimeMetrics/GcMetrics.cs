@@ -34,7 +34,7 @@ internal static class GcMetrics
             long collectionsFromThisGeneration = GC.CollectionCount(gen);
             var currentValue = collectionsFromThisGeneration - collectionsFromHigherGeneration;
 
-            metricSender.SendLong(MetricsNames.Gc.CollectionsCount, currentValue, MetricType.CUMULATIVE_COUNTER, Tags.GenerationTags[gen]);
+            metricSender.SendLong(MetricsNames.NetRuntime.Gc.CollectionsCount, currentValue, MetricType.CUMULATIVE_COUNTER, Tags.GenerationTags[gen]);
 
             collectionsFromHigherGeneration = collectionsFromThisGeneration;
         }

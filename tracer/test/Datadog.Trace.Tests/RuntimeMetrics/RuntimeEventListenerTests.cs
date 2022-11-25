@@ -29,12 +29,13 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
         {
             var metricSender = new Mock<ISignalFxMetricSender>();
 
-            using var listener = new RuntimeEventListener(metricSender.Object, TimeSpan.FromSeconds(10));
+            var settings = SettingsGenerator.Generate();
+            using var listener = new RuntimeEventListener(settings, metricSender.Object, TimeSpan.FromSeconds(10));
 
             listener.Refresh();
 
-            metricSender.Verify(s => s.SendLong(MetricsNames.ContentionCount, It.IsAny<long>(), MetricType.CUMULATIVE_COUNTER, null), Times.Once);
-            metricSender.Verify(s => s.SendLong(MetricsNames.ThreadPoolWorkersCount, It.IsAny<long>(), MetricType.GAUGE, null), Times.Once);
+            metricSender.Verify(s => s.SendLong(MetricsNames.NetRuntime.ContentionCount, It.IsAny<long>(), MetricType.CUMULATIVE_COUNTER, null), Times.Once);
+            metricSender.Verify(s => s.SendLong(MetricsNames.NetRuntime.ThreadPoolWorkersCount, It.IsAny<long>(), MetricType.GAUGE, null), Times.Once);
         }
 
         [Fact]
@@ -45,10 +46,11 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
             var mutex = new ManualResetEventSlim();
 
             // TotalPauseTime is pushed on the GcRestartEnd event, which should be the last event for any GC
-            metricSender.Setup(s => s.SendDouble(MetricsNames.Gc.PauseTime, It.IsAny<double>(), MetricType.COUNTER, It.IsAny<string[]>()))
+            metricSender.Setup(s => s.SendDouble(MetricsNames.NetRuntime.Gc.PauseTime, It.IsAny<double>(), MetricType.COUNTER, It.IsAny<string[]>()))
                 .Callback(() => mutex.Set());
 
-            using var listener = new RuntimeEventListener(metricSender.Object, TimeSpan.FromSeconds(10));
+            var settings = SettingsGenerator.Generate();
+            using var listener = new RuntimeEventListener(settings, metricSender.Object, TimeSpan.FromSeconds(10));
 
             metricSender.Invocations.Clear();
 
@@ -63,17 +65,17 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
                 throw new TimeoutException("Timed-out waiting for pause times to be reported.");
             }
 
-            metricSender.Verify(s => s.SendLong(MetricsNames.Gc.HeapSize, It.IsAny<long>(), MetricType.GAUGE, new[] { "generation:gen0" }), Times.AtLeastOnce);
-            metricSender.Verify(s => s.SendLong(MetricsNames.Gc.HeapSize, It.IsAny<long>(), MetricType.GAUGE, new[] { "generation:gen1" }), Times.AtLeastOnce);
-            metricSender.Verify(s => s.SendLong(MetricsNames.Gc.HeapSize, It.IsAny<long>(), MetricType.GAUGE, new[] { "generation:gen2" }), Times.AtLeastOnce);
-            metricSender.Verify(s => s.SendLong(MetricsNames.Gc.HeapSize, It.IsAny<long>(), MetricType.GAUGE, new[] { "generation:loh" }), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendLong(MetricsNames.NetRuntime.Gc.HeapSize, It.IsAny<long>(), MetricType.GAUGE, new[] { "generation:gen0" }), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendLong(MetricsNames.NetRuntime.Gc.HeapSize, It.IsAny<long>(), MetricType.GAUGE, new[] { "generation:gen1" }), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendLong(MetricsNames.NetRuntime.Gc.HeapSize, It.IsAny<long>(), MetricType.GAUGE, new[] { "generation:gen2" }), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendLong(MetricsNames.NetRuntime.Gc.HeapSize, It.IsAny<long>(), MetricType.GAUGE, new[] { "generation:loh" }), Times.AtLeastOnce);
 
-            metricSender.Verify(s => s.SendLong(MetricsNames.Gc.AllocatedBytes, It.IsAny<long>(), MetricType.CUMULATIVE_COUNTER, It.IsAny<string[]>()), Times.AtLeastOnce);
-            metricSender.Verify(s => s.SendDouble(MetricsNames.Gc.PauseTime, It.IsAny<double>(), MetricType.COUNTER, It.IsAny<string[]>()), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendLong(MetricsNames.NetRuntime.Gc.AllocatedBytes, It.IsAny<long>(), MetricType.CUMULATIVE_COUNTER, It.IsAny<string[]>()), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendDouble(MetricsNames.NetRuntime.Gc.PauseTime, It.IsAny<double>(), MetricType.COUNTER, It.IsAny<string[]>()), Times.AtLeastOnce);
 
 #if NET6_0_OR_GREATER
-            metricSender.Verify(s => s.SendLong(MetricsNames.Gc.HeapSize, It.IsAny<long>(), MetricType.GAUGE, new[] { "generation:poh" }), Times.AtLeastOnce);
-            metricSender.Verify(s => s.SendLong(MetricsNames.Gc.HeapCommittedMemory, It.IsAny<long>(), MetricType.GAUGE, It.IsAny<string[]>()), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendLong(MetricsNames.NetRuntime.Gc.HeapSize, It.IsAny<long>(), MetricType.GAUGE, new[] { "generation:poh" }), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendLong(MetricsNames.NetRuntime.Gc.HeapCommittedMemory, It.IsAny<long>(), MetricType.GAUGE, It.IsAny<string[]>()), Times.AtLeastOnce);
 #endif
         }
 
@@ -105,17 +107,19 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
             };
 
             var metricSender = new Mock<ISignalFxMetricSender>();
-            using var listener = new RuntimeEventListener(metricSender.Object, TimeSpan.FromSeconds(1));
+            var settings = SettingsGenerator.Generate();
+
+            using var listener = new RuntimeEventListener(settings, metricSender.Object, TimeSpan.FromSeconds(1));
 
             // Wait for the counters to be refreshed
             mutex.Wait();
 
-            metricSender.Verify(s => s.SendDouble(MetricsNames.AspNetCoreCurrentRequests, 1.0, MetricType.GAUGE, null), Times.AtLeastOnce);
-            metricSender.Verify(s => s.SendDouble(MetricsNames.AspNetCoreFailedRequests, 2.0, MetricType.GAUGE, null), Times.AtLeastOnce);
-            metricSender.Verify(s => s.SendDouble(MetricsNames.AspNetCoreTotalRequests, 4.0, MetricType.GAUGE, null), Times.AtLeastOnce);
-            metricSender.Verify(s => s.SendDouble(MetricsNames.AspNetCoreRequestQueueLength, 8.0, MetricType.GAUGE, null), Times.AtLeastOnce);
-            metricSender.Verify(s => s.SendDouble(MetricsNames.AspNetCoreConnectionQueueLength, 16.0, MetricType.GAUGE, null), Times.AtLeastOnce);
-            metricSender.Verify(s => s.SendDouble(MetricsNames.AspNetCoreTotalConnections, 32.0, MetricType.GAUGE, null), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendDouble(MetricsNames.AspNetCore.CoreCurrentRequests, 1.0, MetricType.GAUGE, null), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendDouble(MetricsNames.AspNetCore.CoreFailedRequests, 2.0, MetricType.GAUGE, null), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendDouble(MetricsNames.AspNetCore.CoreTotalRequests, 4.0, MetricType.GAUGE, null), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendDouble(MetricsNames.AspNetCore.CoreRequestQueueLength, 8.0, MetricType.GAUGE, null), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendDouble(MetricsNames.AspNetCore.CoreConnectionQueueLength, 16.0, MetricType.GAUGE, null), Times.AtLeastOnce);
+            metricSender.Verify(s => s.SendDouble(MetricsNames.AspNetCore.CoreTotalConnections, 32.0, MetricType.GAUGE, null), Times.AtLeastOnce);
 
             foreach (var counter in counters)
             {

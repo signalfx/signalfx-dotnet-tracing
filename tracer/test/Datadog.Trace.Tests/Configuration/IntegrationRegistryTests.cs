@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using Datadog.Trace.Configuration;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -16,16 +18,16 @@ namespace Datadog.Trace.Tests.Configuration
         public void CanRoundTripIntegrationIds()
         {
             using var scope = new AssertionScope();
-            var values = IntegrationRegistry.Ids.Values;
+            var values = ValuesRegistry<IntegrationId>.Ids.Values;
             values.Should().HaveCountGreaterThan(0);
 
-            foreach (var i in IntegrationRegistry.Ids.Values)
+            foreach (var i in ValuesRegistry<IntegrationId>.Ids.Values)
             {
                 var integrationId = (IntegrationId)i;
-                var name = IntegrationRegistry.GetName(integrationId);
-                IntegrationRegistry.TryGetIntegrationId(name, out var parsedId1).Should().BeTrue();
-                IntegrationRegistry.TryGetIntegrationId(name.ToUpperInvariant(), out var parsedId2).Should().BeTrue();
-                IntegrationRegistry.TryGetIntegrationId(name.ToLowerInvariant(), out var parsedId3).Should().BeTrue();
+                var name = ValuesRegistry<IntegrationId>.GetName(integrationId);
+                ValuesRegistry<IntegrationId>.TryGetValue(name, out var parsedId1).Should().BeTrue();
+                ValuesRegistry<IntegrationId>.TryGetValue(name.ToUpperInvariant(), out var parsedId2).Should().BeTrue();
+                ValuesRegistry<IntegrationId>.TryGetValue(name.ToLowerInvariant(), out var parsedId3).Should().BeTrue();
 
                 parsedId1.Should().Be(integrationId);
                 parsedId2.Should().Be(integrationId);
@@ -36,7 +38,7 @@ namespace Datadog.Trace.Tests.Configuration
         [Fact]
         public void TryGetIntegrationId_ReturnsFalseForUnknownIntegration()
         {
-            IntegrationRegistry.TryGetIntegrationId("blobby", out _).Should().BeFalse();
+            ValuesRegistry<IntegrationId>.TryGetValue("blobby", out _).Should().BeFalse();
         }
     }
 }

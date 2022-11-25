@@ -79,6 +79,8 @@ namespace Datadog.Trace.Configuration
 
             Integrations = new IntegrationSettingsCollection(source);
 
+            MetricsIntegrations = new MetricsIntegrationSettingsCollection(source);
+
             ExporterSettings = new ExporterSettings(source);
 
 #pragma warning disable 618 // App analytics is deprecated, but still used
@@ -196,9 +198,6 @@ namespace Datadog.Trace.Configuration
             CpuProfilingEnabled = source?.GetBool(ConfigurationKeys.AlwaysOnProfiler.CpuEnabled) ?? false;
             var memoryProfilingEnabled = source?.GetBool(ConfigurationKeys.AlwaysOnProfiler.MemoryEnabled) ?? false;
             MemoryProfilingEnabled = memoryProfilingEnabled;
-            var runtimeMetricsExplicitlyEnabled = source?.GetBool(ConfigurationKeys.RuntimeMetricsEnabled) ??
-                                        false;
-            RuntimeMetricsEnabled = runtimeMetricsExplicitlyEnabled || memoryProfilingEnabled;
             ThreadSamplingPeriod = GetThreadSamplingPeriod(source);
 
             var profilingExportInterval = source?.GetInt32(ConfigurationKeys.AlwaysOnProfiler.ExportInterval) ?? 10000;
@@ -346,6 +345,11 @@ namespace Datadog.Trace.Configuration
         public IntegrationSettingsCollection Integrations { get; }
 
         /// <summary>
+        /// Gets a collection of <see cref="MetricsIntegrations"/> keyed by metric integration name.
+        /// </summary>
+        public MetricsIntegrationSettingsCollection MetricsIntegrations { get; }
+
+        /// <summary>
         /// Gets or sets the global tags, which are applied to all <see cref="Span"/>s.
         /// </summary>
         public IDictionary<string, string> GlobalTags { get; set; }
@@ -401,12 +405,6 @@ namespace Datadog.Trace.Configuration
         /// <seealso cref="ConfigurationKeys.Convention"/>
         /// </summary>
         public ConventionType Convention { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether runtime metrics
-        /// are enabled and sent to DogStatsd.
-        /// </summary>
-        public bool RuntimeMetricsEnabled { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether stats are computed on the tracer side

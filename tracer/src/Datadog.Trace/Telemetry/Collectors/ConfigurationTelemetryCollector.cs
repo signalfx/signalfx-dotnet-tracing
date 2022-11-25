@@ -123,7 +123,6 @@ namespace Datadog.Trace.Telemetry
                 new(ConfigTelemetryData.SampleRate, value: settings.GlobalSamplingRate),
                 new(ConfigTelemetryData.SamplingRules, value: settings.CustomSamplingRules),
                 new(ConfigTelemetryData.LogInjectionEnabled, value: settings.LogsInjectionEnabled),
-                new(ConfigTelemetryData.RuntimeMetricsEnabled, value: settings.RuntimeMetricsEnabled),
                 new(ConfigTelemetryData.RoutetemplateResourcenamesEnabled, value: settings.RouteTemplateResourceNamesEnabled),
                 new(ConfigTelemetryData.RoutetemplateExpansionEnabled, value: settings.ExpandRouteTemplatesEnabled),
                 new(ConfigTelemetryData.PartialflushEnabled, value: settings.ExporterSettings.PartialFlushEnabled),

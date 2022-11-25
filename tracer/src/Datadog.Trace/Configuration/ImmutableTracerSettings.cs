@@ -51,6 +51,7 @@ namespace Datadog.Trace.Configuration
             CustomSamplingRules = settings.CustomSamplingRules;
             GlobalSamplingRate = settings.GlobalSamplingRate;
             Integrations = new ImmutableIntegrationSettingsCollection(settings.Integrations, settings.DisabledIntegrationNames);
+            MetricsIntegrations = new ImmutableMetricsIntegrationSettingsCollection(settings.MetricsIntegrations, settings.MemoryProfilingEnabled);
             GlobalTags = new ReadOnlyDictionary<string, string>(settings.GlobalTags);
             HeaderTags = new ReadOnlyDictionary<string, string>(settings.HeaderTags);
             GrpcTags = new ReadOnlyDictionary<string, string>(settings.GrpcTags);
@@ -58,7 +59,6 @@ namespace Datadog.Trace.Configuration
             IpHeaderDisabled = settings.IpHeaderDisabled;
             TracerMetricsEnabled = settings.TracerMetricsEnabled;
             StatsComputationEnabled = settings.StatsComputationEnabled;
-            RuntimeMetricsEnabled = settings.RuntimeMetricsEnabled;
             KafkaCreateConsumerScopeEnabled = settings.KafkaCreateConsumerScopeEnabled;
             StartupDiagnosticLogEnabled = settings.StartupDiagnosticLogEnabled;
             HttpClientExcludedUrlSubstrings = settings.HttpClientExcludedUrlSubstrings;
@@ -187,6 +187,11 @@ namespace Datadog.Trace.Configuration
         public ImmutableIntegrationSettingsCollection Integrations { get; }
 
         /// <summary>
+        /// Gets a collection of <see cref="Integrations"/> keyed by integration name.
+        /// </summary>
+        public ImmutableMetricsIntegrationSettingsCollection MetricsIntegrations { get; }
+
+        /// <summary>
         /// Gets the global tags, which are applied to all <see cref="Span"/>s.
         /// </summary>
         public IReadOnlyDictionary<string, string> GlobalTags { get; }
@@ -235,12 +240,6 @@ namespace Datadog.Trace.Configuration
         /// Gets a value indicating whether the diagnostic log at startup is enabled
         /// </summary>
         public bool StartupDiagnosticLogEnabled { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether runtime metrics
-        /// are enabled and sent to DogStatsd.
-        /// </summary>
-        internal bool RuntimeMetricsEnabled { get; }
 
         /// <summary>
         /// Gets the comma separated list of url patterns to skip tracing.

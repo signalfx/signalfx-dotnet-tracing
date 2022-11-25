@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.Configuration;
@@ -17,7 +19,7 @@ namespace Datadog.Trace.Tests.Telemetry
     public class IntegrationTelemetryCollectorTests
     {
         private const IntegrationId IntegrationId = Trace.Configuration.IntegrationId.Kafka;
-        private static readonly string IntegrationName = IntegrationRegistry.GetName(IntegrationId);
+        private static readonly string IntegrationName = ValuesRegistry<IntegrationId>.GetName(IntegrationId);
 
         [Fact]
         public void HasChangesWhenNewIntegrationRunning()

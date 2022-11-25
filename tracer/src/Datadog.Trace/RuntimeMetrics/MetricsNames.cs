@@ -9,30 +9,34 @@ namespace Datadog.Trace.RuntimeMetrics
 {
     internal static class MetricsNames
     {
-        public const string ExceptionsCount = "process.runtime.dotnet.exceptions.count";
-
-        public const string ContentionCount = "process.runtime.dotnet.monitor.lock_contention.count";
-
-        public const string ThreadPoolWorkersCount = "process.runtime.dotnet.thread_pool.threads.count";
-
-        public const string AspNetCoreCurrentRequests = "runtime.dotnet.aspnetcore.requests.current";
-
-        public const string AspNetCoreFailedRequests = "runtime.dotnet.aspnetcore.requests.failed";
-        public const string AspNetCoreTotalRequests = "runtime.dotnet.aspnetcore.requests.total";
-        public const string AspNetCoreRequestQueueLength = "runtime.dotnet.aspnetcore.requests.queue_length";
-
-        public const string AspNetCoreCurrentConnections = "runtime.dotnet.aspnetcore.connections.current";
-        public const string AspNetCoreConnectionQueueLength = "runtime.dotnet.aspnetcore.connections.queue_length";
-        public const string AspNetCoreTotalConnections = "runtime.dotnet.aspnetcore.connections.total";
-
-        internal static class Gc
+        internal static class AspNetCore
         {
-            public const string CollectionsCount = "process.runtime.dotnet.gc.collections.count";
-            public const string HeapSize = "process.runtime.dotnet.gc.heap.size";
-            public const string TotalObjectsSize = "process.runtime.dotnet.gc.objects.size";
-            public const string AllocatedBytes = "process.runtime.dotnet.gc.allocations.size";
-            public const string HeapCommittedMemory = "process.runtime.dotnet.gc.committed_memory.size";
-            public const string PauseTime = "process.runtime.dotnet.gc.pause.time";
+            public const string CoreCurrentRequests = "signalfx.dotnet.aspnetcore.requests.current";
+
+            public const string CoreFailedRequests = "signalfx.dotnet.aspnetcore.requests.failed";
+            public const string CoreTotalRequests = "signalfx.dotnet.aspnetcore.requests.total";
+            public const string CoreRequestQueueLength = "signalfx.dotnet.aspnetcore.requests.queue_length";
+
+            public const string CoreCurrentConnections = "signalfx.dotnet.aspnetcore.connections.current";
+            public const string CoreConnectionQueueLength = "signalfx.dotnet.aspnetcore.connections.queue_length";
+            public const string CoreTotalConnections = "signalfx.dotnet.aspnetcore.connections.total";
+        }
+
+        internal static class NetRuntime
+        {
+            public const string ExceptionsCount = "process.runtime.dotnet.exceptions.count";
+            public const string ContentionCount = "process.runtime.dotnet.monitor.lock_contention.count";
+            public const string ThreadPoolWorkersCount = "process.runtime.dotnet.thread_pool.threads.count";
+
+            internal static class Gc
+            {
+                public const string CollectionsCount = "process.runtime.dotnet.gc.collections.count";
+                public const string HeapSize = "process.runtime.dotnet.gc.heap.size";
+                public const string TotalObjectsSize = "process.runtime.dotnet.gc.objects.size";
+                public const string AllocatedBytes = "process.runtime.dotnet.gc.allocations.size";
+                public const string HeapCommittedMemory = "process.runtime.dotnet.gc.committed_memory.size";
+                public const string PauseTime = "process.runtime.dotnet.gc.pause.time";
+            }
         }
 
         internal static class Process

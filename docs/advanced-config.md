@@ -58,7 +58,8 @@ The following settings are common to most instrumentation scenarios:
 | `SIGNALFX_PROFILER_PROCESSES` | Sets the filename of executables the profiler can attach to. Supports multiple semicolon-separated values, for example: `MyApp.exe;dotnet.exe` |  |
 | `SIGNALFX_TRACE_CONFIG_FILE` | Path of the JSON configuration file. |  |
 | `SIGNALFX_TRACE_ENABLED` | Enable to activate the tracer. | `true` |
-| `SIGNALFX_RUNTIME_METRICS_ENABLED` | Enable to activate the runtime metrics. | `false` |
+| `SIGNALFX_METRICS_{0}_ENABLED` | Configuration pattern for enabling or disabling a specific group of metrics. See [metrics.md](metrics.md)
+for details. | `false` |
 | `SIGNALFX_TRACE_METRICS_ENABLED` | Enable to activate additional trace metrics. | `false` |
 
 ## Global instrumentation settings

@@ -7,10 +7,15 @@ The SignalFx Instrumentation for .NET includes automatic runtime metrics collect
 When enabled, metrics are periodically captured and sent
 to Splunk Observability Cloud.
 
-To enable runtime metrics, set the `SIGNALFX_RUNTIME_METRICS_ENABLED` environment
+To enable runtime metrics, set the `SIGNALFX_METRICS_{0}_ENABLED` environment
 variable to `true` for your .NET process.
+The supported metrics types are `NetRuntime`, `Process`, `AspNetCore`.
+For example, in order to enable `NetRuntime` metrics, set `SIGNALFX_METRICS_NetRuntime_ENABLED=true`.
 
-> Runtime metrics are automatically enabled when [AlwaysOn memory profiling](internal/memory-profiling.md) is enabled. Memory profiling setting overrides metrics setting (runtime metrics will always be enabled if memory profiling is enabled, even if `SIGNALFX_RUNTIME_METRICS_ENABLED` is set to `false`). 
+> Runtime metrics are automatically enabled when [AlwaysOn memory profiling](internal/memory-profiling.md)
+is enabled. Memory profiling setting overrides metrics setting (runtime metrics
+will always be enabled if memory profiling is enabled,
+even if `SIGNALFX_METRICS_NetRuntime_ENABLED` is set to `false`).
 
 The following metrics are collected by default after enabling .NET metrics.
 To learn about differences between SignalFx metric types, visit [documentation](https://docs.splunk.com/Observability/metrics-and-metadata/metric-types.html#metric-types).
@@ -48,13 +53,13 @@ Names and metric structure of the metrics exported are aligned with the OpenTele
 
 | Metric                                                  | Description                                                                                                                       | Type               |
 |:--------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------|:-------------------|
-| `runtime.dotnet.aspnetcore.connections.current`         | The current number of active HTTP connections to the web server. (.NET Core only)                                                 | Gauge              |
-| `runtime.dotnet.aspnetcore.connections.queue_length`    | The current length of the HTTP connection queue. (.NET Core only)                                                                 | Gauge              |
-| `runtime.dotnet.aspnetcore.connections.total`           | The total number of HTTP connections to the web server. (.NET Core only)                                                          | Gauge              |
-| `runtime.dotnet.aspnetcore.requests.current`            | The current number of HTTP requests that have started, but not yet stopped. (.NET Core only)                                      | Gauge              |
-| `runtime.dotnet.aspnetcore.requests.failed`             | The number of failed HTTP requests received by the server. (.NET Core only)                                                       | Gauge              |
-| `runtime.dotnet.aspnetcore.requests.queue_length`       | The current length of the HTTP request queue.                                                                                     | Gauge              |
-| `runtime.dotnet.aspnetcore.requests.total`              | The total number of HTTP requests received by the server. (.NET Core only)                                                        | Gauge              |
+| `signalfx.dotnet.aspnetcore.connections.current`         | The current number of active HTTP connections to the web server.                                                | Gauge              |
+| `signalfx.dotnet.aspnetcore.connections.queue_length`    | The current length of the HTTP connection queue.                                                                 | Gauge              |
+| `signalfx.dotnet.aspnetcore.connections.total`           | The total number of HTTP connections to the web server.                                                          | Gauge              |
+| `signalfx.dotnet.aspnetcore.requests.current`            | The current number of HTTP requests that have started, but not yet stopped.                                      | Gauge              |
+| `signalfx.dotnet.aspnetcore.requests.failed`             | The number of failed HTTP requests received by the server.                                                       | Gauge              |
+| `signalfx.dotnet.aspnetcore.requests.queue_length`       | The current length of the HTTP request queue.                                                                                     | Gauge              |
+| `signalfx.dotnet.aspnetcore.requests.total`              | The total number of HTTP requests received by the server.                                                        | Gauge              |
 
 ## Additional permissions for IIS
 
