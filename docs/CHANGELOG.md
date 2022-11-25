@@ -28,8 +28,10 @@ that allows to enable specific metrics groups (See [advanced-config](advanced-co
 
 - Add `SIGNALFX_TRACE_BUFFER_SIZE` setting to configure trace exporter buffer size.
 - Add `SIGNALFX_METRICS_{0}_ENABLED` to enable specific metrics group.
-- Change metric structure of the metrics exported to align with the OpenTelemetry
+- Change metric structure of the runtime metrics exported to align with the OpenTelemetry
 implementation from the [Runtime](https://github.com/open-telemetry/opentelemetry-dotnet-contrib/blob/bc947a00c3f859cc436f050e81172fc1f8bc09d7/src/OpenTelemetry.Instrumentation.Runtime) package.
+- Change metric structure of the process metrics exported to align with the OpenTelemetry
+implementation from the [Process](https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/926386e68c9066e8032853e8309abdf4088d8dca/src/OpenTelemetry.Instrumentation.Process) package.
 
 ## [Release 0.2.9](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.2.9)
 
