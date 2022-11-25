@@ -26,6 +26,7 @@ that allows to enable specific metrics groups (See [advanced-config](advanced-co
 
 ### Enhancements
 
+- Add support for .NET 7.0.
 - Add `SIGNALFX_TRACE_BUFFER_SIZE` setting to configure trace exporter buffer size.
 - Add `SIGNALFX_METRICS_{0}_ENABLED` to enable specific metrics group.
 - Change metric structure of the runtime metrics exported to align with the OpenTelemetry
