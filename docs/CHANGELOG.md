@@ -13,10 +13,16 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 ### Breaking changes
 
+### Bugfixes
+
+### Enhancements
+
+## [Release 0.2.10](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v0.2.10)
+
+### Breaking changes
+
 - Replace `SIGNALFX_RUNTIME_METRICS_ENABLED` setting with `SIGNALFX_METRICS_{0}_ENABLED`,
 that allows to enable specific metrics groups (See [advanced-config](advanced-config.md)).
-
-### Bugfixes
 
 ### Enhancements
 

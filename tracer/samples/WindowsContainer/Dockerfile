@@ -6,7 +6,7 @@
 FROM mcr.microsoft.com/dotnet/aspnet:5.0-windowsservercore-ltsc2019 AS base
 WORKDIR /app
 
-ARG TRACER_VERSION=0.2.9
+ARG TRACER_VERSION=0.2.10
 ENV SIGNALFX_TRACER_VERSION=$TRACER_VERSION
 ENV ASPNETCORE_URLS=http://*.80
 

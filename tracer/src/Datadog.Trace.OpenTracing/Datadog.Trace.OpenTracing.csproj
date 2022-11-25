@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <!-- NuGet -->
-    <Version>0.2.9</Version>
+    <Version>0.2.10</Version>
     <Title>SignalFx Tracing OpenTracing</Title>
     <Description>Provides OpenTracing support for SignalFx Tracing</Description>
 	  <AssemblyName>SignalFx.Tracing.OpenTracing</AssemblyName>

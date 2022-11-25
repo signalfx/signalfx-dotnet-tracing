@@ -3,7 +3,7 @@
 
 #pragma once
 
-constexpr auto PROFILER_VERSION = "0.2.9";
+constexpr auto PROFILER_VERSION = "0.2.10";
 
 // The beta revision is temporary
 constexpr auto PROFILER_BETA_REVISION = "1";

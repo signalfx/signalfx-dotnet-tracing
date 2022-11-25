@@ -15,7 +15,7 @@ WORKDIR /app
 COPY --from=build /app/out .
 
 # Set up Datadog APM
-ARG TRACER_VERSION=0.2.9
+ARG TRACER_VERSION=0.2.10
 RUN mkdir -p /var/log/signalfx
 RUN mkdir -p /opt/signalfx
 RUN curl -LO https://github.com/signalfx/signalfx-dotnet-tracing/releases/download/v${TRACER_VERSION}/signalfx-dotnet-tracing_${TRACER_VERSION}_amd64.deb
