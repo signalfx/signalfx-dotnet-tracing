@@ -15,6 +15,8 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 - Replace `SIGNALFX_RUNTIME_METRICS_ENABLED` setting with `SIGNALFX_METRICS_{0}_ENABLED`,
 that allows to enable specific metrics groups (See [advanced-config](advanced-config.md)).
+- Rename `SIGNALFX_TRACE_METRICS_ENABLED` to `SIGNALFX_METRICS_Traces_ENABLED` to
+preserve consistent naming convention.
 
 ### Bugfixes
 

@@ -196,7 +196,7 @@ namespace Datadog.Trace.Configuration
         /// Configuration key for enabling or disabling internal metrics sent to DogStatsD.
         /// Default value is <c>false</c> (disabled).
         /// </summary>
-        public const string TracerMetricsEnabled = "SIGNALFX_TRACE_METRICS_ENABLED";
+        public const string TracerMetricsEnabled = "SIGNALFX_METRICS_Traces_ENABLED";
 
         /// <summary>
         /// Configuration key for enabling or disabling tagging Redis

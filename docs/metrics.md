@@ -84,7 +84,7 @@ net localgroup "Performance Monitor Users" "IIS APPPOOL\DefaultAppPool" /add
 
 The SignalFx Instrumentation for .NET supports trace metrics collection.
 
-To enable additional metrics related to traces, set the `SIGNALFX_TRACE_METRICS_ENABLED`
+To enable additional metrics related to traces, set the `SIGNALFX_METRICS_Traces_ENABLED`
 environment variable to `true` for your .NET process.
 
 | Metric                                   | Description                                               | Type     |
