@@ -59,7 +59,6 @@ The following settings are common to most instrumentation scenarios:
 | `SIGNALFX_TRACE_CONFIG_FILE` | Path of the JSON configuration file. |  |
 | `SIGNALFX_TRACE_ENABLED` | Enable to activate the tracer. | `true` |
 | `SIGNALFX_METRICS_{0}_ENABLED` | Configuration pattern for enabling or disabling a specific group of metrics. See [metrics.md](metrics.md) for details. | `false` |
-| `SIGNALFX_TRACE_METRICS_ENABLED` | Enable to activate additional trace metrics. | `false` |
 
 ## Global instrumentation settings
 
