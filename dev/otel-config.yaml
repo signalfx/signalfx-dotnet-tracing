@@ -41,9 +41,6 @@ exporters:
       insecure: true
   prometheus:
     endpoint: "0.0.0.0:8889"
-    namespace: promexample
-    const_labels:
-      label1: value1
 
 service:
   pipelines:
@@ -54,7 +51,7 @@ service:
     metrics:
       receivers: [signalfx]
       processors: [batch]
-      exporters: [logging, signalfx]
+      exporters: [logging, prometheus, signalfx]
     logs:
       receivers: [otlp]
       processors: [batch]
