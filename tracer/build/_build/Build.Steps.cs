@@ -1036,7 +1036,7 @@ partial class Build
                     .SetProperty("VSTestNoBuild", true)
                     .SetNoLogo(true)
                     .SetFilter(Filter ?? "RunOnWindows=True&LoadFromGAC!=True&IIS!=True")
-                    .CombineWith(ParallelIntegrationTests, (s, project) => s
+                    .CombineWith(ClrProfilerIntegrationTests, (s, project) => s
                         .EnableTrxLogOutput(GetResultsDirectory(project))
                         .SetTargetPath(project)));
             }
