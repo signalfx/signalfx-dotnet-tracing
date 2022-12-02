@@ -66,7 +66,7 @@ The following settings are common to most instrumentation scenarios:
 |-|-|-|
 | `SIGNALFX_DISABLED_INTEGRATIONS` | Comma-separated list of disabled library instrumentations. The available integration ID values can be found [here](instrumented-libraries.md). |  |
 | `SIGNALFX_RECORDED_VALUE_MAX_LENGTH` | The maximum length an attribute value can have. Values longer than this are truncated. Values are discarded entirely when set to 0, and ignored when set to a negative value. | `12000` |
-| `SIGNALFX_TRACE_GLOBAL_TAGS` | Comma-separated list of key-value pairs that specify global span tags. For example: `"key1:val1,key2:val2"` |  |
+| `SIGNALFX_GLOBAL_TAGS` | Comma-separated list of key-value pairs that specify global tags added to all telemetry signals. For example: `"key1:val1,key2:val2"` |  |
 | `SIGNALFX_TRACE_{0}_ENABLED` | Configuration pattern for enabling or disabling a specific [library instrumentation](instrumented-libraries.md). For example, in order to disable Kafka instrumentation, set `SIGNALFX_TRACE_Kafka_ENABLED=false` | `true` |
 
 ## Exporter settings

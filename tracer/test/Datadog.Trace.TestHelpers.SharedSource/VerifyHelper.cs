@@ -22,7 +22,6 @@ namespace Datadog.Trace.TestHelpers
         private static readonly Regex LocalhostRegex = new(@"localhost\:\d+", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private static readonly Regex LoopBackRegex = new(@"127.0.0.1\:\d+", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private static readonly Regex KeepRateRegex = new(@"_dd.tracer_kr: \d\.\d+", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        private static readonly Regex ThreadSamplingVersionRegex = new(@"StringValue: \d\.\d\.\d\.\d", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private static readonly Regex ProcessIdRegex = new(@"process_id: \d+\.0", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private static readonly Regex ClientIpRegex = new(@"net.peer.ip: (.)*(?=,)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private static readonly Regex GrpcUserAgentRegex = new(@"http.user_agent: grpc-dotnet\/(.)*(?=,)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
@@ -77,24 +76,6 @@ namespace Datadog.Trace.TestHelpers
             settings.AddRegexScrubber(ClientIpRegex, "net.peer.ip: 127.0.0.1");
             settings.AddRegexScrubber(GrpcUserAgentRegex, "http.user_agent: grpc-dotnet/123");
             settings.ScrubInlineGuids();
-            return settings;
-        }
-
-        public static VerifySettings GetThreadSamplingVerifierSettings(params object[] parameters)
-        {
-            var settings = new VerifySettings();
-
-            DerivePathInfoForSnapshotFiles();
-
-            if (parameters.Length > 0)
-            {
-                settings.UseParameters(parameters);
-            }
-
-            settings.DisableRequireUniquePrefix();
-
-            settings.AddScrubber(builder => ReplaceRegex(builder, ThreadSamplingVersionRegex, "StringValue: w.x.y.z"));
-
             return settings;
         }
 

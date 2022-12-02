@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Datadog.Trace.Configuration;
 using Datadog.Tracer.OpenTelemetry.Proto.Common.V1;
 using Datadog.Tracer.OpenTelemetry.Proto.Logs.V1;
@@ -21,7 +22,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
         {
             // The same _logsData instance is used on all export messages. With the exception of the list of
             // LogRecords, the Logs property, all other fields are prepopulated.
-            _logsData = GdiProfilingConventions.CreateLogsData(tracerSettings.GlobalTags);
+            _logsData = GdiProfilingConventions.CreateLogsData(tracerSettings);
             _logSender = logSender ?? throw new ArgumentNullException(nameof(logSender));
 
             _format = GdiProfilingConventions.LogRecord.Attributes.Format(format);
@@ -85,11 +86,12 @@ namespace Datadog.Trace.AlwaysOnProfiler
             {
                 Attributes =
                 {
-                    GdiProfilingConventions.LogRecord.Attributes.Source,
-                    profilingDataType,
-                    _format
+                    GdiProfilingConventions.LogRecord.Attributes.Source, profilingDataType, _format
                 },
-                Body = new AnyValue { StringValue = body }
+                Body = new AnyValue
+                {
+                    StringValue = body
+                }
             };
 
             _logsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs.Add(logRecord);
@@ -105,13 +107,21 @@ namespace Datadog.Trace.AlwaysOnProfiler
             private const string OpenTelemetryProfiling = "otel.profiling";
             private const string Version = "0.1.0";
 
-            public static LogsData CreateLogsData(IEnumerable<KeyValuePair<string, string>> additionalResources)
+            public static LogsData CreateLogsData(ImmutableTracerSettings tracerSettings)
             {
-                var resource = OpenTelemetry.Resource;
-                foreach (var kvp in additionalResources)
-                {
-                    resource.Attributes.Add(new KeyValue { Key = kvp.Key, Value = new AnyValue { StringValue = kvp.Value } });
-                }
+                var resource = new Resource();
+                var profilingAttributes = OtelResource
+                                         .GetCommonAttributes(tracerSettings, CorrelationIdentifier.Service)
+                                         .Select(kv =>
+                                                     new KeyValue
+                                                     {
+                                                         Key = kv.Key,
+                                                         Value = new AnyValue
+                                                         {
+                                                             StringValue = kv.Value
+                                                         }
+                                                     });
+                resource.Attributes.AddRange(profilingAttributes);
 
                 return new LogsData
                 {
@@ -123,10 +133,10 @@ namespace Datadog.Trace.AlwaysOnProfiler
                             {
                                 new InstrumentationLibraryLogs
                                 {
-                                    InstrumentationLibrary = OpenTelemetry.InstrumentationLibrary,
-                                },
+                                    InstrumentationLibrary = OpenTelemetry.InstrumentationLibrary
+                                }
                             },
-                            Resource = OpenTelemetry.Resource
+                            Resource = resource
                         }
                     }
                 };
@@ -139,19 +149,6 @@ namespace Datadog.Trace.AlwaysOnProfiler
                     Name = OpenTelemetryProfiling,
                     Version = Version
                 };
-
-                public static readonly Resource Resource = new()
-                {
-                    Attributes =
-                    {
-                        new KeyValue { Key = CorrelationIdentifier.EnvKey, Value = new AnyValue { StringValue = CorrelationIdentifier.Env } },
-                        new KeyValue { Key = CorrelationIdentifier.ServiceKey, Value = new AnyValue { StringValue = CorrelationIdentifier.Service } },
-                        new KeyValue { Key = "telemetry.sdk.name", Value = new AnyValue { StringValue = "signalfx-" + TracerConstants.Library } },
-                        new KeyValue { Key = "telemetry.sdk.language", Value = new AnyValue { StringValue = TracerConstants.Language } },
-                        new KeyValue { Key = "telemetry.sdk.version", Value = new AnyValue { StringValue = TracerConstants.AssemblyVersion } },
-                        new KeyValue { Key = "splunk.distro.version", Value = new AnyValue { StringValue = TracerConstants.AssemblyVersion } }
-                    }
-                };
             }
 
             public static class LogRecord
@@ -161,7 +158,10 @@ namespace Datadog.Trace.AlwaysOnProfiler
                     public static readonly KeyValue Source = new()
                     {
                         Key = "com.splunk.sourcetype",
-                        Value = new AnyValue { StringValue = OpenTelemetryProfiling }
+                        Value = new AnyValue
+                        {
+                            StringValue = OpenTelemetryProfiling
+                        }
                     };
 
                     public static KeyValue Type(string sampleType)
@@ -181,7 +181,10 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         return new KeyValue
                         {
                             Key = "source.event.period",
-                            Value = new AnyValue { IntValue = periodMilliseconds }
+                            Value = new AnyValue
+                            {
+                                IntValue = periodMilliseconds
+                            }
                         };
                     }
 
