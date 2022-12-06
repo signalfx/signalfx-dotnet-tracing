@@ -11,6 +11,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using OpenTelemetry.TestHelpers.Proto.Common.V1;
 using OpenTelemetry.TestHelpers.Proto.Logs.V1;
+using OpenTelemetry.TestHelpers.Proto.Resource.V1;
 using VerifyXunit;
 using Xunit;
 using Xunit.Abstractions;
@@ -43,9 +44,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 // On a dev box it is typical to get at least 4 but the CI machines seem slower, using 2
                 logsData.Length.Should().BeGreaterOrEqualTo(expected: 2);
 
-                var settings = VerifyHelper.GetThreadSamplingVerifierSettings();
-                settings.UseTextForParameters("OnlyCommonAttributes");
-
                 await DumpLogRecords(logsData);
 
                 var containStackTraceForClassHierarchy = false;
@@ -53,7 +51,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 foreach (var data in logsData)
                 {
-                    var logRecords = data.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs;
+                    var dataResourceLog = data.ResourceLogs[0];
+                    var instrumentationLibraryLogs = dataResourceLog.InstrumentationLibraryLogs[0];
+                    var logRecords = instrumentationLibraryLogs.Logs;
 
                     containStackTraceForClassHierarchy |= logRecords.Any(record => ContainStackTraceForClassHierarchy(record, expectedStackTrace));
 
@@ -61,11 +61,12 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     {
                         AllShouldHaveCorrectAttributes(logRecords, ExpectedAttributes());
                         AllBodiesShouldHaveCorrectFormat(logRecords);
+                        ContainsExpectedAttributes(dataResourceLog.Resource);
+                        HasNameAndVersionSet(instrumentationLibraryLogs.InstrumentationLibrary);
                     }
 
                     // all samples should contain the same common attributes, only stack traces are vary
                     logRecords.Clear();
-                    await Verifier.Verify(data, settings);
                 }
 
                 Assert.True(containStackTraceForClassHierarchy, "At least one stack trace containing class hierarchy should be reported.");

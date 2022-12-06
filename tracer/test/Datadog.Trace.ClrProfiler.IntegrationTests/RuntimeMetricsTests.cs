@@ -6,8 +6,11 @@
 // Modified by Splunk Inc.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.TestHelpers;
+using Datadog.Tracer.SignalFx.Metrics.Protobuf;
+using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -33,7 +36,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             using var processResult = RunSampleAndWaitForExit(agent);
             var requests = agent.Metrics;
 
-            Assert.True(requests.Count == 0, "Received metrics despite being disabled. Metrics received: " + string.Join("\n", requests));
+            requests.Count.Should().Be(0, "When metrics are disabled, no metrics should be sent.");
         }
 
         [SkippableFact]
@@ -79,31 +82,52 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetEnvironmentVariable("SIGNALFX_METRICS_NetRuntime_ENABLED", "1");
             SetInstrumentationVerification();
 
+            var constantDimensions = new List<Dimension>
+            {
+                new() { key = "deployment.environment", value = "integration_tests" },
+                new() { key = "service.name", value = "Samples.RuntimeMetrics" },
+                new() { key = "telemetry.sdk.name", value = "signalfx-dotnet-tracing" },
+                new() { key = "telemetry.sdk.language", value = "dotnet" },
+                new() { key = "telemetry.sdk.version", value = TracerConstants.AssemblyVersion },
+                new() { key = "splunk.distro.version", value = TracerConstants.AssemblyVersion }
+            };
+
             using var agent = EnvironmentHelper.GetMockAgent(useStatsD: true);
 
             using var processResult = RunSampleAndWaitForExit(agent);
 
-            var requests = agent.Metrics;
+            var dataPoints = agent.Metrics;
 
             // Check if we receive 2 kinds of metrics:
             // - exception count is gathered using common .NET APIs
             // - contention count is gathered using platform-specific APIs
 
-            var exceptionRequestsCount = requests.Count(r => r.metric == "process.runtime.dotnet.exceptions.count");
+            var exceptionRequestsCount = dataPoints.Count(r => r.metric == "process.runtime.dotnet.exceptions.count");
 
-            Assert.True(exceptionRequestsCount > 0, "No exception metrics received.");
+            exceptionRequestsCount.Should().BeGreaterThan(0);
 
             // Check if .NET Framework or .NET Core 3.1+
             if (!EnvironmentHelper.IsCoreClr()
              || (Environment.Version.Major == 3 && Environment.Version.Minor == 1)
              || Environment.Version.Major >= 5)
             {
-                var contentionRequestsCount = requests.Count(r => r.metric == "process.runtime.dotnet.monitor.lock_contention.count");
+                var contentionRequestsCount = dataPoints.Count(r => r.metric == "process.runtime.dotnet.monitor.lock_contention.count");
 
-                Assert.True(contentionRequestsCount > 0, "No contention metrics received.");
+                contentionRequestsCount.Should().BeGreaterThan(0);
             }
 
-            Assert.Empty(agent.Exceptions);
+            foreach (var dataPoint in dataPoints)
+            {
+                foreach (var dimension in constantDimensions)
+                {
+                    dataPoint.dimensions.Should().ContainEquivalentOf(dimension);
+                }
+
+                dataPoint.dimensions.Should().Contain(dimension => dimension.key == "host.name");
+                dataPoint.dimensions.Should().Contain(dimension => dimension.key == "process.pid");
+            }
+
+            agent.Exceptions.Should().BeEmpty();
             VerifyInstrumentation(processResult.Process);
         }
     }

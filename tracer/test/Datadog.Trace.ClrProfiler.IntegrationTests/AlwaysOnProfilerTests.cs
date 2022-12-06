@@ -7,12 +7,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Datadog.Trace.TestHelpers;
 using FluentAssertions;
 using OpenTelemetry.TestHelpers.Proto.Collector.Logs.V1;
 using OpenTelemetry.TestHelpers.Proto.Common.V1;
 using OpenTelemetry.TestHelpers.Proto.Logs.V1;
+using OpenTelemetry.TestHelpers.Proto.Resource.V1;
 using Xunit.Abstractions;
 
 namespace Datadog.Trace.ClrProfiler.IntegrationTests
@@ -78,6 +80,33 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             stackTrace.Add("My.Custom.Test.Namespace.ClassA.MethodA()");
 
             return stackTrace;
+        }
+
+        protected static void ContainsExpectedAttributes(Resource resource)
+        {
+            var constantAttributes = new List<KeyValue>
+            {
+                new() { Key = "deployment.environment", Value = new AnyValue { StringValue = "integration_tests" } },
+                new() { Key = "service.name", Value = new AnyValue { StringValue = "Samples.AlwaysOnProfiler" } },
+                new() { Key = "telemetry.sdk.name", Value = new AnyValue { StringValue = "signalfx-dotnet-tracing" } },
+                new() { Key = "telemetry.sdk.language", Value = new AnyValue { StringValue = "dotnet" } },
+                new() { Key = "telemetry.sdk.version", Value = new AnyValue { StringValue = TracerConstants.AssemblyVersion } },
+                new() { Key = "splunk.distro.version", Value = new AnyValue { StringValue = TracerConstants.AssemblyVersion } },
+            };
+
+            foreach (var constantAttribute in constantAttributes)
+            {
+                resource.Attributes.Should().ContainEquivalentOf(constantAttribute);
+            }
+
+            resource.Attributes.Should().Contain(value => value.Key == "host.name");
+            resource.Attributes.Should().Contain(value => value.Key == "process.pid");
+        }
+
+        protected static void HasNameAndVersionSet(InstrumentationLibrary instrumentationLibrary)
+        {
+            instrumentationLibrary.Name.Should().Be("otel.profiling");
+            instrumentationLibrary.Version.Should().Be("0.1.0");
         }
 
         protected async Task DumpLogRecords(ExportLogsServiceRequest[] logsData)

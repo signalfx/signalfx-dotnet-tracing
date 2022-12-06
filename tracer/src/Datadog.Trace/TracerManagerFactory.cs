@@ -13,6 +13,7 @@ using System.Threading;
 using Datadog.Trace.Abstractions;
 using Datadog.Trace.Agent;
 using Datadog.Trace.Agent.Zipkin;
+using Datadog.Trace.AlwaysOnProfiler;
 using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.ContinuousProfiler;
@@ -253,32 +254,15 @@ namespace Datadog.Trace
         private static SignalFxMetricSender CreateMetricSender(ImmutableTracerSettings settings, string serviceName)
         {
             var metricExporter = new SignalFxMetricExporter(settings.ExporterSettings.MetricsEndpointUrl, settings.SignalFxAccessToken);
-            return new SignalFxMetricSender(GetConstantTags(settings, serviceName).ToArray(), metricExporter, MaxMetricsInAsyncQueue);
+            return new SignalFxMetricSender(GetConstantTags(settings, serviceName), metricExporter, MaxMetricsInAsyncQueue);
         }
 
-        private static List<string> GetConstantTags(ImmutableTracerSettings settings, string serviceName)
+        private static string[] GetConstantTags(ImmutableTracerSettings settings, string serviceName)
         {
-            var constantTags = new List<string>
-            {
-                "lang:.NET",
-                $"lang_interpreter:{FrameworkDescription.Instance.Name}",
-                $"lang_version:{FrameworkDescription.Instance.ProductVersion}",
-                $"tracer_version:{TracerConstants.AssemblyVersion}",
-                $"service:{serviceName}",
-                $"{Tags.RuntimeId}:{DistributedTracer.Instance.GetRuntimeId()}"
-            };
-
-            if (settings.Environment != null)
-            {
-                constantTags.Add($"env:{settings.Environment}");
-            }
-
-            if (settings.ServiceVersion != null)
-            {
-                constantTags.Add($"version:{settings.ServiceVersion}");
-            }
-
-            return constantTags;
+            return OtelResource
+                  .GetCommonAttributes(settings, serviceName)
+                  .Select(kv => $"{kv.Key}:{kv.Value}")
+                  .ToArray();
         }
 
         /// <summary>

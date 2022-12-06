@@ -25,6 +25,7 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 that allows to enable specific metrics groups (See [advanced-config](advanced-config.md)).
 - Rename `SIGNALFX_TRACE_METRICS_ENABLED` to `SIGNALFX_METRICS_Traces_ENABLED` to
 preserve consistent naming convention.
+- Rename `SIGNALFX_TRACE_GLOBAL_TAGS` to `SIGNALFX_GLOBAL_TAGS`.
 
 ### Enhancements
 
