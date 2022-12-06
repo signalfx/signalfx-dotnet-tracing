@@ -94,6 +94,8 @@ namespace Datadog.Trace.Configuration
                                           100;
 
             GlobalTags = source?.GetDictionary(ConfigurationKeys.GlobalTags) ??
+                         // backwards compatibility for names used in the past
+                         source?.GetDictionary("SIGNALFX_TRACE_GLOBAL_TAGS") ??
                          // default value (empty)
                          new ConcurrentDictionary<string, string>();
 

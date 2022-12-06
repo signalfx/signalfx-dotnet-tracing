@@ -203,7 +203,7 @@ namespace Datadog.Trace.TestHelpers
                 "SIGNALFX_DISABLED_INTEGRATIONS",
                 "SIGNALFX_SERVICE_NAME",
                 "SIGNALFX_VERSION",
-                "SIGNALFX_TRACE_GLOBAL_TAGS",
+                "SIGNALFX_GLOBAL_TAGS",
                 "SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS",
                 "SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES",
                 "SIGNALFX_CONVENTION",

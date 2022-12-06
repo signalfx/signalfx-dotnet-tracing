@@ -110,7 +110,7 @@ namespace Datadog.Trace.Configuration
         /// value are colon-separated. For example Key1:Value1, Key2:Value2
         /// </summary>
         /// <seealso cref="TracerSettings.GlobalTags"/>
-        public const string GlobalTags = "SIGNALFX_TRACE_GLOBAL_TAGS";
+        public const string GlobalTags = "SIGNALFX_GLOBAL_TAGS";
 
         /// <summary>
         /// Configuration key for a map of header keys to tag names.
