@@ -64,7 +64,6 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
             pprof.AddLabel(sampleBuilder, "thread.id", threadSample.ManagedId);
             pprof.AddLabel(sampleBuilder, "thread.name", threadSample.ThreadName);
-            pprof.AddLabel(sampleBuilder, "thread.os.id", threadSample.NativeId);
             return sampleBuilder;
         }
 

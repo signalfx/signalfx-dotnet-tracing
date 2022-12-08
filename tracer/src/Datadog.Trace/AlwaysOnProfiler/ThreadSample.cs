@@ -16,8 +16,6 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
         public int ManagedId { get; set; }
 
-        public int NativeId { get; set; }
-
         public string ThreadName { get; set; }
 
         public uint ThreadIndex { get; set; }

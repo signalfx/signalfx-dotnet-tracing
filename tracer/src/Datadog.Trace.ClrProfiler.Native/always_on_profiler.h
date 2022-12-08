@@ -70,12 +70,11 @@ public:
 class ThreadState
 {
 public:
-    DWORD native_id_;
     shared::WSTRING thread_name_;
-    ThreadState() : native_id_(0)
+    ThreadState()
     {
     }
-    ThreadState(ThreadState const& other) : native_id_(other.native_id_), thread_name_(other.thread_name_)
+    ThreadState(ThreadState const& other) : thread_name_(other.thread_name_)
     {
     }
 };
@@ -208,7 +207,6 @@ public:
     ICorProfilerInfo10* info10;
     static void ThreadCreated(ThreadID thread_id);
     void ThreadDestroyed(ThreadID thread_id);
-    void ThreadAssignedToOsThread(ThreadID managedThreadId, DWORD os_thread_id);
     void ThreadNameChanged(ThreadID thread_id, ULONG cch_name, WCHAR name[]);
 
     void SetGlobalInfo10(ICorProfilerInfo10* info10);

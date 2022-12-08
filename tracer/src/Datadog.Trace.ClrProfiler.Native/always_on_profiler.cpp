@@ -197,7 +197,6 @@ void ThreadSamplesBuffer::StartSample(ThreadID id, const ThreadState* state, con
     CHECK_SAMPLES_BUFFER_LENGTH()
     WriteByte(kThreadSamplesStartSample);
     WriteInt(span_context.managed_thread_id_);
-    WriteInt(static_cast<int32_t>(state->native_id_));
     WriteString(state->thread_name_);
     WriteUInt64(span_context.trace_id_high_);
     WriteUInt64(span_context.trace_id_low_);
@@ -216,7 +215,6 @@ void ThreadSamplesBuffer::AllocationSample(uint64_t allocSize, const WCHAR* allo
     WriteUInt64(allocSize);
     WriteString(allocType, allocTypeCharLen);
     WriteInt(span_context.managed_thread_id_);
-    WriteInt(static_cast<int32_t>(state->native_id_));
     WriteString(state->thread_name_);
     WriteUInt64(span_context.trace_id_high_);
     WriteUInt64(span_context.trace_id_low_);
@@ -902,18 +900,6 @@ void AlwaysOnProfiler::ThreadDestroyed(ThreadID thread_id)
 
         thread_span_context_map.erase(thread_id);
     }
-}
-void AlwaysOnProfiler::ThreadAssignedToOsThread(ThreadID thread_id, DWORD os_thread_id)
-{
-    std::lock_guard<std::mutex> guard(thread_state_lock_);
-
-    ThreadState* state = managed_tid_to_state_[thread_id];
-    if (state == nullptr)
-    {
-        state = new ThreadState();
-        managed_tid_to_state_[thread_id] = state;
-    }
-    state->native_id_ = os_thread_id;
 }
 void AlwaysOnProfiler::ThreadNameChanged(ThreadID thread_id, ULONG cch_name, WCHAR name[])
 {

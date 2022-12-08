@@ -174,7 +174,6 @@ public:
     // ICorProfilerInfo callbacks to track thread naming (used by AlwaysOnProfiler only)
     HRESULT STDMETHODCALLTYPE ThreadCreated(ThreadID threadId)override;
     HRESULT STDMETHODCALLTYPE ThreadDestroyed(ThreadID threadId)override;
-    HRESULT STDMETHODCALLTYPE ThreadAssignedToOSThread(ThreadID managedThreadId, DWORD osThreadId) override;
     HRESULT STDMETHODCALLTYPE ThreadNameChanged(ThreadID threadId, ULONG cchName, WCHAR name[]) override;
 
     // Needed for allocation sampling

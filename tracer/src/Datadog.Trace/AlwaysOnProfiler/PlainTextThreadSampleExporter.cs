@@ -84,11 +84,10 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
             stackTraceBuilder.AppendFormat(
                 CultureInfo.InvariantCulture,
-                "\"{0}\" #{1} prio=0 os_prio=0 cpu=0 elapsed=0 tid=0x{2:x} nid=0x{3:x}\n",
+                "\"{0}\" #{1} prio=0 os_prio=0 cpu=0 elapsed=0 tid=0x{2:x}\n",
                 threadSample.ThreadName,
                 threadSample.ThreadIndex,
-                threadSample.ManagedId,
-                threadSample.NativeId);
+                threadSample.ManagedId);
 
             // TODO Splunk: APMI-2565 here should go Thread state, equivalent of"    java.lang.Thread.State: TIMED_WAITING (sleeping)"
             stackTraceBuilder.Append("\n");

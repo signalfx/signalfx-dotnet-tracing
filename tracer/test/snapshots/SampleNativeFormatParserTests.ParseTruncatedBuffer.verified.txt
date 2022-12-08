@@ -5,7 +5,6 @@
       Milliseconds: 1649268034960
     },
     ManagedId: Id_1,
-    NativeId: Id_2,
     ThreadName: ,
     Frames: [
       System.Threading.Monitor.Wait(System.Object, System.Int32),
@@ -24,7 +23,6 @@
       Milliseconds: 1649268034960
     },
     ManagedId: Id_3,
-    NativeId: Id_4,
     ThreadName: .NET ThreadPool Worker,
     ThreadIndex: 3,
     Frames: [
