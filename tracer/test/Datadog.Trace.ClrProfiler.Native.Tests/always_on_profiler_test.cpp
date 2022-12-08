@@ -45,7 +45,7 @@ TEST(AlwaysOnProfilerTest, BasicBufferBehavior)
     tsb.EndSample();
     tsb.EndBatch();
     tsb.WriteFinalStats(SamplingStatistics());
-    ASSERT_EQ(1290, tsb.buffer_->size()); // not manually calculated but does depend on thread name limiting and not repeating frame strings
+    ASSERT_EQ(1286, tsb.buffer_->size()); // not manually calculated but does depend on thread name limiting and not repeating frame strings
     ASSERT_EQ(2, tsb.codes_.size());
 }
 TEST(AlwaysOnProfilerTest, AllocationSampleBuffer)
@@ -69,7 +69,7 @@ TEST(AlwaysOnProfilerTest, AllocationSampleBuffer)
     tsb.RecordFrame(7001, frame1);
     tsb.EndSample();
 
-    ASSERT_EQ(1309, tsb.buffer_->size()); // not manually calculated
+    ASSERT_EQ(1305, tsb.buffer_->size()); // not manually calculated
 }
 
 TEST(AlwaysOnProfilerTest, BufferOverrunBehavior)
