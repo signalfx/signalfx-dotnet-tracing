@@ -22,7 +22,7 @@
       Nanoseconds: 1649268034960000000,
       Milliseconds: 1649268034960
     },
-    ManagedId: Id_3,
+    ManagedId: Id_2,
     ThreadName: .NET ThreadPool Worker,
     ThreadIndex: 3,
     Frames: [
@@ -70,7 +70,7 @@
       Nanoseconds: 1649268034960000000,
       Milliseconds: 1649268034960
     },
-    ManagedId: Id_5,
+    ManagedId: Id_3,
     ThreadName: .NET ThreadPool Gate,
     ThreadIndex: 4,
     Frames: [
@@ -86,7 +86,7 @@
       Nanoseconds: 1649268034960000000,
       Milliseconds: 1649268034960
     },
-    ManagedId: Id_5,
+    ManagedId: Id_3,
     ThreadName: .NET ThreadPool Worker,
     ThreadIndex: 5,
     Frames: [
@@ -103,7 +103,7 @@
       Nanoseconds: 1649268034960000000,
       Milliseconds: 1649268034960
     },
-    ManagedId: Id_5,
+    ManagedId: Id_3,
     ThreadName: .NET ThreadPool Worker,
     ThreadIndex: 7,
     Frames: [
@@ -145,7 +145,7 @@
       Nanoseconds: 1649268034960000000,
       Milliseconds: 1649268034960
     },
-    ManagedId: Id_5,
+    ManagedId: Id_3,
     ThreadName: .NET ThreadPool Worker,
     ThreadIndex: 8,
     Frames: [
@@ -162,7 +162,7 @@
       Nanoseconds: 1649268034960000000,
       Milliseconds: 1649268034960
     },
-    ManagedId: Id_10,
+    ManagedId: Id_4,
     ThreadName: .NET ThreadPool Worker,
     ThreadIndex: 9,
     Frames: [
@@ -179,7 +179,7 @@
       Nanoseconds: 1649268034960000000,
       Milliseconds: 1649268034960
     },
-    ManagedId: Id_12,
+    ManagedId: Id_5,
     ThreadName: ,
     ThreadIndex: 12,
     Frames: [
@@ -308,7 +308,7 @@
       Nanoseconds: 1649268034960000000,
       Milliseconds: 1649268034960
     },
-    ManagedId: Id_5,
+    ManagedId: Id_3,
     ThreadName: ,
     ThreadIndex: 13,
     Frames: [
@@ -378,7 +378,7 @@
       Nanoseconds: 1649268034960000000,
       Milliseconds: 1649268034960
     },
-    ManagedId: Id_5,
+    ManagedId: Id_3,
     ThreadName: My Cool Thread 0,
     ThreadIndex: 15,
     Frames: [

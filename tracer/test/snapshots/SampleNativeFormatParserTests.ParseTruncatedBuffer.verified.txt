@@ -22,7 +22,7 @@
       Nanoseconds: 1649268034960000000,
       Milliseconds: 1649268034960
     },
-    ManagedId: Id_3,
+    ManagedId: Id_2,
     ThreadName: .NET ThreadPool Worker,
     ThreadIndex: 3,
     Frames: [
