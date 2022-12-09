@@ -21,6 +21,8 @@ preserve consistent naming convention.
 
 ### Bugfixes
 
+- Fix a deadlock in AlwaysOn Profiling.
+
 ### Enhancements
 
 - Add `SIGNALFX_TRACE_BUFFER_SIZE` setting to configure trace exporter buffer size.
