@@ -166,7 +166,6 @@ public class PprofThreadSampleExporterTests
             {
                 Timestamp = new ThreadSample.Time(10000),
                 ThreadIndex = 0,
-                NativeId = 1,
                 ManagedId = 2,
                 ThreadName = "test_thread"
             }
@@ -180,9 +179,6 @@ public class PprofThreadSampleExporterTests
         {
             var threadName = GetLabelString("thread.name", profile.StringTables, profile.Samples[0]);
             threadName.Should().Be("test_thread");
-
-            var nativeId = GetLabelNum("thread.os.id", profile);
-            nativeId.Should().Be(1);
 
             var managedThreadId = GetLabelNum("thread.id", profile);
             managedThreadId.Should().Be(2);
@@ -204,7 +200,6 @@ public class PprofThreadSampleExporterTests
             {
                 Timestamp = new ThreadSample.Time(10000),
                 ThreadIndex = 0,
-                NativeId = 1,
                 ManagedId = 2,
                 ThreadName = "test_thread"
             });
@@ -241,7 +236,6 @@ public class PprofThreadSampleExporterTests
             {
                 Timestamp = new ThreadSample.Time(10000),
                 ThreadIndex = 0,
-                NativeId = 1,
                 ManagedId = 2,
                 ThreadName = "test_thread"
             });
@@ -269,7 +263,6 @@ public class PprofThreadSampleExporterTests
             {
                 Timestamp = new ThreadSample.Time(1000),
                 ThreadIndex = 0,
-                NativeId = 1,
                 ManagedId = 2,
                 ThreadName = "test_thread",
                 SpanId = 1234567890,
@@ -304,9 +297,6 @@ public class PprofThreadSampleExporterTests
 
             var threadName = GetLabelString("thread.name", profile.StringTables, profile.Samples[0]);
             threadName.Should().Be("test_thread");
-
-            var nativeId = GetLabelNum("thread.os.id", profile);
-            nativeId.Should().Be(1);
         }
     }
 

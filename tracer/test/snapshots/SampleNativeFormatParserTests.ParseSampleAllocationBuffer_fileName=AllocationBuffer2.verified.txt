@@ -8,7 +8,6 @@
         Milliseconds: 1664371474050
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: .NET ThreadPool Worker,
       Frames: [
         System.Net.Sockets.Socket.DoConnect(System.Net.EndPoint, System.Net.Internals.SocketAddress),
