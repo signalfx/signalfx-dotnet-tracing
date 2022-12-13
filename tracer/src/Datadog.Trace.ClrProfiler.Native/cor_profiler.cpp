@@ -3332,14 +3332,6 @@ HRESULT STDMETHODCALLTYPE CorProfiler::ThreadDestroyed(ThreadID threadId)
     }
     return S_OK;
 }
-HRESULT STDMETHODCALLTYPE CorProfiler::ThreadAssignedToOSThread(ThreadID managedThreadId, DWORD osThreadId)
-{
-    if (alwaysOnProfiler != NULL)
-    {
-        alwaysOnProfiler->ThreadAssignedToOsThread(managedThreadId, osThreadId);
-    }
-    return S_OK;
-}
 HRESULT STDMETHODCALLTYPE CorProfiler::ThreadNameChanged(ThreadID threadId, ULONG cchName, WCHAR name[])
 {
     if (alwaysOnProfiler != NULL)

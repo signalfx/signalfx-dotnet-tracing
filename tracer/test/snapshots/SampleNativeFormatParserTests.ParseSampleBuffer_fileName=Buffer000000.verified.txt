@@ -5,7 +5,6 @@
       Milliseconds: 1649267460807
     },
     ManagedId: Id_1,
-    NativeId: Id_2,
     ThreadName: ,
     Frames: [
       System.Threading.Thread.Sleep(System.Int32),
@@ -35,7 +34,6 @@
       Milliseconds: 1649267460807
     },
     ManagedId: Id_1,
-    NativeId: Id_3,
     ThreadName: .NET ThreadPool Worker,
     ThreadIndex: 3,
     Frames: [
@@ -53,7 +51,6 @@
       Milliseconds: 1649267460807
     },
     ManagedId: Id_1,
-    NativeId: Id_4,
     ThreadName: .NET ThreadPool Gate,
     ThreadIndex: 4,
     Frames: [
@@ -70,7 +67,6 @@
       Milliseconds: 1649267460807
     },
     ManagedId: Id_1,
-    NativeId: Id_5,
     ThreadName: .NET ThreadPool Worker,
     ThreadIndex: 5,
     Frames: [
@@ -88,7 +84,6 @@
       Milliseconds: 1649267460807
     },
     ManagedId: Id_1,
-    NativeId: Id_6,
     ThreadName: .NET ThreadPool Worker,
     ThreadIndex: 7,
     Frames: [
@@ -106,7 +101,6 @@
       Milliseconds: 1649267460807
     },
     ManagedId: Id_1,
-    NativeId: Id_7,
     ThreadName: .NET ThreadPool Worker,
     ThreadIndex: 8,
     Frames: [
@@ -149,7 +143,6 @@
       Milliseconds: 1649267460807
     },
     ManagedId: Id_1,
-    NativeId: Id_8,
     ThreadName: .NET ThreadPool Worker,
     ThreadIndex: 9,
     Frames: [

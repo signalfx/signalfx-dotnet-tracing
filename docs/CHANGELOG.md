@@ -27,6 +27,10 @@ that allows to enable specific metrics groups (See [advanced-config](advanced-co
 preserve consistent naming convention.
 - Rename `SIGNALFX_TRACE_GLOBAL_TAGS` to `SIGNALFX_GLOBAL_TAGS`.
 
+### Bugfixes
+
+- Fix a deadlock in AlwaysOn Profiling.
+
 ### Enhancements
 
 - Add support for .NET 7.0.
