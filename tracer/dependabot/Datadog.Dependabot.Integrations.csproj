@@ -8,7 +8,7 @@
   <ItemGroup>
     <!-- Integration: System.Data -->
     <!-- Assembly: System.Data -->
-    <!-- Latest package https://www.nuget.org/packages/System.Data.SqlClient/4.8.3 -->
+    <!-- Latest package https://www.nuget.org/packages/System.Data.SqlClient/4.8.5 -->
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
 
     <!-- Integration: System.Data.Common -->
@@ -173,7 +173,7 @@
 
     <!-- Integration: System.Data.SqlClient -->
     <!-- Assembly: System.Data.SqlClient -->
-    <!-- Latest package https://www.nuget.org/packages/System.Data.SqlClient/4.8.3 -->
+    <!-- Latest package https://www.nuget.org/packages/System.Data.SqlClient/4.8.5 -->
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
 
     <!-- Integration: Microsoft.Data.Sqlite -->
