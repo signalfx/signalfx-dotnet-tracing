@@ -6,7 +6,7 @@ Setting up SignalFx Instrumentation for .NET to run in Windows Nano Server Docke
 FROM mcr.microsoft.com/dotnet/aspnet:6.0-nanoserver-ltsc2022
 
 # Download SignalFx Instrumentation for .NET zip.
-ARG TRACER_VERSION=0.2.9
+ARG TRACER_VERSION=1.0.0
 ADD https://github.com/signalfx/signalfx-dotnet-tracing/releases/download/v${TRACER_VERSION}/signalfx-dotnet-tracing-${TRACER_VERSION}.zip "C:/signalfx-dotnet-tracing.zip"
 
 # Extract zip to C:/signalfx/
@@ -48,7 +48,7 @@ ENV CORECLR_ENABLE_PROFILING=1 \
     CORECLR_PROFILER='{B4C89B0F-9908-4F73-9F59-0D77C5A06874}' \
     SIGNALFX_ENDPOINT_URL='<my-endpoint-here>' \
 
-ARG TRACER_VERSION=0.2.9
+ARG TRACER_VERSION=1.0.0
 
 # Download and install SignalFx Instrumentation for .NET MSI.
 # Note: MSI is preferred installation method for Windows to setup profiler at once and reduce manual steps.

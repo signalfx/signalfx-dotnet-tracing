@@ -24,7 +24,7 @@ function Reset-IIS() {
 #>
 function Install-SignalFxDotnet() {
     # signalfx-dotnet-tracing github repository API
-    $release = "0.2.9"
+    $release = "1.0.0"
     $api = "https://api.github.com/repos/signalfx/signalfx-dotnet-tracing/releases/tags/v$($release)"
 
     # determine OS architecture

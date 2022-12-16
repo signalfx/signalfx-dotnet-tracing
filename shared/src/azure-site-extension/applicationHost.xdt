@@ -25,17 +25,17 @@
         <add name="COMPLUS_LoaderOptimization" value="1" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
         <add name="COR_ENABLE_PROFILING" value="1" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
         <add name="COR_PROFILER" value="{B4C89B0F-9908-4F73-9F59-0D77C5A06874}" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
-        <add name="COR_PROFILER_PATH" value="%HOME%\signalfx\tracing\v0.2.9\win-x64\SignalFx.Tracing.ClrProfiler.Native.dll" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
-        <add name="COR_PROFILER_PATH_32" value="%HOME%\signalfx\tracing\v0.2.9\win-x86\SignalFx.Tracing.ClrProfiler.Native.dll" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
-        <add name="COR_PROFILER_PATH_64" value="%HOME%\signalfx\tracing\v0.2.9\win-x64\SignalFx.Tracing.ClrProfiler.Native.dll" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
+        <add name="COR_PROFILER_PATH" value="%HOME%\signalfx\tracing\v1.0.0\win-x64\SignalFx.Tracing.ClrProfiler.Native.dll" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
+        <add name="COR_PROFILER_PATH_32" value="%HOME%\signalfx\tracing\v1.0.0\win-x86\SignalFx.Tracing.ClrProfiler.Native.dll" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
+        <add name="COR_PROFILER_PATH_64" value="%HOME%\signalfx\tracing\v1.0.0\win-x64\SignalFx.Tracing.ClrProfiler.Native.dll" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
 
         <add name="CORECLR_ENABLE_PROFILING" value="1" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
         <add name="CORECLR_PROFILER" value="{B4C89B0F-9908-4F73-9F59-0D77C5A06874}" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
-        <add name="CORECLR_PROFILER_PATH_32" value="%HOME%\signalfx\tracing\v0.2.9\win-x86\SignalFx.Tracing.ClrProfiler.Native.dll" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
-        <add name="CORECLR_PROFILER_PATH_64" value="%HOME%\signalfx\tracing\v0.2.9\win-x64\SignalFx.Tracing.ClrProfiler.Native.dll" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
+        <add name="CORECLR_PROFILER_PATH_32" value="%HOME%\signalfx\tracing\v1.0.0\win-x86\SignalFx.Tracing.ClrProfiler.Native.dll" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
+        <add name="CORECLR_PROFILER_PATH_64" value="%HOME%\signalfx\tracing\v1.0.0\win-x64\SignalFx.Tracing.ClrProfiler.Native.dll" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
 
-        <add name="SIGNALFX_DOTNET_TRACER_HOME" value="%HOME%\signalfx\tracing\v0.2.9" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
-        <add name="SIGNALFX_TRACE_LOG_DIRECTORY" value="%HOME%\LogFiles\signalfx\tracing\v0.2.9\" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
+        <add name="SIGNALFX_DOTNET_TRACER_HOME" value="%HOME%\signalfx\tracing\v1.0.0" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
+        <add name="SIGNALFX_TRACE_LOG_DIRECTORY" value="%HOME%\LogFiles\signalfx\tracing\v1.0.0\" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
         <add name="SIGNALFX_AZURE_APP_SERVICES" value="1" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
         <add name="SIGNALFX_PROFILER_EXCLUDE_PROCESSES" value="SnapshotUploader.exe;workerforwarder.exe" xdt:Locator="Match(name)" xdt:Transform="Insert"/>
       </environmentVariables>
