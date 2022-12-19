@@ -191,11 +191,6 @@ See [troubleshooting.md](troubleshooting.md).
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) before creating an issue or
 a pull request.
 
-## Performance overhead tests
-
-A dashboard with recent performance overhead data is available at https://signalfx.github.io/signalfx-dotnet-tracing/.
-Test follows the approach outlined in [splunk-otel-java-overhead-test](https://github.com/signalfx/splunk-otel-java-overhead-test).
-
 ## License
 
 The SignalFx Instrumentation for .NET is a redistribution of the
