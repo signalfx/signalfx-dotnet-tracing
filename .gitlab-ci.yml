@@ -13,7 +13,6 @@ stages:
   - fossa-scan
   - checksum
   - checksum-sign
-  - run-overhead-test
 
 linux-build:
   stage: build
@@ -121,67 +120,6 @@ checksums-sign:
   artifacts:
     paths:
       - signed/
-
-run-overhead-test:
-  stage: run-overhead-test
-  needs: ["sign-deb"]
-  rules:
-    # run when version tag encountered
-    - if: '$CI_COMMIT_TAG =~ /^v.*/'
-    - if: '$CI_COMMIT_REF_NAME == "main"'
-      when: manual
-  image:
-    name: docker.repo.splunkdev.net/ci-cd/ci-container:python-3.9-aws
-  before_script:
-    - apt update && apt install -y rsync
-    - python --version
-    - pip install --upgrade pip jinja2-cli
-    - pip install splunk-orca -i https://repo.splunk.com/artifactory/api/pypi/pypi/simple
-    - pip uninstall -y ansible && pip install ansible-core==2.12.1
-    - ansible-galaxy collection install ansible.posix
-    - orca --version
-    - creds-helper init
-    - ORCA_USERNAME_FILE=$(creds-helper kv ORCA_CREDENTIALS --key=username)
-    - ORCA_PASSWORD_FILE=$(creds-helper kv ORCA_CREDENTIALS --key=password)
-    - export ORCA_USERNAME=$(cat "$ORCA_USERNAME_FILE")
-    - export ORCA_PASSWORD=$(cat "$ORCA_PASSWORD_FILE")
-    # This appears to provide an access token that does not work, so we have to fetch it ourselves.
-    # - export VAULT_ACCESS_TOKEN=$(cat `creds-helper vault` | jq -j '.VAULT_TOKEN')
-    - >
-      export VAULT_ACCESS_TOKEN=$(curl -qs -H 'X-Vault-Namespace: eeff/application' -X POST --data "{\"password\": \"${ORCA_PASSWORD}\"}" https://secrets.splunkit.io/v1/auth/ldap/login/${ORCA_USERNAME} | jq -r '.auth.client_token')
-    - mkdir -p ~/.orca
-    - echo '[general]' > ~/.orca/orca.conf
-    - echo "username = ${ORCA_USERNAME}" >> ~/.orca/orca.conf
-    - echo 'aws_access_key_id = ' >> ~/.orca/orca.conf
-    - echo 'aws_secret_access_key = ' >> ~/.orca/orca.conf
-    - echo "vault_token = ${VAULT_ACCESS_TOKEN}" >> ~/.orca/orca.conf
-    - echo 'vault_host = secrets.splunkit.io' >> ~/.orca/orca.conf
-    - echo 'vault_namespace = eeff/application' >> ~/.orca/orca.conf
-    - echo 'vault_secrets_engine = orca_aws_kv' >> ~/.orca/orca.conf
-    - echo 'vault_secrets_path = default/creds' >> ~/.orca/orca.conf
-    - echo 'export DOCKER_TLS_VERIFY=1' > ~/.orca/env.sh
-    - echo 'export COMPOSE_TLS_VERSION=TLSv1_2' >> ~/.orca/env.sh
-    - echo "export DOCKER_CERT_PATH=$PWD" >> ~/.orca/env.sh
-    - echo "export DOCKER_HOST=tcp://ucp.west.splunkeng.com:443" >> ~/.orca/env.sh
-    - ssh-keygen -t rsa -N '' -m PEM -f /root/.orca/id_rsa
-    - echo "Installing github cli (gh)"
-    - curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
-    - echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-    - apt update
-    - apt install -y gh
-    # rename deb package
-    - cp -vfp $(ls signed/*.deb) package.deb
-  script:
-    - orca --cloud aws show deployments
-    # provisioning will not work if deployments already exist, so we purge here first.
-    - orca --cloud aws destroy --all
-    - ./overhead-test/provision/provision.sh
-    - orca --cloud aws show deployments
-    - ./overhead-test/provision/start-remote-test.sh
-    - sleep 30
-    - ./overhead-test/provision/wait-for-test-complete.sh
-    - ./overhead-test/provision/fetch-results.sh
-    - ./overhead-test/provision/create-results-pr.sh
 
 oss-scan:
   stage: fossa-scan
