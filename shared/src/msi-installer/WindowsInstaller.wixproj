@@ -17,7 +17,7 @@
     <IntermediateOutputPath>obj\$(Configuration)\$(Platform)\</IntermediateOutputPath>
     <SuppressPdbOutput>True</SuppressPdbOutput>
     <DefineSolutionProperties>false</DefineSolutionProperties>
-    <OutputName>datadog-dotnet-apm-1.0.0-$(Platform)</OutputName> <!-- -The regex recognizes this line -->
+    <OutputName>datadog-dotnet-apm-1.0.1-$(Platform)</OutputName> <!-- -The regex recognizes this line -->
     <MonitoringHomeDirectory Condition="'$(MonitoringHomeDirectory)' == ''">$(MSBuildThisFileDirectory)..\..\bin\monitoring-home</MonitoringHomeDirectory>
     <TracerHomeDirectory Condition="'$(TracerHomeDirectory)' == ''">$(MSBuildThisFileDirectory)..\bin\windows-tracer-home</TracerHomeDirectory>
     <ProfilerHomeDirectory Condition="'$(ProfilerHomeDirectory)' == ''">$(MSBuildThisFileDirectory)..\bin\DDProf-Deploy</ProfilerHomeDirectory>
