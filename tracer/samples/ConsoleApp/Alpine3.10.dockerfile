@@ -16,7 +16,7 @@ COPY --from=build /app/out .
 
 # Set up Datadog APM
 RUN apk --no-cache update && apk add curl
-ARG TRACER_VERSION=1.0.0
+ARG TRACER_VERSION=1.0.1
 RUN mkdir -p /var/log/signalfx
 RUN mkdir -p /opt/signalfx
 RUN curl -L https://github.com/signalfx/signalfx-dotnet-tracing/releases/download/v${TRACER_VERSION}/signalfx-dotnet-tracing-${TRACER_VERSION}-musl.tar.gz \

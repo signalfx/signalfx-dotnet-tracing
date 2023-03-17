@@ -11,13 +11,17 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 ### General
 
-- Deprecate `process.cpu.utilization` metric.
-
 ### Breaking changes
 
 ### Bugfixes
 
 ### Enhancements
+
+## [Release 1.0.1](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v1.0.1)
+
+### General
+
+- Deprecate `process.cpu.utilization` metric.
 
 ## [Release 1.0.0](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v1.0.0)
 
