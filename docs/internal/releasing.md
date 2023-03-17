@@ -34,10 +34,6 @@ needs any adjustments. Contact @signalfx/gdi-docs team if needed.
 1. Monitor and check the [`Release draft` GitHub workflow](https://github.com/signalfx/signalfx-dotnet-tracing/actions/workflows/release-draft.yml)
    for any errors.
 
-1. Wait for pull request with `automated` label to be created with recent test's results.
-Verify the results.
-(either in a PR before the merge, or using the [dashboard](https://signalfx.github.io/signalfx-dotnet-tracing/) after the merge)
-
 1. Double-check and test the GitHub release artifacts.
 
 1. Update the GitHub release description using the [CHANGELOG.md](../CHANGELOG.md)
