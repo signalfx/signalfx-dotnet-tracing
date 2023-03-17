@@ -37,11 +37,11 @@ function Install-SignalFxDotnet() {
 
     try {
         # Find MSI to download
-        $download = (Invoke-WebRequest $api | ConvertFrom-Json).assets | Where-Object { $_.name -eq $asset_name } | Select-Object -Property browser_download_url,name
+        $download = (Invoke-WebRequest $api -UseBasicParsing | ConvertFrom-Json).assets | Where-Object { $_.name -eq $asset_name } | Select-Object -Property browser_download_url,name
 
         # Download installer MSI to Temp
         $msi = Get-TempPath | Join-Path -ChildPath $download.name
-        Invoke-WebRequest -Uri $download.browser_download_url -OutFile $msi
+        Invoke-WebRequest -Uri $download.browser_download_url -OutFile $msi -UseBasicParsing
     }
     catch {
         $msg = $_
