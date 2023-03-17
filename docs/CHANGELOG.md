@@ -11,6 +11,8 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 ### General
 
+- Deprecate `process.cpu.utilization` metric.
+
 ### Breaking changes
 
 ### Bugfixes
