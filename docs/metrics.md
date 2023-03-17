@@ -41,25 +41,25 @@ implementation from the [Runtime](https://github.com/open-telemetry/opentelemetr
 
 Names and metric structure of the metrics exported are aligned with the OpenTelemetry implementation from the [Process](https://github.com/open-telemetry/opentelemetry-dotnet-contrib/tree/926386e68c9066e8032853e8309abdf4088d8dca/src/OpenTelemetry.Instrumentation.Process) package.
 
-| Metric                               | Description                                                                                                                         | Type              |
-|:-------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------|:------------------|
-| `process.memory.usage`               | The amount of physical memory allocated for this process.                                                                           | Gauge             |
-| `process.memory.virtual`             | The amount of committed virtual memory for this process.                                                                            | Gauge             |
-| `process.cpu.time`                   | Total CPU seconds broken down by different states(`user`,`system`).                                                                 | CumulativeCounter |
-| `process.cpu.utilization`            | Difference in process.cpu.time since the last measurement, divided by the elapsed time and number of CPUs available to the process. | Gauge             |
-| `process.threads`                    | Process threads count.                                                                                                              | Gauge             |
+| Metric                                 | Description                                                                                                                         | Type              |
+|:---------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------|:------------------|
+| `process.memory.usage`                 | The amount of physical memory allocated for this process.                                                                           | Gauge             |
+| `process.memory.virtual`               | The amount of committed virtual memory for this process.                                                                            | Gauge             |
+| `process.cpu.time`                     | Total CPU seconds broken down by different states(`user`,`system`).                                                                 | CumulativeCounter |
+| `process.cpu.utilization` (deprecated) | Difference in process.cpu.time since the last measurement, divided by the elapsed time and number of CPUs available to the process. | Gauge             |
+| `process.threads`                      | Process threads count.                                                                                                              | Gauge             |
 
 ## ASP.NET Core metrics
 
-| Metric                                                  | Description                                                                                                                       | Type               |
-|:--------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------|:-------------------|
-| `signalfx.dotnet.aspnetcore.connections.current`         | The current number of active HTTP connections to the web server.                                                | Gauge              |
-| `signalfx.dotnet.aspnetcore.connections.queue_length`    | The current length of the HTTP connection queue.                                                                 | Gauge              |
-| `signalfx.dotnet.aspnetcore.connections.total`           | The total number of HTTP connections to the web server.                                                          | Gauge              |
-| `signalfx.dotnet.aspnetcore.requests.current`            | The current number of HTTP requests that have started, but not yet stopped.                                      | Gauge              |
-| `signalfx.dotnet.aspnetcore.requests.failed`             | The number of failed HTTP requests received by the server.                                                       | Gauge              |
-| `signalfx.dotnet.aspnetcore.requests.queue_length`       | The current length of the HTTP request queue.                                                                                     | Gauge              |
-| `signalfx.dotnet.aspnetcore.requests.total`              | The total number of HTTP requests received by the server.                                                        | Gauge              |
+| Metric                                                   | Description                                                                                                             | Type               |
+|:---------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------|:-------------------|
+| `signalfx.dotnet.aspnetcore.connections.current`         | The current number of active HTTP connections to the web server.                                                        | Gauge              |
+| `signalfx.dotnet.aspnetcore.connections.queue_length`    | The current length of the HTTP connection queue.                                                                        | Gauge              |
+| `signalfx.dotnet.aspnetcore.connections.total`           | The total number of HTTP connections to the web server.                                                                 | Gauge              |
+| `signalfx.dotnet.aspnetcore.requests.current`            | The current number of HTTP requests that have started, but not yet stopped.                                             | Gauge              |
+| `signalfx.dotnet.aspnetcore.requests.failed`             | The number of failed HTTP requests received by the server.                                                              | Gauge              |
+| `signalfx.dotnet.aspnetcore.requests.queue_length`       | The current length of the HTTP request queue.                                                                           | Gauge              |
+| `signalfx.dotnet.aspnetcore.requests.total`              | The total number of HTTP requests received by the server.                                                               | Gauge              |
 
 ## Additional permissions for IIS
 
