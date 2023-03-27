@@ -300,6 +300,69 @@ public class PprofThreadSampleExporterTests
         }
     }
 
+    [Fact]
+    public void Total_frame_count_is_added_to_logRecord_attributes_for_cpu_samples()
+    {
+        var sender = new TestSender();
+        var exporter = new PprofThreadSampleExporter(
+            DefaultSettings(),
+            sender);
+
+        var firstSample = DefaultSample("frame1", "frame2");
+
+        var secondSample = DefaultSample("frame1");
+
+        exporter.ExportThreadSamples(new List<ThreadSample> { firstSample, secondSample });
+
+        var sentLog = sender.SentLogs[0];
+
+        var profilingDataType = sentLog.Attributes.Single(kv => kv.Key == "profiling.data.total.frame.count");
+        profilingDataType.Value.IntValue.Should().Be(3);
+    }
+
+    [Fact]
+    public void Total_frame_count_is_added_to_logRecord_attributes_for_allocation_samples()
+    {
+        var sender = new TestSender();
+        var exporter = new PprofThreadSampleExporter(
+            DefaultSettings(),
+            sender);
+
+        var firstSample = new AllocationSample(
+            1000,
+            "System.String",
+            DefaultSample("frame1", "frame2"));
+
+        var secondSample = new AllocationSample(
+            1000,
+            "System.String",
+            DefaultSample("frame1"));
+
+        exporter.ExportAllocationSamples(new List<AllocationSample> { firstSample, secondSample });
+
+        var sentLog = sender.SentLogs[0];
+
+        var profilingDataType = sentLog.Attributes.Single(kv => kv.Key == "profiling.data.total.frame.count");
+        profilingDataType.Value.IntValue.Should().Be(3);
+    }
+
+    private static ThreadSample DefaultSample(params string[] frames)
+    {
+        var sample = new ThreadSample
+        {
+            Timestamp = new ThreadSample.Time(10000),
+            ThreadIndex = 0,
+            ManagedId = 2,
+            ThreadName = "test_thread"
+        };
+        foreach (var frame in frames)
+        {
+            sample.Frames.Add(frame);
+        }
+
+        return sample;
+    }
+
     private static long GetLabelNum(string labelName, Profile profile)
     {
         var label = GetLabel(labelName, profile.StringTables, profile.Samples[0]);
