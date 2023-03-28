@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Vendors.ProtoBuf;
 using Datadog.Tracer.OpenTelemetry.Proto.Common.V1;
@@ -36,9 +35,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
         protected override void ProcessAllocationSamples(List<AllocationSample> allocationSamples)
         {
             var allocationProfile = BuildAllocationProfile(allocationSamples);
-            var totalFrameCount = CountFrames(
-                allocationSamples
-                   .Select(allocationSample => allocationSample.ThreadSample));
+            var totalFrameCount = CountFrames(allocationSamples);
 
             AddLogRecord(
                 allocationProfile,
@@ -46,10 +43,26 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 totalFrameCount);
         }
 
-        private static int CountFrames(IEnumerable<ThreadSample> samples)
+        private static int CountFrames(List<ThreadSample> samples)
         {
-            return samples
-               .Sum(threadSample => threadSample.Frames.Count);
+            var sum = 0;
+            for (var i = 0; i < samples.Count; i++)
+            {
+                sum += samples[i].Frames.Count;
+            }
+
+            return sum;
+        }
+
+        private static int CountFrames(List<AllocationSample> samples)
+        {
+            var sum = 0;
+            for (var i = 0; i < samples.Count; i++)
+            {
+                sum += samples[i].ThreadSample.Frames.Count;
+            }
+
+            return sum;
         }
 
         private static string Serialize(Profile profile)
