@@ -6,12 +6,14 @@ using System.IO;
 using System.IO.Compression;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Vendors.ProtoBuf;
+using Datadog.Tracer.OpenTelemetry.Proto.Common.V1;
 using Datadog.Tracer.Pprof.Proto.Profile;
 
 namespace Datadog.Trace.AlwaysOnProfiler
 {
     internal class PprofThreadSampleExporter : ThreadSampleExporter
     {
+        private const string TotalFrameCountAttributeName = "profiling.data.total.frame.count";
         private readonly TimeSpan _threadSamplingPeriod;
 
         public PprofThreadSampleExporter(ImmutableTracerSettings tracerSettings, ILogSender logSender)
@@ -23,13 +25,44 @@ namespace Datadog.Trace.AlwaysOnProfiler
         protected override void ProcessThreadSamples(List<ThreadSample> samples)
         {
             var cpuProfile = BuildCpuProfile(samples);
-            AddLogRecord(cpuProfile, ProfilingDataTypeCpu);
+            var totalFrameCount = CountFrames(samples);
+            AddLogRecord(
+                cpuProfile,
+                ProfilingDataTypeCpu,
+                totalFrameCount);
         }
 
         protected override void ProcessAllocationSamples(List<AllocationSample> allocationSamples)
         {
             var allocationProfile = BuildAllocationProfile(allocationSamples);
-            AddLogRecord(allocationProfile, ProfilingDataTypeAllocation);
+            var totalFrameCount = CountFrames(allocationSamples);
+
+            AddLogRecord(
+                allocationProfile,
+                ProfilingDataTypeAllocation,
+                totalFrameCount);
+        }
+
+        private static int CountFrames(List<ThreadSample> samples)
+        {
+            var sum = 0;
+            for (var i = 0; i < samples.Count; i++)
+            {
+                sum += samples[i].Frames.Count;
+            }
+
+            return sum;
+        }
+
+        private static int CountFrames(List<AllocationSample> samples)
+        {
+            var sum = 0;
+            for (var i = 0; i < samples.Count; i++)
+            {
+                sum += samples[i].ThreadSample.Frames.Count;
+            }
+
+            return sum;
         }
 
         private static string Serialize(Profile profile)
@@ -80,6 +113,20 @@ namespace Datadog.Trace.AlwaysOnProfiler
             }
 
             return Serialize(pprof.Profile);
+        }
+
+        private void AddLogRecord(string profile, KeyValue profilingDataType, int totalFrameCount)
+        {
+            var logRecord = AddLogRecord(profile, profilingDataType);
+            logRecord.Attributes.Add(
+                new KeyValue
+                {
+                    Key = TotalFrameCountAttributeName,
+                    Value = new AnyValue
+                    {
+                        IntValue = totalFrameCount
+                    }
+                });
         }
 
         private string BuildCpuProfile(List<ThreadSample> threadSamples)

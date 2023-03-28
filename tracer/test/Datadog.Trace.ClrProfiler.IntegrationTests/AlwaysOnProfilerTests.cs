@@ -27,11 +27,15 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetServiceVersion("1.0.0");
         }
 
-        protected static void AllShouldHaveCorrectAttributes(List<LogRecord> logRecords, List<KeyValue> attributes)
+        protected static void AllShouldHaveBasicAttributes(List<LogRecord> logRecords, List<KeyValue> attributes)
         {
-            var expectedAttributesForLogRecord = new LogRecord();
-            expectedAttributesForLogRecord.Attributes.AddRange(attributes);
-            logRecords.Should().AllBeEquivalentTo(expectedAttributesForLogRecord, option => option.Including(x => x.Attributes));
+            foreach (var logRecord in logRecords)
+            {
+                foreach (var attribute in attributes)
+                {
+                    logRecord.Attributes.Should().ContainEquivalentOf(attribute);
+                }
+            }
         }
 
         protected static IEnumerable<string> CreateExpectedStackTrace()
@@ -82,7 +86,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             return stackTrace;
         }
 
-        protected static void ContainsExpectedAttributes(Resource resource)
+        protected static void ResourceContainsExpectedAttributes(Resource resource)
         {
             var constantAttributes = new List<KeyValue>
             {

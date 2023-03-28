@@ -15,6 +15,7 @@ using Datadog.Tracer.Pprof.Proto.Profile;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using OpenTelemetry.TestHelpers.Proto.Common.V1;
+using OpenTelemetry.TestHelpers.Proto.Logs.V1;
 using VerifyXunit;
 using Xunit;
 using Xunit.Abstractions;
@@ -71,12 +72,12 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                     using (new AssertionScope())
                     {
-                        AllShouldHaveCorrectAttributes(logRecords, ExpectedAttributes());
-                        ContainsExpectedAttributes(dataResourceLog.Resource);
+                        AllShouldHaveBasicAttributes(logRecords, ConstantValuedAttributes());
+                        RecordsContainFrameCountAttribute(logRecords);
+                        ResourceContainsExpectedAttributes(dataResourceLog.Resource);
                         HasNameAndVersionSet(instrumentationLibraryLogs.InstrumentationLibrary);
                     }
 
-                    // all samples should contain the same common attributes, only stack traces are vary
                     logRecords.Clear();
                 }
 
@@ -84,7 +85,15 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             }
         }
 
-        private static List<KeyValue> ExpectedAttributes()
+        private static void RecordsContainFrameCountAttribute(List<LogRecord> logRecords)
+        {
+            foreach (var logRecord in logRecords)
+            {
+                logRecord.Attributes.Should().Contain(attr => attr.Key == "profiling.data.total.frame.count");
+            }
+        }
+
+        private static List<KeyValue> ConstantValuedAttributes()
         {
             return new List<KeyValue>
             {
