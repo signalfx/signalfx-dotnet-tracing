@@ -59,9 +59,9 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                     using (new AssertionScope())
                     {
-                        AllShouldHaveCorrectAttributes(logRecords, ExpectedAttributes());
+                        AllShouldHaveBasicAttributes(logRecords, ExpectedAttributes());
                         AllBodiesShouldHaveCorrectFormat(logRecords);
-                        ContainsExpectedAttributes(dataResourceLog.Resource);
+                        ResourceContainsExpectedAttributes(dataResourceLog.Resource);
                         HasNameAndVersionSet(instrumentationLibraryLogs.InstrumentationLibrary);
                     }
 
