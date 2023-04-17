@@ -581,13 +581,6 @@ namespace Datadog.Trace.Configuration
             /// <seealso cref="ConfigurationKeys.AlwaysOnProfiler.ThreadSamplingPeriod"/>
             /// <seealso cref="TracerSettings.ProfilerExportInterval"/>
             public const string ExportInterval = "SIGNALFX_PROFILER_EXPORT_INTERVAL";
-
-            /// <summary>
-            /// Configuration key to set export format.
-            /// The default value is Pprof.
-            /// </summary>
-            /// <seealso cref="ExporterSettings.ProfilerExportFormat"/>
-            public const string ExportFormat = "SIGNALFX_PROFILER_EXPORT_FORMAT";
         }
 
         internal static class Telemetry

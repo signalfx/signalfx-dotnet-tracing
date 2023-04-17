@@ -1,8 +1,9 @@
 // Modified by Splunk Inc.
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
-using Datadog.Trace.AlwaysOnProfiler.NativeBufferExporters;
+using Datadog.Trace.AlwaysOnProfiler.LogRecordAppenders;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Logging;
 
@@ -23,14 +24,12 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(ThreadSampler));
 
-        private static void SampleReadingThread(INativeBufferExporter nativeBufferExporter, TimeSpan exportInterval)
+        private static void SampleReadingThread(SampleExporter sampleExporter, TimeSpan exportInterval)
         {
-            var buffer = new byte[BufferSize];
-
             while (true)
             {
                 Thread.Sleep(exportInterval);
-                nativeBufferExporter.Export(buffer);
+                sampleExporter.Export();
             }
         }
 
@@ -61,11 +60,11 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
             Log.Debug("Initializing AlwaysOnProfiler export thread.");
 
-            var bufferExporter = GetConfiguredExporter(tracerSettings, cpuProfilingAvailable, memoryProfilingAvailable);
+            var sampleExporter = GetConfiguredExporter(tracerSettings, cpuProfilingAvailable, memoryProfilingAvailable);
 
             var thread = new Thread(() =>
             {
-                SampleReadingThread(bufferExporter, tracerSettings.ProfilerExportInterval);
+                SampleReadingThread(sampleExporter, tracerSettings.ProfilerExportInterval);
             })
             {
                 Name = BackgroundThreadName,
@@ -76,22 +75,25 @@ namespace Datadog.Trace.AlwaysOnProfiler
             Log.Information("AlwaysOnProfiler export thread initialized.");
         }
 
-        private static INativeBufferExporter GetConfiguredExporter(ImmutableTracerSettings tracerSettings, bool cpuProfilingAvailable, bool memoryProfilingAvailable)
+        private static SampleExporter GetConfiguredExporter(ImmutableTracerSettings tracerSettings, bool cpuProfilingAvailable, bool memoryProfilingAvailable)
         {
-            var exporterFactory = new ThreadSampleExporterFactory(tracerSettings);
-            var sampleExporter = exporterFactory.CreateThreadSampleExporter();
+            var buffer = new byte[BufferSize];
 
-            var cpuBufferExporter = new CpuNativeBufferExporter(sampleExporter);
-            var allocationBufferExporter = new AllocationNativeBufferExporter(sampleExporter);
+            var sampleProcessor = new ThreadSampleProcessor(tracerSettings);
 
-            INativeBufferExporter configuredExporter = cpuProfilingAvailable switch
+            var cpuLogRecordsAppender = new CpuLogRecordAppender(sampleProcessor, buffer);
+            var allocationLogRecordsAppender = new AllocationLogRecordAppender(sampleProcessor, buffer);
+
+            var appenders = cpuProfilingAvailable switch
             {
-                true when memoryProfilingAvailable => new SequentialNativeBufferExporter(cpuBufferExporter, allocationBufferExporter),
-                true => cpuBufferExporter,
-                _ => allocationBufferExporter
+                true when memoryProfilingAvailable => new ILogRecordAppender[] { cpuLogRecordsAppender, allocationLogRecordsAppender },
+                true => new ILogRecordAppender[] { cpuLogRecordsAppender },
+                _ => new ILogRecordAppender[] { allocationLogRecordsAppender }
             };
 
-            return configuredExporter;
+            var logSender = new OtlpHttpLogSender(tracerSettings.ExporterSettings.LogsEndpointUrl);
+
+            return new SampleExporter(tracerSettings, logSender, appenders);
         }
     }
 }
