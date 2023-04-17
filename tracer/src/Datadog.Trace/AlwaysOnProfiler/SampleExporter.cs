@@ -25,7 +25,7 @@ internal class SampleExporter
     {
         _logSender = logSender ?? throw new ArgumentNullException(nameof(logSender));
         _logRecordAppenders = logRecordAppenders ?? throw new ArgumentNullException(nameof(logRecordAppenders));
-        // The same _logsData instance is used on all export messages. With the exception of the list of
+        // The same LogsData instance is used on all export messages. With the exception of the list of
         // LogRecords, the Logs property, all other fields are prepopulated.
         _logsData = CreateLogsData(tracerSettings);
     }
@@ -54,7 +54,7 @@ internal class SampleExporter
         }
         finally
         {
-            // The exporter reuses the _logsData object, but the actual log records are not
+            // The exporter reuses the logRecords object, but the actual log records are not
             // needed after serialization, release the log records so they can be garbage collected.
             logRecords.Clear();
         }

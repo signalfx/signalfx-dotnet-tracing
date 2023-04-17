@@ -4,7 +4,7 @@ namespace Datadog.Trace.AlwaysOnProfiler;
 
 /// <summary>
 /// Holds the GDI profiling semantic conventions.
-/// <see href="https://github.com/signalfx/gdi-specification/blob/b09e176ca3771c3ef19fc9d23e8722fc77a3b6e9/specification/semantic_conventions.md#profiling-resourcelogs-message"/>
+/// <see href="https://github.com/signalfx/gdi-specification/blob/v1.5.0/specification/semantic_conventions.md"/>
 /// </summary>
 internal static class GdiProfilingConventions
 {
