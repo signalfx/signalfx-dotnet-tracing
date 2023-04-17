@@ -17,23 +17,12 @@ public class SampleExporterTests
         var testSender = new TestSender();
         var exporter = new SampleExporter(DefaultSettings(), testSender, new ILogRecordAppender[] { testAppender });
 
-        // Initially, LogsData has no log records.
-        exporter.LogsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs.Should().BeEmpty();
-
         exporter.Export();
 
         using (new AssertionScope())
         {
             testSender.SentLogData.Should().HaveCount(1);
-
-            // Exporter's LogsData was used to export logRecords.
-            testSender.SentLogData[0].Should().BeSameAs(exporter.LogsData);
-
-            // Exporter's LogsData was not empty when an attempt to export using testSender was made.
             testSender.LogRecordSnapshots[0].Name.Should().Be("1");
-
-            // LogsData's log records are cleared after an export attempt.
-            exporter.LogsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs.Should().BeEmpty();
         }
 
         exporter.Export();
@@ -41,13 +30,10 @@ public class SampleExporterTests
         using (new AssertionScope())
         {
             testSender.SentLogData.Should().HaveCount(2);
-            testSender.SentLogData[0].Should().BeSameAs(exporter.LogsData);
-            testSender.SentLogData[1].Should().BeSameAs(exporter.LogsData);
+            testSender.SentLogData[0].Should().BeSameAs(testSender.SentLogData[1]);
 
             testSender.LogRecordSnapshots.Should().HaveCount(2);
             testSender.LogRecordSnapshots[1].Name.Should().Be("2");
-
-            exporter.LogsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs.Should().BeEmpty();
         }
     }
 

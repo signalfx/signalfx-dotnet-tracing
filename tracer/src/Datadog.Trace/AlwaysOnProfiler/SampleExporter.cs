@@ -19,20 +19,20 @@ internal class SampleExporter
     private readonly ILogSender _logSender;
     private readonly IList<ILogRecordAppender> _logRecordAppenders;
 
+    private readonly LogsData _logsData;
+
     public SampleExporter(ImmutableTracerSettings tracerSettings, ILogSender logSender, IList<ILogRecordAppender> logRecordAppenders)
     {
         _logSender = logSender ?? throw new ArgumentNullException(nameof(logSender));
         _logRecordAppenders = logRecordAppenders ?? throw new ArgumentNullException(nameof(logRecordAppenders));
         // The same _logsData instance is used on all export messages. With the exception of the list of
         // LogRecords, the Logs property, all other fields are prepopulated.
-        LogsData = CreateLogsData(tracerSettings);
+        _logsData = CreateLogsData(tracerSettings);
     }
-
-    internal LogsData LogsData { get; }
 
     public void Export()
     {
-        var logRecords = LogsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs;
+        var logRecords = _logsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs;
         try
         {
             foreach (var logRecordAppender in _logRecordAppenders)
@@ -45,7 +45,7 @@ internal class SampleExporter
 
             if (logRecords.Count > 0)
             {
-                _logSender.Send(LogsData);
+                _logSender.Send(_logsData);
             }
         }
         catch (Exception ex)
