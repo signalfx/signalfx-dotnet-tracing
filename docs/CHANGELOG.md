@@ -17,6 +17,12 @@ and this repository adheres to [Semantic Versioning](https://semver.org/spec/v2.
 
 ### Enhancements
 
+## [Release 1.0.2](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v1.0.2)
+
+### General
+
+- Add `profiling.data.total.frame.count` attribute when exporting profiling data.
+
 ## [Release 1.0.1](https://github.com/signalfx/signalfx-dotnet-tracing/releases/tag/v1.0.1)
 
 ### General

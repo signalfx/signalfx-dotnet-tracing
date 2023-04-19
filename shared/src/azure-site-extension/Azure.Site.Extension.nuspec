@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>SignalFx.NET.Tracing.Azure.Site.Extension</id>
-    <version>1.0.1.0</version>
+    <version>1.0.2.0</version>
     <title>SignalFx .NET Tracing</title>
     <authors>SignalFx</authors>
     <icon>icon.png</icon>
