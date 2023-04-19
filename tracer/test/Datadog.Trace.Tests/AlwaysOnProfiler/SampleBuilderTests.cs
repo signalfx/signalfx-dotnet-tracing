@@ -9,14 +9,13 @@ namespace Datadog.Trace.Tests.AlwaysOnProfiler
 {
     public class SampleBuilderTests
     {
-        private readonly SampleBuilder _sampleBuilder = new();
-
         [Fact]
         public void AddLocationId()
         {
-            _sampleBuilder.AddLocationId(100);
+            SampleBuilder sampleBuilder = new();
+            sampleBuilder.AddLocationId(100);
 
-            var sample = _sampleBuilder.Build();
+            var sample = sampleBuilder.Build();
 
             sample.LocationIds.Should().HaveCount(1);
             sample.LocationIds.Should().Contain(100);
@@ -26,12 +25,33 @@ namespace Datadog.Trace.Tests.AlwaysOnProfiler
         public void AddLabel()
         {
             var label = new Label();
-            _sampleBuilder.AddLabel(label);
+            SampleBuilder sampleBuilder = new();
+            sampleBuilder.AddLabel(label);
 
-            var sample = _sampleBuilder.Build();
+            var sample = sampleBuilder.Build();
 
             sample.Labels.Should().HaveCount(1);
             sample.Labels[0].Should().Be(label);
+        }
+
+        [Fact]
+        public void SetValue()
+        {
+            var builder = new SampleBuilder();
+            builder.SetValue(1);
+            var sample = builder.Build();
+
+            sample.Values.Should().HaveCount(1);
+            sample.Values[0].Should().Be(1);
+        }
+
+        [Fact]
+        public void DefaultValue()
+        {
+            var builder = new SampleBuilder();
+            var sample = builder.Build();
+
+            sample.Values.Should().BeEmpty();
         }
     }
 }

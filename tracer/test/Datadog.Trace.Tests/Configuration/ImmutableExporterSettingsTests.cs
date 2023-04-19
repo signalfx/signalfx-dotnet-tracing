@@ -81,8 +81,7 @@ namespace Datadog.Trace.Tests.Configuration
                 (e, i) => e.PartialFlushMinSpans == i.PartialFlushMinSpans,
                 (e, i) => e.ValidationWarnings.Count == i.ValidationWarnings.Count,
                 (e, i) => e.SyncExport == i.SyncExport,
-                (e, i) => e.TraceBufferSize == i.TraceBufferSize,
-                (e, i) => e.ProfilerExportFormat == i.ProfilerExportFormat
+                (e, i) => e.TraceBufferSize == i.TraceBufferSize
             };
 
             var mutableProperties = typeof(ExporterSettings)

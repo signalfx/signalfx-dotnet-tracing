@@ -13,17 +13,15 @@ using Xunit;
 
 namespace Datadog.Trace.Tests.AlwaysOnProfiler;
 
-public class PprofThreadSampleExporterTests
+public class ThreadSampleProcessorTests
 {
     [Fact]
     public void If_stack_sample_has_span_context_associated_then_it_is_exported_inside_labels()
     {
-        var sender = new TestSender();
-        var exporter = new PprofThreadSampleExporter(
-            DefaultSettings(),
-            sender);
+        var exporter = new ThreadSampleProcessor(
+            DefaultSettings());
 
-        exporter.ExportThreadSamples(new List<ThreadSample>
+        var logRecord = exporter.ProcessThreadSamples(new List<ThreadSample>
         {
             new ThreadSample()
             {
@@ -41,14 +39,10 @@ public class PprofThreadSampleExporterTests
             },
         });
 
-        sender.SentLogs.Count.Should().Be(1, "all of the samples should be sent inside single LogRecord.");
+        logRecord.TraceId.Should().BeNull("traceId should not be set on LogRecord level for pprof exporter.");
+        logRecord.SpanId.Should().BeNull("spanId should not be set on LogRecord level for pprof exporter.");
 
-        var log = sender.SentLogs[0];
-
-        log.TraceId.Should().BeNull("traceId should not be set on LogRecord level for pprof exporter.");
-        log.SpanId.Should().BeNull("spanId should not be set on LogRecord level for pprof exporter.");
-
-        var profile = Deserialize(log.Body.StringValue);
+        var profile = Deserialize(logRecord.Body.StringValue);
 
         profile.Samples.Count.Should().Be(2);
 
@@ -81,12 +75,10 @@ public class PprofThreadSampleExporterTests
     {
         const long expectedPeriod = 1000;
 
-        var sender = new TestSender();
-        var exporter = new PprofThreadSampleExporter(
-            DefaultSettings(samplingPeriodMs: expectedPeriod),
-            sender);
+        var exporter = new ThreadSampleProcessor(
+            DefaultSettings(samplingPeriodMs: expectedPeriod));
 
-        exporter.ExportThreadSamples(new List<ThreadSample>
+        var logRecord = exporter.ProcessThreadSamples(new List<ThreadSample>
         {
             new ThreadSample()
             {
@@ -94,9 +86,7 @@ public class PprofThreadSampleExporterTests
             }
         });
 
-        var sentLog = sender.SentLogs[0];
-
-        var profile = Deserialize(sentLog.Body.StringValue);
+        var profile = Deserialize(logRecord.Body.StringValue);
 
         var eventPeriod = GetLabelNum("source.event.period", profile);
 
@@ -106,12 +96,10 @@ public class PprofThreadSampleExporterTests
     [Fact]
     public void Timestamp_is_exported_inside_labels()
     {
-        var sender = new TestSender();
-        var exporter = new PprofThreadSampleExporter(
-            DefaultSettings(),
-            sender);
+        var exporter = new ThreadSampleProcessor(
+            DefaultSettings());
 
-        exporter.ExportThreadSamples(new List<ThreadSample>
+        var logRecord = exporter.ProcessThreadSamples(new List<ThreadSample>
         {
             new ThreadSample()
             {
@@ -119,11 +107,9 @@ public class PprofThreadSampleExporterTests
             }
         });
 
-        var sentLog = sender.SentLogs[0];
+        logRecord.TimeUnixNano.Should().Be(0, "for pprof exporter, timestamp for an event is exported as a label.");
 
-        sentLog.TimeUnixNano.Should().Be(0, "for pprof exporter, timestamp for an event is exported as a label.");
-
-        var profile = Deserialize(sentLog.Body.StringValue);
+        var profile = Deserialize(logRecord.Body.StringValue);
 
         var timestamp = GetLabelNum("source.event.time", profile);
 
@@ -133,12 +119,10 @@ public class PprofThreadSampleExporterTests
     [Fact]
     public void Format_is_added_to_log_record_attributes()
     {
-        var sender = new TestSender();
-        var exporter = new PprofThreadSampleExporter(
-            DefaultSettings(),
-            sender);
+        var exporter = new ThreadSampleProcessor(
+            DefaultSettings());
 
-        exporter.ExportThreadSamples(new List<ThreadSample>
+        var logRecord = exporter.ProcessThreadSamples(new List<ThreadSample>
         {
             new ThreadSample()
             {
@@ -146,21 +130,17 @@ public class PprofThreadSampleExporterTests
             }
         });
 
-        var sentLog = sender.SentLogs[0];
-
-        var format = sentLog.Attributes.Single(kv => kv.Key == "profiling.data.format");
+        var format = logRecord.Attributes.Single(kv => kv.Key == "profiling.data.format");
         format.Value.StringValue.Should().Be("pprof-gzip-base64");
     }
 
     [Fact]
     public void Thread_info_is_exported_inside_labels()
     {
-        var sender = new TestSender();
-        var exporter = new PprofThreadSampleExporter(
-            DefaultSettings(),
-            sender);
+        var exporter = new ThreadSampleProcessor(
+            DefaultSettings());
 
-        exporter.ExportThreadSamples(new List<ThreadSample>
+        var logRecord = exporter.ProcessThreadSamples(new List<ThreadSample>
         {
             new ThreadSample()
             {
@@ -171,9 +151,7 @@ public class PprofThreadSampleExporterTests
             }
         });
 
-        var sentLog = sender.SentLogs[0];
-
-        var profile = Deserialize(sentLog.Body.StringValue);
+        var profile = Deserialize(logRecord.Body.StringValue);
 
         using (new AssertionScope())
         {
@@ -188,10 +166,8 @@ public class PprofThreadSampleExporterTests
     [Fact]
     public void Allocation_size_in_bytes_is_sent_as_a_value_for_exported_allocation_sample()
     {
-        var sender = new TestSender();
-        var exporter = new PprofThreadSampleExporter(
-            DefaultSettings(),
-            sender);
+        var exporter = new ThreadSampleProcessor(
+            DefaultSettings());
 
         var allocationSample = new AllocationSample(
             1000,
@@ -204,12 +180,10 @@ public class PprofThreadSampleExporterTests
                 ThreadName = "test_thread"
             });
 
-        exporter.ExportAllocationSamples(
+        var logRecord = exporter.ProcessAllocationSamples(
             new List<AllocationSample> { allocationSample });
 
-        var sentLog = sender.SentLogs[0];
-
-        var profile = Deserialize(sentLog.Body.StringValue);
+        var profile = Deserialize(logRecord.Body.StringValue);
 
         using (new AssertionScope())
         {
@@ -224,10 +198,8 @@ public class PprofThreadSampleExporterTests
     [Fact]
     public void Log_record_type_is_set_to_allocation_for_exported_allocation_sample()
     {
-        var sender = new TestSender();
-        var exporter = new PprofThreadSampleExporter(
-            DefaultSettings(),
-            sender);
+        var exporter = new ThreadSampleProcessor(
+            DefaultSettings());
 
         var allocationSample = new AllocationSample(
             1000,
@@ -240,21 +212,17 @@ public class PprofThreadSampleExporterTests
                 ThreadName = "test_thread"
             });
 
-        exporter.ExportAllocationSamples(new List<AllocationSample> { allocationSample });
+        var logRecord = exporter.ProcessAllocationSamples(new List<AllocationSample> { allocationSample });
 
-        var sentLog = sender.SentLogs[0];
-
-        var profilingDataType = sentLog.Attributes.Single(kv => kv.Key == "profiling.data.type");
+        var profilingDataType = logRecord.Attributes.Single(kv => kv.Key == "profiling.data.type");
         profilingDataType.Value.StringValue.Should().Be("allocation");
     }
 
     [Fact]
     public void Common_labels_are_set_for_exported_allocation_sample()
     {
-        var sender = new TestSender();
-        var exporter = new PprofThreadSampleExporter(
-            DefaultSettings(),
-            sender);
+        var exporter = new ThreadSampleProcessor(
+            DefaultSettings());
 
         var allocationSample = new AllocationSample(
             1000,
@@ -270,11 +238,9 @@ public class PprofThreadSampleExporterTests
                 TraceIdHigh = 1234567890
             });
 
-        exporter.ExportAllocationSamples(new List<AllocationSample> { allocationSample });
+        var logRecord = exporter.ProcessAllocationSamples(new List<AllocationSample> { allocationSample });
 
-        var sentLog = sender.SentLogs[0];
-
-        var profile = Deserialize(sentLog.Body.StringValue);
+        var profile = Deserialize(logRecord.Body.StringValue);
 
         using (new AssertionScope())
         {
@@ -303,30 +269,23 @@ public class PprofThreadSampleExporterTests
     [Fact]
     public void Total_frame_count_is_added_to_logRecord_attributes_for_cpu_samples()
     {
-        var sender = new TestSender();
-        var exporter = new PprofThreadSampleExporter(
-            DefaultSettings(),
-            sender);
+        var exporter = new ThreadSampleProcessor(DefaultSettings());
 
         var firstSample = DefaultSample("frame1", "frame2");
 
         var secondSample = DefaultSample("frame1");
 
-        exporter.ExportThreadSamples(new List<ThreadSample> { firstSample, secondSample });
+        var logRecord = exporter.ProcessThreadSamples(new List<ThreadSample> { firstSample, secondSample });
 
-        var sentLog = sender.SentLogs[0];
-
-        var profilingDataType = sentLog.Attributes.Single(kv => kv.Key == "profiling.data.total.frame.count");
+        var profilingDataType = logRecord.Attributes.Single(kv => kv.Key == "profiling.data.total.frame.count");
         profilingDataType.Value.IntValue.Should().Be(3);
     }
 
     [Fact]
     public void Total_frame_count_is_added_to_logRecord_attributes_for_allocation_samples()
     {
-        var sender = new TestSender();
-        var exporter = new PprofThreadSampleExporter(
-            DefaultSettings(),
-            sender);
+        var exporter = new ThreadSampleProcessor(
+            DefaultSettings());
 
         var firstSample = new AllocationSample(
             1000,
@@ -338,11 +297,9 @@ public class PprofThreadSampleExporterTests
             "System.String",
             DefaultSample("frame1"));
 
-        exporter.ExportAllocationSamples(new List<AllocationSample> { firstSample, secondSample });
+        var logRecord = exporter.ProcessAllocationSamples(new List<AllocationSample> { firstSample, secondSample });
 
-        var sentLog = sender.SentLogs[0];
-
-        var profilingDataType = sentLog.Attributes.Single(kv => kv.Key == "profiling.data.total.frame.count");
+        var profilingDataType = logRecord.Attributes.Single(kv => kv.Key == "profiling.data.total.frame.count");
         profilingDataType.Value.IntValue.Should().Be(3);
     }
 
@@ -386,10 +343,7 @@ public class PprofThreadSampleExporterTests
     {
         return new ImmutableTracerSettings(new TracerSettings
         {
-            ExporterSettings = new ExporterSettings
-            {
-                ProfilerExportFormat = ProfilerExportFormat.Pprof
-            },
+            ExporterSettings = new ExporterSettings(),
             ThreadSamplingPeriod = TimeSpan.FromMilliseconds(samplingPeriodMs)
         });
     }
