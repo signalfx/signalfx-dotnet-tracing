@@ -6,11 +6,14 @@ namespace Datadog.Trace.Tests.AlwaysOnProfiler;
 
 internal class TestSender : ILogSender
 {
-    public IList<LogRecord> SentLogs { get; } = new List<LogRecord>();
+    public List<LogRecord> LogRecordSnapshots { get; } = new();
+
+    public List<LogsData> SentLogData { get; } = new();
 
     public void Send(LogsData logsData)
     {
-        var logRecord = logsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs[0];
-        SentLogs.Add(logRecord);
+        SentLogData.Add(logsData);
+        var logRecords = logsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs;
+        LogRecordSnapshots.AddRange(logRecords);
     }
 }

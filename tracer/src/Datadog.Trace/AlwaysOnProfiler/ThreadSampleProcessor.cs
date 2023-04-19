@@ -7,51 +7,52 @@ using System.IO.Compression;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Vendors.ProtoBuf;
 using Datadog.Tracer.OpenTelemetry.Proto.Common.V1;
+using Datadog.Tracer.OpenTelemetry.Proto.Logs.V1;
 using Datadog.Tracer.Pprof.Proto.Profile;
 
 namespace Datadog.Trace.AlwaysOnProfiler
 {
-    internal class PprofThreadSampleExporter : ThreadSampleExporter
+    internal class ThreadSampleProcessor
     {
         private const string TotalFrameCountAttributeName = "profiling.data.total.frame.count";
+        private readonly KeyValue _format;
+        private readonly KeyValue _profilingDataTypeCpu;
+        private readonly KeyValue _profilingDataTypeAllocation;
         private readonly TimeSpan _threadSamplingPeriod;
 
-        public PprofThreadSampleExporter(ImmutableTracerSettings tracerSettings, ILogSender logSender)
-            : base(tracerSettings, logSender, "pprof-gzip-base64")
+        public ThreadSampleProcessor(ImmutableTracerSettings tracerSettings)
         {
+            _format = GdiProfilingConventions.LogRecord.Attributes.Format("pprof-gzip-base64");
+            _profilingDataTypeCpu = GdiProfilingConventions.LogRecord.Attributes.Type("cpu");
+            _profilingDataTypeAllocation = GdiProfilingConventions.LogRecord.Attributes.Type("allocation");
+
             _threadSamplingPeriod = tracerSettings.ThreadSamplingPeriod;
         }
 
-        protected override void ProcessThreadSamples(List<ThreadSample> samples)
+        public LogRecord ProcessThreadSamples(List<ThreadSample> threadSamples)
         {
-            var cpuProfile = BuildCpuProfile(samples);
-            var totalFrameCount = CountFrames(samples);
-            AddLogRecord(
-                cpuProfile,
-                ProfilingDataTypeCpu,
-                totalFrameCount);
+            if (threadSamples == null || threadSamples.Count < 1)
+            {
+                return null;
+            }
+
+            var cpuProfile = BuildCpuProfile(threadSamples);
+            var totalFrameCount = CountFrames(threadSamples);
+
+            return BuildLogRecord(cpuProfile, _profilingDataTypeCpu, totalFrameCount);
         }
 
-        protected override void ProcessAllocationSamples(List<AllocationSample> allocationSamples)
+        public LogRecord ProcessAllocationSamples(List<AllocationSample> allocationSamples)
         {
+            if (allocationSamples == null || allocationSamples.Count < 1)
+            {
+                return null;
+            }
+
             var allocationProfile = BuildAllocationProfile(allocationSamples);
             var totalFrameCount = CountFrames(allocationSamples);
 
-            AddLogRecord(
-                allocationProfile,
-                ProfilingDataTypeAllocation,
-                totalFrameCount);
-        }
-
-        private static int CountFrames(List<ThreadSample> samples)
-        {
-            var sum = 0;
-            for (var i = 0; i < samples.Count; i++)
-            {
-                sum += samples[i].Frames.Count;
-            }
-
-            return sum;
+            return BuildLogRecord(allocationProfile, _profilingDataTypeAllocation, totalFrameCount);
         }
 
         private static int CountFrames(List<AllocationSample> samples)
@@ -60,6 +61,17 @@ namespace Datadog.Trace.AlwaysOnProfiler
             for (var i = 0; i < samples.Count; i++)
             {
                 sum += samples[i].ThreadSample.Frames.Count;
+            }
+
+            return sum;
+        }
+
+        private static int CountFrames(List<ThreadSample> samples)
+        {
+            var sum = 0;
+            for (var i = 0; i < samples.Count; i++)
+            {
+                sum += samples[i].Frames.Count;
             }
 
             return sum;
@@ -90,8 +102,9 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 pprof.AddLabel(sampleBuilder, "trace_id", TraceIdHelper.ToString(threadSample.TraceIdHigh, threadSample.TraceIdLow));
             }
 
-            foreach (var methodName in threadSample.Frames)
+            for (var index = 0; index < threadSample.Frames.Count; index++)
             {
+                var methodName = threadSample.Frames[index];
                 sampleBuilder.AddLocationId(pprof.GetLocationId(methodName));
             }
 
@@ -103,37 +116,25 @@ namespace Datadog.Trace.AlwaysOnProfiler
         private static string BuildAllocationProfile(List<AllocationSample> allocationSamples)
         {
             var pprof = new Pprof();
-            foreach (var allocationSample in allocationSamples)
+            for (var index = 0; index < allocationSamples.Count; index++)
             {
+                var allocationSample = allocationSamples[index];
                 var sampleBuilder = CreateSampleBuilder(pprof, allocationSample.ThreadSample);
 
                 // TODO Splunk: export typename
-                sampleBuilder.AddValue(allocationSample.AllocationSizeBytes);
+                sampleBuilder.SetValue(allocationSample.AllocationSizeBytes);
                 pprof.Profile.Samples.Add(sampleBuilder.Build());
             }
 
             return Serialize(pprof.Profile);
         }
 
-        private void AddLogRecord(string profile, KeyValue profilingDataType, int totalFrameCount)
-        {
-            var logRecord = AddLogRecord(profile, profilingDataType);
-            logRecord.Attributes.Add(
-                new KeyValue
-                {
-                    Key = TotalFrameCountAttributeName,
-                    Value = new AnyValue
-                    {
-                        IntValue = totalFrameCount
-                    }
-                });
-        }
-
         private string BuildCpuProfile(List<ThreadSample> threadSamples)
         {
             var pprof = new Pprof();
-            foreach (var threadSample in threadSamples)
+            for (var index = 0; index < threadSamples.Count; index++)
             {
+                var threadSample = threadSamples[index];
                 var sampleBuilder = CreateSampleBuilder(pprof, threadSample);
 
                 pprof.AddLabel(sampleBuilder, "source.event.period", (long)_threadSamplingPeriod.TotalMilliseconds);
@@ -141,6 +142,25 @@ namespace Datadog.Trace.AlwaysOnProfiler
             }
 
             return Serialize(pprof.Profile);
+        }
+
+        private LogRecord BuildLogRecord(string cpuProfile, KeyValue profilingDataType, int totalFrameCount)
+        {
+            // The stack follows the experimental GDI conventions described at
+            // https://github.com/signalfx/gdi-specification/blob/29cbcbc969531d50ccfd0b6a4198bb8a89cedebb/specification/semantic_conventions.md#logrecord-message-fields
+
+            var frameCountAttribute = new KeyValue { Key = TotalFrameCountAttributeName, Value = new AnyValue { IntValue = totalFrameCount } };
+            return new LogRecord
+            {
+                Attributes =
+                {
+                    GdiProfilingConventions.LogRecord.Attributes.Source, profilingDataType, _format, frameCountAttribute
+                },
+                Body = new AnyValue
+                {
+                    StringValue = cpuProfile
+                }
+            };
         }
     }
 }

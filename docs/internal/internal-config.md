@@ -22,7 +22,6 @@ These settings should be never used by the users.
 | `SIGNALFX_LOGS_DIRECT_SUBMISSION_MAX_BATCH_SIZE` | Configuration key for the maximum number of logs to send at one time  | `1000` |
 | `SIGNALFX_LOGS_DIRECT_SUBMISSION_MAX_QUEUE_SIZE` | Configuration key for the maximum number of logs to hold in internal queue at any one time | `100000` |
 | `SIGNALFX_LOGS_DIRECT_SUBMISSION_BATCH_PERIOD_SECONDS` | Configuration key for the time in seconds to wait between checking for batches | `2` |
-| `SIGNALFX_PROFILER_EXPORT_FORMAT` | Format in which data will be exported. Available values are: `Pprof` for pprof-gzip-base64 format, and `Text` for plain text stack trace. | `PProf` |
 | `SIGNALFX_PROFILER_MEMORY_ENABLED` | Enable to activate memory profiling. | `false` |
 | `SIGNALFX_PROFILER_MAX_MEMORY_SAMPLES_PER_MINUTE` | Configuratoin key for the maximum number of memory samples gathered per minute. | `200`
 | `SIGNALFX_PROFILER_EXPORT_INTERVAL` | Profiling exporter interval in milliseconds. It defines how often the profiling data is sent to the collector. If the CPU profiling is enabled this value will automatically be set to match `SIGNALFX_PROFILER_CALL_STACK_INTERVAL`. | `10000` |

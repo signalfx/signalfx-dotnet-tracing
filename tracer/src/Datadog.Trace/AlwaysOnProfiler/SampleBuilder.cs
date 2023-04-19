@@ -1,5 +1,6 @@
 // Modified by Splunk Inc.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Datadog.Tracer.Pprof.Proto.Profile;
@@ -10,7 +11,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
     {
         private readonly Sample _sample = new();
         private readonly IList<ulong> _locationIds = new List<ulong>();
-        private readonly IList<long> _values = new List<long>();
+        private long? _value;
 
         public SampleBuilder AddLabel(Label label)
         {
@@ -18,9 +19,9 @@ namespace Datadog.Trace.AlwaysOnProfiler
             return this;
         }
 
-        public SampleBuilder AddValue(long val)
+        public SampleBuilder SetValue(long val)
         {
-            _values.Add(val);
+            _value = val;
             return this;
         }
 
@@ -33,7 +34,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
         public Sample Build()
         {
             _sample.LocationIds = _locationIds.ToArray();
-            _sample.Values = _values.ToArray();
+            _sample.Values = _value.HasValue ? new[] { _value.Value } : Array.Empty<long>();
 
             return _sample;
         }
