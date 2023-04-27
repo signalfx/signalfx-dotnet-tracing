@@ -83,7 +83,7 @@ const shared::WSTRING system_private_corelib_assemblyName = WStr("System.Private
 const shared::WSTRING datadog_trace_clrprofiler_managed_loader_assemblyName = WStr("SignalFx.Tracing.ClrProfiler.Managed.Loader");
 
 const shared::WSTRING managed_profiler_full_assembly_version =
-    WStr("SignalFx.Tracing, Version=1.0.2.0, Culture=neutral, PublicKeyToken=e43a27c2023d388a");
+    WStr("SignalFx.Tracing, Version=1.1.0.0, Culture=neutral, PublicKeyToken=e43a27c2023d388a");
 
 const shared::WSTRING managed_profiler_name = WStr("SignalFx.Tracing");
 
@@ -121,7 +121,7 @@ const AssemblyProperty managed_profiler_assembly_property = AssemblyProperty(
                   123, 102, 42,  57,  219, 122, 95,  191, 59,  10,  120, 157, 167, 170, 1,   81,  183, 182, 51,  111,
                   204, 130, 205, 122, 20,  157, 247, 246, 102, 245, 57,  108, 141, 233, 44,  166, 68,  215, 162, 209},
     160, 32772, 1)
-        .WithVersion(1, 0, 2, 0);
+        .WithVersion(1, 1, 0, 0);
 
 } // namespace trace
 

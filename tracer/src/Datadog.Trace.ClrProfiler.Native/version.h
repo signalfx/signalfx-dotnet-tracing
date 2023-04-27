@@ -1,3 +1,3 @@
 #pragma once
 
-constexpr auto PROFILER_VERSION = "1.0.2";
+constexpr auto PROFILER_VERSION = "1.1.0";
