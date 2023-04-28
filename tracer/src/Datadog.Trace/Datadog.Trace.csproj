@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <!-- NuGet -->
-    <Version>1.0.1</Version>
+    <Version>1.1.0</Version>
     <Title>SignalFx .NET Tracing</Title>
     <Description>SignalFx .NET Tracing library</Description>
     <AssemblyName>SignalFx.Tracing</AssemblyName>

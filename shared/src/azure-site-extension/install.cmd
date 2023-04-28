@@ -8,7 +8,7 @@ echo Extension directory is %extensionBaseDir%
 echo Site root directory is %siteHome%
 
 REM Create version specific tracer directory
-SET tracerDir=%siteHome%\signalfx\tracing\v1.0.1
+SET tracerDir=%siteHome%\signalfx\tracing\v1.1.0
 if not exist %tracerDir% mkdir %tracerDir%
 
 REM Copy tracer to version specific directory
