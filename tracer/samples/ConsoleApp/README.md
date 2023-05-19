@@ -1,5 +1,5 @@
 # .NET Core Docker Sample
-This sample demonstrates how to build container images for .NET Core apps that use the Datadog .NET Tracer.
+This sample demonstrates how to build container images for .NET (Core) apps that use the SignalFx Instrumentation for .NET.
 
 The instructions assume that you have cloned this repo, have [Docker](https://www.docker.com/products/docker) installed, and have a command prompt open in the `customer-samples/ConsoleApp` directory.
 
