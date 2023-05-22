@@ -7,11 +7,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using Datadog.Trace.Abstractions;
 using Datadog.Trace.Agent;
 using Datadog.Trace.Agent.Zipkin;
+using Datadog.Trace.AlwaysOnProfiler;
 using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.ContinuousProfiler;
@@ -55,7 +57,8 @@ namespace Datadog.Trace
                 statsd: null,
                 runtimeMetrics: null,
                 logSubmissionManager: previous?.DirectLogSubmission,
-                telemetry: null);
+                telemetry: null,
+                metricSender: null);
 
             try
             {
@@ -87,7 +90,8 @@ namespace Datadog.Trace
             IDogStatsd statsd,
             RuntimeMetricsWriter runtimeMetrics,
             DirectLogSubmissionManager logSubmissionManager,
-            ITelemetryController telemetry)
+            ITelemetryController telemetry,
+            ISignalFxMetricSender metricSender)
         {
             settings ??= ImmutableTracerSettings.FromDefaultSources();
 
@@ -97,17 +101,27 @@ namespace Datadog.Trace
 
             var traceIdConvention = GetTraceIdConvention(settings.Convention);
 
-            statsd = settings.TracerMetricsEnabled
-                         ? (statsd ?? CreateDogStatsdClient(settings, defaultServiceName))
-                         : null;
+            if (settings.TracerMetricsEnabled)
+            {
+                metricSender ??= CreateMetricSender(settings, defaultServiceName);
+                statsd ??= CreateDogStatsdClient(settings, defaultServiceName, metricSender);
+            }
+            else
+            {
+                statsd = null;
+            }
+
             sampler ??= GetSampler(settings);
 
             agentWriter ??= GetAgentWriter(settings, statsd, sampler);
-            scopeManager ??= new AsyncLocalScopeManager(settings.CpuProfilingEnabled && FrameworkDescription.Instance.SupportsCpuProfiling());
+            var supportsCpuProfiling = settings.CpuProfilingEnabled && FrameworkDescription.Instance.SupportsCpuProfiling();
+            var supportsMemoryProfiling = settings.MemoryProfilingEnabled && FrameworkDescription.Instance.SupportsMemoryProfiling();
+            scopeManager ??= new AsyncLocalScopeManager(supportsCpuProfiling || supportsMemoryProfiling);
 
-            if (settings.RuntimeMetricsEnabled && !DistributedTracer.Instance.IsChildTracer)
+            if (settings.MetricsIntegrations.Settings.Any(s => s.Enabled) && !DistributedTracer.Instance.IsChildTracer)
             {
-                runtimeMetrics ??= new RuntimeMetricsWriter(statsd ?? CreateDogStatsdClient(settings, defaultServiceName), TimeSpan.FromSeconds(10));
+                metricSender ??= CreateMetricSender(settings, defaultServiceName);
+                runtimeMetrics ??= new RuntimeMetricsWriter(settings.MetricsIntegrations, metricSender, TimeSpan.FromSeconds(10));
             }
 
             logSubmissionManager = DirectLogSubmissionManager.Create(
@@ -122,7 +136,7 @@ namespace Datadog.Trace
 
             SpanContextPropagator.Instance = ContextPropagators.GetSpanContextPropagator(settings.PropagationStyleInject, settings.PropagationStyleExtract);
 
-            var tracerManager = CreateTracerManagerFrom(settings, agentWriter, sampler, scopeManager, statsd, runtimeMetrics, traceIdConvention, logSubmissionManager, telemetry, defaultServiceName);
+            var tracerManager = CreateTracerManagerFrom(settings, agentWriter, sampler, scopeManager, statsd, runtimeMetrics, traceIdConvention, logSubmissionManager, telemetry, defaultServiceName, metricSender);
             return tracerManager;
         }
 
@@ -139,8 +153,9 @@ namespace Datadog.Trace
             ITraceIdConvention traceIdConvention,
             DirectLogSubmissionManager logSubmissionManager,
             ITelemetryController telemetry,
-            string defaultServiceName)
-            => new TracerManager(settings, agentWriter, sampler, scopeManager, statsd, runtimeMetrics, traceIdConvention, logSubmissionManager, telemetry, defaultServiceName);
+            string defaultServiceName,
+            ISignalFxMetricSender metricSender)
+            => new TracerManager(settings, agentWriter, sampler, scopeManager, statsd, runtimeMetrics, traceIdConvention, logSubmissionManager, telemetry, defaultServiceName, metricSender);
 
         protected virtual ISampler GetSampler(ImmutableTracerSettings settings)
         {
@@ -192,35 +207,14 @@ namespace Datadog.Trace
             }
         }
 
-        private static IDogStatsd CreateDogStatsdClient(ImmutableTracerSettings settings, string serviceName)
+        private static IDogStatsd CreateDogStatsdClient(ImmutableTracerSettings settings, string serviceName, ISignalFxMetricSender metricSender)
         {
             try
             {
-                var constantTags = new List<string>
-                                   {
-                                       "lang:.NET",
-                                       $"lang_interpreter:{FrameworkDescription.Instance.Name}",
-                                       $"lang_version:{FrameworkDescription.Instance.ProductVersion}",
-                                       $"tracer_version:{TracerConstants.AssemblyVersion}",
-                                       $"service:{serviceName}",
-                                       $"{Tags.RuntimeId}:{DistributedTracer.Instance.GetRuntimeId()}"
-                                   };
-
-                if (settings.Environment != null)
-                {
-                    constantTags.Add($"env:{settings.Environment}");
-                }
-
-                if (settings.ServiceVersion != null)
-                {
-                    constantTags.Add($"version:{settings.ServiceVersion}");
-                }
+                var constantTags = GetConstantTags(settings, serviceName);
 
                 if (settings.ExporterSettings.MetricsExporter == MetricsExporterType.SignalFx)
                 {
-                    var metricExporter = new SignalFxMetricExporter(settings.ExporterSettings.MetricsEndpointUrl, settings.SignalFxAccessToken);
-                    var metricSender = new SignalFxMetricSender(new AsyncSignalFxMetricWriter(metricExporter, MaxMetricsInAsyncQueue), constantTags.ToArray());
-                    // TODO splunk: consider registering dependencies and disposing them inside SignalFxStats
                     return new SignalFxStats(metricSender);
                 }
 
@@ -255,6 +249,20 @@ namespace Datadog.Trace
                 Log.Error(ex, "Unable to instantiate StatsD client.");
                 return new NoOpStatsd();
             }
+        }
+
+        private static SignalFxMetricSender CreateMetricSender(ImmutableTracerSettings settings, string serviceName)
+        {
+            var metricExporter = new SignalFxMetricExporter(settings.ExporterSettings.MetricsEndpointUrl, settings.SignalFxAccessToken);
+            return new SignalFxMetricSender(GetConstantTags(settings, serviceName), metricExporter, MaxMetricsInAsyncQueue);
+        }
+
+        private static string[] GetConstantTags(ImmutableTracerSettings settings, string serviceName)
+        {
+            return OtelResource
+                  .GetCommonAttributes(settings, serviceName)
+                  .Select(kv => $"{kv.Key}:{kv.Value}")
+                  .ToArray();
         }
 
         /// <summary>

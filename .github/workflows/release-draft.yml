@@ -15,9 +15,9 @@ jobs:
     timeout-minutes: 30
     env:
       baseImage: ${{ matrix.baseImage }}
-      dotnetSdkVersion: 6.0.401
+      dotnetSdkVersion: 7.0.101
     steps:
-    - uses: actions/checkout@v3.1.0
+    - uses: actions/checkout@v3.5.2
     - name: Build Docker image
       run: |
         docker build \
@@ -36,7 +36,7 @@ jobs:
           dd-trace-dotnet/${baseImage}-builder \
           dotnet /build/bin/Debug/_build.dll Clean BuildTracerHome ZipMonitoringHome
     - name: Upload Linux x64 packages
-      uses: actions/upload-artifact@v3.1.0
+      uses: actions/upload-artifact@v3.1.2
       with:
         name: artifacts
         path: ./tracer/src/bin/artifacts/linux-x64
@@ -47,28 +47,31 @@ jobs:
     timeout-minutes: 30
     steps:
       - run: git config --system core.longpaths true
-      - uses: actions/checkout@v3.1.0
-      - uses: actions/setup-dotnet@v3.0.2
+      - uses: actions/checkout@v3.5.2
+      - uses: actions/setup-dotnet@v3.0.3
         with:
           dotnet-version: | 
             2.1.818
-            3.1.423
+            3.1.426
             5.0.408
-            6.0.401
+            6.0.404
+            7.0.101
       - run: tracer\build.cmd Clean BuildTracerHome PackageTracerHome
         shell: cmd
       - name: Upload Windows MSI
-        uses: actions/upload-artifact@v3.1.0
+        uses: actions/upload-artifact@v3.1.2
         with:
           name: artifacts
-          path: tracer/bin/artifacts/*/en-us
+          path: |
+            tracer/bin/artifacts/*/en-us
+            Splunk.SignalFx.DotNet.psm1
       - name: Upload NuGet packages
-        uses: actions/upload-artifact@v3.1.0
+        uses: actions/upload-artifact@v3.1.2
         with:
           name: nuget
           path: tracer/bin/artifacts/nuget/SignalFx.NET.Tracing.Azure.Site.Extension.*.nupkg
       - name: Upload Windows Zip package
-        uses: actions/upload-artifact@v3.1.0
+        uses: actions/upload-artifact@v3.1.2
         with:
           name: zip
           path: tracer/bin/artifacts/signalfx-dotnet-tracing-*.zip
@@ -81,14 +84,14 @@ jobs:
       contents: write
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v3.1.0
-      - uses: actions/download-artifact@v3.0.0
+      - uses: actions/checkout@v3.5.2
+      - uses: actions/download-artifact@v3.0.2
         with:
           path: .
       - name: Extract Version from Tag
         id: get_version
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\/v}
       - name: Create Release
-        run: gh release create v${{ steps.get_version.outputs.VERSION }} --draft artifacts/signalfx* artifacts/x64/en-us/*.msi  artifacts/x86/en-us/*.msi zip/signalfx-dotnet-tracing-*.zip nuget/SignalFx.NET.Tracing.Azure.Site.Extension.*.nupkg
+        run: gh release create v${{ steps.get_version.outputs.VERSION }} --draft artifacts/*.psm1 artifacts/signalfx* artifacts/tracer/bin/artifacts/x64/en-us/*.msi  artifacts/tracer/bin/artifacts/x86/en-us/*.msi zip/signalfx-dotnet-tracing-*.zip nuget/SignalFx.NET.Tracing.Azure.Site.Extension.*.nupkg
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

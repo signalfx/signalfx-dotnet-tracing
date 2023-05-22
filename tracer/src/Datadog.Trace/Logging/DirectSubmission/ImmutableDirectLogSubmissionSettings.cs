@@ -138,17 +138,17 @@ namespace Datadog.Trace.Logging.DirectSubmission
             }
 
             var stringifiedTags = StringifyGlobalTags(globalTags);
-            var enabledIntegrations = new bool[IntegrationRegistry.Ids.Count];
+            var enabledIntegrations = new bool[ValuesRegistry<IntegrationId>.Ids.Count];
             var enabledIntegrationNames = new List<string>(SupportedIntegrations.Length);
 
             foreach (var integrationName in enabledLogShippingIntegrations)
             {
-                if (!IntegrationRegistry.TryGetIntegrationId(integrationName, out var integrationId))
+                if (!ValuesRegistry<IntegrationId>.TryGetValue(integrationName, out var integrationId))
                 {
                     validationErrors.Add(
                         "Unknown integration: " + integrationName +
                         ". Use a valid logs integration name: " +
-                        string.Join(", ", SupportedIntegrations.Select(x => IntegrationRegistry.GetName(x))));
+                        string.Join(", ", SupportedIntegrations.Select(x => ValuesRegistry<IntegrationId>.GetName(x))));
                     continue;
                 }
 
@@ -156,13 +156,13 @@ namespace Datadog.Trace.Logging.DirectSubmission
                 {
                     validationErrors.Add(
                         "Integration: " + integrationName + " is not a supported direct log submission integration. " +
-                        "Use one of " + string.Join(", ", SupportedIntegrations.Select(x => IntegrationRegistry.GetName(x))));
+                        "Use one of " + string.Join(", ", SupportedIntegrations.Select(x => ValuesRegistry<IntegrationId>.GetName(x))));
                     continue;
                 }
 
                 if (!enabledIntegrations[(int)integrationId])
                 {
-                    enabledIntegrationNames.Add(IntegrationRegistry.GetName(integrationId));
+                    enabledIntegrationNames.Add(ValuesRegistry<IntegrationId>.GetName(integrationId));
                     enabledIntegrations[(int)integrationId] = true;
                 }
             }

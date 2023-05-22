@@ -30,16 +30,9 @@ needs any adjustments. Contact @signalfx/gdi-docs team if needed.
    ```
 
    After you push the Git tag, a GitHub workflow should start creating a draft release.
-   Overhead test will be started as well.
 
 1. Monitor and check the [`Release draft` GitHub workflow](https://github.com/signalfx/signalfx-dotnet-tracing/actions/workflows/release-draft.yml)
    for any errors.
-
-1. Wait for pull request with `automated` label to be created with recent test's results.
-Verify the results.
-(either in a PR before the merge, or using the [dashboard](https://signalfx.github.io/signalfx-dotnet-tracing/) after the merge)
-
-> *NOTE*: It takes approximately 2 hours for overhead test to complete.
 
 1. Double-check and test the GitHub release artifacts.
 

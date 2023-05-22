@@ -12,8 +12,10 @@ using System.Collections.ObjectModel;
 using System.Diagnostics.Tracing;
 using System.Reflection;
 using System.Threading;
+using Datadog.Trace.Configuration;
 using Datadog.Trace.Logging;
-using Datadog.Trace.Vendors.StatsdClient;
+using Datadog.Trace.SignalFx.Metrics;
+using Datadog.Tracer.SignalFx.Metrics.Protobuf;
 
 namespace Datadog.Trace.RuntimeMetrics
 {
@@ -22,9 +24,7 @@ namespace Datadog.Trace.RuntimeMetrics
         private const string RuntimeEventSourceName = "Microsoft-Windows-DotNETRuntime";
         private const string AspNetCoreHostingEventSourceName = "Microsoft.AspNetCore.Hosting";
         private const string AspNetCoreKestrelEventSourceName = "Microsoft-AspNetCore-Server-Kestrel";
-        private const string ThreadStatsMetrics = $"{MetricsNames.ContentionTime}, {MetricsNames.ContentionCount}, {MetricsNames.ThreadPoolWorkersCount}";
-
-        private const int EventContentionStop = 91;
+        private const string ThreadStatsMetrics = $"{MetricsNames.NetRuntime.ContentionCount}, {MetricsNames.NetRuntime.ThreadPoolWorkersCount}";
 
         private const int EventGcHeapStats = 4;
 
@@ -46,24 +46,24 @@ namespace Datadog.Trace.RuntimeMetrics
         private static readonly Func<int, ulong> GetGenerationSize;
 #endif
         private static bool _isGcInfoAvailable;
-        private readonly Timing _contentionTime = new Timing();
 
         private readonly string _delayInSeconds;
 
-        private readonly IDogStatsd _statsd;
+        private readonly ImmutableMetricsIntegrationSettingsCollection _settings;
+        private readonly ISignalFxMetricSender _metricSender;
         private DateTime? _gcStart;
 
         static RuntimeEventListener()
         {
             MetricsMapping = new Dictionary<string, string>
             {
-                ["current-requests"] = MetricsNames.AspNetCoreCurrentRequests,
-                ["failed-requests"] = MetricsNames.AspNetCoreFailedRequests,
-                ["total-requests"] = MetricsNames.AspNetCoreTotalRequests,
-                ["request-queue-length"] = MetricsNames.AspNetCoreRequestQueueLength,
-                ["current-connections"] = MetricsNames.AspNetCoreCurrentConnections,
-                ["connection-queue-length"] = MetricsNames.AspNetCoreConnectionQueueLength,
-                ["total-connections"] = MetricsNames.AspNetCoreTotalConnections
+                ["current-requests"] = MetricsNames.AspNetCore.CoreCurrentRequests,
+                ["failed-requests"] = MetricsNames.AspNetCore.CoreFailedRequests,
+                ["total-requests"] = MetricsNames.AspNetCore.CoreTotalRequests,
+                ["request-queue-length"] = MetricsNames.AspNetCore.CoreRequestQueueLength,
+                ["current-connections"] = MetricsNames.AspNetCore.CoreCurrentConnections,
+                ["connection-queue-length"] = MetricsNames.AspNetCore.CoreConnectionQueueLength,
+                ["total-connections"] = MetricsNames.AspNetCore.CoreTotalConnections
             };
 
             // source originated from: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/blob/bc947a00c3f859cc436f050e81172fc1f8bc09d7/src/OpenTelemetry.Instrumentation.Runtime/RuntimeMetrics.cs
@@ -76,9 +76,10 @@ namespace Datadog.Trace.RuntimeMetrics
 #endif
         }
 
-        public RuntimeEventListener(IDogStatsd statsd, TimeSpan delay)
+        public RuntimeEventListener(ImmutableMetricsIntegrationSettingsCollection settings, ISignalFxMetricSender metricSender, TimeSpan delay)
         {
-            _statsd = statsd;
+            _settings = settings;
+            _metricSender = metricSender;
             _delayInSeconds = ((int)delay.TotalSeconds).ToString();
 
             EventSourceCreated += (_, e) => EnableEventSource(e.EventSource);
@@ -104,13 +105,10 @@ namespace Datadog.Trace.RuntimeMetrics
 
         public void Refresh()
         {
-            // Can't use a Timing because Dogstatsd doesn't support local aggregation
-            // It means that the aggregations in the UI would be wrong
-            _statsd.Gauge(MetricsNames.ContentionTime, _contentionTime.Clear());
-            _statsd.Counter(MetricsNames.ContentionCount, Monitor.LockContentionCount);
+            _metricSender.SendLong(MetricsNames.NetRuntime.ContentionCount, Monitor.LockContentionCount, MetricType.CUMULATIVE_COUNTER);
 
             // TODO splunk: opentelemetry-dotnet-contrib plans to change to ObservableUpDownCounter, will need to be adjusted
-            _statsd.Gauge(MetricsNames.ThreadPoolWorkersCount, ThreadPool.ThreadCount);
+            _metricSender.SendLong(MetricsNames.NetRuntime.ThreadPoolWorkersCount, ThreadPool.ThreadCount, MetricType.GAUGE);
 
 #if NET6_0_OR_GREATER
             // source originated from: https://github.com/open-telemetry/opentelemetry-dotnet-contrib/blob/bc947a00c3f859cc436f050e81172fc1f8bc09d7/src/OpenTelemetry.Instrumentation.Runtime/RuntimeMetrics.cs
@@ -126,24 +124,24 @@ namespace Datadog.Trace.RuntimeMetrics
                 // 4 -> poh
 
                 // TODO splunk: opentelemetry-dotnet-contrib plans to change to ObservableUpDownCounter, will need to be adjusted
-                _statsd.Gauge(MetricsNames.Gc.HeapSize, GetGenerationSize(i), tags: GcMetrics.Tags.GenerationTags[i]);
+                _metricSender.SendLong(MetricsNames.NetRuntime.Gc.HeapSize, (long)GetGenerationSize(i), MetricType.GAUGE, tags: GcMetrics.Tags.GenerationTags[i]);
             }
 
             if (IsGcInfoAvailable)
             {
                 // TODO splunk: opentelemetry-dotnet-contrib plans to change to ObservableUpDownCounter, will need to be adjusted
-                _statsd.Gauge(MetricsNames.Gc.HeapCommittedMemory, GC.GetGCMemoryInfo().TotalCommittedBytes);
+                _metricSender.SendLong(MetricsNames.NetRuntime.Gc.HeapCommittedMemory, GC.GetGCMemoryInfo().TotalCommittedBytes, MetricType.GAUGE);
             }
 #endif
 
-            _statsd.Counter(MetricsNames.Gc.AllocatedBytes, GC.GetTotalAllocatedBytes());
+            _metricSender.SendLong(MetricsNames.NetRuntime.Gc.AllocatedBytes, GC.GetTotalAllocatedBytes(), MetricType.CUMULATIVE_COUNTER);
 
             Log.Debug("Sent the following metrics: {metrics}", ThreadStatsMetrics);
         }
 
         protected override void OnEventWritten(EventWrittenEventArgs eventData)
         {
-            if (_statsd == null)
+            if (_metricSender == null)
             {
                 // I know it sounds crazy at first, but because OnEventSourceCreated is called from the base constructor,
                 // and EnableEvents is called from OnEventSourceCreated, it's entirely possible that OnEventWritten
@@ -165,52 +163,46 @@ namespace Datadog.Trace.RuntimeMetrics
         private void HandleEvent(EventWrittenEventArgs eventData)
         {
 #if !NET6_0_OR_GREATER
-            if (eventData.EventId == EventGcHeapStats)
+            if (eventData.EventId == EventGcHeapStats && _settings[MetricsIntegrationId.NetRuntime].Enabled)
             {
                 var stats = HeapStats.FromPayload(eventData.Payload);
 
                 // TODO splunk: opentelemetry-dotnet-contrib plans to change to ObservableUpDownCounter, will need to be adjusted
-                _statsd.Gauge(MetricsNames.Gc.HeapSize, stats.Gen0Size, tags: GcMetrics.Tags.Gen0);
-                _statsd.Gauge(MetricsNames.Gc.HeapSize, stats.Gen1Size, tags: GcMetrics.Tags.Gen1);
-                _statsd.Gauge(MetricsNames.Gc.HeapSize, stats.Gen2Size, tags: GcMetrics.Tags.Gen2);
-                _statsd.Gauge(MetricsNames.Gc.HeapSize, stats.LohSize, tags: GcMetrics.Tags.LargeObjectHeap);
+                _metricSender.SendLong(MetricsNames.NetRuntime.Gc.HeapSize, (long)stats.Gen0Size, MetricType.GAUGE, tags: GcMetrics.Tags.Gen0);
+                _metricSender.SendLong(MetricsNames.NetRuntime.Gc.HeapSize, (long)stats.Gen1Size, MetricType.GAUGE, tags: GcMetrics.Tags.Gen1);
+                _metricSender.SendLong(MetricsNames.NetRuntime.Gc.HeapSize, (long)stats.Gen2Size, MetricType.GAUGE, tags: GcMetrics.Tags.Gen2);
+                _metricSender.SendLong(MetricsNames.NetRuntime.Gc.HeapSize, (long)stats.LohSize, MetricType.GAUGE, tags: GcMetrics.Tags.LargeObjectHeap);
             }
 #endif
 
-            if (eventData.EventName == "EventCounters")
+            if (eventData.EventName == "EventCounters" && _settings[MetricsIntegrationId.AspNetCore].Enabled)
             {
                 ExtractCounters(eventData.Payload);
             }
-            else if (eventData.EventId == EventGcSuspendBegin)
+            else if (_settings[MetricsIntegrationId.NetRuntime].Enabled)
             {
-                // event is generated also for non-gc related suspends
-                // verify suspend reason before setting _gcStart field
-                var suspendReason = (uint)eventData.Payload[0];
-                if (suspendReason == SuspendForGc || suspendReason == SuspendForGcPrep)
+                if (eventData.EventId == EventGcSuspendBegin)
                 {
-                    _gcStart = eventData.TimeStamp;
+                    // event is generated also for non-gc related suspends
+                    // verify suspend reason before setting _gcStart field
+                    var suspendReason = (uint)eventData.Payload[0];
+                    if (suspendReason == SuspendForGc || suspendReason == SuspendForGcPrep)
+                    {
+                        _gcStart = eventData.TimeStamp;
+                    }
                 }
-            }
-            else if (eventData.EventId == EventGcRestartEnd)
-            {
-                var start = _gcStart;
-
-                // for etw it was possible to miss some events
-                // set to null to avoid bogus data
-                _gcStart = null;
-
-                if (start != null)
+                else if (eventData.EventId == EventGcRestartEnd)
                 {
-                    _statsd.IncrementDouble(MetricsNames.Gc.PauseTime, (eventData.TimeStamp - start.Value).TotalMilliseconds);
-                }
-            }
-            else
-            {
-                if (eventData.EventId == EventContentionStop)
-                {
-                    var durationInNanoseconds = (double)eventData.Payload[2];
+                    var start = _gcStart;
 
-                    _contentionTime.Time(durationInNanoseconds / 1_000_000);
+                    // for etw it was possible to miss some events
+                    // set to null to avoid bogus data
+                    _gcStart = null;
+
+                    if (start != null)
+                    {
+                        _metricSender.SendDouble(MetricsNames.NetRuntime.Gc.PauseTime, (eventData.TimeStamp - start.Value).TotalMilliseconds, MetricType.COUNTER);
+                    }
                 }
             }
         }
@@ -254,7 +246,7 @@ namespace Datadog.Trace.RuntimeMetrics
                 {
                     var value = (double)rawValue;
 
-                    _statsd.Gauge(statName, value);
+                    _metricSender.SendDouble(statName, value, MetricType.GAUGE);
                     Log.Debug("Sent the following metrics: {metrics}", statName);
                 }
                 else

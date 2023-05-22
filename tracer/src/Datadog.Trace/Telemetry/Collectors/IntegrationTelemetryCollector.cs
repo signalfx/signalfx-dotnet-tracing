@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,11 +21,11 @@ namespace Datadog.Trace.Telemetry
 
         public IntegrationTelemetryCollector()
         {
-            _integrationsById = new IntegrationDetail[IntegrationRegistry.Names.Length];
+            _integrationsById = new IntegrationDetail[ValuesRegistry<IntegrationId>.Names.Length];
 
-            for (var i = 0; i < IntegrationRegistry.Names.Length; i++)
+            for (var i = 0; i < ValuesRegistry<IntegrationId>.Names.Length; i++)
             {
-                _integrationsById[i] = new IntegrationDetail { Name = IntegrationRegistry.Names[i] };
+                _integrationsById[i] = new IntegrationDetail { Name = ValuesRegistry<IntegrationId>.Names[i] };
             }
         }
 

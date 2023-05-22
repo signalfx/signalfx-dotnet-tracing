@@ -58,8 +58,7 @@ The following settings are common to most instrumentation scenarios:
 | `SIGNALFX_PROFILER_PROCESSES` | Sets the filename of executables the profiler can attach to. Supports multiple semicolon-separated values, for example: `MyApp.exe;dotnet.exe` |  |
 | `SIGNALFX_TRACE_CONFIG_FILE` | Path of the JSON configuration file. |  |
 | `SIGNALFX_TRACE_ENABLED` | Enable to activate the tracer. | `true` |
-| `SIGNALFX_RUNTIME_METRICS_ENABLED` | Enable to activate the runtime metrics. | `false` |
-| `SIGNALFX_TRACE_METRICS_ENABLED` | Enable to activate additional trace metrics. | `false` |
+| `SIGNALFX_METRICS_{0}_ENABLED` | Configuration pattern for enabling or disabling a specific group of metrics. See [metrics.md](metrics.md) for details. | `false` |
 
 ## Global instrumentation settings
 
@@ -67,7 +66,8 @@ The following settings are common to most instrumentation scenarios:
 |-|-|-|
 | `SIGNALFX_DISABLED_INTEGRATIONS` | Comma-separated list of disabled library instrumentations. The available integration ID values can be found [here](instrumented-libraries.md). |  |
 | `SIGNALFX_RECORDED_VALUE_MAX_LENGTH` | The maximum length an attribute value can have. Values longer than this are truncated. Values are discarded entirely when set to 0, and ignored when set to a negative value. | `12000` |
-| `SIGNALFX_TRACE_GLOBAL_TAGS` | Comma-separated list of key-value pairs that specify global span tags. For example: `"key1:val1,key2:val2"` |  |
+| `SIGNALFX_TRACE_GLOBAL_TAGS` | Deprecated. Use `SIGNALFX_GLOBAL_TAGS` instead. |  |
+| `SIGNALFX_GLOBAL_TAGS` | Comma-separated list of key-value pairs that specify global tags added to all telemetry signals. For example: `"key1:val1,key2:val2"`. If unset, the value of the `SIGNALFX_TRACE_GLOBAL_TAGS` environment variable is used, if available. |  |
 | `SIGNALFX_TRACE_{0}_ENABLED` | Configuration pattern for enabling or disabling a specific [library instrumentation](instrumented-libraries.md). For example, in order to disable Kafka instrumentation, set `SIGNALFX_TRACE_Kafka_ENABLED=false` | `true` |
 
 ## Exporter settings
@@ -158,7 +158,7 @@ of SignalFx Instrumentation for .NET.
 |-|-|-|
 | `SIGNALFX_PROFILER_LOGS_ENDPOINT` | The URL to where logs are exported using [OTLP/HTTP v1 log protocol](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md) | `http://localhost:4318/v1/logs` |
 | `SIGNALFX_PROFILER_ENABLED` | Enable to activate thread sampling. | `false` |
-| `SIGNALFX_PROFILER_CALL_STACK_INTERVAL` | Sampling period. It defines how often the threads are stopped in order to fetch all stack traces. This value cannot be lower than `1000` milliseconds. | `10000` |
+| `SIGNALFX_PROFILER_CALL_STACK_INTERVAL` | Sampling period in milliseconds. It defines how often the threads are stopped in order to fetch all stack traces. This value cannot be lower than `1000` milliseconds. | `10000` |
 
 ## Including query string settings
 
@@ -172,6 +172,6 @@ This feature is ASP.NET Core only.
 
 [^regex]: Query string obfuscation default regex:
 
-    ```txt
-    ((?i)(?:p(?:ass)?w(?:or)?d|pass(?:_?phrase)?|secret|(?:api_?|private_?|public_?|access_?|secret_?)key(?:_?id)?|token|consumer_?(?:id|key|secret)|sign(?:ed|ature)?|auth(?:entication|orization)?)(?:(?:\s|%20)*(?:=|%3D)[^&]+|(?:""|%22)(?:\s|%20)*(?::|%3A)(?:\s|%20)*(?:""|%22)(?:%2[^2]|%[^2]|[^""%])+(?:""|%22))|bearer(?:\s|%20)+[a-z0-9\._\-]|token(?::|%3A)[a-z0-9]{13}|gh[opsu]_[0-9a-zA-Z]{36}|ey[I-L](?:[\w=-]|%3D)+\.ey[I-L](?:[\w=-]|%3D)+(?:\.(?:[\w.+\/=-]|%3D|%2F|%2B)+)?|[\-]{5}BEGIN(?:[a-z\s]|%20)+PRIVATE(?:\s|%20)KEY[\-]{5}[^\-]+[\-]{5}END(?:[a-z\s]|%20)+PRIVATE(?:\s|%20)KEY|ssh-rsa(?:\s|%20)*(?:[a-z0-9\/\.+]|%2F|%5C|%2B){100,})`
-    ```
+```txt
+((?i)(?:p(?:ass)?w(?:or)?d|pass(?:_?phrase)?|secret|(?:api_?|private_?|public_?|access_?|secret_?)key(?:_?id)?|token|consumer_?(?:id|key|secret)|sign(?:ed|ature)?|auth(?:entication|orization)?)(?:(?:\s|%20)*(?:=|%3D)[^&]+|(?:""|%22)(?:\s|%20)*(?::|%3A)(?:\s|%20)*(?:""|%22)(?:%2[^2]|%[^2]|[^""%])+(?:""|%22))|bearer(?:\s|%20)+[a-z0-9\._\-]|token(?::|%3A)[a-z0-9]{13}|gh[opsu]_[0-9a-zA-Z]{36}|ey[I-L](?:[\w=-]|%3D)+\.ey[I-L](?:[\w=-]|%3D)+(?:\.(?:[\w.+\/=-]|%3D|%2F|%2B)+)?|[\-]{5}BEGIN(?:[a-z\s]|%20)+PRIVATE(?:\s|%20)KEY[\-]{5}[^\-]+[\-]{5}END(?:[a-z\s]|%20)+PRIVATE(?:\s|%20)KEY|ssh-rsa(?:\s|%20)*(?:[a-z0-9\/\.+]|%2F|%5C|%2B){100,})`
+```

@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -55,7 +57,6 @@ namespace Datadog.Trace.Util
 
         /// <summary>
         /// Wrapper around <see cref="Process.GetCurrentProcess"/> and its property accesses
-        ///
         /// On .NET Framework the <see cref="Process"/> class is guarded by a
         /// LinkDemand for FullTrust, so partial trust callers will throw an exception.
         /// This exception is thrown when the caller method is being JIT compiled, NOT
@@ -65,16 +66,18 @@ namespace Datadog.Trace.Util
         /// <param name="userProcessorTime">CPU time in user mode</param>
         /// <param name="systemCpuTime">CPU time in kernel mode</param>
         /// <param name="threadCount">Number of threads</param>
-        /// <param name="privateMemorySize">Committed memory size</param>
+        /// <param name="virtualMemorySize">Committed memory size</param>
+        /// <param name="workingSet">Working set</param>
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public static void GetCurrentProcessRuntimeMetrics(out TimeSpan userProcessorTime, out TimeSpan systemCpuTime, out int threadCount, out long privateMemorySize)
+        public static void GetCurrentProcessRuntimeMetrics(out TimeSpan userProcessorTime, out TimeSpan systemCpuTime, out int threadCount, out long virtualMemorySize, out long workingSet)
         {
             using var process = Process.GetCurrentProcess();
 
             userProcessorTime = process.UserProcessorTime;
             systemCpuTime = process.PrivilegedProcessorTime;
             threadCount = process.Threads.Count;
-            privateMemorySize = process.PrivateMemorySize64;
+            virtualMemorySize = process.VirtualMemorySize64;
+            workingSet = process.WorkingSet64;
         }
     }
 }

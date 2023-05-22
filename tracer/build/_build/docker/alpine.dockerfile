@@ -44,12 +44,13 @@ FROM base as tester
 # Install .NET Core runtimes using install script
 RUN curl -sSL https://dot.net/v1/dotnet-install.sh --output dotnet-install.sh \
     && echo "SHA256: $(sha256sum dotnet-install.sh)" \
-    && echo "aaa889cd9fd06f098144fc065db3ab8525133666d9a21c2ca45017aabfef4d23  dotnet-install.sh" | sha256sum -c \
+    && echo "e7e05ef4c1980e4d75dd5c27c1c387ff0dac8931595583b9ff6fa362da7c2de9  dotnet-install.sh" | sha256sum -c \
     && chmod +x ./dotnet-install.sh \
     && ./dotnet-install.sh --runtime aspnetcore --version 2.1.30 --install-dir /usr/share/dotnet --no-path \
     && ./dotnet-install.sh --runtime aspnetcore --version 3.0.3 --install-dir /usr/share/dotnet --no-path \
-    && ./dotnet-install.sh --runtime aspnetcore --version 3.1.26 --install-dir /usr/share/dotnet --no-path \
+    && ./dotnet-install.sh --runtime aspnetcore --version 3.1.31 --install-dir /usr/share/dotnet --no-path \
     && ./dotnet-install.sh --runtime aspnetcore --version 5.0.17 --install-dir /usr/share/dotnet --no-path \
+    && ./dotnet-install.sh --runtime aspnetcore --version 6.0.11 --install-dir /usr/share/dotnet --no-path \
     && rm dotnet-install.sh
 
 # Copy the build project in and build it

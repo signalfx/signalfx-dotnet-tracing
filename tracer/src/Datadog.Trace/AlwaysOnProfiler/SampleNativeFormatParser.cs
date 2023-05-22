@@ -63,7 +63,6 @@ namespace Datadog.Trace.AlwaysOnProfiler
                     else if (operationCode == OpCodes.StartSample)
                     {
                         var managedId = ReadInt(buffer, ref position);
-                        var nativeId = ReadInt(buffer, ref position);
                         var threadName = ReadString(buffer, ref position);
                         var traceIdHigh = ReadInt64(buffer, ref position);
                         var traceIdLow = ReadInt64(buffer, ref position);
@@ -85,7 +84,6 @@ namespace Datadog.Trace.AlwaysOnProfiler
                             TraceIdLow = traceIdLow,
                             SpanId = spanId,
                             ManagedId = managedId,
-                            NativeId = nativeId,
                             ThreadName = threadName,
                             ThreadIndex = threadIndex
                         };
@@ -159,7 +157,6 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         var allocatedSize = ReadInt64(buffer, ref position); // Technically uint64 but whatever
                         var typeName = ReadString(buffer, ref position);
                         var managedId = ReadInt(buffer, ref position);
-                        var nativeId = ReadInt(buffer, ref position);
                         var threadName = ReadString(buffer, ref position);
                         var traceIdHigh = ReadInt64(buffer, ref position);
                         var traceIdLow = ReadInt64(buffer, ref position);
@@ -172,7 +169,6 @@ namespace Datadog.Trace.AlwaysOnProfiler
                             TraceIdLow = traceIdLow,
                             SpanId = spanId,
                             ManagedId = managedId,
-                            NativeId = nativeId,
                             ThreadName = threadName
                         };
 
@@ -180,7 +176,14 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
                         // each allocation sample has independently coded strings
                         var codeDictionary = new Dictionary<int, string>();
+
                         ReadStackFrames(code, threadSample, codeDictionary, buffer, ref position);
+                        if (threadName == ThreadSampler.BackgroundThreadName)
+                        {
+                            // TODO Splunk: add configuration option to include the sampler thread. By default remove it.
+                            continue;
+                        }
+
                         allocationSamples.Add(new AllocationSample(allocatedSize, typeName, threadSample));
                     }
                     else

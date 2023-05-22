@@ -22,6 +22,7 @@ using Datadog.Trace.PlatformHelpers;
 using Datadog.Trace.Processors;
 using Datadog.Trace.RuntimeMetrics;
 using Datadog.Trace.Sampling;
+using Datadog.Trace.SignalFx.Metrics;
 using Datadog.Trace.Telemetry;
 using Datadog.Trace.Util;
 using Datadog.Trace.Util.Http;
@@ -59,6 +60,7 @@ namespace Datadog.Trace
             DirectLogSubmissionManager directLogSubmission,
             ITelemetryController telemetry,
             string defaultServiceName,
+            ISignalFxMetricSender metricSender,
             ITraceProcessor[] traceProcessors = null)
         {
             Settings = settings;
@@ -68,6 +70,7 @@ namespace Datadog.Trace
             Statsd = statsd;
             RuntimeMetrics = runtimeMetricsWriter;
             DefaultServiceName = defaultServiceName;
+            MetricSender = metricSender;
             TraceIdConvention = traceIdConvention;
             DirectLogSubmission = directLogSubmission;
             Telemetry = telemetry;
@@ -133,6 +136,8 @@ namespace Datadog.Trace
         public QueryStringManager QueryStringManager { get; }
 
         public IDogStatsd Statsd { get; }
+
+        public ISignalFxMetricSender MetricSender { get; }
 
         public ITraceProcessor[] TraceProcessors { get; }
 
@@ -208,6 +213,11 @@ namespace Datadog.Trace
                 {
                     statsdReplaced = true;
                     oldManager.Statsd?.Dispose();
+                }
+
+                if (oldManager.MetricSender != newManager.MetricSender)
+                {
+                    oldManager.MetricSender?.Dispose();
                 }
 
                 var runtimeMetricsWriterReplaced = false;
@@ -344,8 +354,18 @@ namespace Datadog.Trace
                     writer.WritePropertyName("log_injection_enabled");
                     writer.WriteValue(instanceSettings.LogsInjectionEnabled);
 
-                    writer.WritePropertyName("runtime_metrics_enabled");
-                    writer.WriteValue(instanceSettings.RuntimeMetricsEnabled);
+                    writer.WritePropertyName("enabled_metrics_integrations");
+                    writer.WriteStartArray();
+
+                    foreach (var integration in instanceSettings.MetricsIntegrations.Settings)
+                    {
+                        if (integration.Enabled)
+                        {
+                            writer.WriteValue(integration.IntegrationName);
+                        }
+                    }
+
+                    writer.WriteEndArray();
 
                     writer.WritePropertyName("disabled_integrations");
                     writer.WriteStartArray();
@@ -405,6 +425,9 @@ namespace Datadog.Trace
 
                     writer.WritePropertyName("thread_sampling_period");
                     writer.WriteValue(instanceSettings.ThreadSamplingPeriod);
+
+                    writer.WritePropertyName("profiler_export_interval");
+                    writer.WriteValue(instanceSettings.ProfilerExportInterval);
 
                     writer.WritePropertyName("memory_profiling_enabled");
                     writer.WriteValue(instanceSettings.MemoryProfilingEnabled);

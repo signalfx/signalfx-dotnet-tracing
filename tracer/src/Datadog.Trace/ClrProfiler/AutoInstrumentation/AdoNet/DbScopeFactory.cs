@@ -48,7 +48,7 @@ namespace Datadog.Trace.ClrProfiler.AutoInstrumentation.AdoNet
                 var tags = new SqlTags
                 {
                     DbType = dbType,
-                    InstrumentationName = IntegrationRegistry.GetName(integrationId)
+                    InstrumentationName = ValuesRegistry<IntegrationId>.GetName(integrationId)
                 };
 
                 tags.SetAnalyticsSampleRate(integrationId, tracer.Settings, enabledWithGlobalSetting: false);

@@ -5,6 +5,7 @@
 #include <chrono>
 #include <map>
 #include <algorithm>
+#include <shared_mutex>
 #ifndef _WIN32
   #include <pthread.h>
   #include <codecvt>
@@ -47,6 +48,8 @@ static std::mutex thread_span_context_lock;
 static std::unordered_map<ThreadID, always_on_profiler::thread_span_context> thread_span_context_map;
 
 static std::mutex name_cache_lock = std::mutex();
+
+static std::shared_mutex profiling_lock = std::shared_mutex();
 
 static ICorProfilerInfo10* profiler_info; // After feature sets settle down, perhaps this should be refactored and have a single static instance of ThreadSampler
 
@@ -197,7 +200,6 @@ void ThreadSamplesBuffer::StartSample(ThreadID id, const ThreadState* state, con
     CHECK_SAMPLES_BUFFER_LENGTH()
     WriteByte(kThreadSamplesStartSample);
     WriteInt(span_context.managed_thread_id_);
-    WriteInt(static_cast<int32_t>(state->native_id_));
     WriteString(state->thread_name_);
     WriteUInt64(span_context.trace_id_high_);
     WriteUInt64(span_context.trace_id_low_);
@@ -216,7 +218,6 @@ void ThreadSamplesBuffer::AllocationSample(uint64_t allocSize, const WCHAR* allo
     WriteUInt64(allocSize);
     WriteString(allocType, allocTypeCharLen);
     WriteInt(span_context.managed_thread_id_);
-    WriteInt(static_cast<int32_t>(state->native_id_));
     WriteString(state->thread_name_);
     WriteUInt64(span_context.trace_id_high_);
     WriteUInt64(span_context.trace_id_low_);
@@ -629,6 +630,11 @@ int GetMaxAllocationsPerMinute()
 
 void PauseClrAndCaptureSamples(AlwaysOnProfiler* prof, ICorProfilerInfo10* info10)
 {
+    // before trying to suspend the runtime, acquire exclusive lock
+    // it's not safe to try to suspend the runtime after other locks are acquired
+    // if there is application thread in the middle of AllocationTick
+    std::unique_lock<std::shared_mutex> unique_lock(profiling_lock);
+
     // These locks are in use by managed threads; Acquire locks before suspending the runtime to prevent deadlock
     // Any of these can be in use by random app/clr threads, but this is the only
     // place that acquires more than one lock at a time.
@@ -818,6 +824,17 @@ bool AllocationSubSampler::ShouldSample()
 
 void AlwaysOnProfiler::AllocationTick(ULONG dataLen, LPCBYTE data)
 {
+    // try to acquire shared lock without blocking
+    // and return early if attempt was unsuccessful -
+    // PauseClrAndCaptureSamples acquired exclusive lock
+    // and it's not safe to proceed
+    std::shared_lock<std::shared_mutex> shared_lock(profiling_lock, std::try_to_lock);
+    if(!shared_lock.owns_lock())
+    {
+        // can't continue if suspension already started
+        trace::Logger::Debug("Possible runtime suspension in progress, can't safely process allocation tick.");
+        return;
+    }
     if (this->allocationSubSampler == nullptr || !this->allocationSubSampler->ShouldSample())
     {
         return;
@@ -902,18 +919,6 @@ void AlwaysOnProfiler::ThreadDestroyed(ThreadID thread_id)
 
         thread_span_context_map.erase(thread_id);
     }
-}
-void AlwaysOnProfiler::ThreadAssignedToOsThread(ThreadID thread_id, DWORD os_thread_id)
-{
-    std::lock_guard<std::mutex> guard(thread_state_lock_);
-
-    ThreadState* state = managed_tid_to_state_[thread_id];
-    if (state == nullptr)
-    {
-        state = new ThreadState();
-        managed_tid_to_state_[thread_id] = state;
-    }
-    state->native_id_ = os_thread_id;
 }
 void AlwaysOnProfiler::ThreadNameChanged(ThreadID thread_id, ULONG cch_name, WCHAR name[])
 {

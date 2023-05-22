@@ -5,7 +5,6 @@
       Milliseconds: 1649268034960
     },
     ManagedId: Id_1,
-    NativeId: Id_2,
     ThreadName: ,
     Frames: [
       System.Threading.Monitor.Wait(System.Object, System.Int32),
@@ -23,8 +22,7 @@
       Nanoseconds: 1649268034960000000,
       Milliseconds: 1649268034960
     },
-    ManagedId: Id_3,
-    NativeId: Id_4,
+    ManagedId: Id_2,
     ThreadName: .NET ThreadPool Worker,
     ThreadIndex: 3,
     Frames: [
@@ -72,8 +70,7 @@
       Nanoseconds: 1649268034960000000,
       Milliseconds: 1649268034960
     },
-    ManagedId: Id_5,
-    NativeId: Id_6,
+    ManagedId: Id_3,
     ThreadName: .NET ThreadPool Gate,
     ThreadIndex: 4,
     Frames: [
@@ -89,8 +86,7 @@
       Nanoseconds: 1649268034960000000,
       Milliseconds: 1649268034960
     },
-    ManagedId: Id_5,
-    NativeId: Id_7,
+    ManagedId: Id_3,
     ThreadName: .NET ThreadPool Worker,
     ThreadIndex: 5,
     Frames: [
@@ -107,8 +103,7 @@
       Nanoseconds: 1649268034960000000,
       Milliseconds: 1649268034960
     },
-    ManagedId: Id_5,
-    NativeId: Id_8,
+    ManagedId: Id_3,
     ThreadName: .NET ThreadPool Worker,
     ThreadIndex: 7,
     Frames: [
@@ -150,8 +145,7 @@
       Nanoseconds: 1649268034960000000,
       Milliseconds: 1649268034960
     },
-    ManagedId: Id_5,
-    NativeId: Id_9,
+    ManagedId: Id_3,
     ThreadName: .NET ThreadPool Worker,
     ThreadIndex: 8,
     Frames: [
@@ -168,8 +162,7 @@
       Nanoseconds: 1649268034960000000,
       Milliseconds: 1649268034960
     },
-    ManagedId: Id_10,
-    NativeId: Id_11,
+    ManagedId: Id_4,
     ThreadName: .NET ThreadPool Worker,
     ThreadIndex: 9,
     Frames: [
@@ -186,8 +179,7 @@
       Nanoseconds: 1649268034960000000,
       Milliseconds: 1649268034960
     },
-    ManagedId: Id_12,
-    NativeId: Id_13,
+    ManagedId: Id_5,
     ThreadName: ,
     ThreadIndex: 12,
     Frames: [
@@ -316,8 +308,7 @@
       Nanoseconds: 1649268034960000000,
       Milliseconds: 1649268034960
     },
-    ManagedId: Id_5,
-    NativeId: Id_14,
+    ManagedId: Id_3,
     ThreadName: ,
     ThreadIndex: 13,
     Frames: [
@@ -387,8 +378,7 @@
       Nanoseconds: 1649268034960000000,
       Milliseconds: 1649268034960
     },
-    ManagedId: Id_5,
-    NativeId: Id_15,
+    ManagedId: Id_3,
     ThreadName: My Cool Thread 0,
     ThreadIndex: 15,
     Frames: [

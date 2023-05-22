@@ -12,14 +12,11 @@ using namespace always_on_profiler;
 TEST(AlwaysOnProfilerTest, ThreadStateTracking)
 {
     AlwaysOnProfiler ts; // Do NOT call StartSampling on this, which will create a background thread, etc.
-    ts.ThreadAssignedToOsThread(1, 1001);
     ts.ThreadNameChanged(1, 6, const_cast<WCHAR*>(L"Sample"));
     ts.ThreadCreated(1);
-    ts.ThreadAssignedToOsThread(1, 1002);
     ts.ThreadNameChanged(2, 7, const_cast<WCHAR*>(L"Thread1"));
     ts.ThreadNameChanged(2, 6, const_cast<WCHAR*>(L"thread"));
     ts.ThreadCreated(2);
-    EXPECT_EQ(1002, ts.managed_tid_to_state_[1]->native_id_);
     EXPECT_EQ(L"Sample", ts.managed_tid_to_state_[1]->thread_name_);
     EXPECT_EQ(L"thread", ts.managed_tid_to_state_[2]->thread_name_);
     ts.ThreadDestroyed(1);
@@ -38,7 +35,6 @@ TEST(AlwaysOnProfilerTest, BasicBufferBehavior)
     const shared::WSTRING frame2 = WStr("SomeFairlyLongClassName::ADifferentMethodName");
     ThreadSamplesBuffer tsb(&buf);
     ThreadState threadState;
-    threadState.native_id_ = 1000;
     threadState.thread_name_.append(longThreadName);
 
     tsb.StartBatch();
@@ -49,7 +45,7 @@ TEST(AlwaysOnProfilerTest, BasicBufferBehavior)
     tsb.EndSample();
     tsb.EndBatch();
     tsb.WriteFinalStats(SamplingStatistics());
-    ASSERT_EQ(1290, tsb.buffer_->size()); // not manually calculated but does depend on thread name limiting and not repeating frame strings
+    ASSERT_EQ(1286, tsb.buffer_->size()); // not manually calculated but does depend on thread name limiting and not repeating frame strings
     ASSERT_EQ(2, tsb.codes_.size());
 }
 TEST(AlwaysOnProfilerTest, AllocationSampleBuffer)
@@ -65,7 +61,6 @@ TEST(AlwaysOnProfilerTest, AllocationSampleBuffer)
     const shared::WSTRING typeName = WStr("ThisIsMyTypeName");
     ThreadSamplesBuffer tsb(&buf);
     ThreadState threadState;
-    threadState.native_id_ = 1000;
     threadState.thread_name_.append(longThreadName);
 
     tsb.AllocationSample(32, typeName.c_str(), typeName.length(), 1, &threadState, thread_span_context());
@@ -74,7 +69,7 @@ TEST(AlwaysOnProfilerTest, AllocationSampleBuffer)
     tsb.RecordFrame(7001, frame1);
     tsb.EndSample();
 
-    ASSERT_EQ(1309, tsb.buffer_->size()); // not manually calculated
+    ASSERT_EQ(1305, tsb.buffer_->size()); // not manually calculated
 }
 
 TEST(AlwaysOnProfilerTest, BufferOverrunBehavior)
@@ -90,7 +85,6 @@ TEST(AlwaysOnProfilerTest, BufferOverrunBehavior)
     ThreadSamplesBuffer tsb(&buf);
 
     ThreadState threadState;
-    threadState.native_id_ = 1000;
     threadState.thread_name_.append(long_thread_name);
    
     // Now span a bunch of data and ensure we don't overflow (too much)

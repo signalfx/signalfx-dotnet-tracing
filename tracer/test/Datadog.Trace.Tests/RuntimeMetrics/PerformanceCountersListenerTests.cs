@@ -8,10 +8,12 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Datadog.Trace.RuntimeMetrics;
+using Datadog.Trace.SignalFx.Metrics;
 using Datadog.Trace.Vendors.StatsdClient;
 using FluentAssertions;
 using Moq;
 using Xunit;
+using MetricType = Datadog.Tracer.SignalFx.Metrics.Protobuf.MetricType;
 
 namespace Datadog.Trace.Tests.RuntimeMetrics
 {
@@ -20,7 +22,7 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
         [Fact]
         public async Task PushEvents()
         {
-            var statsd = new Mock<IDogStatsd>();
+            var statsd = new Mock<ISignalFxMetricSender>();
 
             using var listener = new PerformanceCountersListener(statsd.Object);
 
@@ -28,12 +30,12 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
 
             listener.Refresh();
 
-            statsd.Verify(s => s.Gauge(MetricsNames.Gc.HeapSize, It.IsAny<double>(), 1, new[] { "generation:gen0" }), Times.Once);
-            statsd.Verify(s => s.Gauge(MetricsNames.Gc.HeapSize, It.IsAny<double>(), 1, new[] { "generation:gen1" }), Times.Once);
-            statsd.Verify(s => s.Gauge(MetricsNames.Gc.HeapSize, It.IsAny<double>(), 1, new[] { "generation:gen2" }), Times.Once);
-            statsd.Verify(s => s.Gauge(MetricsNames.Gc.HeapSize, It.IsAny<double>(), 1, new[] { "generation:loh" }), Times.Once);
+            statsd.Verify(s => s.SendLong(MetricsNames.NetRuntime.Gc.HeapSize, It.IsAny<long>(), MetricType.GAUGE, new[] { "generation:gen0" }), Times.Once);
+            statsd.Verify(s => s.SendLong(MetricsNames.NetRuntime.Gc.HeapSize, It.IsAny<long>(), MetricType.GAUGE, new[] { "generation:gen1" }), Times.Once);
+            statsd.Verify(s => s.SendLong(MetricsNames.NetRuntime.Gc.HeapSize, It.IsAny<long>(), MetricType.GAUGE, new[] { "generation:gen2" }), Times.Once);
+            statsd.Verify(s => s.SendLong(MetricsNames.NetRuntime.Gc.HeapSize, It.IsAny<long>(), MetricType.GAUGE, new[] { "generation:loh" }), Times.Once);
 
-            statsd.Verify(s => s.Counter(MetricsNames.ContentionCount, It.IsAny<long>(), 1, It.IsAny<string[]>()), Times.Once);
+            statsd.Verify(s => s.SendLong(MetricsNames.NetRuntime.ContentionCount, It.IsAny<long>(), MetricType.CUMULATIVE_COUNTER, It.IsAny<string[]>()), Times.Once);
 
             statsd.VerifyNoOtherCalls();
         }
@@ -48,7 +50,7 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
                 barrier.SignalAndWait();
             }
 
-            var statsd = new Mock<IDogStatsd>();
+            var statsd = new Mock<ISignalFxMetricSender>();
 
             using var listener = new TestPerformanceCounterListener(statsd.Object, Callback);
 
@@ -72,8 +74,8 @@ namespace Datadog.Trace.Tests.RuntimeMetrics
             // The field needs to be volatile because it's used concurrently from two threads
             private volatile Action _callback;
 
-            public TestPerformanceCounterListener(IDogStatsd statsd, Action callback)
-                : base(statsd)
+            public TestPerformanceCounterListener(ISignalFxMetricSender metricSender, Action callback)
+                : base(metricSender)
             {
                 _callback = callback;
             }

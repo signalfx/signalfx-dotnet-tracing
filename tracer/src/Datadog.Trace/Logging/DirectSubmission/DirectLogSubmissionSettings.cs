@@ -63,7 +63,7 @@ namespace Datadog.Trace.Logging.DirectSubmission
             var globalTags = source?.GetDictionary(ConfigurationKeys.DirectLogSubmission.GlobalTags)
                           ?? source?.GetDictionary(ConfigurationKeys.GlobalTags)
                              // backwards compatibility for names used in the past
-                          ?? source?.GetDictionary("SIGNALFX_TRACE_GLOBAL_TAGS");
+                          ?? source?.GetDictionary("SIGNALFX_GLOBAL_TAGS");
 
             DirectLogSubmissionGlobalTags = globalTags?.Where(kvp => !string.IsNullOrWhiteSpace(kvp.Key) && !string.IsNullOrWhiteSpace(kvp.Value))
                                                        .ToDictionary(kvp => kvp.Key.Trim(), kvp => kvp.Value.Trim())

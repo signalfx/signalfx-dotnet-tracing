@@ -1,4 +1,4 @@
-[
+﻿[
   {
     AllocationSizeBytes: 14808,
     TypeName: EventMetadata[],
@@ -8,7 +8,6 @@
         Milliseconds: 1664371457638
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         System.Diagnostics.Tracing.EventSource.CreateManifestAndDescriptors(System.Type, System.String, System.Diagnostics.Tracing.EventSource, System.Diagnostics.Tracing.EventManifestOptions),
@@ -37,7 +36,6 @@
         Milliseconds: 1664371457654
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         System.Diagnostics.Tracing.EventSource.AddEventDescriptor(System.Diagnostics.Tracing.EventSource.EventMetadata[]&, System.String, System.Diagnostics.Tracing.EventAttribute, System.Reflection.ParameterInfo[], System.Boolean),
@@ -67,7 +65,6 @@
         Milliseconds: 1664371457656
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         System.Reflection.RuntimeMethodInfo.<get_Signature>g__LazyCreateSignature|24_0(),
@@ -99,7 +96,6 @@
         Milliseconds: 1664371457657
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         System.Reflection.CustomAttribute.CreateCaObject(System.Reflection.RuntimeModule, System.RuntimeType, System.IRuntimeMethodInfo, System.IntPtr&, System.IntPtr, System.Int32&),
@@ -136,7 +132,6 @@
         Milliseconds: 1664371457658
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         System.Text.StringBuilder.ExpandByABlock(System.Int32),
@@ -169,7 +164,6 @@
         Milliseconds: 1664371457659
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         System.Text.StringBuilder.ExpandByABlock(System.Int32),
@@ -202,7 +196,6 @@
         Milliseconds: 1664371457661
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         System.Text.StringBuilder.ExpandByABlock(System.Int32),
@@ -237,7 +230,6 @@
         Milliseconds: 1664371457663
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         System.Text.StringBuilder.ExpandByABlock(System.Int32),
@@ -271,7 +263,6 @@
         Milliseconds: 1664371457663
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         System.Text.StringBuilder.ExpandByABlock(System.Int32),
@@ -305,7 +296,6 @@
         Milliseconds: 1664371457664
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         System.Text.StringBuilder.ToString(),
@@ -337,7 +327,6 @@
         Milliseconds: 1664371457664
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         System.Text.Encoding.GetBytes(System.String),
@@ -369,7 +358,6 @@
         Milliseconds: 1664371458580
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         System.Diagnostics.NtProcessInfoHelper.GetProcessInfos(System.Nullable`1[System.Int32]),
@@ -406,7 +394,6 @@
         Milliseconds: 1664371458584
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         System.Diagnostics.NtProcessInfoHelper.GetProcessInfos(System.Nullable`1[System.Int32]),
@@ -443,7 +430,6 @@
         Milliseconds: 1664371458594
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         System.Diagnostics.NtProcessInfoHelper.GetProcessInfos(System.Nullable`1[System.Int32]),
@@ -480,7 +466,6 @@
         Milliseconds: 1664371459279
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         System.Reflection.RuntimeParameterInfo.GetParameters(System.IRuntimeMethodInfo, System.Reflection.MemberInfo, System.Signature, System.Reflection.ParameterInfo&, System.Boolean),
@@ -538,7 +523,6 @@
         Milliseconds: 1664371459467
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         System.String.Ctor(System.ReadOnlySpan`1[System.Char]),
@@ -583,7 +567,6 @@
         Milliseconds: 1664371459588
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         System.Reflection.RuntimeCustomAttributeData.GetCustomAttributeRecords(System.Reflection.RuntimeModule, System.Int32),
@@ -630,7 +613,6 @@
         Milliseconds: 1664371459766
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         SignalFx.Tracing.ClrProfiler.Instrumentation.Initialize(),
@@ -664,7 +646,6 @@
         Milliseconds: 1664371459883
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         System.RuntimeTypeHandle.GetTypeByName(System.String, System.Boolean, System.Boolean, System.Runtime.CompilerServices.StackCrawlMarkHandle, System.Runtime.CompilerServices.ObjectHandleOnStack, System.Runtime.CompilerServices.ObjectHandleOnStack, System.Runtime.CompilerServices.ObjectHandleOnStack),
@@ -705,7 +686,6 @@
         Milliseconds: 1664371459889
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         System.Collections.Concurrent.ConcurrentDictionary`2..ctor(System.Int32, System.Int32, System.Boolean, System.Collections.Generic.IEqualityComparer`1[TKey]),
@@ -756,7 +736,6 @@
         Milliseconds: 1664371459978
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         System.Collections.Generic.Dictionary`2.Resize(System.Int32, System.Boolean),
@@ -818,7 +797,6 @@
         Milliseconds: 1664371459979
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         System.Text.StringBuilder.ToString(),
@@ -879,7 +857,6 @@
         Milliseconds: 1664371460071
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         SignalFx.Tracing.Vendors.IndieSystem.Text.RegularExpressions.RegexCaseEquivalences..cctor(),
@@ -934,7 +911,6 @@
         Milliseconds: 1664371460152
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         SignalFx.Tracing.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.SymbolicRegexRunnerFactory..ctor(SignalFx.Tracing.Vendors.IndieSystem.Text.RegularExpressions.RegexTree, SignalFx.Tracing.Vendors.IndieSystem.Text.RegularExpressions.RegexOptions, System.TimeSpan),
@@ -983,7 +959,6 @@
         Milliseconds: 1664371460199
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         System.Collections.Generic.Dictionary`2.Resize(System.Int32, System.Boolean),
@@ -1040,7 +1015,6 @@
         Milliseconds: 1664371460209
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         SignalFx.Tracing.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD.Deserialize(System.ReadOnlySpan`1[System.Byte]),
@@ -1096,7 +1070,6 @@
         Milliseconds: 1664371460210
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         System.Collections.Generic.Dictionary`2.Resize(System.Int32, System.Boolean),
@@ -1166,7 +1139,6 @@
         Milliseconds: 1664371460211
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         System.Collections.Generic.Dictionary`2.Resize(System.Int32, System.Boolean),
@@ -1237,7 +1209,6 @@
         Milliseconds: 1664371460211
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         System.Collections.Generic.Dictionary`2.Resize(System.Int32, System.Boolean),
@@ -1305,7 +1276,6 @@
         Milliseconds: 1664371460212
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         System.Collections.Generic.Dictionary`2.Resize(System.Int32, System.Boolean),
@@ -1366,7 +1336,6 @@
         Milliseconds: 1664371460213
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         SignalFx.Tracing.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.RegexNodeConverter.ConvertToSymbolicRegexNode(SignalFx.Tracing.Vendors.IndieSystem.Text.RegularExpressions.RegexNode),
@@ -1416,7 +1385,6 @@
         Milliseconds: 1664371460219
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         SignalFx.Tracing.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.CharSetSolver.GetOrCreateBDD(System.Int32, SignalFx.Tracing.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD, SignalFx.Tracing.Vendors.IndieSystem.Text.RegularExpressions.Symbolic.BDD),
@@ -1474,7 +1442,6 @@
         Milliseconds: 1664371460220
       },
       ManagedId: Id_1,
-      NativeId: Id_2,
       ThreadName: ,
       Frames: [
         System.Collections.Generic.Dictionary`2.Resize(System.Int32, System.Boolean),
@@ -1540,7 +1507,6 @@
         Milliseconds: 1664371460273
       },
       ManagedId: Id_1,
-      NativeId: Id_3,
       ThreadName: ,
       Frames: [
         System.GC.GetGCMemoryInfo(System.GCKind),
@@ -1548,24 +1514,6 @@
         System.Buffers.TlsOverPerCoreLockedStacksArrayPool`1.Trim(),
         System.Buffers.TlsOverPerCoreLockedStacksArrayPool`1.<>c.<InitializeTlsBucketsAndTrimming>b__13_0(System.Object),
         System.Gen2GcCallback.Finalize(),
-        Unknown_Native_Function(unknown)
-      ]
-    }
-  },
-  {
-    AllocationSizeBytes: 204856,
-    TypeName: System.Byte[],
-    ThreadSample: {
-      Timestamp: {
-        Nanoseconds: 1664371461273000000,
-        Milliseconds: 1664371461273
-      },
-      ManagedId: Id_1,
-      NativeId: Id_4,
-      ThreadName: SignalFx Profiling Sampler Thread,
-      Frames: [
-        SignalFx.Tracing.AlwaysOnProfiler.ThreadSampler.SampleReadingThread(),
-        System.Threading.Thread.StartCallback(),
         Unknown_Native_Function(unknown)
       ]
     }

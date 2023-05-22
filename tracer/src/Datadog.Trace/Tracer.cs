@@ -55,7 +55,7 @@ namespace Datadog.Trace
         /// The <see cref="TracerManager"/> created will be scoped specifically to this instance.
         /// </summary>
         internal Tracer(TracerSettings settings, IAgentWriter agentWriter, ISampler sampler, IScopeManager scopeManager, IDogStatsd statsd, ITelemetryController telemetry = null)
-            : this(TracerManagerFactory.Instance.CreateTracerManager(settings?.Build(), agentWriter, sampler, scopeManager, statsd, runtimeMetrics: null, logSubmissionManager: null, telemetry: telemetry ?? NullTelemetryController.Instance))
+            : this(TracerManagerFactory.Instance.CreateTracerManager(settings?.Build(), agentWriter, sampler, scopeManager, statsd, runtimeMetrics: null, logSubmissionManager: null, telemetry: telemetry ?? NullTelemetryController.Instance, null))
         {
         }
 
@@ -430,7 +430,7 @@ namespace Datadog.Trace
                 return;
             }
 
-            var signalFxOpenTracingAssembly = Assembly.Load(new AssemblyName("SignalFx.Tracing.OpenTracing, Version=0.2.9.0, Culture=neutral, PublicKeyToken=e43a27c2023d388a"));
+            var signalFxOpenTracingAssembly = Assembly.Load(new AssemblyName("SignalFx.Tracing.OpenTracing, Version=1.1.0.0, Culture=neutral, PublicKeyToken=e43a27c2023d388a"));
             var openTracingTracerFactoryType = signalFxOpenTracingAssembly.GetType("Datadog.Trace.OpenTracing.OpenTracingTracerFactory");
             var methodInfo = openTracingTracerFactoryType.GetMethod("RegisterGlobalTracerIfAbsent");
             object[] args = { instance };

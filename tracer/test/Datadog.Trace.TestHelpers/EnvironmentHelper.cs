@@ -203,7 +203,7 @@ namespace Datadog.Trace.TestHelpers
                 "SIGNALFX_DISABLED_INTEGRATIONS",
                 "SIGNALFX_SERVICE_NAME",
                 "SIGNALFX_VERSION",
-                "SIGNALFX_TRACE_GLOBAL_TAGS",
+                "SIGNALFX_GLOBAL_TAGS",
                 "SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS",
                 "SIGNALFX_INSTRUMENTATION_ELASTICSEARCH_TAG_QUERIES",
                 "SIGNALFX_CONVENTION",
@@ -212,8 +212,7 @@ namespace Datadog.Trace.TestHelpers
                 // thread sampling
                 "SIGNALFX_PROFILER_LOGS_ENDPOINT",
                 "SIGNALFX_PROFILER_ENABLED",
-                "SIGNALFX_PROFILER_CALL_STACK_INTERVAL",
-                "SIGNALFX_PROFILER_EXPORT_FORMAT"
+                "SIGNALFX_PROFILER_CALL_STACK_INTERVAL"
             };
 
             foreach (string variable in environmentVariables)

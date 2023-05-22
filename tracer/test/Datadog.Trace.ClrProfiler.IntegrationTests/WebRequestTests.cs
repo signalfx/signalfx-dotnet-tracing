@@ -5,7 +5,6 @@
 
 // Modified by Splunk Inc.
 
-using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.ClrProfiler.IntegrationTests.Helpers;
 using Datadog.Trace.Configuration;
@@ -60,7 +59,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 PropagationTestHelpers.AssertPropagationEnabled(spans.First(), processResult);
 
+#if NET7_0
+                telemetry.AssertIntegrationEnabled(IntegrationId.HttpSocketsHandler); // uses HttpClient internally
+#else
                 telemetry.AssertIntegrationEnabled(IntegrationId.WebRequest);
+#endif
                 VerifyInstrumentation(processResult.Process);
             }
         }
@@ -85,7 +88,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 PropagationTestHelpers.AssertPropagationDisabled(processResult);
 
+#if NET7_0
+                telemetry.AssertIntegrationDisabled(IntegrationId.HttpMessageHandler); // uses HttpClient internally
+#else
                 telemetry.AssertIntegrationDisabled(IntegrationId.WebRequest);
+#endif
                 VerifyInstrumentation(processResult.Process);
             }
         }

@@ -44,6 +44,7 @@ Windows in Git Bash:
 
 ```sh
 git clean -fXd ; ./tracer/build.cmd ; \
+Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.cmd BuildAndRunWindowsIntegrationTests --framework net7.0 ; \
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.cmd BuildAndRunWindowsIntegrationTests --framework net6.0 ; \
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.cmd BuildAndRunWindowsIntegrationTests --framework net5.0 ; \
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.cmd BuildAndRunWindowsIntegrationTests --framework netcoreapp3.1 ; \
@@ -56,6 +57,7 @@ Windows in Ubuntu WSL:
 ```sh
 git clean -fXd ; ./tracer/build.sh ; \
 docker-compose run --rm StartDependencies ; \
+Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.sh BuildAndRunLinuxIntegrationTests --framework net7.0 ; \
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.sh BuildAndRunLinuxIntegrationTests --framework net6.0 ; \
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.sh BuildAndRunLinuxIntegrationTests --framework net5.0 ; \
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.sh BuildAndRunLinuxIntegrationTests --framework netcoreapp3.1 ; \

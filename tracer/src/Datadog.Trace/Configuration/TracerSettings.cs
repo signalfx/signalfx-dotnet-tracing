@@ -79,6 +79,8 @@ namespace Datadog.Trace.Configuration
 
             Integrations = new IntegrationSettingsCollection(source);
 
+            MetricsIntegrations = new MetricsIntegrationSettingsCollection(source);
+
             ExporterSettings = new ExporterSettings(source);
 
 #pragma warning disable 618 // App analytics is deprecated, but still used
@@ -92,6 +94,8 @@ namespace Datadog.Trace.Configuration
                                           100;
 
             GlobalTags = source?.GetDictionary(ConfigurationKeys.GlobalTags) ??
+                         // backwards compatibility for names used in the past
+                         source?.GetDictionary("SIGNALFX_TRACE_GLOBAL_TAGS") ??
                          // default value (empty)
                          new ConcurrentDictionary<string, string>();
 
@@ -122,9 +126,6 @@ namespace Datadog.Trace.Configuration
                             true;
 
             StatsComputationEnabled = source?.GetBool(ConfigurationKeys.StatsComputationEnabled) ?? false;
-
-            RuntimeMetricsEnabled = source?.GetBool(ConfigurationKeys.RuntimeMetricsEnabled) ??
-                                    false;
 
             CustomSamplingRules = source?.GetString(ConfigurationKeys.CustomSamplingRules);
 
@@ -197,8 +198,12 @@ namespace Datadog.Trace.Configuration
 
             // If you change this, change environment_variables.h too
             CpuProfilingEnabled = source?.GetBool(ConfigurationKeys.AlwaysOnProfiler.CpuEnabled) ?? false;
-            MemoryProfilingEnabled = source?.GetBool(ConfigurationKeys.AlwaysOnProfiler.MemoryEnabled) ?? false;
+            var memoryProfilingEnabled = source?.GetBool(ConfigurationKeys.AlwaysOnProfiler.MemoryEnabled) ?? false;
+            MemoryProfilingEnabled = memoryProfilingEnabled;
             ThreadSamplingPeriod = GetThreadSamplingPeriod(source);
+
+            var profilingExportInterval = source?.GetInt32(ConfigurationKeys.AlwaysOnProfiler.ExportInterval) ?? 10000;
+            ProfilerExportInterval = TimeSpan.FromMilliseconds(profilingExportInterval);
 
             LogSubmissionSettings = new DirectLogSubmissionSettings(source);
 
@@ -342,6 +347,11 @@ namespace Datadog.Trace.Configuration
         public IntegrationSettingsCollection Integrations { get; }
 
         /// <summary>
+        /// Gets a collection of <see cref="MetricsIntegrations"/> keyed by metric integration name.
+        /// </summary>
+        public MetricsIntegrationSettingsCollection MetricsIntegrations { get; }
+
+        /// <summary>
         /// Gets or sets the global tags, which are applied to all <see cref="Span"/>s.
         /// </summary>
         public IDictionary<string, string> GlobalTags { get; set; }
@@ -397,12 +407,6 @@ namespace Datadog.Trace.Configuration
         /// <seealso cref="ConfigurationKeys.Convention"/>
         /// </summary>
         public ConventionType Convention { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether runtime metrics
-        /// are enabled and sent to DogStatsd.
-        /// </summary>
-        public bool RuntimeMetricsEnabled { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether stats are computed on the tracer side
@@ -557,6 +561,15 @@ namespace Datadog.Trace.Configuration
         /// </summary>
         /// <seealso cref="TracerSettings.ThreadSamplingPeriod"/>
         internal TimeSpan ThreadSamplingPeriod { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value for the profiling data export interval.
+        /// The default value is 1000 milliseconds.
+        /// If CPU profiling is enables this value should match ThreadSamplingPeriod.
+        /// </summary>
+        /// <seealso cref="TracerSettings.ProfilerExportInterval"/>
+        /// <seealso cref="TracerSettings.ThreadSamplingPeriod"/>
+        internal TimeSpan ProfilerExportInterval { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether the feature flag to enable the updated ASP.NET resource names is enabled
@@ -753,7 +766,7 @@ namespace Datadog.Trace.Configuration
         {
             // If you change any of these constants, check with always_on_profiler.cpp first
             int period = source.SafeReadInt32(
-                key: ConfigurationKeys.AlwaysOnProfiler.Period,
+                key: ConfigurationKeys.AlwaysOnProfiler.ThreadSamplingPeriod,
                 defaultTo: 10_000,
                 validators: (value) => value >= 1_000);
 

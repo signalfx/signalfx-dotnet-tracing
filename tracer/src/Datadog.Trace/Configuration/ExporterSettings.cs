@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using Datadog.Trace.Agent;
-using Datadog.Trace.AlwaysOnProfiler;
 using Datadog.Trace.Configuration.Helpers;
 using Datadog.Trace.SignalFx.Metrics;
 using Datadog.Trace.Vendors.Serilog;
@@ -103,21 +102,6 @@ namespace Datadog.Trace.Configuration
                 key: ConfigurationKeys.TraceBufferSize,
                 defaultTo: 1000,
                 validators: configuredSize => configuredSize > 0);
-
-            var stringProfileExportFormat = source?.GetString(ConfigurationKeys.AlwaysOnProfiler.ExportFormat);
-            if (string.IsNullOrEmpty(stringProfileExportFormat))
-            {
-                ProfilerExportFormat = ProfilerExportFormat.Pprof;
-            }
-            else if (Enum.TryParse(stringProfileExportFormat, out ProfilerExportFormat profilerExportFormat))
-            {
-                ProfilerExportFormat = profilerExportFormat;
-            }
-            else
-            {
-                Log.Logger.Warning("Unknown {0} passed: {1}, using {2} as a default", ConfigurationKeys.AlwaysOnProfiler.ExportFormat, stringProfileExportFormat, ProfilerExportFormat.Pprof);
-                ProfilerExportFormat = ProfilerExportFormat.Pprof;
-            }
         }
 
         /// <summary>
@@ -202,11 +186,6 @@ namespace Datadog.Trace.Configuration
         public MetricsExporterType MetricsExporter { get; set; }
 
         internal List<string> ValidationWarnings { get; }
-
-        /// <summary>
-        /// Gets or sets the format in which the profiling data will be exported.
-        /// </summary>
-        internal ProfilerExportFormat ProfilerExportFormat { get; set; }
 
         /// <summary>
         /// Gets or sets the minimum number of closed spans in a trace before it's partially flushed

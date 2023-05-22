@@ -11,7 +11,7 @@ using Datadog.Trace.Propagators;
 using Datadog.Trace.TestHelpers;
 using FluentAssertions;
 using Xunit;
-using sd = System.Diagnostics;
+using Sd = System.Diagnostics;
 
 namespace Datadog.Trace.Tests
 {
@@ -40,12 +40,12 @@ namespace Datadog.Trace.Tests
 
             Tracer.Instance.ActiveScope.Should().BeNull();
 
-            sd.Activity myActivity = null;
+            Sd.Activity myActivity = null;
             IScope scopeFromActivity = null;
             try
             {
                 // Create activity as a base of the trace
-                myActivity = new sd.Activity("Custom activity");
+                myActivity = new Sd.Activity("Custom activity");
 
                 // Set some tags before start
                 myActivity.AddTag("BeforeStartTag", "MyValue");
@@ -81,11 +81,11 @@ namespace Datadog.Trace.Tests
                     ((Span)scope.Span).Context.RawTraceId.Should().Be(traceId);
 
                     // Create a new child activity as child of span
-                    sd.Activity childActivity = null;
+                    Sd.Activity childActivity = null;
                     IScope scopeFromChildActivity = null;
                     try
                     {
-                        childActivity = new sd.Activity("Child activity");
+                        childActivity = new Sd.Activity("Child activity");
                         childActivity.AddTag("BeforeStartTag", "MyValue");
                         _fixture.StartActivity(childActivity);
                         childActivity.AddTag("AfterStartTag", "MyValue");
@@ -151,10 +151,10 @@ namespace Datadog.Trace.Tests
                 var hexSpanId = spanId.ToString("x16");
 
                 // Create a new child activity as child of span
-                sd.Activity childActivity = null;
+                Sd.Activity childActivity = null;
                 try
                 {
-                    childActivity = new sd.Activity("Child activity");
+                    childActivity = new Sd.Activity("Child activity");
                     _fixture.StartActivity(childActivity);
 
                     // An activity should create a new datadog scope
@@ -195,7 +195,7 @@ namespace Datadog.Trace.Tests
         public class ActivityFixture : IDisposable
         {
 #if (NETCOREAPP2_0_OR_GREATER || NETFRAMEWORK) && !NET5_0_OR_GREATER
-            private readonly sd.DiagnosticSource source = new sd.DiagnosticListener("ActivityFixture");
+            private readonly Sd.DiagnosticSource source = new Sd.DiagnosticListener("ActivityFixture");
 #endif
 
             public ActivityFixture()
@@ -208,7 +208,7 @@ namespace Datadog.Trace.Tests
                 Activity.ActivityListener.StopListeners();
             }
 
-            public void StartActivity(sd.Activity activity)
+            public void StartActivity(Sd.Activity activity)
             {
                 if (activity is null)
                 {
@@ -222,7 +222,7 @@ namespace Datadog.Trace.Tests
 #endif
             }
 
-            public void StopActivity(sd.Activity activity)
+            public void StopActivity(Sd.Activity activity)
             {
                 if (activity is null)
                 {

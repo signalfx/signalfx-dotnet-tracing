@@ -41,7 +41,7 @@ on:
 
 env:
   buildConfiguration: Release
-  dotnetSdkVersion: 6.0.401
+  dotnetSdkVersion: 7.0.101
   relativeTracerHome: /shared/bin/monitoring-home/tracer
   relativeArtifacts: /tracer/src/bin/artifacts
   binDir: ${{ github.workspace }}/tracer/src/bin
@@ -69,14 +69,15 @@ jobs:
     - name: Support Windows long paths
       if: ${{ runner.os == 'Windows' }}
       run: git config --system core.longpaths true
-    - uses: actions/checkout@v3.1.0
-    - uses: actions/setup-dotnet@v3.0.2
+    - uses: actions/checkout@v3.5.2
+    - uses: actions/setup-dotnet@v3.0.3
       with:
         dotnet-version: | 
           2.1.818
-          3.1.423
+          3.1.426
           5.0.408
-          6.0.401
+          6.0.404
+          7.0.101
     - name: Install CMake 3.19.8
       if: ${{ runner.os == 'Linux' }}
       run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh -o cmakeinstall.sh && chmod +x cmakeinstall.sh && sudo ./cmakeinstall.sh --prefix=/usr/local --exclude-subdir
@@ -86,31 +87,31 @@ jobs:
     - name: Build tracer home
       run: ./tracer/build.cmd Clean BuildTracerHome PackageTracerHome
     - name: Publish Tracer
-      uses: actions/upload-artifact@v3.1.0
+      uses: actions/upload-artifact@v3.1.2
       with:
         path: ${{ env.tracerHome }}
         name: ${{ matrix.machine }}-tracer-home
     - name: Publish Windows x86 MSI
       if: ${{ runner.os == 'Windows' }}
-      uses: actions/upload-artifact@v3.1.0
+      uses: actions/upload-artifact@v3.1.2
       with:
         path: ${{ env.artifacts }}/x86/en-us
         name: windows-msi-x86
     - name: Publish Windows x64 MSI
       if: ${{ runner.os == 'Windows' }}
-      uses: actions/upload-artifact@v3.1.0
+      uses: actions/upload-artifact@v3.1.2
       with:
         path: ${{ env.artifacts }}/x64/en-us
         name: windows-msi-x64
     - name: Publish Linux x64 packages
       if: ${{ runner.os == 'Linux' }}
-      uses: actions/upload-artifact@v3.1.0
+      uses: actions/upload-artifact@v3.1.2
       with:
         path: ${{ env.artifacts }}/linux-x64
         name: linux-x64-packages
     - name: Publish NuGet packages
       if: ${{ runner.os == 'Windows' }}
-      uses: actions/upload-artifact@v3.1.0
+      uses: actions/upload-artifact@v3.1.2
       with:
         path: ${{ env.artifacts }}/nuget/SignalFx.NET.Tracing.Azure.Site.Extension.*.nupkg
         name: nuget-packages
@@ -124,14 +125,15 @@ jobs:
     runs-on: ubuntu-20.04
     timeout-minutes: 60
     steps:
-    - uses: actions/checkout@v3.1.0
-    - uses: actions/setup-dotnet@v3.0.2
+    - uses: actions/checkout@v3.5.2
+    - uses: actions/setup-dotnet@v3.0.3
       with:
         dotnet-version: | 
           2.1.818
-          3.1.423
+          3.1.426
           5.0.408
-          6.0.401
+          6.0.404
+          7.0.101
     - name: Build Docker image
       run: |
         docker build \
@@ -151,7 +153,7 @@ jobs:
           dd-trace-dotnet/${{ matrix.base-image }}-builder \
           dotnet /build/bin/Debug/_build.dll Clean BuildTracerHome ZipMonitoringHome
     - name: Publish Linux x64-musl packages
-      uses: actions/upload-artifact@v3.1.0
+      uses: actions/upload-artifact@v3.1.2
       with:
         path: ${{ env.artifacts }}/linux-x64
         name: linux-x64-musl-packages
@@ -170,16 +172,17 @@ jobs:
     - name: Support Windows long paths
       if: ${{ runner.os == 'Windows' }}
       run: git config --system core.longpaths true
-    - uses: actions/checkout@v3.1.0
-    - uses: actions/setup-dotnet@v3.0.2
+    - uses: actions/checkout@v3.5.2
+    - uses: actions/setup-dotnet@v3.0.3
       with:
         dotnet-version: | 
           2.1.818
-          3.1.423
+          3.1.426
           5.0.408
-          6.0.401
+          6.0.404
+          7.0.101
     - run: ./tracer/build.cmd Clean BuildTracerHome BuildAndRunManagedUnitTests
-    - uses: actions/upload-artifact@v3.1.0
+    - uses: actions/upload-artifact@v3.1.2
       with:
         name: ${{ matrix.machine }}-managed-unit-tests-build_data
         path: tracer/build_data
@@ -195,14 +198,15 @@ jobs:
     runs-on: ubuntu-20.04
     timeout-minutes: 60
     steps:
-    - uses: actions/checkout@v3.1.0
-    - uses: actions/setup-dotnet@v3.0.2
+    - uses: actions/checkout@v3.5.2
+    - uses: actions/setup-dotnet@v3.0.3
       with:
         dotnet-version: | 
           2.1.818
-          3.1.423
+          3.1.426
           5.0.408
-          6.0.401
+          6.0.404
+          7.0.101
     - name: Build Docker image
       run: |
         docker build \
@@ -222,7 +226,7 @@ jobs:
           dd-trace-dotnet/${{ matrix.base-image }}-tester \
           dotnet /build/bin/Debug/_build.dll Clean BuildTracerHome BuildAndRunManagedUnitTests
     - name: Publish managed tests results
-      uses: actions/upload-artifact@v3.1.0
+      uses: actions/upload-artifact@v3.1.2
       with:
         name: ${{ matrix.base-image }}-managed-unit-tests-build_data
         path: tracer/build_data
@@ -241,14 +245,15 @@ jobs:
     - name: Support Windows long paths
       if: ${{ runner.os == 'Windows' }}
       run: git config --system core.longpaths true
-    - uses: actions/checkout@v3.1.0
-    - uses: actions/setup-dotnet@v3.0.2
+    - uses: actions/checkout@v3.5.2
+    - uses: actions/setup-dotnet@v3.0.3
       with:
         dotnet-version: | 
           2.1.818
-          3.1.423
+          3.1.426
           5.0.408
-          6.0.401
+          6.0.404
+          7.0.101
     - name: Install CMake 3.19.8
       if: ${{ runner.os == 'Linux' }}
       run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh -o cmakeinstall.sh && chmod +x cmakeinstall.sh && sudo ./cmakeinstall.sh --prefix=/usr/local --exclude-subdir
@@ -266,14 +271,15 @@ jobs:
     runs-on: ubuntu-20.04
     timeout-minutes: 60
     steps:
-    - uses: actions/checkout@v3.1.0
-    - uses: actions/setup-dotnet@v3.0.2
+    - uses: actions/checkout@v3.5.2
+    - uses: actions/setup-dotnet@v3.0.3
       with:
         dotnet-version: | 
           2.1.818
-          3.1.423
+          3.1.426
           5.0.408
-          6.0.401
+          6.0.404
+          7.0.101
     - name: Build Docker image
       run: |
         docker build \
@@ -293,7 +299,7 @@ jobs:
           dd-trace-dotnet/${{ matrix.base-image }}-builder \
           dotnet /build/bin/Debug/_build.dll Clean BuildTracerHome BuildAndRunNativeUnitTests
     - name: Publish native tests results
-      uses: actions/upload-artifact@v3.1.0
+      uses: actions/upload-artifact@v3.1.2
       with:
         name: ${{ matrix.base-image }}-native-unit-tests-build_data
         path: tracer/build_data
@@ -307,7 +313,7 @@ jobs:
       matrix:
         machine: [ windows-2022 ]
         platform: [ x64 ]
-        framework: [ net461, netcoreapp3.1, net5.0, net6.0 ]
+        framework: [ net461, netcoreapp3.1, net5.0, net6.0, net7.0 ]
         target: [ BuildAndRunWindowsIntegrationTests, BuildAndRunWindowsRegressionTests ]
     runs-on: ${{ matrix.machine }}
     timeout-minutes: 60
@@ -315,14 +321,15 @@ jobs:
     - name: Support Windows long paths
       if: ${{ runner.os == 'Windows' }}
       run: git config --system core.longpaths true
-    - uses: actions/checkout@v3.1.0
-    - uses: actions/setup-dotnet@v3.0.2
+    - uses: actions/checkout@v3.5.2
+    - uses: actions/setup-dotnet@v3.0.3
       with:
         dotnet-version: | 
           2.1.818
-          3.1.423
+          3.1.426
           5.0.408
-          6.0.401
+          6.0.404
+          7.0.101
     # Cosmos is _way_ to flaky at the moment. Try enabling again at a later time
     # - name: Start CosmosDB Emulator
     #   if: ${{ matrix.target == 'BuildAndRunWindowsIntegrationTests' }}
@@ -357,7 +364,7 @@ jobs:
         subst y: .
         y:
         ./tracer/build.cmd BuildTracerHome ${{ matrix.target }} -Framework ${{ matrix.framework }} -TargetPlatform ${{ matrix.platform }} --PrintDriveSpace
-    - uses: actions/upload-artifact@v3.1.0
+    - uses: actions/upload-artifact@v3.1.2
       with:
         name: ${{ matrix.machine }}-integration-tests-${{ matrix.platform }}-${{ matrix.framework }}-${{ matrix.target }}-build_data
         path: tracer/build_data
@@ -370,18 +377,19 @@ jobs:
       fail-fast: false
       matrix:
         base-image: [ debian, alpine ]
-        framework: [ netcoreapp3.1, net5.0, net6.0 ]
+        framework: [ netcoreapp3.1, net5.0, net6.0, net7.0 ]
     runs-on: ubuntu-20.04
     timeout-minutes: 60
     steps:
-    - uses: actions/checkout@v3.1.0
-    - uses: actions/setup-dotnet@v3.0.2
+    - uses: actions/checkout@v3.5.2
+    - uses: actions/setup-dotnet@v3.0.3
       with:
         dotnet-version: | 
           2.1.818
-          3.1.423
+          3.1.426
           5.0.408
-          6.0.401
+          6.0.404
+          7.0.101
     - name: Build Docker image
       run: |
         docker build \
@@ -415,7 +423,7 @@ jobs:
     - name: docker-compose stop services
       run: docker-compose down
       if: (${{ job.status }} != 'cancelled')
-    - uses: actions/upload-artifact@v3.1.0
+    - uses: actions/upload-artifact@v3.1.2
       with:
         name: ${{ matrix.base-image }}-integration-tests-${{ matrix.framework }}-build_data
         path: tracer/build_data
@@ -435,14 +443,15 @@ jobs:
     - name: Support Windows long paths
       if: ${{ runner.os == 'Windows' }}
       run: git config --system core.longpaths true
-    - uses: actions/checkout@v3.1.0
-    - uses: actions/setup-dotnet@v3.0.2
+    - uses: actions/checkout@v3.5.2
+    - uses: actions/setup-dotnet@v3.0.3
       with:
         dotnet-version: | 
           2.1.818
-          3.1.423
+          3.1.426
           5.0.408
-          6.0.401
+          6.0.404
+          7.0.101
     - name: install Microsoft.Net.Component.4.6.1.TargetingPack
       run: |
           Set-Location "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
@@ -464,7 +473,7 @@ jobs:
           }
     - name: RunWindowsTracerIisIntegrationTests
       run: ./tracer/build.cmd BuildTracerHome BuildAspNetIntegrationTests RunWindowsTracerIisIntegrationTests -Framework ${{ matrix.framework }}
-    - uses: actions/upload-artifact@v3.1.0
+    - uses: actions/upload-artifact@v3.1.2
       with:
         name: windows-tracer-iis-integration-tests-${{ matrix.platform }}-build_data
         path: tracer/build_data
@@ -484,14 +493,15 @@ jobs:
     - name: Support Windows long paths
       if: ${{ runner.os == 'Windows' }}
       run: git config --system core.longpaths true
-    - uses: actions/checkout@v3.1.0
-    - uses: actions/setup-dotnet@v3.0.2
+    - uses: actions/checkout@v3.5.2
+    - uses: actions/setup-dotnet@v3.0.3
       with:
         dotnet-version: |
           2.1.818
-          3.1.423
+          3.1.426
           5.0.408
-          6.0.401
+          6.0.404
+          7.0.101
     - name: install Microsoft.Net.Component.4.6.1.TargetingPack
       run: |
           Set-Location "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
@@ -518,7 +528,7 @@ jobs:
     - name: docker-compose stop services
       run: docker-compose down
       if: (${{ job.status }} != 'cancelled')
-    - uses: actions/upload-artifact@v3.1.0
+    - uses: actions/upload-artifact@v3.1.2
       with:
         name: windows-msi-integration-tests-${{ matrix.platform }}-build_data
         path: tracer/build_data

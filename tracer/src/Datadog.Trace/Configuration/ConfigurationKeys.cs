@@ -110,7 +110,7 @@ namespace Datadog.Trace.Configuration
         /// value are colon-separated. For example Key1:Value1, Key2:Value2
         /// </summary>
         /// <seealso cref="TracerSettings.GlobalTags"/>
-        public const string GlobalTags = "SIGNALFX_TRACE_GLOBAL_TAGS";
+        public const string GlobalTags = "SIGNALFX_GLOBAL_TAGS";
 
         /// <summary>
         /// Configuration key for a map of header keys to tag names.
@@ -196,13 +196,7 @@ namespace Datadog.Trace.Configuration
         /// Configuration key for enabling or disabling internal metrics sent to DogStatsD.
         /// Default value is <c>false</c> (disabled).
         /// </summary>
-        public const string TracerMetricsEnabled = "SIGNALFX_TRACE_METRICS_ENABLED";
-
-        /// <summary>
-        /// Configuration key for enabling or disabling runtime metrics sent to DogStatsD.
-        /// Default value is <c>false</c> (disabled).
-        /// </summary>
-        public const string RuntimeMetricsEnabled = "SIGNALFX_RUNTIME_METRICS_ENABLED";
+        public const string TracerMetricsEnabled = "SIGNALFX_METRICS_Traces_ENABLED";
 
         /// <summary>
         /// Configuration key for enabling or disabling tagging Redis
@@ -515,6 +509,17 @@ namespace Datadog.Trace.Configuration
             public const string AnalyticsSampleRate = "SIGNALFX_TRACE_{0}_ANALYTICS_SAMPLE_RATE";
         }
 
+        /// <summary>
+        /// String format patterns used to match metrics integration-specific configuration keys.
+        /// </summary>
+        public static class Metrics
+        {
+            /// <summary>
+            /// Configuration key pattern for enabling or disabling a metric integration.
+            /// </summary>
+            public const string Enabled = "SIGNALFX_METRICS_{0}_ENABLED";
+        }
+
         internal static class FeatureFlags
         {
             /// <summary>
@@ -566,14 +571,16 @@ namespace Datadog.Trace.Configuration
             /// The default value is 10000 milliseconds.
             /// </summary>
             /// <seealso cref="TracerSettings.ThreadSamplingPeriod"/>
-            public const string Period = "SIGNALFX_PROFILER_CALL_STACK_INTERVAL";
+            public const string ThreadSamplingPeriod = "SIGNALFX_PROFILER_CALL_STACK_INTERVAL";
 
             /// <summary>
-            /// Configuration key to set export format.
-            /// The default value is Pprof.
+            /// Configuration key to set default profiling data export interval.
+            /// If CPU profiling is enables this value should match ThreadSamplingPeriod.
+            /// The default value is 10000 milliseconds.
             /// </summary>
-            /// <seealso cref="ExporterSettings.ProfilerExportFormat"/>
-            public const string ExportFormat = "SIGNALFX_PROFILER_EXPORT_FORMAT";
+            /// <seealso cref="ConfigurationKeys.AlwaysOnProfiler.ThreadSamplingPeriod"/>
+            /// <seealso cref="TracerSettings.ProfilerExportInterval"/>
+            public const string ExportInterval = "SIGNALFX_PROFILER_EXPORT_INTERVAL";
         }
 
         internal static class Telemetry

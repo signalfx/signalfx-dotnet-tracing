@@ -100,10 +100,24 @@ internal static partial class DotNetSettingsExtensions
             .SetResultsDirectory(resultsDirectory);
     }
 
+    public static DotNetMSBuildSettings EnableTrxLogOutput(this DotNetMSBuildSettings settings, string resultsDirectory)
+    {
+        return settings
+              .SetProperty("VSTestLogger", "trx")
+              .SetProperty("VSTestResultsDirectory", resultsDirectory);
+    }
+
+    public static DotNetMSBuildSettings SetFilter(this DotNetMSBuildSettings settings, string filter)
+    {
+        return settings
+              .SetProperty("VSTestTestCaseFilter", filter);
+    }
+
     /// <summary>
     /// GitLab installs MSBuild in a non-standard place that causes issues for Nuke trying to resolve it
     /// </summary>
-    public static MSBuildSettings SetMSBuildPath(this MSBuildSettings settings)
+    public static T SetMSBuildPath<T>(this T settings)
+        where T : ToolSettings
     {
         var vsRoot = Environment.GetEnvironmentVariable("VSTUDIO_ROOT");
 
