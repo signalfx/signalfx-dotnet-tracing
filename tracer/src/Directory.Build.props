@@ -10,7 +10,7 @@
 
     <!-- NuGet packages -->
     <IsPackable>true</IsPackable>
-    <PackageIconUrl>https://github.com/signalfx/signalfx-dotnet-tracing/raw/main/signalfx-logo-64x64.png</PackageIconUrl>
+    <PackageIconUrl>https://github.com/signalfx/signalfx-dotnet-tracing/raw/main/logo-64x64.png</PackageIconUrl>
     <PackageIcon>packageIcon.png</PackageIcon>
     <PackageProjectUrl>https://docs.signalfx.com/en/latest/apm/apm-instrument/apm-dotnet.html</PackageProjectUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
@@ -26,7 +26,7 @@
 
   <ItemGroup>
     <!-- NuGet -->
-    <None Include="$(MSBuildThisFileDirectory)\..\..\signalfx-logo-256x256.png" Pack="true" Visible="false" PackagePath="packageIcon.png" />
+    <None Include="$(MSBuildThisFileDirectory)\..\..\logo-256x256.png" Pack="true" Visible="false" PackagePath="packageIcon.png" />
 
     <!-- StyleCop -->
     <Compile Include="$(MSBuildThisFileDirectory)GlobalSuppressions.cs" Link="GlobalSuppressions.src.cs" />
