@@ -18,7 +18,7 @@
   <String Id="LicenseAgreementDlgTitle">{\WixUI_Font_Title_White}End-User License Agreement</String>
   <String Id="LicenseAgreementDlgDescription">{\WixUI_Font_Normal_White}Please read the following license agreement carefully</String>
   <String Id="InstallDirDlgTitle">{\WixUI_Font_Title_White}Destination Folder</String>
-  <String Id="InstallDirDlgDescription">{\WixUI_Font_Normal_White}Click Next to install to the default folder or click Change to choose another.</String>
+  <String Id="InstallDirDlgDescription">{\WixUI_Font_Normal_White}Select the destination folder</String>
   <String Id="BrowseDlgTitle">{\WixUI_Font_Title_White}Change destination folder</String>
   <String Id="BrowseDlgDescription">{\WixUI_Font_Normal_White}Browse to the destination folder</String>
   <String Id="ProgressDlgTitleInstalling">{\WixUI_Font_Title_White}Installing [ProductName]</String>
