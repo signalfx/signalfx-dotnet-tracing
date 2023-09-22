@@ -2,24 +2,24 @@
 using System.Collections.Generic;
 using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.Logging;
-using Datadog.Tracer.OpenTelemetry.Proto.Logs.V1;
+using Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1;
 
 namespace Datadog.Trace.AlwaysOnProfiler.LogRecordAppenders;
 
-internal class AllocationLogRecordAppender : ILogRecordAppender
+internal class AllocationProfileAppender : IProfileAppender
 {
-    private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(AllocationLogRecordAppender));
+    private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(AllocationProfileAppender));
     private readonly ThreadSampleProcessor _allocationSampleProcessor;
     private readonly byte[] _buffer;
 
-    public AllocationLogRecordAppender(ThreadSampleProcessor processor, byte[] buffer)
+    public AllocationProfileAppender(ThreadSampleProcessor processor, byte[] buffer)
     {
         _allocationSampleProcessor = processor ?? throw new ArgumentNullException(nameof(processor));
         _buffer = buffer ?? throw new ArgumentNullException(nameof(buffer));
     }
 
     /// <inheritdoc />
-    public void AppendTo(List<LogRecord> results)
+    public void AppendTo(List<Profile> results)
     {
         if (results == null)
         {

@@ -6,53 +6,47 @@ using System.IO;
 using System.IO.Compression;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Vendors.ProtoBuf;
-using Datadog.Tracer.OpenTelemetry.Proto.Common.V1;
-using Datadog.Tracer.OpenTelemetry.Proto.Logs.V1;
+using Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1;
 using Datadog.Tracer.Pprof.Proto.Profile;
+using Profile = Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1.Profile;
 
 namespace Datadog.Trace.AlwaysOnProfiler
 {
     internal class ThreadSampleProcessor
     {
-        private const string TotalFrameCountAttributeName = "profiling.data.total.frame.count";
-        private readonly KeyValue _format;
-        private readonly KeyValue _profilingDataTypeCpu;
-        private readonly KeyValue _profilingDataTypeAllocation;
         private readonly TimeSpan _threadSamplingPeriod;
 
         public ThreadSampleProcessor(ImmutableTracerSettings tracerSettings)
         {
-            _format = GdiProfilingConventions.LogRecord.Attributes.Format("pprof-gzip-base64");
-            _profilingDataTypeCpu = GdiProfilingConventions.LogRecord.Attributes.Type("cpu");
-            _profilingDataTypeAllocation = GdiProfilingConventions.LogRecord.Attributes.Type("allocation");
-
             _threadSamplingPeriod = tracerSettings.ThreadSamplingPeriod;
         }
 
-        public LogRecord ProcessThreadSamples(List<ThreadSample> threadSamples)
+        public Profile ProcessThreadSamples(List<ThreadSample> threadSamples)
         {
             if (threadSamples == null || threadSamples.Count < 1)
             {
                 return null;
             }
 
-            var cpuProfile = BuildCpuProfile(threadSamples);
-            var totalFrameCount = CountFrames(threadSamples);
+            // var cpuProfile = BuildPprofCpuProfile(threadSamples);
+            // var totalFrameCount = CountFrames(threadSamples);
 
-            return BuildLogRecord(cpuProfile, _profilingDataTypeCpu, totalFrameCount);
+            // OTLP_PROFILES: TODO: Add actual data.
+            return new Profile();
         }
 
-        public LogRecord ProcessAllocationSamples(List<AllocationSample> allocationSamples)
+        public Profile ProcessAllocationSamples(List<AllocationSample> allocationSamples)
         {
             if (allocationSamples == null || allocationSamples.Count < 1)
             {
                 return null;
             }
 
-            var allocationProfile = BuildAllocationProfile(allocationSamples);
-            var totalFrameCount = CountFrames(allocationSamples);
+            // var allocationProfile = BuildAllocationProfile(allocationSamples);
+            // var totalFrameCount = CountFrames(allocationSamples);
 
-            return BuildLogRecord(allocationProfile, _profilingDataTypeAllocation, totalFrameCount);
+            // OTLP_PROFILES: TODO: Add actual data.
+            return new Profile();
         }
 
         private static int CountFrames(List<AllocationSample> samples)
@@ -77,7 +71,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
             return sum;
         }
 
-        private static string Serialize(Profile profile)
+        private static string Serialize(Datadog.Tracer.Pprof.Proto.Profile.Profile profile)
         {
             using var memoryStream = new MemoryStream();
             using (var compressionStream = new GZipStream(memoryStream, CompressionMode.Compress))
@@ -129,7 +123,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
             return Serialize(pprof.Profile);
         }
 
-        private string BuildCpuProfile(List<ThreadSample> threadSamples)
+        private string BuildPprofCpuProfile(List<ThreadSample> threadSamples)
         {
             var pprof = new Pprof();
             for (var index = 0; index < threadSamples.Count; index++)
@@ -142,25 +136,6 @@ namespace Datadog.Trace.AlwaysOnProfiler
             }
 
             return Serialize(pprof.Profile);
-        }
-
-        private LogRecord BuildLogRecord(string cpuProfile, KeyValue profilingDataType, int totalFrameCount)
-        {
-            // The stack follows the experimental GDI conventions described at
-            // https://github.com/signalfx/gdi-specification/blob/29cbcbc969531d50ccfd0b6a4198bb8a89cedebb/specification/semantic_conventions.md#logrecord-message-fields
-
-            var frameCountAttribute = new KeyValue { Key = TotalFrameCountAttributeName, Value = new AnyValue { IntValue = totalFrameCount } };
-            return new LogRecord
-            {
-                Attributes =
-                {
-                    GdiProfilingConventions.LogRecord.Attributes.Source, profilingDataType, _format, frameCountAttribute
-                },
-                Body = new AnyValue
-                {
-                    StringValue = cpuProfile
-                }
-            };
         }
     }
 }

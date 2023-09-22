@@ -1,27 +1,25 @@
 ﻿using System;
 using System.Net;
-using Datadog.Trace.Configuration;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Propagation;
-using Datadog.Tracer.OpenTelemetry.Proto.Logs.V1;
 
 namespace Datadog.Trace.AlwaysOnProfiler;
 
 /// <summary>
 /// Sends logs in binary-encoded protobuf format over HTTP.
 /// </summary>
-internal class OtlpHttpLogSender : ILogSender
+internal class OtlpHttpSender : IOtlpSender
 {
-    private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(OtlpHttpLogSender));
+    private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(OtlpHttpSender));
 
     private readonly Uri _logsEndpointUrl;
 
-    public OtlpHttpLogSender(Uri logsEndpointUrl)
+    public OtlpHttpSender(Uri logsEndpointUrl)
     {
         _logsEndpointUrl = logsEndpointUrl ?? throw new ArgumentNullException(nameof(logsEndpointUrl));
     }
 
-    public void Send(LogsData logsData)
+    public void Send(object data)
     {
         HttpWebRequest httpWebRequest;
 
@@ -33,7 +31,7 @@ internal class OtlpHttpLogSender : ILogSender
             httpWebRequest.Headers.Add(CommonHttpHeaderNames.TracingEnabled, "false");
 
             using var stream = httpWebRequest.GetRequestStream();
-            Vendors.ProtoBuf.Serializer.Serialize(stream, logsData);
+            Vendors.ProtoBuf.Serializer.Serialize(stream, data);
             stream.Flush();
         }
         catch (Exception ex)

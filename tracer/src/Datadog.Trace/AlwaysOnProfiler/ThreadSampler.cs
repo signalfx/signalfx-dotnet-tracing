@@ -81,19 +81,19 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
             var sampleProcessor = new ThreadSampleProcessor(tracerSettings);
 
-            var cpuLogRecordsAppender = new CpuLogRecordAppender(sampleProcessor, buffer);
-            var allocationLogRecordsAppender = new AllocationLogRecordAppender(sampleProcessor, buffer);
+            var cpuLogRecordsAppender = new CpuProfileAppender(sampleProcessor, buffer);
+            var allocationLogRecordsAppender = new AllocationProfileAppender(sampleProcessor, buffer);
 
             var appenders = cpuProfilingAvailable switch
             {
-                true when memoryProfilingAvailable => new ILogRecordAppender[] { cpuLogRecordsAppender, allocationLogRecordsAppender },
-                true => new ILogRecordAppender[] { cpuLogRecordsAppender },
-                _ => new ILogRecordAppender[] { allocationLogRecordsAppender }
+                true when memoryProfilingAvailable => new IProfileAppender[] { cpuLogRecordsAppender, allocationLogRecordsAppender },
+                true => new IProfileAppender[] { cpuLogRecordsAppender },
+                _ => new IProfileAppender[] { allocationLogRecordsAppender }
             };
 
-            var logSender = new OtlpHttpLogSender(tracerSettings.ExporterSettings.LogsEndpointUrl);
+            var otlpHttpSender = new OtlpHttpSender(tracerSettings.ExporterSettings.LogsEndpointUrl);
 
-            return new SampleExporter(tracerSettings, logSender, appenders);
+            return new SampleExporter(tracerSettings, otlpHttpSender, appenders);
         }
     }
 }
