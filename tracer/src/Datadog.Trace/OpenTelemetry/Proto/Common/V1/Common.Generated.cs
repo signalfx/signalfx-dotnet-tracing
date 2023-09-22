@@ -127,25 +127,7 @@ namespace Datadog.Tracer.OpenTelemetry.Proto.Common.V1
     }
 
     [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
-    [global::System.Obsolete]
-    public partial class StringKeyValue : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
-    {
-        private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
-        global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::Datadog.Trace.Vendors.ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
-
-        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(1, Name = @"key")]
-        [global::System.ComponentModel.DefaultValue("")]
-        public string Key { get; set; } = "";
-
-        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(2, Name = @"value")]
-        [global::System.ComponentModel.DefaultValue("")]
-        public string Value { get; set; } = "";
-
-    }
-
-    [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
-    public partial class InstrumentationLibrary : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
+    public partial class InstrumentationScope : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {
         private global::Datadog.Trace.Vendors.ProtoBuf.IExtension __pbn__extensionData;
         global::Datadog.Trace.Vendors.ProtoBuf.IExtension global::Datadog.Trace.Vendors.ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -158,6 +140,12 @@ namespace Datadog.Tracer.OpenTelemetry.Proto.Common.V1
         [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(2, Name = @"version")]
         [global::System.ComponentModel.DefaultValue("")]
         public string Version { get; set; } = "";
+
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(3, Name = @"attributes")]
+        public global::System.Collections.Generic.List<KeyValue> Attributes { get; } = new global::System.Collections.Generic.List<KeyValue>();
+
+        [global::Datadog.Trace.Vendors.ProtoBuf.ProtoMember(4, Name = @"dropped_attributes_count")]
+        public uint DroppedAttributesCount { get; set; }
 
     }
 
