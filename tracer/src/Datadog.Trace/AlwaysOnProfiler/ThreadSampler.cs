@@ -1,9 +1,8 @@
 // Modified by Splunk Inc.
 
 using System;
-using System.Collections.Generic;
 using System.Threading;
-using Datadog.Trace.AlwaysOnProfiler.LogRecordAppenders;
+using Datadog.Trace.AlwaysOnProfiler.ProfileAppenders;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Logging;
 
@@ -81,14 +80,14 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
             var sampleProcessor = new ThreadSampleProcessor(tracerSettings);
 
-            var cpuLogRecordsAppender = new CpuProfileAppender(sampleProcessor, buffer);
-            var allocationLogRecordsAppender = new AllocationProfileAppender(sampleProcessor, buffer);
+            var cpuProfileAppender = new CpuProfileAppender(sampleProcessor, buffer);
+            var allocationProfileAppender = new AllocationProfileAppender(sampleProcessor, buffer);
 
             var appenders = cpuProfilingAvailable switch
             {
-                true when memoryProfilingAvailable => new IProfileAppender[] { cpuLogRecordsAppender, allocationLogRecordsAppender },
-                true => new IProfileAppender[] { cpuLogRecordsAppender },
-                _ => new IProfileAppender[] { allocationLogRecordsAppender }
+                true when memoryProfilingAvailable => new IProfileAppender[] { cpuProfileAppender, allocationProfileAppender },
+                true => new IProfileAppender[] { cpuProfileAppender },
+                _ => new IProfileAppender[] { allocationProfileAppender }
             };
 
             var otlpHttpSender = new OtlpHttpSender(tracerSettings.ExporterSettings.LogsEndpointUrl);

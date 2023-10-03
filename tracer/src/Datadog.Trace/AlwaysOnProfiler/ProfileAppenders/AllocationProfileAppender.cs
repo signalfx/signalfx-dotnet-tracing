@@ -4,7 +4,7 @@ using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.Logging;
 using Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1;
 
-namespace Datadog.Trace.AlwaysOnProfiler.LogRecordAppenders;
+namespace Datadog.Trace.AlwaysOnProfiler.ProfileAppenders;
 
 internal class AllocationProfileAppender : IProfileAppender
 {

@@ -17,17 +17,17 @@ internal class SampleExporter
     private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(SampleExporter));
 
     private readonly IOtlpSender _otlpSender;
-    private readonly IList<IProfileAppender> _logRecordAppenders; // OTLP_PROFILES: TODO: Update field name.
+    private readonly IList<IProfileAppender> _profileAppenders;
 
     private readonly ProfilesData _profilesData;
 
-    public SampleExporter(ImmutableTracerSettings tracerSettings, IOtlpSender otlpSender, IList<IProfileAppender> logRecordAppenders)
+    public SampleExporter(ImmutableTracerSettings tracerSettings, IOtlpSender otlpSender, IList<IProfileAppender> profileAppenders)
     {
         _otlpSender = otlpSender ?? throw new ArgumentNullException(nameof(otlpSender));
-        _logRecordAppenders = logRecordAppenders ?? throw new ArgumentNullException(nameof(logRecordAppenders));
-        // OTLP_PROFILES: TODO: update comments.
-        // The same LogsData instance is used on all export messages. With the exception of the list of
-        // LogRecords, the Logs property, all other fields are prepopulated.
+        _profileAppenders = profileAppenders ?? throw new ArgumentNullException(nameof(profileAppenders));
+
+        // The same ProfilesData instance is used on all export messages. With the exception of the list of
+        // Profiles, the Profiles property, all other fields are pre-populated.
         _profilesData = CreateProfilesData(tracerSettings);
     }
 
@@ -36,7 +36,14 @@ internal class SampleExporter
         var profiles = _profilesData.ResourceProfiles[0].ScopeProfiles[0].Profiles;
         try
         {
-            // OTLP_PROFILES: TODO: add Profile objects, the actual data.
+            foreach (var profileAppender in _profileAppenders)
+            {
+                // Accumulate results in profiles object, an alias, to _profilesData.ResourceProfiles[0].ScopeProfiles[0].Profiles
+                // Allocation samples appender adds at most 1 Profile object,
+                // cpu samples appender may add 2.
+                profileAppender.AppendTo(profiles);
+            }
+
             if (profiles.Count > 0)
             {
                 _otlpSender.Send(_profilesData);
@@ -76,19 +83,18 @@ internal class SampleExporter
             {
                 new ResourceProfiles
                 {
+                    Resource = resource,
                     ScopeProfiles =
                     {
                         new ScopeProfiles
                         {
                             Scope = new InstrumentationScope
                             {
-                                // OTLP_PROFILES: TODO: Define better constants/literals
-                                Name = "otlp.profiles",
-                                Version = "v0.0.0"
+                                Name = "otlp.profiles@154f871",
+                                Version = "v0.0.1"
                             }
                         }
-                    },
-                    Resource = resource
+                    }
                 }
             }
         };

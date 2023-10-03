@@ -4,7 +4,7 @@ using Datadog.Trace.ClrProfiler;
 using Datadog.Trace.Logging;
 using Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1;
 
-namespace Datadog.Trace.AlwaysOnProfiler.LogRecordAppenders;
+namespace Datadog.Trace.AlwaysOnProfiler.ProfileAppenders;
 
 internal class CpuProfileAppender : IProfileAppender
 {
@@ -38,7 +38,7 @@ internal class CpuProfileAppender : IProfileAppender
         }
     }
 
-    private void AddProfileFromThreadSamples(byte[] buffer, List<Profile> logRecords)
+    private void AddProfileFromThreadSamples(byte[] buffer, List<Profile> profiles)
     {
         var read = NativeMethods.SignalFxReadThreadSamples(buffer.Length, buffer);
         if (read <= 0)
@@ -48,11 +48,11 @@ internal class CpuProfileAppender : IProfileAppender
         }
 
         var threadSamples = SampleNativeFormatParser.ParseThreadSamples(buffer, read);
-        var logRecord = _threadSampleProcessor.ProcessThreadSamples(threadSamples);
+        var profile = _threadSampleProcessor.ProcessThreadSamples(threadSamples);
 
-        if (logRecord != null)
+        if (profile != null)
         {
-            logRecords.Add(logRecord);
+            profiles.Add(profile);
         }
     }
 }
