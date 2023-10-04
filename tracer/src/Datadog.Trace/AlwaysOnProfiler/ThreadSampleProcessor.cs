@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using Datadog.Trace.AlwaysOnProfiler.OtelProfilesHelpers;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Vendors.Newtonsoft.Json.Utilities;
 using Datadog.Trace.Vendors.ProtoBuf;
@@ -33,22 +34,23 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
             var stringTable = new LookupTable<string>();
             stringTable.GetOrCreateIndex(string.Empty);
-            var keyValue = new KeyValue { Key = "test", Value = new AnyValue { IntValue = 1 } };
-            var stackTraceIndicesTable = new LookupTable<Indices>();
-            var stackTraceTable = new DependentLookupTable<Indices, Stacktrace>(stackTraceIndicesTable);
 
-            var functionTable = new DependentLookupTable<string, Function>(stringTable);
-            var locationTable = new DependentLookupTable<string, Location>(stringTable);
+            var stackTraceTable = new CustomEntryKeyLookupTable<Indices, Stacktrace>();
+
+            var locationTable = new CustomEntryKeyLookupTable<string, Location>();
+            var functionTable = new CustomEntryKeyLookupTable<string, Function>();
+            var linkTable = new CustomEntryKeyLookupTable<string, Link>();
 
             var startTimeUnixNano = threadSamples[0].Timestamp.Nanoseconds;
             var endTimeUnixNano = threadSamples[0].Timestamp.Nanoseconds;
-            
+
             // Arrays to create ProfileType after all samples are processed.
             var samplesCount = threadSamples.Count;
             var stackTracesIndices = new uint[samplesCount];
+            var linkIndices = new uint[samplesCount];
             var timestamps = new ulong[samplesCount];
 
-            for (int i = 0; i < samplesCount; i++)
+            for (int sampleIndex = 0; sampleIndex < samplesCount; sampleIndex++)
             {
                 var threadSample = threadSamples[0];
 
@@ -65,6 +67,28 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
                 // Process thread information
                 var threadNameIndex = stringTable.GetOrCreateIndex(threadSample.ThreadName);
+
+                // Process trace context, if any
+                uint linkIndex = 0; // Default is thread sample not associated to any span and trace context.
+                if (threadSample.SpanId != 0 || threadSample.TraceIdHigh != 0 || threadSample.TraceIdLow != 0)
+                {
+                    // The key needs to be unique, for now, something very simple. It can be optimized later.
+                    var linkKey = $"{threadSample.SpanId}{threadSample.TraceIdLow}{threadSample.TraceIdHigh}";
+                    linkIndex = linkTable.GetOrCreateIndex(
+                        linkKey,
+                        () =>
+                        {
+                            // OTLP_PROFILES: TODO: check the conversion below, for now just to compile
+                            var traceId = new List<byte>(BitConverter.GetBytes(threadSample.TraceIdLow));
+                            traceId.AddRange(BitConverter.GetBytes(threadSample.TraceIdHigh));
+                            var link = new Link
+                            {
+                                SpanId = BitConverter.GetBytes(threadSample.SpanId), TraceId = traceId.ToArray()
+                            };
+
+                            return link;
+                        });
+                }
 
                 var stackTraceLocations = new List<uint>(threadSample.Frames.Count);
                 foreach (var functionName in threadSample.Frames)
@@ -88,7 +112,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
                     stackTraceLocations.Add(locationIndex);
                 }
-                
+
                 var stackTraceIndex = stackTraceTable.GetOrCreateIndex(
                     new Indices(stackTraceLocations),
                     () =>
@@ -97,13 +121,16 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         stackTrace.LocationIndices.AddRange(stackTraceLocations);
                         return stackTrace;
                     });
-                stackTracesIndices[i] = stackTraceIndex;
-                timestamps[i] = sampleTimeUnixNano;
+
+                stackTracesIndices[sampleIndex] = stackTraceIndex;
+                linkIndices[sampleIndex] = linkIndex;
+                timestamps[sampleIndex] = sampleTimeUnixNano;
             }
 
             var cpuProfileType = new ProfileType
             {
                 StacktraceIndices = stackTracesIndices,
+                LinkIndices = linkIndices,
                 Timestamps = timestamps
             };
 
@@ -115,12 +142,14 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
             // Lookup tables that require default element on first entry
             profile.Links.Add(default);
-            profile.Attributes.Add(d);
+            profile.Attributes.Add(default);
+
             // Set the lookup tables
-            profile.StringTables.AddRange(stringTable);
             profile.Stacktraces.AddRange(stackTraceTable);
-            profile.Functions.AddRange(functionTable);
             profile.Locations.AddRange(locationTable);
+            profile.Functions.AddRange(functionTable);
+            profile.Links.AddRange(linkTable);
+            profile.StringTables.AddRange(stringTable);
 
             profile.ProfileTypes.Add(cpuProfileType);
 
@@ -203,10 +232,11 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
         private static OtelProfile BuildOtelProfileForAllocationProfile(List<AllocationSample> allocationSamples)
         {
-            var startTimeUnixNano = ulong.MaxValue;
-            var endTimeUnixNano = ulong.MinValue;
+            // var startTimeUnixNano = ulong.MaxValue;
+            // var endTimeUnixNano = ulong.MinValue;
             var profile = new OtelProfile();
 
+            /*
             for (var index = 0; index < allocationSamples.Count; index++)
             {
                 var allocationSample = allocationSamples[index];
@@ -224,9 +254,9 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 var stackTrace = new Stacktrace();
                 if (threadSample.SpanId != 0 || threadSample.TraceIdHigh != 0 || threadSample.TraceIdLow != 0)
                 {
-                    profile.
-                    pprof.AddLabel(sampleBuilder, "span_id", threadSample.SpanId.ToString("x16"));
-                    pprof.AddLabel(sampleBuilder, "trace_id", TraceIdHelper.ToString(threadSample.TraceIdHigh, threadSample.TraceIdLow));
+                    // OTLP_PROFILES: TODO: Add trace context information
+                    // pprof.AddLabel(sampleBuilder, "span_id", threadSample.SpanId.ToString("x16"));
+                    // pprof.AddLabel(sampleBuilder, "trace_id", TraceIdHelper.ToString(threadSample.TraceIdHigh, threadSample.TraceIdLow));
                 }
 
                 for (var index = 0; index < threadSample.Frames.Count; index++)
@@ -242,6 +272,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 profileBuilder.SetValue(allocationSample.AllocationSizeBytes);
                 pprof.Profile.Samples.Add(profileBuilder.Build());
             }
+            */
 
             return profile;
         }
@@ -259,98 +290,6 @@ namespace Datadog.Trace.AlwaysOnProfiler
             }
 
             return pprof.Profile;
-        }
-
-        private class Indices : IEnumerable<uint>, IEquatable<Indices>
-        {
-            private readonly uint[] _indices;
-            private readonly int _hashCode;
-
-            public Indices(IList<uint> indices)
-            {
-                _indices = new uint[indices.Count];
-
-                // Since they are going to be in a Lookup go ahead and already calculate the hash code.
-                // Nothing fancy here, just adding a hash function that takes into account the indices contents.
-                var hashCode = indices.Count;
-                for (var i = 0; i < indices.Count; i++)
-                {
-                    var index = indices[i];
-                    hashCode = (int)unchecked((hashCode * 314159) + index);
-                }
-
-                _hashCode = hashCode;
-            }
-
-            public override bool Equals(object obj) => obj is Indices anotherIndices && Equals(anotherIndices);
-
-            public bool Equals(Indices other)
-            {
-                if (_hashCode != other?._hashCode)
-                {
-                    return false;
-                }
-
-                for (var i = 0; i < _indices.Length; i++)
-                {
-                    if (_indices[i] != other._indices[i])
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-
-            public override int GetHashCode() => _hashCode;
-
-            public IEnumerator<uint> GetEnumerator() => ((IEnumerable<uint>)_indices).GetEnumerator();
-
-            IEnumerator IEnumerable.GetEnumerator() => _indices.GetEnumerator();
-        }
-
-        private class LookupTable<T> : List<T>
-        {
-            private readonly Dictionary<T, uint> _entriesDictionary = new();
-            private uint _index = 0;
-
-            public uint GetOrCreateIndex(T entry)
-            {
-                if (_entriesDictionary.TryGetValue(entry, out var index))
-                {
-                    return index;
-                }
-
-                Add(entry);
-                _entriesDictionary.Add(entry, _index);
-                return _index++;
-            }
-        }
-
-        private class DependentLookupTable<TEntryKey, TEntry> : List<TEntry>
-        {
-            private readonly Dictionary<TEntryKey, uint> _entryDictionary = new();
-            private readonly LookupTable<TEntryKey> _baseTable;
-            private uint _index = 0;
-
-            public DependentLookupTable(LookupTable<TEntryKey> baseTable)
-            {
-                _baseTable = baseTable;
-            }
-
-            public uint GetOrCreateIndex(TEntryKey entryKey, Func<TEntry> createEntry)
-            {
-                if (_entryDictionary.TryGetValue(entryKey, out var index))
-                {
-                    return index;
-                }
-
-                var entry = createEntry();
-
-                Add(entry);
-                _entryDictionary.Add(entryKey, _index);
-                return _index++;
-            }
         }
     }
 }
