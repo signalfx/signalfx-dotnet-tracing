@@ -39,7 +39,12 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
             var locationTable = new CustomEntryKeyLookupTable<string, Location>();
             var functionTable = new CustomEntryKeyLookupTable<string, Function>();
+
             var linkTable = new CustomEntryKeyLookupTable<string, Link>();
+            linkTable.GetOrCreateIndex(string.Empty, () => new Link());
+
+            var attributeSetTable = new CustomEntryKeyLookupTable<string, AttributeSet>();
+            attributeSetTable.GetOrCreateIndex(string.Empty, () => new AttributeSet());
 
             var startTimeUnixNano = threadSamples[0].Timestamp.Nanoseconds;
             var endTimeUnixNano = threadSamples[0].Timestamp.Nanoseconds;
@@ -48,6 +53,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
             var samplesCount = threadSamples.Count;
             var stackTracesIndices = new uint[samplesCount];
             var linkIndices = new uint[samplesCount];
+            var attributeSetIndices = new uint[samplesCount];
             var timestamps = new ulong[samplesCount];
 
             for (int sampleIndex = 0; sampleIndex < samplesCount; sampleIndex++)
@@ -66,7 +72,21 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 }
 
                 // Process thread information
-                var threadNameIndex = stringTable.GetOrCreateIndex(threadSample.ThreadName);
+                var attributes = new[]
+                {
+                    new KeyValue { Key = "thread.name.index", Value = new AnyValue { IntValue = stringTable.GetOrCreateIndex(threadSample.ThreadName) } },
+                    new KeyValue { Key = "thread.id", Value = new AnyValue { IntValue = threadSample.ManagedId } }
+                };
+
+                var sampleAttributeSetKey = $"{attributes[0].Key}{attributes[0].Value.StringValue}{attributes[1].Key}{attributes[1].Value.IntValue}";
+                var attributeSetIndex = attributeSetTable.GetOrCreateIndex(
+                    sampleAttributeSetKey,
+                    () =>
+                    {
+                        var sampleAttributeSet = new AttributeSet();
+                        sampleAttributeSet.Attributes.AddRange(attributes);
+                        return sampleAttributeSet;
+                    });
 
                 // Process trace context, if any
                 uint linkIndex = 0; // Default is thread sample not associated to any span and trace context.
@@ -124,6 +144,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
                 stackTracesIndices[sampleIndex] = stackTraceIndex;
                 linkIndices[sampleIndex] = linkIndex;
+                attributeSetIndices[sampleIndex] = attributeSetIndex;
                 timestamps[sampleIndex] = sampleTimeUnixNano;
             }
 
@@ -131,6 +152,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
             {
                 StacktraceIndices = stackTracesIndices,
                 LinkIndices = linkIndices,
+                AttributeSetIndices = attributeSetIndices,
                 Timestamps = timestamps
             };
 
@@ -140,15 +162,12 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 EndTimeUnixNano = endTimeUnixNano
             };
 
-            // Lookup tables that require default element on first entry
-            profile.Links.Add(default);
-            profile.Attributes.Add(default);
-
             // Set the lookup tables
             profile.Stacktraces.AddRange(stackTraceTable);
             profile.Locations.AddRange(locationTable);
             profile.Functions.AddRange(functionTable);
             profile.Links.AddRange(linkTable);
+            profile.AttributeSets.AddRange(attributeSetTable);
             profile.StringTables.AddRange(stringTable);
 
             profile.ProfileTypes.Add(cpuProfileType);

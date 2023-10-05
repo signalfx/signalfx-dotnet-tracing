@@ -91,7 +91,7 @@ internal class SampleExporter
                             Scope = new InstrumentationScope
                             {
                                 Name = "otlp.profiles@154f871",
-                                Version = "v0.0.1"
+                                Version = "0.0.1"
                             }
                         }
                     }
