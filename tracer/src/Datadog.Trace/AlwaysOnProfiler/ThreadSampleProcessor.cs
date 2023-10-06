@@ -58,7 +58,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
             for (int sampleIndex = 0; sampleIndex < samplesCount; sampleIndex++)
             {
-                var threadSample = threadSamples[0];
+                var threadSample = threadSamples[sampleIndex];
 
                 // Check start and end times
                 var sampleTimeUnixNano = threadSample.Timestamp.Nanoseconds;
@@ -74,7 +74,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 // Process thread information
                 var attributes = new[]
                 {
-                    new KeyValue { Key = "thread.name.index", Value = new AnyValue { IntValue = stringTable.GetOrCreateIndex(threadSample.ThreadName) } },
+                    new KeyValue { Key = "thread.name", Value = new AnyValue { IntValue = stringTable.GetOrCreateIndex(threadSample.ThreadName ?? string.Empty) } },
                     new KeyValue { Key = "thread.id", Value = new AnyValue { IntValue = threadSample.ManagedId } }
                 };
 
@@ -117,7 +117,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         functionName,
                         () => new Function
                         {
-                            NameIndex = stringTable.GetOrCreateIndex(functionName),
+                            NameIndex = stringTable.GetOrCreateIndex(functionName ?? string.Empty),
                             FilenameIndex = stringTable.GetOrCreateIndex("unknown")
                         });
 
@@ -137,8 +137,10 @@ namespace Datadog.Trace.AlwaysOnProfiler
                     new Indices(stackTraceLocations),
                     () =>
                     {
-                        var stackTrace = new Stacktrace();
-                        stackTrace.LocationIndices.AddRange(stackTraceLocations);
+                        var stackTrace = new Stacktrace
+                        {
+                            LocationIndices = stackTraceLocations.ToArray()
+                        };
                         return stackTrace;
                     });
 
@@ -150,6 +152,9 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
             var cpuProfileType = new ProfileType
             {
+                SampleRate = (ulong)_threadSamplingPeriod.TotalMilliseconds,
+                TypeIndex = stringTable.GetOrCreateIndex("cpu"),
+                UnitIndex = stringTable.GetOrCreateIndex("ms"),
                 StacktraceIndices = stackTracesIndices,
                 LinkIndices = linkIndices,
                 AttributeSetIndices = attributeSetIndices,
@@ -158,6 +163,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
             var profile = new OtelProfile
             {
+                ProfileId = Guid.Empty.ToByteArray(),
                 StartTimeUnixNano = startTimeUnixNano,
                 EndTimeUnixNano = endTimeUnixNano
             };

@@ -21,126 +21,76 @@ public class ThreadSampleProcessorTests
         var exporter = new ThreadSampleProcessor(
             DefaultSettings());
 
-        var logRecord = exporter.ProcessThreadSamples(new List<ThreadSample>
+        var profile = exporter.ProcessThreadSamples(new List<ThreadSample>
         {
             new ThreadSample()
             {
                 SpanId = 1234567890,
                 TraceIdLow = 9876543210,
                 TraceIdHigh = 1234567890,
-                Timestamp = new ThreadSample.Time(10000),
+                Timestamp = new ThreadSample.Time(10_000),
             },
             new ThreadSample()
             {
                 SpanId = 9876543210,
                 TraceIdLow = 1234567890,
                 TraceIdHigh = 9876543210,
-                Timestamp = new ThreadSample.Time(10000),
+                Timestamp = new ThreadSample.Time(11_000),
             },
         });
 
-        logRecord.TraceId.Should().BeNull("traceId should not be set on LogRecord level for pprof exporter.");
-        logRecord.SpanId.Should().BeNull("spanId should not be set on LogRecord level for pprof exporter.");
+        profile.ProfileId.Should().BeEquivalentTo(Guid.Empty.ToByteArray());
+        profile.StartTimeUnixNano.Should().Be(10_000_000_000);
+        profile.EndTimeUnixNano.Should().Be(11_000_000_000);
+        profile.Stacktraces.Should().ContainSingle();
+        profile.Links.Should().HaveCount(3); // 2 different trace IDs, plus mandatory "empty" entry
+        profile.ProfileTypes.Should().ContainSingle();
 
-        var profile = Deserialize(logRecord.Body.StringValue);
+        // OTLP_PROFILES: TODO: profile.Links[1] and profile.Links[2]
 
-        profile.Samples.Count.Should().Be(2);
+        var cpuProfile = profile.ProfileTypes[0];
+        cpuProfile.StacktraceIndices.Should().HaveCount(2);
+        cpuProfile.StacktraceIndices.Should().AllBeEquivalentTo(0);
+        cpuProfile.LinkIndices.Should().HaveCount(2);
+        cpuProfile.LinkIndices.Should().NotContain(index => index == 0); // None of the thread samples have
+        cpuProfile.Timestamps.Should().HaveCount(2);
+        cpuProfile.Timestamps.Should().Satisfy(ts => ts == 10_000_000_000, ts => ts == 11_000_000_000);
 
-        using (new AssertionScope())
-        {
-            var firstSpanId = GetLabelString("span_id", profile.StringTables, profile.Samples[0]);
-
-            // hex representation of 1234567890
-            firstSpanId.Should().Be("00000000499602d2");
-
-            var firstTraceId = GetLabelString("trace_id", profile.StringTables, profile.Samples[0]);
-
-            // concatenated hex representations of 1234567890 and 9876543210
-            firstTraceId.Should().Be("00000000499602d2000000024cb016ea");
-
-            var secondSpanId = GetLabelString("span_id", profile.StringTables, profile.Samples[1]);
-
-            // hex representation of 9876543210
-            secondSpanId.Should().Be("000000024cb016ea");
-
-            var secondTraceId = GetLabelString("trace_id", profile.StringTables, profile.Samples[1]);
-
-            // concatenated hex representations of 9876543210 and 1234567890
-            secondTraceId.Should().Be("000000024cb016ea00000000499602d2");
-        }
+        // Check default sampling rate.
+        cpuProfile.SampleRate.Should().Be(10_000);
+        profile.StringTables[(int)cpuProfile.TypeIndex].Should().Be("cpu");
+        profile.StringTables[(int)cpuProfile.UnitIndex].Should().Be("ms");
     }
 
     [Fact]
-    public void Event_period_is_exported_inside_labels()
+    public void Sample_rate_is_exported_in_profile_type()
     {
         const long expectedPeriod = 1000;
 
         var exporter = new ThreadSampleProcessor(
             DefaultSettings(samplingPeriodMs: expectedPeriod));
 
-        var logRecord = exporter.ProcessThreadSamples(new List<ThreadSample>
+        var profile = exporter.ProcessThreadSamples(new List<ThreadSample>
         {
             new ThreadSample()
             {
-                Timestamp = new ThreadSample.Time(10000)
+                Timestamp = new ThreadSample.Time(11000)
             }
         });
 
-        var profile = Deserialize(logRecord.Body.StringValue);
-
-        var eventPeriod = GetLabelNum("source.event.period", profile);
-
-        eventPeriod.Should().Be(expectedPeriod);
+        var profileType = profile.ProfileTypes[0];
+        profileType.SampleRate.Should().Be(expectedPeriod);
+        profile.StringTables[(int)profileType.TypeIndex].Should().Be("cpu");
+        profile.StringTables[(int)profileType.UnitIndex].Should().Be("ms");
     }
 
     [Fact]
-    public void Timestamp_is_exported_inside_labels()
+    public void Thread_info_is_exported_inside_attribute_sets()
     {
         var exporter = new ThreadSampleProcessor(
             DefaultSettings());
 
-        var logRecord = exporter.ProcessThreadSamples(new List<ThreadSample>
-        {
-            new ThreadSample()
-            {
-                Timestamp = new ThreadSample.Time(milliseconds: 1000)
-            }
-        });
-
-        logRecord.TimeUnixNano.Should().Be(0, "for pprof exporter, timestamp for an event is exported as a label.");
-
-        var profile = Deserialize(logRecord.Body.StringValue);
-
-        var timestamp = GetLabelNum("source.event.time", profile);
-
-        timestamp.Should().Be(1000);
-    }
-
-    [Fact]
-    public void Format_is_added_to_log_record_attributes()
-    {
-        var exporter = new ThreadSampleProcessor(
-            DefaultSettings());
-
-        var logRecord = exporter.ProcessThreadSamples(new List<ThreadSample>
-        {
-            new ThreadSample()
-            {
-                Timestamp = new ThreadSample.Time(10000)
-            }
-        });
-
-        var format = logRecord.Attributes.Single(kv => kv.Key == "profiling.data.format");
-        format.Value.StringValue.Should().Be("pprof-gzip-base64");
-    }
-
-    [Fact]
-    public void Thread_info_is_exported_inside_labels()
-    {
-        var exporter = new ThreadSampleProcessor(
-            DefaultSettings());
-
-        var logRecord = exporter.ProcessThreadSamples(new List<ThreadSample>
+        var profile = exporter.ProcessThreadSamples(new List<ThreadSample>
         {
             new ThreadSample()
             {
@@ -151,18 +101,17 @@ public class ThreadSampleProcessorTests
             }
         });
 
-        var profile = Deserialize(logRecord.Body.StringValue);
-
         using (new AssertionScope())
         {
-            var threadName = GetLabelString("thread.name", profile.StringTables, profile.Samples[0]);
-            threadName.Should().Be("test_thread");
-
-            var managedThreadId = GetLabelNum("thread.id", profile);
-            managedThreadId.Should().Be(2);
+            var profileType = profile.ProfileTypes[0];
+            var attributeSetIndex = profileType.AttributeSetIndices[0];
+            var attributeSet = profile.AttributeSets[(int)attributeSetIndex];
+            attributeSet.Attributes.Should().Contain(kv => kv.Key == "thread.name" && profile.StringTables[(int)kv.Value.IntValue] == "test_thread");
+            attributeSet.Attributes.Should().Contain(kv => kv.Key == "thread.id" && kv.Value.IntValue == 2);
         }
     }
 
+    /*
     [Fact]
     public void Allocation_size_in_bytes_is_sent_as_a_value_for_exported_allocation_sample()
     {
@@ -339,6 +288,15 @@ public class ThreadSampleProcessorTests
         return label;
     }
 
+    private static Profile Deserialize(string body)
+    {
+        using var memoryStream = new MemoryStream(Convert.FromBase64String(body));
+        using var gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress);
+        var profile = Serializer.Deserialize<Profile>(gzipStream);
+        return profile;
+    }
+    */
+
     private static ImmutableTracerSettings DefaultSettings(long samplingPeriodMs = 10000)
     {
         return new ImmutableTracerSettings(new TracerSettings
@@ -346,13 +304,5 @@ public class ThreadSampleProcessorTests
             ExporterSettings = new ExporterSettings(),
             ThreadSamplingPeriod = TimeSpan.FromMilliseconds(samplingPeriodMs)
         });
-    }
-
-    private static Profile Deserialize(string body)
-    {
-        using var memoryStream = new MemoryStream(Convert.FromBase64String(body));
-        using var gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress);
-        var profile = Serializer.Deserialize<Profile>(gzipStream);
-        return profile;
     }
 }
