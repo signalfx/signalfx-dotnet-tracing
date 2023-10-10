@@ -32,19 +32,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 return null;
             }
 
-            var stringTable = new LookupTable<string>();
-            stringTable.GetOrCreateIndex(string.Empty);
-
-            var stackTraceTable = new CustomEntryKeyLookupTable<Indices, Stacktrace>();
-
-            var locationTable = new CustomEntryKeyLookupTable<string, Location>();
-            var functionTable = new CustomEntryKeyLookupTable<string, Function>();
-
-            var linkTable = new CustomEntryKeyLookupTable<string, Link>();
-            linkTable.GetOrCreateIndex(string.Empty, () => new Link());
-
-            var attributeSetTable = new CustomEntryKeyLookupTable<string, AttributeSet>();
-            attributeSetTable.GetOrCreateIndex(string.Empty, () => new AttributeSet());
+            var profileLookupTables = new ProfileLookupTables();
 
             var startTimeUnixNano = threadSamples[0].Timestamp.Nanoseconds;
             var endTimeUnixNano = threadSamples[0].Timestamp.Nanoseconds;
@@ -74,76 +62,18 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 // Process thread information
                 var attributes = new[]
                 {
-                    new KeyValue { Key = "thread.name", Value = new AnyValue { IntValue = stringTable.GetOrCreateIndex(threadSample.ThreadName ?? string.Empty) } },
+                    new KeyValue { Key = "thread.name", Value = new AnyValue { IntValue = profileLookupTables.GetStringIndex(threadSample.ThreadName ?? string.Empty) } },
                     new KeyValue { Key = "thread.id", Value = new AnyValue { IntValue = threadSample.ManagedId } }
                 };
+                var attributeSetIndex = profileLookupTables.GetAttributeSetIndex(attributes);
 
-                var sampleAttributeSetKey = $"{attributes[0].Key}{attributes[0].Value.StringValue}{attributes[1].Key}{attributes[1].Value.IntValue}";
-                var attributeSetIndex = attributeSetTable.GetOrCreateIndex(
-                    sampleAttributeSetKey,
-                    () =>
-                    {
-                        var sampleAttributeSet = new AttributeSet();
-                        sampleAttributeSet.Attributes.AddRange(attributes);
-                        return sampleAttributeSet;
-                    });
+                // Process trace context
+                var linkIndex = profileLookupTables.GetLinkIndex(threadSample);
 
-                // Process trace context, if any
-                uint linkIndex = 0; // Default is thread sample not associated to any span and trace context.
-                if (threadSample.SpanId != 0 || threadSample.TraceIdHigh != 0 || threadSample.TraceIdLow != 0)
-                {
-                    // The key needs to be unique, for now, something very simple. It can be optimized later.
-                    var linkKey = $"{threadSample.SpanId}{threadSample.TraceIdLow}{threadSample.TraceIdHigh}";
-                    linkIndex = linkTable.GetOrCreateIndex(
-                        linkKey,
-                        () =>
-                        {
-                            // OTLP_PROFILES: TODO: check the conversion below, for now just to compile
-                            var traceId = new List<byte>(BitConverter.GetBytes(threadSample.TraceIdLow));
-                            traceId.AddRange(BitConverter.GetBytes(threadSample.TraceIdHigh));
-                            var link = new Link
-                            {
-                                SpanId = BitConverter.GetBytes(threadSample.SpanId), TraceId = traceId.ToArray()
-                            };
+                // Process the stack trace itself
+                var stackTraceIndex = profileLookupTables.GetStacktraceIndex(threadSample.Frames);
 
-                            return link;
-                        });
-                }
-
-                var stackTraceLocations = new List<uint>(threadSample.Frames.Count);
-                foreach (var functionName in threadSample.Frames)
-                {
-                    var functionIndex = functionTable.GetOrCreateIndex(
-                        functionName,
-                        () => new Function
-                        {
-                            NameIndex = stringTable.GetOrCreateIndex(functionName ?? string.Empty),
-                            FilenameIndex = stringTable.GetOrCreateIndex("unknown")
-                        });
-
-                    var locationIndex = locationTable.GetOrCreateIndex(
-                        functionName,
-                        () =>
-                        {
-                            var location = new Location();
-                            location.Lines.Add(new Line { FunctionIndex = functionIndex });
-                            return location;
-                        });
-
-                    stackTraceLocations.Add(locationIndex);
-                }
-
-                var stackTraceIndex = stackTraceTable.GetOrCreateIndex(
-                    new Indices(stackTraceLocations),
-                    () =>
-                    {
-                        var stackTrace = new Stacktrace
-                        {
-                            LocationIndices = stackTraceLocations.ToArray()
-                        };
-                        return stackTrace;
-                    });
-
+                // Update profile type arrays for current thread sample
                 stackTracesIndices[sampleIndex] = stackTraceIndex;
                 linkIndices[sampleIndex] = linkIndex;
                 attributeSetIndices[sampleIndex] = attributeSetIndex;
@@ -153,8 +83,8 @@ namespace Datadog.Trace.AlwaysOnProfiler
             var cpuProfileType = new ProfileType
             {
                 SampleRate = (ulong)_threadSamplingPeriod.TotalMilliseconds,
-                TypeIndex = stringTable.GetOrCreateIndex("cpu"),
-                UnitIndex = stringTable.GetOrCreateIndex("ms"),
+                TypeIndex = profileLookupTables.GetStringIndex("cpu"),
+                UnitIndex = profileLookupTables.GetStringIndex("ms"),
                 StacktraceIndices = stackTracesIndices,
                 LinkIndices = linkIndices,
                 AttributeSetIndices = attributeSetIndices,
@@ -168,15 +98,11 @@ namespace Datadog.Trace.AlwaysOnProfiler
                 EndTimeUnixNano = endTimeUnixNano
             };
 
-            // Set the lookup tables
-            profile.Stacktraces.AddRange(stackTraceTable);
-            profile.Locations.AddRange(locationTable);
-            profile.Functions.AddRange(functionTable);
-            profile.Links.AddRange(linkTable);
-            profile.AttributeSets.AddRange(attributeSetTable);
-            profile.StringTables.AddRange(stringTable);
-
+            // Add profile types
             profile.ProfileTypes.Add(cpuProfileType);
+
+            // Add lookup tables
+            profileLookupTables.CopyLookupTablesToProfile(profile);
 
             return profile;
         }

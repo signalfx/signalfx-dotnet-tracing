@@ -11,4 +11,11 @@ internal interface IProfileAppender
     /// </summary>
     /// <param name="profiles">The collection to add records to.</param>
     void AppendTo(List<Profile> profiles);
+
+    // AppendProfileTypeResult AppendProfileType(List<ProfileType> profileTypes);
 }
+
+// internal readonly record struct AppendProfileTypeResult(
+//     bool AppendedData,
+//     ThreadSample.Time StartTimestamp,
+//     ThreadSample.Time EndTimestamp);

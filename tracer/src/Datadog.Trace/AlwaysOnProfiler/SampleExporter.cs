@@ -44,7 +44,7 @@ internal class SampleExporter
                 profileAppender.AppendTo(profiles);
             }
 
-            if (profiles.Count > 0)
+            if (profiles.Exists(p => p.ProfileTypes.Count > 0))
             {
                 _otlpSender.Send(_profilesData);
             }
