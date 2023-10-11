@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Datadog.Trace.AlwaysOnProfiler.ProfileAppenders;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Logging;
 

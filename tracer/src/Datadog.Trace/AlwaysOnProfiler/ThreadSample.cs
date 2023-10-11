@@ -1,5 +1,3 @@
-// Modified by Splunk Inc
-
 using System.Collections.Generic;
 
 namespace Datadog.Trace.AlwaysOnProfiler
@@ -18,21 +16,16 @@ namespace Datadog.Trace.AlwaysOnProfiler
 
         public string ThreadName { get; set; }
 
-        public uint ThreadIndex { get; set; }
-
         public IList<string> Frames { get; } = new List<string>();
 
         internal class Time
         {
             public Time(long milliseconds)
             {
-                Milliseconds = milliseconds;
                 Nanoseconds = (ulong)milliseconds * 1_000_000u;
             }
 
             public ulong Nanoseconds { get; }
-
-            public long Milliseconds { get; }
         }
     }
 }

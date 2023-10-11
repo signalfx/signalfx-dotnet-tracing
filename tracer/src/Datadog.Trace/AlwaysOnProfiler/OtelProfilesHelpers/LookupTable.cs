@@ -1,6 +1,3 @@
-// Modified by Splunk Inc.
-
-using System;
 using System.Collections.Generic;
 
 namespace Datadog.Trace.AlwaysOnProfiler.OtelProfilesHelpers

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Datadog.Trace.Vendors.ProtoBuf;
 using Datadog.Tracer.OpenTelemetry.Proto.Common.V1;
 using Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1;
 

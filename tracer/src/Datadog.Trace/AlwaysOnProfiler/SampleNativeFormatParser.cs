@@ -1,5 +1,3 @@
-// Modified by Splunk Inc.
-
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -85,7 +83,6 @@ namespace Datadog.Trace.AlwaysOnProfiler
                             SpanId = spanId,
                             ManagedId = managedId,
                             ThreadName = threadName,
-                            ThreadIndex = threadIndex
                         };
 
                         ReadStackFrames(code, threadSample, codeDictionary, buffer, ref position);
