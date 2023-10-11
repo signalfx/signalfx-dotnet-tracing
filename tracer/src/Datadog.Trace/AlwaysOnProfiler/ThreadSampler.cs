@@ -1,6 +1,7 @@
 // Modified by Splunk Inc.
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Datadog.Trace.AlwaysOnProfiler.ProfileAppenders;
 using Datadog.Trace.Configuration;
@@ -77,22 +78,21 @@ namespace Datadog.Trace.AlwaysOnProfiler
         private static SampleExporter GetConfiguredExporter(ImmutableTracerSettings tracerSettings, bool cpuProfilingAvailable, bool memoryProfilingAvailable)
         {
             var buffer = new byte[BufferSize];
+            var cpuProfileTypeBuilder = new CpuProfileTypeBuilder(tracerSettings.ThreadSamplingPeriod, buffer);
+            var allocationProfileTypeBuilder = new AllocationProfileTypeBuilder(buffer);
 
-            var sampleProcessor = new ThreadSampleProcessor(tracerSettings);
-
-            var cpuProfileAppender = new CpuProfileAppender(sampleProcessor, buffer);
-            var allocationProfileAppender = new AllocationProfileAppender(sampleProcessor, buffer);
-
-            var appenders = cpuProfilingAvailable switch
+            List<IProfileTypeBuilder> profileTypeBuilders = cpuProfilingAvailable switch
             {
-                true when memoryProfilingAvailable => new IProfileAppender[] { cpuProfileAppender, allocationProfileAppender },
-                true => new IProfileAppender[] { cpuProfileAppender },
-                _ => new IProfileAppender[] { allocationProfileAppender }
+                // The doubling of the cpuProfileTypeBuilder is intentional: to preserve behavior of SFx.NET original implementation.
+                true when memoryProfilingAvailable => new() { cpuProfileTypeBuilder, cpuProfileTypeBuilder, allocationProfileTypeBuilder },
+                true => new() { cpuProfileTypeBuilder, cpuProfileTypeBuilder },
+                _ => new() { allocationProfileTypeBuilder }
             };
 
+            var profileBuilder = new ProfileBuilder(profileTypeBuilders);
             var otlpHttpSender = new OtlpHttpSender(tracerSettings.ExporterSettings.LogsEndpointUrl);
 
-            return new SampleExporter(tracerSettings, otlpHttpSender, appenders);
+            return new SampleExporter(tracerSettings, otlpHttpSender, profileBuilder);
         }
     }
 }

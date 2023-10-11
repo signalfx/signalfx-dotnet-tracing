@@ -17,14 +17,14 @@ internal class SampleExporter
     private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(SampleExporter));
 
     private readonly IOtlpSender _otlpSender;
-    private readonly IList<IProfileAppender> _profileAppenders;
+    private readonly ProfileBuilder _profileBuilder;
 
     private readonly ProfilesData _profilesData;
 
-    public SampleExporter(ImmutableTracerSettings tracerSettings, IOtlpSender otlpSender, IList<IProfileAppender> profileAppenders)
+    public SampleExporter(ImmutableTracerSettings tracerSettings, IOtlpSender otlpSender, ProfileBuilder profileBuilder)
     {
         _otlpSender = otlpSender ?? throw new ArgumentNullException(nameof(otlpSender));
-        _profileAppenders = profileAppenders ?? throw new ArgumentNullException(nameof(profileAppenders));
+        _profileBuilder = profileBuilder ?? throw new ArgumentNullException(nameof(profileBuilder));
 
         // The same ProfilesData instance is used on all export messages. With the exception of the list of
         // Profiles, the Profiles property, all other fields are pre-populated.
@@ -36,16 +36,10 @@ internal class SampleExporter
         var profiles = _profilesData.ResourceProfiles[0].ScopeProfiles[0].Profiles;
         try
         {
-            foreach (var profileAppender in _profileAppenders)
+            var profile = _profileBuilder.Build();
+            if (profile != null && profile.ProfileTypes.Count > 0)
             {
-                // Accumulate results in profiles object, an alias, to _profilesData.ResourceProfiles[0].ScopeProfiles[0].Profiles
-                // Allocation samples appender adds at most 1 Profile object,
-                // cpu samples appender may add 2.
-                profileAppender.AppendTo(profiles);
-            }
-
-            if (profiles.Exists(p => p.ProfileTypes.Count > 0))
-            {
+                profiles.Add(profile);
                 _otlpSender.Send(_profilesData);
             }
         }

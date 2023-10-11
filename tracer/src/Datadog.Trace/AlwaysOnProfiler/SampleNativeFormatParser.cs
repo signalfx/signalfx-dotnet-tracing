@@ -162,14 +162,16 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         var traceIdLow = ReadInt64(buffer, ref position);
                         var spanId = ReadInt64(buffer, ref position);
 
-                        var threadSample = new ThreadSample
+                        var threadAllocationSample = new AllocationSample
                         {
                             Timestamp = new ThreadSample.Time(timestampMillis),
                             TraceIdHigh = traceIdHigh,
                             TraceIdLow = traceIdLow,
                             SpanId = spanId,
                             ManagedId = managedId,
-                            ThreadName = threadName
+                            ThreadName = threadName,
+                            AllocationSizeBytes = allocatedSize,
+                            TypeName = typeName
                         };
 
                         var code = ReadShort(buffer, ref position);
@@ -177,14 +179,14 @@ namespace Datadog.Trace.AlwaysOnProfiler
                         // each allocation sample has independently coded strings
                         var codeDictionary = new Dictionary<int, string>();
 
-                        ReadStackFrames(code, threadSample, codeDictionary, buffer, ref position);
+                        ReadStackFrames(code, threadAllocationSample, codeDictionary, buffer, ref position);
                         if (threadName == ThreadSampler.BackgroundThreadName)
                         {
                             // TODO Splunk: add configuration option to include the sampler thread. By default remove it.
                             continue;
                         }
 
-                        allocationSamples.Add(new AllocationSample(allocatedSize, typeName, threadSample));
+                        allocationSamples.Add(threadAllocationSample);
                     }
                     else
                     {

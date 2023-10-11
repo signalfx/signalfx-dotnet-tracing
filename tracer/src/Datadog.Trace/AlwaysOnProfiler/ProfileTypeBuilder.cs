@@ -5,15 +5,18 @@ using Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1;
 
 namespace Datadog.Trace.AlwaysOnProfiler;
 
-internal abstract class ProfileTypeBuilder<TThreadSample>
+internal abstract class ProfileTypeBuilder<TThreadSample> : IProfileTypeBuilder
     where TThreadSample : ThreadSample
 {
     protected abstract long CalculateSampleValue(TThreadSample threadSample);
 
     protected abstract void SetProfileTypeInformation(ProfileLookupTables profileLookupTables, ProfileType profileType);
 
-    public ProfileTypeBuildResult Build(ProfileLookupTables profileLookupTables, List<TThreadSample> threadSamples)
+    protected abstract List<TThreadSample> RetrieveSamples();
+
+    public ProfileTypeBuildResult Build(ProfileLookupTables profileLookupTables)
     {
+        var threadSamples = RetrieveSamples();
         if (threadSamples == null || threadSamples.Count < 1)
         {
             return new ProfileTypeBuildResult();

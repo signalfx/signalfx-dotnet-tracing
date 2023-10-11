@@ -126,7 +126,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
             var sum = 0;
             for (var i = 0; i < samples.Count; i++)
             {
-                sum += samples[i].ThreadSample.Frames.Count;
+                sum += samples[i].Frames.Count;
             }
 
             return sum;
@@ -172,7 +172,7 @@ namespace Datadog.Trace.AlwaysOnProfiler
             for (var index = 0; index < allocationSamples.Count; index++)
             {
                 var allocationSample = allocationSamples[index];
-                var profileBuilder = CreatePprofProfileBuilder(pprof, allocationSample.ThreadSample);
+                var profileBuilder = CreatePprofProfileBuilder(pprof, allocationSample);
 
                 profileBuilder.SetValue(allocationSample.AllocationSizeBytes);
                 pprof.Profile.Samples.Add(profileBuilder.Build());
