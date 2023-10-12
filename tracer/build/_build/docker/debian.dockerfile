@@ -22,7 +22,7 @@ RUN apt-get update \
         git=1:2.20.1-2+deb10u3 \
         procps=2:3.3.15-2 \
         wget=1.20.1-1.1 \
-        curl=7.64.0-4+deb10u6 \
+        curl=7.64.0-4+deb10u7 \
         cmake=3.13.4-1 \
         make=4.2.1-1.2 \
         llvm=1:7.0-47 \
