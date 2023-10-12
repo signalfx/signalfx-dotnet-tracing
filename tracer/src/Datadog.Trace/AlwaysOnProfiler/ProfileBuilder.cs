@@ -5,7 +5,7 @@ using Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1;
 
 namespace Datadog.Trace.AlwaysOnProfiler;
 
-internal class ProfileBuilder
+internal class ProfileBuilder : IProfileBuilder
 {
     private readonly IList<IProfileTypeBuilder> _profileTypeBuilders;
 

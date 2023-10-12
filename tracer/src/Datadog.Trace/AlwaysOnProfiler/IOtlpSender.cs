@@ -1,6 +1,8 @@
-﻿namespace Datadog.Trace.AlwaysOnProfiler;
+﻿using Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1;
+
+namespace Datadog.Trace.AlwaysOnProfiler;
 
 internal interface IOtlpSender
 {
-    void Send(object data);
+    void Send(ProfilesData profilesData);
 }

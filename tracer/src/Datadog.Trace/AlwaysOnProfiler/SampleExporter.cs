@@ -17,11 +17,11 @@ internal class SampleExporter
     private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(SampleExporter));
 
     private readonly IOtlpSender _otlpSender;
-    private readonly ProfileBuilder _profileBuilder;
+    private readonly IProfileBuilder _profileBuilder;
 
     private readonly ProfilesData _profilesData;
 
-    public SampleExporter(ImmutableTracerSettings tracerSettings, IOtlpSender otlpSender, ProfileBuilder profileBuilder)
+    public SampleExporter(ImmutableTracerSettings tracerSettings, IOtlpSender otlpSender, IProfileBuilder profileBuilder)
     {
         _otlpSender = otlpSender ?? throw new ArgumentNullException(nameof(otlpSender));
         _profileBuilder = profileBuilder ?? throw new ArgumentNullException(nameof(profileBuilder));

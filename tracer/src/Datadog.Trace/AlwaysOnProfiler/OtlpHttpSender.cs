@@ -2,6 +2,7 @@
 using System.Net;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Propagation;
+using Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1;
 
 namespace Datadog.Trace.AlwaysOnProfiler;
 
@@ -19,7 +20,7 @@ internal class OtlpHttpSender : IOtlpSender
         _logsEndpointUrl = logsEndpointUrl ?? throw new ArgumentNullException(nameof(logsEndpointUrl));
     }
 
-    public void Send(object data)
+    public void Send(ProfilesData profilesData)
     {
         HttpWebRequest httpWebRequest;
 
@@ -31,7 +32,7 @@ internal class OtlpHttpSender : IOtlpSender
             httpWebRequest.Headers.Add(CommonHttpHeaderNames.TracingEnabled, "false");
 
             using var stream = httpWebRequest.GetRequestStream();
-            Vendors.ProtoBuf.Serializer.Serialize(stream, data);
+            Vendors.ProtoBuf.Serializer.Serialize(stream, profilesData);
             stream.Flush();
         }
         catch (Exception ex)
