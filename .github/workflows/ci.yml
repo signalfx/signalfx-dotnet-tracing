@@ -391,10 +391,13 @@ jobs:
           6.0.404
           7.0.101
 
+    - name: Disk usage before removing images
+      run: df -h
+
     - name: Remove large node images
       run: docker rmi node:20 node:18 node:16
 
-    - name: Disk usage
+    - name: Disk usage after removing images
       run: df -h
 
     - name: Build Docker image
