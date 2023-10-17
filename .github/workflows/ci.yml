@@ -394,6 +394,12 @@ jobs:
     - name: Remove large node images
       run: docker rmi node:20 node:18 node:16
 
+    - name: Remove a few unused dirs
+      run: sudo rm -rf \
+            /usr/local/lib/android /opt/ghc \
+            /usr/share/swift /usr/local/.ghcup \
+            /usr/lib/jvm || true
+
     - name: Disk usage
       run: df -h
 
