@@ -390,6 +390,13 @@ jobs:
           5.0.408
           6.0.404
           7.0.101
+
+    - name: Remove large node images
+      run: docker rmi node:20 node:18 node:16
+
+    - name: Disk usage
+      run: df -h
+
     - name: Build Docker image
       run: |
         docker build \
