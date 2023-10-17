@@ -377,7 +377,7 @@ jobs:
       fail-fast: false
       matrix:
         base-image: [ debian, alpine ]
-        framework: [ netcoreapp3.1, net5.0, net6.0, net7.0 ]
+        framework: [ netcoreapp3.1, net6.0, net7.0 ]
     runs-on: ubuntu-20.04
     timeout-minutes: 60
     steps:
