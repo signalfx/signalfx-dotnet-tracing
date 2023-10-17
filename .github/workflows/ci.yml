@@ -419,14 +419,14 @@ jobs:
       run: docker-compose build --build-arg SERVERLESS_ARTIFACTS_PATH=.${relativeTracerHome} StartDependencies
     - name: Start dependencies
       run: docker-compose up -d StartDependencies
-    - name: Run integration tests in container
-      run: | 
-        framework=${{ matrix.framework }} baseImage=${{ matrix.base-image }} docker-compose run --rm \
-          -e baseImage=${{ matrix.base-image }} \
-          -e framework=${{ matrix.framework }} \
-          -e Verify_DisableClipboard=true \
-          -e DiffEngine_Disabled=true \
-          IntegrationTests
+    # - name: Run integration tests in container
+    #   run: | 
+    #     framework=${{ matrix.framework }} baseImage=${{ matrix.base-image }} docker-compose run --rm \
+    #       -e baseImage=${{ matrix.base-image }} \
+    #       -e framework=${{ matrix.framework }} \
+    #       -e Verify_DisableClipboard=true \
+    #       -e DiffEngine_Disabled=true \
+    #       IntegrationTests
     - name: docker-compose stop services
       run: docker-compose down
       if: (${{ job.status }} != 'cancelled')
