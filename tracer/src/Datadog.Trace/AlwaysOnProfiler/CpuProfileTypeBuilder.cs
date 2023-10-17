@@ -10,11 +10,16 @@ internal sealed class CpuProfileTypeBuilder : ProfileTypeBuilder<ThreadSample>
 {
     private readonly TimeSpan _samplingPeriod;
     private readonly byte[] _buffer;
+    private readonly Func<List<ThreadSample>> _retrieveSamplesFunc;
 
-    public CpuProfileTypeBuilder(TimeSpan samplingPeriod, byte[] sharedUnparsedSamplesBuffer)
+    public CpuProfileTypeBuilder(
+        TimeSpan samplingPeriod,
+        byte[] sharedUnparsedSamplesBuffer,
+        Func<List<ThreadSample>> retrieveSamplesFunc = null) // For testing purposes.
     {
         _samplingPeriod = samplingPeriod;
         _buffer = sharedUnparsedSamplesBuffer;
+        _retrieveSamplesFunc = retrieveSamplesFunc ?? DefaultRetrieveSamples;
     }
 
     protected override long CalculateSampleValue(ThreadSample threadSample) => 0;
@@ -26,7 +31,9 @@ internal sealed class CpuProfileTypeBuilder : ProfileTypeBuilder<ThreadSample>
         profileType.UnitIndex = profileLookupTables.GetStringIndex("ms");
     }
 
-    protected override List<ThreadSample> RetrieveSamples()
+    protected override List<ThreadSample> RetrieveSamples() => _retrieveSamplesFunc();
+
+    private List<ThreadSample> DefaultRetrieveSamples()
     {
         var read = NativeMethods.SignalFxReadThreadSamples(_buffer.Length, _buffer);
         if (read <= 0)
