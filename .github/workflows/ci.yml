@@ -131,7 +131,6 @@ jobs:
         dotnet-version: | 
           2.1.818
           3.1.426
-          5.0.408
           6.0.404
           7.0.101
     - name: Build Docker image
@@ -178,7 +177,6 @@ jobs:
         dotnet-version: | 
           2.1.818
           3.1.426
-          5.0.408
           6.0.404
           7.0.101
     - run: ./tracer/build.cmd Clean BuildTracerHome BuildAndRunManagedUnitTests
@@ -204,7 +202,6 @@ jobs:
         dotnet-version: | 
           2.1.818
           3.1.426
-          5.0.408
           6.0.404
           7.0.101
     - name: Build Docker image
@@ -251,7 +248,6 @@ jobs:
         dotnet-version: | 
           2.1.818
           3.1.426
-          5.0.408
           6.0.404
           7.0.101
     - name: Install CMake 3.19.8
@@ -277,7 +273,6 @@ jobs:
         dotnet-version: | 
           2.1.818
           3.1.426
-          5.0.408
           6.0.404
           7.0.101
     - name: Build Docker image
@@ -313,7 +308,7 @@ jobs:
       matrix:
         machine: [ windows-2022 ]
         platform: [ x64 ]
-        framework: [ net461, netcoreapp3.1, net5.0, net6.0, net7.0 ]
+        framework: [ net461, netcoreapp3.1, net6.0, net7.0 ]
         target: [ BuildAndRunWindowsIntegrationTests, BuildAndRunWindowsRegressionTests ]
     runs-on: ${{ matrix.machine }}
     timeout-minutes: 60
@@ -327,7 +322,6 @@ jobs:
         dotnet-version: | 
           2.1.818
           3.1.426
-          5.0.408
           6.0.404
           7.0.101
     # Cosmos is _way_ to flaky at the moment. Try enabling again at a later time
@@ -387,7 +381,6 @@ jobs:
         dotnet-version: | 
           2.1.818
           3.1.426
-          5.0.408
           6.0.404
           7.0.101
 
@@ -462,7 +455,6 @@ jobs:
         dotnet-version: | 
           2.1.818
           3.1.426
-          5.0.408
           6.0.404
           7.0.101
     - name: install Microsoft.Net.Component.4.6.1.TargetingPack
@@ -512,7 +504,6 @@ jobs:
         dotnet-version: |
           2.1.818
           3.1.426
-          5.0.408
           6.0.404
           7.0.101
     - name: install Microsoft.Net.Component.4.6.1.TargetingPack
