@@ -91,3 +91,5 @@ RUN if [ "$(uname -m)" = "x86_64" ]; \
 COPY . /build
 RUN dotnet build /build
 WORKDIR /project
+
+ENV IsDebian=true
