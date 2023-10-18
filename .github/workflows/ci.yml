@@ -131,7 +131,6 @@ jobs:
         dotnet-version: | 
           2.1.818
           3.1.426
-          5.0.408
           6.0.404
           7.0.101
     - name: Build Docker image
@@ -178,7 +177,6 @@ jobs:
         dotnet-version: | 
           2.1.818
           3.1.426
-          5.0.408
           6.0.404
           7.0.101
     - run: ./tracer/build.cmd Clean BuildTracerHome BuildAndRunManagedUnitTests
@@ -204,7 +202,6 @@ jobs:
         dotnet-version: | 
           2.1.818
           3.1.426
-          5.0.408
           6.0.404
           7.0.101
     - name: Build Docker image
@@ -251,7 +248,6 @@ jobs:
         dotnet-version: | 
           2.1.818
           3.1.426
-          5.0.408
           6.0.404
           7.0.101
     - name: Install CMake 3.19.8
@@ -277,7 +273,6 @@ jobs:
         dotnet-version: | 
           2.1.818
           3.1.426
-          5.0.408
           6.0.404
           7.0.101
     - name: Build Docker image
@@ -313,7 +308,7 @@ jobs:
       matrix:
         machine: [ windows-2022 ]
         platform: [ x64 ]
-        framework: [ net461, netcoreapp3.1, net5.0, net6.0, net7.0 ]
+        framework: [ net461, netcoreapp3.1, net6.0, net7.0 ]
         target: [ BuildAndRunWindowsIntegrationTests, BuildAndRunWindowsRegressionTests ]
     runs-on: ${{ matrix.machine }}
     timeout-minutes: 60
@@ -327,7 +322,6 @@ jobs:
         dotnet-version: | 
           2.1.818
           3.1.426
-          5.0.408
           6.0.404
           7.0.101
     # Cosmos is _way_ to flaky at the moment. Try enabling again at a later time
@@ -377,7 +371,7 @@ jobs:
       fail-fast: false
       matrix:
         base-image: [ debian, alpine ]
-        framework: [ netcoreapp3.1, net5.0, net6.0, net7.0 ]
+        framework: [ netcoreapp3.1, net6.0, net7.0 ]
     runs-on: ubuntu-20.04
     timeout-minutes: 60
     steps:
@@ -387,9 +381,21 @@ jobs:
         dotnet-version: | 
           2.1.818
           3.1.426
-          5.0.408
           6.0.404
           7.0.101
+
+    - name: Remove large node images
+      run: docker rmi node:20 node:18 node:16
+
+    - name: Remove a few unused dirs
+      run: sudo rm -rf \
+            /usr/local/lib/android /opt/ghc \
+            /usr/share/swift /usr/local/.ghcup \
+            /usr/lib/jvm || true
+
+    - name: Disk usage
+      run: df -h
+
     - name: Build Docker image
       run: |
         docker build \
@@ -409,7 +415,7 @@ jobs:
           dd-trace-dotnet/${{ matrix.base-image }}-builder \
           dotnet /build/bin/Debug/_build.dll Info Clean BuildTracerHome BuildLinuxIntegrationTests -Framework ${{ matrix.framework }}
     - name: Build dependencies
-      run: docker-compose build --build-arg SERVERLESS_ARTIFACTS_PATH=.${relativeTracerHome} serverless-lambda-no-param-sync serverless-lambda-one-param-sync serverless-lambda-two-params-sync serverless-lambda-no-param-async serverless-lambda-one-param-async serverless-lambda-two-params-async serverless-lambda-no-param-void serverless-lambda-one-param-void serverless-lambda-two-params-void
+      run: docker-compose build --build-arg SERVERLESS_ARTIFACTS_PATH=.${relativeTracerHome} StartDependencies
     - name: Start dependencies
       run: docker-compose up -d StartDependencies
     - name: Run integration tests in container
@@ -449,7 +455,6 @@ jobs:
         dotnet-version: | 
           2.1.818
           3.1.426
-          5.0.408
           6.0.404
           7.0.101
     - name: install Microsoft.Net.Component.4.6.1.TargetingPack
@@ -499,7 +504,6 @@ jobs:
         dotnet-version: |
           2.1.818
           3.1.426
-          5.0.408
           6.0.404
           7.0.101
     - name: install Microsoft.Net.Component.4.6.1.TargetingPack

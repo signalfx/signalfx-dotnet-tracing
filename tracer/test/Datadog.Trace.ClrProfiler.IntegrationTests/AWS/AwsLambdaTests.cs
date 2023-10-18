@@ -33,7 +33,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AWS
         [Trait("Category", "Lambda")]
         public async Task SubmitsTraces()
         {
-            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("IsAlpine")))
+            if (Environment.GetEnvironmentVariable("IsAlpine") == "true" || Environment.GetEnvironmentVariable("IsDebian") == "true")
             {
                 Output.WriteLine("Skipping");
                 return;
