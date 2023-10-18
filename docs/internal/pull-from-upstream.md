@@ -46,7 +46,6 @@ Windows in Git Bash:
 git clean -fXd ; ./tracer/build.cmd ; \
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.cmd BuildAndRunWindowsIntegrationTests --framework net7.0 ; \
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.cmd BuildAndRunWindowsIntegrationTests --framework net6.0 ; \
-Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.cmd BuildAndRunWindowsIntegrationTests --framework net5.0 ; \
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.cmd BuildAndRunWindowsIntegrationTests --framework netcoreapp3.1 ; \
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.cmd BuildAndRunWindowsIntegrationTests --framework net461 ; \
 ./tracer/build.cmd OverwriteSnapshotFiles
@@ -59,7 +58,6 @@ git clean -fXd ; ./tracer/build.sh ; \
 docker-compose run --rm StartDependencies ; \
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.sh BuildAndRunLinuxIntegrationTests --framework net7.0 ; \
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.sh BuildAndRunLinuxIntegrationTests --framework net6.0 ; \
-Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.sh BuildAndRunLinuxIntegrationTests --framework net5.0 ; \
 Verify_DisableClipboard=true DiffEngine_Disabled=true ./tracer/build.sh BuildAndRunLinuxIntegrationTests --framework netcoreapp3.1 ; \
 docker-compose down ; \
 ./tracer/build.sh OverwriteSnapshotFiles
