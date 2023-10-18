@@ -415,7 +415,7 @@ jobs:
           dd-trace-dotnet/${{ matrix.base-image }}-builder \
           dotnet /build/bin/Debug/_build.dll Info Clean BuildTracerHome BuildLinuxIntegrationTests -Framework ${{ matrix.framework }}
     - name: Build dependencies
-      run: docker-compose build --build-arg SERVERLESS_ARTIFACTS_PATH=.${relativeTracerHome} serverless-lambda-no-param-sync serverless-lambda-one-param-sync serverless-lambda-two-params-sync serverless-lambda-no-param-async serverless-lambda-one-param-async serverless-lambda-two-params-async serverless-lambda-no-param-void serverless-lambda-one-param-void serverless-lambda-two-params-void
+      run: docker-compose build --build-arg SERVERLESS_ARTIFACTS_PATH=.${relativeTracerHome} StartDependencies
     - name: Start dependencies
       run: docker-compose up -d StartDependencies
     - name: Run integration tests in container
