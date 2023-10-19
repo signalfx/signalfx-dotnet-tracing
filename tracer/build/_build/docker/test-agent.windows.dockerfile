@@ -1,4 +1,4 @@
-FROM python:3.11.3-windowsservercore-1809
+FROM python:3.11-windowsservercore-1809
 
 WORKDIR /
 
