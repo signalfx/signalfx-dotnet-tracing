@@ -38,6 +38,8 @@ on:
     - shared/src/native-src/*
   pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 1,3,5' # Every Monday, Wednesday, and Friday at midnight UTC
 
 env:
   buildConfiguration: Release
