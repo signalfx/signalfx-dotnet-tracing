@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -13,11 +13,11 @@
     <PackageReference Include="AWSSDK.SimpleSystemsManagement" Version="3.7.3.11" />
     <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="6.0.0" />
     <PackageReference Include="Microsoft.TeamFoundationServer.Client" Version="16.170.0" />
-    <PackageReference Include="NuGet.CommandLine" Version="5.9.3">
+    <PackageReference Include="NuGet.CommandLine" Version="5.11.5">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="NuGet.Protocol" Version="5.11.3" />
+    <PackageReference Include="NuGet.Protocol" Version="5.11.5" />
     <PackageReference Include="Nuke.Common" Version="5.0.2" />
     <PackageReference Include="Colorful.Console" Version="1.2.15" />
     <PackageReference Include="Octokit.GraphQL" Version="0.1.8-beta" />
