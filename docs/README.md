@@ -34,7 +34,7 @@ and [`ActivitySource`](https://docs.microsoft.com/en-us/dotnet/core/diagnostics/
 
 ## Requirements
 
-- .NET Core 3.1, .NET 5.0, .NET 6.0, and .NEt 7.0 on Windows and Linux
+- .NET Core 3.1, .NET 5.0, .NET 6.0, and .NET 7.0 on Windows and Linux
 - .NET Framework 4.6.1 and higher on Windows
 
 ## Instrumented libraries and frameworks
