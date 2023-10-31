@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Datadog.Trace.AlwaysOnProfiler;
-using Datadog.Trace.AlwaysOnProfiler.OtelProfilesHelpers;
 using Datadog.Trace.Vendors.Newtonsoft.Json.Utilities;
-using Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1;
 using FluentAssertions;
 using Xunit;
 

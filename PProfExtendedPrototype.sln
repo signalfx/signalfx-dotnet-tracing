@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tracer", "tracer", "{127B03F7-0101-42E3-AAE1-3E2BD7CA8425}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C3EEE149-7B55-4F1B-804E-15150DBD11D4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Datadog.Trace", "tracer\src\Datadog.Trace\Datadog.Trace.csproj", "{1735FC5A-7AC9-4527-8976-6814338D2098}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{4A6E6DB7-C7D2-48E1-8011-CBD876E85F8B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Datadog.Trace.Tests", "tracer\test\Datadog.Trace.Tests\Datadog.Trace.Tests.csproj", "{0E4F6914-8F8B-4465-91B4-1F464C154A14}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1735FC5A-7AC9-4527-8976-6814338D2098}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1735FC5A-7AC9-4527-8976-6814338D2098}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1735FC5A-7AC9-4527-8976-6814338D2098}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1735FC5A-7AC9-4527-8976-6814338D2098}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E4F6914-8F8B-4465-91B4-1F464C154A14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E4F6914-8F8B-4465-91B4-1F464C154A14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E4F6914-8F8B-4465-91B4-1F464C154A14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E4F6914-8F8B-4465-91B4-1F464C154A14}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C3EEE149-7B55-4F1B-804E-15150DBD11D4} = {127B03F7-0101-42E3-AAE1-3E2BD7CA8425}
+		{1735FC5A-7AC9-4527-8976-6814338D2098} = {C3EEE149-7B55-4F1B-804E-15150DBD11D4}
+		{4A6E6DB7-C7D2-48E1-8011-CBD876E85F8B} = {127B03F7-0101-42E3-AAE1-3E2BD7CA8425}
+		{0E4F6914-8F8B-4465-91B4-1F464C154A14} = {4A6E6DB7-C7D2-48E1-8011-CBD876E85F8B}
+	EndGlobalSection
+EndGlobal

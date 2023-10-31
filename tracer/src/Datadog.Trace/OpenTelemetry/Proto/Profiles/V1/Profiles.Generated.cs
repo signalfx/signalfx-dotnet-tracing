@@ -189,7 +189,7 @@ namespace Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1
         public ulong[] Timestamps { get; set; }
 
     }
-
+    
     [global::Datadog.Trace.Vendors.ProtoBuf.ProtoContract()]
     public partial class Mapping : global::Datadog.Trace.Vendors.ProtoBuf.IExtensible
     {

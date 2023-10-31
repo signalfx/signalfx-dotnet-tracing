@@ -43,7 +43,12 @@ internal class ProfileLookupTables
                 sb.Append(attribute.Key);
                 sb.Append(':');
 
-                // OTLP_PROFILES: TODO: For now assuming that the value is always an IntValue
+                // OTLP_PROFILES: TODO: For now assuming that the value is always an IntValue, an indext to stringTable
+                if (!attribute.Value.ShouldSerializeIntValue())
+                {
+                    throw new NotSupportedException("Only 'IntValue' is supported.");
+                }
+
                 sb.Append(attribute.Value.IntValue);
                 sb.Append(';');
             }
