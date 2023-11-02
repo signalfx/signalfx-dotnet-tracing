@@ -7,17 +7,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using Datadog.Trace.TestHelpers;
-using Datadog.Trace.Vendors.ProtoBuf;
-using Datadog.Tracer.Pprof.Proto.Profile;
 using FluentAssertions;
 using FluentAssertions.Execution;
-using OpenTelemetry.TestHelpers.Proto.Collector.Logs.V1;
+using OpenTelemetry.TestHelpers.Proto.Collector.Profiles.V1;
 using OpenTelemetry.TestHelpers.Proto.Common.V1;
-using OpenTelemetry.TestHelpers.Proto.Logs.V1;
+using OpenTelemetry.TestHelpers.Proto.Profiles.V1;
 using VerifyXunit;
 using Xunit;
 using Xunit.Abstractions;
@@ -43,89 +40,37 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetEnvironmentVariable("SIGNALFX_PROFILER_EXPORT_INTERVAL", "1000");
 
             using (var agent = EnvironmentHelper.GetMockAgent())
-            using (var logsCollector = EnvironmentHelper.GetMockOtelLogsCollector())
-            using (var processResult = RunSampleAndWaitForExit(agent, logsCollector.Port))
+            using (var profilesCollector = EnvironmentHelper.GetMockOtelProfilesCollector())
+            using (var processResult = RunSampleAndWaitForExit(agent, profilesCollector.Port))
             {
-                var logsData = logsCollector.LogsData.ToArray();
+                var profilesData = profilesCollector.ProfilesData.ToArray();
                 // The application works for 6 seconds with debug logging enabled we expect at least 2 attempts of thread sampling in CI.
                 // On a dev box it is typical to get at least 4 but the CI machines seem slower, using 2
-                logsData.Length.Should().BeGreaterOrEqualTo(expected: 2);
+                profilesData.Length.Should().BeGreaterOrEqualTo(expected: 2);
 
-                await DumpLogRecords(logsData);
+                await DumpProfilesData(profilesData);
 
                 var containStackTraceForClassHierarchy = false;
                 var expectedStackTrace = string.Join("\n", CreateExpectedStackTrace());
 
-                foreach (var data in logsData)
+                foreach (var data in profilesData)
                 {
-                    IList<Profile> profiles = new List<Profile>();
-                    var dataResourceLog = data.ResourceLogs[0];
-                    var instrumentationLibraryLogs = dataResourceLog.InstrumentationLibraryLogs[0];
-                    var logRecords = instrumentationLibraryLogs.Logs;
-
-                    foreach (var gzip in logRecords.Select(record => record.Body.StringValue).Select(Convert.FromBase64String))
-                    {
-                        await using var memoryStream = new MemoryStream(gzip);
-                        await using var gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress);
-                        var profile = Serializer.Deserialize<Profile>(gzipStream);
-                        profiles.Add(profile);
-                    }
+                    var dataResourceProfile = data.ResourceProfiles[0];
+                    var scopeProfiles = dataResourceProfile.ScopeProfiles[0];
+                    var profiles = scopeProfiles.Profiles;
 
                     containStackTraceForClassHierarchy |= profiles.Any(profile => ContainStackTraceForClassHierarchy(profile, expectedStackTrace));
 
                     using (new AssertionScope())
                     {
-                        AllShouldHaveBasicAttributes(logRecords, ConstantValuedAttributes());
-                        RecordsContainFrameCountAttribute(logRecords);
-                        ResourceContainsExpectedAttributes(dataResourceLog.Resource);
-                        HasNameAndVersionSet(instrumentationLibraryLogs.InstrumentationLibrary);
+                        ResourceContainsExpectedAttributes(dataResourceProfile.Resource);
+                        HasNameAndVersionSet(scopeProfiles.Scope);
                     }
 
-                    logRecords.Clear();
+                    profiles.Clear();
                 }
 
                 Assert.True(containStackTraceForClassHierarchy, "At least one stack trace containing class hierarchy should be reported.");
-            }
-        }
-
-        private static void RecordsContainFrameCountAttribute(List<LogRecord> logRecords)
-        {
-            foreach (var logRecord in logRecords)
-            {
-                logRecord.Attributes.Should().Contain(attr => attr.Key == "profiling.data.total.frame.count");
-            }
-        }
-
-        private static List<KeyValue> ConstantValuedAttributes()
-        {
-            return new List<KeyValue>
-            {
-                new KeyValue
-                {
-                    Key = "com.splunk.sourcetype",
-                    Value = new AnyValue { StringValue = "otel.profiling" }
-                },
-                new KeyValue
-                {
-                    Key = "profiling.data.format",
-                    Value = new AnyValue { StringValue = "pprof-gzip-base64" }
-                },
-                new KeyValue
-                {
-                    Key = "profiling.data.type",
-                    Value = new AnyValue { StringValue = "cpu" }
-                }
-            };
-        }
-
-        private static void AllShouldHaveBasicAttributes(List<LogRecord> logRecords, List<KeyValue> attributes)
-        {
-            foreach (var logRecord in logRecords)
-            {
-                foreach (var attribute in attributes)
-                {
-                    logRecord.Attributes.Should().ContainEquivalentOf(attribute);
-                }
             }
         }
 
@@ -198,27 +143,27 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             resource.Attributes.Should().Contain(value => value.Key == "process.pid");
         }
 
-        private static void HasNameAndVersionSet(InstrumentationLibrary instrumentationLibrary)
+        private static void HasNameAndVersionSet(InstrumentationScope instrumentationScope)
         {
-            instrumentationLibrary.Name.Should().Be("otel.profiling");
-            instrumentationLibrary.Version.Should().Be("0.1.0");
+            instrumentationScope.Name.Should().Be("otlp.profiles@154f871");
+            instrumentationScope.Version.Should().Be("0.0.1");
         }
 
         private static bool ContainStackTraceForClassHierarchy(Profile profile, string expectedStackTrace)
         {
             var frames = profile.Locations
                                 .SelectMany(location => location.Lines)
-                                .Select(line => line.FunctionId)
-                                .Select(functionId => profile.Functions[(int)functionId - 1])
-                                .Select(function => profile.StringTables[(int)function.Name]);
+                                .Select(line => line.FunctionIndex)
+                                .Select(functionIndex => profile.Functions[(int)functionIndex])
+                                .Select(function => profile.StringTables[(int)function.NameIndex]);
 
             var stackTrace = string.Join("\n", frames);
             return stackTrace.Contains(expectedStackTrace);
         }
 
-        private async Task DumpLogRecords(ExportLogsServiceRequest[] logsData)
+        private async Task DumpProfilesData(ExportProfilesServiceRequest[] profilesData)
         {
-            foreach (var data in logsData)
+            foreach (var data in profilesData)
             {
                 await using var memoryStream = new MemoryStream();
                 await System.Text.Json.JsonSerializer.SerializeAsync(memoryStream, data);

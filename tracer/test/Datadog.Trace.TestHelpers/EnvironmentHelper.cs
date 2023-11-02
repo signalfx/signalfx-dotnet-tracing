@@ -551,10 +551,10 @@ namespace Datadog.Trace.TestHelpers
             return tcpUdpAgent;
         }
 
-        public MockOtelLogsCollector GetMockOtelLogsCollector()
+        public MockOtelProfilesCollector GetMockOtelProfilesCollector()
         {
             var logsCollectorPort = TcpPortProvider.GetOpenPort();
-            var logsCollector = new MockOtelLogsCollector(logsCollectorPort);
+            var logsCollector = new MockOtelProfilesCollector(logsCollectorPort);
 
             _output.WriteLine($"Assigned port {logsCollector.Port} for the logsCollectorPort.");
 

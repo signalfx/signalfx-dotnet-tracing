@@ -125,25 +125,7 @@ namespace OpenTelemetry.TestHelpers.Proto.Common.V1
     }
 
     [global::ProtoBuf.ProtoContract()]
-    [global::System.Obsolete]
-    public partial class StringKeyValue : global::ProtoBuf.IExtensible
-    {
-        private global::ProtoBuf.IExtension __pbn__extensionData;
-        global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-            => global::ProtoBuf.Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
-
-        [global::ProtoBuf.ProtoMember(1, Name = @"key")]
-        [global::System.ComponentModel.DefaultValue("")]
-        public string Key { get; set; } = "";
-
-        [global::ProtoBuf.ProtoMember(2, Name = @"value")]
-        [global::System.ComponentModel.DefaultValue("")]
-        public string Value { get; set; } = "";
-
-    }
-
-    [global::ProtoBuf.ProtoContract()]
-    public partial class InstrumentationLibrary : global::ProtoBuf.IExtensible
+    public partial class InstrumentationScope : global::ProtoBuf.IExtensible
     {
         private global::ProtoBuf.IExtension __pbn__extensionData;
         global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -156,6 +138,12 @@ namespace OpenTelemetry.TestHelpers.Proto.Common.V1
         [global::ProtoBuf.ProtoMember(2, Name = @"version")]
         [global::System.ComponentModel.DefaultValue("")]
         public string Version { get; set; } = "";
+
+        [global::ProtoBuf.ProtoMember(3, Name = @"attributes")]
+        public global::System.Collections.Generic.List<KeyValue> Attributes { get; } = new global::System.Collections.Generic.List<KeyValue>();
+
+        [global::ProtoBuf.ProtoMember(4, Name = @"dropped_attributes_count")]
+        public uint DroppedAttributesCount { get; set; }
 
     }
 

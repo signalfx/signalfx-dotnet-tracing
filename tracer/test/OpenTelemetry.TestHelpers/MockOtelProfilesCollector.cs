@@ -4,16 +4,15 @@ using System;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Threading;
-using OpenTelemetry.TestHelpers.Proto.Collector.Logs.V1;
-using OpenTelemetry.TestHelpers.Proto.Logs.V1;
+using OpenTelemetry.TestHelpers.Proto.Collector.Profiles.V1;
 
 namespace OpenTelemetry.TestHelpers;
 
-public class MockOtelLogsCollector : IDisposable
+public class MockOtelProfilesCollector : IDisposable
 {
     private readonly HttpListener _listener;
 
-    public MockOtelLogsCollector(int port = 4318)
+    public MockOtelProfilesCollector(int port = 4318)
     {
         var listener = new HttpListener();
         listener.Prefixes.Add($"http://127.0.0.1:{port}/");
@@ -34,7 +33,7 @@ public class MockOtelLogsCollector : IDisposable
     /// </summary>
     public int Port { get; }
 
-    public ConcurrentQueue<ExportLogsServiceRequest> LogsData { get; } = new();
+    public ConcurrentQueue<ExportProfilesServiceRequest> ProfilesData { get; } = new();
 
     public void Dispose()
     {
@@ -49,15 +48,15 @@ public class MockOtelLogsCollector : IDisposable
             {
                 var ctx = _listener.GetContext();
 
-                var logsData = ProtoBuf.Serializer.Deserialize<ExportLogsServiceRequest>(ctx.Request.InputStream);
+                var profilesData = ProtoBuf.Serializer.Deserialize<ExportProfilesServiceRequest>(ctx.Request.InputStream);
 
-                LogsData.Enqueue(logsData);
+                ProfilesData.Enqueue(profilesData);
 
                 ctx.Response.ContentType = "application/x-protobuf";
 
-                var exportLogsServiceResponse = new ExportLogsServiceResponse();
+                var exportProfilesServiceResponse = new ExportProfilesServiceResponse();
 
-                ProtoBuf.Serializer.Serialize(ctx.Response.OutputStream, exportLogsServiceResponse);
+                ProtoBuf.Serializer.Serialize(ctx.Response.OutputStream, exportProfilesServiceResponse);
                 ctx.Response.Close();
             }
             catch (HttpListenerException)
