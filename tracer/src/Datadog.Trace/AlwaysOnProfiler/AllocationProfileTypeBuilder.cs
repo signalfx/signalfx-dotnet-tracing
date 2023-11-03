@@ -23,7 +23,7 @@ internal class AllocationProfileTypeBuilder : ProfileTypeBuilder<AllocationSampl
 
     protected override void SetProfileTypeInformation(ProfileLookupTables profileLookupTables, ProfileType profileType)
     {
-        profileType.SampleRate = 100_000; // OTLP_PROFILES: TODO: Get this value from config and validate it.
+        profileType.SampleRate = 100_000;
         profileType.TypeIndex = profileLookupTables.GetStringIndex("allocation");
         profileType.UnitIndex = profileLookupTables.GetStringIndex("bytes");
     }
