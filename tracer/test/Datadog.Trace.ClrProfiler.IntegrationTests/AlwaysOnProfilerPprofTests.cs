@@ -2,7 +2,7 @@
 
 // Thread Sampling is not supported by .NET Framework and lower versions of .NET Core
 
-#if NETCOREAPP3_1_OR_GREATER
+#if NET6_0_OR_GREATER
 
 using System;
 using System.Collections.Generic;
