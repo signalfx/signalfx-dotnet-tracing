@@ -714,9 +714,11 @@ namespace Datadog.Tracer.OpenTelemetry.Proto.Common.V1
         public ArrayValue() { }
         public System.Collections.Generic.List<Datadog.Tracer.OpenTelemetry.Proto.Common.V1.AnyValue> Values { get; }
     }
-    public class InstrumentationLibrary
+    public class InstrumentationScope
     {
-        public InstrumentationLibrary() { }
+        public InstrumentationScope() { }
+        public System.Collections.Generic.List<Datadog.Tracer.OpenTelemetry.Proto.Common.V1.KeyValue> Attributes { get; }
+        public uint DroppedAttributesCount { get; set; }
         [System.ComponentModel.DefaultValue("")]
         public string Name { get; set; }
         [System.ComponentModel.DefaultValue("")]
@@ -734,87 +736,121 @@ namespace Datadog.Tracer.OpenTelemetry.Proto.Common.V1
         public KeyValueList() { }
         public System.Collections.Generic.List<Datadog.Tracer.OpenTelemetry.Proto.Common.V1.KeyValue> Values { get; }
     }
-    [System.Obsolete]
-    public class StringKeyValue
-    {
-        public StringKeyValue() { }
-        [System.ComponentModel.DefaultValue("")]
-        public string Key { get; set; }
-        [System.ComponentModel.DefaultValue("")]
-        public string Value { get; set; }
-    }
 }
-namespace Datadog.Tracer.OpenTelemetry.Proto.Logs.V1
+namespace Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1
 {
-    public class InstrumentationLibraryLogs
+    public enum AggregationTemporality
     {
-        public InstrumentationLibraryLogs() { }
-        public Datadog.Tracer.OpenTelemetry.Proto.Common.V1.InstrumentationLibrary InstrumentationLibrary { get; set; }
-        public System.Collections.Generic.List<Datadog.Tracer.OpenTelemetry.Proto.Logs.V1.LogRecord> Logs { get; }
-        [System.ComponentModel.DefaultValue("")]
-        public string SchemaUrl { get; set; }
+        AggregationTemporalityUnspecified = 0,
+        AggregationTemporalityDelta = 1,
+        AggregationTemporalityCumulative = 2,
     }
-    public class LogRecord
+    public class AttributeSet
     {
-        public LogRecord() { }
+        public AttributeSet() { }
         public System.Collections.Generic.List<Datadog.Tracer.OpenTelemetry.Proto.Common.V1.KeyValue> Attributes { get; }
-        public Datadog.Tracer.OpenTelemetry.Proto.Common.V1.AnyValue Body { get; set; }
         public uint DroppedAttributesCount { get; set; }
-        public uint Flags { get; set; }
-        [System.ComponentModel.DefaultValue("")]
-        public string Name { get; set; }
-        public Datadog.Tracer.OpenTelemetry.Proto.Logs.V1.SeverityNumber SeverityNumber { get; set; }
-        [System.ComponentModel.DefaultValue("")]
-        public string SeverityText { get; set; }
+    }
+    public class Function
+    {
+        public Function() { }
+        public uint FilenameIndex { get; set; }
+        public uint NameIndex { get; set; }
+        public uint StartLine { get; set; }
+        public uint SystemNameIndex { get; set; }
+    }
+    public class Line
+    {
+        public Line() { }
+        public uint FunctionIndex { get; set; }
+        public uint line { get; set; }
+    }
+    public class Link
+    {
+        public Link() { }
         public byte[] SpanId { get; set; }
-        public ulong TimeUnixNano { get; set; }
         public byte[] TraceId { get; set; }
     }
-    public enum LogRecordFlags
+    public class Location
     {
-        LogRecordFlagUnspecified = 0,
-        LogRecordFlagTraceFlagsMask = 255,
+        public Location() { }
+        public ulong Address { get; set; }
+        public uint[] AttributeSetIndices { get; set; }
+        public System.Collections.Generic.List<Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1.Line> Lines { get; }
+        public uint MappingIndex { get; set; }
     }
-    public class LogsData
+    public class Mapping
     {
-        public LogsData() { }
-        public System.Collections.Generic.List<Datadog.Tracer.OpenTelemetry.Proto.Logs.V1.ResourceLogs> ResourceLogs { get; }
+        public Mapping() { }
+        public uint[] AttributeSetIndices { get; set; }
+        public uint BuildIdIndex { get; set; }
+        public ulong FileOffset { get; set; }
+        public uint FilenameIndex { get; set; }
+        public ulong MemoryLimit { get; set; }
+        public ulong MemoryStart { get; set; }
+        public Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1.SymbolFidelity SymbolicInfo { get; set; }
     }
-    public class ResourceLogs
+    public class Profile
     {
-        public ResourceLogs() { }
-        public System.Collections.Generic.List<Datadog.Tracer.OpenTelemetry.Proto.Logs.V1.InstrumentationLibraryLogs> InstrumentationLibraryLogs { get; }
+        public Profile() { }
+        public System.Collections.Generic.List<Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1.AttributeSet> AttributeSets { get; }
+        public System.Collections.Generic.List<Datadog.Tracer.OpenTelemetry.Proto.Common.V1.KeyValue> Attributes { get; }
+        public uint DroppedAttributesCount { get; set; }
+        public ulong EndTimeUnixNano { get; set; }
+        public System.Collections.Generic.List<Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1.Function> Functions { get; }
+        public System.Collections.Generic.List<Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1.Link> Links { get; }
+        public System.Collections.Generic.List<Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1.Location> Locations { get; }
+        public System.Collections.Generic.List<Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1.Mapping> Mappings { get; }
+        public byte[] OriginalPayload { get; set; }
+        public byte[] ProfileId { get; set; }
+        public System.Collections.Generic.List<Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1.ProfileType> ProfileTypes { get; }
+        public System.Collections.Generic.List<Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1.Stacktrace> Stacktraces { get; }
+        public ulong StartTimeUnixNano { get; set; }
+        public System.Collections.Generic.List<string> StringTables { get; }
+    }
+    public class ProfileType
+    {
+        public ProfileType() { }
+        public Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1.AggregationTemporality AggregationTemporality { get; set; }
+        public uint[] AttributeSetIndices { get; set; }
+        public uint[] LinkIndices { get; set; }
+        public ulong SampleRate { get; set; }
+        public uint[] StacktraceIndices { get; set; }
+        public ulong[] Timestamps { get; set; }
+        public uint TypeIndex { get; set; }
+        public uint UnitIndex { get; set; }
+        public long[] Values { get; set; }
+    }
+    public class ProfilesData
+    {
+        public ProfilesData() { }
+        public System.Collections.Generic.List<Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1.ResourceProfiles> ResourceProfiles { get; }
+    }
+    public class ResourceProfiles
+    {
+        public ResourceProfiles() { }
         public Datadog.Tracer.OpenTelemetry.Proto.Resource.V1.Resource Resource { get; set; }
         [System.ComponentModel.DefaultValue("")]
         public string SchemaUrl { get; set; }
+        public System.Collections.Generic.List<Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1.ScopeProfiles> ScopeProfiles { get; }
     }
-    public enum SeverityNumber
+    public class ScopeProfiles
     {
-        SeverityNumberUnspecified = 0,
-        SeverityNumberTrace = 1,
-        SeverityNumberTrace2 = 2,
-        SeverityNumberTrace3 = 3,
-        SeverityNumberTrace4 = 4,
-        SeverityNumberDebug = 5,
-        SeverityNumberDebug2 = 6,
-        SeverityNumberDebug3 = 7,
-        SeverityNumberDebug4 = 8,
-        SeverityNumberInfo = 9,
-        SeverityNumberInfo2 = 10,
-        SeverityNumberInfo3 = 11,
-        SeverityNumberInfo4 = 12,
-        SeverityNumberWarn = 13,
-        SeverityNumberWarn2 = 14,
-        SeverityNumberWarn3 = 15,
-        SeverityNumberWarn4 = 16,
-        SeverityNumberError = 17,
-        SeverityNumberError2 = 18,
-        SeverityNumberError3 = 19,
-        SeverityNumberError4 = 20,
-        SeverityNumberFatal = 21,
-        SeverityNumberFatal2 = 22,
-        SeverityNumberFatal3 = 23,
-        SeverityNumberFatal4 = 24,
+        public ScopeProfiles() { }
+        public System.Collections.Generic.List<Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1.Profile> Profiles { get; }
+        [System.ComponentModel.DefaultValue("")]
+        public string SchemaUrl { get; set; }
+        public Datadog.Tracer.OpenTelemetry.Proto.Common.V1.InstrumentationScope Scope { get; set; }
+    }
+    public class Stacktrace
+    {
+        public Stacktrace() { }
+        public uint[] LocationIndices { get; set; }
+    }
+    public enum SymbolFidelity
+    {
+        SymbolFidelityUnspecified = 0,
+        SymbolFidelityFull = 1,
     }
 }
 namespace Datadog.Tracer.OpenTelemetry.Proto.Resource.V1
