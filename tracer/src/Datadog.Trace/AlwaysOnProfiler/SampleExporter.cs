@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Logging;
 using Datadog.Tracer.OpenTelemetry.Proto.Common.V1;
-using Datadog.Tracer.OpenTelemetry.Proto.Logs.V1;
+using Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1;
 using Datadog.Tracer.OpenTelemetry.Proto.Resource.V1;
 
 namespace Datadog.Trace.AlwaysOnProfiler;
@@ -16,36 +15,31 @@ internal class SampleExporter
 {
     private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(SampleExporter));
 
-    private readonly ILogSender _logSender;
-    private readonly IList<ILogRecordAppender> _logRecordAppenders;
+    private readonly IOtlpSender _otlpSender;
+    private readonly IProfileBuilder _profileBuilder;
 
-    private readonly LogsData _logsData;
+    private readonly ProfilesData _profilesData;
 
-    public SampleExporter(ImmutableTracerSettings tracerSettings, ILogSender logSender, IList<ILogRecordAppender> logRecordAppenders)
+    public SampleExporter(ImmutableTracerSettings tracerSettings, IOtlpSender otlpSender, IProfileBuilder profileBuilder)
     {
-        _logSender = logSender ?? throw new ArgumentNullException(nameof(logSender));
-        _logRecordAppenders = logRecordAppenders ?? throw new ArgumentNullException(nameof(logRecordAppenders));
-        // The same LogsData instance is used on all export messages. With the exception of the list of
-        // LogRecords, the Logs property, all other fields are prepopulated.
-        _logsData = CreateLogsData(tracerSettings);
+        _otlpSender = otlpSender ?? throw new ArgumentNullException(nameof(otlpSender));
+        _profileBuilder = profileBuilder ?? throw new ArgumentNullException(nameof(profileBuilder));
+
+        // The same ProfilesData instance is used on all export messages. With the exception of the list of
+        // Profiles, the Profiles property, all other fields are pre-populated.
+        _profilesData = CreateProfilesData(tracerSettings);
     }
 
     public void Export()
     {
-        var logRecords = _logsData.ResourceLogs[0].InstrumentationLibraryLogs[0].Logs;
+        var profiles = _profilesData.ResourceProfiles[0].ScopeProfiles[0].Profiles;
         try
         {
-            foreach (var logRecordAppender in _logRecordAppenders)
+            var profile = _profileBuilder.Build();
+            if (profile != null && profile.ProfileTypes.Count > 0)
             {
-                // Accumulate results in logRecords:
-                // allocation samples appender creates at most 1 log record,
-                // cpu samples appender can create 2
-                logRecordAppender.AppendTo(logRecords);
-            }
-
-            if (logRecords.Count > 0)
-            {
-                _logSender.Send(_logsData);
+                profiles.Add(profile);
+                _otlpSender.Send(_profilesData);
             }
         }
         catch (Exception ex)
@@ -54,13 +48,13 @@ internal class SampleExporter
         }
         finally
         {
-            // The exporter reuses the logRecords object, but the actual log records are not
-            // needed after serialization, release the log records so they can be garbage collected.
-            logRecords.Clear();
+            // The exporter reuses the profiles object, but the individual Profile objects are not
+            // needed after serialization, release the Profile objects so they can be garbage collected.
+            profiles.Clear();
         }
     }
 
-    private static LogsData CreateLogsData(ImmutableTracerSettings tracerSettings)
+    private static ProfilesData CreateProfilesData(ImmutableTracerSettings tracerSettings)
     {
         var resource = new Resource();
         var profilingAttributes = OtelResource
@@ -76,20 +70,24 @@ internal class SampleExporter
                                              });
         resource.Attributes.AddRange(profilingAttributes);
 
-        return new LogsData
+        return new ProfilesData
         {
-            ResourceLogs =
+            ResourceProfiles =
             {
-                new ResourceLogs
+                new ResourceProfiles
                 {
-                    InstrumentationLibraryLogs =
+                    Resource = resource,
+                    ScopeProfiles =
                     {
-                        new InstrumentationLibraryLogs
+                        new ScopeProfiles
                         {
-                            InstrumentationLibrary = GdiProfilingConventions.OpenTelemetry.InstrumentationLibrary
+                            Scope = new InstrumentationScope
+                            {
+                                Name = "otlp.profiles@154f871",
+                                Version = "0.0.1"
+                            }
                         }
-                    },
-                    Resource = resource
+                    }
                 }
             }
         };

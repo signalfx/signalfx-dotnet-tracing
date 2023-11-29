@@ -1,8 +1,7 @@
 ﻿[
   {
     Timestamp: {
-      Nanoseconds: 1649267460807000000,
-      Milliseconds: 1649267460807
+      Nanoseconds: 1649267460807000000
     },
     ManagedId: Id_1,
     ThreadName: ,
@@ -30,12 +29,10 @@
   },
   {
     Timestamp: {
-      Nanoseconds: 1649267460807000000,
-      Milliseconds: 1649267460807
+      Nanoseconds: 1649267460807000000
     },
     ManagedId: Id_1,
     ThreadName: .NET ThreadPool Worker,
-    ThreadIndex: 3,
     Frames: [
       Interop.Kernel32.GetQueuedCompletionStatus(System.IntPtr, System.Int32&, System.UIntPtr&, System.IntPtr&, System.Int32),
       System.Threading.LowLevelLifoSemaphore.WaitForSignal(System.Int32),
@@ -47,12 +44,10 @@
   },
   {
     Timestamp: {
-      Nanoseconds: 1649267460807000000,
-      Milliseconds: 1649267460807
+      Nanoseconds: 1649267460807000000
     },
     ManagedId: Id_1,
     ThreadName: .NET ThreadPool Gate,
-    ThreadIndex: 4,
     Frames: [
       System.Threading.WaitHandle.WaitOneNoCheck(System.Int32),
       System.Threading.WaitHandle.WaitOne(System.Int32),
@@ -63,12 +58,10 @@
   },
   {
     Timestamp: {
-      Nanoseconds: 1649267460807000000,
-      Milliseconds: 1649267460807
+      Nanoseconds: 1649267460807000000
     },
     ManagedId: Id_1,
     ThreadName: .NET ThreadPool Worker,
-    ThreadIndex: 5,
     Frames: [
       Interop.Kernel32.GetQueuedCompletionStatus(System.IntPtr, System.Int32&, System.UIntPtr&, System.IntPtr&, System.Int32),
       System.Threading.LowLevelLifoSemaphore.WaitForSignal(System.Int32),
@@ -80,12 +73,10 @@
   },
   {
     Timestamp: {
-      Nanoseconds: 1649267460807000000,
-      Milliseconds: 1649267460807
+      Nanoseconds: 1649267460807000000
     },
     ManagedId: Id_1,
     ThreadName: .NET ThreadPool Worker,
-    ThreadIndex: 7,
     Frames: [
       Interop.Kernel32.GetQueuedCompletionStatus(System.IntPtr, System.Int32&, System.UIntPtr&, System.IntPtr&, System.Int32),
       System.Threading.LowLevelLifoSemaphore.WaitForSignal(System.Int32),
@@ -97,12 +88,10 @@
   },
   {
     Timestamp: {
-      Nanoseconds: 1649267460807000000,
-      Milliseconds: 1649267460807
+      Nanoseconds: 1649267460807000000
     },
     ManagedId: Id_1,
     ThreadName: .NET ThreadPool Worker,
-    ThreadIndex: 8,
     Frames: [
       System.Threading.Monitor.Wait(System.Object, System.Int32),
       System.Threading.ManualResetEventSlim.Wait(System.Int32, System.Threading.CancellationToken),
@@ -139,12 +128,10 @@
   },
   {
     Timestamp: {
-      Nanoseconds: 1649267460807000000,
-      Milliseconds: 1649267460807
+      Nanoseconds: 1649267460807000000
     },
     ManagedId: Id_1,
     ThreadName: .NET ThreadPool Worker,
-    ThreadIndex: 9,
     Frames: [
       Interop.Kernel32.GetQueuedCompletionStatus(System.IntPtr, System.Int32&, System.UIntPtr&, System.IntPtr&, System.Int32),
       System.Threading.LowLevelLifoSemaphore.WaitForSignal(System.Int32),

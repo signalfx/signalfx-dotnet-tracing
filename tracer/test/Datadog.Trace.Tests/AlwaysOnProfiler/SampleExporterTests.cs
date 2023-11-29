@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Datadog.Trace.AlwaysOnProfiler;
 using Datadog.Trace.Configuration;
-using Datadog.Tracer.OpenTelemetry.Proto.Logs.V1;
+using Datadog.Tracer.OpenTelemetry.Proto.Profiles.V1;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Xunit;
@@ -11,30 +12,49 @@ namespace Datadog.Trace.Tests.AlwaysOnProfiler;
 public class SampleExporterTests
 {
     [Fact]
-    public void Logs_data_is_reused_between_export_attempts()
+    public void Profile_data_is_reused_between_export_attempts()
     {
-        var testAppender = new TestAppender();
+        var testProfileBuilder = new TestProfileBuilder();
         var testSender = new TestSender();
-        var exporter = new SampleExporter(DefaultSettings(), testSender, new ILogRecordAppender[] { testAppender });
+        var exporter = new SampleExporter(DefaultSettings(), testSender, testProfileBuilder);
+
+        ProfilesData fstProfilesData, sndProfilesData;
 
         exporter.Export();
 
         using (new AssertionScope())
         {
-            testSender.SentLogData.Should().HaveCount(1);
-            testSender.LogRecordSnapshots[0].Name.Should().Be("1");
+            testSender.SentProfilesData.Should().HaveCount(1);
+
+            fstProfilesData = testSender.SentProfilesData[0];
+
+            fstProfilesData.ResourceProfiles.Should().HaveCount(1);
+            fstProfilesData.ResourceProfiles[0].ScopeProfiles.Should().HaveCount(1);
+
+            testSender.AllSentProfiles.Should().HaveCount(1);
+            var profile = testSender.AllSentProfiles[0];
+            profile.ProfileId.Should().BeEquivalentTo(Guid.Empty.ToByteArray());
+            profile.StartTimeUnixNano.Should().Be(0);
         }
 
         exporter.Export();
 
         using (new AssertionScope())
         {
-            testSender.SentLogData.Should().HaveCount(2);
-            testSender.SentLogData[0].Should().BeSameAs(testSender.SentLogData[1]);
+            testSender.SentProfilesData.Should().HaveCount(2);
 
-            testSender.LogRecordSnapshots.Should().HaveCount(2);
-            testSender.LogRecordSnapshots[1].Name.Should().Be("2");
+            sndProfilesData = testSender.SentProfilesData[1];
+
+            sndProfilesData.ResourceProfiles.Should().HaveCount(1);
+            sndProfilesData.ResourceProfiles[0].ScopeProfiles.Should().HaveCount(1);
+
+            testSender.AllSentProfiles.Should().HaveCount(2);
+            var profile = testSender.AllSentProfiles[1];
+            profile.ProfileId.Should().BeEquivalentTo(Guid.Empty.ToByteArray());
+            profile.StartTimeUnixNano.Should().Be(1);
         }
+
+        fstProfilesData.ResourceProfiles.Should().BeSameAs(sndProfilesData.ResourceProfiles);
     }
 
     private static ImmutableTracerSettings DefaultSettings()
@@ -46,17 +66,39 @@ public class SampleExporterTests
         });
     }
 
-    private class TestAppender : ILogRecordAppender
+    private class TestSender : IOtlpSender
     {
-        private int _count;
+        public List<ProfilesData> SentProfilesData { get; } = new();
 
-        public void AppendTo(List<LogRecord> results)
+        public List<Profile> AllSentProfiles { get; } = new();
+
+        public void Send(ProfilesData profilesData)
         {
-            _count += 1;
-            results.Add(new LogRecord
+            SentProfilesData.Add(profilesData);
+
+            // Capture all profiles that were sent.
+            profilesData.ResourceProfiles.ForEach(
+                resourceProfile => resourceProfile.ScopeProfiles.ForEach(
+                    scpProfile => AllSentProfiles.AddRange(scpProfile.Profiles)));
+        }
+    }
+
+    private class TestProfileBuilder : IProfileBuilder
+    {
+        private ulong _buildCallsCount = 0;
+
+        public Profile Build()
+        {
+            var profile = new Profile
             {
-                Name = _count.ToString()
-            });
+                ProfileId = Guid.Empty.ToByteArray(),
+                StartTimeUnixNano = _buildCallsCount++
+            };
+
+            // Exporter only exports if there is at least one profile type.
+            profile.ProfileTypes.Add(new ProfileType());
+
+            return profile;
         }
     }
 }

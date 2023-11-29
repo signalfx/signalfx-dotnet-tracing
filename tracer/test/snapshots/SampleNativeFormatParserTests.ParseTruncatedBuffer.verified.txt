@@ -1,8 +1,7 @@
 ﻿[
   {
     Timestamp: {
-      Nanoseconds: 1649268034960000000,
-      Milliseconds: 1649268034960
+      Nanoseconds: 1649268034960000000
     },
     ManagedId: Id_1,
     ThreadName: ,
@@ -19,12 +18,10 @@
   },
   {
     Timestamp: {
-      Nanoseconds: 1649268034960000000,
-      Milliseconds: 1649268034960
+      Nanoseconds: 1649268034960000000
     },
     ManagedId: Id_2,
     ThreadName: .NET ThreadPool Worker,
-    ThreadIndex: 3,
     Frames: [
       System.Net.Sockets.SocketPal.Connect(System.Net.Sockets.SafeSocketHandle, System.Byte[], System.Int32),
       System.Net.Sockets.Socket.DoConnect(System.Net.EndPoint, System.Net.Internals.SocketAddress),

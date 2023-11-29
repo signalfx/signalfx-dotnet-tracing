@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Datadog.Trace.AlwaysOnProfiler.LogRecordAppenders;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Logging;
 
@@ -78,22 +77,21 @@ namespace Datadog.Trace.AlwaysOnProfiler
         private static SampleExporter GetConfiguredExporter(ImmutableTracerSettings tracerSettings, bool cpuProfilingAvailable, bool memoryProfilingAvailable)
         {
             var buffer = new byte[BufferSize];
+            var cpuProfileTypeBuilder = new CpuProfileTypeBuilder(tracerSettings.ThreadSamplingPeriod, buffer);
+            var allocationProfileTypeBuilder = new AllocationProfileTypeBuilder(buffer);
 
-            var sampleProcessor = new ThreadSampleProcessor(tracerSettings);
-
-            var cpuLogRecordsAppender = new CpuLogRecordAppender(sampleProcessor, buffer);
-            var allocationLogRecordsAppender = new AllocationLogRecordAppender(sampleProcessor, buffer);
-
-            var appenders = cpuProfilingAvailable switch
+            List<IProfileTypeBuilder> profileTypeBuilders = cpuProfilingAvailable switch
             {
-                true when memoryProfilingAvailable => new ILogRecordAppender[] { cpuLogRecordsAppender, allocationLogRecordsAppender },
-                true => new ILogRecordAppender[] { cpuLogRecordsAppender },
-                _ => new ILogRecordAppender[] { allocationLogRecordsAppender }
+                // The doubling of the cpuProfileTypeBuilder is intentional: to preserve behavior of SFx.NET original implementation.
+                true when memoryProfilingAvailable => new() { cpuProfileTypeBuilder, cpuProfileTypeBuilder, allocationProfileTypeBuilder },
+                true => new() { cpuProfileTypeBuilder, cpuProfileTypeBuilder },
+                _ => new() { allocationProfileTypeBuilder }
             };
 
-            var logSender = new OtlpHttpLogSender(tracerSettings.ExporterSettings.LogsEndpointUrl);
+            var profileBuilder = new ProfileBuilder(profileTypeBuilders);
+            var otlpHttpSender = new OtlpHttpSender(tracerSettings.ExporterSettings.LogsEndpointUrl);
 
-            return new SampleExporter(tracerSettings, logSender, appenders);
+            return new SampleExporter(tracerSettings, otlpHttpSender, profileBuilder);
         }
     }
 }
