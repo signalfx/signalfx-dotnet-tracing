@@ -336,7 +336,6 @@ jobs:
     #     Start-CosmosDbEmulator -Timeout 300
     # Workaround around long name being hit in MultiDomainHostTests.WorksOutsideTheGAC tests
     - name: install Microsoft.Net.Component.4.6.1.TargetingPack
-      if: ${{ matrix.target == 'BuildAndRunWindowsRegressionTests' }}
       run: |
           Set-Location "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
           $InstallPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise"
