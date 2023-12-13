@@ -308,7 +308,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        machine: [ windows-2022 ]
+        machine: [ windows-2019 ] # Use 2019 to include net461
         platform: [ x64 ]
         framework: [ net461, netcoreapp3.1, net6.0, net7.0 ]
         target: [ BuildAndRunWindowsIntegrationTests, BuildAndRunWindowsRegressionTests ]
