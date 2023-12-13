@@ -12,6 +12,9 @@
 
     <!-- WebClient is obsolete -->
     <NoWarn>SYSLIB0014</NoWarn>
+
+    <!-- .NET 8 gives warnings when building against .NET Core 2.1 -->
+    <NoWarn>$(NoWarn);NU1902;NU1903</NoWarn>
   </PropertyGroup>
 
   <!-- StyleCop -->
