@@ -55,7 +55,7 @@ namespace GeneratePackageVersions
 
             foreach (var entry in entries)
             {
-                var project = solution.GetProject(entry.SampleProjectName);
+                var project = solution.AllProjects.First(p => p.Name.Equals(entry.SampleProjectName));
                 var supportedTargetFrameworks = project
                                                .GetTargetFrameworks()
                                                .Select(x => (TargetFramework)new TargetFramework.TargetFrameworkTypeConverter().ConvertFrom(x));

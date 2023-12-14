@@ -62,7 +62,7 @@ partial class Build
         {
             var buildDirectory = NativeLoaderProject.Directory;
             CMake.Value(arguments: ".", workingDirectory: buildDirectory);
-            Make.Value(workingDirectory: buildDirectory);
+            Make.Value(arguments: string.Empty, workingDirectory: buildDirectory);
         });
 
     Target PublishNativeLoader => _ => _

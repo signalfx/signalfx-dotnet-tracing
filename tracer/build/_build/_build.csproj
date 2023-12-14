@@ -2,11 +2,13 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <RootNamespace></RootNamespace>
-    <NoWarn>CS0649;CS0169;SA1652</NoWarn>
+    <NoWarn>CS0649;CS0169;CS0618;SA1652</NoWarn>
+    <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
     <NukeRootDirectory>..\..\..</NukeRootDirectory>
     <NukeScriptDirectory>..\..</NukeScriptDirectory>
+    <NukeTelemetryVersion>1</NukeTelemetryVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,7 +20,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="NuGet.Protocol" Version="5.11.5" />
-    <PackageReference Include="Nuke.Common" Version="5.0.2" />
+    <PackageReference Include="Nuke.Common" Version="7.0.6" />
     <PackageReference Include="Colorful.Console" Version="1.2.15" />
     <PackageReference Include="Octokit.GraphQL" Version="0.1.8-beta" />
     <PackageReference Include="Perfolizer" Version="0.2.1" />

@@ -89,13 +89,13 @@ partial class Build
     Target BuildIisSampleApp => _ => _
         .Description("Rebuilds an IIS sample app")
         .Requires(() => SampleName)
-        .Requires(() => Solution.GetProject(SampleName) != null)
+        .Requires(() => Solution.AllProjects.FirstOrDefault(p => p.Name.Equals(SampleName)) != null)
         .Executes(() =>
         {
             MSBuild(s => s
                 .SetConfiguration(BuildConfiguration)
                 .SetTargetPlatform(TargetPlatform)
-                .SetProjectFile(Solution.GetProject(SampleName)));
+                .SetProjectFile(Solution.AllProjects.First(p => p.Name.Equals(SampleName))));
         });
 
     Target RunIisSample => _ => _
@@ -131,7 +131,7 @@ partial class Build
             envVars.AddTracerEnvironmentVariables(MonitoringHomeDirectory);
             envVars.AddExtraEnvVariables(ExtraEnvVars);
 
-            string project = Solution.GetProject(SampleName)?.Path;
+            string project = Solution.AllProjects.First(p => p.Name == SampleName)?.Path;
             if (project is not null)
             {
                 Logger.Info($"Running sample '{SampleName}'");
@@ -171,7 +171,7 @@ partial class Build
        .DependsOn(Clean, Restore, CreateRequiredDirectories, CompileManagedSrc, PublishManagedProfiler)
        .Executes(async () =>
        {
-           var testDir = Solution.GetProject(Projects.ClrProfilerIntegrationTests).Directory;
+           var testDir = Solution.AllProjects.First(p => p.Name == Projects.ClrProfilerIntegrationTests).Directory;
 
            var versionGenerator = new PackageVersionGenerator(TracerDirectory, testDir);
            await versionGenerator.GenerateVersions(Solution);
@@ -205,7 +205,7 @@ partial class Build
             var dependabotProj = TracerDirectory / "dependabot"  /  "Datadog.Dependabot.Vendors.csproj";
             DependabotFileManager.UpdateVendors(dependabotProj);
 
-            var vendorDirectory = Solution.GetProject(Projects.DatadogTrace).Directory / "Vendors";
+            var vendorDirectory = Solution.AllProjects.First(p => p.Name == Projects.DatadogTrace).Directory / "Vendors";
             var downloadDirectory = TemporaryDirectory / "Downloads";
             EnsureCleanDirectory(downloadDirectory);
             await UpdateVendorsTool.UpdateVendors(downloadDirectory, vendorDirectory);

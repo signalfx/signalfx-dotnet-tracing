@@ -72,7 +72,7 @@ partial class Build
             {
                 // On Alpine, we do not have permission to access the file libunwind-prefix/src/libunwind/config/config.guess
                 // Make the whole folder and its content accessible by everyone to make sure the upload process does not fail
-                Chmod.Value.Invoke(" -R 777 " + ProfilerLinuxBuildDirectory);
+                Chmod.Value.Invoke(" -R 777 " + ProfilerLinuxBuildDirectory.ToString());
             }
         });
 
@@ -87,9 +87,9 @@ partial class Build
             EnsureExistingDirectory(workingDirectory);
 
             var exePath = workingDirectory / "Datadog.Profiler.Native.Tests";
-            Chmod.Value.Invoke("+x " + exePath);
+            Chmod.Value.Invoke("+x " + exePath.ToString());
 
-            var testExe = ToolResolver.GetLocalTool(exePath);
+            var testExe = ToolResolver.GetTool(exePath);
             testExe("--gtest_output=xml", workingDirectory: workingDirectory);
         });
 
@@ -128,7 +128,7 @@ partial class Build
             EnsureExistingDirectory(workingDirectory);
 
             var exePath = workingDirectory / "Datadog.Profiler.Native.Tests.exe";
-            var testExe = ToolResolver.GetLocalTool(exePath);
+            var testExe = ToolResolver.GetTool(exePath);
             testExe("--gtest_output=xml", workingDirectory: workingDirectory);
         });
 
@@ -212,7 +212,7 @@ partial class Build
         .Unlisted()
         .Executes(() =>
         {
-            var samplesToBuild = ProfilerSamplesSolution.GetProjects("*");
+            var samplesToBuild = ProfilerSamplesSolution.AllProjects;
 
             // Always x64
             DotNetBuild(x => x
@@ -234,7 +234,7 @@ partial class Build
             EnsureExistingDirectory(ProfilerTestLogsDirectory);
 
             var integrationTestProjects = ProfilerDirectory.GlobFiles("test/*.IntegrationTests/*.csproj")
-                .Select(x => ProfilerSolution.GetProject(x))
+                .Select(x => ProfilerSolution.AllProjects.First(p => p.Path == x))
                 .ToList();
 
             try
