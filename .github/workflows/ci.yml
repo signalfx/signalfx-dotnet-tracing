@@ -43,7 +43,7 @@ on:
 
 env:
   buildConfiguration: Release
-  dotnetSdkVersion: 7.0.101
+  dotnetSdkVersion: 8.0.100
   relativeTracerHome: /shared/bin/monitoring-home/tracer
   relativeArtifacts: /tracer/src/bin/artifacts
   binDir: ${{ github.workspace }}/tracer/src/bin
@@ -80,6 +80,7 @@ jobs:
           5.0.408
           6.0.404
           7.0.101
+          8.0.100
     - name: Install CMake 3.19.8
       if: ${{ runner.os == 'Linux' }}
       run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh -o cmakeinstall.sh && chmod +x cmakeinstall.sh && sudo ./cmakeinstall.sh --prefix=/usr/local --exclude-subdir
@@ -135,6 +136,7 @@ jobs:
           3.1.426
           6.0.404
           7.0.101
+          8.0.100
     - name: Build Docker image
       run: |
         docker build \
@@ -181,7 +183,9 @@ jobs:
           3.1.426
           6.0.404
           7.0.101
-    - run: ./tracer/build.cmd Clean BuildTracerHome BuildAndRunManagedUnitTests
+          8.0.100
+
+          - run: ./tracer/build.cmd Clean BuildTracerHome BuildAndRunManagedUnitTests
     - uses: actions/upload-artifact@v3.1.2
       with:
         name: ${{ matrix.machine }}-managed-unit-tests-build_data
@@ -206,7 +210,9 @@ jobs:
           3.1.426
           6.0.404
           7.0.101
-    - name: Build Docker image
+          8.0.100
+
+          - name: Build Docker image
       run: |
         docker build \
           --build-arg DOTNETSDK_VERSION=${dotnetSdkVersion} \
@@ -252,7 +258,9 @@ jobs:
           3.1.426
           6.0.404
           7.0.101
-    - name: Install CMake 3.19.8
+          8.0.100
+
+          - name: Install CMake 3.19.8
       if: ${{ runner.os == 'Linux' }}
       run: curl -sL https://cmake.org/files/v3.19/cmake-3.19.8-Linux-x86_64.sh -o cmakeinstall.sh && chmod +x cmakeinstall.sh && sudo ./cmakeinstall.sh --prefix=/usr/local --exclude-subdir
     - name: Create logging path
@@ -277,7 +285,9 @@ jobs:
           3.1.426
           6.0.404
           7.0.101
-    - name: Build Docker image
+          8.0.100
+
+          - name: Build Docker image
       run: |
         docker build \
           --build-arg DOTNETSDK_VERSION=${dotnetSdkVersion} \
@@ -326,7 +336,9 @@ jobs:
           3.1.426
           6.0.404
           7.0.101
-    # Cosmos is _way_ to flaky at the moment. Try enabling again at a later time
+          8.0.100
+
+          # Cosmos is _way_ to flaky at the moment. Try enabling again at a later time
     # - name: Start CosmosDB Emulator
     #   if: ${{ matrix.target == 'BuildAndRunWindowsIntegrationTests' }}
     #   shell: powershell
@@ -384,6 +396,7 @@ jobs:
           3.1.426
           6.0.404
           7.0.101
+          8.0.100
 
     - name: Remove large node images
       run: docker rmi node:20 node:18 node:16
@@ -458,6 +471,8 @@ jobs:
           3.1.426
           6.0.404
           7.0.101
+          8.0.100
+
     - name: install Microsoft.Net.Component.4.6.1.TargetingPack
       run: |
           Set-Location "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
@@ -507,7 +522,9 @@ jobs:
           3.1.426
           6.0.404
           7.0.101
-    - name: install Microsoft.Net.Component.4.6.1.TargetingPack
+          8.0.100
+
+          - name: install Microsoft.Net.Component.4.6.1.TargetingPack
       run: |
           Set-Location "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
           $InstallPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise"
