@@ -842,15 +842,15 @@ partial class Build
 
             var regressionLibs = regressionsDirectory.GlobFiles("**/*.csproj")
                  .Where(path =>
-                    (path, Solution.AllProjects.First(p => p.Path == path).TryGetTargetFrameworks()) switch
+                    (path, Solution.AllProjects.FirstOrDefault(p => p.Path == path)?.TryGetTargetFrameworks()) switch
                     {
                         _ when path.Contains("ExpenseItDemo") => false,
                         _ when path.Contains("StackExchange.Redis.AssemblyConflict.LegacyProject") => false,
                         _ when path.Contains("MismatchedTracerVersions") => false,
                         _ when path.Contains("dependency-libs") => false,
                         _ when !string.IsNullOrWhiteSpace(SampleName) => path.Contains(SampleName),
-                        (_, var targets) when targets is not null => targets.Contains(Framework),
-                        _ => true,
+                        (_, null) => true,
+                        (_, { } targets) => targets.Contains(Framework)
                     }
                   );
 
@@ -933,7 +933,8 @@ partial class Build
             var projects = includeIntegration
                 .Concat(includeSecurity)
                 .Concat(includeDebugger)
-                .Select(path => Solution.AllProjects.First(proj => proj.Path == path))
+                .Select(path => Solution.AllProjects.FirstOrDefault(proj => proj.Path == path))
+                .WhereNotNull()
                 .Where(project =>
                 (project, project.TryGetTargetFrameworks(), project.RequiresDockerDependency()) switch
                 {
