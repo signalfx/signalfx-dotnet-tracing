@@ -1235,7 +1235,7 @@ partial class Build
                 .Concat(regressionProjects)
                 .Concat(instrumentationProjects)
                 .Concat(debuggerProjects)
-                .Select(path => (path, project: Solution.AllProjects.First(p => p.Name == path)))
+                .Select(path => (path, project: Solution.AllProjects.First(p => p.Path == path)))
                 .Where(x => (IncludeTestsRequiringDocker, x.project) switch
                 {
                     // filter out or to integration tests that have docker dependencies
