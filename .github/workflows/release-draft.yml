@@ -58,7 +58,7 @@ jobs:
             7.0.101
             8.0.100
 
-            - run: tracer\build.cmd Clean BuildTracerHome PackageTracerHome
+      - run: tracer\build.cmd Clean BuildTracerHome PackageTracerHome
         shell: cmd
       - name: Upload Windows MSI
         uses: actions/upload-artifact@v3.1.2
