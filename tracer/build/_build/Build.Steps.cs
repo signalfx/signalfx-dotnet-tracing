@@ -841,16 +841,16 @@ partial class Build
                 .Directory.Parent;
 
             var regressionLibs = regressionsDirectory.GlobFiles("**/*.csproj")
-                 .Where(path =>
+                .Where(path =>
                     (path, Solution.AllProjects.FirstOrDefault(p => p.Path == path)?.TryGetTargetFrameworks()) switch
                     {
-                        _ when path.Contains("ExpenseItDemo") => false,
-                        _ when path.Contains("StackExchange.Redis.AssemblyConflict.LegacyProject") => false,
-                        _ when path.Contains("MismatchedTracerVersions") => false,
-                        _ when path.Contains("dependency-libs") => false,
-                        _ when !string.IsNullOrWhiteSpace(SampleName) => path.Contains(SampleName),
-                        (_, null) => true,
-                        (_, { } targets) => targets.Contains(Framework)
+                        _ when path.Name.Contains("ExpenseItDemo") => false,
+                        _ when path.Name.Contains("StackExchange.Redis.AssemblyConflict.LegacyProject") => false,
+                        _ when path.Name.Contains("MismatchedTracerVersions") => false,
+                        _ when path.Name.Contains("dependency-libs") => false,
+                        _ when !string.IsNullOrWhiteSpace(SampleName) => path.Name.Contains(SampleName),
+                        (_, { } targets) => targets.Contains(Framework),
+                        _ => true
                     }
                   );
 
