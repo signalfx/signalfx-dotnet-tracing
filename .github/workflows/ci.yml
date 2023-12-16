@@ -43,7 +43,7 @@ on:
 
 env:
   buildConfiguration: Release
-  dotnetSdkVersion: 8.0.100
+  dotnetSdkVersion: 7.0.101
   relativeTracerHome: /shared/bin/monitoring-home/tracer
   relativeArtifacts: /tracer/src/bin/artifacts
   binDir: ${{ github.workspace }}/tracer/src/bin
