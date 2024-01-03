@@ -67,7 +67,7 @@ partial class Build
     AbsolutePath SourceDirectory => TracerDirectory / "src";
     AbsolutePath BuildDirectory => TracerDirectory / "build";
     AbsolutePath TestsDirectory => TracerDirectory / "test";
-    AbsolutePath DistributionHomeDirectory => Solution.GetProject(Projects.DatadogMonitoringDistribution).Directory / "home";
+    AbsolutePath DistributionHomeDirectory => Solution.AllProjects.First(p => p.Name == Projects.DatadogMonitoringDistribution).Directory / "home";
 
 
     AbsolutePath TempDirectory => (AbsolutePath)(IsWin ? Path.GetTempPath() : "/tmp/");
@@ -76,9 +76,9 @@ partial class Build
     {
         "win-x86", "win-x64"
     };
-    Project NativeProfilerProject => Solution.GetProject(Projects.ClrProfilerNative);
-    Project NativeLoaderProject => Solution.GetProject(Projects.NativeLoader);
-    Project AlwaysOnProfilerNativeDepProject => Solution.GetProject(Projects.AlwaysOnProfilerNativeDep);
+    Project NativeProfilerProject => Solution.AllProjects.First(p => p.Name == Projects.ClrProfilerNative);
+    Project NativeLoaderProject => Solution.AllProjects.First(p => p.Name == Projects.NativeLoader);
+    Project AlwaysOnProfilerNativeDepProject => Solution.AllProjects.First(p => p.Name.Equals(Projects.AlwaysOnProfilerNativeDep));
 
     string NativeProfilerModule => "SignalFx.Tracing.ClrProfiler.Native";
     string AlwaysOnProfilerNativeDepModule => "Samples.AlwaysOnProfiler.NativeDep";
@@ -104,20 +104,20 @@ partial class Build
 
     IEnumerable<Project> ProjectsToPack => new[]
     {
-        Solution.GetProject(Projects.DatadogTrace),
-        Solution.GetProject(Projects.DatadogTraceOpenTracing),
-        Solution.GetProject(Projects.DatadogTraceAnnotations),
+        Solution.AllProjects.First(p => p.Name == Projects.DatadogTrace),
+        Solution.AllProjects.First(p => p.Name == Projects.DatadogTraceOpenTracing),
+        Solution.AllProjects.First(p => p.Name == Projects.DatadogTraceAnnotations),
     };
 
     Project[] ParallelIntegrationTests => new[]
     {
-        Solution.GetProject(Projects.TraceIntegrationTests),
-        Solution.GetProject(Projects.OpenTracingIntegrationTests),
+        Solution.AllProjects.First(p => p.Name == Projects.TraceIntegrationTests),
+        Solution.AllProjects.First(p => p.Name == Projects.OpenTracingIntegrationTests),
     };
 
     Project[] ClrProfilerIntegrationTests => new[]
     {
-        Solution.GetProject(Projects.ClrProfilerIntegrationTests)
+        Solution.AllProjects.First(p => p.Name == Projects.ClrProfilerIntegrationTests)
     };
 
     readonly IEnumerable<TargetFramework> TargetFrameworks = new[]
@@ -211,7 +211,7 @@ partial class Build
         {
             var nativeProjectDirectory = NativeProfilerProject.Directory;
             CMake.Value(arguments: ".", workingDirectory: nativeProjectDirectory);
-            Make.Value(workingDirectory: nativeProjectDirectory);
+            Make.Value(arguments: string.Empty, workingDirectory: nativeProjectDirectory);
         });
 
     Target CompileNativeSrc => _ => _
@@ -294,7 +294,7 @@ partial class Build
             CMake.Value(
                 arguments: "-S .",
                 workingDirectory: buildDirectory);
-            Make.Value(workingDirectory: buildDirectory);
+            Make.Value(arguments: string.Empty, workingDirectory: buildDirectory);
         });
 
     Target CompileNativeTestsLinux => _ => _
@@ -324,7 +324,7 @@ partial class Build
                 : TargetFrameworks.Where(framework => !framework.ToString().StartsWith("net4"));
             // Publish Datadog.Trace.MSBuild which includes Datadog.Trace and Datadog.Trace.AspNet
             DotNetPublish(s => s
-                .SetProject(Solution.GetProject(Projects.DatadogTraceMsBuild))
+                .SetProject(Solution.AllProjects.First(p => p.Name == Projects.DatadogTraceMsBuild))
                 .SetConfiguration(BuildConfiguration)
                 .SetTargetPlatformAnyCPU()
                 .EnableNoBuild()
@@ -450,7 +450,7 @@ partial class Build
 
             // Publish Datadog.Trace.OpenTracing
             DotNetPublish(s => s
-                              .SetProject(Solution.GetProject(Projects.DatadogTraceOpenTracing))
+                              .SetProject(Solution.AllProjects.First(p => p.Name == Projects.DatadogTraceOpenTracing))
                               .SetConfiguration(BuildConfiguration)
                               .SetTargetPlatformAnyCPU()
                               .EnableNoBuild()
@@ -501,7 +501,7 @@ partial class Build
         .Executes(() =>
         {
             MSBuild(s => s
-                    .SetTargetPath(Solution.GetProject(Projects.WindowsInstaller))
+                    .SetTargetPath(Solution.AllProjects.First(p => p.Name == Projects.WindowsInstaller))
                     .SetConfiguration(BuildConfiguration)
                     .SetMSBuildPath()
                     .AddProperty("RunWixToolsOutOfProc", true)
@@ -576,7 +576,7 @@ partial class Build
             directories.ForEach(existingDir =>
             {
                 var newDir = existingDir.Parent / $"{TargetPlatform}" / BuildConfiguration;
-                if (DirectoryExists(newDir))
+                if (Directory.Exists(newDir))
                 {
                     Logger.Info($"Skipping '{newDir}' as already exists");
                 }
@@ -735,7 +735,7 @@ partial class Build
             EnsureExistingDirectory(TestLogsDirectory);
 
             var testProjects = TracerDirectory.GlobFiles("test/**/*.Tests.csproj")
-                .Select(x => Solution.GetProject(x))
+                .Select(x => Solution.AllProjects.First(p => p.Path == x))
                 .ToList();
 
             testProjects.ForEach(EnsureResultsDirectory);
@@ -771,7 +771,7 @@ partial class Build
         {
             var workingDirectory = TestsDirectory / "Datadog.Trace.ClrProfiler.Native.Tests" / "bin" / BuildConfiguration.ToString() / TargetPlatform.ToString();
             var exePath = workingDirectory / "Datadog.Trace.ClrProfiler.Native.Tests.exe";
-            var testExe = ToolResolver.GetLocalTool(exePath);
+            var testExe = ToolResolver.GetTool(exePath);
             testExe("--gtest_output=xml", workingDirectory: workingDirectory);
         });
 
@@ -837,20 +837,20 @@ partial class Build
         .Requires(() => Framework)
         .Executes(() =>
         {
-            var regressionsDirectory = Solution.GetProject(Projects.DataDogThreadTest)
+            var regressionsDirectory = Solution.AllProjects.First(p => p.Name == Projects.DataDogThreadTest)
                 .Directory.Parent;
 
-            var regressionLibs = GlobFiles(regressionsDirectory / "**" / "*.csproj")
-                 .Where(path =>
-                    (path, Solution.GetProject(path).TryGetTargetFrameworks()) switch
+            var regressionLibs = regressionsDirectory.GlobFiles("**/*.csproj")
+                .Where(path =>
+                    (path, Solution.AllProjects.FirstOrDefault(p => p.Path == path)?.TryGetTargetFrameworks()) switch
                     {
-                        _ when path.Contains("ExpenseItDemo") => false,
-                        _ when path.Contains("StackExchange.Redis.AssemblyConflict.LegacyProject") => false,
-                        _ when path.Contains("MismatchedTracerVersions") => false,
-                        _ when path.Contains("dependency-libs") => false,
-                        _ when !string.IsNullOrWhiteSpace(SampleName) => path.Contains(SampleName),
-                        (_, var targets) when targets is not null => targets.Contains(Framework),
-                        _ => true,
+                        _ when path.Name.Contains("ExpenseItDemo") => false,
+                        _ when path.Name.Contains("StackExchange.Redis.AssemblyConflict.LegacyProject") => false,
+                        _ when path.Name.Contains("MismatchedTracerVersions") => false,
+                        _ when path.Name.Contains("dependency-libs") => false,
+                        _ when !string.IsNullOrWhiteSpace(SampleName) => path.Name.Contains(SampleName),
+                        (_, { } targets) => targets.Contains(Framework),
+                        _ => true
                     }
                   );
 
@@ -933,7 +933,8 @@ partial class Build
             var projects = includeIntegration
                 .Concat(includeSecurity)
                 .Concat(includeDebugger)
-                .Select(x => Solution.GetProject(x))
+                .Select(path => Solution.AllProjects.FirstOrDefault(proj => proj.Path == path))
+                .WhereNotNull()
                 .Where(project =>
                 (project, project.TryGetTargetFrameworks(), project.RequiresDockerDependency()) switch
                 {
@@ -1094,7 +1095,7 @@ partial class Build
         .After(PublishIisSamples)
         .Requires(() => Framework)
         .Executes(() => RunWindowsIisIntegrationTests(
-                      Solution.GetProject(Projects.ClrProfilerIntegrationTests)));
+                      Solution.AllProjects.First(p => p.Name == Projects.ClrProfilerIntegrationTests)));
 
     void RunWindowsIisIntegrationTests(Project project)
     {
@@ -1132,7 +1133,7 @@ partial class Build
         .Requires(() => Framework)
         .Executes(() =>
         {
-            var project = Solution.GetProject(Projects.ClrProfilerIntegrationTests);
+            var project = Solution.AllProjects.First(p => p.Name == Projects.ClrProfilerIntegrationTests);
             var resultsDirectory = GetResultsDirectory(project);
             EnsureCleanDirectory(resultsDirectory);
             try
@@ -1234,7 +1235,7 @@ partial class Build
                 .Concat(regressionProjects)
                 .Concat(instrumentationProjects)
                 .Concat(debuggerProjects)
-                .Select(path => (path, project: Solution.GetProject(path)))
+                .Select(path => (path, project: Solution.AllProjects.First(p => p.Path == path)))
                 .Where(x => (IncludeTestsRequiringDocker, x.project) switch
                 {
                     // filter out or to integration tests that have docker dependencies
@@ -1480,7 +1481,7 @@ partial class Build
          .Executes(() =>
           {
               DotNetBuild(x => x
-                  .SetProjectFile(Solution.GetProject(Projects.ToolArtifactsTests))
+                  .SetProjectFile(Solution.AllProjects.First(p => p.Name == Projects.ToolArtifactsTests))
                   .EnableNoDependencies()
                   .EnableNoRestore()
                   .SetConfiguration(BuildConfiguration)
@@ -1492,7 +1493,7 @@ partial class Build
        .After(BuildToolArtifactTests)
        .Executes(() =>
         {
-            var project = Solution.GetProject(Projects.ToolArtifactsTests);
+            var project = Solution.AllProjects.First(p => p.Name == Projects.ToolArtifactsTests);
 
             DotNetTest(config => config
                 .SetProjectFile(project)
@@ -1524,7 +1525,7 @@ partial class Build
            };
 
            var logDirectory = BuildDataDirectory / "logs";
-           if (DirectoryExists(logDirectory))
+           if (Directory.Exists(logDirectory))
            {
                // Should we care about warnings too?
                var managedErrors = logDirectory.GlobFiles("**/dotnet-tracer-managed-*")
@@ -1735,10 +1736,10 @@ partial class Build
         Logger.Info($"Using '{packageDirectory}' for NuGet package location");
 
         // GRPC runs a tool for codegen, which apparently isn't automatically marked as executable
-        var grpcTools = GlobFiles(packageDirectory / "grpc.tools", "**/tools/linux_*/*");
+        var grpcTools = packageDirectory.GlobFiles("./grpc.tools", "**/tools/linux_*/*");
         foreach (var toolPath in grpcTools)
         {
-            Chmod.Value.Invoke(" +x " + toolPath);
+            Chmod.Value.Invoke(" +x " + toolPath.ToString());
         }
     }
 
@@ -1752,7 +1753,7 @@ partial class Build
     {
         // Not sure if/why this is necessary, and we can't just point to the correct output location
         var src = TracerHomeDirectory;
-        var testProject = Solution.GetProject(project).Directory;
+        var testProject = Solution.AllProjects.First(p => p.Name == project).Directory;
         var dest = testProject / "bin" / BuildConfiguration / Framework / "profiler-lib";
         CopyDirectoryRecursively(src, dest, DirectoryExistsPolicy.Merge, FileExistsPolicy.Overwrite);
 
@@ -1767,7 +1768,7 @@ partial class Build
     {
         if (Directory.Exists(TempDirectory))
         {
-            foreach (var dump in GlobFiles(TempDirectory, "coredump*"))
+            foreach (var dump in TempDirectory.GlobFiles("coredump*"))
             {
                 MoveFileToDirectory(dump, BuildDataDirectory / "dumps", FileExistsPolicy.Overwrite);
             }
@@ -1795,7 +1796,7 @@ partial class Build
                              .Add("DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Include=\"[Datadog.Trace.ClrProfiler.*]*,[Datadog.Trace]*,[Datadog.Trace.AspNet]*\""));
     }
 
-    protected override void OnTargetStart(string target)
+    protected override void OnTargetRunning(string target)
     {
         if (PrintDriveSpace)
         {
@@ -1804,7 +1805,7 @@ partial class Build
                 Logger.Info($"Drive space available on '{drive.Name}': {PrettyPrint(drive.AvailableFreeSpace)} / {PrettyPrint(drive.TotalSize)}");
             }
         }
-        base.OnTargetStart(target);
+        base.OnTargetRunning(target);
 
         static string PrettyPrint(long bytes)
         {

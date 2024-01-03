@@ -296,7 +296,7 @@ partial class Build : NukeBuild
         .Executes(() =>
         {
             DotNetBuild(x => x
-                .SetProjectFile(Solution.GetProject(Projects.DatadogMonitoringDistribution))
+                .SetProjectFile(Solution.AllProjects.First(p => p.Name == Projects.DatadogMonitoringDistribution))
                 .EnableNoRestore()
                 .EnableNoDependencies()
                 .SetConfiguration(BuildConfiguration)
@@ -309,7 +309,7 @@ partial class Build : NukeBuild
         .Description("Runs the Benchmarks project")
         .Executes(() =>
         {
-            var benchmarksProject = Solution.GetProject(Projects.BenchmarksTrace);
+            var benchmarksProject = Solution.AllProjects.First(p => p.Name == Projects.BenchmarksTrace);
             var resultsDirectory = benchmarksProject.Directory / "BenchmarkDotNet.Artifacts" / "results";
             EnsureCleanDirectory(resultsDirectory);
 

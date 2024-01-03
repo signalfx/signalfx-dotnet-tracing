@@ -11,7 +11,7 @@ public class DotNetMSBuildSettings : MSBuildSettings
     ///   Path to the DotNet executable.
     /// </summary>
     public override string ProcessToolPath => DotNetTasks.DotNetPath;
-    public override Action<OutputType, string> ProcessCustomLogger => DotNetTasks.DotNetLogger;
+    public override Action<OutputType, string> ProcessLogger => DotNetTasks.DotNetLogger;
     protected override Arguments ConfigureProcessArguments(Arguments arguments)
     {
         arguments
