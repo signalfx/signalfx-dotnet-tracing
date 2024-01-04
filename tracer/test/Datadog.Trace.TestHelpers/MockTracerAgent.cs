@@ -78,14 +78,7 @@ namespace Datadog.Trace.TestHelpers
 
         public ConcurrentQueue<string> StatsdRequests { get; } = new();
 
-        /// <summary>
-        /// Gets the <see cref="Datadog.Trace.Telemetry.TelemetryData"/> requests received by the telemetry endpoint
-        /// </summary>
-        public ConcurrentStack<object> Telemetry { get; } = new();
-
         public ITestOutputHelper Output { get; set; }
-
-        public IImmutableList<NameValueCollection> TelemetryRequestHeaders { get; private set; } = ImmutableList<NameValueCollection>.Empty;
 
         /// <summary>
         /// Gets or sets a value indicating whether to skip deserialization of traces.
@@ -187,37 +180,6 @@ namespace Datadog.Trace.TestHelpers
             }
 
             return relevantSpans;
-        }
-
-        /// <summary>
-        /// Wait for the telemetry condition to be satisfied.
-        /// Note that the first telemetry that satisfies the condition is returned
-        /// To retrieve all telemetry received, use <see cref="Telemetry"/>
-        /// </summary>
-        /// <param name="hasExpectedValues">A predicate for the current telemetry.
-        /// The object passed to the func will be a <see cref="TelemetryData"/> instance</param>
-        /// <param name="timeoutInMilliseconds">The timeout</param>
-        /// <param name="sleepTime">The time between checks</param>
-        /// <returns>The telemetry that satisfied <paramref name="hasExpectedValues"/></returns>
-        public object WaitForLatestTelemetry(
-            Func<object, bool> hasExpectedValues,
-            int timeoutInMilliseconds = 5000,
-            int sleepTime = 200)
-        {
-            var deadline = DateTime.UtcNow.AddMilliseconds(timeoutInMilliseconds);
-
-            object latest = default;
-            while (DateTime.UtcNow < deadline)
-            {
-                if (Telemetry.TryPeek(out latest) && hasExpectedValues(latest))
-                {
-                    break;
-                }
-
-                Thread.Sleep(sleepTime);
-            }
-
-            return latest;
         }
 
         public IImmutableList<MockClientStatsPayload> WaitForStats(
@@ -403,10 +365,6 @@ namespace Datadog.Trace.TestHelpers
                     throw;
                 }
             }
-        }
-
-        private protected void HandlePotentialTelemetryData(MockHttpParser.MockHttpRequest request)
-        {
         }
 
         private void AssertHeader(

@@ -39,7 +39,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.CI
         public void SubmitTraces(string packageVersion)
         {
             List<MockSpan> spans = null;
-            // string[] messages = null;
             try
             {
                 SetEnvironmentVariable("SIGNALFX_CIVISIBILITY_ENABLED", "1");
