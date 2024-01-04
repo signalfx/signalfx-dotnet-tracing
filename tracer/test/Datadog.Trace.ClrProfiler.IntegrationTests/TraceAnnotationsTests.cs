@@ -88,7 +88,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetEnvironmentVariable("SIGNALFX_TRACE_METHODS", ddTraceMethodsString);
 
             // Don't bother with telemetry when two assemblies are loaded because we could get unreliable results
-            MockTelemetryAgent<TelemetryData> telemetry = _twoAssembliesLoaded ? null : this.ConfigureTelemetry();
             using (var agent = EnvironmentHelper.GetMockAgent())
             using (RunSampleAndWaitForExit(agent))
             {
@@ -142,16 +141,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 rootSpan.Start.Should().BeLessThan(remainingSpans.First().Start);
                 (rootSpan.Start + rootSpan.Duration).Should().BeGreaterThan(lastEndTime.Value);
 
-                telemetry?.AssertIntegrationEnabled(IntegrationId.TraceAnnotations);
-                telemetry?.AssertConfiguration(ConfigTelemetryData.TraceMethods);
-
                 // Run snapshot verification
                 var settings = VerifyHelper.GetSpanVerifierSettings();
                 await Verifier.Verify(orderedSpans, settings)
                               .UseMethodName("_");
             }
-
-            telemetry?.Dispose();
         }
 
         [SkippableFact]
@@ -160,7 +154,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         public void IntegrationDisabled()
         {
             // Don't bother with telemetry when two assemblies are loaded because we could get unreliable results
-            MockTelemetryAgent<TelemetryData> telemetry = _twoAssembliesLoaded ? null : this.ConfigureTelemetry();
             SetEnvironmentVariable("SIGNALFX_TRACE_METHODS", string.Empty);
             SetEnvironmentVariable("SIGNALFX_TRACE_ANNOTATIONS_ENABLED", "false");
 
@@ -169,8 +162,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             var spans = agent.WaitForSpans(1, 2000);
 
             Assert.Empty(spans);
-            telemetry?.AssertIntegration(IntegrationId.TraceAnnotations, enabled: false, autoEnabled: false);
-            telemetry?.Dispose();
         }
     }
 }

@@ -95,7 +95,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         protected async Task RunSubmitsTraces(string packageVersion = "")
         {
             SetInstrumentationVerification();
-            using var telemetry = this.ConfigureTelemetry();
             int? aspNetCorePort = null;
 
             using (var agent = EnvironmentHelper.GetMockAgent())
@@ -193,8 +192,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 VerifyInstrumentation(process);
             }
-
-            telemetry.AssertIntegrationEnabled(IntegrationId.GraphQL);
         }
 
         private int SubmitRequests(int aspNetCorePort)

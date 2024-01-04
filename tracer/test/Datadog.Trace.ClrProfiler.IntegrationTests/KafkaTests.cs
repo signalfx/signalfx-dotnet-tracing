@@ -51,7 +51,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         {
             var topic = $"sample-topic-{TestPrefix}-{packageVersion}".Replace('.', '-');
 
-            using var telemetry = this.ConfigureTelemetry();
             using var agent = EnvironmentHelper.GetMockAgent();
             using var processResult = RunSampleAndWaitForExit(agent, arguments: topic, packageVersion: packageVersion);
 
@@ -141,8 +140,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                    .And.OnlyContain(x => x.Tags[Tags.ErrorMsg].Contains("Broker: Unknown topic or partition"))
                    .And.OnlyContain(x => x.Tags[Tags.ErrorType] == "Confluent.Kafka.ConsumeException");
             }
-
-            telemetry.AssertIntegrationEnabled(IntegrationId.Kafka);
         }
 
         private void VerifyProducerSpanProperties(List<MockSpan> producerSpans, string resourceName, int expectedCount)

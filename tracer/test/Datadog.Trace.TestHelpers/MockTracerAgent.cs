@@ -407,40 +407,6 @@ namespace Datadog.Trace.TestHelpers
 
         private protected void HandlePotentialTelemetryData(MockHttpParser.MockHttpRequest request)
         {
-            if (request.ContentLength >= 1)
-            {
-                try
-                {
-                    var body = ReadStreamBody(request);
-                    using var stream = new MemoryStream(body);
-
-                    var telemetry = MockTelemetryAgent<TelemetryData>.DeserializeResponse(stream);
-                    Telemetry.Push(telemetry);
-
-                    lock (this)
-                    {
-                        var headerCollection = new NameValueCollection();
-                        foreach (var header in request.Headers)
-                        {
-                            headerCollection.Add(header.Name, header.Value);
-                        }
-
-                        TelemetryRequestHeaders = TelemetryRequestHeaders.Add(headerCollection);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    var message = ex.Message.ToLowerInvariant();
-
-                    if (message.Contains("beyond the end of the stream"))
-                    {
-                        // Accept call is likely interrupted by a dispose
-                        // Swallow the exception and let the test finish
-                    }
-
-                    throw;
-                }
-            }
         }
 
         private void AssertHeader(
@@ -707,71 +673,54 @@ namespace Datadog.Trace.TestHelpers
                             ctx.Response.AddHeader("Datadog-Agent-Version", Version);
                         }
 
-                        if (TelemetryEnabled && (ctx.Request.Url?.AbsolutePath.StartsWith("/" + TelemetryConstants.AgentTelemetryEndpoint) ?? false))
+                        var buffer = Encoding.UTF8.GetBytes("{}");
+
+                        if (ctx.Request.RawUrl.EndsWith("/info"))
                         {
-                            // telemetry request
-                            var telemetry = MockTelemetryAgent<TelemetryData>.DeserializeResponse(ctx.Request.InputStream);
-                            Telemetry.Push(telemetry);
-
-                            lock (this)
-                            {
-                                TelemetryRequestHeaders = TelemetryRequestHeaders.Add(new NameValueCollection(ctx.Request.Headers));
-                            }
-
-                            ctx.Response.StatusCode = 200;
+                            var endpoints = $"{{\"endpoints\":{JsonConvert.SerializeObject(DiscoveryService.AllSupportedEndpoints)}}}";
+                            buffer = Encoding.UTF8.GetBytes(endpoints);
                         }
-                        else
+                        else if (ctx.Request.RawUrl.Contains("/debugger/v1/input"))
                         {
-                            var buffer = Encoding.UTF8.GetBytes("{}");
+                            using var body = ctx.Request.InputStream;
+                            using var streamReader = new StreamReader(body);
+                            var batch = streamReader.ReadToEnd();
+                            ReceiveDebuggerBatch(batch);
+                        }
+                        else if (ShouldDeserializeTraces)
+                        {
+                            if (ctx.Request.Url?.AbsolutePath == "/v0.6/stats")
+                            {
+                                var statsPayload = MessagePackSerializer.Deserialize<MockClientStatsPayload>(ctx.Request.InputStream);
+                                OnStatsDeserialized(statsPayload);
 
-                            if (ctx.Request.RawUrl.EndsWith("/info"))
-                            {
-                                var endpoints = $"{{\"endpoints\":{JsonConvert.SerializeObject(DiscoveryService.AllSupportedEndpoints)}}}";
-                                buffer = Encoding.UTF8.GetBytes(endpoints);
-                            }
-                            else if (ctx.Request.RawUrl.Contains("/debugger/v1/input"))
-                            {
-                                using var body = ctx.Request.InputStream;
-                                using var streamReader = new StreamReader(body);
-                                var batch = streamReader.ReadToEnd();
-                                ReceiveDebuggerBatch(batch);
-                            }
-                            else if (ShouldDeserializeTraces)
-                            {
-                                if (ctx.Request.Url?.AbsolutePath == "/v0.6/stats")
+                                lock (this)
                                 {
-                                    var statsPayload = MessagePackSerializer.Deserialize<MockClientStatsPayload>(ctx.Request.InputStream);
-                                    OnStatsDeserialized(statsPayload);
-
-                                    lock (this)
-                                    {
-                                        Stats = Stats.Add(statsPayload);
-                                    }
-                                }
-                                else
-                                {
-                                    // assume trace request
-                                    var spans = MessagePackSerializer.Deserialize<IList<IList<MockSpan>>>(ctx.Request.InputStream);
-                                    OnRequestDeserialized(spans);
-
-                                    lock (this)
-                                    {
-                                        // we only need to lock when replacing the span collection,
-                                        // not when reading it because it is immutable
-                                        Spans = Spans.AddRange(spans.SelectMany(trace => trace));
-                                        RequestHeaders = RequestHeaders.Add(new NameValueCollection(ctx.Request.Headers));
-                                    }
+                                    Stats = Stats.Add(statsPayload);
                                 }
                             }
+                            else
+                            {
+                                // assume trace request
+                                var spans = MessagePackSerializer.Deserialize<IList<IList<MockSpan>>>(ctx.Request.InputStream);
+                                OnRequestDeserialized(spans);
 
-                            ctx.Response.ContentType = "application/json";
-                            ctx.Response.ContentLength64 = buffer.LongLength;
-                            ctx.Response.OutputStream.Write(buffer, 0, buffer.Length);
+                                lock (this)
+                                {
+                                    // we only need to lock when replacing the span collection,
+                                    // not when reading it because it is immutable
+                                    Spans = Spans.AddRange(spans.SelectMany(trace => trace));
+                                    RequestHeaders = RequestHeaders.Add(new NameValueCollection(ctx.Request.Headers));
+                                }
+                            }
                         }
+
+                        ctx.Response.ContentType = "application/json";
+                        ctx.Response.ContentLength64 = buffer.LongLength;
+                        ctx.Response.OutputStream.Write(buffer, 0, buffer.Length);
 
                         // NOTE: HttpStreamRequest doesn't support Transfer-Encoding: Chunked
                         // (Setting content-length avoids that)
-
                         ctx.Response.Close();
                     }
                     catch (HttpListenerException)
@@ -918,14 +867,7 @@ namespace Datadog.Trace.TestHelpers
             private async Task HandleNamedPipeTraces(NamedPipeServerStream namedPipeServerStream, CancellationToken cancellationToken)
             {
                 var request = await MockHttpParser.ReadRequest(namedPipeServerStream);
-                if (TelemetryEnabled && request.PathAndQuery.StartsWith("/" + TelemetryConstants.AgentTelemetryEndpoint))
-                {
-                    HandlePotentialTelemetryData(request);
-                }
-                else
-                {
-                    HandlePotentialTraces(request);
-                }
+                HandlePotentialTraces(request);
 
                 var responseBytes = GetResponseBytes(body: "{}");
                 await namedPipeServerStream.WriteAsync(responseBytes, offset: 0, count: responseBytes.Length);

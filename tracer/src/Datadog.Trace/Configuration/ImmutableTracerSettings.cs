@@ -85,7 +85,7 @@ namespace Datadog.Trace.Configuration
             ThreadSamplingPeriod = settings.ThreadSamplingPeriod;
             ProfilerExportInterval = CpuProfilingEnabled ? ThreadSamplingPeriod : settings.ProfilerExportInterval;
 
-            LogSubmissionSettings = ImmutableDirectLogSubmissionSettings.Create(settings.LogSubmissionSettings);
+            LogSubmissionSettings = ImmutableDirectLogSubmissionSettings.CreateNullSettings();
             // Logs injection is enabled by default if direct log submission is enabled, otherwise disabled by default
             LogsInjectionEnabled = settings.LogSubmissionSettings.LogsInjectionEnabled ?? LogSubmissionSettings.IsEnabled;
             DebuggerSettings = ImmutableDebuggerSettings.Create(settings.DebuggerSettings);

@@ -55,7 +55,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         {
             SetEnvironmentVariable("SIGNALFX_INSTRUMENTATION_MONGODB_TAG_COMMANDS", tagCommands.ToString().ToLowerInvariant());
 
-            using var telemetry = this.ConfigureTelemetry();
             using (var agent = EnvironmentHelper.GetMockAgent())
             using (RunSampleAndWaitForExit(agent, packageVersion: packageVersion))
             {
@@ -110,8 +109,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     var result = span.IsMongoDB();
                     Assert.True(result.Success, result.ToString());
                 }
-
-                telemetry.AssertIntegrationEnabled(IntegrationId.MongoDb);
 
                 // do some basic verification on the "admin" spans
                 using var scope = new AssertionScope();

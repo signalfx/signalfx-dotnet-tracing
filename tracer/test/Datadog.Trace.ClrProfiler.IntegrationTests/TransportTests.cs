@@ -73,7 +73,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
             EnvironmentHelper.EnableTransport(GetTransport(transportType));
 
-            using var telemetry = this.ConfigureTelemetry();
             using var agent = GetAgent(transportType);
             agent.Output = Output;
 
@@ -88,8 +87,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                                   .DisableRequireUniquePrefix()
                                   .UseFileName("TransportTests");
             }
-
-            telemetry.AssertConfiguration(ConfigTelemetryData.AgentTraceTransport, transportType.ToString());
 
             MockTracerAgent GetAgent(TracesTransportType type)
                 => type switch

@@ -40,7 +40,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             const string expectedOperationName = dbType + ".query";
             const string expectedServiceName = "Samples.FakeDbCommand";
 
-            using var telemetry = this.ConfigureTelemetry();
             using var agent = EnvironmentHelper.GetMockAgent();
             using var process = RunSampleAndWaitForExit(agent);
             var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
@@ -55,8 +54,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
 
                 Assert.Equal(expectedServiceName, span.Service);
             }
-
-            telemetry.AssertIntegrationEnabled(IntegrationId.AdoNet);
         }
     }
 }

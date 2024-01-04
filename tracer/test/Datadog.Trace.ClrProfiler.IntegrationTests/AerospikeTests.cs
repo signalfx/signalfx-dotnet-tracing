@@ -31,7 +31,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("Category", "ArmUnsupported")]
         public async Task SubmitTraces(string packageVersion)
         {
-            using var telemetry = this.ConfigureTelemetry();
             using (var agent = EnvironmentHelper.GetMockAgent())
             using (RunSampleAndWaitForExit(agent, packageVersion: packageVersion))
             {
@@ -58,8 +57,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 await VerifyHelper.VerifySpans(spans, settings)
                                   .DisableRequireUniquePrefix()
                                   .UseFileName(nameof(AerospikeTests));
-
-                telemetry.AssertIntegrationEnabled(IntegrationId.Aerospike);
             }
         }
     }

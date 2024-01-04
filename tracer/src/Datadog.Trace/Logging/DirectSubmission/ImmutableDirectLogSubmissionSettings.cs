@@ -8,8 +8,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Logging.DirectSubmission.Sink.PeriodicBatching;
 
@@ -76,130 +74,6 @@ namespace Datadog.Trace.Logging.DirectSubmission
         public List<string> EnabledIntegrationNames { get; }
 
         public BatchingSinkOptions BatchingOptions { get; }
-
-        public static ImmutableDirectLogSubmissionSettings Create(TracerSettings settings)
-            => Create(settings.LogSubmissionSettings);
-
-        public static ImmutableDirectLogSubmissionSettings Create(DirectLogSubmissionSettings settings)
-            => Create(
-                host: settings.DirectLogSubmissionHost,
-                source: settings.DirectLogSubmissionSource,
-                intakeUrl: settings.DirectLogSubmissionUrl,
-                accessToken: settings.SignalFxAccessToken,
-                minimumLevel: settings.DirectLogSubmissionMinimumLevel,
-                globalTags: settings.DirectLogSubmissionGlobalTags,
-                enabledLogShippingIntegrations: settings.DirectLogSubmissionEnabledIntegrations,
-                batchingOptions: new BatchingSinkOptions(
-                    batchSizeLimit: settings.DirectLogSubmissionBatchSizeLimit,
-                    queueLimit: settings.DirectLogSubmissionQueueSizeLimit,
-                    period: settings.DirectLogSubmissionBatchPeriod));
-
-        public static ImmutableDirectLogSubmissionSettings Create(
-            string? host,
-            string? source,
-            string? intakeUrl,
-            string? accessToken,
-            DirectSubmissionLogLevel minimumLevel,
-            IDictionary<string, string> globalTags,
-            ICollection<string> enabledLogShippingIntegrations,
-            BatchingSinkOptions batchingOptions)
-        {
-            if (enabledLogShippingIntegrations.Count == 0)
-            {
-                // not trying to enable log submission, so don't log any errors and create a _null_ implementation
-                return CreateNullSettings();
-            }
-
-            var isEnabled = true;
-            var validationErrors = new List<string>();
-
-            if (string.IsNullOrWhiteSpace(host))
-            {
-                isEnabled = false;
-                validationErrors.Add($"Missing required setting '{ConfigurationKeys.DirectLogSubmission.Host}'.");
-            }
-
-            if (string.IsNullOrWhiteSpace(source))
-            {
-                isEnabled = false;
-                validationErrors.Add($"Missing required setting '{ConfigurationKeys.DirectLogSubmission.Source}'.");
-            }
-
-            if (!Uri.TryCreate(intakeUrl, UriKind.Absolute, out var intakeUri))
-            {
-                isEnabled = false;
-                validationErrors.Add($"The intake url '{intakeUrl}' was not a valid URL.");
-            }
-
-            if (string.IsNullOrWhiteSpace(accessToken))
-            {
-                isEnabled = false;
-                validationErrors.Add($"Missing required settings '{ConfigurationKeys.SignalFxAccessToken}'.");
-            }
-
-            var stringifiedTags = StringifyGlobalTags(globalTags);
-            var enabledIntegrations = new bool[ValuesRegistry<IntegrationId>.Ids.Count];
-            var enabledIntegrationNames = new List<string>(SupportedIntegrations.Length);
-
-            foreach (var integrationName in enabledLogShippingIntegrations)
-            {
-                if (!ValuesRegistry<IntegrationId>.TryGetValue(integrationName, out var integrationId))
-                {
-                    validationErrors.Add(
-                        "Unknown integration: " + integrationName +
-                        ". Use a valid logs integration name: " +
-                        string.Join(", ", SupportedIntegrations.Select(x => ValuesRegistry<IntegrationId>.GetName(x))));
-                    continue;
-                }
-
-                if (!SupportedIntegrations.Contains(integrationId))
-                {
-                    validationErrors.Add(
-                        "Integration: " + integrationName + " is not a supported direct log submission integration. " +
-                        "Use one of " + string.Join(", ", SupportedIntegrations.Select(x => ValuesRegistry<IntegrationId>.GetName(x))));
-                    continue;
-                }
-
-                if (!enabledIntegrations[(int)integrationId])
-                {
-                    enabledIntegrationNames.Add(ValuesRegistry<IntegrationId>.GetName(integrationId));
-                    enabledIntegrations[(int)integrationId] = true;
-                }
-            }
-
-            return new ImmutableDirectLogSubmissionSettings(
-                host: host ?? string.Empty,
-                source: source ?? string.Empty,
-                globalTags: stringifiedTags,
-                intakeUrl: intakeUri!,
-                apiKey: accessToken ?? string.Empty,
-                isEnabled: isEnabled,
-                minimumLevel: minimumLevel,
-                enabledIntegrations: enabledIntegrations,
-                validationErrors,
-                enabledIntegrationNames,
-                batchingOptions);
-        }
-
-        private static string StringifyGlobalTags(IDictionary<string, string> globalTags)
-        {
-            if (globalTags.Count == 0)
-            {
-                return string.Empty;
-            }
-
-            var sb = new StringBuilder();
-            foreach (var tagPair in globalTags)
-            {
-                sb.Append(tagPair.Key)
-                  .Append(':')
-                  .Append(tagPair.Value)
-                  .Append(',');
-            }
-
-            // remove final joiner
-            return sb.ToString(startIndex: 0, length: sb.Length - 1);
-        }
 
         public static ImmutableDirectLogSubmissionSettings CreateNullSettings()
         {

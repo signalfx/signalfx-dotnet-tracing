@@ -261,7 +261,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
             var totalExpectedSpans = (requestCount * spansPerRequest);
 
-            using var telemetry = this.ConfigureTelemetry();
             using var agent = EnvironmentHelper.GetMockAgent();
             using var assert = new AssertionScope();
             using (var processResult = RunSampleAndWaitForExit(agent, packageVersion: packageVersion, aspNetCorePort: 0))
@@ -285,7 +284,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 if (!isGrpcSupported)
                 {
                     Output.WriteLine($"Package version {packageVersion} is not supported in Grpc, skipping snapshot verification");
-                    telemetry.AssertIntegrationDisabled(IntegrationId.Grpc);
                     return;
                 }
 
@@ -394,20 +392,16 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     }
                 }
             }
-
-            telemetry.AssertIntegrationEnabled(IntegrationId.Grpc);
         }
 
         protected void RunIntegrationDisabled(string packageVersion)
         {
-            using var telemetry = this.ConfigureTelemetry();
             SetEnvironmentVariable($"SIGNALFX_TRACE_{nameof(IntegrationId.Grpc)}_ENABLED", "false");
             using var agent = EnvironmentHelper.GetMockAgent();
             using var process = RunSampleAndWaitForExit(agent, packageVersion: packageVersion, aspNetCorePort: 0);
             var spans = agent.WaitForSpans(1, timeoutInMilliseconds: 500).Where(s => s.Type == "grpc.request").ToList();
 
             Assert.Empty(spans);
-            telemetry.AssertIntegrationDisabled(IntegrationId.Grpc);
         }
 
         protected void GuardAlpine()

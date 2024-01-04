@@ -583,29 +583,6 @@ namespace Datadog.Trace.Configuration
             public const string ExportInterval = "SIGNALFX_PROFILER_EXPORT_INTERVAL";
         }
 
-        internal static class Telemetry
-        {
-            /// <summary>
-            /// Configuration key for enabling or disabling internal telemetry.
-            /// Default value is <c>true</c> (enabled).
-            /// </summary>
-            public const string Enabled = "SIGNALFX_INSTRUMENTATION_TELEMETRY_ENABLED";
-
-            /// <summary>
-            /// Configuration key for sending telemetry direct to telemetry intake. If enabled, and
-            /// <see cref="ConfigurationKeys.ApiKey"/> is set, sends telemetry direct to intake. Otherwise, sends
-            /// telemetry to Agent. Enabled by default if <see cref="ConfigurationKeys.ApiKey"/> is available.
-            /// </summary>
-            public const string AgentlessEnabled = "SIGNALFX_INSTRUMENTATION_TELEMETRY_AGENTLESS_ENABLED";
-
-            /// <summary>
-            /// Configuration key for the telemetry URL where the Tracer sends telemetry. Only applies when agentless
-            /// telemetry is in use (otherwise telemetry is sent to the agent using
-            /// <see cref="ExporterSettings.AgentUri"/> instead)
-            /// </summary>
-            public const string Uri = "SIGNALFX_INSTRUMENTATION_TELEMETRY_URL";
-        }
-
         internal static class TagPropagation
         {
             /// <summary>
