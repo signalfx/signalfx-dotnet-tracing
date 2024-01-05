@@ -54,7 +54,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
             int emptyBasicGetCount = 0;
 
-            using var telemetry = this.ConfigureTelemetry();
             using (var agent = EnvironmentHelper.GetMockAgent())
             using (RunSampleAndWaitForExit(agent, arguments: $"{TestPrefix}", packageVersion: packageVersion))
             {
@@ -243,7 +242,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             Assert.Equal(2, exchangeDeclareCount);
             Assert.Equal(2, queueBindCount);
             Assert.Equal(8, queueDeclareCount);
-            telemetry.AssertIntegrationEnabled(IntegrationId.RabbitMQ);
         }
 
         private void AssertSpanName(MockSpan span, string operation)

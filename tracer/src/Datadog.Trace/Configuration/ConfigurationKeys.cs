@@ -430,46 +430,6 @@ namespace Datadog.Trace.Configuration
         public const string QueryStringReportingEnabled = "SIGNALFX_HTTP_SERVER_TAG_QUERY_STRING";
 
         /// <summary>
-        /// String constants for CI Visibility configuration keys.
-        /// </summary>
-        public static class CIVisibility
-        {
-            /// <summary>
-            /// Configuration key for enabling or disabling CI Visibility.
-            /// Default value is false (disabled).
-            /// </summary>
-            public const string Enabled = "SIGNALFX_CIVISIBILITY_ENABLED";
-
-            /// <summary>
-            /// Configuration key for enabling or disabling Agentless in CI Visibility.
-            /// Default value is false (disabled).
-            /// </summary>
-            public const string AgentlessEnabled = "SIGNALFX_CIVISIBILITY_AGENTLESS_ENABLED";
-
-            /// <summary>
-            /// Configuration key for setting the agentless url endpoint
-            /// </summary>
-            public const string AgentlessUrl = "SIGNALFX_CIVISIBILITY_AGENTLESS_URL";
-
-            /// <summary>
-            /// Configuration key for enabling or disabling Logs direct submission.
-            /// Default value is false (disabled).
-            /// </summary>
-            public const string Logs = "SIGNALFX_CIVISIBILITY_LOGS_ENABLED";
-
-            /// <summary>
-            /// Configuration key for enabling or disabling Code Coverage in CI Visibility.
-            /// Default value is false (disabled).
-            /// </summary>
-            public const string CodeCoverage = "SIGNALFX_CIVISIBILITY_CODE_COVERAGE_ENABLED";
-
-            /// <summary>
-            /// Configuration key for re-signing assemblies after the Code Coverage modification.
-            /// </summary>
-            public const string CodeCoverageSnkFile = "SIGNALFX_CIVISIBILITY_CODE_COVERAGE_SNK_FILEPATH";
-        }
-
-        /// <summary>
         /// String constants for proxy configuration keys.
         /// </summary>
         public static class Proxy
@@ -581,29 +541,6 @@ namespace Datadog.Trace.Configuration
             /// <seealso cref="ConfigurationKeys.AlwaysOnProfiler.ThreadSamplingPeriod"/>
             /// <seealso cref="TracerSettings.ProfilerExportInterval"/>
             public const string ExportInterval = "SIGNALFX_PROFILER_EXPORT_INTERVAL";
-        }
-
-        internal static class Telemetry
-        {
-            /// <summary>
-            /// Configuration key for enabling or disabling internal telemetry.
-            /// Default value is <c>true</c> (enabled).
-            /// </summary>
-            public const string Enabled = "SIGNALFX_INSTRUMENTATION_TELEMETRY_ENABLED";
-
-            /// <summary>
-            /// Configuration key for sending telemetry direct to telemetry intake. If enabled, and
-            /// <see cref="ConfigurationKeys.ApiKey"/> is set, sends telemetry direct to intake. Otherwise, sends
-            /// telemetry to Agent. Enabled by default if <see cref="ConfigurationKeys.ApiKey"/> is available.
-            /// </summary>
-            public const string AgentlessEnabled = "SIGNALFX_INSTRUMENTATION_TELEMETRY_AGENTLESS_ENABLED";
-
-            /// <summary>
-            /// Configuration key for the telemetry URL where the Tracer sends telemetry. Only applies when agentless
-            /// telemetry is in use (otherwise telemetry is sent to the agent using
-            /// <see cref="ExporterSettings.AgentUri"/> instead)
-            /// </summary>
-            public const string Uri = "SIGNALFX_INSTRUMENTATION_TELEMETRY_URL";
         }
 
         internal static class TagPropagation

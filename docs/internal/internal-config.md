@@ -13,15 +13,6 @@ These settings should be never used by the users.
 | `SIGNALFX_CONVENTION` | Sets the semantic and trace id conventions for the tracer. Available values are: `Datadog` (64bit trace id), `OpenTelemetry` (128 bit trace id). | `OpenTelemetry` |
 | `SIGNALFX_DUMP_ILREWRITE_ENABLED` | Allows the profiler to dump the IL original code and modification to the log. | `false` |
 | `SIGNALFX_EXPORTER` | The exporter to be used. The Tracer uses it to encode and dispatch traces. Available values are: `DatadogAgent`, `Zipkin`. | `Zipkin` |
-| `SIGNALFX_LOGS_DIRECT_SUBMISSION_INTEGRATIONS` | Configuration key for a list of direct log submission integrations to enable. Only selected integrations are enabled for direct log submission. Supports multiple values separated with semi-colons. Valid values are `ILogger`, `Serilog`, `Log4Net`, `NLog` | `` |
-| `SIGNALFX_LOGS_DIRECT_SUBMISSION_HOST` | Configuration key for the name of the originating host for direct logs submission. | `` |
-| `SIGNALFX_LOGS_DIRECT_SUBMISSION_SOURCE` | Configuration key for the originating source for direct logs submission. | `csharp` |
-| `SIGNALFX_LOGS_DIRECT_SUBMISSION_TAGS` | Configuration key for a list of tags to be applied globally to all logs directly submitted. Supports multiple key key-value pairs which are comma-separated, and for which the key and value are colon-separated. For example Key1:Value1, Key2:Value2 | `` |
-| `SIGNALFX_LOGS_DIRECT_SUBMISSION_URL` | Configuration key for the url to send logs to.  | `https://http-intake.logs.datadoghq.com:443` |
-| `SIGNALFX_LOGS_DIRECT_SUBMISSION_MINIMUM_LEVEL` | Configuration key for the minimum level logs should have to be sent to the intake. Should be one of `Verbose`,`Debug`,`Information`,`Warning`,`Error`,`Fatal` | `Information` |
-| `SIGNALFX_LOGS_DIRECT_SUBMISSION_MAX_BATCH_SIZE` | Configuration key for the maximum number of logs to send at one time  | `1000` |
-| `SIGNALFX_LOGS_DIRECT_SUBMISSION_MAX_QUEUE_SIZE` | Configuration key for the maximum number of logs to hold in internal queue at any one time | `100000` |
-| `SIGNALFX_LOGS_DIRECT_SUBMISSION_BATCH_PERIOD_SECONDS` | Configuration key for the time in seconds to wait between checking for batches | `2` |
 | `SIGNALFX_PROFILER_MEMORY_ENABLED` | Enable to activate memory profiling. | `false` |
 | `SIGNALFX_PROFILER_MAX_MEMORY_SAMPLES_PER_MINUTE` | Configuratoin key for the maximum number of memory samples gathered per minute. | `200`
 | `SIGNALFX_PROFILER_EXPORT_INTERVAL` | Profiling exporter interval in milliseconds. It defines how often the profiling data is sent to the collector. If the CPU profiling is enabled this value will automatically be set to match `SIGNALFX_PROFILER_CALL_STACK_INTERVAL`. | `10000` |
@@ -32,12 +23,6 @@ These settings should be never used by the users.
 |-|-|-|
 | `SIGNALFX_AGENT_HOST` | The Agent host where the tracer can send traces. |  |
 | `SIGNALFX_APM_RECEIVER_PORT` | The port for Trace Agent binding. | `8126` |
-| `SIGNALFX_CIVISIBILITY_AGENTLESS_ENABLED` | Enable to activate Agentless in CI Visibility. | `false` |
-| `SIGNALFX_CIVISIBILITY_AGENTLESS_URL` | Configuration key for setting the agentless url endpoint. |  |
-| `SIGNALFX_CIVISIBILITY_CODE_COVERAGE_ENABLED` | Configuration key for enabling or disabling Code Coverage in CI Visibility. | `false` |
-| `SIGNALFX_CIVISIBILITY_CODE_COVERAGE_SNK_FILEPATH` | Configuration key for re-signing assemblies after the Code Coverage modification. |  |
-| `SIGNALFX_CIVISIBILITY_ENABLED` | Enable to activate CI Visibility. | `false` |
-| `SIGNALFX_CIVISIBILITY_LOGS_ENABLED` | Enable to activate Logs direct submission. | `false` |
 | `SIGNALFX_DOGSTATSD_ARGS` | Comma-separated list of arguments to be passed to the DogStatsD process. |  |
 | `SIGNALFX_DOGSTATSD_PATH` | The DogStatsD path for when a standalone instance needs to be started. |  |
 | `SIGNALFX_DOGSTATSD_PIPE_NAME` | The named pipe that DogStatsD binds to. |  |
@@ -67,8 +52,6 @@ These settings should be never used by the users.
 | `SIGNALFX_TRACE_TRANSPORT` | Overrides the transport to use for communicating with the trace agent. Available values are: `datagod-tcp`, `datadog-named-pipes`. |  |
 | `SIGNALFX_AAS_ENABLE_CUSTOM_TRACING` | Used to force the loader to start the tracer agent (in case automatic instrumentation is disabled). Used in contexts where the user cannot manage agent processes, such as Azure App Services. |  |
 | `SIGNALFX_AAS_ENABLE_CUSTOM_METRICS` | Used to force the loader to start dogstatsd (in case automatic instrumentation is disabled). Used in contexts where the user cannot manage agent processes, such as Azure App Services. |  |
-| `SIGNALFX_INSTRUMENTATION_TELEMETRY_ENABLED` | Used to enable internal telemetry. | `false` |
-| `SIGNALFX_TRACE_TELEMETRY_URL` | Sets the telemetry URL where the tracer sends telemetry. |  |
 | `SIGNALFX_SITE` | Sets the default destination site. |  |
 | `SIGNALFX_LOG_LEVEL` | Sets the log level for serverless. |  |
 | `_SIGNALFX_EXTENSION_PATH` | Sets the lambda extension path. |  |

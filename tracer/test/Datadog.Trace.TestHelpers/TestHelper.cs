@@ -16,7 +16,6 @@ using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
-using Datadog.Trace.Configuration;
 using Datadog.Trace.Propagation;
 using Xunit;
 using Xunit.Abstractions;
@@ -485,27 +484,6 @@ namespace Datadog.Trace.TestHelpers
             // Return 'true' to verify instrumentation on local machine.
             // return true;
             return EnvironmentHelper.IsRunningInAzureDevOps() && EnvironmentHelper.IsScheduledBuild();
-        }
-
-        protected void EnableDirectLogSubmission(int intakePort, string integrationName, string host = "integration_tests")
-        {
-            SetEnvironmentVariable(ConfigurationKeys.DirectLogSubmission.Host, host);
-            SetEnvironmentVariable(ConfigurationKeys.DirectLogSubmission.Url, $"http://127.0.0.1:{intakePort}");
-            SetEnvironmentVariable(ConfigurationKeys.DirectLogSubmission.EnabledIntegrations, integrationName);
-            SetEnvironmentVariable(ConfigurationKeys.SignalFxAccessToken, "DUMMY_KEY_REQUIRED_FOR_DIRECT_SUBMISSION");
-        }
-
-        protected void EnableTelemetry(bool enabled = true, int? standaloneAgentPort = null)
-        {
-            SetEnvironmentVariable("SIGNALFX_INSTRUMENTATION_TELEMETRY_ENABLED", enabled.ToString());
-            SetEnvironmentVariable("SIGNALFX_INSTRUMENTATION_TELEMETRY_AGENTLESS_ENABLED", standaloneAgentPort.HasValue.ToString());
-
-            if (standaloneAgentPort.HasValue)
-            {
-                SetEnvironmentVariable("SIGNALFX_INSTRUMENTATION_TELEMETRY_URL", $"http://localhost:{standaloneAgentPort}");
-                // API key is required for agentless
-                SetEnvironmentVariable("SIGNALFX_API_KEY", "INVALID_KEY_FOR_TESTS");
-            }
         }
 
         protected async Task<IImmutableList<MockSpan>> GetWebServerSpans(

@@ -107,7 +107,6 @@ namespace Datadog.Trace.Coverage.Collector
                     }
                     else if (tracerTarget == TracerTarget.Net461)
                     {
-                        _logger.Debug($"Assembly: {FilePath}, is a net461 signed assembly, a .snk file is required ({Configuration.ConfigurationKeys.CIVisibility.CodeCoverageSnkFile} environment variable).");
                         return;
                     }
                 }

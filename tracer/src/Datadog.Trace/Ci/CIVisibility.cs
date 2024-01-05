@@ -13,7 +13,6 @@ using Datadog.Trace.Ci.Configuration;
 using Datadog.Trace.Configuration;
 using Datadog.Trace.Logging;
 using Datadog.Trace.Pdb;
-using Datadog.Trace.Util;
 
 namespace Datadog.Trace.Ci
 {
@@ -21,10 +20,9 @@ namespace Datadog.Trace.Ci
     {
         private static readonly CIVisibilitySettings _settings = CIVisibilitySettings.FromDefaultSources();
         private static int _firstInitialization = 1;
-        private static Lazy<bool> _enabledLazy = new Lazy<bool>(() => InternalEnabled(), true);
         internal static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(CIVisibility));
 
-        public static bool Enabled => _enabledLazy.Value;
+        public static bool Enabled => false;
 
         public static bool IsRunning => Interlocked.CompareExchange(ref _firstInitialization, 0, 0) == 0;
 
@@ -155,61 +153,6 @@ namespace Datadog.Trace.Ci
         {
             await InternalFlushAsync().ConfigureAwait(false);
             MethodSymbolResolver.Instance.Clear();
-        }
-
-        private static bool InternalEnabled()
-        {
-            var processName = ProcessHelpers.GetCurrentProcessName() ?? string.Empty;
-
-            // By configuration
-            if (_settings.Enabled)
-            {
-                // When is enabled by configuration we only enable it to the testhost child process if the process name is dotnet.
-                if (processName.Equals("dotnet", StringComparison.OrdinalIgnoreCase) && Environment.CommandLine.IndexOf("testhost.dll", StringComparison.OrdinalIgnoreCase) == -1)
-                {
-                    Log.Information("CI Visibility disabled because the process name is 'dotnet' but the commandline doesn't contain 'testhost.dll': {cmdline}", Environment.CommandLine);
-                    return false;
-                }
-
-                Log.Information("CI Visibility Enabled by Configuration");
-                return true;
-            }
-
-            // Try to autodetect based in the domain name.
-            var domainName = AppDomain.CurrentDomain.FriendlyName ?? string.Empty;
-            if (domainName.StartsWith("testhost", StringComparison.Ordinal) ||
-                domainName.StartsWith("vstest", StringComparison.Ordinal) ||
-                domainName.StartsWith("xunit", StringComparison.Ordinal) ||
-                domainName.StartsWith("nunit", StringComparison.Ordinal) ||
-                domainName.StartsWith("MSBuild", StringComparison.Ordinal))
-            {
-                Log.Information("CI Visibility Enabled by Domain name whitelist");
-                PropagateCiVisibilityEnvironmentVariable();
-                return true;
-            }
-
-            // Try to autodetect based in the process name.
-            if (processName.StartsWith("testhost.", StringComparison.Ordinal))
-            {
-                Log.Information("CI Visibility Enabled by Process name whitelist");
-                PropagateCiVisibilityEnvironmentVariable();
-                return true;
-            }
-
-            return false;
-
-            static void PropagateCiVisibilityEnvironmentVariable()
-            {
-                try
-                {
-                    // Set the configuration key to propagate the configuration to child processes.
-                    Environment.SetEnvironmentVariable(ConfigurationKeys.CIVisibility.Enabled, "1", EnvironmentVariableTarget.Process);
-                }
-                catch
-                {
-                    // .
-                }
-            }
         }
     }
 }

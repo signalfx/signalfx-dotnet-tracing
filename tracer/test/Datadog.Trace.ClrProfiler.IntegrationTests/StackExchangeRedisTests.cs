@@ -51,7 +51,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         public async Task SubmitsTraces(string packageVersion)
         {
             using var a = new AssertionScope();
-            using var telemetry = this.ConfigureTelemetry();
             using var agent = EnvironmentHelper.GetMockAgent();
             using (RunSampleAndWaitForExit(agent, arguments: $"{TestPrefix}", packageVersion: packageVersion))
             {
@@ -85,8 +84,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                     Assert.Contains(Tags.Version, (IDictionary<string, string>)span.Tags);
                 }
 
-                telemetry.AssertIntegrationEnabled(IntegrationId.StackExchangeRedis);
-
                 var settings = VerifyHelper.GetSpanVerifierSettings();
                 settings.UseFileName($"{nameof(StackExchangeRedisTests)}.{calculatedVersion}");
                 settings.DisableRequireUniquePrefix();
@@ -104,8 +101,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                         .ThenBy(x => x.Start)
                         .ThenBy(x => x.Duration));
             }
-
-            telemetry.AssertIntegrationEnabled(IntegrationId.StackExchangeRedis);
         }
 
         private static PackageVersion GetPackageVersion(string packageVersionString)

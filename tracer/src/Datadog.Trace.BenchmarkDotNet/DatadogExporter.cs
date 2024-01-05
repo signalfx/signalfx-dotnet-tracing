@@ -29,18 +29,6 @@ namespace Datadog.Trace.BenchmarkDotNet
 
         private static readonly IDatadogLogger Log = DatadogLogging.GetLoggerFor(typeof(DatadogExporter));
 
-        static DatadogExporter()
-        {
-            try
-            {
-                Environment.SetEnvironmentVariable(Configuration.ConfigurationKeys.CIVisibility.Enabled, "1", EnvironmentVariableTarget.Process);
-            }
-            catch
-            {
-                // .
-            }
-        }
-
         /// <inheritdoc />
         public string Name => nameof(DatadogExporter);
 

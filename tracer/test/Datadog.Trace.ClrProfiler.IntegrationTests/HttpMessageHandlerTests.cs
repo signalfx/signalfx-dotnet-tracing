@@ -64,7 +64,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             int httpPort = TcpPortProvider.GetOpenPort();
             Output.WriteLine($"Assigning port {httpPort} for the httpPort.");
 
-            using var telemetry = this.ConfigureTelemetry();
             using (var agent = EnvironmentHelper.GetMockAgent())
             using (ProcessResult processResult = RunSampleAndWaitForExit(agent, arguments: $"Port={httpPort}"))
             {
@@ -86,11 +85,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 PropagationTestHelpers.AssertPropagationEnabled(spans.First(), processResult);
 
                 using var scope = new AssertionScope();
-                telemetry.AssertIntegrationEnabled(IntegrationId.HttpMessageHandler);
-                // ignore for now auto enabled for simplicity
-                telemetry.AssertIntegration(IntegrationId.HttpSocketsHandler, enabled: IsUsingSocketHandler(instrumentation), autoEnabled: null);
-                telemetry.AssertIntegration(IntegrationId.WinHttpHandler, enabled: IsUsingWinHttpHandler(instrumentation), autoEnabled: null);
-                telemetry.AssertIntegration(IntegrationId.CurlHandler, enabled: IsUsingCurlHandler(instrumentation), autoEnabled: null);
                 VerifyInstrumentation(processResult.Process);
             }
         }
@@ -107,7 +101,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
             const string expectedOperationName = "http.request";
 
-            using var telemetry = this.ConfigureTelemetry();
             int httpPort = TcpPortProvider.GetOpenPort();
 
             using (var agent = EnvironmentHelper.GetMockAgent())
@@ -120,10 +113,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 using var scope = new AssertionScope();
                 // ignore auto enabled for simplicity
-                telemetry.AssertIntegrationDisabled(IntegrationId.HttpMessageHandler);
-                telemetry.AssertIntegration(IntegrationId.HttpSocketsHandler, enabled: false, autoEnabled: null);
-                telemetry.AssertIntegration(IntegrationId.WinHttpHandler, enabled: false, autoEnabled: null);
-                telemetry.AssertIntegration(IntegrationId.CurlHandler, enabled: false, autoEnabled: null);
                 VerifyInstrumentation(processResult.Process);
             }
         }

@@ -44,7 +44,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         {
             var expectedSpanCount = 14;
 
-            using var telemetry = this.ConfigureTelemetry();
             using (var agent = EnvironmentHelper.GetMockAgent())
             using (RunSampleAndWaitForExit(agent, arguments: $"{TestPrefix}", packageVersion: packageVersion))
             {
@@ -84,7 +83,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
                 dbTags.Should().Be(10);
                 containerTags.Should().Be(4);
-                telemetry.AssertIntegrationEnabled(IntegrationId.CosmosDb);
             }
         }
     }

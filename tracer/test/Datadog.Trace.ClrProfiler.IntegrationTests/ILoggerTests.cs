@@ -37,13 +37,11 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
             SetEnvironmentVariable("SIGNALFX_LOGS_INJECTION", "true");
         }
 
-        [SkippableTheory]
-        [InlineData(false)]
-        [InlineData(true)]
+        [SkippableFact]
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         [Trait("SupportsInstrumentationVerification", "True")]
-        public void InjectsLogs(bool enableLogShipping)
+        public void InjectsLogs()
         {
             // One of the traces starts by manual opening a span when the background service starts,
             // and then it sends a HTTP request to the server.
@@ -61,11 +59,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 #endif
 
             SetInstrumentationVerification();
-            using var logsIntake = new MockLogsIntake();
-            if (enableLogShipping)
-            {
-                EnableDirectLogSubmission(logsIntake.Port, nameof(IntegrationId.ILogger), nameof(InjectsLogs));
-            }
 
             using (var agent = EnvironmentHelper.GetMockAgent())
             using (var processResult = RunSampleAndWaitForExit(agent, aspNetCorePort: 0))
@@ -76,41 +69,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 ValidateLogCorrelation(spans, _logFiles, expectedCorrelatedTraceCount, expectedCorrelatedSpanCount);
                 VerifyInstrumentation(processResult.Process);
             }
-        }
-
-        [SkippableFact]
-        [Trait("Category", "EndToEnd")]
-        [Trait("RunOnWindows", "True")]
-        [Trait("SupportsInstrumentationVerification", "True")]
-        public void DirectlyShipsLogs()
-        {
-            SetInstrumentationVerification();
-            var hostName = "integration_ilogger_tests";
-            using var logsIntake = new MockLogsIntake();
-
-            EnableDirectLogSubmission(logsIntake.Port, nameof(IntegrationId.ILogger), hostName);
-
-            var agentPort = TcpPortProvider.GetOpenPort();
-            using var agent = MockTracerAgent.Create(agentPort);
-            using var processResult = RunSampleAndWaitForExit(agent, aspNetCorePort: 0);
-
-            Assert.True(processResult.ExitCode >= 0, $"Process exited with code {processResult.ExitCode} and exception: {processResult.StandardError}");
-
-            var logs = logsIntake.Logs;
-
-            using var scope = new AssertionScope();
-            logs.Should().NotBeNull();
-            logs.Should().HaveCountGreaterOrEqualTo(12); // have an unknown number of "Waiting for app started handling requests"
-            logs.Should()
-                .OnlyContain(x => x.Service == "LogsInjection.ILogger")
-                .And.OnlyContain(x => x.Host == hostName)
-                .And.OnlyContain(x => x.Source == "csharp")
-                .And.OnlyContain(x => x.Env == "integration_tests")
-                .And.OnlyContain(x => x.Version == "1.0.0")
-                .And.OnlyContain(x => x.Exception == null)
-                .And.OnlyContain(x => x.LogLevel == DirectSubmissionLogLevel.Information);
-
-            VerifyInstrumentation(processResult.Process);
         }
     }
 }

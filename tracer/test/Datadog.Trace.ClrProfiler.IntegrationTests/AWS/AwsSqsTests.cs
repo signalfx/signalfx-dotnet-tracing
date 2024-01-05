@@ -34,7 +34,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AWS
         [Trait("Category", "EndToEnd")]
         public async Task SubmitsTraces(string packageVersion)
         {
-            using var telemetry = this.ConfigureTelemetry();
             using (var agent = EnvironmentHelper.GetMockAgent())
             using (RunSampleAndWaitForExit(agent, packageVersion: packageVersion))
             {
@@ -69,8 +68,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AWS
                 // - GetQueueUrl
                 // - PurgeQueue
                 await VerifyHelper.VerifySpans(spans, settings);
-
-                telemetry.AssertIntegrationEnabled(IntegrationId.AwsSqs);
             }
         }
     }

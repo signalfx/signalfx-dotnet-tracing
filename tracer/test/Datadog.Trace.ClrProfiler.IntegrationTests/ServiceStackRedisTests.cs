@@ -32,7 +32,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("Category", "EndToEnd")]
         public async Task SubmitsTraces(string packageVersion)
         {
-            using var telemetry = this.ConfigureTelemetry();
             using (var agent = EnvironmentHelper.GetMockAgent())
             using (RunSampleAndWaitForExit(agent, arguments: $"{TestPrefix}", packageVersion: packageVersion))
             {
@@ -79,8 +78,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                             .ThenBy(x => x.Start)
                             .ThenBy(x => x.Duration));
                 }
-
-                telemetry.AssertIntegrationEnabled(IntegrationId.ServiceStackRedis);
             }
         }
     }

@@ -33,7 +33,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             const string expectedOperationName = dbType + ".query";
             const string expectedServiceName = "Samples.SQLite.Core";
 
-            using var telemetry = this.ConfigureTelemetry();
             using var agent = EnvironmentHelper.GetMockAgent();
             using var process = RunSampleAndWaitForExit(agent);
             var spans = agent.WaitForSpans(expectedSpanCount, operationName: expectedOperationName);
@@ -47,8 +46,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
 
                 Assert.Equal(expectedServiceName, span.Service);
             }
-
-            telemetry.AssertIntegrationEnabled(IntegrationId.Sqlite);
         }
 
         [SkippableFact]
@@ -61,14 +58,12 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests.AdoNet
             const string expectedOperationName = "sqlite.query";
 
             SetEnvironmentVariable($"SIGNALFX_TRACE_{nameof(IntegrationId.Sqlite)}_ENABLED", "false");
-            using var telemetry = this.ConfigureTelemetry();
             using var agent = EnvironmentHelper.GetMockAgent();
             using var process = RunSampleAndWaitForExit(agent);
             var spans = agent.WaitForSpans(totalSpanCount, returnAllOperations: true);
 
             Assert.NotEmpty(spans);
             Assert.Empty(spans.Where(s => s.Name.Equals(expectedOperationName)));
-            telemetry.AssertIntegrationDisabled(IntegrationId.Sqlite);
         }
     }
 }

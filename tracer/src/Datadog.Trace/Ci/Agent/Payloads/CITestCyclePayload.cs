@@ -18,16 +18,15 @@ namespace Datadog.Trace.Ci.Agent.Payloads
             if (!string.IsNullOrWhiteSpace(agentlessUrl))
             {
                 var builder = new UriBuilder(agentlessUrl);
-                builder.Path = "api/v2/citestcycle";
                 Url = builder.Uri;
             }
             else
             {
                 Url = new UriBuilder(
                     scheme: "https",
-                    host: "citestcycle-intake." + CIVisibility.Settings.Site,
-                    port: 443,
-                    pathValue: "api/v2/citestcycle").Uri;
+                    host: CIVisibility.Settings.Site,
+                    portNumber: 443)
+                   .Uri;
             }
         }
 

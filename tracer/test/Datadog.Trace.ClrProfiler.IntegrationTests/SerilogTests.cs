@@ -38,11 +38,7 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
 
         public static IEnumerable<object[]> GetTestData()
         {
-            foreach (var item in PackageVersions.Serilog)
-            {
-                yield return item.Concat(false);
-                yield return item.Concat(true);
-            }
+            return PackageVersions.Serilog;
         }
 
         [SkippableTheory]
@@ -50,15 +46,10 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         [Trait("SupportsInstrumentationVerification", "True")]
-        public void InjectsLogsWhenEnabled(string packageVersion, bool enableLogShipping)
+        public void InjectsLogsWhenEnabled(string packageVersion)
         {
             SetEnvironmentVariable("SIGNALFX_LOGS_INJECTION", "true");
             SetInstrumentationVerification();
-            using var logsIntake = new MockLogsIntake();
-            if (enableLogShipping)
-            {
-                EnableDirectLogSubmission(logsIntake.Port, nameof(IntegrationId.Serilog), nameof(InjectsLogsWhenEnabled));
-            }
 
             var expectedCorrelatedTraceCount = 1;
             var expectedCorrelatedSpanCount = 1;
@@ -80,15 +71,10 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
         [Trait("Category", "EndToEnd")]
         [Trait("RunOnWindows", "True")]
         [Trait("SupportsInstrumentationVerification", "True")]
-        public void DoesNotInjectLogsWhenDisabled(string packageVersion, bool enableLogShipping)
+        public void DoesNotInjectLogsWhenDisabled(string packageVersion)
         {
             SetEnvironmentVariable("SIGNALFX_LOGS_INJECTION", "false");
             SetInstrumentationVerification();
-            using var logsIntake = new MockLogsIntake();
-            if (enableLogShipping)
-            {
-                EnableDirectLogSubmission(logsIntake.Port, nameof(IntegrationId.Serilog), nameof(InjectsLogsWhenEnabled));
-            }
 
             var expectedCorrelatedTraceCount = 0;
             var expectedCorrelatedSpanCount = 0;
@@ -103,49 +89,6 @@ namespace Datadog.Trace.ClrProfiler.IntegrationTests
                 ValidateLogCorrelation(spans, logFiles, expectedCorrelatedTraceCount, expectedCorrelatedSpanCount, packageVersion, disableLogCorrelation: true);
                 VerifyInstrumentation(processResult.Process);
             }
-        }
-
-        [SkippableTheory]
-        [MemberData(nameof(PackageVersions.Serilog), MemberType = typeof(PackageVersions))]
-        [Trait("Category", "EndToEnd")]
-        [Trait("RunOnWindows", "True")]
-        [Trait("SupportsInstrumentationVerification", "True")]
-        public void DirectlyShipsLogs(string packageVersion)
-        {
-            var hostName = "integration_serilog_tests";
-            using var logsIntake = new MockLogsIntake();
-
-            SetInstrumentationVerification();
-            SetEnvironmentVariable("SIGNALFX_LOGS_INJECTION", "true");
-            EnableDirectLogSubmission(logsIntake.Port, nameof(IntegrationId.Serilog), hostName);
-
-            var agentPort = TcpPortProvider.GetOpenPort();
-            using var agent = MockTracerAgent.Create(agentPort);
-            using var processResult = RunSampleAndWaitForExit(agent, packageVersion: packageVersion);
-
-            Assert.True(processResult.ExitCode >= 0, $"Process exited with code {processResult.ExitCode} and exception: {processResult.StandardError}");
-
-            var logs = logsIntake.Logs;
-
-            using var scope = new AssertionScope();
-            logs.Should().NotBeNull();
-            logs.Should().HaveCountGreaterOrEqualTo(3);
-            logs.Should()
-                .OnlyContain(x => x.Service == "LogsInjection.Serilog")
-                .And.OnlyContain(x => x.Env == "integration_tests")
-                .And.OnlyContain(x => x.Version == "1.0.0")
-                .And.OnlyContain(x => x.Host == hostName)
-                .And.OnlyContain(x => x.Source == "csharp")
-                .And.OnlyContain(x => x.Exception == null)
-                .And.OnlyContain(x => x.LogLevel == DirectSubmissionLogLevel.Information);
-
-            logs
-               .Where(x => !x.Message.Contains(ExcludeMessagePrefix))
-               .Should()
-               .NotBeEmpty()
-               .And.OnlyContain(x => !string.IsNullOrEmpty(x.TraceId))
-               .And.OnlyContain(x => !string.IsNullOrEmpty(x.SpanId));
-            VerifyInstrumentation(processResult.Process);
         }
 
         private LogFileTest[] GetLogFiles(string packageVersion, bool logsInjectionEnabled)
