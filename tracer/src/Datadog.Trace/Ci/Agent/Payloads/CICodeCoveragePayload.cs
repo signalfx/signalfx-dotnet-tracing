@@ -21,16 +21,14 @@ namespace Datadog.Trace.Ci.Agent.Payloads
             if (!string.IsNullOrWhiteSpace(agentlessUrl))
             {
                 var builder = new UriBuilder(agentlessUrl);
-                builder.Path = "api/v2/citestcov";
                 Url = builder.Uri;
             }
             else
             {
                 Url = new UriBuilder(
                     scheme: "https",
-                    host: "event-platform-intake." + CIVisibility.Settings.Site,
-                    port: 443,
-                    pathValue: "api/v2/citestcov").Uri;
+                    host: CIVisibility.Settings.Site,
+                    portNumber: 443).Uri;
             }
 
             // We call reset here to add the dummy event

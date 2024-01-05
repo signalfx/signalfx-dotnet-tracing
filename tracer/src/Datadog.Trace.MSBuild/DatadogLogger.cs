@@ -35,15 +35,6 @@ namespace Datadog.Trace.MSBuild
 
         static DatadogLogger()
         {
-            try
-            {
-                Environment.SetEnvironmentVariable(Configuration.ConfigurationKeys.CIVisibility.Enabled, "1", EnvironmentVariableTarget.Process);
-            }
-            catch
-            {
-                // .
-            }
-
             CIVisibility.Initialize();
         }
 

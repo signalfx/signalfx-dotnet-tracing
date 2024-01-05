@@ -430,46 +430,6 @@ namespace Datadog.Trace.Configuration
         public const string QueryStringReportingEnabled = "SIGNALFX_HTTP_SERVER_TAG_QUERY_STRING";
 
         /// <summary>
-        /// String constants for CI Visibility configuration keys.
-        /// </summary>
-        public static class CIVisibility
-        {
-            /// <summary>
-            /// Configuration key for enabling or disabling CI Visibility.
-            /// Default value is false (disabled).
-            /// </summary>
-            public const string Enabled = "SIGNALFX_CIVISIBILITY_ENABLED";
-
-            /// <summary>
-            /// Configuration key for enabling or disabling Agentless in CI Visibility.
-            /// Default value is false (disabled).
-            /// </summary>
-            public const string AgentlessEnabled = "SIGNALFX_CIVISIBILITY_AGENTLESS_ENABLED";
-
-            /// <summary>
-            /// Configuration key for setting the agentless url endpoint
-            /// </summary>
-            public const string AgentlessUrl = "SIGNALFX_CIVISIBILITY_AGENTLESS_URL";
-
-            /// <summary>
-            /// Configuration key for enabling or disabling Logs direct submission.
-            /// Default value is false (disabled).
-            /// </summary>
-            public const string Logs = "SIGNALFX_CIVISIBILITY_LOGS_ENABLED";
-
-            /// <summary>
-            /// Configuration key for enabling or disabling Code Coverage in CI Visibility.
-            /// Default value is false (disabled).
-            /// </summary>
-            public const string CodeCoverage = "SIGNALFX_CIVISIBILITY_CODE_COVERAGE_ENABLED";
-
-            /// <summary>
-            /// Configuration key for re-signing assemblies after the Code Coverage modification.
-            /// </summary>
-            public const string CodeCoverageSnkFile = "SIGNALFX_CIVISIBILITY_CODE_COVERAGE_SNK_FILEPATH";
-        }
-
-        /// <summary>
         /// String constants for proxy configuration keys.
         /// </summary>
         public static class Proxy

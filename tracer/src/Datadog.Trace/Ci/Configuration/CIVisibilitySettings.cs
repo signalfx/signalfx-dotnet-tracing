@@ -3,6 +3,8 @@
 // This product includes software developed at Datadog (https://www.datadoghq.com/). Copyright 2017 Datadog, Inc.
 // </copyright>
 
+// Modified by Splunk Inc.
+
 using System;
 using Datadog.Trace.Configuration;
 
@@ -12,32 +14,24 @@ namespace Datadog.Trace.Ci.Configuration
     {
         public CIVisibilitySettings(IConfigurationSource source)
         {
-            Enabled = source?.GetBool(ConfigurationKeys.CIVisibility.Enabled) ?? false;
-            Agentless = source?.GetBool(ConfigurationKeys.CIVisibility.AgentlessEnabled) ?? false;
-            Logs = source?.GetBool(ConfigurationKeys.CIVisibility.Logs) ?? false;
-            ApiKey = source?.GetString(ConfigurationKeys.ApiKey);
-            Site = source?.GetString(ConfigurationKeys.Site) ?? "datadoghq.com";
-            AgentlessUrl = source?.GetString(ConfigurationKeys.CIVisibility.AgentlessUrl);
+            Enabled = false;
+            Agentless = false;
+            Logs = false;
+            ApiKey = string.Empty;
+            Site = "localhost";
+            AgentlessUrl = string.Empty;
 
             // By default intake payloads has a 5MB limit
             MaximumAgentlessPayloadSize = 5 * 1024 * 1024;
 
-            ProxyHttps = source?.GetString(ConfigurationKeys.Proxy.ProxyHttps);
-            var proxyNoProxy = source?.GetString(ConfigurationKeys.Proxy.ProxyNoProxy) ?? string.Empty;
-            ProxyNoProxy = proxyNoProxy.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            ProxyHttps = string.Empty;
+            ProxyNoProxy = Array.Empty<string>();
 
             TracerSettings = new TracerSettings(source);
 
-            if (Logs)
-            {
-                // Enable the direct log submission
-                TracerSettings.LogSubmissionSettings.DirectLogSubmissionEnabledIntegrations.Add("XUnit");
-                TracerSettings.LogSubmissionSettings.DirectLogSubmissionBatchPeriod = TimeSpan.FromSeconds(1);
-            }
-
             // Code coverage
-            CodeCoverageEnabled = source?.GetBool(ConfigurationKeys.CIVisibility.CodeCoverage) ?? false;
-            CodeCoverageSnkFilePath = source?.GetString(ConfigurationKeys.CIVisibility.CodeCoverageSnkFile);
+            CodeCoverageEnabled = false;
+            CodeCoverageSnkFilePath = string.Empty;
         }
 
         /// <summary>

@@ -23,12 +23,6 @@ These settings should be never used by the users.
 |-|-|-|
 | `SIGNALFX_AGENT_HOST` | The Agent host where the tracer can send traces. |  |
 | `SIGNALFX_APM_RECEIVER_PORT` | The port for Trace Agent binding. | `8126` |
-| `SIGNALFX_CIVISIBILITY_AGENTLESS_ENABLED` | Enable to activate Agentless in CI Visibility. | `false` |
-| `SIGNALFX_CIVISIBILITY_AGENTLESS_URL` | Configuration key for setting the agentless url endpoint. |  |
-| `SIGNALFX_CIVISIBILITY_CODE_COVERAGE_ENABLED` | Configuration key for enabling or disabling Code Coverage in CI Visibility. | `false` |
-| `SIGNALFX_CIVISIBILITY_CODE_COVERAGE_SNK_FILEPATH` | Configuration key for re-signing assemblies after the Code Coverage modification. |  |
-| `SIGNALFX_CIVISIBILITY_ENABLED` | Enable to activate CI Visibility. | `false` |
-| `SIGNALFX_CIVISIBILITY_LOGS_ENABLED` | Enable to activate Logs direct submission. | `false` |
 | `SIGNALFX_DOGSTATSD_ARGS` | Comma-separated list of arguments to be passed to the DogStatsD process. |  |
 | `SIGNALFX_DOGSTATSD_PATH` | The DogStatsD path for when a standalone instance needs to be started. |  |
 | `SIGNALFX_DOGSTATSD_PIPE_NAME` | The named pipe that DogStatsD binds to. |  |
