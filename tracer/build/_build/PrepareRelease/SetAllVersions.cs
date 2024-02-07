@@ -310,19 +310,6 @@ namespace PrepareRelease
                     "src/Datadog.Trace/TracerConstants.cs",
                     FourPartVersionReplace);
 
-                // Four-part Sfx tag version update (Tests)
-                SynchronizeVersion(
-                    "test/Datadog.Trace.ClrProfiler.IntegrationTests/CI/MsTestV2Tests.cs",
-                    FourPartAssertVersionReplace);
-
-                SynchronizeVersion(
-                    "test/Datadog.Trace.ClrProfiler.IntegrationTests/CI/NUnitTests.cs",
-                    FourPartAssertVersionReplace);
-
-                SynchronizeVersion(
-                    "test/Datadog.Trace.ClrProfiler.IntegrationTests/CI/XUnitTests.cs",
-                    FourPartAssertVersionReplace);
-
                 // Native clr profiler updates
                 SynchronizeVersion(
                     "src/Datadog.Trace.ClrProfiler.Native/CMakeLists.txt",
