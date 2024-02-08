@@ -151,7 +151,7 @@ jobs:
       run: |
         docker run --rm \
           --mount type=bind,source="${GITHUB_WORKSPACE}",target=/project \
-          --env NugetPackageDirectory=/project/$(relativeNugetPackageDirectory) \
+          --env NugetPackageDirectory=/project/${relativeNugetPackageDirectory} \
           --env tracerHome=/project/${relativeTracerHome} \
           --env artifacts=/project/${relativeArtifacts} \
           --env SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN} \
@@ -226,7 +226,7 @@ jobs:
       run: |
         docker run --rm \
           --mount type=bind,source="${GITHUB_WORKSPACE}",target=/project \
-          --env NugetPackageDirectory=/project/$(relativeNugetPackageDirectory) \
+          --env NugetPackageDirectory=/project/${relativeNugetPackageDirectory} \
           --env tracerHome=/project/${relativeTracerHome} \
           --env artifacts=/project/${relativeArtifacts} \
           --env SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN} \
@@ -301,7 +301,7 @@ jobs:
       run: |
         docker run --rm \
           --mount type=bind,source="${GITHUB_WORKSPACE}",target=/project \
-          --env NugetPackageDirectory=/project/$(relativeNugetPackageDirectory) \
+          --env NugetPackageDirectory=/project/${relativeNugetPackageDirectory} \
           --env tracerHome=/project/${relativeTracerHome} \
           --env artifacts=/project/${relativeArtifacts} \
           --env SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN} \
@@ -424,7 +424,7 @@ jobs:
       run: |
         docker run --rm \
           --mount type=bind,source="${GITHUB_WORKSPACE}",target=/project \
-          --env NugetPackageDirectory=/project/$(relativeNugetPackageDirectory) \
+          --env NugetPackageDirectory=/project/${relativeNugetPackageDirectory} \
           --env tracerHome=/project/${relativeTracerHome} \
           --env artifacts=/project/${relativeArtifacts} \
           --env SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN} \
