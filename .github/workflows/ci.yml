@@ -429,7 +429,7 @@ jobs:
           --env artifacts=/project/${relativeArtifacts} \
           --env SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN} \
           dd-trace-dotnet/${{ matrix.base-image }}-builder \
-          dotnet /build/bin/Debug/_build.dll Info Clean BuildTracerHome BuildLinuxIntegrationTests -Framework ${{ matrix.framework }}
+          /bin/sh -c 'git config --global --add safe.directory /project && ./tracer/build.sh Info Clean BuildTracerHome BuildLinuxIntegrationTests -Framework ${{ matrix.framework }}'
     - name: Build dependencies
       run: docker-compose build --build-arg SERVERLESS_ARTIFACTS_PATH=.${relativeTracerHome} StartDependencies
     - name: Start dependencies
