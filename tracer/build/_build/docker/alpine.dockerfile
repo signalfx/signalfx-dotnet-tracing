@@ -34,10 +34,7 @@ WORKDIR /project
 
 FROM base as builder
 
-# Copy the build project in and build it
 WORKDIR /project
-COPY . /build
-RUN dotnet build /build
 
 FROM base as tester
 
@@ -51,7 +48,4 @@ RUN curl -sSL https://dot.net/v1/dotnet-install.sh --output dotnet-install.sh \
     && ./dotnet-install.sh --runtime aspnetcore --version 6.0.11 --install-dir /usr/share/dotnet --no-path \
     && rm dotnet-install.sh
 
-# Copy the build project in and build it
 WORKDIR /project
-COPY . /build
-RUN dotnet build /build

@@ -34,7 +34,7 @@ jobs:
           --env tracerHome=/shared/bin/monitoring-home/tracer \
           --env artifacts=/project/tracer/src/bin/artifacts \
           dd-trace-dotnet/${baseImage}-builder \
-          dotnet /build/bin/Debug/_build.dll Clean BuildTracerHome ZipMonitoringHome
+          /bin/sh -c 'git config --global --add safe.directory /project && ./tracer/build.sh Clean BuildTracerHome ZipMonitoringHome'
     - name: Upload Linux x64 packages
       uses: actions/upload-artifact@v3.1.2
       with:

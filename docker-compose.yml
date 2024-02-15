@@ -512,7 +512,7 @@ services:
       args:
         - DOTNETSDK_VERSION=${dotnetCoreSdkLatestVersion:-7.0.202}
     image: dd-trace-dotnet/${baseImage:-centos7}-tester
-    command: dotnet /build/bin/Debug/_build.dll RunLinuxIntegrationTests --framework ${framework:-netcoreapp3.1} --code-coverage
+    command: /bin/sh -c './tracer/build.sh RunLinuxIntegrationTests --framework ${framework:-netcoreapp3.1} --code-coverage'
     volumes:
       - ./:/project
     environment:

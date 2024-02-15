@@ -151,12 +151,12 @@ jobs:
       run: |
         docker run --rm \
           --mount type=bind,source="${GITHUB_WORKSPACE}",target=/project \
-          --env NugetPackageDirectory=/project/$(relativeNugetPackageDirectory) \
+          --env NugetPackageDirectory=/project/${relativeNugetPackageDirectory} \
           --env tracerHome=/project/${relativeTracerHome} \
           --env artifacts=/project/${relativeArtifacts} \
           --env SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN} \
           dd-trace-dotnet/${{ matrix.base-image }}-builder \
-          dotnet /build/bin/Debug/_build.dll Clean BuildTracerHome ZipMonitoringHome
+          /bin/sh -c 'git config --global --add safe.directory /project && ./tracer/build.sh Clean BuildTracerHome ZipMonitoringHome'
     - name: Publish Linux x64-musl packages
       uses: actions/upload-artifact@v3.1.2
       with:
@@ -226,12 +226,12 @@ jobs:
       run: |
         docker run --rm \
           --mount type=bind,source="${GITHUB_WORKSPACE}",target=/project \
-          --env NugetPackageDirectory=/project/$(relativeNugetPackageDirectory) \
+          --env NugetPackageDirectory=/project/${relativeNugetPackageDirectory} \
           --env tracerHome=/project/${relativeTracerHome} \
           --env artifacts=/project/${relativeArtifacts} \
           --env SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN} \
           dd-trace-dotnet/${{ matrix.base-image }}-tester \
-          dotnet /build/bin/Debug/_build.dll Clean BuildTracerHome BuildAndRunManagedUnitTests
+          /bin/sh -c 'git config --global --add safe.directory /project && ./tracer/build.sh Clean BuildTracerHome BuildAndRunManagedUnitTests'
     - name: Publish managed tests results
       uses: actions/upload-artifact@v3.1.2
       with:
@@ -301,12 +301,12 @@ jobs:
       run: |
         docker run --rm \
           --mount type=bind,source="${GITHUB_WORKSPACE}",target=/project \
-          --env NugetPackageDirectory=/project/$(relativeNugetPackageDirectory) \
+          --env NugetPackageDirectory=/project/${relativeNugetPackageDirectory} \
           --env tracerHome=/project/${relativeTracerHome} \
           --env artifacts=/project/${relativeArtifacts} \
           --env SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN} \
           dd-trace-dotnet/${{ matrix.base-image }}-builder \
-          dotnet /build/bin/Debug/_build.dll Clean BuildTracerHome BuildAndRunNativeUnitTests
+          /bin/sh -c 'git config --global --add safe.directory /project && ./tracer/build.sh Clean BuildTracerHome BuildAndRunNativeUnitTests'
     - name: Publish native tests results
       uses: actions/upload-artifact@v3.1.2
       with:
@@ -424,12 +424,12 @@ jobs:
       run: |
         docker run --rm \
           --mount type=bind,source="${GITHUB_WORKSPACE}",target=/project \
-          --env NugetPackageDirectory=/project/$(relativeNugetPackageDirectory) \
+          --env NugetPackageDirectory=/project/${relativeNugetPackageDirectory} \
           --env tracerHome=/project/${relativeTracerHome} \
           --env artifacts=/project/${relativeArtifacts} \
           --env SIGNALFX_CLR_ENABLE_NGEN=${SIGNALFX_CLR_ENABLE_NGEN} \
           dd-trace-dotnet/${{ matrix.base-image }}-builder \
-          dotnet /build/bin/Debug/_build.dll Info Clean BuildTracerHome BuildLinuxIntegrationTests -Framework ${{ matrix.framework }}
+          /bin/sh -c 'git config --global --add safe.directory /project && ./tracer/build.sh Info Clean BuildTracerHome BuildLinuxIntegrationTests -Framework ${{ matrix.framework }}'
     - name: Build dependencies
       run: docker-compose build --build-arg SERVERLESS_ARTIFACTS_PATH=.${relativeTracerHome} StartDependencies
     - name: Start dependencies
