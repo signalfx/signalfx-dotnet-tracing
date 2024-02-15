@@ -46,9 +46,9 @@ namespace UpdateVendors
 
             Add(
                 libraryName: "MessagePack",
-                version: "1.9.3",
-                downloadUrl: "https://github.com/neuecc/MessagePack-CSharp/archive/v1.9.3.zip",
-                pathToSrc: new[] { "MessagePack-CSharp-1.9.3", "src", "MessagePack" },
+                version: "1.9.11",
+                downloadUrl: "https://github.com/neuecc/MessagePack-CSharp/archive/refs/tags/v1.9.11.zip",
+                pathToSrc: new[] { "MessagePack-CSharp-1.9.11", "src", "MessagePack" },
                 transform: filePath => RewriteCsFileWithStandardTransform(filePath, originalNamespace: "MessagePack"));
 
             Add(
@@ -222,6 +222,42 @@ namespace UpdateVendors
                             builder.Replace("\"ProtoBuf.ProtoMapAttribute\"", "\"Datadog.Trace.Vendors.ProtoBuf.ProtoMapAttribute\"");
                             builder.Replace("\"ProtoBuf.ProtoIgnoreAttribute\"", "\"Datadog.Trace.Vendors.ProtoBuf.ProtoIgnoreAttribute\"");
                             builder.Replace("\"ProtoBuf.ProtoMemberAttribute\"", "\"Datadog.Trace.Vendors.ProtoBuf.ProtoMemberAttribute\"");
+                        }
+                        // Special MessagePack processing
+                        if (originalNamespace.StartsWith("MessagePack"))
+                        {
+                            var fileName = Path.GetFileNameWithoutExtension(filePath);
+                            if (fileName == "StandardClassLibraryFormatter")
+                            {
+                                builder.Replace("    public sealed class ValueTaskFormatter<T>", "#if NETCOREAPP\n    public sealed class ValueTaskFormatter<T>");
+                                builder.Replace("    }\n\n#endif\n}", "    }\n#endif\n\n#endif\n}");
+                            }
+                            else if (fileName == "ValueTupleFormatter")
+                            {
+                                builder.Replace("#if NETSTANDARD || NETFRAMEWORK", "#if NETSTANDARD || NETCOREAPP");
+                            }
+                            else if (fileName == "DynamicAssembly")
+                            {
+                                builder.Replace("#if NETSTANDARD || NETFRAMEWORK", "#if NETSTANDARD || NETFRAMEWORK || NETCOREAPP");
+                            }
+                            else if (fileName == "LZ4Codec.Helper")
+                            {
+                                builder.Replace("#if NETSTANDARD || NETFRAMEWORK", "#if ENABLE_UNSAFE_MSGPACK");
+                            }
+                            else if (fileName == "StandardResolver")
+                            {
+                                builder.Replace("#if !(NETSTANDARD || NETFRAMEWORK)", "#if !(NETSTANDARD || NETFRAMEWORK || NETCOREAPP)");
+                            }
+                            else if (fileName == "DynamicGenericResolver")
+                            {
+                                builder.Replace("                // ValueTask", "#if NETCOREAPP\n                // ValueTask");
+                                builder.Replace("                // ValueTuple", "#if NETCOREAPP\n                // ValueTuple");
+                                builder.Replace("                // Tuple", "#endif\n                // Tuple");
+                                builder.Replace("                // ArraySegement", "#endif\n                // ArraySegment");
+                                builder.Replace("GetTypeInfo().IsConstructedGenericType()", "IsConstructedGenericType");
+                            }
+
+                            builder.Replace("#if NETSTANDARD || NETFRAMEWORK\n        [System.Runtime.CompilerServices.MethodImpl", "#if NETSTANDARD || NETFRAMEWORK || NETCOREAPP\n        [System.Runtime.CompilerServices.MethodImpl");
                         }
 
                         // Debugger.Break() is a dangerous method that may crash the process. We don't
