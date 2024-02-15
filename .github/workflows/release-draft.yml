@@ -15,7 +15,7 @@ jobs:
     timeout-minutes: 30
     env:
       baseImage: ${{ matrix.baseImage }}
-      dotnetSdkVersion: 8.0.101
+      dotnetSdkVersion: 8.0.200
     steps:
     - uses: actions/checkout@v3.5.3
     - name: Build Docker image
@@ -54,9 +54,9 @@ jobs:
             2.1.818
             3.1.426
             5.0.408
-            6.0.418
+            6.0.419
             7.0.202
-            8.0.101
+            8.0.200
 
       - run: tracer\build.cmd Clean BuildTracerHome PackageTracerHome
         shell: cmd

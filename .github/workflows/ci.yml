@@ -78,9 +78,9 @@ jobs:
           2.1.818
           3.1.426
           5.0.408
-          6.0.418
+          6.0.419
           7.0.202
-          8.0.101
+          8.0.200
 
     - name: Install CMake 3.19.8
       if: ${{ runner.os == 'Linux' }}
@@ -135,9 +135,9 @@ jobs:
         dotnet-version: | 
           2.1.818
           3.1.426
-          6.0.418
+          6.0.419
           7.0.202
-          8.0.101
+          8.0.200
 
     - name: Build Docker image
       run: |
@@ -183,9 +183,9 @@ jobs:
         dotnet-version: | 
           2.1.818
           3.1.426
-          6.0.418
+          6.0.419
           7.0.202
-          8.0.101
+          8.0.200
 
     - run: ./tracer/build.cmd Clean BuildTracerHome BuildAndRunManagedUnitTests
     - uses: actions/upload-artifact@v3.1.2
@@ -210,9 +210,9 @@ jobs:
         dotnet-version: | 
           2.1.818
           3.1.426
-          6.0.418
+          6.0.419
           7.0.202
-          8.0.101
+          8.0.200
 
     - name: Build Docker image
       run: |
@@ -258,9 +258,9 @@ jobs:
         dotnet-version: | 
           2.1.818
           3.1.426
-          6.0.418
+          6.0.419
           7.0.202
-          8.0.101
+          8.0.200
 
     - name: Install CMake 3.19.8
       if: ${{ runner.os == 'Linux' }}
@@ -285,9 +285,9 @@ jobs:
         dotnet-version: | 
           2.1.818
           3.1.426
-          6.0.418
+          6.0.419
           7.0.202
-          8.0.101
+          8.0.200
 
     - name: Build Docker image
       run: |
@@ -336,9 +336,9 @@ jobs:
         dotnet-version: | 
           2.1.818
           3.1.426
-          6.0.418
+          6.0.419
           7.0.202
-          8.0.101
+          8.0.200
 
     # Cosmos is _way_ to flaky at the moment. Try enabling again at a later time
     # - name: Start CosmosDB Emulator
@@ -396,9 +396,9 @@ jobs:
         dotnet-version: | 
           2.1.818
           3.1.426
-          6.0.418
+          6.0.419
           7.0.202
-          8.0.101
+          8.0.200
 
     - name: Remove large node images
       run: docker rmi node:20 node:18 node:16
@@ -471,9 +471,9 @@ jobs:
         dotnet-version: | 
           2.1.818
           3.1.426
-          6.0.418
+          6.0.419
           7.0.202
-          8.0.101
+          8.0.200
 
     - name: install Microsoft.Net.Component.4.6.1.TargetingPack
       run: |
@@ -522,9 +522,9 @@ jobs:
         dotnet-version: |
           2.1.818
           3.1.426
-          6.0.418
+          6.0.419
           7.0.202
-          8.0.101
+          8.0.200
 
     - name: install Microsoft.Net.Component.4.6.1.TargetingPack
       run: |
