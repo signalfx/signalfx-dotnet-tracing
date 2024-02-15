@@ -1,5 +1,5 @@
 ARG DOTNETSDK_VERSION
-FROM mcr.microsoft.com/dotnet/sdk:$DOTNETSDK_VERSION-alpine3.18 as base
+FROM mcr.microsoft.com/dotnet/sdk:$DOTNETSDK_VERSION-alpine3.16 as base
 
 # SECURITY NOTE: Exception is made for APK packages, 
 # no need to lock versions
