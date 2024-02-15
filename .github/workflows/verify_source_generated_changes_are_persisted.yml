@@ -17,7 +17,7 @@ jobs:
 
       - uses: actions/setup-dotnet@v3.2.0
         with:
-          dotnet-version: '8.0.100'
+          dotnet-version: '8.0.200'
 
       - name: "Removing existing generated files"
         run: Get-ChildItem –Path ".\tracer\src\Datadog.Trace\Generated" -Recurse -File | Remove-Item
