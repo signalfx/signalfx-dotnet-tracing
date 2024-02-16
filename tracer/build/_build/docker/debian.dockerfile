@@ -46,7 +46,7 @@ RUN apt-get update \
 # Install the .NET SDK
 RUN curl -sSL https://dot.net/v1/dotnet-install.sh --output dotnet-install.sh  \
     && echo "SHA256: $(sha256sum dotnet-install.sh)" \
-    && echo "ff2ff47318ffff0af9a6395ca6308b54376fba8c97a3a5eba3e848b0caf17b58  dotnet-install.sh" | sha256sum -c \
+    && echo "5eb82d8578f55cdadcb2edfd35ec649a2c6fc11a682e876b1cd68077badbf794  dotnet-install.sh" | sha256sum -c \
     && chmod +x ./dotnet-install.sh \
     && ./dotnet-install.sh --version $DOTNETSDK_VERSION --install-dir /usr/share/dotnet \
     && rm ./dotnet-install.sh \
@@ -76,7 +76,7 @@ RUN if [ "$(uname -m)" = "x86_64" ]; \
     fi \
     && curl -sSL https://dot.net/v1/dotnet-install.sh --output dotnet-install.sh \
     && echo "SHA256: $(sha256sum dotnet-install.sh)" \
-    && echo "ff2ff47318ffff0af9a6395ca6308b54376fba8c97a3a5eba3e848b0caf17b58  dotnet-install.sh" | sha256sum -c \
+    && echo "5eb82d8578f55cdadcb2edfd35ec649a2c6fc11a682e876b1cd68077badbf794  dotnet-install.sh" | sha256sum -c \
     && chmod +x ./dotnet-install.sh \
     && ./dotnet-install.sh --runtime $NETCORERUNTIME2_1 --version 2.1.30 --install-dir /usr/share/dotnet --no-path \
     && ./dotnet-install.sh --runtime aspnetcore --version 3.1.31 --install-dir /usr/share/dotnet --no-path \
