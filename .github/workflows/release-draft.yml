@@ -55,7 +55,7 @@ jobs:
             3.1.426
             5.0.408
             6.0.419
-            7.0.202
+            7.0.406
             8.0.200
 
       - run: tracer\build.cmd Clean BuildTracerHome PackageTracerHome
