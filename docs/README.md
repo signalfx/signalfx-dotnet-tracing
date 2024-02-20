@@ -1,5 +1,5 @@
 > # :warning: Deprecation Notice
-> **The SignalFx Instrumentation for .NET is deprecated as of  February 21, 2024 and will reach End of Support on February 21 2025. Until then, only critical security fixes and bug fixes will be provided. After the date, this repository will be archived and no longer maintained.**
+> **The SignalFx Instrumentation for .NET is deprecated as of February 21, 2024 and will reach End of Support on February 21 2025. Until then, only critical security fixes and bug fixes will be provided. After the date, this repository will be archived and no longer maintained.**
 > New customers instrumenting the .NET ecosystem should use [Splunk Distribution of OpenTelemetry .NET](https://github.com/signalfx/splunk-otel-dotnet). Existing customers should consider migrating to [Splunk Distribution of OpenTelemetry .NET](https://github.com/signalfx/splunk-otel-dotnet) which offers similar capabilities. To learn how to migrate, see [migration guide](https://docs.splunk.com/observability/en/gdi/get-data-in/application/otel-dotnet/troubleshooting/migrate-signalfx-dotnet-to-dotnet-otel.html).
 
 # SignalFx Instrumentation for .NET
