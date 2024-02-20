@@ -1,4 +1,6 @@
->ℹ️&nbsp;&nbsp;SignalFx was acquired by Splunk in October 2019. See [Splunk SignalFx](https://www.splunk.com/en_us/investor-relations/acquisitions/signalfx.html) for more information.
+> # :warning: Deprecation Notice
+> **The SignalFx Instrumentation for .NET is deprecated as of  February 21, 2024 and will reach End of Support on February 21 2025. Until then, only critical security fixes and bug fixes will be provided. After the date, this repository will be archived and no longer maintained.**
+> New customers instrumenting the .NET ecosystem should use [Splunk Distribution of OpenTelemetry .NET](https://github.com/signalfx/splunk-otel-dotnet). Existing customers should consider migrating to [Splunk Distribution of OpenTelemetry .NET](https://github.com/signalfx/splunk-otel-dotnet) which offers similar capabilities. To learn how to migrate, see [migration guide](https://docs.splunk.com/observability/en/gdi/get-data-in/application/otel-dotnet/troubleshooting/migrate-signalfx-dotnet-to-dotnet-otel.html).
 
 # SignalFx Instrumentation for .NET
 
@@ -199,3 +201,5 @@ It is licensed under the terms of the Apache Software License version 2.0.
 For more details, see [the license file](../LICENSE).
 
 The third-party dependencies list can be found [here](../LICENSE-3rdparty.csv).
+
+>ℹ️&nbsp;&nbsp;SignalFx was acquired by Splunk in October 2019. See [Splunk SignalFx](https://www.splunk.com/en_us/investor-relations/acquisitions/signalfx.html) for more information.
