@@ -71,7 +71,7 @@ jobs:
     - name: Support Windows long paths
       if: ${{ runner.os == 'Windows' }}
       run: git config --system core.longpaths true
-    - uses: actions/checkout@v3.5.3
+    - uses: actions/checkout@v4.1.2
     - uses: actions/setup-dotnet@v3.2.0
       with:
         dotnet-version: | 
@@ -129,7 +129,7 @@ jobs:
     runs-on: ubuntu-20.04
     timeout-minutes: 60
     steps:
-    - uses: actions/checkout@v3.5.3
+    - uses: actions/checkout@v4.1.2
     - uses: actions/setup-dotnet@v3.2.0
       with:
         dotnet-version: | 
@@ -177,7 +177,7 @@ jobs:
     - name: Support Windows long paths
       if: ${{ runner.os == 'Windows' }}
       run: git config --system core.longpaths true
-    - uses: actions/checkout@v3.5.3
+    - uses: actions/checkout@v4.1.2
     - uses: actions/setup-dotnet@v3.2.0
       with:
         dotnet-version: | 
@@ -204,7 +204,7 @@ jobs:
     runs-on: ubuntu-20.04
     timeout-minutes: 60
     steps:
-    - uses: actions/checkout@v3.5.3
+    - uses: actions/checkout@v4.1.2
     - uses: actions/setup-dotnet@v3.2.0
       with:
         dotnet-version: | 
@@ -252,7 +252,7 @@ jobs:
     - name: Support Windows long paths
       if: ${{ runner.os == 'Windows' }}
       run: git config --system core.longpaths true
-    - uses: actions/checkout@v3.5.3
+    - uses: actions/checkout@v4.1.2
     - uses: actions/setup-dotnet@v3.2.0
       with:
         dotnet-version: | 
@@ -279,7 +279,7 @@ jobs:
     runs-on: ubuntu-20.04
     timeout-minutes: 60
     steps:
-    - uses: actions/checkout@v3.5.3
+    - uses: actions/checkout@v4.1.2
     - uses: actions/setup-dotnet@v3.2.0
       with:
         dotnet-version: | 
@@ -330,7 +330,7 @@ jobs:
     - name: Support Windows long paths
       if: ${{ runner.os == 'Windows' }}
       run: git config --system core.longpaths true
-    - uses: actions/checkout@v3.5.3
+    - uses: actions/checkout@v4.1.2
     - uses: actions/setup-dotnet@v3.2.0
       with:
         dotnet-version: | 
@@ -390,7 +390,7 @@ jobs:
     runs-on: ubuntu-20.04
     timeout-minutes: 60
     steps:
-    - uses: actions/checkout@v3.5.3
+    - uses: actions/checkout@v4.1.2
     - uses: actions/setup-dotnet@v3.2.0
       with:
         dotnet-version: | 
@@ -465,7 +465,7 @@ jobs:
     - name: Support Windows long paths
       if: ${{ runner.os == 'Windows' }}
       run: git config --system core.longpaths true
-    - uses: actions/checkout@v3.5.3
+    - uses: actions/checkout@v4.1.2
     - uses: actions/setup-dotnet@v3.2.0
       with:
         dotnet-version: | 
@@ -516,7 +516,7 @@ jobs:
     - name: Support Windows long paths
       if: ${{ runner.os == 'Windows' }}
       run: git config --system core.longpaths true
-    - uses: actions/checkout@v3.5.3
+    - uses: actions/checkout@v4.1.2
     - uses: actions/setup-dotnet@v3.2.0
       with:
         dotnet-version: |
