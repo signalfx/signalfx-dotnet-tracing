@@ -13,7 +13,7 @@ jobs:
         run: git config --system core.longpaths true
 
       - name: Checkout
-        uses: actions/checkout@v3.5.3
+        uses: actions/checkout@v4.1.6
 
       - uses: actions/setup-dotnet@v3.2.0
         with:
