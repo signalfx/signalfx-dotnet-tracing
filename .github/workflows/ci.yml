@@ -91,31 +91,31 @@ jobs:
     - name: Build tracer home
       run: ./tracer/build.cmd Clean BuildTracerHome PackageTracerHome
     - name: Publish Tracer
-      uses: actions/upload-artifact@v3.1.2
+      uses: actions/upload-artifact@v4.3.5
       with:
         path: ${{ env.tracerHome }}
         name: ${{ matrix.machine }}-tracer-home
     - name: Publish Windows x86 MSI
       if: ${{ runner.os == 'Windows' }}
-      uses: actions/upload-artifact@v3.1.2
+      uses: actions/upload-artifact@v4.3.5
       with:
         path: ${{ env.artifacts }}/x86/en-us
         name: windows-msi-x86
     - name: Publish Windows x64 MSI
       if: ${{ runner.os == 'Windows' }}
-      uses: actions/upload-artifact@v3.1.2
+      uses: actions/upload-artifact@v4.3.5
       with:
         path: ${{ env.artifacts }}/x64/en-us
         name: windows-msi-x64
     - name: Publish Linux x64 packages
       if: ${{ runner.os == 'Linux' }}
-      uses: actions/upload-artifact@v3.1.2
+      uses: actions/upload-artifact@v4.3.5
       with:
         path: ${{ env.artifacts }}/linux-x64
         name: linux-x64-packages
     - name: Publish NuGet packages
       if: ${{ runner.os == 'Windows' }}
-      uses: actions/upload-artifact@v3.1.2
+      uses: actions/upload-artifact@v4.3.5
       with:
         path: ${{ env.artifacts }}/nuget/SignalFx.NET.Tracing.Azure.Site.Extension.*.nupkg
         name: nuget-packages
@@ -158,7 +158,7 @@ jobs:
           dd-trace-dotnet/${{ matrix.base-image }}-builder \
           /bin/sh -c 'git config --global --add safe.directory /project && ./tracer/build.sh Clean BuildTracerHome ZipMonitoringHome'
     - name: Publish Linux x64-musl packages
-      uses: actions/upload-artifact@v3.1.2
+      uses: actions/upload-artifact@v4.3.5
       with:
         path: ${{ env.artifacts }}/linux-x64
         name: linux-x64-musl-packages
@@ -188,7 +188,7 @@ jobs:
           8.0.200
 
     - run: ./tracer/build.cmd Clean BuildTracerHome BuildAndRunManagedUnitTests
-    - uses: actions/upload-artifact@v3.1.2
+    - uses: actions/upload-artifact@v4.3.5
       with:
         name: ${{ matrix.machine }}-managed-unit-tests-build_data
         path: tracer/build_data
@@ -233,7 +233,7 @@ jobs:
           dd-trace-dotnet/${{ matrix.base-image }}-tester \
           /bin/sh -c 'git config --global --add safe.directory /project && ./tracer/build.sh Clean BuildTracerHome BuildAndRunManagedUnitTests'
     - name: Publish managed tests results
-      uses: actions/upload-artifact@v3.1.2
+      uses: actions/upload-artifact@v4.3.5
       with:
         name: ${{ matrix.base-image }}-managed-unit-tests-build_data
         path: tracer/build_data
@@ -308,7 +308,7 @@ jobs:
           dd-trace-dotnet/${{ matrix.base-image }}-builder \
           /bin/sh -c 'git config --global --add safe.directory /project && ./tracer/build.sh Clean BuildTracerHome BuildAndRunNativeUnitTests'
     - name: Publish native tests results
-      uses: actions/upload-artifact@v3.1.2
+      uses: actions/upload-artifact@v4.3.5
       with:
         name: ${{ matrix.base-image }}-native-unit-tests-build_data
         path: tracer/build_data
@@ -373,7 +373,7 @@ jobs:
         subst y: .
         y:
         ./tracer/build.cmd BuildTracerHome ${{ matrix.target }} -Framework ${{ matrix.framework }} -TargetPlatform ${{ matrix.platform }} --PrintDriveSpace
-    - uses: actions/upload-artifact@v3.1.2
+    - uses: actions/upload-artifact@v4.3.5
       with:
         name: ${{ matrix.machine }}-integration-tests-${{ matrix.platform }}-${{ matrix.framework }}-${{ matrix.target }}-build_data
         path: tracer/build_data
@@ -445,7 +445,7 @@ jobs:
     - name: docker-compose stop services
       run: docker-compose down
       if: (${{ job.status }} != 'cancelled')
-    - uses: actions/upload-artifact@v3.1.2
+    - uses: actions/upload-artifact@v4.3.5
       with:
         name: ${{ matrix.base-image }}-integration-tests-${{ matrix.framework }}-build_data
         path: tracer/build_data
@@ -496,7 +496,7 @@ jobs:
           }
     - name: RunWindowsTracerIisIntegrationTests
       run: ./tracer/build.cmd BuildTracerHome BuildAspNetIntegrationTests RunWindowsTracerIisIntegrationTests -Framework ${{ matrix.framework }}
-    - uses: actions/upload-artifact@v3.1.2
+    - uses: actions/upload-artifact@v4.3.5
       with:
         name: windows-tracer-iis-integration-tests-${{ matrix.platform }}-build_data
         path: tracer/build_data
@@ -552,7 +552,7 @@ jobs:
     - name: docker-compose stop services
       run: docker-compose down
       if: (${{ job.status }} != 'cancelled')
-    - uses: actions/upload-artifact@v3.1.2
+    - uses: actions/upload-artifact@v4.3.5
       with:
         name: windows-msi-integration-tests-${{ matrix.platform }}-build_data
         path: tracer/build_data
