@@ -36,7 +36,7 @@ jobs:
           dd-trace-dotnet/${baseImage}-builder \
           /bin/sh -c 'git config --global --add safe.directory /project && ./tracer/build.sh Clean BuildTracerHome ZipMonitoringHome'
     - name: Upload Linux x64 packages
-      uses: actions/upload-artifact@v3.1.2
+      uses: actions/upload-artifact@v4.3.6
       with:
         name: artifacts
         path: ./tracer/src/bin/artifacts/linux-x64
@@ -61,19 +61,19 @@ jobs:
       - run: tracer\build.cmd Clean BuildTracerHome PackageTracerHome
         shell: cmd
       - name: Upload Windows MSI
-        uses: actions/upload-artifact@v3.1.2
+        uses: actions/upload-artifact@v4.3.6
         with:
           name: artifacts
           path: |
             tracer/bin/artifacts/*/en-us
             Splunk.SignalFx.DotNet.psm1
       - name: Upload NuGet packages
-        uses: actions/upload-artifact@v3.1.2
+        uses: actions/upload-artifact@v4.3.6
         with:
           name: nuget
           path: tracer/bin/artifacts/nuget/SignalFx.NET.Tracing.Azure.Site.Extension.*.nupkg
       - name: Upload Windows Zip package
-        uses: actions/upload-artifact@v3.1.2
+        uses: actions/upload-artifact@v4.3.6
         with:
           name: zip
           path: tracer/bin/artifacts/signalfx-dotnet-tracing-*.zip
