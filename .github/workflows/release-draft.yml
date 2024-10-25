@@ -48,7 +48,7 @@ jobs:
     steps:
       - run: git config --system core.longpaths true
       - uses: actions/checkout@v3.5.3
-      - uses: actions/setup-dotnet@v3.2.0
+      - uses: actions/setup-dotnet@v4.1.0
         with:
           dotnet-version: | 
             2.1.818
