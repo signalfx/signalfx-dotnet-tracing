@@ -1,7 +1,7 @@
 > # :warning: End of Support (EOS) Notice
-> **The SignalFx Java Agent has reached End of Support and has been permanently archived.**
+> **The SignalFx Instrumentation for .NET has reached End of Support and has been permanently archived.**
 >
->The [Splunk Distribution of OpenTelemetry .NET]([https://github.com/signalfx/splunk-otel-java](https://github.com/signalfx/splunk-otel-dotnet)) is the successor.
+> The [Splunk Distribution of OpenTelemetry .NET]([https://github.com/signalfx/splunk-otel-java](https://github.com/signalfx/splunk-otel-dotnet)) is the successor.
 > To learn how to migrate, see [Migrate from the SignalFx .NET Instrumentation](https://docs.splunk.com/observability/en/gdi/get-data-in/application/otel-dotnet/troubleshooting/migrate-signalfx-dotnet-to-dotnet-otel.html).
 ---
 
